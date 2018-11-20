@@ -4,6 +4,7 @@
 """ggrc.views
 Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 """
+# pylint: disable=too-many-lines
 
 import collections
 import json
@@ -21,6 +22,7 @@ from ggrc.cache import utils as cache_utils
 from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
 from ggrc.models import background_task, reflection, revision
+from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
 from ggrc.query import views as query_views
 from ggrc.rbac import permissions
@@ -176,7 +178,10 @@ def run_issues_generation(task):
     from ggrc.integrations import issuetracker_bulk_sync
     bulk_creator = issuetracker_bulk_sync.IssueTrackerBulkCreator()
     params = getattr(task, "parameters", {})
-    return bulk_creator.sync_issuetracker(params)
+    (_, errors) = bulk_creator.sync_issuetracker(params)
+    if errors is None:
+      errors = []
+    return bulk_creator.make_response(errors)
   except integrations_errors.Error as error:
     logger.error('Bulk issue generation failed with error: %s', error.message)
     raise exceptions.BadRequest(error.message)
@@ -190,14 +195,64 @@ def run_issues_update(task):
   """Update linked IssueTracker issues for provided objects."""
   try:
     from ggrc.integrations import issuetracker_bulk_sync
-    comment_updater = issuetracker_bulk_sync.IssueTrackerCommentUpdater()
     bulk_updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
     params = getattr(task, "parameters", {})
-    comment_updater.sync_issuetracker(params)
-    return bulk_updater.sync_issuetracker(params)
+    (_, errors) = bulk_updater.sync_issuetracker(params)
+    if errors is None:
+      errors = []
+    return bulk_updater.make_response(errors)
   except integrations_errors.Error as error:
     logger.error('Bulk issue update failed with error: %s', error.message)
     raise exceptions.BadRequest(error.message)
+
+
+@app.route(
+    "/_background_tasks/background_issues_update", methods=["POST"]
+)
+@background_task.queued_task
+def background_issues_update(task):
+  """Update linked IssueTracker issues for provided objects."""
+  # pylint: disable=too-many-locals
+  try:
+    from ggrc.integrations import issuetracker_bulk_sync
+    comment_updater = issuetracker_bulk_sync.IssueTrackerCommentUpdater()
+    bulk_updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
+    bulk_creator = issuetracker_bulk_sync.IssueTrackerBulkCreator()
+    params = getattr(task, "parameters", {})
+    revision_ids = params.get("revision_ids")
+    mail_data = params.get("mail_data")
+    update_args = integration_utils.build_updated_objects_args(revision_ids,
+                                                               mail_data)
+    update_errors = None
+    if update_args.get("objects"):
+      (_, update_errors) = bulk_updater.sync_issuetracker(update_args)
+
+    create_args = integration_utils.build_created_objects_args(revision_ids,
+                                                               mail_data)
+    create_errors = None
+    if create_args.get("objects"):
+      (_, create_errors) = bulk_creator.sync_issuetracker(create_args)
+
+    comment_args = integration_utils.build_comments_args(revision_ids,
+                                                         mail_data)
+    if comment_args.get("comments"):
+      comment_updater.sync_issuetracker(comment_args)
+
+    errors = _merge_errors(create_errors, update_errors)
+    return bulk_creator.make_response(errors)
+  except integrations_errors.Error as error:
+    logger.error('Bulk issue update failed with error: %s', error.message)
+    raise exceptions.BadRequest(error.message)
+
+
+def _merge_errors(create_errors, update_errors):
+  """Merge errors for bulk update and create."""
+  if create_errors is None:
+    errors = [] if update_errors is None else update_errors
+  else:
+    errors = create_errors.extend(update_errors) \
+        if update_errors else create_errors
+  return errors
 
 
 def start_compute_attributes(revision_ids=None, event_id=None):
@@ -858,25 +913,6 @@ def generate_issues():
   return bg_task.task_scheduled_response()
 
 
-def background_generate_issues(parameters=None):
-  """Bulk generate linked issuetracker issues for provided objects.
-
-  This function creates issuetracker tickets for all provided objects
-  (if such tickets haven't been created before). Can be called inside import
-  task.
-  """
-  method = "POST"
-  validate_bulk_sync_data(parameters)
-  bg_task = background_task.create_task(
-      "generate_issues",
-      "/_background_tasks/run_issues_generation",
-      run_issues_generation,
-      parameters=parameters,
-      method=method,
-  )
-  return bg_task.task_scheduled_response()
-
-
 @app.route("/update_issues", methods=["POST"])
 @login.login_required
 def update_issues():
@@ -903,11 +939,10 @@ def background_update_issues(parameters=None):
   task.
   """
   method = "POST"
-  validate_bulk_sync_data(parameters)
   bg_task = background_task.create_task(
       "update_issues",
-      "/_background_tasks/run_issues_update",
-      run_issues_update,
+      "/_background_tasks/background_issues_update",
+      background_issues_update,
       parameters=parameters,
       method=method,
   )

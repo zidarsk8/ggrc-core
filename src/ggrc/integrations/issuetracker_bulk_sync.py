@@ -107,10 +107,11 @@ class IssueTrackerBulkCreator(object):
       )
     except:  # pylint: disable=bare-except
       self.send_notification(filename, recipient, failed=True)
+      return (None, None)
     else:
       if created or errors:
         self.send_notification(filename, recipient, errors=errors)
-    return self.make_response(errors)
+    return (created, errors)
 
   @staticmethod
   def group_objs_by_type(object_data):

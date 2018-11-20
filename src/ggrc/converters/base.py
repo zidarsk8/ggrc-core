@@ -7,10 +7,8 @@ from collections import defaultdict
 from flask import g
 from google.appengine.ext import deferred
 
-from ggrc import db
 from ggrc import login
 from ggrc import settings
-from ggrc.models import all_models
 from ggrc.utils import benchmark
 from ggrc.utils import structures
 from ggrc.cache.memcache import MemCache
@@ -100,115 +98,20 @@ class ImportConverter(BaseConverter):
 
   def _start_issuetracker_update(self, revision_ids):
     """Create or update issuetracker tickets for all imported instances."""
-    issuetracked_models = ["Assessment", "Issue"]
 
-    objects = self._collect_issuetracked_objects(revision_ids,
-                                                 issuetracked_models)
-    comments = self._collect_comments(revision_ids, issuetracked_models)
+    arg_list = {"revision_ids": revision_ids}
 
-    if not (objects or comments):
-      return
-
-    arg_list = {
-        "objects": [{"type": obj[0], "id": int(obj[1])} for obj in objects],
-        "comments": [{
-            "type": obj[0],
-            "id": int(obj[1]),
-            "comment_description": obj[2]
-        } for obj in comments]
-    }
     filename = getattr(self.ie_job, "title", '')
     user_email = getattr(self.user, "email", '')
     mail_data = {
         "filename": filename,
         "user_email": user_email,
     }
+
     arg_list["mail_data"] = mail_data
 
     from ggrc import views
     views.background_update_issues(parameters=arg_list)
-    views.background_generate_issues(parameters=arg_list)
-
-  @staticmethod
-  def _collect_issuetracked_objects(revision_ids, issuetracked_models):
-    """Collect all issuetracked models and issuetracker issues.
-
-    Args:
-        revision_ids: list of revision ids for all objects that were imported.
-        issuetracked_models: list of all issuetracked models that should be
-          filtered.
-    Returns:
-        list of issuetracked objects that were imported.
-    """
-
-    revisions = all_models.Revision
-    iti = all_models.IssuetrackerIssue
-
-    issue_tracked_objects = db.session.query(
-        revisions.resource_type,
-        revisions.resource_id,
-    ).filter(
-        revisions.resource_type.in_(issuetracked_models),
-        revisions.id.in_(revision_ids)
-    )
-
-    iti_related_objects = db.session.query(
-        iti.object_type,
-        iti.object_id,
-    ).join(
-        revisions,
-        revisions.resource_id == iti.id,
-    ).filter(
-        revisions.resource_type == "IssuetrackerIssue",
-        revisions.id.in_(revision_ids),
-        iti.object_type.in_(issuetracked_models),
-    )
-
-    return issue_tracked_objects.union(iti_related_objects).all()
-
-  @staticmethod
-  def _collect_comments(revision_ids, issuetracked_models):
-    """Collect all comments to issuetracked models.
-
-       Args:
-           revision_ids: list of revision ids for all objects that were
-             imported.
-           issuetracked_models: list of all issuetracked models that should be
-             filtered.
-       Returns:
-           list of comments that were imported.
-     """
-    revisions = all_models.Revision
-    comments = all_models.Comment
-
-    imported_comments_src = db.session.query(
-        revisions.destination_type,
-        revisions.destination_id,
-        comments.description,
-    ).join(
-        comments,
-        revisions.source_id == comments.id,
-    ).filter(
-        revisions.resource_type == "Relationship",
-        revisions.source_type == "Comment",
-        revisions.id.in_(revision_ids),
-        revisions.destination_type.in_(issuetracked_models)
-    )
-
-    imported_comments_dst = db.session.query(
-        revisions.source_type,
-        revisions.source_id,
-        comments.description,
-    ).join(
-        comments,
-        revisions.destination_id == comments.id,
-    ).filter(
-        revisions.resource_type == "Relationship",
-        revisions.destination_type == "Comment",
-        revisions.id.in_(revision_ids),
-        revisions.source_type.in_(issuetracked_models)
-    )
-    return imported_comments_dst.union(imported_comments_src).all()
 
   def _start_compute_attributes_job(self, revision_ids):
     if revision_ids:
