@@ -436,7 +436,9 @@ class ImportRowConverter(RowConverter):
       return
     for secondary_object in self.objects.values():
       secondary_object.insert_object()
-    if self.issue_tracker:
+    if issubclass(self.obj.__class__, issue_tracker.IssueTracked):
+      if not self.issue_tracker:
+        self.issue_tracker = self.obj.issue_tracker
       all_models.IssuetrackerIssue.create_or_update_from_dict(
           self.obj, self.issue_tracker
       )
