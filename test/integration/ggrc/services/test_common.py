@@ -83,14 +83,15 @@ class TestServices(TestCase):
     self.assert404(response)
 
   def test_collection_put(self):
-    self.assert_allow(
-        self.client.put(self.mock_url(), headers=self.get_headers()),
-        COLLECTION_ALLOWED)
+    response = self.client.put(self.mock_url(), headers=self.get_headers())
+    self.assert_allow(response, COLLECTION_ALLOWED)
 
   def test_collection_delete(self):
-    self.assert_allow(
-        self.client.delete(self.mock_url(), headers=self.get_headers()),
-        COLLECTION_ALLOWED)
+    response = self.client.delete(
+        self.mock_url(),
+        headers=self.get_headers()
+    )
+    self.assert_allow(response, COLLECTION_ALLOWED)
 
   def _prepare_model_for_put(self, foo_param="buzz"):
     """Common object initializing sequence."""

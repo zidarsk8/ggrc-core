@@ -16,9 +16,6 @@ export default can.Component.extend({
         type: 'string',
         value: 'created_at',
       },
-      allRelatedSnapshots: {
-        Value: can.List,
-      },
       itemsType: {
         type: 'string',
         value: 'Issue',

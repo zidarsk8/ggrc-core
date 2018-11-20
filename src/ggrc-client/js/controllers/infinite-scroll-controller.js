@@ -3,7 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-can.Control('CMS.Controllers.InfiniteScroll', {
+can.Control.extend({
+  pluginName: 'cms_controllers_infinite_scroll',
   defaults: {},
 }, {
   init: function () {},
@@ -60,7 +61,8 @@ can.Control('CMS.Controllers.InfiniteScroll', {
   },
 });
 
-can.Control('CMS.Controllers.LHN_Tooltips', {
+can.Control.extend({
+  pluginName: 'cms_controllers_lhn_tooltips',
   defaults: {
     tooltip_view: GGRC.mustache_path + '/base_objects/extended_info.mustache',
     trigger_selector: '.show-extended',

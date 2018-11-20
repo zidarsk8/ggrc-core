@@ -172,6 +172,7 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   @simple_property
   def parent_obj(self):
+    # pylint: disable=attribute-defined-outside-init
     return self._parent_obj
 
   @parent_obj.setter
@@ -213,7 +214,7 @@ class Document(Roleable, Relatable, mixins.Titled,
     from ggrc.models import relationship
     rel = relationship.Relationship(
         source=parent_obj,
-        destination=self
+        destination=self,
     )
     db.session.add(rel)
 
@@ -239,7 +240,7 @@ class Document(Roleable, Relatable, mixins.Titled,
         parent_folder_id = self._get_folder(parent)
         self.add_gdrive_file_folder(parent_folder_id)
       self._build_relationship(parent)
-      self._parent_obj = None
+      self._parent_obj = None  # pylint: disable=attribute-defined-outside-init
     elif (self.kind == Document.FILE and
           self.source_gdrive_id and not self.link):
       self.gdrive_id = self.source_gdrive_id
@@ -262,13 +263,7 @@ class Document(Roleable, Relatable, mixins.Titled,
 
   def add_admin_role(self):
     """Add current user to Document Admins"""
-    from ggrc.models import all_models
-    admin_role = db.session.query(all_models.AccessControlRole).filter_by(
-        name="Admin", object_type=self.type).one()
-    self.extend_access_control_list([{
-        "ac_role": admin_role,
-        "person": login.get_current_user()
-    }])
+    self.add_person_with_role_name(login.get_current_user(), "Admin")
 
   def handle_relationship_created(self, target):
     """Add document to parent folder if specified"""

@@ -512,16 +512,17 @@ def _get_roles(assessment):
 
   ac_list = access_control.list.AccessControlList
   ac_role = access_control.role.AccessControlRole
+  ac_people = access_control.people.AccessControlPerson
   query = db.session.query(
-      ac_list.person_id,
+      ac_people.person_id,
       ac_role.name,
       all_models.Person.email
   ).join(
+      ac_list,
+  ).join(
       ac_role,
-      ac_role.id == ac_list.ac_role_id
   ).join(
       all_models.Person,
-      all_models.Person.id == ac_list.person_id
   ).filter(
       ac_list.object_type == _ASSESSMENT_MODEL_NAME,
       ac_list.object_id == assessment.id,
@@ -756,20 +757,21 @@ def get_issue_info(obj):
 
 def get_reporter_email(assessment):
   """Get reporter email for assessment."""
-  person, acl, acr = (all_models.Person, all_models.AccessControlList,
-                      all_models.AccessControlRole)
+  person = all_models.Person
+  acl = all_models.AccessControlList
+  acr = all_models.AccessControlRole
+  acp = all_models.AccessControlPerson
+
   reporter_email = db.session.query(
       person.email,
   ).join(
+      acp
+  ).join(
       acl,
-      person.id == acl.person_id,
   ).join(
       acr,
-      sa.and_(
-          acl.ac_role_id == acr.id,
-          acr.name == "Audit Captains",
-      ),
   ).filter(
+      acr.name == "Audit Captains",
       acl.object_id == assessment.audit_id,
       acl.object_type == all_models.Audit.__name__,
   ).order_by(
@@ -1066,6 +1068,31 @@ def bulk_children_gen_allowed(obj):
   ])
 
 
+# pylint: disable=invalid-name
+def create_missing_issuetrackerissues(parent_type, parent_id):
+  """We need to create issue_tracker_info for related assessments.
+
+  Assessment created without issuetracker_issue if parent Audit's
+  issuetracker_issue is disabled. But load_issuetracked_objects assumes that
+  each Assessment has issuetracker_issue.
+  """
+  if parent_type != "Audit":
+    return
+
+  audit = all_models.Audit.query.get(parent_id)
+  if audit.issuetracker_issue and audit.assessments:
+    issue_tracker_info = audit.issuetracker_issue.get_issue(
+        parent_type, parent_id
+    ).to_dict()
+    for assessment in audit.assessments:
+      if assessment.issuetracker_issue is None:
+        all_models.IssuetrackerIssue.create_or_update_from_dict(
+            assessment, issue_tracker_info)
+    # flush is needed here to 'load_issuetracked_objects' be able to load
+    # missing assessments
+    db.session.flush()
+
+
 def load_issuetracked_objects(parent_type, parent_id):
   """Fetch issuetracked objects from db."""
   if parent_type != "Audit":
@@ -1092,3 +1119,16 @@ def load_issuetracked_objects(parent_type, parent_id):
           all_models.Audit.issuetracker_issue
       )
   )
+
+
+def prepare_issue_update_json(assmt, issue_tracker_info=None):
+  """Prepare issuetracker issue json for Assessment object update."""
+  if not issue_tracker_info:
+    issue_tracker_info = assmt.issue_tracker
+
+  integration_utils.set_values_for_missed_fields(assmt, issue_tracker_info)
+  builder = issue_tracker_params_builder.AssessmentParamsBuilder()
+  builder.handle_issue_tracker_info(assmt, issue_tracker_info)
+  issue_tracker_params = builder.params
+  params = issue_tracker_params.get_issue_tracker_params()
+  return params

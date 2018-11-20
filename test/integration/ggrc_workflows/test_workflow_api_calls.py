@@ -80,12 +80,12 @@ class TestWorkflowsApiPost(TestCase):
     self.api.set_user(admin)
 
     related_models = (
-        (all_models.CycleTaskEntry, 33, False),
-        (all_models.TaskGroup, 21, False),
-        (all_models.TaskGroupTask, 21, True),
-        (all_models.Cycle, 3, False),
-        (all_models.CycleTaskGroup, 3, True),
-        (all_models.CycleTaskGroupObjectTask, 3, True),
+        (all_models.CycleTaskEntry, 26, False),
+        (all_models.TaskGroup, 16, False),
+        (all_models.TaskGroupTask, 16, True),
+        (all_models.Cycle, 2, False),
+        (all_models.CycleTaskGroup, 2, True),
+        (all_models.CycleTaskGroupObjectTask, 2, True),
     )
     for related_model, acl_count, is_deleted in related_models:
       self._delete_and_check_related_acl(related_model, acl_count, is_deleted)
@@ -145,7 +145,7 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.CycleTaskEntry, data)
     self.assertEqual(response.status_code, 201)
 
-    self._check_propagated_acl(3)
+    self._check_propagated_acl(2)
 
   @ddt.data('Admin', 'Workflow Member')
   def test_tg_assignee(self, role_name):
@@ -169,17 +169,17 @@ class TestWorkflowsApiPost(TestCase):
     workflow = all_models.Workflow.query.one()
     task_group = all_models.TaskGroup.query.one()
 
-    actual_acl = all_models.AccessControlList.eager_query().filter(
-        all_models.AccessControlList.person_id == task_group.contact_id,
+    ac_people = all_models.AccessControlPerson.query.filter(
+        all_models.AccessControlPerson.person_id == task_group.contact_id,
     ).all()
-    self.assertEqual(len(actual_acl), 3)
+    self.assertEqual(len(ac_people), 1)
 
     actual = {
-        (acl.object_type, acl.object_id)
-        for acl in actual_acl
+        (acp.ac_list.object_type, acp.ac_list.object_id)
+        for acp in ac_people
     }
     self.assertIn((workflow.type, workflow.id), actual)
-    self.assertIn((task_group.type, task_group.id), actual)
+    self.assertNotIn((task_group.type, task_group.id), actual)
 
   def test_task_group_assignee_gets_workflow_member(self):  # noqa pylint: disable=invalid-name
     """Test TaskGroup assignee gets WorkflowMember role."""
@@ -200,23 +200,13 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(response.status_code, 201)
 
     workflow = all_models.Workflow.query.one()
-    task_group = all_models.TaskGroup.query.one()
 
-    parent_acl = all_models.AccessControlList.eager_query().filter(
-        all_models.AccessControlList.person_id == task_group.contact_id,
-        all_models.AccessControlList.object_type == workflow.type,
-        all_models.AccessControlList.object_id == workflow.id
-    ).one()
-    tg_acl = all_models.AccessControlList.eager_query().filter(
-        all_models.AccessControlList.person_id == task_group.contact_id,
-        all_models.AccessControlList.object_type == task_group.type,
-        all_models.AccessControlList.object_id == task_group.id
-    ).one()
-    self.assertEqual(parent_acl.ac_role.name, "Workflow Member")
-    # Below we are using parent.parent to jump over the intermediary
-    # relationship.
-    self.assertEqual(tg_acl.parent.parent.id, parent_acl.id)
-    self.assertIn("Workflow Member", tg_acl.ac_role.name)
+    wf_members = [
+        acp.person.id
+        for acp in
+        workflow.acr_name_acl_map["Workflow Member"].access_control_people
+    ]
+    self.assertIn(self.people_ids[2], wf_members)
 
   def _create_propagation_acl_test_data(self):  # noqa pylint: disable=invalid-name
     """Create objects for Workflow ACL propagation test."""
@@ -271,22 +261,22 @@ class TestWorkflowsApiPost(TestCase):
          all_models.CycleTaskGroup.__name__),
         (all_models.CycleTaskGroupObjectTask.query.one().id,
          all_models.CycleTaskGroupObjectTask.__name__),
-        (all_models.CycleTaskEntry.query.one().id,
-         all_models.CycleTaskEntry.__name__)
     )
     related_count = len(related_objects) * 2  # *2 is for relationships
     bd_tasks_count = all_models.BackgroundTask.query.count()
 
-    all_acl = [acl for acl in all_models.AccessControlList.eager_query().all()]
+    all_acls = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.parent_id_nn != 0
+    ).count()
     self.assertEqual(
-        len(all_acl),
-        bd_tasks_count + roles_count + roles_count * related_count
+        all_acls,
+        bd_tasks_count + roles_count * related_count
     )
 
   def test_assign_workflow_acl(self):
     """Test propagation Workflow ACL roles on Workflow's update ACL records."""
     self._create_propagation_acl_test_data()
-    self._check_propagated_acl(3)
+    self._check_propagated_acl(2)
 
   def test_unassign_workflow_acl(self):
     """Test propagation Workflow ACL roles on person unassigned."""
@@ -318,8 +308,8 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
     workflow = all_models.Workflow.eager_query().one()
-    act_res = {acl.person_id: acl.ac_role_id
-               for acl in workflow.access_control_list}
+    act_res = {person.id: acl.ac_role_id
+               for person, acl in workflow.access_control_list}
     self.assertDictEqual(exp_res, act_res)
 
   def test_update_workflow_acl_people(self):
@@ -344,8 +334,8 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.put(workflow, put_params)
     self.assert200(response)
     workflow = all_models.Workflow.eager_query().one()
-    act_res = {acl.person_id: acl.ac_role_id
-               for acl in workflow.access_control_list}
+    act_res = {person.id: acl.ac_role_id
+               for person, acl in workflow.access_control_list}
     self.assertDictEqual(exp_res, act_res)
 
   def test_send_invalid_data(self):

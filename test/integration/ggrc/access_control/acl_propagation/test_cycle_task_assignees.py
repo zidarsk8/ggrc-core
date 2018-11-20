@@ -25,7 +25,7 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "clone": (False, "unimplemented"),
           },
           "TaskGroup": {
-              "create": (False, "unimplemented"),
+              "create": False,
               "read": False,
               "update": False,
               "delete": False,
@@ -34,7 +34,7 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "map_created_control": False,
               "read_mapped_control": False,
               "upmap_control": False,
-              "clone": (False, "unimplemented"),
+              "clone": False,
           },
           "TaskGroupTask": {
               "create": False,
@@ -61,6 +61,8 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "read": True,
               "update": True,
               "delete": False,
+              "add_comment": True,
+              "read_comment": True,
               "map_control": False,
               "map_created_control": True,
               "read_mapped_control": False,
@@ -70,12 +72,6 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "verify": True,
               "decline": True,
               "restore": True,
-          },
-          "CycleTaskEntry": {
-              "create": True,
-              "read": True,
-              "update": False,
-              "delete": False,
           },
       },
       "Reader": {
@@ -87,7 +83,7 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "clone": (False, "unimplemented"),
           },
           "TaskGroup": {
-              "create": (False, "unimplemented"),
+              "create": False,
               "read": True,
               "update": False,
               "delete": False,
@@ -96,7 +92,7 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "map_created_control": False,
               "read_mapped_control": True,
               "upmap_control": False,
-              "clone": (False, "unimplemented"),
+              "clone": False,
           },
           "TaskGroupTask": {
               "create": False,
@@ -123,6 +119,8 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "read": True,
               "update": True,
               "delete": False,
+              "add_comment": True,
+              "read_comment": True,
               "map_control": False,
               "map_created_control": True,
               "read_mapped_control": True,
@@ -132,12 +130,6 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "verify": True,
               "decline": True,
               "restore": True,
-          },
-          "CycleTaskEntry": {
-              "create": True,
-              "read": True,
-              "update": False,
-              "delete": False,
           },
       },
       "Editor": {
@@ -185,6 +177,8 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "read": True,
               "update": True,
               "delete": False,
+              "add_comment": True,
+              "read_comment": True,
               "map_control": True,
               "map_created_control": True,
               "read_mapped_control": True,
@@ -194,12 +188,6 @@ class TestCycleTaskAssigneesPropagation(base.TestACLPropagation):
               "verify": True,
               "decline": True,
               "restore": True,
-          },
-          "CycleTaskEntry": {
-              "create": True,
-              "read": True,
-              "update": True,
-              "delete": True,
           },
       },
   }

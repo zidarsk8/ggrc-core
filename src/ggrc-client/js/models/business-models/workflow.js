@@ -99,12 +99,8 @@ export default Cacheable('CMS.Models.Workflow', {
         });
         return taskGroup.save();
       })
-      .then((tg) => {
-        // Prevent the redirect form workflow_page.js
-        taskGroup.attr('_no_redirect', true);
-        this.attr('_redirect', `${redirectLink}/task_group/${tg.id}`);
+      .then(() => {
         dfd.resolve(this);
-        return this;
       })
       .fail(dfd.reject);
 

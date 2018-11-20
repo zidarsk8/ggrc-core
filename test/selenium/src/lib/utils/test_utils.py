@@ -64,30 +64,54 @@ def obj_assert(actual_obj, expected_obj):
   # https://github.com/pytest-dev/pytest/issues/3632
   # pylint: disable=unidiomatic-typecheck
   assert type(actual_obj) == type(expected_obj)
-  actual_obj_dict = actual_obj.obj_dict()
-  expected_obj_dict = expected_obj.obj_dict()
-  _dict_assert(actual_obj_dict, expected_obj_dict)
+  _AppEntityAssertion().do(actual_obj, expected_obj)
 
 
-def _dict_assert(actual_dict, expected_dict):
-  """Assert that dicts are the same."""
-  for key in set(actual_dict) & set(expected_dict):
-    _value_assert(key, actual_dict[key], expected_dict[key])
+class _AppEntityAssertion(object):
+  """A class to assert that actual and expected entities are the same."""
+  # Argument `path_to_attr` in class' methods holds the path to attribute
+  #   that is currently checked.
+
+  def do(self, actual_obj, expected_obj):
+    """Assert that `actual_obj` is the same as `expected_obj` except keys where
+    values are None.
+    """
+    actual_obj_dict = actual_obj.obj_dict()
+    expected_obj_dict = expected_obj.obj_dict()
+    self._dict_assert(actual_obj_dict, expected_obj_dict,
+                      path_to_attr=actual_obj.obj_type())
+
+  def _dict_assert(self, actual_dict, expected_dict, path_to_attr):
+    """Assert that dicts are the same."""
+    for key in set(actual_dict) | set(expected_dict):
+      self._value_assert(actual_dict[key], expected_dict[key],
+                         path_to_attr=path_to_attr + "['{}']".format(key))
+
+  def _list_assert(self, actual_list, expected_list, path_to_attr):
+    """Assert that lists are the same."""
+    actual_expected_lists = itertools.izip_longest(actual_list, expected_list)
+    for idx, (actual, expected) in enumerate(actual_expected_lists):
+      self._value_assert(actual, expected,
+                         path_to_attr=path_to_attr + "[{}]".format(idx))
+
+  def _value_assert(self, actual_value, expected_value, path_to_attr):
+    """Assert that values are the same."""
+    if actual_value is None:
+      return
+    if isinstance(actual_value, list) and isinstance(expected_value, list):
+      self._list_assert(actual_value, expected_value,
+                        path_to_attr=path_to_attr)
+    elif isinstance(actual_value, dict) and isinstance(expected_value, dict):
+      self._dict_assert(actual_value, expected_value,
+                        path_to_attr=path_to_attr)
+    else:
+      error_message = "path to attribute: {}".format(path_to_attr)
+      assert actual_value == expected_value, error_message
 
 
-def _list_assert(actual_list, expected_list):
-  """Assert that lists are them same."""
-  for actual, expected in itertools.izip_longest(actual_list, expected_list):
-    _value_assert(None, actual, expected)
-
-
-def _value_assert(current_key, actual_value, expected_value):
-  """Assert that values are the same."""
-  if actual_value is None:
-    return
-  if isinstance(actual_value, list) and isinstance(expected_value, list):
-    _list_assert(actual_value, expected_value)
-  elif isinstance(actual_value, dict) and isinstance(expected_value, dict):
-    _dict_assert(actual_value, expected_value)
-  else:
-    assert actual_value == expected_value, "key: {}".format(current_key)
+def set_unknown_attrs_to_none(obj):
+  """After creation of object via UI, `created_at` and `updated_at`
+  are unknown. So they can't be compared with object retrieved from UI.
+  """
+  obj.created_at = None
+  obj.updated_at = None

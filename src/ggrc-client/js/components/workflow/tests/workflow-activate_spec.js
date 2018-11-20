@@ -50,7 +50,7 @@ describe('workflow-activate component', function () {
       spyOn(viewModel, 'initWorkflow');
       spyOn(Permission, 'refresh');
       spyOn(viewModel, 'updateActiveCycleCounts');
-      spyOn(viewModel, 'redirectToFirstCycle');
+      spyOn(helpers, 'redirectToCycle');
     });
 
     it('should be in waiting state while refresh is in progress', function () {
@@ -90,8 +90,7 @@ describe('workflow-activate component', function () {
 
     it('should redirect to WF cycle', async function (done) {
       await viewModel.repeatOnHandler(workflow);
-      expect(viewModel.redirectToFirstCycle)
-        .toHaveBeenCalledWith(workflow);
+      expect(helpers.redirectToCycle).toHaveBeenCalled();
       done();
     });
 
@@ -219,25 +218,6 @@ describe('workflow-activate component', function () {
       result = await viewModel.updateActiveCycleCounts(workflow);
       expect(result).toBe(expectedResult);
       done();
-    });
-  });
-
-  describe('redirectToFirstCycle() method', () => {
-    let workflow;
-
-    beforeEach(function () {
-      workflow = new can.Map({cycles: []});
-      spyOn(helpers, 'redirectToCycle');
-    });
-
-    it('redirects to first workflow cycle', function () {
-      const cycleStub = new can.Map({
-        id: 123,
-        type: 'Cycle',
-      });
-      workflow.attr('cycles').push(cycleStub);
-      viewModel.redirectToFirstCycle(workflow);
-      expect(helpers.redirectToCycle).toHaveBeenCalledWith(cycleStub);
     });
   });
 

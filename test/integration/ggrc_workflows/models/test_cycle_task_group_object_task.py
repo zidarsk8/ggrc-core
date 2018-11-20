@@ -51,31 +51,23 @@ class TestCTGOT(BaseTestCase):
       taskgroup = wf_factories.TaskGroupFactory(workflow=workflow)
       task_1 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
       task_2 = wf_factories.TaskGroupTaskFactory(task_group=taskgroup)
-      task_role = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.name == "Task Assignees",
-          all_models.AccessControlRole.object_type == task_1.type,
-      ).one()
-      factories.AccessControlListFactory(ac_role=task_role,
-                                         object=task_1,
-                                         person=assignee_1)
-      factories.AccessControlListFactory(ac_role=task_role,
-                                         object=task_2,
-                                         person=assignee_2)
+      factories.AccessControlPersonFactory(
+          ac_list=task_1.acr_name_acl_map["Task Assignees"],
+          person=assignee_1,
+      )
+      factories.AccessControlPersonFactory(
+          ac_list=task_2.acr_name_acl_map["Task Assignees"],
+          person=assignee_2,
+      )
       sec_assignee = factories.PersonFactory(email=self.TASK_SEC_ASSIGNEE)
-      task_role = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.name == "Task Secondary Assignees",
-          all_models.AccessControlRole.object_type == task_1.type,
-      ).one()
-      factories.AccessControlListFactory(ac_role=task_role,
-                                         object=task_1,
-                                         person=sec_assignee)
-      wf_admin_role = all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.name == "Admin",
-          all_models.AccessControlRole.object_type == workflow.type,
-      ).one()
-      factories.AccessControlListFactory(ac_role=wf_admin_role,
-                                         object=workflow,
-                                         person=workflow_admin)
+      factories.AccessControlPersonFactory(
+          ac_list=task_1.acr_name_acl_map["Task Secondary Assignees"],
+          person=sec_assignee,
+      )
+      factories.AccessControlPersonFactory(
+          ac_list=workflow.acr_name_acl_map["Admin"],
+          person=workflow_admin,
+      )
 
     generator = wf_generator.WorkflowsGenerator()
     self.cycle_id = generator.generate_cycle(workflow)[1].id
@@ -388,3 +380,30 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
     items = colections["cycle_task_group_object_tasks"]
     self.assertEqual(1, len(items))
     self.assertEqual(ctgts[filter_flag].id, items[0]["id"])
+
+  def test_ctgot_new_comments(self):
+    """Test if ctgot create with new comments"""
+    comment = self.api_helper.post(all_models.Comment, {
+      "comment": {
+        "context": None,
+        "description": "test1"
+      },
+    })
+    comment_json = comment.json.get("comment")
+
+    self.assertEqual(comment.status_code, 201)
+    self.assertEqual(comment_json.get("description"), "test1")
+
+    comment_id = comment_json.get("id")
+    comment_type = comment_json.get("type")
+    ctgot = wf_factories.CycleTaskFactory()
+    ctgot_id = ctgot.id
+    response = self.api_helper.post(all_models.Relationship, {
+      "relationship": {
+        "source": {"id": ctgot_id, "type": ctgot.type},
+        "destination": {"id": comment_id, "type": comment_type},
+        "context": None
+      },
+    })
+
+    self.assertEqual(response.status_code, 201)

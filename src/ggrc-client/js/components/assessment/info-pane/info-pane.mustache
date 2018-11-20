@@ -213,12 +213,15 @@
                         ></ca-object-modal-content>
                     </simple-modal>
                     <!-- End of Modal Window -->
-                    <assessment-controls-toolbar class="assessment-controls-toolbar"
-                        {instance}="instance"
-                        {verifiers}="verifiers"
-                        {form-state}="formState"
-                        (on-state-change)="onStateChange(%event)"
-                    ></assessment-controls-toolbar>
+
+                    {{#unless isEditDenied}}
+                      <assessment-controls-toolbar class="assessment-controls-toolbar"
+                          {instance}="instance"
+                          {verifiers}="verifiers"
+                          {form-state}="formState"
+                          (on-state-change)="onStateChange(%event)"
+                      ></assessment-controls-toolbar>
+                    {{/unless}}
                 </div>
                 <div class="info-pane__section">
                     <assessment-people {instance}="instance">

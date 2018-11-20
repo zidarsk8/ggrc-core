@@ -1,11 +1,11 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module with Person model definition."""
+
 import re
-from sqlalchemy import event
 from sqlalchemy.orm import validates
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.session import Session
 
 from ggrc import builder
 from ggrc import db
@@ -26,11 +26,18 @@ from ggrc.models.person_profile import PersonProfile
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
              Relatable, base.ContextRBAC, Base, Indexed, db.Model):
+  """Person model definition."""
 
   def __init__(self, *args, **kwargs):
     """Initialize profile relationship while creating Person instance"""
     super(Person, self).__init__(*args, **kwargs)
     self.profile = PersonProfile()
+
+    self.build_object_context(
+        context=1,
+        name='Personal Context',
+        description=''
+    )
 
   __tablename__ = 'people'
 
@@ -41,8 +48,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   object_people = db.relationship(
       'ObjectPerson', backref='person', cascade='all, delete-orphan')
-  access_control_list = db.relationship(
-      'AccessControlList', backref='person', cascade='all, delete-orphan')
   language = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Person.language_id) == Option.id, '
@@ -53,6 +58,12 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       "PersonProfile",
       uselist=False,
       back_populates="person",
+  )
+
+  access_control_people = db.relationship(
+      'AccessControlPerson',
+      foreign_keys='AccessControlPerson.person_id',
+      backref="person",
   )
 
   @staticmethod
@@ -96,10 +107,11 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @classmethod
   def _filter_by_user_role(cls, predicate):
+    """Custom filter by user roles."""
     from ggrc_basic_permissions.models import Role, UserRole
     return UserRole.query.join(Role).filter(
         (UserRole.person_id == cls.id) &
-        (UserRole.context_id == None) &  # noqa
+        (UserRole.context_id.is_(None)) &  # noqa
         predicate(Role.name)
     ).exists()
 
@@ -129,7 +141,8 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
                            'person_language')
 
   @validates('email')
-  def validate_email(self, key, email):
+  def validate_email(self, _, email):
+    """Email property validator."""
     if not Person.is_valid_email(email):
       message = "Email address '{}' is invalid. Valid email must be provided"
       raise ValidationError(message.format(email))
@@ -137,10 +150,12 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @staticmethod
   def is_valid_email(val):
-    # Borrowed from Django
-    # literal form, ipv4 address (SMTP 4.1.3)
+    """Check for valid email.
+
+    Borrowed from Django. Literal form, ipv4 address (SMTP 4.1.3).
+    """
     email_re = re.compile(
-        '^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$',
+        r'^[-!#$%&\'*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$',
         re.IGNORECASE)
     return email_re.match(val) if val else False
 
@@ -175,8 +190,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     the system-wide context, it shows the highest ranked one (if there are
     multiple) or "No Access" if there are none.
     """
-    # FIXME: This method should be in `ggrc_basic_permissions`, since it
-    #   depends on `Role` and `UserRole` objects
 
     if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
       return SystemWideRoles.SUPERUSER
@@ -196,24 +209,11 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
         for user_role in self.user_roles
         if user_role.role.name in role_hierarchy
     ])
-    if len(unique_roles) == 0:
+    if not unique_roles:
       return u"No Access"
-    else:
-      # -1 as default to make items not in this list appear on top
-      # and thus shown to the user
-      sorted_roles = sorted(unique_roles,
-                            key=lambda x: role_hierarchy.get(x, -1))
-      return sorted_roles[0]
 
-
-@event.listens_for(Session, 'after_flush_postexec')
-def receive_after_flush(session, _):
-  """Make sure newly created users have a personal context set"""
-  for o in session.identity_map.values():
-    if not isinstance(o, Person):
-      continue
-    user_context = o.get_or_create_object_context(
-        context=1,
-        name='Personal Context for {0}'.format(o.id),
-        description='')
-    db.session.add(user_context)
+    # -1 as default to make items not in this list appear on top
+    # and thus shown to the user
+    sorted_roles = sorted(unique_roles,
+                          key=lambda x: role_hierarchy.get(x, -1))
+    return sorted_roles[0]

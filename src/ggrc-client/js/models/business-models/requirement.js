@@ -9,6 +9,7 @@ import caUpdate from '../mixins/ca-update';
 import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
+import Relationship from '../service-models/relationship';
 
 export default Cacheable('CMS.Models.Requirement', {
   root_object: 'requirement',
@@ -78,4 +79,20 @@ export default Cacheable('CMS.Models.Requirement', {
     this._super(...arguments);
     this.validateNonBlank('title');
   },
-}, {});
+}, {
+  created() {
+    this._super(...arguments);
+
+    if (!this.directive || !this.directive.id) {
+      return;
+    }
+
+    let directiveDfd = new Relationship({
+      source: this,
+      destination: this.directive,
+      context: this.context,
+    }).save();
+
+    this.delay_resolving_save_until($.when(directiveDfd));
+  },
+});

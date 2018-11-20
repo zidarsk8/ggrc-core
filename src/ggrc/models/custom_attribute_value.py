@@ -132,7 +132,10 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
     Returns:
         A model instance of type specified in attribute_value
     """
-    return getattr(self, self._attribute_object_attr)
+    try:
+      return getattr(self, self._attribute_object_attr)
+    except:  # pylint: disable=bare-except
+      return None
 
   @attribute_object.setter
   def attribute_object(self, value):

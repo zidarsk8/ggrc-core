@@ -22,7 +22,6 @@ from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc import utils
 from ggrc.notifications import common
 from ggrc.notifications.data_handlers import get_object_url
-from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 
 logger = logging.getLogger(__name__)
@@ -48,7 +47,7 @@ class IssueTrackerBulkCreator(object):
     self.break_on_errs = False
     self.client = issues.Client()
 
-  def sync_issuetracker(self, objects_data, create_issuetracker=True):
+  def sync_issuetracker(self, objects_data):
     """Generate IssueTracker issues in bulk.
 
     Args:
@@ -66,10 +65,7 @@ class IssueTrackerBulkCreator(object):
               IssuetrackedObjInfo(obj, *obj_id_info[obj.id])
           )
 
-    created, errors = self.handle_issuetracker_sync(
-        issuetracked_info,
-        create_issuetracker=create_issuetracker
-    )
+    created, errors = self.handle_issuetracker_sync(issuetracked_info)
 
     logger.info(
         "Synchronized issues count: %s, failed count: %s",
@@ -109,7 +105,7 @@ class IssueTrackerBulkCreator(object):
         )
     )
 
-  def handle_issuetracker_sync(self, tracked_objs, create_issuetracker=False):
+  def handle_issuetracker_sync(self, tracked_objs):
     """Create IssueTracker issues for tracked objects in bulk.
 
     Args:
@@ -128,10 +124,7 @@ class IssueTrackerBulkCreator(object):
         if not self.bulk_sync_allowed(obj_info.obj):
           raise exceptions.Forbidden()
 
-        issue_json = self._get_issue_json(
-            obj_info.obj,
-            create_issuetracker=create_issuetracker
-        )
+        issue_json = self._get_issue_json(obj_info.obj)
         self._populate_issue_json(obj_info, issue_json)
 
         issue_id = getattr(obj_info.obj.issuetracker_issue, "issue_id", None)
@@ -157,14 +150,15 @@ class IssueTrackerBulkCreator(object):
       self.update_db_issues(created)
     return created, errors
 
-  def _get_issue_json(self, object_, create_issuetracker=False):
+  def _get_issue_json(self, object_):
     """Get json data for issuetracker issue related to provided object."""
     issue_json = None
     integration_handler = self.INTEGRATION_HANDLERS.get(object_.type)
     if hasattr(integration_handler, "prepare_issue_json"):
       issue_json = integration_handler.prepare_issue_json(
           object_,
-          create_issuetracker=create_issuetracker
+          issue_tracker_info=object_.issue_tracker,
+          create_issuetracker=True,
       )
 
     if not issue_json:
@@ -194,6 +188,9 @@ class IssueTrackerBulkCreator(object):
     elif not result and not issue_json.get("issue_id"):
       raise integrations_errors.Error("Unknown error")
 
+    if not issue_json.get("assignee") and result:
+      issue_json["assignee"] = result.get("issueState", {}).get("assignee")
+
   @staticmethod
   def _add_error(error_list, object_, error):
     """Save error information"""
@@ -214,13 +211,11 @@ class IssueTrackerBulkCreator(object):
   def bulk_sync_allowed(obj):
     """Check if user has permissions to synchronize issuetracker issue.
 
-    Args:
-        obj: instance for which issue should be generated/updated.
-
     Returns:
         True if it's allowed, False if not allowed.
     """
-    return permissions.is_allowed_update_for(obj)
+    del obj
+    return True
 
   def update_db_issues(self, issues_info):
     """Update db IssueTracker issues with provided data.
@@ -397,6 +392,19 @@ class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
         interval=10
     )
 
+  def _get_issue_json(self, object_):
+    """Get json data for issuetracker issue related to provided object."""
+    issue_json = None
+    integration_handler = self.INTEGRATION_HANDLERS.get(object_.type)
+    if hasattr(integration_handler, "prepare_issue_update_json"):
+      issue_json = integration_handler.prepare_issue_update_json(object_)
+
+    if not issue_json:
+      raise integrations_errors.Error(
+          "Can't create issuetracker issue json for {}".format(object_.type)
+      )
+    return issue_json
+
 
 class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
   """Class with methods for bulk tickets creation for child objects."""
@@ -406,8 +414,7 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     self.break_on_errs = True
 
   # pylint: disable=arguments-differ
-  def sync_issuetracker(self, parent_type, parent_id, child_type,
-                        create_issuetracker=True):
+  def sync_issuetracker(self, parent_type, parent_id, child_type):
     """Generate IssueTracker issues in bulk for child objects.
 
     Args:
@@ -429,14 +436,11 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
                   parent_type, child_type
               )
           )
-
+        handler.create_missing_issuetrackerissues(parent_type, parent_id)
         for obj in handler.load_issuetracked_objects(parent_type, parent_id):
           issuetracked_info.append(IssuetrackedObjInfo(obj))
 
-      created, errors = self.handle_issuetracker_sync(
-          issuetracked_info,
-          create_issuetracker=create_issuetracker
-      )
+      created, errors = self.handle_issuetracker_sync(issuetracked_info)
 
       logger.info("Synchronized issues count: %s, failed count: %s",
                   len(created), len(errors))

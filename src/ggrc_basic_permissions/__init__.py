@@ -7,6 +7,7 @@ import cPickle
 import datetime
 import itertools
 import zlib
+import logging
 
 import flask
 import sqlalchemy as sa
@@ -32,6 +33,9 @@ from ggrc_basic_permissions.contributed_roles import BasicRoleDeclarations
 from ggrc_basic_permissions.converters.handlers import COLUMN_HANDLERS
 from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
+
+
+logger = logging.getLogger(__name__)
 
 
 blueprint = flask.Blueprint(
@@ -314,7 +318,7 @@ def load_personal_context(user, permissions):
       .append(personal_context.id)
 
 
-def _get_acl_filter():
+def _get_acl_filter(acl_model):
   """Get filter for acl entries.
 
   This creates a filter to select only acl entries for objects that were
@@ -326,21 +330,29 @@ def _get_acl_filter():
   Returns:
     list of filter statements.
   """
-  stubs = getattr(flask.g, "referenced_object_stubs", {})
-  if not stubs:
-    return []
+  stubs = getattr(flask.g, "referenced_object_stubs", None)
+  if stubs is None:
+    logger.warning("Using full permissions query")
+    return [
+        acl_model.object_type != all_models.Relationship.__name__,
+    ]
+
   roleable_models = {m.__name__ for m in all_models.all_models
                      if issubclass(m, Roleable)}
-  keys = [(type_, id_)
-          for type_, ids in stubs.iteritems()
-          for id_ in ids
-          if type_ in roleable_models]
+  keys = [
+      (type_, id_)
+      for type_, ids in stubs.iteritems()
+      for id_ in ids
+      if type_ in roleable_models
+  ]
   if not keys:
-    return []
+    return [
+        sa.false()
+    ]
   return [
       sa.tuple_(
-          all_models.AccessControlList.object_type,
-          all_models.AccessControlList.object_id,
+          acl_model.object_type,
+          acl_model.object_id,
       ).in_(
           keys,
       )
@@ -349,27 +361,26 @@ def _get_acl_filter():
 
 def load_access_control_list(user, permissions):
   """Load permissions from access_control_list"""
-  acl = all_models.AccessControlList
+  acl_base = db.aliased(all_models.AccessControlList, name="acl_base")
+  acl_propagated = db.aliased(all_models.AccessControlList,
+                              name="acl_propagated")
   acr = all_models.AccessControlRole
-  additional_filters = _get_acl_filter()
+  acp = all_models.AccessControlPerson
+  additional_filters = _get_acl_filter(acl_propagated)
   access_control_list = db.session.query(
-      acl.object_type,
-      acl.object_id,
-      sa.func.max(acr.read),
-      sa.func.max(acr.update),
-      sa.func.max(acr.delete),
-  ).with_hint(
-      acl, "USE INDEX (ix_person_object)"
+      acl_propagated.object_type,
+      acl_propagated.object_id,
+      acr.read,
+      acr.update,
+      acr.delete,
   ).filter(
       sa.and_(
-          acl.person_id == user.id,
-          acl.ac_role_id == acr.id,
-          acl.object_type != all_models.Relationship.__name__,
+          acp.person_id == user.id,
+          acp.ac_list_id == acl_base.id,
+          acl_base.id == acl_propagated.base_id,
+          acl_propagated.ac_role_id == acr.id,
           *additional_filters
       )
-  ).group_by(
-      acl.object_type,
-      acl.object_id,
   )
 
   for object_type, object_id, read, update, delete in access_control_list:

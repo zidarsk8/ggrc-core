@@ -3,16 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../tree/tree-view-node';
+import Ctrl from '../tree/tree-view-node';
 
-describe('CMS.Controllers.TreeViewNode', function () {
+describe('TreeViewNode Controller', function () {
   'use strict';
-
-  let Ctrl; // the controller under test
-
-  beforeAll(function () {
-    Ctrl = CMS.Controllers.TreeViewNode;
-  });
 
   describe('draw_node() method', function () {
     let ctrlInst; // fake controller instance

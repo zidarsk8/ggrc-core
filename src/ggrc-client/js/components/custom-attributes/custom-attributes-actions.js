@@ -9,6 +9,7 @@ export default can.Component.extend({
   tag: 'custom-attributes-actions',
   template,
   viewModel: {
+    instance: null,
     formEditMode: false,
     edit: function () {
       this.attr('formEditMode', true);

@@ -65,6 +65,7 @@ class BaseRBACFactory(object):
 
     self.generate_cycle(self.workflow_id)
     cycle_task = all_models.CycleTaskGroupObjectTask.query.first()
+    self.cycle_task_id = cycle_task.id
     acr = all_models.AccessControlRole.query.get(acr_id)
     self.assign_person(cycle_task, acr, user_id)
 
@@ -88,9 +89,10 @@ class BaseRBACFactory(object):
   @staticmethod
   def assign_person(object_, acr, person_id):
     """Assign person to object."""
-    if object_.type == acr.object_type:
-      factories.AccessControlListFactory(
-          object=object_,
-          person_id=person_id,
-          ac_role=acr,
-      )
+    # pylint: disable=protected-access
+    for ac_list in object_._access_control_list:
+      if ac_list.ac_role.name == acr.name and acr.object_type == object_.type:
+        factories.AccessControlPersonFactory(
+            person_id=person_id,
+            ac_list=ac_list,
+        )

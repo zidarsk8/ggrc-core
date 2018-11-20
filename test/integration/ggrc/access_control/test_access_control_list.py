@@ -34,7 +34,6 @@ class TestAccessControlList(TestCase):
     super(TestAccessControlList, self).setUp()
     self.api = Api()
     self.person = factories.PersonFactory(name="My Person")
-    self.control = factories.ControlFactory()
     self.acr = factories.AccessControlRoleFactory(
         object_type="Control",
         read=True
@@ -43,10 +42,10 @@ class TestAccessControlList(TestCase):
         object_type="Control",
         read=True
     )
-    self.acl = factories.AccessControlListFactory(
-        object=self.control,
-        ac_role_id=self.acr.id,
-        person=self.person
+    self.control = factories.ControlFactory()
+    factories.AccessControlPersonFactory(
+        ac_list=self.control.acr_acl_map[self.acr],
+        person=self.person,
     )
 
   def _post_control(self, id_, person_id, collection=False):
@@ -168,7 +167,7 @@ class TestAccessControlList(TestCase):
     # One ACL and Control created in setUp and on by POST
     self.assertEqual(
         all_models.Revision.query.filter_by(
-            resource_type="AccessControlList"
+            resource_type="AccessControlPerson"
         ).count(),
         2
     )
@@ -189,7 +188,7 @@ class TestAccessControlList(TestCase):
     )
     self.assertEqual(
         all_models.Revision.query.filter_by(
-            resource_type="AccessControlList"
+            resource_type="AccessControlPerson"
         ).count(),
         3
     )

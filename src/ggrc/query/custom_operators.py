@@ -13,7 +13,6 @@ from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc.models import all_models
-from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
@@ -147,10 +146,17 @@ def related_people(exp, object_class, target_class, query):
 
   res = []
 
-  res.extend(db.session.query(AccessControlList.person_id).filter(
+  acl = all_models.AccessControlList
+  acp = all_models.AccessControlPerson
+
+  # Note using we are using base_id in the join statement because this filter
+  # should include propagated roles as well.
+  res.extend(db.session.query(acp.person_id).filter(
       sqlalchemy.and_(
-          AccessControlList.object_id.in_(exp['ids']),
-          AccessControlList.object_type == exp['object_name'])
+          acl.object_id.in_(exp['ids']),
+          acl.object_type == exp['object_name'],
+          acp.ac_list_id == acl.base_id,
+      )
   ))
   if res:
     return object_class.id.in_([obj[0] for obj in res])
@@ -332,7 +338,7 @@ def build_expression(exp, object_class, target_class, query):
   """Make an SQLAlchemy filtering expression from exp expression tree."""
   if not exp:
     # empty expression doesn't required filter
-    return
+    return None
   if autocast.is_autocast_required_for(exp):
     exp = validate("left", "right")(autocast.autocast)(exp, target_class)
   if not exp:
