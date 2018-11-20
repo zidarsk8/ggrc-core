@@ -25,7 +25,6 @@ export default Directive('CMS.Models.Contract', {
   isRoleable: true,
   attributes: {
   },
-  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['Requirement'],
   },
