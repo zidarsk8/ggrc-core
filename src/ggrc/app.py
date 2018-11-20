@@ -163,23 +163,6 @@ def _enable_debug_toolbar():
     DebugToolbarExtension(app)
 
 
-def _enable_jasmine():
-  """Set jasmine sources and specs if it's enabled.
-
-  Jasmine is used for javascript tests and is not installed on the production
-  environment, that is why we must check if it enabled before tying to import
-  it.
-  """
-  if getattr(settings, "ENABLE_JASMINE", False):
-    from flask.ext.jasmine import Asset
-    from flask.ext.jasmine import Jasmine
-    # Configure Flask-Jasmine, for dev mode unit testing
-    jasmine = Jasmine(app)
-
-    jasmine.sources(
-        Asset("dashboard-js-templates"))
-
-
 def _set_display_queries(report_type):
   """Set the app request handler for displaying sql queries.
 
@@ -287,6 +270,5 @@ init_extra_listeners()
 notifications.register_notification_listeners()
 
 _enable_debug_toolbar()
-_enable_jasmine()
 _display_sql_queries()
 _display_request_time()
