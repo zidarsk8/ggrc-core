@@ -1,13 +1,18 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Integration tests for one time workflow notifications."""
 import textwrap
+import uuid
+
 from datetime import date, datetime
+
+import mock
 from freezegun import freeze_time
 
 from ggrc import db
 from ggrc.notifications import common
-from ggrc.models import Notification
+from ggrc.models import Notification, all_models
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
@@ -55,6 +60,30 @@ class TestOneTimeWorkflowNotification(TestCase):
         "type": obj.__class__.__name__,
     }
 
+  def setup_cycle_tasks(self):
+    """Prepare environment with couple of active cycle tasks."""
+    with freeze_time("2018-11-01"):
+      _, workflow = self.wf_generator.generate_workflow(
+          self.one_time_workflow_1
+      )
+      self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
+    return all_models.CycleTaskGroupObjectTask.query
+
+  def assert_nofication_sent_with(self, text):
+    """Assert if text exists in sent notification."""
+    with mock.patch("ggrc.notifications.common.send_email") as send_email:
+      self.client.get("/_notifications/send_daily_digest")
+      _, _, content = send_email.call_args[0]
+    self.assertIn(text, content)
+
+  def assert_nofication_sent_without(self, text):
+    """Assert if text doesn't exist in sent notification."""
+    with mock.patch("ggrc.notifications.common.send_email") as send_email:
+      self.client.get("/_notifications/send_daily_digest")
+      _, _, content = send_email.call_args[0]
+    self.assertNotIn(text, content)
+
   def test_one_time_wf(self):
     # setup
     with freeze_time("2015-04-07 03:21:34"):
@@ -91,6 +120,49 @@ class TestOneTimeWorkflowNotification(TestCase):
 
       common.get_daily_notifications()
 
+  def test_deprecated_ct_acl_update(self):
+    """Test if acl update for deprecated CT will not create notification."""
+    cycle_task = self.setup_cycle_tasks().first()
+    cycle_task_title = cycle_task.title
+    response = self.api.put(cycle_task, {"status": "Deprecated"})
+    self.assert200(response)
+    self.assert_nofication_sent_without(cycle_task_title)
+
+    task_assignee = all_models.AccessControlRole.query.filter_by(
+        name="Task Assignees",
+        object_type="CycleTaskGroupObjectTask",
+    ).first()
+    person = self.object_generator.generate_person(user_role="Creator")[1]
+    response = self.api.put(
+        cycle_task,
+        {
+            "access_control_list": [{
+                "ac_role_id": task_assignee.id,
+                "person": {
+                    "id": person.id,
+                    "type": "Person",
+                }
+            }]
+        }
+    )
+    self.assert200(response)
+    self.assert_nofication_sent_without(cycle_task_title)
+
+  def test_restore_deprecated_ct(self):
+    """Test notifications for CT which was restored from Deprecated."""
+    cycle_task = self.setup_cycle_tasks().first()
+    cycle_task_title = cycle_task.title
+
+    self.assert_nofication_sent_with(cycle_task_title)
+
+    response = self.api.put(cycle_task, {"status": "Deprecated"})
+    self.assert200(response)
+    self.assert_nofication_sent_without(cycle_task_title)
+
+    response = self.api.put(cycle_task, {"status": "Assigned"})
+    self.assert200(response)
+    self.assert_nofication_sent_with(cycle_task_title)
+
   def create_test_cases(self):
     def person_dict(person_id):
       return {
@@ -106,13 +178,13 @@ class TestOneTimeWorkflowNotification(TestCase):
         "task_groups": [{
             "title": "one time task group",
             "task_group_tasks": [{
-                "title": "task 1",
+                "title": "task_{}".format(str(uuid.uuid4())),
                 "description": "some task",
                 "contact": person_dict(self.random_people[0].id),
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }, {
-                "title": "task 2",
+                "title": "task_{}".format(str(uuid.uuid4())),
                 "description": "some task",
                 "contact": person_dict(self.random_people[1].id),
                 "start_date": date(2015, 5, 4),
@@ -122,13 +194,13 @@ class TestOneTimeWorkflowNotification(TestCase):
         }, {
             "title": "another one time task group",
             "task_group_tasks": [{
-                "title": "task 1 in tg 2",
+                "title": "task_{}".format(str(uuid.uuid4())),
                 "description": "some task",
                 "contact": person_dict(self.random_people[0].id),
                 "start_date": date(2015, 5, 8),  # friday
                 "end_date": date(2015, 5, 12),
             }, {
-                "title": "task 2 in tg 2",
+                "title": "task_{}".format(str(uuid.uuid4())),
                 "description": "some task",
                 "contact": person_dict(self.random_people[2].id),
                 "start_date": date(2015, 5, 1),  # friday

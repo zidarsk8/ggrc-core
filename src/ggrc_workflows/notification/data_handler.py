@@ -412,6 +412,9 @@ def get_cycle_task_data(notification, tasks_cache=None, del_rels_cache=None):
   if not cycle_task or not cycle_task.cycle_task_group.cycle.is_current:
     return {}
 
+  if cycle_task.status == CycleTaskGroupObjectTask.DEPRECATED:
+    return {}
+
   notification_name = notification.notification_type.name
   if notification_name in ["manual_cycle_created", "cycle_created"]:
     return get_cycle_created_task_data(notification)
