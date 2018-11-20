@@ -64,8 +64,7 @@ const updateAssessments = (assessments) => {
           status: 'loaded',
         });
 
-        delete Assessment.cache[assessment.id];
-        delete Assessment.store[assessment.id];
+        Assessment.removeFromCacheById(assessment.id);
 
         deferred.resolve([...updated, assessment]);
       }, () => {

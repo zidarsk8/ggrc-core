@@ -307,7 +307,7 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   removeFromCacheById: function (key) {
-    return delete this.store[key];
+    return delete this.cache[key];
   },
 
   newInstance: function (args) {
