@@ -426,17 +426,8 @@ export default can.Model('can.Model.Cacheable', {
       this.removeFromCacheById(params[this.id]);
       delete this.cache[params[this.id]];
     }
-    model = this.findInCacheById(params[this.id]) ||
-      (params.provisional_id &&
-        can.getObject('provisional_cache',
-          can.Model.Cacheable, true)[params.provisional_id]);
+    model = this.findInCacheById(params[this.id]);
     if (model && !isSnapshot(params)) {
-      if (model.provisional_id && params.id) {
-        delete can.Model.Cacheable.provisional_cache[model.provisional_id];
-        model.removeAttr('provisional_id');
-        model.constructor.cache[params.id] = model;
-        model.attr('id', params.id);
-      }
       if (model.cleanupAcl && params.access_control_list) {
         // Clear ACL to avoid "merge" of arrays.
         // "params" has valid ACL array.
@@ -856,9 +847,6 @@ export default can.Model('can.Model.Cacheable', {
     this.dispatch('modelBeforeSave');
 
     if (isNew) {
-      this.attr('provisional_id', 'provisional_' + Date.now());
-      can.getObject('provisional_cache',
-        can.Model.Cacheable, true)[this.provisional_id] = this;
       if (this.before_create) {
         this.before_create();
       }
