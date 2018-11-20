@@ -45,7 +45,7 @@ class IssueTrackerBulkCreator(object):
 
   SUCCESS_TITLE = (
       'Ticket generation for your GGRC import {filename} was completed '
-      'successfully.'
+      'successfully'
   )
   SUCCESS_TEXT = (
       'The assessments or the issues from the import file that required '
