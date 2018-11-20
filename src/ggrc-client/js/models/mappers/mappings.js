@@ -271,24 +271,6 @@ export default can.Construct.extend({
     return mappings;
   },
   /*
-    return the defined name of the canonical mapping between two objects.
-    object - the string type (shortName) of the "from" object's class
-    option - the string type (shortName) of the "to" object's class
-
-    return: an instance of GGRC.ListLoaders.BaseListLoader (mappings are implemented as ListLoaders)
-  */
-  get_canonical_mapping_name: function (object, option) {
-    let mappingName = null;
-    can.each(this.modules, function (mod, name) {
-      if (mod._canonical_mappings && mod._canonical_mappings[object] &&
-        mod._canonical_mappings[object][option]) {
-        mappingName = mod._canonical_mappings[object][option];
-        return false;
-      }
-    });
-    return mappingName;
-  },
-  /*
     return all canonical mappings (suitable for joining) from all modules for an object type.
     object - a string representing the object type's shortName
 
