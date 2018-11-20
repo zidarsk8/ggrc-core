@@ -30,7 +30,6 @@ export default TreeLoader({
     filter_states: [],
     sortable: true,
     start_expanded: false, // true
-    draw_children: true,
     find_function: null,
     options_property: 'tree_view_options',
     allow_reading: true,
