@@ -10,9 +10,9 @@ import mock
 
 from flask import g
 
+from ggrc import settings
 from ggrc import db
 from ggrc import views
-from ggrc.app import app
 
 from ggrc.notifications import data_handlers
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
@@ -253,35 +253,18 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
     result_ids = [issue.id for issue in result]
     self.assertEqual(set(issue_ids_enabled), set(result_ids))
 
-  @ddt.data(
-      ("IssueTrackerBulkCreator", "background_generate_issues"),
-      ("IssueTrackerBulkUpdater", "background_update_issues"),
-  )
-  @ddt.unpack
-  def test_issue_generate_call(self, class_name, func_name):
+  def test_issue_generate_call(self):
     """Test generate_issue call creates task for bulk generate."""
     user = all_models.Person.query.filter_by(email="user@example.com").one()
     setattr(g, '_current_user', user)
-    _, assessment_ids = self.setup_assessments(3)
-
     data = {
-        "objects": [{
-            "type": "Assessment",
-            "id": id_,
-        } for id_ in assessment_ids],
+        "revision_ids": [1, 2, 3],
     }
-
-    response = app.make_response(("success", 200, ))
-    func_addr = ("ggrc.integrations.issuetracker_bulk_sync." +
-                 class_name + ".sync_issuetracker")
-    with mock.patch(func_addr, return_value=response) as generate_mock:
-      callable_func = getattr(views, func_name)
-      result = callable_func(data)
+    result = views.background_update_issues(data)
 
     self.assert200(result)
     bg_task = all_models.BackgroundTask.query.one()
     self.assertEqual(bg_task.status, "Success")
-    generate_mock.assert_called_once()
 
   def test_asmnt_bulk_generate(self):
     """Test bulk generation of issues for Assessments."""
@@ -910,7 +893,6 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
 @ddt.ddt
 class TestBulkCommentUpdate(TestBulkIssuesSync):
   """Test adding comments to IssueTracker issues via bulk."""
-  response = app.make_response(("success", 200))
 
   @ddt.data(
       ("Issue", ["c1", "c2", "c3"]),
@@ -954,11 +936,9 @@ class TestBulkCommentUpdate(TestBulkIssuesSync):
         )
 
   @ddt.data("Issue", "Assessment")
-  @mock.patch.object(issuetracker_bulk_sync.IssueTrackerBulkUpdater,
-                     "sync_issuetracker", return_value=response)
-  @mock.patch.object(issuetracker_bulk_sync.IssueTrackerCommentUpdater,
-                     "sync_issuetracker", return_value=response)
-  def test_comment_update_call(self, model, update_mock, comment_mock):
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_comment_update_call(self,
+                               model):
     """Test bulk update calls appropriate methods"""
     with factories.single_commit():
       factory = factories.get_model_factory(model)
@@ -969,21 +949,28 @@ class TestBulkCommentUpdate(TestBulkIssuesSync):
           issue_id=123,
       )
     comments = "c1;;c2;;c3"
-    response = self.import_data(OrderedDict([
-        ("object_type", model),
-        ("Code*", obj.slug),
-        ("Comments", "c1;;c2;;c3"),
-    ]))
-    expected_objects = [{"type": model, "id": obj.id}, ]
+
+    with mock.patch.object(issuetracker_bulk_sync.IssueTrackerCommentUpdater,
+                           "sync_issuetracker",
+                           return_value=([], [])) as comment_mock:
+      with mock.patch.object(issuetracker_bulk_sync.IssueTrackerBulkCreator,
+                             "sync_issuetracker",
+                             return_value=([], [])) as create_mock:
+        with mock.patch.object(issuetracker_bulk_sync.IssueTrackerBulkCreator,
+                               "sync_issuetracker",
+                               return_value=([], [])) as upd_mock:
+          response = self.import_data(OrderedDict([
+              ("object_type", model),
+              ("Code*", obj.slug),
+              ("Comments", comments),
+          ]))
+
     expected_comments = [
         {'comment_description': comment, 'type': model, 'id': obj.id}
         for comment in comments.split(";;")
     ]
-
     self._check_csv_response(response, {})
-    comment_mock.assert_called_once()
     self.assertEqual(comment_mock.call_args[0][0]["comments"],
                      expected_comments)
-    self.assertEqual(comment_mock.call_args[0][0]["objects"],
-                     expected_objects)
-    update_mock.assert_called_once()
+    upd_mock.assert_called_once()
+    create_mock.assert_not_called()
