@@ -119,7 +119,7 @@ integration_acl_tests () {
   provision_dev "cleandev_1"
 
   echo "Running ${PROJECT}"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_integration_acl
   " && rc=$? || rc=$?
@@ -136,7 +136,7 @@ integration_ggrc_tests () {
   provision_dev "cleandev_1"
 
   echo "Running ${PROJECT}"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_integration_ggrc
   " && rc=$? || rc=$?
@@ -153,7 +153,7 @@ integration_non_ggrc_tests () {
   provision_dev "cleandev_1"
 
   echo "Running ${PROJECT}"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_integration_non_ggrc
   " && rc=$? || rc=$?
@@ -170,7 +170,7 @@ integration_tests () {
   provision_dev "cleandev_1"
 
   echo "Running ${PROJECT}"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_integration
   " && rc=$? || rc=$?
@@ -202,7 +202,7 @@ unittests_tests () {
   provision_dev "cleandev_1"
 
   echo "Running python unit tests"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/run_unit
   " && unit_rc=$? || unit_rc=$?
@@ -213,7 +213,7 @@ unittests_tests () {
 
   echo "Running karma tests"
 
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/node_modules/karma/bin/karma start \\
       /vagrant/karma.conf.js --single-run --reporters dots,junit
@@ -231,7 +231,7 @@ code_style_tests () {
   print_line
 
   echo "Running pylint"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     /vagrant/bin/check_pylint_diff
   " && pylint_rc=$? || pylint_rc=$?
@@ -247,7 +247,7 @@ code_style_tests () {
   print_line
 
   echo "Running flake8"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     cd /vagrant
     flake8 .
@@ -264,7 +264,7 @@ code_style_tests () {
   print_line
 
   echo "Running eslint"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     export PATH=\$PATH:/vagrant-dev/node_modules/.bin
     /vagrant/bin/check_eslint
   " && eslint_rc=$? || eslint_rc=$?
@@ -280,7 +280,7 @@ code_style_tests () {
   print_line
 
   echo "Running misspell"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     make misspell
   " && misspell_rc=$? || misspell_rc=$?
 
@@ -295,7 +295,7 @@ code_style_tests () {
   print_line
 
   echo "Running license header check"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     /vagrant/bin/check_license_headers
   " && license_rc=$? || license_rc=$?
 
@@ -328,7 +328,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running pylint"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     pylint -f parseable src/ggrc\
                         src/ggrc_basic_permissions\
@@ -343,7 +343,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running eslint"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     eslint -f checkstyle src -o test/eslint.xml
   " || true
@@ -351,7 +351,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running flake8"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     flake8 --config setup.cfg src/ test/ > test/flake8.out
   " || true
@@ -359,7 +359,7 @@ checkstyle_tests () {
   print_line
 
   echo "Running misspell"
-  docker exec -i ${PROJECT}_cleandev_1 su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_cleandev_1 -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     make misspell
   " || true
