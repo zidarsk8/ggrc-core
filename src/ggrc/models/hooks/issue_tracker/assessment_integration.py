@@ -911,8 +911,9 @@ def _link_assessment(assessment, issue_tracker_info):
     return
 
   issue_params = prepare_issue_json(assessment, issue_tracker_info, True)
+  issuetracker_ccs = response.get("issueState", {}).get("ccs", [])
   grouped_ccs = group_cc_emails(object_ccs=issue_params.get("ccs", []),
-                                additional_ccs=response["issueState"]["ccs"])
+                                additional_ccs=issuetracker_ccs)
   issue_params["ccs"] = grouped_ccs
   try:
     issues.Client().update_issue(ticket_id, issue_params)
