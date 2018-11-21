@@ -84,7 +84,6 @@ skip_files:
 - migrations/.*
 - tests/.*
 - service_specs/.*
-- assets/.*
 - reports/.*
 - extras/deploy/.*
 

@@ -36,16 +36,6 @@ stubs).
 ``CMS.Models.Program.cache`` will have an array of all the loaded
 programs.
 
-Client-side File Manifests
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Mustache templates need to be referenced
-from a manifest file in order for it to be usable in constructing the
-UI.
-
-These manifest files live in ``src/<module>/assets/assets.yaml``.
-
-Javascript resources are bundled together using webpack.
 
 Page Structure
 ~~~~~~~~~~~~~~
@@ -168,7 +158,7 @@ Model
 ~~~~~
 
 View models (defined in JavaScript) are in
-``src/<module>/assets/javascripts/models/``
+``src/ggrc-client/js/models/``
 
 The models define:
 
@@ -302,7 +292,7 @@ Components
 ~~~~~~~~~~
 
 In order to build the UI we are using components,
-that are placed in the directory ``assets/javascripts/components``
+that are placed in the directory ``ggrc-client/js/components``
 
 Standard view templates
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -319,7 +309,7 @@ the UI is created.
 -  ``extended_info.mustache`` - Defines the content of an object’s
    tooltip/popover in the LHN lists.  Specified as the ``tooltip_view``
    parameter when rendering
-   :src:`ggrc/assets/mustache/dashboard/lhn.mustache`.
+   :src:`ggrc-client/js/mustache/dashboard/lhn.mustache`.
 -  ``modal_content.mustache`` - Defines the view for modal “create” or
    “edit” form functionality.  For most objects, this path is
    automatically generated using the ``data-template`` or
@@ -330,10 +320,10 @@ Where to find view templates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The view files are in the following folder within a module
-``src/<module>/assets/mustache/``.
+``src/ggrc-client/js/mustache/``.
 
-For example, the ``ggrc_workflow`` views are in the following folder
-:src:`ggrc_workflows/assets/mustache/`
+For example, the ``workflow`` views are in the following folder
+:src:`src/ggrc-client/js/mustache/workflows`
 
 View Helpers
 ^^^^^^^^^^^^
@@ -341,9 +331,9 @@ View Helpers
 View helpers are defined using the Mustache `helper mechanism provided
 by CanJS <http://canjs.com/docs/can.mustache.Helpers.html>`_.  Core
 helpers are specified in
-:src:`ggrc/assets/javascripts/mustache_helpers.js`,
+:src:`ggrc-client/js/mustache_helpers.js`,
 and extension helpers should be specified in a file named similar to
-``src/<module_name>/assets/javascripts/<class_name>_mustache_helpers.js``.
+``src/<module_name>/js/<class_name>_mustache_helpers.js``.
 
 Extensions
 ~~~~~~~~~~
@@ -382,17 +372,6 @@ The minimum that __init__.py must contain is:
         )
 
 This will set up an extension to be recognized by Flask.
-
-Asset hierarchies in extensions should follow the ggrc-core model:
-assets.yaml should define the bundles for dashboard-js,
-dashboard-templates, and dashboard-js-specs; The folder naming
-convention for these bundles (``assets/javascripts``,
-``assets/mustache``, and ``assets/js_specs``, respectively) should be
-followed for each extension. An important caveat is that the assets
-bundler can only bundle one asset with a given path over all base
-folders, so you should avoid re-using paths known to exist in ggrc-core
-or other extensions (e.g. "mustache_helper.js" and "models/mixins.js"
-already exist in ggrc-core, so don't name your files the same as these).
 
 DB migrations should be set up in ``migrations/versions`` as in
 ggrc-core. Once the extension is created and the settings path added to
@@ -455,12 +434,12 @@ Modals
 The core logic and functionality related to modals is defined in the
 following files:
 
--  ``ggrc/assets/javascripts/bootstrap/modal-ajax.js``
--  ``ggrc/assets/javascripts/bootstrap/modal-form.js``
--  ``ggrc/assets/javascripts/controllers/modals_controller.js``
+-  ``ggrc-client/js/bootstrap/modal-ajax.js``
+-  ``ggrc-client/js/bootstrap/modal-form.js``
+-  ``ggrc-client/js/controllers/modals/modals_controller.js``
 
 The view for a modal is defined in
-``/src/<module>/assets/mustache/<class_name>/modal_content.mustache``.
+``/src/ggrc-client/js/mustache/<class_name>/modal_content.mustache``.
 
 More about modals in `modals.md <modals.md>`_.
 
@@ -520,7 +499,7 @@ relationships are stored in.
 Mappings essentially turn the entire system into a
 `property graph <https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph>`_.
 
-Mappings are defined in :src:`ggrc/assets/javascripts/models/mappings-ggrc.js`.
+Mappings are defined in :src:`ggrc-client/js/models/mappers/mappings-ggrc.js`.
 
 We don't have a function that gets all the objects mapped to a given
 object. You can get the mappings of an instance by calling
@@ -532,24 +511,24 @@ Types of Mappings
 ^^^^^^^^^^^^^^^^^
 
 There are 8 types of mappings. The types of mappings are defined with
-Mappers. Mappers are defined in :src:`ggrc/assets/javascripts/models/mappers.js`
+Mappers. Mappers are defined in :src:`ggrc-client/js/models/mappers/models/index.js`
 
 Each type of mapping is defined below:
 
--  **Proxy** :src:`ggrc/assets/javascripts/models/mappers/proxy-list-loader.js`:
+-  **Proxy** :src:`ggrc-client/js/models/mappers/proxy-list-loader.js`:
    A proxy mapping is a relationship where one model
    references another through another “join” or “proxy” model.  E.g.,
    Programs reference Controls via the ProgramControl join/proxy model.
     The Proxy mapping specifies the attributes and models involved in
    the relationship, e.g.:
 
--  **Direct** :src:`ggrc/assets/javascripts/models/mappers/direct-list-loader.js`:
+-  **Direct** :src:`ggrc-client/js/models/mappers/direct-list-loader.js`:
    A direct mapping is a relationship where one model
    directly references another model.  E.g., Sections contain a
    ``directive`` attribute, so Section has a Direct mapping to
    Directive.
 
--  **Search** :src:`ggrc/assets/javascripts/models/mappers/search-list-loader.js`:
+-  **Search** :src:`ggrc-client/js/models/mappers/search-list-loader.js`:
    A search mapping is a relationship where results are
    produced by a function returning a deferred. This mapping is f
    foremost used by the Advanced Search feature and for getting owned
@@ -558,12 +537,12 @@ Each type of mapping is defined below:
    any type is created, so it is recommended to use this mapper
    sparingly in the system if it makes a number of large AJAX calls.
 
--  **Multi** :src:`ggrc/assets/javascripts/models/mappers/multi-list-loader.js`:
+-  **Multi** :src:`ggrc-client/js/models/mappers/multi-list-loader.js`:
    Constructs a mapping which is the union of zero or more
    other mappings.  Specifically, the set of ``result.instance`` values
    is the union of ``result.instance`` from the contributing mappings.
 
--  **CustomFilter** :src:`ggrc/assets/javascripts/models/mappers/custom-filtered-list-loader.js`:
+-  **CustomFilter** :src:`ggrc-client/js/models/mappers/custom-filtered-list-loader.js`:
    A custom filtered mapping runs a filter function on
    every result coming from a source mapping and returns all results
    where the function returns either a truthy value or a deferred that

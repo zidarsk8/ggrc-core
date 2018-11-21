@@ -120,25 +120,22 @@ misspell :
 		! -path "./src/ggrc-client/vendor/*"\
 		! -path "./test/*.out"\
 		! -path "./test/*.xml"\
-		! -path "./src/ggrc/assets/stylesheets/dashboard.css"\
 		! -path "./src/packages/*"\
 		! -path "./package-lock.json"\
 		| xargs $(GOLANG_PACKAGES)/misspell -error -locale US
 
 ## Deployment!
 
-src/ggrc/assets/assets.manifest :
+build_assets :
 	source "bin/init_env"; \
 		GGRC_SETTINGS_MODULE="$(SETTINGS_MODULE)" bin/build_assets
 
 src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml --from-env
 
-deploy : appengine_packages src/ggrc/assets/assets.manifest src/app.yaml
+deploy : appengine_packages build_assets src/app.yaml
 
 clean_deploy :
-	rm -f src/ggrc/assets/stylesheets/dashboard.css
-	rm -f src/ggrc/static/dashboard-*.* src/ggrc/assets/assets.manifest
 	rm -f src/app.yaml
 
 clean : clean_deploy
