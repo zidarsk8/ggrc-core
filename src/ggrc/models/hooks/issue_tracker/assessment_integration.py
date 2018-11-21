@@ -898,7 +898,7 @@ def _link_assessment(assessment, issue_tracker_info):
     return
 
   try:
-    issues.Client().get_issue(ticket_id)
+    response = issues.Client().get_issue(ticket_id)
   except integrations_errors.Error as error:
     logger.error(
         "Unable to link a ticket while creating object ID=%d: %s",
@@ -911,7 +911,9 @@ def _link_assessment(assessment, issue_tracker_info):
     return
 
   issue_params = prepare_issue_json(assessment, issue_tracker_info)
-
+  grouped_ccs = group_cc_emails(object_ccs=issue_params.get("ccs", []),
+                                additional_ccs=response["issueState"]["ccs"])
+  issue_params["ccs"] = grouped_ccs
   try:
     issues.Client().update_issue(ticket_id, issue_params)
   except integrations_errors.Error as error:
