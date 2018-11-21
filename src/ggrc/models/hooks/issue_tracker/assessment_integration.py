@@ -611,19 +611,19 @@ def get_audit_ccs(assessment):
   return audit_ccs
 
 
-def group_cc_emails(audit_ccs, assessment_ccs):
-  """Returns grouped cc emails between audit and assessment.
+def group_cc_emails(object_ccs, additional_ccs):
+  """Returns grouped cc emails.
 
   Args:
-    audit_ccs: List of audit ccs
-    assessment_ccs: List of assessment ccs
+    object_ccs: first list of  ccs
+    additional_ccs: additional list of ccs
 
   Returns:
     Grouped list of ccs
   """
-  audit_ccs = frozenset(audit_ccs)
-  assessment_ccs = frozenset(assessment_ccs)
-  grouped_ccs = list(audit_ccs.union(assessment_ccs))
+  object_ccs = frozenset(object_ccs)
+  additional_ccs = frozenset(additional_ccs)
+  grouped_ccs = list(object_ccs.union(additional_ccs))
 
   return grouped_ccs
 
@@ -871,7 +871,7 @@ def prepare_issue_json(assessment, issue_tracker_info=None,
   if create_issuetracker:
     cc_list = issue_tracker_info.get('cc_list', [])
     audit_ccs = get_audit_ccs(assessment)
-    grouped_ccs = group_cc_emails(audit_ccs, cc_list)
+    grouped_ccs = group_cc_emails(object_ccs=cc_list, additional_ccs=audit_ccs)
     if grouped_ccs:
       issue_params['ccs'] = grouped_ccs
     else:
@@ -898,7 +898,7 @@ def _link_assessment(assessment, issue_tracker_info):
     return
 
   try:
-    issues.Client().get_issue(ticket_id)
+    response = issues.Client().get_issue(ticket_id)
   except integrations_errors.Error as error:
     logger.error(
         "Unable to link a ticket while creating object ID=%d: %s",
@@ -910,8 +910,11 @@ def _link_assessment(assessment, issue_tracker_info):
     )
     return
 
-  issue_params = prepare_issue_json(assessment, issue_tracker_info)
-
+  issue_params = prepare_issue_json(assessment, issue_tracker_info, True)
+  issuetracker_ccs = response.get("issueState", {}).get("ccs", [])
+  grouped_ccs = group_cc_emails(object_ccs=issue_params.get("ccs", []),
+                                additional_ccs=issuetracker_ccs)
+  issue_params["ccs"] = grouped_ccs
   try:
     issues.Client().update_issue(ticket_id, issue_params)
   except integrations_errors.Error as error:
