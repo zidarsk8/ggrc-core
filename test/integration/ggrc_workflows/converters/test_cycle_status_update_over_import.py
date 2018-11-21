@@ -59,7 +59,7 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
       )
       self.tasks = []
       for ind, task_status in enumerate(self.DEFAULT_TASK_STATUSES):
-        self.tasks.append(factories.CycleTaskFactory(
+        self.tasks.append(factories.CycleTaskGroupObjectTaskFactory(
             title='task{}'.format(ind),
             cycle=self.cycle,
             cycle_task_group=self.group,

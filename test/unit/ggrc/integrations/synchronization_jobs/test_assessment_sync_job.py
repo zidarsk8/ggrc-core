@@ -141,7 +141,7 @@ class BaseClientTest(unittest.TestCase):
   def test_update_issue(self):
     """Tests updating issue."""
     cli_mock = mock.MagicMock()
-    self.assertIsNone(sync_utils.update_issue(cli_mock, 1, 'params'))
+    self.assertIsNotNone(sync_utils.update_issue(cli_mock, 1, 'params'))
     cli_mock.update_issue.assert_called_once_with(1, 'params')
 
   def test_update_issue_with_retry(self):

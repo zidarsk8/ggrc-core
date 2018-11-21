@@ -38,7 +38,7 @@ export default Cacheable('CMS.Models.Program', {
   programRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
   orderOfRoles: ['Program Managers', 'Program Editors', 'Program Readers'],
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/programs/tree-item-attr.mustache',
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
@@ -60,24 +60,10 @@ export default Cacheable('CMS.Models.Program', {
         attr_name: 'review_status',
         order: 80,
       }]),
-    add_item_view: GGRC.mustache_path +
-      '/base_objects/tree_add_item.mustache',
     display_attr_names: ['title', 'status', 'updated_at', 'Program Managers'],
   },
   sub_tree_view_options: {
     default_filter: ['Standard'],
-  },
-  links_to: {
-    System: {},
-    Process: {},
-    Facility: {},
-    OrgGroup: {},
-    Vendor: {},
-    Project: {},
-    DataAsset: {},
-    AccessGroup: {},
-    Product: {},
-    Market: {},
   },
   defaults: {
     status: 'Draft',

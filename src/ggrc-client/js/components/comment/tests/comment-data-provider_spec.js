@@ -95,7 +95,7 @@ describe('comment-data-provider component', () => {
     });
   });
 
-  describe('addComment() methid', () => {
+  describe('addComment() method', () => {
     it('adds comment to the beginning of the collection', () => {
       viewModel.attr('comments').replace(['comment2']);
       viewModel.addComment({
@@ -107,20 +107,15 @@ describe('comment-data-provider component', () => {
   });
 
   describe('removeComment() method', () => {
-    it('removes the comment based on "_stamp" property', () => {
-      viewModel.attr('comments').replace([{
-        title: 'comment1',
-        _stamp: '1',
-      }, {
-        title: 'comment2',
-        _stamp: '2',
-      }]);
+    it('removes the comment', () => {
+      viewModel.attr('comments').replace([
+        {title: 'comment1'},
+        {title: 'comment2'},
+      ]);
+      viewModel.removeComment(viewModel.attr('comments')[0]);
 
-      viewModel.removeComment({
-        _stamp: '2',
-      });
-
-      expect(viewModel.attr('comments')[0].attr('title')).toBe('comment1');
+      expect(viewModel.attr('comments').length).toBe(1);
+      expect(viewModel.attr('comments')[0].attr('title')).toBe('comment2');
     });
   });
 

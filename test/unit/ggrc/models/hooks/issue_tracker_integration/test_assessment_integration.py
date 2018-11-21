@@ -123,3 +123,20 @@ class TestUtilityFunctions(unittest.TestCase):
       update_info_mock.assert_called_once()
       self.assertEqual(update_info_mock.call_args[0][1]['enabled'],
                        issue_tracker_enabled)
+
+  @ddt.data(
+      ([], [], []),
+      (["1@e.w", "1@e.w"], ["1@e.w", "2@e.w"], ["1@e.w", "2@e.w"]),
+      (["1@e.w", "2@e.w"], ["3@e.w", "2@e.w"], ["1@e.w", "2@e.w", "3@e.w"]),
+      (["1@e.w", "2@e.w"],
+       ["3@e.w", "4@e.w"],
+       ["1@e.w", "2@e.w", "3@e.w", "4@e.w"]),
+  )
+  @ddt.unpack
+  def test_grouped_ccs_method(self, object_ccs, additional_ccs, expected_ccs):
+    """Test group_cc_emails() method"""
+    grouped_ccs = assessment_integration.group_cc_emails(
+        object_ccs=object_ccs,
+        additional_ccs=additional_ccs,
+    )
+    self.assertEqual(set(grouped_ccs), set(expected_ccs))

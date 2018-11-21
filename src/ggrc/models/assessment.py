@@ -215,7 +215,7 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
           "display_name": "Ticket Tracker",
           "mandatory": False,
           "view_only": True,
-      }
+      },
   }
 
   @simple_property

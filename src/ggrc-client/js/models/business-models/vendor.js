@@ -59,24 +59,9 @@ export default Cacheable('CMS.Models.Vendor', {
         disable_sorting: true,
       },
     ]),
-    add_item_view:
-      GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
   },
   sub_tree_view_options: {
     default_filter: ['Program'],
-  },
-  links_to: {
-    System: {},
-    Process: {},
-    Program: {},
-    Product: {},
-    Facility: {},
-    OrgGroup: {},
-    Vendor: {},
-    Project: {},
-    DataAsset: {},
-    AccessGroup: {},
-    Market: {},
   },
   defaults: {
     status: 'Draft',

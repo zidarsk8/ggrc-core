@@ -32,50 +32,7 @@
               {{#case 'default'}}
                 <div class="owner attr-content">
                   {{#instance}}
-                    {{#switch type}}
-                      {{#case 'Audit'}}
-                        {{> '/static/mustache/audits/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Control'}}
-                        {{> '/static/mustache/controls/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Directive'}}
-                        {{> '/static/mustache/directives/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Evidence'}}
-                        {{> '/static/mustache/evidence/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Document'}}
-                        {{> '/static/mustache/documents/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Objective'}}
-                        {{> '/static/mustache/objectives/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Person'}}
-                        {{> '/static/mustache/people/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Program'}}
-                        {{> '/static/mustache/programs/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Requirement'}}
-                        {{> '/static/mustache/requirements/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'RiskAssessment'}}
-                        {{> '/static/mustache/risk_assessments/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'Workflow'}}
-                        {{> '/static/mustache/workflows/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'CycleTaskGroupObjectTask'}}
-                        {{> '/static/mustache/cycle_task_group_object_tasks/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#case 'TaskGroup'}}
-                        {{> '/static/mustache/task_groups/tree-item-attr.mustache'}}
-                      {{/case}}
-                      {{#default}}
-                        {{> '/static/mustache/base_objects/tree-item-attr.mustache'}}
-                      {{/default}}
-                    {{/switch}}
+                    {{> attrTemplate}}
                   {{/instance}}
                 </div>
               {{/case}}

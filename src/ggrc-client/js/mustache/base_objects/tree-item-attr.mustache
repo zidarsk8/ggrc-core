@@ -4,30 +4,10 @@
 }}
 
 {{#switch attr_name}}
-  {{#case 'contact'}}
-    <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
-    </model-loader>
-  {{/case}}
-  {{#case 'secondary_contact'}}
-    <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.secondary_contact" {type}="loadedModel" {field}="'email'"/>
-    </model-loader>
-  {{/case}}
   {{#case 'network_zone'}}
     <model-loader {path}="'service-models/option'">
       <tree-field {source}="instance.network_zone" {type}="loadedModel"/>
     </model-loader>
-  {{/case}}
-  {{#case 'design'}}
-    {{#using design=instance.design}}
-      {{design}}
-    {{/using}}
-  {{/case}}
-  {{#case 'operationally'}}
-    {{#using operationally=instance.operationally}}
-      {{operationally}}
-    {{/using}}
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}
@@ -47,15 +27,6 @@
       <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
     </model-loader>
   {{/case}}
-  {{#case 'created_at'}}
-      {{localize_date instance.created_at}}
-  {{/case}}
-  {{#case 'end_date'}}
-    {{localize_date instance.end_date}}
-  {{/case}}
-  {{#case 'due_date'}}
-    {{localize_date instance.due_date}}
-  {{/case}}
   {{#case 'title'}}
     <span>
     {{{firstnonempty instance.title instance.description_inline instance.name instance.email ''}}}
@@ -69,20 +40,6 @@
         </a>
       </span>
     {{/if}}
-  {{/case}}
-  {{#case 'label'}}
-    <div class="labels">
-      {{#instance}}
-        {{#each labels}}
-          <span class="with-comma">{{name}}</span>
-        {{/each}}
-      {{/instance}}
-    </div>
-  {{/case}}
-  {{#case 'last_comment'}}
-    <last-comment
-      {instance}="instance">
-    </last-comment>
   {{/case}}
   {{#case 'questionnaire'}}
       <questions-link {instance}="instance">

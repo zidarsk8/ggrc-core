@@ -36,8 +36,6 @@ export default Cacheable('CMS.Models.TaskGroupTask', {
     task_group: Stub,
   },
   tree_view_options: {
-    attr_view: GGRC.mustache_path +
-      '/task_group_tasks/tree-item-attr.mustache',
     mapper_attr_list: [
       {attr_title: 'Summary', attr_name: 'title'},
       {attr_title: 'Description', attr_name: 'description'},

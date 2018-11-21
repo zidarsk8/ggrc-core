@@ -35,7 +35,7 @@ DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
 
 
 class BaseTestCycleTaskImportUpdate(TestCase):
-
+  """Base class for CycleTask imports"""
   @staticmethod
   def generate_expected_warning(*columns):
     return {
@@ -566,7 +566,7 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
   """Test cases for update assignee column on import cycle tasks"""
 
   def setUp(self):
-    self.instance = factories.CycleTaskFactory()
+    self.instance = factories.CycleTaskGroupObjectTaskFactory()
     self.assignee = ggrc_factories.PersonFactory()
     self.s_assignee = ggrc_factories.PersonFactory()
     self.query = CycleTaskGroupObjectTask.query.filter(

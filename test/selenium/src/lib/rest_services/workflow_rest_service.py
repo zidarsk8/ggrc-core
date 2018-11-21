@@ -1,14 +1,15 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST service for Workflow objects (functions take entity objects)."""
+from lib.app_entity import workflow_entity
 from lib.constants import object_states
-from lib.entities import app_entity, cycle_entity_creation
+from lib.entities import cycle_entity_population
 from lib.rest import rest_convert, base_rest_service
 
 
 class WorkflowRestService(base_rest_service.ObjectRestService):
   """REST service for Workflow app entities."""
-  app_entity_cls = app_entity.Workflow
+  app_entity_cls = workflow_entity.Workflow
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -42,13 +43,13 @@ class WorkflowRestService(base_rest_service.ObjectRestService):
       workflow.recurrences_started = True
       self.edit(workflow)
     else:
-      cycle = cycle_entity_creation.create_workflow_cycle(workflow)
+      cycle = cycle_entity_population.create_workflow_cycle(workflow)
       WorkflowCycleRestService().create(cycle)
 
 
 class TaskGroupRestService(base_rest_service.ObjectRestService):
   """REST service for TaskGroup app entities."""
-  app_entity_cls = app_entity.TaskGroup
+  app_entity_cls = workflow_entity.TaskGroup
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -63,7 +64,7 @@ class TaskGroupRestService(base_rest_service.ObjectRestService):
 
 class TaskGroupTaskRestService(base_rest_service.ObjectRestService):
   """REST service for TaskGroupTask app entities."""
-  app_entity_cls = app_entity.TaskGroupTask
+  app_entity_cls = workflow_entity.TaskGroupTask
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -81,7 +82,7 @@ class TaskGroupTaskRestService(base_rest_service.ObjectRestService):
 
 class WorkflowCycleRestService(base_rest_service.ObjectRestService):
   """REST service for WorkflowCycle app entities."""
-  app_entity_cls = app_entity.WorkflowCycle
+  app_entity_cls = workflow_entity.WorkflowCycle
   _obj_name = "cycle"
 
   @staticmethod

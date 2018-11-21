@@ -4,6 +4,7 @@
  */
 
 import * as StateUtils from './state-utils';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 /**
  * Factory allowing to create Advanced Search Filter Items.
@@ -78,7 +79,7 @@ export const addMappingCriteria = (mapping, request) => {
   if (mapping.mappedTo) {
     let relevantResult =
       builders[mapping.mappedTo.type](mapping.mappedTo.value, request);
-    filterObject = GGRC.query_parser.join_queries(filterObject, relevantResult);
+    filterObject = QueryParser.joinQueries(filterObject, relevantResult);
   }
 
   request.push({
@@ -163,8 +164,8 @@ export const builders = {
       if (item.type !== 'operator') {
         stack.push(builders[item.type](item.value, request));
       } else {
-        let joinedValue = GGRC.query_parser.
-          join_queries(stack.pop(), stack.pop(), item.value);
+        let joinedValue = QueryParser.
+          joinQueries(stack.pop(), stack.pop(), item.value);
         stack.push(joinedValue);
       }
     });

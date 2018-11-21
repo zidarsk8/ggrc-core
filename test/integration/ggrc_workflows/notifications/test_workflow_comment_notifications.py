@@ -35,7 +35,7 @@ class TestWorkflowCommentNotification(test_assignable_notifications.
     person = all_models.Person.query.first()
     person_email = person.email
     with factories.single_commit():
-      obj = wf_factories.CycleTaskFactory(
+      obj = wf_factories.CycleTaskGroupObjectTaskFactory(
           recipients=",".join(recipient_types),
           send_by_default=False,
       )

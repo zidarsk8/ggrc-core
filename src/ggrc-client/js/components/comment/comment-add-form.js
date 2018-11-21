@@ -11,7 +11,6 @@ import {COMMENT_CREATED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import {getAssigneeType} from '../../plugins/ggrc_utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
-import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const tag = 'comment-add-form';
 
@@ -64,13 +63,9 @@ export default can.Component.extend({
       let source = this.attr('instance');
 
       return {
-        comment: source.attr('context'),
         send_notification: this.attr('sendNotifications'),
         context: source.context,
         assignee_type: getAssigneeType(source),
-        created_at: getFormattedUtcDate(),
-        modified_by: {type: 'Person', id: GGRC.current_user.id},
-        _stamp: Date.now(),
       };
     },
     updateComment: function (comment) {
@@ -101,7 +96,7 @@ export default can.Component.extend({
 
       self.attr('isSaving', true);
       comment = self.updateComment(comment);
-      self.dispatch({type: 'beforeCreate', items: [comment.attr()]});
+      self.dispatch({type: 'beforeCreate', items: [comment]});
 
       comment.save()
         .done(function () {

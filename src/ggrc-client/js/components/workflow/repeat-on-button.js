@@ -5,8 +5,7 @@
 
 import '../dropdown/dropdown';
 import template from './templates/repeat-on-button.mustache';
-
-let config = GGRC.Workflow;
+import * as config from '../../apps/workflow-config';
 
 export default can.Component.extend({
   tag: 'repeat-on-button',

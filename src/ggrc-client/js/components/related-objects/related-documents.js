@@ -21,7 +21,6 @@ import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
 import * as businessModels from '../../models/business-models';
-import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -117,15 +116,15 @@ export default can.Component.extend({
       this.attr('documents').replace(documents);
     },
     createDocument: function (data) {
-      let date = getFormattedUtcDate();
       let modelType = this.attr('modelType');
+      let context = modelType === 'Evidence'
+        ? this.instance.context
+        : new Context({id: null});
+
       let document = new businessModels[modelType]({
         link: data,
         title: data,
-        created_at: date,
-        context: this.instance.context || new Context({
-          id: null,
-        }),
+        context,
         kind: this.kind,
       });
       return document;

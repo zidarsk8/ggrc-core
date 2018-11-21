@@ -18,7 +18,7 @@ class InlineEdit(object):
     """Opens inline edit."""
     # Hovering over element and clicking on it using Selenium / Nerodia
     # doesn't open the inline edit control for some reason
-    self._root.wait_until_present()
+    self._root.wait_until(lambda e: e.present)
     self._root.element(class_name="fa-pencil").js_click()
 
   def confirm(self):
@@ -30,6 +30,7 @@ class InlineEdit(object):
     # Wait for JS to work, there are no DOM changes and HTTP requests
     # during some period (GGRC-5891).
     time.sleep(1)
+    ui_utils.wait_for_spinner_to_disappear()
 
 
 class AssessmentFormField(object):
@@ -167,6 +168,11 @@ class CommentArea(object):
   def __init__(self, container):
     self.add_section = container.element(
         class_name="comment-add-form__section")
+
+  @property
+  def exists(self):
+    """Returns whether comment area exists."""
+    return self.add_section.exists
 
 
 class CustomAttributeManager(object):

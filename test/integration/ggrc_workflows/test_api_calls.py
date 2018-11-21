@@ -39,13 +39,13 @@ class TestTaskGroupTaskApiPost(WorkflowTestCase):
 
   def test_create_tgt_wrong_dates(self):
     """Test case for tgt wrong start_ end_ dates"""
-    with self.assertRaises(Exception):
-      self.generator.generate_task_group_task(
-          data={
-              "start_date": datetime.date.today(),
-              "end_date": datetime.date.today() - datetime.timedelta(days=4)
-          }
-      )
+    response, _ = self.generator.generate_task_group_task(
+        data={
+            "start_date": datetime.date.today(),
+            "end_date": datetime.date.today() - datetime.timedelta(days=4)
+        }
+    )
+    self.assertEqual(response.status_code, 400)
 
   def test_tgt_has_view_dates(self):
     """Test get view only fields for TGT."""
@@ -72,7 +72,7 @@ class TestStatusApiPost(TestCase):
           cycle=self.cycle,
           context=self.cycle.workflow.context
       )
-      self.task = wf_factories.CycleTaskFactory(
+      self.task = wf_factories.CycleTaskGroupObjectTaskFactory(
           cycle=self.cycle,
           cycle_task_group=self.group,
           context=self.cycle.workflow.context

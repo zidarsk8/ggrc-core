@@ -26,6 +26,7 @@ import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -161,7 +162,7 @@ export default can.Component.extend({
     },
     prepareUnlockedFilter: function () {
       let filterString = StateUtils.unlockedFilter();
-      return GGRC.query_parser.parse(filterString);
+      return QueryParser.parse(filterString);
     },
     prepareOwnedFilter: function () {
       let userId = GGRC.current_user.id;
@@ -195,14 +196,13 @@ export default can.Component.extend({
         AdvancedSearch.buildFilter(this.attr('filterItems').attr(), request);
       let mappings =
         AdvancedSearch.buildFilter(this.attr('mappingItems').attr(), request);
-      let advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
+      let advancedFilters = QueryParser.joinQueries(filters, mappings);
 
       // the edge case caused by stateless objects
       if (this.attr('statusItem.value.items')) {
         status =
           AdvancedSearch.buildFilter([this.attr('statusItem').attr()], request);
-        advancedFilters = GGRC.query_parser
-          .join_queries(advancedFilters, status);
+        advancedFilters = QueryParser.joinQueries(advancedFilters, status);
       }
       result.request = request;
 
@@ -221,13 +221,13 @@ export default can.Component.extend({
         }
       }
       if (this.shouldApplyUnlockedFilter(modelName)) {
-        advancedFilters = GGRC.query_parser.join_queries(
+        advancedFilters = QueryParser.joinQueries(
           advancedFilters,
           this.prepareUnlockedFilter());
       }
 
       if (this.attr('applyOwnedFilter')) {
-        advancedFilters = GGRC.query_parser.join_queries(
+        advancedFilters = QueryParser.joinQueries(
           advancedFilters,
           this.prepareOwnedFilter());
       }

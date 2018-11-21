@@ -5,6 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../repeat-on-summary';
+import * as WorkflowConfig from '../../../apps/workflow-config';
 
 describe('repeat-on-summary component', function () {
   'use strict';
@@ -18,8 +19,8 @@ describe('repeat-on-summary component', function () {
   describe('unitText getter', function () {
     let unitOptions;
     beforeAll(function () {
-      unitOptions = GGRC.Workflow.unitOptions;
-      GGRC.Workflow.unitOptions = [
+      unitOptions = WorkflowConfig.unitOptions;
+      WorkflowConfig.unitOptions = [
         {
           title: 'Daily',
           value: 'Day',
@@ -38,7 +39,7 @@ describe('repeat-on-summary component', function () {
     });
 
     afterAll(function () {
-      GGRC.Workflow.unitOptions = unitOptions;
+      WorkflowConfig.unitOptions = unitOptions;
     });
 
     it('returns empty text when unit is not specified', function () {

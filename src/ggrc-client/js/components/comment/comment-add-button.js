@@ -4,7 +4,6 @@
  */
 
 import Comment from '../../models/service-models/comment';
-import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const tag = 'comment-add-button';
 const template = `<button class="btn btn-small btn-gray"
@@ -44,7 +43,6 @@ export default can.Component.extend({
 
       comment = new Comment({
         description: description,
-        created_at: getFormattedUtcDate(),
         modified_by: {type: 'Person', id: GGRC.current_user.id},
       });
       // Erase RichText Field after Comment Creation

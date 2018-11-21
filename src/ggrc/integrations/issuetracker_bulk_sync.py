@@ -43,36 +43,75 @@ class IssueTrackerBulkCreator(object):
       "Issue": models.hooks.issue_tracker.issue_integration,
   }
 
+  SUCCESS_TITLE = (
+      'Ticket generation for your GGRC import {filename} was completed '
+      'successfully'
+  )
+  SUCCESS_TEXT = (
+      'The assessments or the issues from the import file that required '
+      'tickets generation (had tickets integration turned on) have been '
+      'successfully linked with the tickets.'
+  )
+  ERROR_TITLE = (
+      'There were some errors in generating tickets for your GGRC import '
+      '{filename}'
+  )
+  ERROR_TEXT = (
+      'There were errors that prevented generation of some tickets based on '
+      'your import file submission. The error may be due to your lack to '
+      'sufficient access to generate/update the tickets. Here is the list of '
+      'assessments or issues that were not updated.'
+  )
+  EXCEPTION_TEXT = "Something went wrong, we are looking into it."
+
   def __init__(self):
     self.break_on_errs = False
     self.client = issues.Client()
 
-  def sync_issuetracker(self, objects_data):
+  def sync_issuetracker(self, request_data):
     """Generate IssueTracker issues in bulk.
 
     Args:
-        objects. ([object_type, object_id, hotlist_ids, component_id])
-
+        request_data: {
+            'objects': [object_type, object_id, hotlist_ids, component_id],
+            'mail_data': {user_email: email, filename: filename}
+        }
+        objects list contains objects to by synchronized,
+        mail_data contains information for email notification(file that was
+          imported name and recipient email)
     Returns:
         flask.wrappers.Response - response with result of generation.
     """
-    issuetracked_info = []
-    with benchmark("Load issuetracked objects from database"):
-      objects_info = self.group_objs_by_type(objects_data)
-      for obj_type, obj_id_info in objects_info.items():
-        for obj in self.get_issuetracked_objects(obj_type, obj_id_info.keys()):
-          issuetracked_info.append(
-              IssuetrackedObjInfo(obj, *obj_id_info[obj.id])
-          )
+    objects_data = request_data.get("objects")
 
-    created, errors = self.handle_issuetracker_sync(issuetracked_info)
+    filename = request_data.get("mail_data", {}).get("filename", '')
+    recipient = request_data.get("mail_data", {}).get("user_email", '')
 
-    logger.info(
-        "Synchronized issues count: %s, failed count: %s",
-        len(created),
-        len(errors)
-    )
-    return self.make_response(errors)
+    try:
+      issuetracked_info = []
+      with benchmark("Load issuetracked objects from database"):
+        objects_info = self.group_objs_by_type(objects_data)
+        for obj_type, obj_id_info in objects_info.items():
+          for obj in self.get_issuetracked_objects(obj_type,
+                                                   obj_id_info.keys()):
+            issuetracked_info.append(
+                IssuetrackedObjInfo(obj, *obj_id_info[obj.id])
+            )
+
+      created, errors = self.handle_issuetracker_sync(issuetracked_info)
+
+      logger.info(
+          "Synchronized issues count: %s, failed count: %s",
+          len(created),
+          len(errors),
+      )
+    except:  # pylint: disable=bare-except
+      self.send_notification(filename, recipient, failed=True)
+      return (None, None)
+    else:
+      if created or errors:
+        self.send_notification(filename, recipient, errors=errors)
+    return (created, errors)
 
   @staticmethod
   def group_objs_by_type(object_data):
@@ -358,9 +397,53 @@ class IssueTrackerBulkCreator(object):
         [("Content-Type", "application/json")]
     ))
 
+  def send_notification(self, filename, recipient, errors=None, failed=False):
+    """Send mail notification with information about errors."""
+    data = {}
+    if failed:
+      data["title"] = self.ERROR_TITLE.format(filename=filename)
+      data["email_text"] = self.EXCEPTION_TEXT
+      body = settings.EMAIL_BULK_SYNC_EXCEPTION.render(sync_data=data)
+    elif errors:
+      data["objects"] = [
+          {
+              "url": get_object_url(obj),
+              "code": obj.slug,
+              "title": obj.title,
+          } for (obj, _) in errors
+      ]
+      data["title"] = self.ERROR_TITLE.format(filename=filename)
+      data["email_text"] = self.ERROR_TEXT.format(filename=filename)
+      body = settings.EMAIL_BULK_SYNC_FAILED.render(sync_data=data)
+    else:
+      data["title"] = self.SUCCESS_TITLE.format(filename=filename)
+      data["email_text"] = self.SUCCESS_TEXT.format(filename=filename)
+      body = settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data=data)
+
+    common.send_email(recipient, ISSUETRACKER_SYNC_TITLE, body)
+
 
 class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
   """Class with methods for bulk tickets update in issuetracker."""
+
+  SUCCESS_TITLE = (
+      'Ticket update for your GGRC import {filename} was completed '
+      'successfully.'
+  )
+  SUCCESS_TEXT = (
+      'The assessments or the issues from the import file that required '
+      'tickets updates have been successfully updated.'
+  )
+  ERROR_TITLE = (
+      'There were some errors in updating tickets for your GGRC import '
+      '{filename}'
+  )
+  ERROR_TEXT = (
+      'There were errors that prevented updates of some tickets based on '
+      'your import file submission. The error may be due to your lack to '
+      'sufficient access to generate/update the tickets. Here is the list '
+      'of assessments or issues that were not updated.'
+  )
 
   @staticmethod
   def get_issuetracked_objects(obj_type, obj_ids):
@@ -475,7 +558,7 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
 
     data = {"title": parent.title}
     if failed:
-      body = settings.EMAIL_BULK_SYNC_EXCEPTION.render()
+      body = settings.EMAIL_BULK_CHILD_SYNC_EXCEPTION.render()
     elif errors:
       data["assessments"] = [
           {
@@ -484,9 +567,9 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
               "title": obj.title,
           } for (obj, _) in errors
       ]
-      body = settings.EMAIL_BULK_SYNC_FAILED.render(sync_data=data)
+      body = settings.EMAIL_BULK_CHILD_SYNC_FAILED.render(sync_data=data)
     else:
-      body = settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data=data)
+      body = settings.EMAIL_BULK_CHILD_SYNC_SUCCEEDED.render(sync_data=data)
 
     receiver = login.get_current_user()
     common.send_email(receiver.email, ISSUETRACKER_SYNC_TITLE, body)
@@ -504,3 +587,109 @@ class IssuetrackedObjInfo(collections.namedtuple(
     return super(IssuetrackedObjInfo, cls).__new__(
         cls, obj, hotlist_ids, component_id
     )
+
+
+class IssueTrackerCommentUpdater(IssueTrackerBulkUpdater):
+  """This class should sync comments added to issuetracked objects."""
+
+  def sync_issuetracker(self, request_data):
+    """Generate IssueTracker issues in bulk.
+
+    Args:
+        request_data: {
+            'comments': [object_type, object_id, comment_description],
+            'mail_data': {user_email: email}
+        }
+        Comments list contains objects to by synchronized and comment that
+        was added to this object. This list can contain multiply comments to
+        single object. Several items would be placed to comments list in that
+        case.
+    Returns:
+        flask.wrappers.Response - response with result of generation.
+    """
+    objects_data = request_data.get("comments", [])
+    author = request_data.get("mail_data", {}).get("user_email", '')
+    issuetracked_info = []
+    with benchmark("Load issuetracked objects from database"):
+      objects_info = self.group_objs_by_type(objects_data)
+      for obj_type, obj_id_info in objects_info.items():
+        for obj in self.get_issuetracked_objects(obj_type,
+                                                 obj_id_info.keys()):
+          for comment in obj_id_info[obj.id]:
+            issuetracked_info.append({
+                "obj": obj,
+                "comment": comment
+            })
+    created, errors = self.handle_issuetracker_sync(issuetracked_info, author)
+    logger.info(
+        "Synchronized comments for issues count: %s, failed count: %s",
+        len(created),
+        len(errors),
+    )
+    return self.make_response(errors)
+
+  # pylint: disable=arguments-differ
+  def handle_issuetracker_sync(self, tracked_objs, author):
+    """Create comments to IssueTracker issues for tracked objects in bulk.
+
+    Args:
+        tracked_objs: [{obj: object, comment:comment}] - tracked object info.
+        It contains object and single comment that was added to it.
+
+        It can be multiple comments to the same object. That means it would be
+        several elements in this list for this object.
+        author - author of comments that were added via bulk operations.
+    Returns:
+        Tuple with dicts of created issue info and errors.
+    """
+    errors = []
+    created = {}
+
+    # IssueTracker server api doesn't support collection post, thus we
+    # create issues in loop.
+    for obj_info in tracked_objs:
+      try:
+        issue_json = self._get_issue_json(obj_info["obj"],
+                                          obj_info["comment"],
+                                          author)
+
+        issue_id = obj_info["obj"].issuetracker_issue.issue_id
+        with benchmark("Synchronize issue for {} with id {}".format(
+            obj_info["obj"].type, obj_info["obj"].id
+        )):
+          res = self.sync_issue(issue_json, issue_id)
+
+        self._process_result(res, issue_json)
+        created[(obj_info["obj"].type, obj_info["obj"].id)] = issue_json
+      except (TypeError, ValueError, AttributeError, integrations_errors.Error,
+              ggrc_exceptions.ValidationError, exceptions.Forbidden) as error:
+        self._add_error(errors, obj_info["obj"], error)
+    return created, errors
+
+  @staticmethod
+  def group_objs_by_type(object_data):
+    """Group objects data by obj type."""
+    objects_info = collections.defaultdict(
+        lambda: collections.defaultdict(list)
+    )
+    for obj in object_data:
+      objects_info[obj.get("type")][obj.get("id")].append(
+          obj.get("comment_description")
+      )
+    return objects_info
+
+  # pylint: disable=arguments-differ
+  def _get_issue_json(self, object_, comment, author):
+    """Get json data for IssueTracker issue related to provided object."""
+    issue_json = None
+    integration_handler = self.INTEGRATION_HANDLERS.get(object_.type)
+    if hasattr(integration_handler, "prepare_comment_update_json"):
+      issue_json = integration_handler.prepare_comment_update_json(object_,
+                                                                   comment,
+                                                                   author)
+
+    if not issue_json:
+      raise integrations_errors.Error(
+          "Can't create issuetracker issue json for {}".format(object_.type)
+      )
+    return issue_json

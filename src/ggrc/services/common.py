@@ -24,7 +24,7 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden, HTTPException
 
 import ggrc.builder.json
 import ggrc.models
@@ -1154,7 +1154,13 @@ class Resource(ModelView):
           db.session.rollback()
         except gdrive.GdriveUnauthorized as error:
           headers["X-Expected-Error"] = True
-          res.append((401, error.message))
+          res.append((401, error.description or ""))
+          db.session.rollback()
+        except HTTPException as error:
+          res.append((
+              error.code or 500,
+              error.description or "",
+          ))
           db.session.rollback()
         except Exception as error:
           res.append((getattr(error, "code", 500), error.message))

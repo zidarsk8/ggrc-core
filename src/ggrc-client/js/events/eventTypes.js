@@ -188,6 +188,17 @@ const MAP_OBJECTS = {
   type: 'mapObjects',
 };
 
+/**
+ * Deferred map objects to instance.
+ * @event deferredMapObjects
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {Object[]} objects - Mapped objects.
+ */
+const DEFERRED_MAP_OBJECTS = {
+  type: 'deferredMapObjects',
+};
+
 export {
   REFRESH_SUB_TREE,
   REFRESH_RELATED,
@@ -207,4 +218,5 @@ export {
   BEFORE_DOCUMENT_CREATE,
   DOCUMENT_CREATE_FAILED,
   MAP_OBJECTS,
+  DEFERRED_MAP_OBJECTS,
 };

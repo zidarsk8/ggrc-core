@@ -7,6 +7,7 @@ import template from './issue-tracker-enable.mustache';
 import logger from './issue-tracker-log';
 import {getPageInstance} from '../current-page-utils';
 import Assessment from '../../../models/business-models/assessment';
+import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 /* eslint-disable no-console */
 
@@ -150,7 +151,7 @@ const IssueTrackerEnabler = can.Map.extend({
         right: slugs,
       },
     };
-    let filter = GGRC.query_parser.join_queries(relevantToAuditFilter, query);
+    let filter = QueryParser.joinQueries(relevantToAuditFilter, query);
 
     let ids = await getRelatedAssessmentsIds(filter);
 

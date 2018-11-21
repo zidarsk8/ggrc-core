@@ -18,7 +18,6 @@ import Permission from '../../permission';
 import template from './create-document-button.mustache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
-import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const viewModel = can.Map.extend({
   parentInstance: null,
@@ -87,7 +86,6 @@ const viewModel = can.Map.extend({
       let instance = new Document({
         title: file.title,
         source_gdrive_id: file.id,
-        created_at: getFormattedUtcDate(),
         context: new Context({id: null}),
       });
 

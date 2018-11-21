@@ -280,44 +280,19 @@ export default can.Component.extend({
         this.attr(type).replace(this['load' + can.capitalize(type)]());
       }.bind(this));
     },
-    afterCreate: function (event, type) {
-      let createdItems = event.items;
-      let success = event.success;
+    removeItems: function (event, type) {
       let items = this.attr(type);
 
       can.batch.start();
-      if (success) {
-        createdItems.forEach((newItem) => {
-          let item = _.find(
-            items,
-            (item) => item._stamp && item._stamp === newItem._stamp
-          );
-
-          if (!item) {
-            return;
-          }
-
-          // apply new values of properties
-          item.attr(newItem);
-
-          // remove unneeded attrs
-          item.removeAttr('_stamp');
+      let resultItems = items.filter((item) => {
+        let newItemIndex = _.findIndex(event.items, (newItem) => {
+          return newItem === item;
         });
-      } else {
-        // remove all "createdItems" from "items" with the same "_stamp"
-        let resultItems = items.filter((item) => {
-          let newItemIndex = _.findIndex(createdItems, (newItem) => {
-            return newItem._stamp === item._stamp;
-          });
+        return newItemIndex < 0;
+      });
 
-          return newItemIndex < 0;
-        });
-
-        items.replace(resultItems);
-      }
+      items.replace(resultItems);
       can.batch.stop();
-
-      this.attr('isUpdating' + can.capitalize(type), false);
     },
     addItems: function (event, type) {
       let items = event.items;
@@ -369,11 +344,6 @@ export default can.Component.extend({
               tracker.USER_JOURNEY_KEYS.INFO_PANE,
               tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
           }
-
-          self.afterCreate({
-            items: [event.item],
-            success: true,
-          }, type);
         })
         .fail(function () {
           if (type === 'comments') {
@@ -387,13 +357,14 @@ export default can.Component.extend({
               false);
           }
 
-          self.afterCreate({
+          self.removeItems({
             items: [event.item],
-            success: false,
           }, type);
         })
         .always(function (assessment) {
           assessment.removeAttr('actions');
+          self.attr('isUpdating' + can.capitalize(type), false);
+
           // dispatching event on instance to pass to the auto-save-form
           self.attr('instance').dispatch(RELATED_ITEMS_LOADED);
 
