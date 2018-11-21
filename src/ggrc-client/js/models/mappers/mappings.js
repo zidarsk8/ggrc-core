@@ -277,9 +277,9 @@ export default can.Construct.extend({
   get_canonical_mappings_for: function (object) {
     let mappings = {};
     let config = this.config;
-    if (config._canonical_mappings && config._canonical_mappings[object]) {
-      _.forEach(config._canonical_mappings[object],
-        (mappingName, model) => {
+    if (config && config[object] && config[object]._canonical) {
+      _.forEach(config[object]._canonical,
+        (model) => {
           mappings[model] = businessModels[model];
         });
     }
@@ -368,9 +368,9 @@ export default can.Construct.extend({
   get_related_mappings_for(object) {
     let mappings = {};
     let config = this.config;
-    if (config._related_mappings && config._related_mappings[object]) {
-      _.forEach(config._related_mappings[object],
-        (mappingName, model) => {
+    if (config && config[object] && config[object]._related) {
+      _.forEach(config[object]._related,
+        (model) => {
           mappings[model] = businessModels[model];
         });
     }
@@ -383,47 +383,11 @@ export default can.Construct.extend({
   */
   init: function (opts) {
     if (this.constructor.config) {
-      throw new Error('Mappings are already initialized');
+      throw new Error('Mappings are already initialized.');
     }
 
-    let that = this;
     this.constructor.config = this;
-    this._canonical_mappings = {};
-    this._related_mappings = {};
-    if (this.groups) {
-      _.forEach(this.groups, function (group, name) {
-        if (typeof group === 'function') {
-          that.groups[name] = $.proxy(group, that.groups);
-        }
-      });
-    }
-    let createdMappings = this.create_mappings(opts);
-    _.forEach(createdMappings, function (mappings, objectType) {
-      if (mappings._canonical) {
-        that._fillInMappings(objectType,
-          mappings._canonical, that._canonical_mappings);
-      }
-
-      if (mappings._related) {
-        that._fillInMappings(objectType,
-          mappings._related, that._related_mappings);
-      }
-    });
-    $.extend(this, createdMappings);
-  },
-  _fillInMappings(objectType, config, mappings) {
-    if (!mappings[objectType]) {
-      mappings[objectType] = {};
-    }
-
-    _.forEach(config, (optionTypes, mappingName) => {
-      if (!can.isArray(optionTypes)) {
-        optionTypes = [optionTypes];
-      }
-      optionTypes.forEach((optionType) => {
-        mappings[objectType][optionType] = mappingName;
-      });
-    });
+    $.extend(this, this.create_mappings(opts));
   },
   // Recursively handle mixins -- this function should not be called directly.
   reify_mixins: function (definition, definitions) {
