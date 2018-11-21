@@ -374,6 +374,47 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     expected_args = (TICKET_ID, {"comment": comment})
     self.assertEqual(expected_args, update_mock.call_args[0])
 
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_cc_list_during_link(self, update_mock):
+    """Test assessment linking functionality sync appropriate cc list"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      assmt = factories.AssessmentFactory(audit=audit)
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=TICKET_ID,
+          issue_tracked_obj=assmt,
+      )
+      user = factories.PersonFactory(email="1@e.com")
+      factories.AccessControlPersonFactory(
+          ac_list=assmt.acr_name_acl_map["Assignees"],
+          person=user,
+      )
+      user = factories.PersonFactory(email="2@e.com")
+      factories.AccessControlPersonFactory(
+          ac_list=assmt.acr_name_acl_map["Assignees"],
+          person=user,
+      )
+    new_ticket_id = TICKET_ID + 1
+    new_data = {"issue_id": new_ticket_id}
+    issue_request_payload = self.put_request_payload_builder(new_data)
+    new_data["ccs"] = ["3@e.com", "4@e.com"]
+    response_payload = self.response_payload_builder(new_data)
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                      return_value=response_payload) as get_mock:
+        response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
+    get_mock.assert_called_once()
+    self.assertEqual(set(update_mock.call_args_list[0][0][1]['ccs']),
+                     {"2@e.com", "3@e.com", "4@e.com"})
+    self.assert200(response)
+
   @mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
                      return_value=True)
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
