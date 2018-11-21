@@ -111,8 +111,8 @@ class BaseClientTest(unittest.TestCase):
 
   @ddt.data(400, 401, 403, 404, 405, 406, 500)
   @mock.patch('ggrc.integrations.client.urlfetch.fetch')
-  def tests_raises(self, error_code, fetch_mock):
-    """Test issues.Client raises appropriate exception"""
+  def test_get_issue_raises_exception(self, error_code, fetch_mock):
+    """Test issues.Client raises appropriate exception for error codes"""
     fetch_mock.return_value = ObjectDict({
         'status_code': error_code,
         'content': '{"status": "content"}'
