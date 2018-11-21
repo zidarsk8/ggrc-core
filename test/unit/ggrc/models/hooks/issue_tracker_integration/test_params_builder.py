@@ -14,8 +14,10 @@ import mock
 from ggrc.models import exceptions
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES
+from ggrc.integrations import client
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
+from unit.ggrc.integrations import test_client
 
 
 @ddt.ddt
@@ -376,3 +378,19 @@ class TestIssueQueryBuilder(unittest.TestCase):
         self.builder.params.get_issue_tracker_params(),
         expected_result
     )
+
+  @ddt.data(400, 401, 403, 404, 405, 406, 500)
+  @mock.patch('ggrc.integrations.client.urlfetch.fetch')
+  def test_link_builder_catch_exception(self, error_code, fetch_mock):
+    """Test builder catches client {} error exception"""
+    obj = mock.MagicMock()
+    fetch_mock.return_value = test_client.ObjectDict({
+        'status_code': error_code,
+        'content': '{"status": "content"}'
+    })
+    with mock.patch.multiple(client.BaseClient, ENDPOINT='endpoint'):
+      with mock.patch.object(params_builder.IssueParamsBuilder,
+                             "_build_allowed_emails",
+                             return_value=[]):
+        result = self.builder.build_params_for_issue_link(obj, 12, {})
+    self.assertTrue(result.is_empty())
