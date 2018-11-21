@@ -17,9 +17,8 @@ import TreeViewConfig from '../../apps/base_widgets';
   system to build widgets, map and unmap objects, etc.
 
   To configure a new Mappings instance, use the following format :
-  { <mixin name or source object type> : {
-      _mixins : [ <mixin name>, ... ],
-      _canonical : { <option type> : <name of mapping in parent object>, ... }
+  { <source object type> : {
+      map : [ <object name>, ...]
       <mapping name> : Proxy(...) | Direct(...)
                       | Multi(...)
                       | CustomFilter(...),
@@ -381,72 +380,11 @@ export default can.Construct.extend({
     On init:
     kick off the application of mixins to the mappings and resolve canonical mappings
   */
-  init: function (opts) {
+  init: function (definitions) {
     if (this.constructor.config) {
       throw new Error('Mappings are already initialized.');
     }
 
-    this.constructor.config = this;
-    $.extend(this, this.create_mappings(opts));
-  },
-  // Recursively handle mixins -- this function should not be called directly.
-  reify_mixins: function (definition, definitions) {
-    let that = this;
-    let finalDefinition = {};
-    if (definition._mixins) {
-      _.forEach(definition._mixins, function (mixin) {
-        if (typeof (mixin) === 'string') {
-          // If string, recursive lookup
-          if (!definitions[mixin]) {
-            console.warn('Undefined mixin: ' + mixin, definitions);
-          } else {
-            _.merge(finalDefinition,
-              that.reify_mixins(definitions[mixin], definitions));
-          }
-        } else if (_.isFunction(mixin)) {
-          // If function, call with current definition state
-          mixin(finalDefinition);
-        } else {
-          // Otherwise, assume object and extend
-          if (finalDefinition._canonical && mixin._canonical) {
-            mixin = Object.assign({}, mixin);
-
-            _.forEach(mixin._canonical, function (types, mapping) {
-              if (finalDefinition._canonical[mapping]) {
-                if (!can.isArray(finalDefinition._canonical[mapping])) {
-                  finalDefinition._canonical[mapping] =
-                    [finalDefinition._canonical[mapping]];
-                }
-                finalDefinition._canonical[mapping] =
-                  can.unique(finalDefinition._canonical[mapping]
-                    .concat(types));
-              } else {
-                finalDefinition._canonical[mapping] = types;
-              }
-            });
-            finalDefinition._canonical = Object.assign({}, mixin._canonical,
-              finalDefinition._canonical);
-            delete mixin._canonical;
-          }
-          Object.assign(finalDefinition, mixin);
-        }
-      });
-    }
-    _.merge(finalDefinition, definition);
-    delete finalDefinition._mixins;
-    return finalDefinition;
-  },
-
-  // create mappings for definitions -- this function should not be called directly/
-  create_mappings: function (definitions) {
-    let mappings = {};
-
-    _.forEach(definitions, (definition, name) => {
-      // Only output the mappings if it's a model, e.g., uppercase first letter
-      if (name[0] === name[0].toUpperCase()) {
-        mappings[name] = this.reify_mixins(definition, definitions);
-      }
-    });
-    return mappings;
+    this.constructor.config = definitions;
   },
 });

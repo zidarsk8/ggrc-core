@@ -34,9 +34,6 @@ const scopingObjects = [
 
 new Mappings({
   base: {},
-  relatedMappings: {
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
-  },
 
   Person: {
     _related: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
@@ -54,31 +51,29 @@ new Mappings({
   },
 
   // Core objects
-  coreObjectsMappings: {
-    _mixins: ['relatedMappings'],
-    _canonical: _.difference(businessObjects, ['Assessment']),
-  },
-
   Issue: {
     _canonical: [...coreObjects, 'Document', 'Program'],
     _related: ['Assessment', 'Audit', 'Person', 'TaskGroup', 'Workflow'],
   },
   Contract: {
-    _mixins: ['coreObjectsMappings'],
     _canonical: _.difference(businessObjects, ['Assessment', 'Contract']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
-    _mixins: ['coreObjectsMappings'],
+    _canonical: _.difference(businessObjects, ['Assessment']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {
-    _mixins: ['coreObjectsMappings'],
+    _canonical: _.difference(businessObjects, ['Assessment']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Policy: {
-    _mixins: ['coreObjectsMappings'],
     _canonical: _.difference(businessObjects, ['Assessment', 'Policy']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Requirement: {
-    _mixins: ['coreObjectsMappings'],
+    _canonical: _.difference(businessObjects, ['Assessment']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Regulation: {
     _canonical: _.difference(businessObjects,
@@ -87,7 +82,8 @@ new Mappings({
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Risk: {
-    _mixins: ['coreObjectsMappings'],
+    _canonical: _.difference(businessObjects, ['Assessment']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Standard: {
     _canonical: _.difference(businessObjects,
@@ -96,67 +92,97 @@ new Mappings({
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Threat: {
-    _mixins: ['coreObjectsMappings'],
+    _canonical: _.difference(businessObjects, ['Assessment']),
+    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
 
   // Scoping objects
-  scopingObjectsMappings: {
+  AccessGroup: {
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
+  },
+  DataAsset: {
     _canonical: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
     _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
       'Workflow'],
   },
-  AccessGroup: {
-    _mixins: ['scopingObjectsMappings'],
-    _canonical: _.difference(businessObjects,
-      ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
-  },
-  DataAsset: {
-    _mixins: ['scopingObjectsMappings'],
-  },
   Facility: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   Market: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   Metric: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   OrgGroup: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   Process: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   Product: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   ProductGroup: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   Project: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   System: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   TechnologyEnvironment: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
   Vendor: {
-    _mixins: ['scopingObjectsMappings'],
+    _canonical: _.difference(businessObjects,
+      ['Assessment', 'Standard', 'Regulation']),
+    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
+      'Workflow'],
   },
 
   // Audit
   Audit: {
-    _mixins: ['relatedObject'],
     _canonical: coreObjects,
     _related:
       ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person', 'Program'],
   },
   Assessment: {
-    _mixins: ['relatedObject'],
     _canonical: coreObjects,
     _related: ['Audit', 'Evidence', 'Person'],
   },
