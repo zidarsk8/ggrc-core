@@ -3,20 +3,22 @@
 
 """Test bulk issuetracker synchronization."""
 import unittest
+from collections import OrderedDict
 
 import ddt
 import mock
 
 from flask import g
 
+from ggrc import settings
 from ggrc import db
 from ggrc import views
-from ggrc.app import app
 
 from ggrc.notifications import data_handlers
 from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
+from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from integration.ggrc import TestCase, generator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
@@ -251,35 +253,18 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
     result_ids = [issue.id for issue in result]
     self.assertEqual(set(issue_ids_enabled), set(result_ids))
 
-  @ddt.data(
-      ("IssueTrackerBulkCreator", "background_generate_issues"),
-      ("IssueTrackerBulkUpdater", "background_update_issues"),
-  )
-  @ddt.unpack
-  def test_issue_generate_call(self, class_name, func_name):
+  def test_issue_generate_call(self):
     """Test generate_issue call creates task for bulk generate."""
     user = all_models.Person.query.filter_by(email="user@example.com").one()
     setattr(g, '_current_user', user)
-    _, assessment_ids = self.setup_assessments(3)
-
     data = {
-        "objects": [{
-            "type": "Assessment",
-            "id": id_,
-        } for id_ in assessment_ids],
+        "revision_ids": [1, 2, 3],
     }
-
-    response = app.make_response(("success", 200, ))
-    func_addr = ("ggrc.integrations.issuetracker_bulk_sync." +
-                 class_name + ".sync_issuetracker")
-    with mock.patch(func_addr, return_value=response) as generate_mock:
-      callable_func = getattr(views, func_name)
-      result = callable_func(data)
+    result = views.background_update_issues(data)
 
     self.assert200(result)
     bg_task = all_models.BackgroundTask.query.one()
     self.assertEqual(bg_task.status, "Success")
-    generate_mock.assert_called_once()
 
   def test_asmnt_bulk_generate(self):
     """Test bulk generation of issues for Assessments."""
@@ -903,3 +888,89 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
     # pylint: disable=protected-access
     result = updater._get_issue_json(obj)
     self.assertEqual(expected_result, result)
+
+
+@ddt.ddt
+class TestBulkCommentUpdate(TestBulkIssuesSync):
+  """Test adding comments to IssueTracker issues via bulk."""
+
+  @ddt.data(
+      ("Issue", ["c1", "c2", "c3"]),
+      ("Assessment", ["c1", "c2", "c3"]),
+  )
+  @ddt.unpack
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_comment_bulk_update(self, model, comments, update_mock):
+    """Test bulk comment's update requests are sent correctly"""
+    with factories.single_commit():
+      factory = factories.get_model_factory(model)
+      obj = factory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=obj,
+          issue_id=123,
+      )
+      request_data = {
+          "comments": [
+              {"type": obj.type, "id": obj.id, "comment_description": comment}
+              for comment in comments
+          ],
+          "mail_data": {"user_email": "user@example.com"},
+      }
+      updater = issuetracker_bulk_sync.IssueTrackerCommentUpdater()
+      result = updater.sync_issuetracker(request_data)
+      builder = issue_tracker_params_builder.IssueParamsBuilder
+      template = builder.COMMENT_TMPL
+      url_builder = builder.get_ggrc_object_url
+
+      self.assert200(result)
+      # pylint: disable=consider-using-enumerate
+      for i in range(len(comments)):
+        self.assertEqual(update_mock.call_args_list[i][0][0], 123)
+        self.assertEqual(
+            update_mock.call_args_list[i][0][1]["comment"],
+            template.format(author="user@example.com",
+                            model=model,
+                            comment=comments[i],
+                            link=url_builder(obj))
+        )
+
+  @ddt.data("Issue", "Assessment")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_comment_update_call(self,
+                               model):
+    """Test bulk update calls appropriate methods"""
+    with factories.single_commit():
+      factory = factories.get_model_factory(model)
+      obj = factory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=obj,
+          issue_id=123,
+      )
+    comments = "c1;;c2;;c3"
+
+    with mock.patch.object(issuetracker_bulk_sync.IssueTrackerCommentUpdater,
+                           "sync_issuetracker",
+                           return_value=([], [])) as comment_mock:
+      with mock.patch.object(issuetracker_bulk_sync.IssueTrackerBulkCreator,
+                             "sync_issuetracker",
+                             return_value=([], [])) as create_mock:
+        with mock.patch.object(issuetracker_bulk_sync.IssueTrackerBulkCreator,
+                               "sync_issuetracker",
+                               return_value=([], [])) as upd_mock:
+          response = self.import_data(OrderedDict([
+              ("object_type", model),
+              ("Code*", obj.slug),
+              ("Comments", comments),
+          ]))
+
+    expected_comments = [
+        {'comment_description': comment, 'type': model, 'id': obj.id}
+        for comment in comments.split(";;")
+    ]
+    self._check_csv_response(response, {})
+    self.assertEqual(comment_mock.call_args[0][0]["comments"],
+                     expected_comments)
+    upd_mock.assert_called_once()
+    create_mock.assert_not_called()

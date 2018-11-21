@@ -45,7 +45,7 @@ class IssueTrackerBulkCreator(object):
 
   SUCCESS_TITLE = (
       'Ticket generation for your GGRC import {filename} was completed '
-      'successfully.'
+      'successfully'
   )
   SUCCESS_TEXT = (
       'The assessments or the issues from the import file that required '
@@ -68,15 +68,25 @@ class IssueTrackerBulkCreator(object):
     self.break_on_errs = False
     self.client = issues.Client()
 
-  def sync_issuetracker(self, objects_data, filename='', recipient=''):
+  def sync_issuetracker(self, request_data):
     """Generate IssueTracker issues in bulk.
 
     Args:
-        objects. ([object_type, object_id, hotlist_ids, component_id])
-
+        request_data: {
+            'objects': [object_type, object_id, hotlist_ids, component_id],
+            'mail_data': {user_email: email, filename: filename}
+        }
+        objects list contains objects to by synchronized,
+        mail_data contains information for email notification(file that was
+          imported name and recipient email)
     Returns:
         flask.wrappers.Response - response with result of generation.
     """
+    objects_data = request_data.get("objects")
+
+    filename = request_data.get("mail_data", {}).get("filename", '')
+    recipient = request_data.get("mail_data", {}).get("user_email", '')
+
     try:
       issuetracked_info = []
       with benchmark("Load issuetracked objects from database"):
@@ -97,9 +107,11 @@ class IssueTrackerBulkCreator(object):
       )
     except:  # pylint: disable=bare-except
       self.send_notification(filename, recipient, failed=True)
+      return (None, None)
     else:
-      self.send_notification(filename, recipient, errors=errors)
-    return self.make_response(errors)
+      if created or errors:
+        self.send_notification(filename, recipient, errors=errors)
+    return (created, errors)
 
   @staticmethod
   def group_objs_by_type(object_data):
@@ -575,3 +587,109 @@ class IssuetrackedObjInfo(collections.namedtuple(
     return super(IssuetrackedObjInfo, cls).__new__(
         cls, obj, hotlist_ids, component_id
     )
+
+
+class IssueTrackerCommentUpdater(IssueTrackerBulkUpdater):
+  """This class should sync comments added to issuetracked objects."""
+
+  def sync_issuetracker(self, request_data):
+    """Generate IssueTracker issues in bulk.
+
+    Args:
+        request_data: {
+            'comments': [object_type, object_id, comment_description],
+            'mail_data': {user_email: email}
+        }
+        Comments list contains objects to by synchronized and comment that
+        was added to this object. This list can contain multiply comments to
+        single object. Several items would be placed to comments list in that
+        case.
+    Returns:
+        flask.wrappers.Response - response with result of generation.
+    """
+    objects_data = request_data.get("comments", [])
+    author = request_data.get("mail_data", {}).get("user_email", '')
+    issuetracked_info = []
+    with benchmark("Load issuetracked objects from database"):
+      objects_info = self.group_objs_by_type(objects_data)
+      for obj_type, obj_id_info in objects_info.items():
+        for obj in self.get_issuetracked_objects(obj_type,
+                                                 obj_id_info.keys()):
+          for comment in obj_id_info[obj.id]:
+            issuetracked_info.append({
+                "obj": obj,
+                "comment": comment
+            })
+    created, errors = self.handle_issuetracker_sync(issuetracked_info, author)
+    logger.info(
+        "Synchronized comments for issues count: %s, failed count: %s",
+        len(created),
+        len(errors),
+    )
+    return self.make_response(errors)
+
+  # pylint: disable=arguments-differ
+  def handle_issuetracker_sync(self, tracked_objs, author):
+    """Create comments to IssueTracker issues for tracked objects in bulk.
+
+    Args:
+        tracked_objs: [{obj: object, comment:comment}] - tracked object info.
+        It contains object and single comment that was added to it.
+
+        It can be multiple comments to the same object. That means it would be
+        several elements in this list for this object.
+        author - author of comments that were added via bulk operations.
+    Returns:
+        Tuple with dicts of created issue info and errors.
+    """
+    errors = []
+    created = {}
+
+    # IssueTracker server api doesn't support collection post, thus we
+    # create issues in loop.
+    for obj_info in tracked_objs:
+      try:
+        issue_json = self._get_issue_json(obj_info["obj"],
+                                          obj_info["comment"],
+                                          author)
+
+        issue_id = obj_info["obj"].issuetracker_issue.issue_id
+        with benchmark("Synchronize issue for {} with id {}".format(
+            obj_info["obj"].type, obj_info["obj"].id
+        )):
+          res = self.sync_issue(issue_json, issue_id)
+
+        self._process_result(res, issue_json)
+        created[(obj_info["obj"].type, obj_info["obj"].id)] = issue_json
+      except (TypeError, ValueError, AttributeError, integrations_errors.Error,
+              ggrc_exceptions.ValidationError, exceptions.Forbidden) as error:
+        self._add_error(errors, obj_info["obj"], error)
+    return created, errors
+
+  @staticmethod
+  def group_objs_by_type(object_data):
+    """Group objects data by obj type."""
+    objects_info = collections.defaultdict(
+        lambda: collections.defaultdict(list)
+    )
+    for obj in object_data:
+      objects_info[obj.get("type")][obj.get("id")].append(
+          obj.get("comment_description")
+      )
+    return objects_info
+
+  # pylint: disable=arguments-differ
+  def _get_issue_json(self, object_, comment, author):
+    """Get json data for IssueTracker issue related to provided object."""
+    issue_json = None
+    integration_handler = self.INTEGRATION_HANDLERS.get(object_.type)
+    if hasattr(integration_handler, "prepare_comment_update_json"):
+      issue_json = integration_handler.prepare_comment_update_json(object_,
+                                                                   comment,
+                                                                   author)
+
+    if not issue_json:
+      raise integrations_errors.Error(
+          "Can't create issuetracker issue json for {}".format(object_.type)
+      )
+    return issue_json

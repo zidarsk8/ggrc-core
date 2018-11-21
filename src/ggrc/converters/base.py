@@ -4,7 +4,7 @@
 """Base objects for csv file converters."""
 
 from collections import defaultdict
-
+from flask import g
 from google.appengine.ext import deferred
 
 from ggrc import login
@@ -52,7 +52,9 @@ class ImportConverter(BaseConverter):
       "title"
   ]
 
-  def __init__(self, dry_run=True, csv_data=None):
+  def __init__(self, ie_job, dry_run=True, csv_data=None):
+    self.user = getattr(g, '_current_user', None)
+    self.ie_job = ie_job
     self.dry_run = dry_run
     self.csv_data = csv_data or []
     self.indexer = get_indexer()
@@ -81,16 +83,35 @@ class ImportConverter(BaseConverter):
       yield block_converter
 
   def import_csv_data(self):
-    revision_ids = []
+    """Process import and post import jobs."""
 
+    revision_ids = []
     for converter in self.initialize_block_converters():
       if not converter.ignore:
         converter.import_csv_data()
         revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
-
     self._start_compute_attributes_job(revision_ids)
+    if not self.dry_run and settings.ISSUE_TRACKER_ENABLED:
+      self._start_issuetracker_update(revision_ids)
     self.drop_cache()
+
+  def _start_issuetracker_update(self, revision_ids):
+    """Create or update issuetracker tickets for all imported instances."""
+
+    arg_list = {"revision_ids": revision_ids}
+
+    filename = getattr(self.ie_job, "title", '')
+    user_email = getattr(self.user, "email", '')
+    mail_data = {
+        "filename": filename,
+        "user_email": user_email,
+    }
+
+    arg_list["mail_data"] = mail_data
+
+    from ggrc import views
+    views.background_update_issues(parameters=arg_list)
 
   def _start_compute_attributes_job(self, revision_ids):
     if revision_ids:

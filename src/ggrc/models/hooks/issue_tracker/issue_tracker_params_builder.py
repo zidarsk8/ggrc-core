@@ -120,6 +120,17 @@ class BaseIssueTrackerParamsBuilder(object):
         if new_value != old_value:
           setattr(self.params, field, new_value)
 
+  def build_params_for_comment(self, sync_obj, comment, author):
+    """Build query to Issue tracker for adding comment to issue."""
+    comment = html2text.HTML2Text().handle(comment).strip("\n")
+    self.params.add_comment(self.COMMENT_TMPL.format(
+        author=author,
+        comment=comment,
+        model=sync_obj.__class__.__name__,
+        link=self.get_ggrc_object_url(sync_obj),
+    ))
+    return self.params
+
 
 class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
   """Issue tracker query builder for GGRC Issue object."""
@@ -236,17 +247,6 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     """Build delete issue query for issue tracker."""
     self.params.add_comment(self.DELETE_TMPL.format(model="Issue"))
 
-    return self.params
-
-  def build_params_for_comment(self, sync_obj, comment, author):
-    """Build query to Issue tracker for adding comment to issue."""
-    comment = html2text.HTML2Text().handle(comment).strip("\n")
-    self.params.add_comment(self.COMMENT_TMPL.format(
-        author=author,
-        comment=comment,
-        model=sync_obj.__class__.__name__,
-        link=self.get_ggrc_object_url(sync_obj),
-    ))
     return self.params
 
   def build_detach_comment(self, new_ticket):
