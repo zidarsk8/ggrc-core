@@ -12,8 +12,8 @@ import TreeViewConfig from '../../apps/base_widgets';
   class Mappings
   represents everything known about how GGRC objects connect to each other.
 
-  a Mappings instance contains the set of known mappings for a module, such as "ggrc_core"
-  or "ggrc_gdrive_integration".  The set of all Mappings instances is used throughout the
+  a Mappings instance contains the set of known mappings.
+  The set of all Mappings instances is used throughout the
   system to build widgets, map and unmap objects, etc.
 
   To configure a new Mappings instance, use the following format :
@@ -28,7 +28,7 @@ import TreeViewConfig from '../../apps/base_widgets';
   }
 */
 export default can.Construct.extend({
-  modules: {},
+  config: null,
   getTypeGroups: function () {
     return {
       entities: {
@@ -250,7 +250,7 @@ export default can.Construct.extend({
     group.items.push(type);
   },
   /*
-    return all mappings from all modules for an object type.
+    return all mappings for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by mapping name
@@ -258,34 +258,32 @@ export default can.Construct.extend({
   */
   get_mappings_for: function (object) {
     let mappings = {};
-    _.forEach(this.modules, function (mod, name) {
-      if (mod[object]) {
-        _.forEach(mod[object], function (mapping, mappingName) {
-          if (mappingName === '_canonical') {
-            return;
-          }
-          mappings[mappingName] = mapping;
-        });
-      }
-    });
+    if (this.config[object]) {
+      _.forEach(this.config[object], function (mapping, mappingName) {
+        if (mappingName === '_canonical') {
+          return;
+        }
+        mappings[mappingName] = mapping;
+      });
+    }
     return mappings;
   },
   /*
-    return all canonical mappings (suitable for joining) from all modules for an object type.
+    return all canonical mappings (suitable for joining) for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all mappings (instances of CMS.Models)
   */
   get_canonical_mappings_for: function (object) {
     let mappings = {};
-    _.forEach(this.modules, (mod, name) => {
-      if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-        _.forEach(mod._canonical_mappings[object],
-          (mappingName, model) => {
-            mappings[model] = businessModels[model];
-          });
-      }
-    });
+    let config = this.config;
+    if (config._canonical_mappings && config._canonical_mappings[object]) {
+      _.forEach(config._canonical_mappings[object],
+        (mappingName, model) => {
+          mappings[model] = businessModels[model];
+        });
+    }
+
     return mappings;
   },
   get_mapper: function (mappingName, type) {
@@ -362,21 +360,20 @@ export default can.Construct.extend({
     return binding.refresh_list();
   },
   /*
-    return all related mappings from all modules for an object type.
+    return all related mappings for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all related mappings (instances of CMS.Models)
   */
   get_related_mappings_for(object) {
     let mappings = {};
-    _.forEach(this.modules, (mod) => {
-      if (mod._related_mappings && mod._related_mappings[object]) {
-        _.forEach(mod._related_mappings[object],
-          (mappingName, model) => {
-            mappings[model] = businessModels[model];
-          });
-      }
-    });
+    let config = this.config;
+    if (config._related_mappings && config._related_mappings[object]) {
+      _.forEach(config._related_mappings[object],
+        (mappingName, model) => {
+          mappings[model] = businessModels[model];
+        });
+    }
     return mappings;
   },
 }, {
@@ -384,10 +381,13 @@ export default can.Construct.extend({
     On init:
     kick off the application of mixins to the mappings and resolve canonical mappings
   */
-  init: function (name, opts) {
-    let createdMappings;
+  init: function (opts) {
+    if (this.constructor.config) {
+      throw new Error('Mappings are already initialized');
+    }
+
     let that = this;
-    this.constructor.modules[name] = this;
+    this.constructor.config = this;
     this._canonical_mappings = {};
     this._related_mappings = {};
     if (this.groups) {
@@ -397,7 +397,7 @@ export default can.Construct.extend({
         }
       });
     }
-    createdMappings = this.create_mappings(opts);
+    let createdMappings = this.create_mappings(opts);
     _.forEach(createdMappings, function (mappings, objectType) {
       if (mappings._canonical) {
         that._fillInMappings(objectType,

@@ -32,7 +32,7 @@ const scopingObjects = [
   'TechnologyEnvironment', 'Vendor',
 ];
 
-new Mappings('ggrc_core', {
+new Mappings({
   base: {},
   relatedMappings: {
     _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
