@@ -16,6 +16,7 @@ from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
+from ggrc.models.mixins.filterable import Filterable
 from ggrc.query import autocast
 from ggrc.query import my_objects
 from ggrc.query.exceptions import BadQueryException
@@ -61,11 +62,19 @@ def build_op_shortcut(predicate):
   def decorated(exp, object_class, target_class, query):
     """decorator for sended predicate"""
     key = exp['left'].lower()
+
     key, filter_by = target_class.attributes_map().get(key, (key, None))
     if callable(filter_by):
       return filter_by(lambda x: predicate(x, exp['right']))
+
     if key in GETATTR_WHITELIST:
       return predicate(getattr(object_class, key, None), exp['right'])
+
+    if issubclass(target_class, Filterable) and \
+       target_class.has_filterable_attribute(key):
+      attr = target_class.get_filterable_attribute(key)
+      return predicate(attr, exp['right'])
+
     return object_class.id.in_(
         db.session.query(Record.key).filter(
             Record.type == object_class.__name__,
