@@ -3,24 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Construct({
-  defaults: {
-    whileQueueHasElements: function () {},
-    whenQueueEmpties: function () {},
-  },
-}, {
-  init: function (options) {
+export default class PersistentNotifier {
+  constructor(options) {
     this.dfds = [];
     this.onEmptyCallbacksList = [];
 
-    can.each(this.constructor.defaults, (val, key) => {
-      this[key] = val;
-    });
-    can.each(options, (val, key) => {
-      this[key] = val;
-    });
-  },
-  queue: function (dfd) {
+    Object.assign(this, options);
+  }
+
+  whileQueueHasElements() {}
+
+  whenQueueEmpties() {}
+
+  queue(dfd) {
     let that = this;
     if (!dfd || !dfd.then) {
       throw new Error('Attempted to queue something other than a ' +
@@ -47,13 +42,14 @@ export default can.Construct({
     if (pendingCallbacks === 0 && that.dfds.length > 0) {
       that.whileQueueHasElements();
     }
-  },
-  onEmpty: function (fn) {
+  }
+
+  onEmpty(fn) {
     if (this.dfds.length === 0) {
       fn();
     }
     if (this.dfds.length > 0 && !this.onEmptyCallbacksList.includes(fn)) {
       this.onEmptyCallbacksList.push(fn);
     }
-  },
-});
+  }
+}
