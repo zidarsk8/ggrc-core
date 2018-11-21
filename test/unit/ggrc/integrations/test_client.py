@@ -7,11 +7,13 @@
 import unittest
 
 import mock
+import ddt
 
 from google.appengine.api import urlfetch_errors
 
 from ggrc.integrations import client
 from ggrc.integrations import integrations_errors
+from ggrc.integrations import issues
 
 
 class ObjectDict(dict):
@@ -21,6 +23,7 @@ class ObjectDict(dict):
   __setattr__ = dict.__setitem__
 
 
+@ddt.ddt
 class BaseClientTest(unittest.TestCase):
   """Test for Base Client"""
 
@@ -105,6 +108,21 @@ class BaseClientTest(unittest.TestCase):
           integrations_errors.HttpError,
           testable_obj._perform_request,
           'some_url')
+
+  @ddt.data(400, 401, 403, 404, 405, 406, 500)
+  @mock.patch('ggrc.integrations.client.urlfetch.fetch')
+  def tests_raises(self, error_code, fetch_mock):
+    """Test issues.Client raises appropriate exception"""
+    fetch_mock.return_value = ObjectDict({
+        'status_code': error_code,
+        'content': '{"status": "content"}'
+    })
+    with mock.patch.multiple(self.testable_cls, ENDPOINT='endpoint'):
+      self.assertRaises(
+          integrations_errors.HttpError,
+          issues.Client().get_issue,
+          'some_id'
+      )
 
 
 class JsonClientTest(unittest.TestCase):
