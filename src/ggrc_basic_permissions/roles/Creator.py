@@ -101,6 +101,7 @@ permissions = {
             }
         },
         "AssessmentTemplate",
+        "BackgroundTask",
         {
             "type": "TaskGroup",
             "condition": "is_workflow_admin",
