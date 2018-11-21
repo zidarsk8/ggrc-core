@@ -61,7 +61,7 @@ export default can.Construct.extend({
       return [];
     }
 
-    if (can.isFunction(baseModel.getAllowedMappings)) {
+    if (_.isFunction(baseModel.getAllowedMappings)) {
       return baseModel
         .getAllowedMappings()
         .filter(function (model) {
@@ -395,7 +395,7 @@ export default can.Construct.extend({
             can.extend(true, finalDefinition,
               that.reify_mixins(definitions[mixin], definitions));
           }
-        } else if (can.isFunction(mixin)) {
+        } else if (_.isFunction(mixin)) {
           // If function, call with current definition state
           mixin(finalDefinition);
         } else {

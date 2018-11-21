@@ -231,7 +231,7 @@ export default Cacheable('CMS.Models.Assessment', {
       oldModel = this.store[id];
     }
 
-    model = oldModel && can.isFunction(oldModel.attr) ?
+    model = oldModel && _.isFunction(oldModel.attr) ?
       oldModel.attr(attributes) :
       new this(attributes);
 

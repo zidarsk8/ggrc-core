@@ -180,7 +180,7 @@ export default can.Control.extend({
   add_child_list: function (item, data) {
     let findParams;
     data.attr({start_expanded: false});
-    if (can.isFunction(item.instance[data.property])) {
+    if (_.isFunction(item.instance[data.property])) {
       // Special case for handling mappings which are functions until
       // first requested, then set their name via .attr('...')
       findParams = function () {
