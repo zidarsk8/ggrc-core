@@ -910,7 +910,7 @@ def _link_assessment(assessment, issue_tracker_info):
     )
     return
 
-  issue_params = prepare_issue_json(assessment, issue_tracker_info)
+  issue_params = prepare_issue_json(assessment, issue_tracker_info, True)
   grouped_ccs = group_cc_emails(object_ccs=issue_params.get("ccs", []),
                                 additional_ccs=response["issueState"]["ccs"])
   issue_params["ccs"] = grouped_ccs
