@@ -91,6 +91,7 @@ class IssueTrackedWithUrl(IssueTracked):
       "issue_severity": "Severity",
       "issue_title": "Issue Title",
       "issue_type": "Issue Type",
+      "enabled": "Integration Enabled",
   }
 
 

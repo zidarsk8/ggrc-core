@@ -483,6 +483,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Priority",
         "Issue Type",
         "Issue Title",
+        "Integration Enabled",
     }
     expected_fields = {
         "mandatory": {
@@ -534,6 +535,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Priority",
         "Issue Type",
         "Issue Title",
+        "Integration Enabled",
     }
     expected_fields = {
         "mandatory": {
