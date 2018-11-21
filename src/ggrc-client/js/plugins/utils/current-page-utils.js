@@ -13,7 +13,7 @@ import {
 } from './snapshot-utils';
 import Mappings from '../../models/mappers/mappings';
 import {inferObjectType} from './models-utils';
-import PersistentNotifier from '../persistent_notifier';
+import PersistentNotifier from '../persistent-notifier';
 import {changeUrl, reloadPage} from '../../router';
 
 /**

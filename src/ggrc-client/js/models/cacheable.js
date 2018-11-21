@@ -11,7 +11,7 @@ import {
   setAttrs,
 } from '../plugins/utils/snapshot-utils';
 import resolveConflict from './conflict-resolution/conflict-resolution';
-import PersistentNotifier from '../plugins/persistent_notifier';
+import PersistentNotifier from '../plugins/persistent-notifier';
 import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
