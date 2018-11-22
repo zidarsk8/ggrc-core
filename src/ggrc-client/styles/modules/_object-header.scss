@@ -176,6 +176,10 @@
           color: $black;
         }
       }
+      .fa-link,
+      .fa-google {
+        margin-right: 8px;
+      } 
       &.border {
         border-top: 1px solid $headerBgnd;
         padding-top: 5px;
