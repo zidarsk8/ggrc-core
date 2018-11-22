@@ -6,7 +6,7 @@
 import Mappings from '../mappings';
 
 describe('Mappings', () => {
-  const types = Mappings.get_canonical_mappings_for('MultitypeSearch');
+  const types = Mappings.getAllowedToMapModels('MultitypeSearch');
 
   let modules = {
     core: [

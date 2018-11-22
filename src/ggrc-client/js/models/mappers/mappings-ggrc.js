@@ -33,175 +33,174 @@ const scopingObjects = [
 ];
 
 new Mappings({
-  base: {},
-
   Person: {
-    _related: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
+    indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
       ...getRoleableModels().map((model) => model.model_singular)],
   },
 
   Program: {
-    _canonical: [...coreObjects, 'Document'],
-    _related: ['Audit', 'Person', 'TaskGroup', 'Workflow'],
+    map: [...coreObjects, 'Document'],
+    indirectMappings: ['Audit', 'Person', 'TaskGroup', 'Workflow'],
   },
 
   Document: {
-    _canonical: [...coreObjects, 'Program'],
-    _related: ['Person'],
+    map: [...coreObjects, 'Program'],
+    indirectMappings: ['Person'],
   },
 
   // Core objects
   Issue: {
-    _canonical: [...coreObjects, 'Document', 'Program'],
-    _related: ['Assessment', 'Audit', 'Person', 'TaskGroup', 'Workflow'],
+    map: [...coreObjects, 'Document', 'Program'],
+    indirectMappings: ['Assessment', 'Audit', 'Person', 'TaskGroup',
+      'Workflow'],
   },
   Contract: {
-    _canonical: _.difference(businessObjects, ['Assessment', 'Contract']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment', 'Contract']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
-    _canonical: _.difference(businessObjects, ['Assessment']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {
-    _canonical: _.difference(businessObjects, ['Assessment']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Policy: {
-    _canonical: _.difference(businessObjects, ['Assessment', 'Policy']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment', 'Policy']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Requirement: {
-    _canonical: _.difference(businessObjects, ['Assessment']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Regulation: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       [...scopingObjects, 'Assessment', 'Regulation']),
-    _related:
+    indirectMappings:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Risk: {
-    _canonical: _.difference(businessObjects, ['Assessment']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Standard: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       [...scopingObjects, 'Assessment', 'Standard']),
-    _related:
+    indirectMappings:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Threat: {
-    _canonical: _.difference(businessObjects, ['Assessment']),
-    _related: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    map: _.difference(businessObjects, ['Assessment']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
 
   // Scoping objects
   AccessGroup: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'AccessGroup', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   DataAsset: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Facility: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Market: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Metric: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   OrgGroup: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Process: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Product: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   ProductGroup: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Project: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   System: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   TechnologyEnvironment: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
   Vendor: {
-    _canonical: _.difference(businessObjects,
+    map: _.difference(businessObjects,
       ['Assessment', 'Standard', 'Regulation']),
-    _related: ['Assessment', 'Person', 'Regulation', 'Standard', 'TaskGroup',
-      'Workflow'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
   },
 
   // Audit
   Audit: {
-    _canonical: coreObjects,
-    _related:
+    map: coreObjects,
+    indirectMappings:
       ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person', 'Program'],
   },
   Assessment: {
-    _canonical: coreObjects,
-    _related: ['Audit', 'Evidence', 'Person'],
+    map: coreObjects,
+    indirectMappings: ['Audit', 'Evidence', 'Person'],
   },
   Evidence: {
-    _related: ['Assessment', 'Audit', 'Person'],
+    indirectMappings: ['Assessment', 'Audit', 'Person'],
   },
   AssessmentTemplate: {
-    _related: ['Audit'],
+    indirectMappings: ['Audit'],
   },
 
   // Workflow
   TaskGroup: {
-    _canonical: [...coreObjects, 'Program'],
+    map: [...coreObjects, 'Program'],
   },
   TaskGroupTask: {
-    _related: ['Person', 'Workflow'],
+    indirectMappings: ['Person', 'Workflow'],
   },
   Workflow: {
-    _related: ['Person', 'TaskGroup', 'TaskGroupTask'],
+    indirectMappings: ['Person', 'TaskGroup', 'TaskGroupTask'],
   },
   CycleTaskGroupObjectTask: {
     // It is needed for an object list generation. This object list
@@ -209,8 +208,8 @@ new Mappings({
     // Types placed within this collection will be intersected
     // with TreeViewConfig.base_widgets_by_type["CycleTaskGroupObjectTask"]
     // collection. The result of the operation is the total list.
-    _canonical: [...coreObjects, 'Audit', 'Program'],
-    _related: ['Person'],
+    map: [...coreObjects, 'Audit', 'Program'],
+    indirectMappings: ['Person'],
     // Needed for related_objects mapper
     related_objects_as_source: Proxy(
       null,
@@ -258,7 +257,7 @@ new Mappings({
     role: Direct('Role', 'user_roles', 'role'),
   },
   MultitypeSearch: {
-    _canonical: [
+    map: [
       'AccessGroup', 'Assessment', 'AssessmentTemplate', 'Audit',
       'Contract', 'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
       'Document', 'Evidence', 'Facility', 'Issue', 'Market', 'Metric',

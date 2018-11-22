@@ -58,9 +58,9 @@ export default can.Construct.extend({
       return [];
     }
 
-    let canonical = this.get_canonical_mappings_for(type);
+    let allowedToMap = this.getAllowedToMapModels(type);
     let list = TreeViewConfig.attr('base_widgets_by_type')[type];
-    const compacted = _.compact([_.keys(canonical), list]);
+    const compacted = _.compact([_.keys(allowedToMap), list]);
     return _.intersection(...compacted);
   },
   /**
@@ -191,10 +191,10 @@ export default can.Construct.extend({
    * @return {Array} - list of available mappings
    */
   getAvailableMappings(type) {
-    let canonical = this.get_canonical_mappings_for(type);
-    let related = this.get_related_mappings_for(type);
+    let allowedToMap = this.getAllowedToMapModels(type);
+    let related = this.getIndirectlyMappedModels(type);
 
-    return Object.assign({}, canonical, related);
+    return Object.assign({}, allowedToMap, related);
   },
   /**
    * Return grouped types.
@@ -259,7 +259,7 @@ export default can.Construct.extend({
     let mappings = {};
     if (this.config[object]) {
       _.forEach(this.config[object], function (mapping, mappingName) {
-        if (mappingName === '_canonical') {
+        if (mappingName === 'map') {
           return;
         }
         mappings[mappingName] = mapping;
@@ -268,21 +268,23 @@ export default can.Construct.extend({
     return mappings;
   },
   /*
-    return all canonical mappings (suitable for joining) for an object type.
+    return all allowed mappings (suitable for joining) for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all mappings (instances of CMS.Models)
   */
-  get_canonical_mappings_for: function (object) {
+  getAllowedToMapModels: function (object) {
+    return this._getModelsFromConfig(object, 'map');
+  },
+  _getModelsFromConfig(object, prop) {
     let mappings = {};
     let config = this.config;
-    if (config && config[object] && config[object]._canonical) {
-      _.forEach(config[object]._canonical,
+    if (config[object] && config[object][prop]) {
+      _.forEach(config[object][prop],
         (model) => {
           mappings[model] = businessModels[model];
         });
     }
-
     return mappings;
   },
   get_mapper: function (mappingName, type) {
@@ -359,27 +361,15 @@ export default can.Construct.extend({
     return binding.refresh_list();
   },
   /*
-    return all related mappings for an object type.
+    return all possible indirectly mapped models for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all related mappings (instances of CMS.Models)
   */
-  get_related_mappings_for(object) {
-    let mappings = {};
-    let config = this.config;
-    if (config && config[object] && config[object]._related) {
-      _.forEach(config[object]._related,
-        (model) => {
-          mappings[model] = businessModels[model];
-        });
-    }
-    return mappings;
+  getIndirectlyMappedModels(object) {
+    return this._getModelsFromConfig(object, 'indirectMappings');
   },
 }, {
-  /*
-    On init:
-    kick off the application of mixins to the mappings and resolve canonical mappings
-  */
   init: function (definitions) {
     if (this.constructor.config) {
       throw new Error('Mappings are already initialized.');
