@@ -91,12 +91,12 @@ setup () {
   docker-compose --file "$DOCKERFILE" $OVERRIDE --project-name "$PROJECT" \
     up --force-recreate -d
 
-  docker exec -i "${PROJECT}_cleandev_1" su -c "
+  docker exec -i "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su -c "
     source /vagrant/bin/init_vagrant_env
     make clean_appengine && make appengine
   "
   if [[ "$MODE" == "dev" ]]; then
-    docker exec -i "${PROJECT}_cleandev_1" su -c "
+    docker exec -i "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su -c "
       source /vagrant/bin/init_vagrant_env
       build_assets
       db_reset
@@ -117,7 +117,7 @@ connect() {
   MODE="$1"
   PROJECT="$2"
 
-  docker exec -it "${PROJECT}_cleandev_1" su
+  docker exec -it "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su
 }
 
 run () {
@@ -136,7 +136,7 @@ run () {
     up --force-recreate -d
     
   if [[ "$MODE" == "dev" ]]; then
-    docker exec -it "${PROJECT}_cleandev_1" su
+    docker exec -it "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su
   fi
 }
 
