@@ -174,10 +174,6 @@
         }
         &.active {
           color: $black;
-          .fa-link {
-            @include opacity(1);
-            color: $green;
-          }
         }
       }
       &.border {
