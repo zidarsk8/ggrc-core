@@ -73,11 +73,8 @@
   </li>
 
   <li>
-    <clipboard-link
-        data-test-id="dropdown_settings_get_permalink_75e3bf91"
-        title="Get permalink"
-        notify="true"
-        text="{{get_permalink_for_object instance}}" />
+    <permalink data-test-id="dropdown_settings_get_permalink_75e3bf91"
+               {instance}="instance"/>
   </li>
 
   {{#is_info_pin}}
