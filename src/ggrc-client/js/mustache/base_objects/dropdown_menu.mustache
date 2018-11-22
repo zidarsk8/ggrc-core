@@ -67,8 +67,7 @@
             {{/is_allowed}}
             {{^if_instance_of instance "TaskGroup|TaskGroupTask"}}
             <li>
-              <permalink data-test-id="dropdown_settings_get_permalink_75e3bf91"
-                         {instance}="instance"/>
+              <permalink {instance}="instance"/>
             </li>
             {{/if_instance_of}}
             {{#if_instance_of instance "Assessment"}}
