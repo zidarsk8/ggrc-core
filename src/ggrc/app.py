@@ -6,7 +6,6 @@
 
 import re
 import time
-from collections import defaultdict
 
 from logging import getLogger
 from logging.config import dictConfig as setup_logging
@@ -27,7 +26,7 @@ from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
 from ggrc.gdrive import init_gdrive_routes
-from ggrc.utils import benchmark, request_storage
+from ggrc.utils import benchmark
 from ggrc.utils.issue_tracker_mock import init_issue_tracker_mock
 
 if settings.ISSUE_TRACKER_MOCK and not settings.PRODUCTION:
@@ -287,21 +286,22 @@ def register_indexing():
     """Create background task for indexing
     Adds header 'X-GGRC-Indexing-Task-Id' with BG task id
     """
-    model_ids = request_storage.get("indexing", defaultdict(set))
-    if model_ids:
-      with benchmark("Create indexing bg task"):
-        chunk_size = db.session.reindex_set.CHUNK_SIZE
-        bg_task = background_task.create_task(
-            name="indexing",
-            url=url_for(bg_update_ft_records.__name__),
-            parameters={"models_ids": model_ids,
-                        "chunk_size": chunk_size},
-            queued_callback=bg_update_ft_records
-        )
-        db.session.expunge_all()  # improves plain_commit time
-        db.session.add(bg_task)
-        db.session.plain_commit()
-        response.headers.add("X-GGRC-Indexing-Task-Id", bg_task.id)
+    if hasattr(db.session, "reindex_set"):
+      model_ids = db.session.reindex_set.model_ids_to_reindex
+      if model_ids:
+        with benchmark("Create indexing bg task"):
+          chunk_size = db.session.reindex_set.CHUNK_SIZE
+          bg_task = background_task.create_task(
+              name="indexing",
+              url=url_for(bg_update_ft_records.__name__),
+              parameters={"models_ids": model_ids,
+                          "chunk_size": chunk_size},
+              queued_callback=bg_update_ft_records
+          )
+          db.session.expunge_all()  # improves plain_commit time
+          db.session.add(bg_task)
+          db.session.plain_commit()
+          response.headers.add("X-GGRC-Indexing-Task-Id", bg_task.id)
     return response
 
 

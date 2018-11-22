@@ -179,7 +179,7 @@ class TestCase(BaseTestCase, object):
     self._custom_headers = {}
     self.headers = {}
     api_helper.wrap_client_calls(self.client)
-    listeners.reindex_in_commit = lambda: True
+    listeners.reindex_on_commit = lambda: True  # Turn off background indexing
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()

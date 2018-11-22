@@ -14,8 +14,8 @@ from ggrc import fulltext
 from ggrc import utils
 from ggrc.models import all_models, get_model
 from ggrc.fulltext import mixin
-from ggrc.models.background_task import reindex_in_commit
-from ggrc.utils import benchmark, helpers, request_storage
+from ggrc.models.background_task import reindex_on_commit
+from ggrc.utils import benchmark, helpers
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
@@ -57,12 +57,9 @@ class ReindexSet(threading.local):
     with benchmark("pre commit indexing hook"):
       self.warmup()
       if self.model_ids_to_reindex:
-        if reindex_in_commit():
+        if reindex_on_commit():
           update_ft_records(self.model_ids_to_reindex, self.CHUNK_SIZE)
-        else:
-          reindex_ids = request_storage.get("indexing", defaultdict(set))
-          for model, ids in self.model_ids_to_reindex.items():
-            reindex_ids[model].update(set(ids))
+      # else: Indexing task will be created in after_request hook
 
 
 @helpers.without_sqlalchemy_cache

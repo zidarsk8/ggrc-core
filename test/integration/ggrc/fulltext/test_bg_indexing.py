@@ -3,14 +3,12 @@
 
 """Tests for checking background indexing logic"""
 import json
-from collections import defaultdict
 from datetime import datetime
 
 import mock
 
 from ggrc import settings
 from ggrc.models import all_models
-from ggrc.utils import request_storage
 from integration.ggrc import TestCase, api_helper
 from integration.ggrc.models import factories
 
@@ -21,10 +19,10 @@ class TestTaskqueueIndexing(TestCase):
   def setUp(self):
     """Set up for test cases."""
     from ggrc.fulltext import listeners
-    from ggrc.models.background_task import reindex_in_commit
+    from ggrc.models.background_task import reindex_on_commit
 
     super(TestTaskqueueIndexing, self).setUp()
-    listeners.reindex_in_commit = reindex_in_commit
+    listeners.reindex_on_commit = reindex_on_commit
     self.api = api_helper.Api()
     self.init_taskqueue()
     self._bg_tasks = {}
@@ -39,7 +37,6 @@ class TestTaskqueueIndexing(TestCase):
                                         data=task.payload,
                                         headers=task.headers)
         self._bg_tasks[task.name] = response
-        request_storage.get("indexing", defaultdict(set)).clear()
 
   def assert_bg_tasks_success(self):
     """Check response status of executed background tasks"""
