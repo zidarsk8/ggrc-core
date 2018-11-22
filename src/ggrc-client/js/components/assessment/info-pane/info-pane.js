@@ -88,7 +88,19 @@ export default can.Component.extend({
           verifiers = acl
             .filter((item) =>
               String(item.ac_role_id) === String(verifierRoleId)
-            ).map((item) => item.person);
+            ).map(
+              // Getter of 'verifiers' is called when access_control_list(ACL) length
+              // is changed or object itself is changed.
+              // When we save new ACL, after getting response from BE,
+              // order of items in ACL can differ from original. In this case
+              // verifiers won't be recalculated and we can get invalid list
+              // after merging ACL data which we get from BE.
+              // To prevent this we returns copies of persons which won't be modified
+              // in scenario described above.
+              ({person}) => ({
+                id: person.id,
+                type: person.type,
+              }));
 
           return verifiers;
         },
