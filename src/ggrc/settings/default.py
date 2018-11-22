@@ -222,3 +222,12 @@ RISK_ASSESSMENT_URL = os.environ.get(
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
 CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
+
+# BackgroundTask default settings
+RETRY_OPTIONS = {
+    "min_backoff_seconds": 30,
+    "max_backoff_seconds": 3600,
+    "max_doublings": 5,
+    "task_retry_limit": 10,
+}
+DEFAULT_QUEUE = "ggrc"

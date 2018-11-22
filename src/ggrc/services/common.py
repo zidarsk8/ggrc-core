@@ -1075,16 +1075,27 @@ class Resource(ModelView):
     with benchmark("collection post"):
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
-          task = create_task(request.method, request.full_path,
-                             None, request.data)
+          task = create_task(
+              name=request.method,
+              url=request.full_path,
+              queued_callback=lambda _: None,
+              parameters=request.data,
+          )
+          db.session.commit()
           if getattr(settings, 'APP_ENGINE', False):
             return self.json_success_response(
                 self.object_for_json(task, 'background_task'),
                 self.modified_at(task))
           body = self.request.json
         else:
-          task_id = int(self.request.headers.get('x-task-id'))
-          task = BackgroundTask.query.get(task_id)
+          task_name = request.headers.get("X-Task-Name")
+          task = BackgroundTask.query.filter_by(name=task_name).first()
+          if not task:
+            return current_app.make_response((
+                'BackgroundTask not found. Retry later.',
+                503,
+                [('Content-Type', 'text/html')]
+            ))
           body = json.loads(task.parameters)
         task.start()
         no_result = True
@@ -1190,13 +1201,13 @@ class Resource(ModelView):
         result = current_app.make_response(
             (self.as_json(res), status, headers))
 
-      with benchmark("collection post > return resullt"):
-        if 'X-GGRC-BackgroundTask' in request.headers:
+      if 'X-GGRC-BackgroundTask' in request.headers:
+        with benchmark("collection post > finish BackgroundTask"):
           if status == 200:
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
-        return result
+      return result
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
