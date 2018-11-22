@@ -151,7 +151,7 @@ describe('Mappings', function () {
   });
 
   describe('getMappingTypes() method', function () {
-    let EXPECTED_GROUPS = ['entities', 'business', 'governance'];
+    let EXPECTED_GROUPS = ['entities', 'scope', 'governance'];
 
     let types = allTypes.concat('MultitypeSearch');
     let modelsForTests = _.difference(types, [

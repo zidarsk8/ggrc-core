@@ -32,7 +32,7 @@ export default can.Component.extend({
       notificationsInfo: {
         value: 'Send Notifications',
         set(newValue) {
-          return this.attr('instance').class.category === 'business' ?
+          return this.attr('instance').class.category === 'scope' ?
             'Notify Contacts' :
             newValue;
         },
@@ -40,7 +40,7 @@ export default can.Component.extend({
       tooltipTitle: {
         get() {
           let title;
-          if (this.attr('instance').class.category === 'business') {
+          if (this.attr('instance').class.category === 'scope') {
             title = 'Comments will be sent as a part of daily digest email ' +
             'notifications to Admins, Assignee, Verifier, ' +
             'Compliance Contacts, Primary Contacts, Secondary Contacts, ' +

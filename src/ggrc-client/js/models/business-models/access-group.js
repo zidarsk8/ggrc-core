@@ -14,7 +14,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.AccessGroup', {
   root_object: 'access_group',
   root_collection: 'access_groups',
-  category: 'business',
+  category: 'scope',
   findAll: 'GET /api/access_groups',
   findOne: 'GET /api/access_groups/{id}',
   create: 'POST /api/access_groups',

@@ -34,7 +34,7 @@ export default can.Construct.extend({
         name: 'People/Groups',
         items: [],
       },
-      business: {
+      scope: {
         name: 'Scope',
         items: [],
       },
