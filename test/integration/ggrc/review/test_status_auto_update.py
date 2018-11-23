@@ -370,7 +370,7 @@ class TestReviewStatusUpdate(TestCase):
     review_id = review.id
 
     ac_role_id = all_models.AccessControlRole.query.filter_by(
-        name="Primary Contacts", object_type="Control"
+        name="Control Operators", object_type="Control"
     ).one().id
 
     user_id = all_models.Person.query.filter_by(

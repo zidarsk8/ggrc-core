@@ -53,7 +53,7 @@ class TestControl(TestCase):
 
   def test_create_commentable(self):
     """Test if commentable fields are set on creation"""
-    recipients = "Admin,Primary Contacts,Secondary Contacts"
+    recipients = "Admin,Control Operators,Control Owners"
     send_by_default = 0
     response = self.api.post(all_models.Control, {
         "control": {
@@ -75,7 +75,7 @@ class TestControl(TestCase):
     self.assertEqual(control.recipients, "")
     self.assertIs(control.send_by_default, True)
 
-    recipients = "Admin,Primary Contacts,Secondary Contacts"
+    recipients = "Admin,Control Operators,Control Owners"
     send_by_default = 0
     self.api.put(control, {
         "recipients": recipients,
