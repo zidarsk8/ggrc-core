@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for AssessmentTemplate model."""
+from ggrc.integrations import constants
 from ggrc.models import all_models
 
 from integration.ggrc import TestCase, Api
@@ -52,6 +53,7 @@ class TestAssessmentTemplate(TestCase):
     response = self.api.get(all_models.AssessmentTemplate, template_id)
     self.assert200(response)
     audit = all_models.Audit.query.get(audit_id)
+    default_issue_type = constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
     self.assertEqual(
         response.json["assessment_template"]["audit"],
         {
@@ -67,7 +69,7 @@ class TestAssessmentTemplate(TestCase):
                 u"hotlist_id": u"some host id",
                 u"issue_id": u"some issue id",
                 u"issue_priority": None,
-                u"issue_type": all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
+                u"issue_type": default_issue_type,
                 u"issue_url": None,
                 u"title": "some title"
             }

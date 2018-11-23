@@ -16,7 +16,9 @@ from ggrc import db
 from ggrc import views
 
 from ggrc.notifications import data_handlers
-from ggrc.integrations import integrations_errors, issuetracker_bulk_sync
+from ggrc.integrations import integrations_errors
+from ggrc.integrations import issuetracker_bulk_sync
+from ggrc.integrations import constants
 from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
@@ -61,7 +63,7 @@ class TestBulkIssuesSync(TestCase):
           enabled=enabled,
           issue_tracked_obj=audit,
           issue_id=issue_id,
-          issue_type=all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE,
+          issue_type=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
           component_id=12345,
           hotlist_id=12345,
           issue_priority="P2",
@@ -174,7 +176,7 @@ class TestBulkIssuesSync(TestCase):
       self.assertEqual(issue.hotlist_id, hotlist_id)
       self.assertEqual(
           issue.issue_type,
-          all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE
+          constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
       )
       self.assertEqual(issue.issue_priority, "P2")
       self.assertEqual(issue.issue_severity, "S2")
@@ -792,7 +794,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
       issue.title = ""
       issue.component_id = "1"
       issue.hotlist_id = "1"
-      issue.issue_type = all_models.IssuetrackerIssue.DEFAULT_ISSUE_TYPE
+      issue.issue_type = constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
       issue.issue_priority = "P2"
       issue.issue_severity = "S2"
       issue.assignee = "test@example.com"
