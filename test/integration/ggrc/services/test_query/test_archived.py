@@ -69,3 +69,27 @@ class TestArchived(WithQueryApi, TestCase):
         field="ids"
     )
     self.assertItemsEqual(ids, expected_ids)
+
+  def test_archived_evidence(self):
+    """Test evidence archived with audit"""
+    expected_evidence_ids = []
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=audit,
+                                    destination=assessment)
+      factories.RelationshipFactory(source=assessment,
+                                    destination=evidence)
+      expected_evidence_ids.append(evidence.id)
+
+    response = self.api.put(audit, {"archived": True})
+    self.assert200(response)
+    ids = self.simple_query(
+        "Evidence",
+        expression=["archived", "=", "true"],
+        type_="ids",
+        field="ids"
+    )
+
+    self.assertItemsEqual(ids, expected_evidence_ids)

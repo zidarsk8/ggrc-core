@@ -86,3 +86,17 @@ def init_hook():
     """Add relationships objects for direct audit mappings."""
     # pylint: disable=unused-argument
     _add_audit_relationships(objects)
+
+  @signals.Restful.model_put_before_commit.connect_via(all_models.Audit)
+  def handle_audit_put_before(sender, **kwargs):
+    del sender  # Unused arg
+    obj = kwargs['obj']
+    initial_state = kwargs['initial_state']
+    old_value = initial_state.archived
+    if old_value is False and obj.archived:
+      # audit was archived so all relationsships
+      # archive all assessment and evidences with
+      for assessment in obj.assessments:
+        db.session.reindex_set.add(assessment)
+        for evidence in assessment.evidences:
+          db.session.reindex_set.add(evidence)
