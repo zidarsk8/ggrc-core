@@ -17,9 +17,10 @@ from ggrc import models
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
+from ggrc.services.resources import mixins
 
 
-class AuditResource(common.ExtendedResource):
+class AuditResource(mixins.SnapshotCounts, common.ExtendedResource):
   """Resource handler for audits."""
 
   # method post is abstract and not used.
@@ -31,6 +32,7 @@ class AuditResource(common.ExtendedResource):
     command_map = {
         None: super(AuditResource, self).get,
         "summary": self.summary_query,
+        "snapshot_counts": self.snapshot_counts_query,
     }
     command = kwargs.pop("command", None)
     if command not in command_map:
@@ -40,7 +42,7 @@ class AuditResource(common.ExtendedResource):
   def summary_query(self, id):
     """Get data for audit summary page."""
     # id name is used as a kw argument and can't be changed here
-    # pylint: disable=invalid-name,redefined-builtin
+    # pylint: disable=invalid-name,redefined-builtin,too-many-locals
     with benchmark("check audit permissions"):
       audit = models.Audit.query.get(id)
       if not permissions.is_allowed_read_for(audit):
