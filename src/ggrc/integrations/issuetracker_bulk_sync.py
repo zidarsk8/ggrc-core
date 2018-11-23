@@ -176,6 +176,7 @@ class IssueTrackerBulkCreator(object):
         created[(obj_info.obj.type, obj_info.obj.id)] = issue_json
       except integrations_errors.Error as error:
         self._add_error(errors, obj_info.obj, error)
+        self._disable_integration(obj_info.obj)
         if self.break_on_errs and getattr(error, "data", None) in (
             WRONG_HOTLIST_ERR.format(issue_json["hotlist_ids"][0]),
             WRONG_COMPONENT_ERR.format(issue_json["component_id"]),
@@ -188,6 +189,14 @@ class IssueTrackerBulkCreator(object):
     with benchmark("Update issuetracker issues in db"):
       self.update_db_issues(created)
     return created, errors
+
+  @staticmethod
+  def _disable_integration(obj):
+    """Disable Issue Tracker integration for object"""
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        obj,
+        {"enabled": False}
+    )
 
   def _get_issue_json(self, object_):
     """Get json data for issuetracker issue related to provided object."""
@@ -488,6 +497,15 @@ class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
       )
     return issue_json
 
+  @staticmethod
+  def _disable_integration(obj):
+    """We shouldn't disable integration for bulk update.
+
+    All data would be synced via chron job a bit later and it wouldn't be
+    a problem.
+    """
+    pass
+
 
 class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
   """Class with methods for bulk tickets creation for child objects."""
@@ -573,6 +591,15 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
 
     receiver = login.get_current_user()
     common.send_email(receiver.email, ISSUETRACKER_SYNC_TITLE, body)
+
+  @staticmethod
+  def _disable_integration(obj):
+    """We shouldn't disable integration for bulk child create.
+
+    We enable integration for child assessments(set enabled=True in our DB)
+    when we've synced it with Issue Tracker using _process_result method.
+    """
+    pass
 
 
 class IssuetrackedObjInfo(collections.namedtuple(
