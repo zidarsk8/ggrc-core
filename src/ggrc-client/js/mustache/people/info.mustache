@@ -5,7 +5,7 @@
 
 {{#instance}}
 
-  {{#is_dashboard_or_all}}
+  {{#if_helpers '\n #is_dashboard_or_all' '\n and #if' is_info_widget}}
     {{> /static/mustache/dashboard/info/info.mustache}}
   {{else}}
 
@@ -80,5 +80,5 @@
   {{#if is_info_widget}}
     <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
   {{/if}}
-  {{/is_dashboard}}
+  {{/if_helpers}}
 {{/instance}}

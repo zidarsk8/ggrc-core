@@ -11,7 +11,6 @@ import {
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Vendor from '../../models/business-models/vendor';
 import Risk from '../../models/business-models/risk';
-import Person from '../../models/business-models/person';
 
 describe('"buildModifiedACL" method', () => {
   it('should not add duplicates', () => {
@@ -190,15 +189,6 @@ describe('"getInstanceView" method', () => {
 
     // "GGRC.Templates" const contains template for Risk
     const instance = makeFakeInstance({model: Risk})();
-
-    const view = getInstanceView(instance);
-    expect(view).toEqual(expectedPath);
-  });
-
-  it('should return "view" path for Person object', () => {
-    const expectedPath = `${GGRC.mustache_path}/people_roles/info.mustache`;
-
-    const instance = makeFakeInstance({model: Person})();
 
     const view = getInstanceView(instance);
     expect(view).toEqual(expectedPath);
