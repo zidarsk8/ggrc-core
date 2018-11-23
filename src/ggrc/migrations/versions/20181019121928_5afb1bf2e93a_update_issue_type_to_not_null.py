@@ -14,7 +14,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '5afb1bf2e93a'
-down_revision = '9beabcd92f34'
+down_revision = 'd9c56989ac07'
 
 
 def update_nullable_valuses():
