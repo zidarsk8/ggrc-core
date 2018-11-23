@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test bulk issuetracker synchronization."""
+# pylint: disable=too-many-lines,invalid-name
 import unittest
 from collections import OrderedDict
 
@@ -231,6 +232,27 @@ class TestBulkIssuesSync(TestCase):
 class TestBulkIssuesGenerate(TestBulkIssuesSync):
   """Test bulk issues generation."""
 
+  @ddt.data("Assessment", "Issue")
+  def test_integration_disabled_on_bulk_create_error(self, model):
+    """Test if {} integration was disabled if bulk creation failed"""
+    user = all_models.Person.query.first()
+    with factories.single_commit():
+      obj = factories.get_model_factory(model)(
+          modified_by=user
+      )
+      iti = factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=obj,
+          enabled=True,
+          issue_id=None,
+      )
+    bulk_creator = issuetracker_bulk_sync.IssueTrackerBulkCreator()
+    objects = [issuetracker_bulk_sync.IssuetrackedObjInfo(obj)]
+    with mock.patch.object(bulk_creator, "sync_issue") as sync_mock:
+      sync_mock.side_effect = integrations_errors.HttpError("error")
+      bulk_creator.handle_issuetracker_sync(objects)
+    sync_mock.assert_called_once()
+    self.assertFalse(iti.enabled)
+
   def test_get_objects_method_assmt(self):
     """Test get_issuetracked_objects() for not linked assessments."""
     _, assessment_ids_enabled = self.setup_assessments(3)
@@ -438,6 +460,27 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
 @ddt.ddt
 class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
   """Test bulk issues generation for child objects."""
+
+  @mock.patch.object(issuetracker_bulk_sync.IssueTrackerBulkChildCreator,
+                     "bulk_sync_allowed",
+                     return_value=True)
+  def test_integration_disabled_on_bulk_child_error(self, permissions_mock):
+    """Test if integration was disabled if bulk child creation failed"""
+    with factories.single_commit():
+      obj = factories.AssessmentFactory()
+      iti = factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=obj,
+          enabled=False,
+          issue_id=None,
+      )
+    bulk_creator = issuetracker_bulk_sync.IssueTrackerBulkChildCreator()
+    objects = [issuetracker_bulk_sync.IssuetrackedObjInfo(obj)]
+    with mock.patch.object(bulk_creator, "sync_issue") as sync_mock:
+      sync_mock.side_effect = integrations_errors.HttpError("error")
+      bulk_creator.handle_issuetracker_sync(objects)
+    sync_mock.assert_called_once()
+    permissions_mock.assert_called_once()
+    self.assertFalse(iti.enabled)
 
   def test_get_objects_method_assmt(self):
     """Test get_issuetracked_objects() for linked assessments."""
@@ -745,6 +788,27 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
 @ddt.ddt
 class TestBulkIssuesUpdate(TestBulkIssuesSync):
   """Test bulk issues update."""
+
+  @ddt.data("Assessment", "Issue")
+  def test_integration_enabled_on_update_error(self, model):
+    """Test if {} integration still enabled if bulk update failed"""
+    user = all_models.Person.query.first()
+    with factories.single_commit():
+      obj = factories.get_model_factory(model)(
+          modified_by=user
+      )
+      iti = factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=obj,
+          enabled=True,
+          issue_id=None,
+      )
+    bulk_updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
+    objects = [issuetracker_bulk_sync.IssuetrackedObjInfo(obj)]
+    with mock.patch.object(bulk_updater, "sync_issue") as sync_mock:
+      sync_mock.side_effect = integrations_errors.HttpError("error")
+      bulk_updater.handle_issuetracker_sync(objects)
+    sync_mock.assert_called_once()
+    self.assertTrue(iti.enabled)
 
   def test_asmnt_bulk_update(self):
     """Test bulk update of issues for Assessments."""
