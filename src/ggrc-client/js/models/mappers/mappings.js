@@ -54,7 +54,7 @@ export default can.Construct.extend({
    * @param {Array} exclude - array of excluded models
    * @return {Array} - list of allowed for mapping Models
    */
-  getMappingList: function (type, include, exclude) {
+  getMappingList: function (type) {
     if (!type) {
       return [];
     }
@@ -62,32 +62,22 @@ export default can.Construct.extend({
     let canonical = this.get_canonical_mappings_for(type);
     let list = TreeViewConfig.attr('base_widgets_by_type')[type];
     const compacted = _.compact([_.keys(canonical), list]);
-    let result = _.intersection(...compacted);
-
-    result = _.difference(result, exclude || []);
-
-    if (include) {
-      result = _.union(result, include);
-    }
-    return result;
+    return _.intersection(...compacted);
   },
   /**
    * Determine if two types of models can be mapped
    *
    * @param {String} target - the target type of model
    * @param {String} source - the source type of model
-   * @param {Object} options - accepts:
-   *        {Array} whitelist - list of added objects
-   *        {Array} forbidden - list blacklisted objects
    *
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
-  isMappableType: function (target, source, options) {
+  isMappableType: function (target, source) {
     let result;
     if (!target || !source) {
       return false;
     }
-    result = this.getMappingList(target, options);
+    result = this.getMappingList(target);
     return _.includes(result, source);
   },
   /**
@@ -181,12 +171,10 @@ export default can.Construct.extend({
    * Return list of allowed for mapping types.
    * Performs checks for
    * @param {String} type - base model type
-   * @param {Array} include - array of included models
-   * @param {Array} exclude - array of excluded models
    * @return {Array} - list of allowed for mapping Models
    */
-  getMappingTypes: function (type, include, exclude) {
-    let list = this.getMappingList(type, include, exclude);
+  getMappingTypes: function (type) {
+    let list = this.getMappingList(type);
     return this.groupTypes(list);
   },
   /**

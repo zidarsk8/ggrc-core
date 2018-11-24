@@ -165,40 +165,13 @@ describe('Mappings', function () {
     modelsForTests.forEach(function (type) {
       it('returns mappable types for ' + type, function () {
         let expectedModels = mappingRules[type];
-        let result = Mappings.getMappingTypes(type, [], []);
+        let result = Mappings.getMappingTypes(type);
         let resultGroups = Object.keys(result);
         let resultModels = getModelsFromGroups(result, EXPECTED_GROUPS);
 
         expect(EXPECTED_GROUPS).toEqual(resultGroups);
         expect(expectedModels.sort()).toEqual(resultModels.sort());
       });
-    });
-  });
-
-  describe('getMappingTypes() method', function () {
-    it('always returns whitelisted items', function () {
-      let list = Mappings.getMappingList('DataAsset');
-      let whitelisted = ['Hello', 'World'];
-      let result = Mappings.getMappingList('DataAsset', whitelisted);
-      expect(_.difference(result, list).sort()).toEqual(whitelisted.sort());
-    });
-
-    it('always remove forbidden items', function () {
-      let forbidden = ['Policy', 'Process', 'Product', 'Program'];
-      let list = Mappings.getMappingList('DataAsset');
-      let result = Mappings.getMappingList('DataAsset', [], forbidden);
-      expect(_.difference(list, result).sort()).toEqual(forbidden.sort());
-    });
-
-    it('always leave whitelisted and remove forbidden items', function () {
-      let forbidden = ['Policy', 'Process', 'Product', 'Program'];
-      let whitelisted = ['Hello', 'World'];
-      let list = Mappings.getMappingList('DataAsset');
-      let result = Mappings.getMappingList('DataAsset',
-        whitelisted, forbidden);
-      let input = _.difference(list, result).concat(_.difference(result, list));
-      let output = forbidden.concat(whitelisted);
-      expect(input.sort()).toEqual(output.sort());
     });
   });
 
