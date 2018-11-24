@@ -42,7 +42,7 @@ export default can.Component.extend({
           let instance = this.attr('instance');
           let options = this.attr('options');
 
-          return Mappings.allowedToMap(pageInstance, instance)
+          return Mappings.allowedToUnmap(pageInstance, instance)
             && !isAuditScopeModel(instance.type)
             && !isSnapshotParent(instance.type)
             && !(isAllObjects() || isMyWork())

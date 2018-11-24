@@ -27,6 +27,7 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
   To configure a new mapping, use the following format :
   { <source object type> : {
       map : [ <object name>, ...]
+      unmap : [ <object name>, ...]
       indirectMappings: [ <object name>, ...]
       mappers : {
         <mapping name> : Proxy(...) | Direct(...)
@@ -41,6 +42,7 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
     using object mapper
   <externalMap> - models that can be mapped only through external system
     not locally
+  <unmap> - models that can be unmapped from source
   <indirectMappings> - models which cannot be directly mapped to object
     through Relationship but linked by another way. Currently used for Mapping
     Filter in Object mapper and Global Search
@@ -69,6 +71,9 @@ new Mappings({
   // Core objects
   Issue: {
     map: [...coreObjects, 'Document', 'Program'],
+    // mapping audit and assessment to issue is not allowed,
+    // but unmapping possible
+    unmap: [...coreObjects, 'Assessment', 'Audit', 'Document', 'Program'],
     indirectMappings: ['Assessment', 'Audit', 'Person', 'TaskGroup',
       'Workflow'],
   },

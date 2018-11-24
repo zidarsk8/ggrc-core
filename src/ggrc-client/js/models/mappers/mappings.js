@@ -69,10 +69,7 @@ export default can.Construct.extend({
     return _.includes(result, source);
   },
   /**
-   * Determine if `source` is allowed to be mapped to `target`.
-   *
-   * By symmetry, this method can be also used to check whether `source` can
-   * be unmapped from `target`.
+   * Determine if `target` is allowed to be mapped to `source`.
    *
    * @param {Object} source - the source object the mapping
    * @param {Object} target - the target object of the mapping
@@ -83,23 +80,14 @@ export default can.Construct.extend({
    */
   allowedToMap: function (source, target, options) {
     let canMap = false;
-    let types;
     let targetType;
     let sourceType;
     let targetContext;
     let sourceContext;
     let createContexts;
 
-    const MAPPING_RULES = Object.freeze({
-      // mapping audit and assessment to issue is not allowed,
-      // but unmap can be possible
-      'issue audit': (options && options.isIssueUnmap),
-      'issue assessment': (options && options.isIssueUnmap),
-    });
-
     targetType = this._getType(target);
     sourceType = this._getType(source);
-    types = [sourceType.toLowerCase(), targetType.toLowerCase()];
 
     // special check for snapshot:
     if (options &&
@@ -110,17 +98,8 @@ export default can.Construct.extend({
       return false;
     }
 
-    let oneWayProp = types.join(' ');
-    if (MAPPING_RULES.hasOwnProperty(oneWayProp)) {
-      // One-way check
-      // special case check:
-      // - mapping an Audit and Assessment to a Issue is not allowed
-      // (but vice versa is allowed)
-      return MAPPING_RULES[oneWayProp];
-    } else {
-      if (!this.isMappableType(sourceType, targetType)) {
-        return false;
-      }
+    if (!this.isMappableType(sourceType, targetType)) {
+      return false;
     }
 
     targetContext = _.exists(target, 'context.id');
@@ -139,6 +118,30 @@ export default can.Construct.extend({
           _.includes(createContexts, targetContext));
     }
     return canMap;
+  },
+  /**
+   * Determine if `target` is allowed to be unmapped from `source`.
+   *
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
+   *
+   * @return {Boolean} - true if unmapping is allowed, false otherwise
+   */
+  allowedToUnmap: function (source, target) {
+    let sourceType = this._getType(source);
+    let targetType = this._getType(target);
+
+    let unmappableTypes = _.keys(this.getAllowedToUnmapModels(sourceType));
+    if (!_.includes(unmappableTypes, targetType)) {
+      return false;
+    }
+
+    let canUnmap = Permission.is_allowed_for('update', source);
+
+    if (target instanceof can.Map && targetType) {
+      canUnmap = canUnmap && Permission.is_allowed_for('update', target);
+    }
+    return canUnmap;
   },
   _getType: function (object) {
     let type;
@@ -261,6 +264,22 @@ export default can.Construct.extend({
   */
   getAllowedToMapModels: function (object) {
     return this._getModelsFromConfig(object, 'map');
+  },
+  /**
+   * Returns collection of models allowed for unmapping
+   * @param {String} object - the object type's shortName
+   * @return {Object} a keyed object of allowed for unmapping models
+   */
+  getAllowedToUnmapModels(object) {
+    let unmapModels = this._getModelsFromConfig(object, 'unmap');
+
+    if (!_.keys(unmapModels).length) {
+      let allowedToMap = this.getAllowedToMapModels(object);
+      let externalMap = this.getExternalMapModels(object);
+      unmapModels = Object.assign({}, allowedToMap, externalMap);
+    }
+
+    return unmapModels;
   },
   _getModelsFromConfig(object, prop) {
     let mappings = {};

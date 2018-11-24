@@ -43,8 +43,8 @@ export default can.Component.extend({
       open: false,
     },
     canUnmap() {
-      return Mappings.allowedToMap(this.attr('issueInstance'),
-        this.attr('target'), {isIssueUnmap: true});
+      return Mappings.allowedToUnmap(this.attr('issueInstance'),
+        this.attr('target'));
     },
 
     processRelatedSnapshots() {
