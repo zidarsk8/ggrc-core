@@ -5,6 +5,7 @@
 
 import Mappings from '../../models/mappers/mappings';
 import {getInstance} from '../../plugins/utils/models-utils';
+import * as businessModels from '../../models/business-models';
 
 /**
  *  @typedef SpecialConfig
@@ -57,7 +58,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
     },
     model: {
       get: function () {
-        return this.modelFromType(this.attr('type'));
+        return businessModels[this.attr('type')];
       },
     },
     type: {
@@ -138,16 +139,6 @@ const ObjectOperationsBaseVM = can.Map.extend({
   relevant: [],
   submitCbs: $.Callbacks(),
   useSnapshots: false,
-  modelFromType: function (type) {
-    let types = _.reduce(_.values(
-      this.availableTypes()), function (memo, val) {
-      if (val.items) {
-        return memo.concat(val.items);
-      }
-      return memo;
-    }, []);
-    return _.find(types, {value: type});
-  },
   onSubmit: function () {
     this.attr('submitCbs').fire();
   },
