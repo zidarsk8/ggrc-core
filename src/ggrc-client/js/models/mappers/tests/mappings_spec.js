@@ -82,7 +82,7 @@ describe('Mappings', function () {
     let models = [];
     groupNames.forEach(function (groupName) {
       let groupModels = groups[groupName].items.map(function (item) {
-        return item.singular;
+        return item.value;
       });
       models = models.concat(groupModels);
     });
@@ -249,8 +249,6 @@ describe('Mappings', function () {
       category: 'category',
       name: 'title_plural',
       value: 'model_singular',
-      plural: 'title_plural',
-      singular: 'model_singular',
     };
 
     it('returns specified object', function () {
