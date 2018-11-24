@@ -16,6 +16,8 @@ import {
   download,
   deleteImportJob,
   stopImportJob,
+  PRIMARY_TIMEOUT,
+  SECONDARY_TIMEOUT,
 } from '../../plugins/utils/import-export-utils';
 import '../show-more/show-more';
 import './download-template/download-template';
@@ -250,7 +252,7 @@ export default can.Component.extend({
           }
         });
     },
-    trackStatusOfImport(jobId, timeout = 2000) {
+    trackStatusOfImport(jobId, timeout = PRIMARY_TIMEOUT) {
       let timioutId = setTimeout(() => {
         getImportJobInfo(jobId)
           .done((info) => {
@@ -260,7 +262,7 @@ export default can.Component.extend({
             this.attr('fileName', info.title);
             this.attr('state', info.status);
 
-            strategy(info, timeout * 2);
+            strategy(info, SECONDARY_TIMEOUT);
           })
           .fail((jqxhr, textStatus, errorThrown) => {
             if (isConnectionLost()) {
