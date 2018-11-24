@@ -32,6 +32,8 @@ const scopingObjects = [
   'TechnologyEnvironment', 'Vendor',
 ];
 
+const snapshotableObjects = GGRC.config.snapshotable_objects;
+
 new Mappings({
   Person: {
     indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
@@ -177,12 +179,12 @@ new Mappings({
 
   // Audit
   Audit: {
-    map: coreObjects,
+    map: [...snapshotableObjects, 'Issue'],
     indirectMappings:
       ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person', 'Program'],
   },
   Assessment: {
-    map: coreObjects,
+    map: [...snapshotableObjects, 'Issue'],
     indirectMappings: ['Audit', 'Evidence', 'Person'],
   },
   Evidence: {

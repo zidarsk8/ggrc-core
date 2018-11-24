@@ -6,7 +6,6 @@
 import {getModelByType} from '../../plugins/utils/models-utils';
 import * as businessModels from '../business-models';
 import Permission from '../../permission';
-import TreeViewConfig from '../../apps/base_widgets';
 
 /*
   class Mappings
@@ -59,9 +58,7 @@ export default can.Construct.extend({
     }
 
     let allowedToMap = this.getAllowedToMapModels(type);
-    let list = TreeViewConfig.attr('base_widgets_by_type')[type];
-    const compacted = _.compact([_.keys(allowedToMap), list]);
-    return _.intersection(...compacted);
+    return _.keys(allowedToMap);
   },
   /**
    * Determine if two types of models can be mapped

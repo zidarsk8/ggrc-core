@@ -7,9 +7,10 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
-import TreeViewConfig from '../../../apps/base_widgets';
+import Mappings from '../../../models/mappers/mappings';
 
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
+import Control from '../../../models/business-models/control';
 
 describe('TreeViewUtils module', function () {
   'use strict';
@@ -137,34 +138,24 @@ describe('TreeViewUtils module', function () {
   });
 
   describe('getModelsForSubTier() method', function () {
-    let baseWidgetsByType;
     let origFilter;
 
     beforeAll(function () {
-      baseWidgetsByType = TreeViewConfig.attr('base_widgets_by_type');
-      origFilter = CycleTaskGroupObjectTask
-        .sub_tree_view_options.default_filter;
-
-      TreeViewConfig.attr('base_widgets_by_type', {
-        CycleTaskGroupObjectTask: ['Audit', 'Program'],
-      });
+      origFilter = Control.sub_tree_view_options.default_filter;
     });
 
     afterAll(function () {
-      TreeViewConfig.attr('base_widgets_by_type', baseWidgetsByType);
-      CycleTaskGroupObjectTask
-        .sub_tree_view_options.default_filter = origFilter;
+      Control.sub_tree_view_options.default_filter = origFilter;
     });
 
     it('gets selected models from model\'s default_filter when available',
       function () {
         let result;
 
-        CycleTaskGroupObjectTask
-          .sub_tree_view_options.default_filter = ['Audit'];
+        Control.sub_tree_view_options.default_filter = ['Audit'];
 
-        result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
-        expect(result.available.length).toEqual(2);
+        result = module.getModelsForSubTier('Control');
+        expect(result.available.length).toEqual(30);
         expect(result.selected.length).toEqual(1);
         expect(result.selected[0]).toEqual('Audit');
       });
@@ -173,13 +164,19 @@ describe('TreeViewUtils module', function () {
       'model\'s default_filter is not available', function () {
       let result;
 
-      CycleTaskGroupObjectTask
-        .sub_tree_view_options.default_filter = null;
+      Control.sub_tree_view_options.default_filter = null;
 
-      result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
-      expect(result.available.length).toEqual(2);
-      expect(result.selected.length).toEqual(2);
+      result = module.getModelsForSubTier('Control');
+      expect(result.available.length).toEqual(30);
+      expect(result.selected.length).toEqual(30);
     });
+
+    it('gets available models from Mappings for CycleTaskGroupObjectTask',
+      () => {
+        spyOn(Mappings, 'getMappingList').and.returnValue(['Audit', 'Control']);
+        let result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
+        expect(result.available.length).toEqual(2);
+      });
   });
 
   describe('startExport() method', () => {
