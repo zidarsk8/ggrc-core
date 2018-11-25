@@ -268,7 +268,7 @@ def start_compute_attributes(revision_ids=None, event_id=None):
 
 def start_update_audit_issues(audit_id, message):
   """Start a background task to update IssueTracker issues related to Audit."""
-  task = background_task.create_task(
+  bg_task = background_task.create_task(
       name='update_audit_issues',
       url=flask.url_for(update_audit_issues.__name__),
       parameters={
@@ -276,9 +276,10 @@ def start_update_audit_issues(audit_id, message):
           'message': message,
       },
       method=u'POST',
-      queued_callback=update_audit_issues
+      queued_callback=update_audit_issues,
   )
-  task.start()
+  db.session.commit()
+  bg_task.start()
 
 
 @app.route("/_background_tasks/generate_wf_tasks_notifications",
@@ -390,6 +391,8 @@ def get_public_config():
       "snapshotable_objects": list(rules.Types.all),
       "snapshotable_ignored": list(rules.Types.ignore),
       "snapshotable_parents": list(rules.Types.parents),
+      "snapshot_related": list(
+          rules.Types.parents | rules.Types.scoped | rules.Types.trans_scope),
       "external_services": {"Person": external_service},
       "enable_release_notes": settings.ENABLE_RELEASE_NOTES,
   }
@@ -600,13 +603,14 @@ def object_browser():
 def admin_reindex_snapshots():
   """Calls a webhook that reindexes indexable objects
   """
-  task_queue = background_task.create_task(
+  bg_task = background_task.create_task(
       name="reindex_snapshots",
       url=flask.url_for(reindex_snapshots.__name__),
       queued_callback=reindex_snapshots,
   )
-  return task_queue.make_response(
-      app.make_response(("scheduled %s" % task_queue.name, 200,
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
                          [('Content-Type', 'text/html')])))
 
 
@@ -616,13 +620,14 @@ def admin_reindex_snapshots():
 def admin_reindex():
   """Calls a webhook that reindexes indexable objects
   """
-  task_queue = background_task.create_task(
+  bg_task = background_task.create_task(
       name="reindex",
       url=flask.url_for(reindex.__name__),
-      queued_callback=reindex
+      queued_callback=reindex,
   )
-  return task_queue.make_response(
-      app.make_response(("scheduled %s" % task_queue.name, 200,
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
                          [('Content-Type', 'text/html')])))
 
 
@@ -632,13 +637,14 @@ def admin_reindex():
 def admin_full_reindex():
   """Calls a webhook that reindexes all indexable objects
   """
-  task_queue = background_task.create_task(
+  bg_task = background_task.create_task(
       name="full_reindex",
       url=flask.url_for(full_reindex.__name__),
       queued_callback=full_reindex
   )
-  return task_queue.make_response(
-      app.make_response(("scheduled %s" % task_queue.name, 200,
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
                          [('Content-Type', 'text/html')])))
 
 
@@ -665,10 +671,14 @@ def admin_propagate_acl():
   if login.get_current_user().email not in admins:
     raise exceptions.Forbidden()
 
-  task_queue = background_task.create_task("propagate_acl", flask.url_for(
-      propagate_acl.__name__), propagate_acl)
-  return task_queue.make_response(
-      app.make_response(("scheduled %s" % task_queue.name, 200,
+  bg_task = background_task.create_task(
+      name="propagate_acl",
+      url=flask.url_for(propagate_acl.__name__),
+      queued_callback=propagate_acl,
+  )
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
                          [('Content-Type', 'text/html')])))
 
 
@@ -681,13 +691,14 @@ def admin_create_missing_revisions():
   if login.get_current_user().email not in admins:
     raise exceptions.Forbidden()
 
-  task_queue = background_task.create_task(
-      "create_missing_revisions",
-      flask.url_for(create_missing_revisions.__name__),
-      create_missing_revisions
+  bg_task = background_task.create_task(
+      name="create_missing_revisions",
+      url=flask.url_for(create_missing_revisions.__name__),
+      queued_callback=create_missing_revisions,
   )
-  return task_queue.make_response(
-      app.make_response(("scheduled %s" % task_queue.name, 200,
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
                         [('Content-Type', 'text/html')])))
 
 
@@ -705,12 +716,6 @@ def admin():
 def assessments_view():
   """The clutter-free list of all Person's Assessments"""
   return flask.render_template("assessments_view/index.haml")
-
-
-@app.route("/background_task/<id_task>", methods=['GET'])
-def get_task_response(id_task):
-  """Gets the status of a background task"""
-  return background_task.make_task_response(id_task)
 
 
 @app.route(
@@ -886,12 +891,13 @@ def generate_children_issues():
   """
   validate_child_bulk_gen_data(flask.request.json)
   bg_task = background_task.create_task(
-      "generate_children_issues",
-      flask.url_for(run_children_issues_generation.__name__),
-      run_children_issues_generation,
-      flask.request.json,
+      name="generate_children_issues",
+      url=flask.url_for(run_children_issues_generation.__name__),
+      queued_callback=run_children_issues_generation,
+      parameters=flask.request.json,
       operation_type="generate_children_issues",
   )
+  db.session.commit()
   return bg_task.task_scheduled_response()
 
 
@@ -905,11 +911,12 @@ def generate_issues():
   """
   validate_bulk_sync_data(flask.request.json)
   bg_task = background_task.create_task(
-      "generate_issues",
-      flask.url_for(run_issues_generation.__name__),
-      run_issues_generation,
-      flask.request.json,
+      name="generate_issues",
+      url=flask.url_for(run_issues_generation.__name__),
+      queued_callback=run_issues_generation,
+      parameters=flask.request.json,
   )
+  db.session.commit()
   return bg_task.task_scheduled_response()
 
 
@@ -923,11 +930,12 @@ def update_issues():
   """
   validate_bulk_sync_data(flask.request.json)
   bg_task = background_task.create_task(
-      "update_issues",
-      flask.url_for(run_issues_update.__name__),
-      run_issues_update,
-      flask.request.json,
+      name="update_issues",
+      url=flask.url_for(run_issues_update.__name__),
+      queued_callback=run_issues_update,
+      parameters=flask.request.json,
   )
+  db.session.commit()
   return bg_task.task_scheduled_response()
 
 
@@ -940,12 +948,13 @@ def background_update_issues(parameters=None):
   """
   method = "POST"
   bg_task = background_task.create_task(
-      "update_issues",
-      "/_background_tasks/background_issues_update",
-      background_issues_update,
+      name="update_issues",
+      url="/_background_tasks/background_issues_update",
+      queued_callback=background_issues_update,
       parameters=parameters,
       method=method,
   )
+  db.session.commit()
   return bg_task.task_scheduled_response()
 
 
@@ -993,11 +1002,12 @@ def validate_bulk_sync_data(json_data):
 @login.admin_required
 def generate_wf_tasks_notifs():
   """Generate notifications for updated wf cycle tasks."""
-  task_queue = background_task.create_task(
-      "generate_wf_tasks_notifications",
-      flask.url_for(generate_wf_tasks_notifications.__name__),
-      generate_wf_tasks_notifications
+  bg_task = background_task.create_task(
+      name="generate_wf_tasks_notifications",
+      url=flask.url_for(generate_wf_tasks_notifications.__name__),
+      queued_callback=generate_wf_tasks_notifications,
   )
-  return task_queue.make_response(
-      app.make_response(("scheduled %s" % task_queue.name, 200,
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
                         [('Content-Type', 'text/html')])))

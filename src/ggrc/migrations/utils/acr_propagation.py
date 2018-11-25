@@ -30,10 +30,16 @@ ACR_TABLE = sa.sql.table(
     sa.sql.column('parent_id', sa.Integer),
 )
 
+ACP_TABLE = sa.sql.table(
+    "access_control_people",
+    sa.sql.column('id', sa.Integer),
+    sa.sql.column('ac_list_id', sa.Integer),
+)
+
 ACL_TABLE = sa.sql.table(
     "access_control_list",
     sa.sql.column('id', sa.Integer),
-    sa.sql.column('ac_role_id', sa.String),
+    sa.sql.column('ac_role_id', sa.Integer),
 )
 
 

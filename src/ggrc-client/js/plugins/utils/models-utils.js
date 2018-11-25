@@ -166,7 +166,7 @@ const getInstance = (objectType, objectId, paramsOrObject) => {
 function isScopeModel(type) {
   const model = businessModels[type];
 
-  return model && model.category === 'business';
+  return model && model.category === 'scope';
 }
 
 /**

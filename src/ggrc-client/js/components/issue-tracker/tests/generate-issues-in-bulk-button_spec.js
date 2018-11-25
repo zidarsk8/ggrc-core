@@ -23,6 +23,9 @@ describe('generate-issues-in-bulk-button component', () => {
       });
 
       it('should set isGeneratingInProgress flag TRUE', () => {
+        spyOn(viewModel, 'generateChildrenIssues')
+          .and.returnValue(new can.Deferred());
+
         viewModel.attr('isGeneratingInProgress', false);
 
         viewModel.generate();

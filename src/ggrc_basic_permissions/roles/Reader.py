@@ -19,6 +19,7 @@ permissions = {
         "AccessControlRole",
         "AccessControlList",
         "Audit",
+        "BackgroundTask",
         "Snapshot",
         "Categorization",
         "Category",
@@ -93,6 +94,7 @@ permissions = {
                 "action": "update",
             }
         },
+        "BackgroundTask",
         {
             "type": "Snapshot",
             "condition": "is_allowed_based_on",

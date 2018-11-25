@@ -24,7 +24,7 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import BadRequest, Forbidden, HTTPException
+from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 import ggrc.builder.json
 import ggrc.models
@@ -327,9 +327,11 @@ class ModelView(View):
       return None
 
   def not_found_message(self):
+    """Generate Not Found message"""
     return '{0} not found.'.format(self.model._inflector.title_singular)
 
   def not_found_response(self):
+    """Generate Not Found response"""
     return current_app.make_response((self.not_found_message(), 404, []))
 
   def collection_last_modified(self):
@@ -415,6 +417,7 @@ class Resource(ModelView):
   """
 
   def dispatch_request(self, *args, **kwargs):  # noqa
+    # pylint: disable=too-many-return-statements,arguments-differ
     with benchmark("Dispatch request"):
       with benchmark("dispatch_request > Check Headers"):
         method = request.method
@@ -461,6 +464,7 @@ class Resource(ModelView):
               cache.clear()
 
   def post(self, *args, **kwargs):
+    """POST operation handler."""
     raise NotImplementedError()
 
   def get(self, id):
@@ -866,6 +870,7 @@ class Resource(ModelView):
     ggrc.builder.json.create(obj, src)
 
   def get_context_id_from_json(self, src):
+    """Get context id from json."""
     context = src.get('context', None)
     if context:
       context_id = context.get('id', None)
@@ -1075,16 +1080,27 @@ class Resource(ModelView):
     with benchmark("collection post"):
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
-          task = create_task(request.method, request.full_path,
-                             None, request.data)
+          task = create_task(
+              name=request.method,
+              url=request.full_path,
+              queued_callback=lambda _: None,
+              parameters=request.data,
+          )
+          db.session.commit()
           if getattr(settings, 'APP_ENGINE', False):
             return self.json_success_response(
                 self.object_for_json(task, 'background_task'),
                 self.modified_at(task))
           body = self.request.json
         else:
-          task_id = int(self.request.headers.get('x-task-id'))
-          task = BackgroundTask.query.get(task_id)
+          task_name = request.headers.get("X-Task-Name")
+          task = BackgroundTask.query.filter_by(name=task_name).first()
+          if not task:
+            return current_app.make_response((
+                'BackgroundTask not found. Retry later.',
+                503,
+                [('Content-Type', 'text/html')]
+            ))
           body = json.loads(task.parameters)
         task.start()
         no_result = True
@@ -1190,13 +1206,13 @@ class Resource(ModelView):
         result = current_app.make_response(
             (self.as_json(res), status, headers))
 
-      with benchmark("collection post > return resullt"):
-        if 'X-GGRC-BackgroundTask' in request.headers:
+      if 'X-GGRC-BackgroundTask' in request.headers:
+        with benchmark("collection post > finish BackgroundTask"):
           if status == 200:
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
-        return result
+      return result
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
@@ -1407,6 +1423,58 @@ class ExtendedResource(Resource):
         methods=['GET']
     )
 
+  def snapshot_counts_query(self, id):
+    """Get data for audit mapped objects counts grouped by child_type."""
+    # id name is used as a kw argument and can't be changed here
+    # pylint: disable=invalid-name,redefined-builtin
+
+    with benchmark("Check audit permissions"):
+      obj = self.model.query.get(id)
+      if not obj:
+        raise NotFound()
+      if not permissions.is_allowed_read_for(obj):
+        raise Forbidden()
+
+    model_name = self.model.__name__
+    with benchmark("Get spanshot counts for audit grouped by child type"):
+      snapshots_dest = db.session.query(
+          ggrc.models.Snapshot.child_type.label("child_type"),
+          ggrc.models.Snapshot.id.label("id")
+      ).join(
+          ggrc.models.Relationship,
+          ggrc.models.Relationship.destination_id == ggrc.models.Snapshot.id
+      ).filter(
+          ggrc.models.Relationship.destination_type == "Snapshot",
+          ggrc.models.Relationship.source_type == model_name,
+          ggrc.models.Relationship.source_id == id
+      )
+
+      snapshots_source = db.session.query(
+          ggrc.models.Snapshot.child_type.label("child_type"),
+          ggrc.models.Snapshot.id.label("id")
+      ).join(
+          ggrc.models.Relationship,
+          ggrc.models.Relationship.source_id == ggrc.models.Snapshot.id
+      ).filter(
+          ggrc.models.Relationship.source_type == "Snapshot",
+          ggrc.models.Relationship.destination_type == model_name,
+          ggrc.models.Relationship.destination_id == id
+      )
+
+      snapshot_counts = snapshots_dest.union(
+          snapshots_source
+      ).with_entities(
+          ggrc.models.Snapshot.child_type,
+          sa.func.count("*")
+      ).group_by(
+          ggrc.models.Snapshot.child_type
+      )
+
+      with benchmark("Make response"):
+        result = dict(snapshot_counts)
+
+    return self.json_success_response(result)
+
 
 def filter_resource(resource, depth=0, user_permissions=None):  # noqa
   """
@@ -1494,6 +1562,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
 
 
 def _is_creator():
+  """Check that current user is Creator."""
   current_user = get_current_user(use_external_user=False)
   return hasattr(current_user, 'system_wide_role') \
       and current_user.system_wide_role == "Creator"
