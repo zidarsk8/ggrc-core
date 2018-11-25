@@ -77,6 +77,7 @@ class TestArchived(WithQueryApi, TestCase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       evidence = factories.EvidenceUrlFactory()
+      # add relationship
       factories.RelationshipFactory(source=audit,
                                     destination=assessment)
       factories.RelationshipFactory(source=assessment,
