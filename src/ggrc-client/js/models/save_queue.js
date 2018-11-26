@@ -127,7 +127,7 @@ import BackgroundTask from '../models/service-models/background-task';
       }.bind(this), this.DELAY);
     },
 
-    enqueue: function (obj, args) {
+    enqueue: function (obj, _saveSuper) {
       let type;
       let bucket;
       let bucketName;
@@ -137,7 +137,7 @@ import BackgroundTask from '../models/service-models/background-task';
           .start(obj.constructor.model_singular,
             tracker.USER_JOURNEY_KEYS.API,
             tracker.USER_ACTIONS.UPDATE_OBJECT);
-        return obj._save(...args).then((objects) => {
+        return obj._save(_saveSuper).then((objects) => {
           stopFn();
           return objects;
         }, stopFn.bind(null, true));

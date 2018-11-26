@@ -849,7 +849,7 @@ export default can.Model('can.Model.Cacheable', {
   delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
   },
-  _save: function (_super) {
+  _save: function (saveCallback) {
     let isNew = this.isNew();
     let saveDfd = this._dfd;
 
@@ -864,7 +864,7 @@ export default can.Model('can.Model.Cacheable', {
       }
     }
 
-    let saveXHR = _super.call(this)
+    let saveXHR = saveCallback.call(this)
       .then((result) => {
         if (!isNew) {
           this.after_update && this.after_update();
@@ -897,8 +897,7 @@ export default can.Model('can.Model.Cacheable', {
     this._dfd = new can.Deferred();
     delayLeavingPageUntil(this._dfd);
 
-    Array.prototype.push.call(arguments, this._super);
-    GGRC.SaveQueue.enqueue(this, arguments);
+    GGRC.SaveQueue.enqueue(this, this._super);
 
     return this._dfd;
   },
