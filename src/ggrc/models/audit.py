@@ -8,6 +8,7 @@ from werkzeug.exceptions import Forbidden
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.builder import simple_property
 from ggrc.login import get_current_user
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
@@ -23,7 +24,8 @@ from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
-from ggrc.models.relationship import Relatable
+from ggrc.models.evidence import Evidence
+from ggrc.models.relationship import Relatable, Relationship
 from ggrc.models.snapshot import Snapshotable
 
 
@@ -216,6 +218,24 @@ class Audit(Snapshotable,
     return query.options(
         orm.joinedload('program'),
         orm.subqueryload('object_people').joinedload('person'),
+    )
+
+  @simple_property
+  def related_evidences(self):
+    """Return all related evidences of audit through assessments"""
+    assessment_ids = Relationship.query.with_entities(
+      Relationship.source_id
+    ).filter_by(
+      destination_id=self.id,
+      destination_type='Audit',
+      source_type='Assessment',
+    ).subquery()
+    return Evidence.query.join(
+      Relationship,
+      Relationship.source_id.in_(assessment_ids)
+    ).filter(
+      Relationship.source_type == 'Assessment',
+      Relationship.destination_type == 'Evidence',
     )
 
 

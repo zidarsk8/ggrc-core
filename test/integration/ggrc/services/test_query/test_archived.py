@@ -78,8 +78,8 @@ class TestArchived(WithQueryApi, TestCase):
       assessment = factories.AssessmentFactory(audit=audit)
       evidence = factories.EvidenceUrlFactory()
       # add relationship
-      factories.RelationshipFactory(source=audit,
-                                    destination=assessment)
+      factories.RelationshipFactory(source=assessment,
+                                    destination=audit)
       factories.RelationshipFactory(source=assessment,
                                     destination=evidence)
       expected_evidence_ids.append(evidence.id)
