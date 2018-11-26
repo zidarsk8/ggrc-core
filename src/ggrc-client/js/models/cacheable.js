@@ -575,9 +575,7 @@ export default can.Model('can.Model.Cacheable', {
       cache[this[idKey]] = this;
     }
     this.attr('class', this.constructor);
-    this.notifier = new PersistentNotifier({
-      name: this.constructor.model_singular,
-    });
+    this.notifier = new PersistentNotifier();
 
     if (!this._pending_joins) {
       this.attr('_pending_joins', []);

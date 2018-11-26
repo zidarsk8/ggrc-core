@@ -129,7 +129,6 @@ const notifier = new PersistentNotifier({
   whenQueueEmpties() {
     window.removeEventListener('beforeunload', _beforeUnloadHandler);
   },
-  name: 'GGRC/window',
 });
 
 const delayLeavingPageUntil = $.proxy(notifier, 'queue');
