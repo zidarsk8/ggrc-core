@@ -177,7 +177,6 @@ export default can.Component.extend({
         item.attr('title', snapshotObject.title);
         item.attr('description', snapshotObject.description);
         item.attr('class', snapshotObject.class);
-        item.attr('snapshot_object_class', 'snapshot-object');
         item.attr('viewLink', snapshotObject.originalLink);
       } else if (!isSnapshotType(item) && item.reify) {
         // add full item object from cache
