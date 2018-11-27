@@ -186,7 +186,7 @@ class IssueTrackerBulkCreator(object):
         self._add_error(errors, obj_info.obj, error)
 
     with benchmark("Update issuetracker issues in db"):
-      self.update_db_issues(created)
+      self.update_db_issues(created, errors)
     return created, errors
 
   def _get_issue_json(self, object_):
@@ -256,8 +256,48 @@ class IssueTrackerBulkCreator(object):
     del obj
     return True
 
-  def update_db_issues(self, issues_info):
-    """Update db IssueTracker issues with provided data.
+  def update_db_issues(self, issues_info, errors):
+    """Update db IssueTracker issues.
+
+    Args:
+        issues_info: Dict with issue properties that were successfully synced
+          to Issue Tracker.
+        errors: [(object_, str(error))] - list of objects that weren't synced
+          to Issue Tracker.
+    We should disable integration for items we haven't created ticket.
+    """
+    self._update_synced_items(issues_info)
+    self._update_failed_items(errors)
+
+  def _update_failed_items(self, errors):
+    """Update items in DB we couldn't sync to Issue Tracker"""
+    issuetracker = all_models.IssuetrackerIssue.__table__
+    stmt = issuetracker.update().where(
+        sa.and_(
+            issuetracker.c.object_type == expr.bindparam("object_type_"),
+            issuetracker.c.object_id == expr.bindparam("object_id_"),
+        )
+    ).values(enabled=False)
+    try:
+      update_values = self._create_failed_items_list(errors)
+      db.session.execute(stmt, update_values)
+      db.session.commit()
+    except sa.exc.OperationalError as error:
+      logger.exception(error)
+      raise exceptions.InternalServerError(
+          "Failed to turn integration off for IssueTracker issues "
+          "that weren't synced in database."
+      )
+
+  @staticmethod
+  def _create_failed_items_list(errors):
+    return [{
+        "object_type_": object_.type,
+        "object_id_": object_.id
+    } for object_, _ in errors]
+
+  def _update_synced_items(self, issues_info):
+    """Update db IssueTracker issues that were synced to Issue Tracker.
 
     Args:
         issues_info: Dict with issue properties.
@@ -300,7 +340,7 @@ class IssueTrackerBulkCreator(object):
     """Prepare issue data for bulk update in db.
 
     Args:
-        issue_json: Dict with issue properties.
+        issue_info: Dict with issue properties.
 
     Returns:
         List of dicts with issues data to update in db.
@@ -475,6 +515,20 @@ class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
         interval=10
     )
 
+  def update_db_issues(self, issues_info, errors):
+    """Update db IssueTracker issues.
+
+    Args:
+        issues_info: Dict with issue properties that were successfully synced
+          to Issue Tracker.
+        errors: [(object_, str(error))] - list of objects that weren't synced
+          to Issue Tracker.
+    We shouldn't disable integration for items we haven't updated cause it
+      still would be synced via cron job.
+    """
+    del errors
+    self._update_synced_items(issues_info)
+
   def _get_issue_json(self, object_):
     """Get json data for issuetracker issue related to provided object."""
     issue_json = None
@@ -532,6 +586,21 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     else:
       self.send_notification(parent_type, parent_id, errors=errors)
     return self.make_response(errors)
+
+  def update_db_issues(self, issues_info, errors):
+    """Update db IssueTracker issues.
+
+    Args:
+        issues_info: Dict with issue properties that were successfully synced
+          to Issue Tracker.
+        errors: [(object_, str(error))] - list of objects that weren't synced
+          to Issue Tracker.
+    We shouldn't disable integration for items we haven't created ticket
+      because it's turned off by default and we turn it on only after
+      successful creation.
+    """
+    del errors
+    self._update_synced_items(issues_info)
 
   def bulk_sync_allowed(self, obj):
     """Check if user has permissions to synchronize issuetracker issue.
