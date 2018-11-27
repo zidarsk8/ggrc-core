@@ -32,7 +32,7 @@ export default can.Construct.extend('can.Model.Mixin', {
           //   Necessary for "attributes"/"serialize"/"convert"
           // Defaults will always be "after" for functions
           //  and "override" for non-function values
-          if (can.isFunction(oldfn)) {
+          if (_.isFunction(oldfn)) {
             switch (aspect) {
               case 'before':
                 obj[key] = function () {

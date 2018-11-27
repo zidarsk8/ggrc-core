@@ -140,7 +140,7 @@ const getInstance = (objectType, objectId, paramsOrObject) => {
   }
 
   if (paramsOrObject) {
-    if ($.isFunction(paramsOrObject.serialize)) {
+    if (_.isFunction(paramsOrObject.serialize)) {
       $.extend(params, paramsOrObject.serialize());
     } else {
       $.extend(params, paramsOrObject || {});

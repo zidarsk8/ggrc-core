@@ -1714,7 +1714,7 @@ Mustache.registerHelper(
 
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
-  modelName = can.isFunction(modelName) ? modelName() : modelName;
+  modelName = _.isFunction(modelName) ? modelName() : modelName;
   isInScope = isInScopeModel(modelName);
   // Temporary Modification to remove possibility to unmap Audit
   isInScope = isInScope || isSnapshotParent(modelName);
