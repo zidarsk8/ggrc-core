@@ -1,6 +1,8 @@
-[//]: <> (updated 11/07/2018)
+[//]: <> (updated 11/28/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
+
+[You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.8sjnq6mfbagk)
 
 [New roles for scoping objects (v1.29.0, 10/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fvuapgweci23)
 
@@ -65,6 +67,13 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)
+
+New columns in import files are now supported for bulk import of ticket tracker integration settings.
+The columns are Integration enabled (true, false), Hotlist ID, Component ID, Priority, Severity, Ticket title.
+You can either generate a new ticket for Assessment/Issue or turn on/off integration for already linked tickets. Linking existing tickets to Assessments/Issues is not supported yet.  
+You can also export ticket tracker config for assessments and issues.
 
 ### New roles for scoping objects (v1.29.0, 10/30/2018)
 
