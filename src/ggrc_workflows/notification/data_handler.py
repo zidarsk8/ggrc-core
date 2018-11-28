@@ -587,7 +587,7 @@ def get_cycle_task_dict(cycle_task, del_rels_cache=None):
       )
     else:
       logger.warning(
-          "Unmapped %s id %s from CycleTask id % has no revisions logged. ",
+          "Unmapped %s id %s from CycleTask id %s has no revisions logged. ",
           removed_object_type, removed_object_id, cycle_task.id
       )
 
