@@ -10,7 +10,7 @@ import Component from '../object-mapper';
 import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
-import * as Utils from '../../../plugins/ggrc_utils';
+import Mappings from '../../../models/mappers/mappings';
 
 describe('object-mapper component', function () {
   let events;
@@ -378,7 +378,7 @@ describe('object-mapper component', function () {
         viewModel,
         closeModal: jasmine.createSpy('closeModal'),
       };
-      spyOn(Utils, 'allowedToMap').and.returnValue(false);
+      spyOn(Mappings, 'allowedToMap').and.returnValue(false);
       handler = events.deferredSave.bind(that);
     });
 
@@ -387,7 +387,7 @@ describe('object-mapper component', function () {
       const objects = [{type: 'Type1'}];
       const dispatch = jasmine.createSpy('dispatch');
       viewModel.attr('deferred_to.instance').dispatch = dispatch;
-      Utils.allowedToMap.and.returnValue(true);
+      Mappings.allowedToMap.and.returnValue(true);
       handler(objects);
 
       expect(dispatch).toHaveBeenCalledWith({

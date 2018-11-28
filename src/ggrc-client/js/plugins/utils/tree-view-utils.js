@@ -29,7 +29,7 @@ import {
   getWidgetConfig,
 } from './object-versions-utils';
 import {getRolesForType} from './acl-utils';
-import {getMappableTypes} from '../ggrc_utils';
+import Mappings from '../../models/mappers/mappings';
 import {caDefTypeName} from './custom-attribute/custom-attribute-config';
 import Cacheable from '../../models/cacheable';
 import * as businessModels from '../../models/business-models';
@@ -344,12 +344,12 @@ function getModelsForSubTier(modelName) {
   let availableModels;
   let selectedModels;
 
-  // getMappableTypes can't be run at once,
+  // getMappingList can't be run at once,
   // cause Mappings is not loaded yet
   if (modelName === 'CycleTaskGroupObjectTask' &&
   !orderedModelsForSubTier[modelName].length) {
     orderedModelsForSubTier[modelName] =
-    getMappableTypes('CycleTaskGroupObjectTask');
+    Mappings.getMappingList('CycleTaskGroupObjectTask');
   }
 
   availableModels = orderedModelsForSubTier[modelName] || [];

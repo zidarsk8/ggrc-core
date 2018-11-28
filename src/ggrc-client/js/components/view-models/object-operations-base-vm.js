@@ -3,9 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {
-  getInScopeModels,
-} from '../../plugins/utils/snapshot-utils';
 import Mappings from '../../models/mappers/mappings';
 import {getInstance} from '../../plugins/utils/models-utils';
 
@@ -126,11 +123,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   showResults: true,
   type: 'Control', // We set default as Control
   availableTypes: function () {
-    let types = Mappings.getMappingTypes(
-      this.attr('object'),
-      [],
-      getInScopeModels().concat('TaskGroup'));
-    return types;
+    return Mappings.getMappingTypes(this.attr('object'));
   },
   object: '',
   bindings: {},

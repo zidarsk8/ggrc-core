@@ -3,9 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {getMappableTypes} from '../../plugins/ggrc_utils';
 import {getModelByType} from '../../plugins/utils/models-utils';
 import * as businessModels from '../business-models';
+import Permission from '../../permission';
+import TreeViewConfig from '../../apps/base_widgets';
 
 /*
   class Mappings
@@ -53,37 +54,127 @@ export default can.Construct.extend({
    * @param {Array} exclude - array of excluded models
    * @return {Array} - list of allowed for mapping Models
    */
-  getMappingList: function (type, include, exclude) {
-    let baseModel = getModelByType(type);
-    exclude = exclude || [];
-    include = include || [];
-    if (!baseModel) {
+  getMappingList: function (type) {
+    if (!type) {
       return [];
     }
 
-    if (_.isFunction(baseModel.getAllowedMappings)) {
-      return baseModel
-        .getAllowedMappings()
-        .filter(function (model) {
-          return exclude.indexOf(model) < 0;
-        })
-        .concat(include);
+    let canonical = this.get_canonical_mappings_for(type);
+    let list = TreeViewConfig.attr('base_widgets_by_type')[type];
+    const compacted = _.compact([_.keys(canonical), list]);
+    return _.intersection(...compacted);
+  },
+  /**
+   * Determine if two types of models can be mapped
+   *
+   * @param {String} target - the target type of model
+   * @param {String} source - the source type of model
+   *
+   * @return {Boolean} - true if mapping is allowed, false otherwise
+   */
+  isMappableType: function (target, source) {
+    let result;
+    if (!target || !source) {
+      return false;
     }
-    return getMappableTypes(type, {
-      whitelist: include,
-      forbidden: exclude,
+    result = this.getMappingList(target);
+    return _.includes(result, source);
+  },
+  /**
+   * Determine if `source` is allowed to be mapped to `target`.
+   *
+   * By symmetry, this method can be also used to check whether `source` can
+   * be unmapped from `target`.
+   *
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
+   * @param {Object} options - the options objects, similar to the one that is
+   *   passed as an argument to Mustache helpers
+   *
+   * @return {Boolean} - true if mapping is allowed, false otherwise
+   */
+  allowedToMap: function (source, target, options) {
+    let canMap = false;
+    let types;
+    let targetType;
+    let sourceType;
+    let targetContext;
+    let sourceContext;
+    let createContexts;
+
+    const MAPPING_RULES = Object.freeze({
+      // mapping audit and assessment to issue is not allowed,
+      // but unmap can be possible
+      'issue audit': (options && options.isIssueUnmap),
+      'issue assessment': (options && options.isIssueUnmap),
     });
+
+    targetType = this._getType(target);
+    sourceType = this._getType(source);
+    types = [sourceType.toLowerCase(), targetType.toLowerCase()];
+
+    // special check for snapshot:
+    if (options &&
+      options.context &&
+      options.context.parent_instance &&
+      options.context.parent_instance.snapshot) {
+      // Avoid add mapping for snapshot
+      return false;
+    }
+
+    let oneWayProp = types.join(' ');
+    if (MAPPING_RULES.hasOwnProperty(oneWayProp)) {
+      // One-way check
+      // special case check:
+      // - mapping an Audit and Assessment to a Issue is not allowed
+      // (but vice versa is allowed)
+      return MAPPING_RULES[oneWayProp];
+    } else {
+      if (!this.isMappableType(sourceType, targetType)) {
+        return false;
+      }
+    }
+
+    targetContext = _.exists(target, 'context.id');
+    sourceContext = _.exists(source, 'context.id');
+    createContexts = _.exists(
+      GGRC, 'permissions.create.Relationship.contexts');
+
+    canMap = Permission.is_allowed_for('update', source) ||
+      _.includes(createContexts, sourceContext) ||
+      // Also allow mapping to source if the source is about to be created.
+      _.isUndefined(source.created_at);
+
+    if (target instanceof can.Map && targetType) {
+      canMap = canMap &&
+        (Permission.is_allowed_for('update', target) ||
+          _.includes(createContexts, targetContext));
+    }
+    return canMap;
+  },
+  _getType: function (object) {
+    let type;
+
+    if (object instanceof can.Model) {
+      type = object.constructor.shortName;
+    } else {
+      type = object.type || object;
+    }
+
+    if (type === 'Snapshot') {
+      type = object.child_type; // check Snapshot original object type
+    }
+
+    return type;
   },
   /**
    * Return list of allowed for mapping types.
    * Performs checks for
    * @param {String} type - base model type
-   * @param {Array} include - array of included models
-   * @param {Array} exclude - array of excluded models
    * @return {Array} - list of allowed for mapping Models
    */
-  getMappingTypes: function (type, include, exclude) {
-    let list = this.getMappingList(type, include, exclude);
+  getMappingTypes: function (type) {
+    let list = this.getMappingList(type);
     return this.groupTypes(list);
   },
   /**

@@ -23,10 +23,6 @@ import {
   buildCountParams,
   batchRequests,
 } from './plugins/utils/query-api-utils';
-import {
-  isMappableType,
-  allowedToMap,
-} from './plugins/ggrc_utils';
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
@@ -877,7 +873,7 @@ Mustache.registerHelper('is_allowed_to_map',
 
     source = resolveComputed(source);
     target = resolveComputed(target);
-    canMap = allowedToMap(source, target, options);
+    canMap = Mappings.allowedToMap(source, target, options);
 
     if (canMap) {
       return options.fn(options.contexts || this);
@@ -1650,7 +1646,7 @@ Mustache.registerHelper('is_mappable_type',
   function (source, target, options) {
     target = Mustache.resolve(target);
     source = Mustache.resolve(source);
-    if (isMappableType(source, target)) {
+    if (Mappings.isMappableType(source, target)) {
       return options.fn(options.contexts);
     }
     return options.inverse(options.contexts);
