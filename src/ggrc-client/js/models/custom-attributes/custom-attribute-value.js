@@ -18,7 +18,6 @@ export default Cacheable('CMS.Models.CustomAttributeValue', {
   attributes: {
     modified_by: Stub,
   },
-  links_to: {},
   init: function () {
     this._super(...arguments);
   },

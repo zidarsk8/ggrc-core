@@ -41,13 +41,14 @@ import {
   getTreeViewHeaders,
   setTreeViewHeaders,
 } from './display-prefs-utils';
+import TreeViewConfig from '../../apps/base_widgets';
 
 /**
 * TreeView-specific utils.
 */
 
-let baseWidgets = GGRC.tree_view.attr('base_widgets_by_type');
-let defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
+let baseWidgets = TreeViewConfig.attr('base_widgets_by_type');
+let defaultOrderTypes = TreeViewConfig.attr('defaultOrderTypes');
 let allTypes = Object.keys(baseWidgets.attr());
 let orderedModelsForSubTier = {};
 

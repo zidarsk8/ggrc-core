@@ -10,6 +10,7 @@ import * as WidgetsUtils from '../../utils/widgets-utils';
 import * as QueryAPI from '../../utils/query-api-utils';
 import Mappings from '../../../models/mappers/mappings';
 import WidgetList from '../../../modules/widget_list';
+import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 describe('GGRC Utils Widgets', function () {
   describe('getWidgetList() method', function () {
@@ -179,7 +180,7 @@ describe('GGRC Utils Widgets', function () {
           };
         });
 
-      spyOn(GGRC.query_parser, 'parse')
+      spyOn(QueryParser, 'parse')
         .and.returnValue({});
 
       spyOn(QueryAPI, 'batchRequests');

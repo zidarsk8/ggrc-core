@@ -5,6 +5,7 @@
 # pylint: disable=too-many-lines
 
 import random
+import re
 
 import pytest
 from selenium import webdriver
@@ -348,6 +349,17 @@ class DropdownStatic(Element):
         break
     else:
       exception.ElementNotFound(val)
+
+
+class DropdownAutocomplete(Element):
+  """Dropdown with autocomplete elements."""
+
+  def select(self, value_name):
+    """Selects autocomplete dropdown element based on element value."""
+    self.element.click()
+    selenium_utils.get_when_visible(self._driver, (
+        By.CSS_SELECTOR, "div[value={}]".format(
+            value_name))).click()
 
 
 class WithBrowser(InstanceRepresentation):
@@ -818,7 +830,7 @@ class CommentsPanel(Element):
         CommentItem(self._driver, element) for element in
         self.element.find_elements(*self._locators.ITEMS_CSS)]
     return [
-        {"modified_by": item.author.text, "created_at": item.datetime.text,
+        {"modified_by": item.author.text, "created_at": item.datetime,
          "description": item.content.text} for item in self._items]
 
   @property
@@ -832,10 +844,10 @@ class CommentsPanel(Element):
     return not self.element.find_element(
         *self.input_txt.locator_or_element).text
 
-  def add_comments(self, *comments):
+  def add_comments(self, comments):
     """Add text comments to input field."""
     count_of_comments = len(self.scopes)
-    for comment in list(*comments):
+    for comment in comments:
       self.input_txt.enter_text(comment)
       self.add_btn.click()
       selenium_utils.get_when_invisible(
@@ -861,10 +873,12 @@ class CommentItem(Element):
 
   @property
   def datetime(self):
-    """Return datetime element of comment from comments item when comments
-    was added.
-    """
-    return Label(self.element, self._locators.DATETIME_CSS)
+    """Return datetime of comment from comments item."""
+    text = self.element.find_element(*self._locators.DATETIME_CSS).text
+    match = re.search(r"\(.+\) (.+)", text)
+    if match:
+      return match.group(1)
+    return text
 
   @property
   def content(self):

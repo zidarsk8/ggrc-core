@@ -20,7 +20,7 @@ export default Cacheable('CMS.Models.Directive', {
   findOne: '/api/directives/{id}',
   mixins: [uniqueTitle, timeboxed, caUpdate, baseNotifications],
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/directives/tree-item-attr.mustache',
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {
         attr_title: 'State',
@@ -58,7 +58,6 @@ export default Cacheable('CMS.Models.Directive', {
         attr_name: 'end_date',
         order: 110,
       }]),
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   attributes: {
     context: Stub,

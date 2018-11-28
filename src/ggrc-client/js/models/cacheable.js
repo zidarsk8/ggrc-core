@@ -291,11 +291,6 @@ export default can.Model('can.Model.Cacheable', {
 
     // Register this type as a custom attributable type if it is one.
     if (this.is_custom_attributable) {
-      if (!GGRC.custom_attributable_types) {
-        GGRC.custom_attributable_types = [];
-      }
-      GGRC.custom_attributable_types.push(can.extend({}, this));
-
       this.validate(
         '_gca_valid',
         function () {
@@ -304,14 +299,6 @@ export default can.Model('can.Model.Cacheable', {
           }
         }
       );
-    }
-
-    // register this type as Roleable if applicable
-    if (this.isRoleable) {
-      if (!GGRC.roleableTypes) {
-        GGRC.roleableTypes = [];
-      }
-      GGRC.roleableTypes.push(can.extend({}, this));
     }
   },
 

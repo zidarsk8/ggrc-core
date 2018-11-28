@@ -105,15 +105,6 @@ describe('Cacheable model', () => {
     });
   });
 
-  describe('::init', () => {
-    it('sets custom attributes', () => {
-      // NB using $.extend here creates a new object with all of the static properties of the function.
-      //  This is how the custom attributable is implemented in setup.
-      expect(GGRC.custom_attributable_types)
-        .toContain($.extend({}, DummyModel));
-    });
-  });
-
   describe('::update', () => {
     let _obj;
 
@@ -216,7 +207,9 @@ describe('Cacheable model', () => {
       //  models calls new DummyModel.List() which we're already spying out,
       //  so spy models() out in order to *not* call it.
       spyOn(DummyModel, 'models').and.callFake(function (items) {
-        let ids = can.map(items, function (item) {return item.id;});
+        let ids = can.map(items, function (item) {
+          return item.id;
+        });
         return can.map(dummyInsts, function (inst) {
           return ~can.inArray(inst.id, ids) ? inst : undefined;
         });

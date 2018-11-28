@@ -53,6 +53,7 @@ export default Cacheable('CMS.Models.Audit', {
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/audits/tree-item-attr.mustache',
+    add_item_view: GGRC.mustache_path + '/audits/tree_add_item.mustache',
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',
@@ -104,7 +105,6 @@ export default Cacheable('CMS.Models.Audit', {
       disable_sorting: true,
       order: 13,
     }],
-    draw_children: true,
   },
   sub_tree_view_options: {
     default_filter: ['Product'],

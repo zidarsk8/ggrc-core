@@ -9,6 +9,8 @@ import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import Component from '../object-mapper';
 import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
+import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
+import * as Utils from '../../../plugins/ggrc_utils';
 
 describe('object-mapper component', function () {
   let events;
@@ -365,37 +367,36 @@ describe('object-mapper component', function () {
 
   describe('"deferredSave" event', function () {
     let that;
-    let spyObj;
 
     beforeEach(function () {
-      spyObj = {
-        trigger: function () {},
-      };
       viewModel.attr({
-        object: 'source',
+        deferred_to: {
+          instance: {},
+        },
       });
-      viewModel.attr('deferred_to', {
-        controller: {element: spyObj},
-      });
-      spyObj = viewModel.attr('deferred_to').controller.element;
       that = {
-        viewModel: viewModel,
-        closeModal: function () {},
+        viewModel,
+        closeModal: jasmine.createSpy('closeModal'),
       };
-      spyOn(that, 'closeModal');
-      spyOn(spyObj, 'trigger');
-      handler = events.deferredSave;
+      spyOn(Utils, 'allowedToMap').and.returnValue(false);
+      handler = events.deferredSave.bind(that);
     });
 
-    it('calls deferredSave', function () {
-      handler.call(that);
-      expect(spyObj.trigger)
-        .toHaveBeenCalledWith('defer:add', [
-          {arr: []},
-        ]);
+    it('dispatches DEFERRED_MAP_OBJECTS for source with objects, ' +
+    'which are allowed to map', function () {
+      const objects = [{type: 'Type1'}];
+      const dispatch = jasmine.createSpy('dispatch');
+      viewModel.attr('deferred_to.instance').dispatch = dispatch;
+      Utils.allowedToMap.and.returnValue(true);
+      handler(objects);
+
+      expect(dispatch).toHaveBeenCalledWith({
+        ...DEFERRED_MAP_OBJECTS,
+        objects,
+      });
     });
     it('calls closeModal', function () {
-      handler.call(that);
+      handler([]);
       expect(that.closeModal).toHaveBeenCalled();
     });
   });

@@ -80,14 +80,8 @@ export default can.Component.extend({
 
       this.dispatch({
         type: 'beforeCommentCreated',
-        items: [can.extend(comment.attr(), {
+        items: [comment.attr({
           assignee_type: getAssigneeType(instance),
-          custom_attribute_revision: {
-            custom_attribute: {
-              title: this.attr('content.title'),
-            },
-            custom_attribute_stored_value: this.attr('content.value'),
-          },
         })],
       });
       this.attr('content.contextScope.errorsMap.comment', false);
@@ -100,7 +94,6 @@ export default can.Component.extend({
         .then(() => {
           this.addComment(comment, {
             context: context,
-            assignee_type: getAssigneeType(instance),
             custom_attribute_revision_upd: {
               custom_attribute_value: {
                 id: this.attr('content.contextScope.valueId')(),

@@ -64,7 +64,7 @@
       placement: function (el, src) {
         $(el).addClass('popover-help-wrap');
         return 'bottom';
-      }.bind(this),
+      },
       title: function () {
         return this.template.find('.popup__title').text();
       }.bind(this),

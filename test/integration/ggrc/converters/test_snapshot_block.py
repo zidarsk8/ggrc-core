@@ -88,6 +88,7 @@ class TestSnapshotBlockConverter(TestCase):
         ('archived', 'Archived'),
         ('status', 'State'),
         ('review_status', 'Review State'),
+        ('reviewers', 'Reviewers'),
         ('assertions', 'Assertions'),
         ('categories', 'Categories'),
         ('fraud_related', 'Fraud Related'),

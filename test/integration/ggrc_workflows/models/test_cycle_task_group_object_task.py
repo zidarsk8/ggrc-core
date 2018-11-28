@@ -342,7 +342,7 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
   def test_get_ct_g_reader_no_role(self):
     """GET CycleTask collection logged in as GlobalReader & No Role."""
     with factories.single_commit():
-      wf_factories.CycleTaskFactory()
+      wf_factories.CycleTaskGroupObjectTaskFactory()
       self.setup_helper.setup_person(rbac_helper.GR_RNAME, "No Role")
 
     g_reader = self.setup_helper.get_person(rbac_helper.GR_RNAME, "No Role")
@@ -366,8 +366,10 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
         task_group = wf_factories.TaskGroupFactory(workflow=workflow)
         tgt = wf_factories.TaskGroupTaskFactory(task_group=task_group)
         cycle = wf_factories.CycleFactory(workflow=workflow)
-        ctgts[flag] = wf_factories.CycleTaskFactory(cycle=cycle,
-                                                    task_group_task=tgt)
+        ctgts[flag] = wf_factories.CycleTaskGroupObjectTaskFactory(
+            cycle=cycle,
+            task_group_task=tgt
+        )
 
     filter_params = "ids={}&object_approval={}".format(
         ",".join([str(c.id) for c in ctgts.values()]),
@@ -396,7 +398,7 @@ class TestCycleTaskApiCalls(workflow_test_case.WorkflowTestCase):
 
     comment_id = comment_json.get("id")
     comment_type = comment_json.get("type")
-    ctgot = wf_factories.CycleTaskFactory()
+    ctgot = wf_factories.CycleTaskGroupObjectTaskFactory()
     ctgot_id = ctgot.id
     response = self.api_helper.post(all_models.Relationship, {
       "relationship": {

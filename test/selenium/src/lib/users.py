@@ -28,7 +28,7 @@ def current_user():
 
 
 def set_current_person(person):
-  """Set user as the current `app_entity.Person`."""
+  """Set user as the current `Person`."""
   user = entity.PersonEntity(
       id=person.obj_id, name=person.name, email=person.email,
       system_wide_role=person.global_role_name)
@@ -37,9 +37,9 @@ def set_current_person(person):
 
 def current_person():
   """Gets current person (app_entity)."""
-  from lib.entities import app_entity_factory
+  from lib.app_entity_factory import person_entity_factory
   user = current_user()
-  return app_entity_factory.PersonFactory().create_empty(
+  return person_entity_factory.PersonFactory().create_empty(
       obj_id=user.id, name=user.name, email=user.email,
       global_role_name=user.system_wide_role)
 

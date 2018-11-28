@@ -1,8 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Conversions from App entity to REST."""
+from lib.app_entity import person_entity
 from lib.constants import roles
-from lib.entities import app_entity
 
 _COMMON_ACCESS_CONTROL_ROLE_MAPPING = {
     "admins": "Admin"
@@ -32,9 +32,7 @@ def build_access_control_list(obj, acr_mapping=None):
 
 
 def _person_list_to_acl_entries(obj_type, acr_name, person_list):
-  """Returns a list of ACL entries built from the list of
-  `app_entity.PersonEntity`s.
-  """
+  """Returns a list of ACL entries built from the list of `Person`s."""
   role_id = roles.ACLRolesIDs.id_of_role(
       object_type=obj_type, name=acr_name)
   return [{"ac_role_id": role_id, "person": to_basic_rest_obj(person)}
@@ -48,7 +46,7 @@ def _raise_if_value_is_person(key, value):
   """
   def is_person(maybe_person):
     """Returns whether the argument is a person."""
-    return isinstance(maybe_person, app_entity.Person)
+    return isinstance(maybe_person, person_entity.Person)
 
   def should_convert(maybe_whitelisted_key):
     """Returns whether the key should be considered a name of ACR."""

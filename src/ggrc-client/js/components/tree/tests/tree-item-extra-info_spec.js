@@ -8,6 +8,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-item-extra-info';
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 import * as businessModels from '../../../models/business-models';
+import TreeViewConfig from '../../../apps/base_widgets';
 
 describe('tree-item-extra-info component', function () {
   'use strict';
@@ -42,7 +43,7 @@ describe('tree-item-extra-info component', function () {
   });
 
   describe('is not active if', function () {
-    let allModels = Object.keys(GGRC.tree_view.attr('base_widgets_by_type'));
+    let allModels = Object.keys(TreeViewConfig.attr('base_widgets_by_type'));
     let notActiveModels = _.difference(allModels, activeModel);
 
     it('workflow_state is not defined', function () {

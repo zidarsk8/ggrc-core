@@ -184,7 +184,8 @@ describe('advanced-search-mapping-criteria component', function () {
   describe('availableAttributes() method', function () {
     it('returns available attributes', function () {
       let attributes = ['attr1', 'attr2'];
-      spyOn(TreeViewUtils, 'getAvailableAttributes').and.returnValue(attributes);
+      spyOn(TreeViewUtils, 'getAvailableAttributes')
+        .and.returnValue(attributes);
       viewModel.attr('criteria.objectName', 'test');
 
       expect(viewModel.availableAttributes()).toBe(attributes);

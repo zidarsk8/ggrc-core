@@ -21,6 +21,7 @@ import {
   getPageType,
   getPageInstance,
 } from './current-page-utils';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 let widgetsCounts = new can.Map({});
 
@@ -142,12 +143,12 @@ function _initWidgetCounts(widgets, type, id) {
     if (isSnapshotRelated(type, widgetObject.name) ||
         widgetObject.isObjectVersion) {
       param = buildParam('Snapshot', {}, expression, null,
-        GGRC.query_parser.parse('child_type = ' + widgetObject.name));
+        QueryParser.parse('child_type = ' + widgetObject.name));
     } else {
       param = buildParam(widgetObject.name,
         {}, expression, null,
         widgetObject.additionalFilter ?
-          GGRC.query_parser.parse(widgetObject.additionalFilter) :
+          QueryParser.parse(widgetObject.additionalFilter) :
           null
       );
     }

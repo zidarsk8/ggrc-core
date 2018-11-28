@@ -27,6 +27,7 @@ import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import './current-exports/current-exports';
 import {connectionLostNotifier} from './connection-lost-notifier';
 import router from '../../router';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 const DEFAULT_TIMEOUT = 2000;
 
@@ -209,9 +210,9 @@ export default can.Component.extend({
           fields: allItems
             .filter((item) => item.isSelected)
             .map((item) => item.key).serialize(),
-          filters: GGRC.query_parser.join_queries(
-            GGRC.query_parser.parse(relevantFilter || ''),
-            GGRC.query_parser.parse(panel.filter || '')
+          filters: QueryParser.joinQueries(
+            QueryParser.parse(relevantFilter || ''),
+            QueryParser.parse(panel.filter || '')
           ),
         };
       });
@@ -250,7 +251,7 @@ export default can.Component.extend({
       this.viewModel.attr('isFilterActive', isExpression);
     },
     '.tree-filter__expression-holder input keyup': function (el, ev) {
-      this.toggleIndicator(GGRC.query_parser.parse(el.val()));
+      this.toggleIndicator(QueryParser.parse(el.val()));
     },
     '.option-type-selector change': function (el, ev) {
       this.viewModel.attr('isFilterActive', false);

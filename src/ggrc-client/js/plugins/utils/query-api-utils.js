@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import QueryParser from '../../generated/ggrc_filter_query_parser';
 /**
  * Util methods for work with QueryAPI.
  */
@@ -202,7 +203,7 @@ function makeRequest(params) {
 }
 
 function _makeRelevantFilter(filter) {
-  let relevantFilter = GGRC.query_parser.parse('#' + filter.type + ',' +
+  let relevantFilter = QueryParser.parse('#' + filter.type + ',' +
     filter.id + '#');
 
   if (filter && !filter.operation) {
@@ -239,7 +240,7 @@ function _makeFilter(filter, relevant) {
   }
   if (filterList.length) {
     return filterList.reduce(function (left, right) {
-      return GGRC.query_parser.join_queries(left, right);
+      return QueryParser.joinQueries(left, right);
     });
   }
   return {expression: {}};

@@ -1,21 +1,23 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Conversions from UI dicts to App entities."""
-from lib.entities import app_entity_factory
+from lib.app_entity_factory import (
+    person_entity_factory, workflow_entity_factory, entity_factory_common)
 from lib.utils import date_utils
 
 
 def ui_to_app(obj_name, ui_dict):
   """Converts ui_dict to app_entity."""
   method_name = {
-      "workflow": workflow_ui_to_app
+      "workflow": workflow_ui_to_app,
+      "cycle_task": cycle_task_ui_to_app
   }[obj_name]
   return method_name(ui_dict)
 
 
 def workflow_ui_to_app(ui_dict):
   """Converts Workflow ui_dict to app_entity."""
-  return app_entity_factory.WorkflowFactory().create_empty(
+  return workflow_entity_factory.WorkflowFactory().create_empty(
       obj_id=int(ui_dict["obj_id"]),
       title=ui_dict["title"],
       state=ui_dict["state"],
@@ -34,7 +36,7 @@ def workflow_ui_to_app(ui_dict):
 
 def task_group_ui_to_app(ui_dict):
   """Converts TaskGroup ui dict to App entity."""
-  return app_entity_factory.TaskGroupFactory().create_empty(
+  return workflow_entity_factory.TaskGroupFactory().create_empty(
       title=ui_dict["title"],
       assignee=email_to_app_person(ui_dict["assignee"])
   )
@@ -42,12 +44,23 @@ def task_group_ui_to_app(ui_dict):
 
 def task_group_task_ui_to_app(ui_dict):
   """Converts TaskGroupTask ui dict to App entity."""
-  return app_entity_factory.TaskGroupTaskFactory().create_empty(
+  return workflow_entity_factory.TaskGroupTaskFactory().create_empty(
       obj_id=ui_dict.get("obj_id"),
       title=ui_dict["title"],
       assignees=emails_to_app_people(ui_dict.get("assignees")),
       start_date=str_to_date(ui_dict["start_date"]),
       due_date=str_to_date(ui_dict["due_date"])
+  )
+
+
+def cycle_task_ui_to_app(ui_dict):
+  """Converts CycleTask ui dict to App entity."""
+  return workflow_entity_factory.CycleTaskFactory().create_empty(
+      title=ui_dict["title"],
+      state=ui_dict["state"],
+      assignees=emails_to_app_people(ui_dict.get("assignees")),
+      due_date=str_to_date(ui_dict["due_date"]),
+      comments=comment_dicts_to_entities(ui_dict["comments"])
   )
 
 
@@ -58,10 +71,26 @@ def emails_to_app_people(emails):
 
 def email_to_app_person(email):
   """Converts email to app person."""
-  return app_entity_factory.PersonFactory().create_empty(
+  return person_entity_factory.PersonFactory().create_empty(
       email=email)
 
 
 def str_to_date(date_str):
   """Converts date string to the date object."""
   return date_utils.str_to_date(date_str, "%m/%d/%Y")
+
+
+def comment_dicts_to_entities(comment_dicts):
+  """Converts the list of comment dicts to the list of comment entities."""
+  return [comment_dict_to_entity(comment_dict)
+          for comment_dict in comment_dicts]
+
+
+def comment_dict_to_entity(comment_dict):
+  """Converts comment dict to Comment app entity."""
+  return entity_factory_common.CommentFactory().create_empty(
+      created_at=date_utils.ui_str_with_zone_to_datetime(
+          comment_dict["created_at"]),
+      description=comment_dict["description"],
+      modified_by=email_to_app_person(comment_dict["modified_by"])
+  )

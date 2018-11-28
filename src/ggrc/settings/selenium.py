@@ -3,3 +3,14 @@
 
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:root@db/ggrcdevtest' \
                           '?charset=utf8'
+LOGGING_LOGGERS = {
+    "ggrc": "INFO",
+    "sqlalchemy": "WARNING",
+    # WARNING - logs warnings and errors only
+    # INFO    - logs SQL-queries
+    # DEBUG   - logs SQL-queries + result sets
+    "werkzeug": "INFO",
+    # WARNING - logs warnings and errors only
+    # INFO    - logs HTTP-queries
+    "ggrc.utils.benchmarks": "DEBUG"
+}

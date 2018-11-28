@@ -3,12 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.query_parser', function () {
+import QueryParser from '../../js/generated/ggrc_filter_query_parser';
+
+describe('QueryParser', function () {
   'use strict';
 
   let parserStructure = {
     parse: jasmine.any(Function),
-    join_queries: jasmine.any(Function),
+    joinQueries: jasmine.any(Function),
     generated: {
       parse: jasmine.any(Function),
       SyntaxError: jasmine.any(Function),
@@ -16,7 +18,7 @@ describe('GGRC.query_parser', function () {
   };
 
   it('should exist', function () {
-    expect(GGRC.query_parser).toEqual(parserStructure);
+    expect(QueryParser).toEqual(parserStructure);
   });
 
   describe('parse', function () {
@@ -25,11 +27,11 @@ describe('GGRC.query_parser', function () {
         expression: {},
       };
 
-      expect(GGRC.query_parser.parse('')).toEqual(emptyResult);
-      expect(GGRC.query_parser.parse(' ')).toEqual(emptyResult);
-      expect(GGRC.query_parser.parse(' \t ')).toEqual(emptyResult);
-      expect(GGRC.query_parser.parse('\t')).toEqual(emptyResult);
-      expect(GGRC.query_parser.parse('    \t')).toEqual(emptyResult);
+      expect(QueryParser.parse('')).toEqual(emptyResult);
+      expect(QueryParser.parse(' ')).toEqual(emptyResult);
+      expect(QueryParser.parse(' \t ')).toEqual(emptyResult);
+      expect(QueryParser.parse('\t')).toEqual(emptyResult);
+      expect(QueryParser.parse('    \t')).toEqual(emptyResult);
     });
 
     it('parses exclude text search queries', function () {
@@ -45,7 +47,7 @@ describe('GGRC.query_parser', function () {
 
       can.each(textSearchQueries, function (queryStr) {
         let text = queryStr.replace('!~', '').trim();
-        expect(GGRC.query_parser.parse(queryStr)).toEqual({
+        expect(QueryParser.parse(queryStr)).toEqual({
           expression: {
             text: text,
             op: {name: 'exclude_text_search'},
@@ -71,7 +73,7 @@ describe('GGRC.query_parser', function () {
 
       can.each(textSearchQueries, function (queryStr) {
         let text = queryStr.replace('~', '').trim();
-        expect(GGRC.query_parser.parse(queryStr)).toEqual({
+        expect(QueryParser.parse(queryStr)).toEqual({
           expression: {
             text: text,
             op: {name: 'text_search'},
@@ -103,7 +105,7 @@ describe('GGRC.query_parser', function () {
 
         can.each(simpleQueries, function (queryStr) {
           let query = queryStr.split(op);
-          expect(GGRC.query_parser.parse(queryStr)).toEqual({
+          expect(QueryParser.parse(queryStr)).toEqual({
             expression: {
               left: query[0].trim().replace(/"/g, ''),
               op: {name: op},
@@ -115,7 +117,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('parses \'is\' queries', function () {
-      expect(GGRC.query_parser.parse('5words is empty')).toEqual({
+      expect(QueryParser.parse('5words is empty')).toEqual({
         expression: {
           left: '5words',
           op: {name: 'is'},
@@ -135,7 +137,7 @@ describe('GGRC.query_parser', function () {
       ];
 
       can.each(queries, (query) => {
-        expect(GGRC.query_parser.parse(query))
+        expect(QueryParser.parse(query))
           .toEqual({
             expression: {
               left: {left: 'n', op: {name: '='}, right: '22'},
@@ -157,7 +159,7 @@ describe('GGRC.query_parser', function () {
       ];
 
       can.each(queries, (query) => {
-        expect(GGRC.query_parser.parse(query))
+        expect(QueryParser.parse(query))
           .toEqual({
             expression: {
               left: {left: 'n', op: {name: '='}, right: '22'},
@@ -169,7 +171,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('parses relevant queries', function () {
-      expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4#'))
+      expect(QueryParser.parse('#SomeClass,1,2,3,4#'))
         .toEqual({
           expression: {
             object_name: 'SomeClass',
@@ -178,7 +180,7 @@ describe('GGRC.query_parser', function () {
           },
         });
 
-      expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4# or #A,1# and #B,2#'))
+      expect(QueryParser.parse('#SomeClass,1,2,3,4# or #A,1# and #B,2#'))
         .toEqual({
           expression: {
             left: {
@@ -203,7 +205,7 @@ describe('GGRC.query_parser', function () {
           },
         });
 
-      expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4# or #A,1#'))
+      expect(QueryParser.parse('#SomeClass,1,2,3,4# or #A,1#'))
         .toEqual({
           expression: {
             left: {
@@ -222,7 +224,7 @@ describe('GGRC.query_parser', function () {
     });
 
     it('parses complex queries', () => {
-      expect(GGRC.query_parser
+      expect(QueryParser
         .parse('(n = 22 and n = 5) and ("bacon ipsum" !~ bacon)'))
         .toEqual({
           expression: {
@@ -236,7 +238,7 @@ describe('GGRC.query_parser', function () {
           },
         });
 
-      expect(GGRC.query_parser
+      expect(QueryParser
         .parse('(n = 22 or n = 5) and ("bacon ipsum" !~ bacon)'))
         .toEqual({
           expression: {
@@ -250,7 +252,7 @@ describe('GGRC.query_parser', function () {
           },
         });
 
-      expect(GGRC.query_parser
+      expect(QueryParser
         .parse('n = 22 or n = 5 and "bacon ipsum" ~ bacon'))
         .toEqual({
           expression: {
@@ -264,7 +266,7 @@ describe('GGRC.query_parser', function () {
           },
         });
 
-      expect(GGRC.query_parser
+      expect(QueryParser
         .parse('("bacon ipsum" ~ bacon) and ("bacon ipsum" !~ bacon)'))
         .toEqual({
           expression: {
@@ -274,7 +276,7 @@ describe('GGRC.query_parser', function () {
           },
         });
 
-      expect(GGRC.query_parser
+      expect(QueryParser
         .parse('hello=worldoo or ~ bacon ipsum'))
         .toEqual({
           expression: {
@@ -298,7 +300,7 @@ describe('GGRC.query_parser', function () {
       ];
 
       queries.forEach((query) => {
-        let result = GGRC.query_parser.parse(query);
+        let result = QueryParser.parse(query);
 
         expect(result).toEqual({
           expression: {
@@ -320,7 +322,7 @@ describe('GGRC.query_parser', function () {
 
       _.forEach(queries, function (query) {
         let value = query.split('~')[1].trim().replace(/^"|"$/g, '');
-        let result = GGRC.query_parser.parse(query);
+        let result = QueryParser.parse(query);
 
         expect(result.expression.right).toEqual(value);
       });
@@ -336,7 +338,7 @@ describe('GGRC.query_parser', function () {
 
       _.forEach(queries, function (query) {
         let value = query.split('~')[1].trim();
-        let result = GGRC.query_parser.parse(query);
+        let result = QueryParser.parse(query);
 
         expect(result.expression.right).toEqual(value);
       });
@@ -345,7 +347,7 @@ describe('GGRC.query_parser', function () {
     it('does not change escaped symbols in case of text search', function () {
       let query = 'some \\\\ test \\% \\_ query';
 
-      let result = GGRC.query_parser.parse(query);
+      let result = QueryParser.parse(query);
 
       expect(result.expression.op.name).toBe('text_search');
       expect(result.expression.text).toBe(query);
@@ -353,13 +355,13 @@ describe('GGRC.query_parser', function () {
 
     it('correctly handles escaped symbol inside attribute name', function () {
       let query = '"my \\" quote" ~ aaa';
-      let result = GGRC.query_parser.parse(query);
+      let result = QueryParser.parse(query);
 
       expect(result.expression.left).toEqual('my \\" quote');
     });
   });
 
-  describe('join_queries', function () {
+  describe('joinQueries', function () {
     it('joins two queries with AND by default', function () {
       let sameQueries = [
         ['a=b and c=d', 'a=b', 'c=d'],
@@ -374,12 +376,12 @@ describe('GGRC.query_parser', function () {
 
       can.each(sameQueries, function (queries) {
         expect(
-          JSON.stringify(GGRC.query_parser.parse(queries[0]))
+          JSON.stringify(QueryParser.parse(queries[0]))
         ).toEqual(
           JSON.stringify(
-            GGRC.query_parser.join_queries(
-              GGRC.query_parser.parse(queries[1]),
-              GGRC.query_parser.parse(queries[2])
+            QueryParser.joinQueries(
+              QueryParser.parse(queries[1]),
+              QueryParser.parse(queries[2])
             )
           )
         );
@@ -398,12 +400,12 @@ describe('GGRC.query_parser', function () {
 
       can.each(sameQueries, function (queries) {
         expect(
-          JSON.stringify(GGRC.query_parser.parse(queries[0]))
+          JSON.stringify(QueryParser.parse(queries[0]))
         ).toEqual(
           JSON.stringify(
-            GGRC.query_parser.join_queries(
-              GGRC.query_parser.parse(queries[1]),
-              GGRC.query_parser.parse(queries[2]),
+            QueryParser.joinQueries(
+              QueryParser.parse(queries[1]),
+              QueryParser.parse(queries[2]),
               'OR'
             )
           )

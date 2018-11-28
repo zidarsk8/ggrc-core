@@ -62,9 +62,11 @@ class TestExportTasks(TestCase):
           cycle_task_group = factories.CycleTaskGroupFactory(
               cycle=cycle, contact=person)
 
-          task = factories.CycleTaskFactory(cycle=cycle,
-                                            cycle_task_group=cycle_task_group,
-                                            task_group_task=task_group_task)
+          task = factories.CycleTaskGroupObjectTaskFactory(
+              cycle=cycle,
+              cycle_task_group=cycle_task_group,
+              task_group_task=task_group_task
+          )
           for r_name in role_names:
             role = all_models.AccessControlRole.query.filter(
                 all_models.AccessControlRole.name == r_name,

@@ -3,10 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if allow_mapping_or_creating}}
   {{#if_instance_of parent_instance 'Audit'}}
     {{^if instance.archived}}
-    {{#if allow_creating}}
     {{#is_allowed 'update' parent_instance}}
       <a href="javascript://"
          class="section-create action-button create-button"
@@ -37,6 +35,4 @@
       {{/is_auditor}}
     {{/is_allowed}}
     {{/if}}
-    {{/if}}
   {{/if_instance_of}}
-{{/if}}

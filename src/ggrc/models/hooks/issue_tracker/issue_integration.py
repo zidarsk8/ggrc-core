@@ -359,3 +359,10 @@ def prepare_issue_update_json(issue, issue_tracker_info=None):
   issue_tracker_params = builder.params
   params = issue_tracker_params.get_issue_tracker_params()
   return params
+
+
+def prepare_comment_update_json(object_, comment, author):
+  """Prepare json for adding comment to IssueTracker issue"""
+  builder = issue_tracker_params_builder.IssueParamsBuilder()
+  params = builder.build_params_for_comment(object_, comment, author)
+  return params.get_issue_tracker_params()

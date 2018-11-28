@@ -2,8 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Task Group info panel."""
 from lib import base
+from lib.app_entity_factory import entity_factory_common
 from lib.element import three_bbs
-from lib.entities import app_entity_factory
 from lib.page.widget import table_with_headers
 from lib.utils import ui_utils
 
@@ -23,7 +23,7 @@ class TaskGroupInfoPanel(base.WithBrowser):
 
   def wait_to_be_init(self):
     """Wait for panel to be initialized."""
-    self._create_task_button.wait_until_present()
+    self._create_task_button.wait_until(lambda e: e.present)
     ui_utils.wait_for_spinner_to_disappear()
 
   @property
@@ -47,7 +47,7 @@ class TaskGroupInfoPanel(base.WithBrowser):
       obj_id = int(obj_row.data_object_id)
       obj_name = obj_row.data_object_type
       obj_title = obj_row.text
-      factory = app_entity_factory.get_factory_by_obj_name(obj_name)()
+      factory = entity_factory_common.get_factory_by_obj_name(obj_name)()
       objs.append(factory.create_empty(obj_id=obj_id, title=obj_title))
     return objs
 

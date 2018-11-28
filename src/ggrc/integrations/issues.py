@@ -12,7 +12,6 @@ class Client(client.JsonClient):
 
   _BASE_PATH = '/api/issues'
 
-  @client.value_for_http_error(predicates={404: None})
   def get_issue(self, issue_id):
     """Returns issue representation by given issue ID.
 

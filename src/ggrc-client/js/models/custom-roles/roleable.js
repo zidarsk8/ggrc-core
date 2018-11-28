@@ -4,6 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
+import {getRoleableModels} from '../../plugins/utils/models-utils';
 
 /**
  * A "mixin" denoting a model type that can be assigned custom roles.
@@ -17,10 +18,10 @@ export default Cacheable('CMS.Models.Roleable', {
   findAll: function () {
     // We do not query the backend, this implementation is used to diplay
     // a list of objects in the Custom Roles widget.
-    let types = _.orderBy(GGRC.roleableTypes, 'category', false);
+    let types = _.orderBy(getRoleableModels(), 'category', false);
 
     let instances = can.map(types, (type, i) => {
-      let withId = can.extend(type, {id: i});
+      let withId = can.extend({}, type, {id: i});
       return new this(withId);
     });
 

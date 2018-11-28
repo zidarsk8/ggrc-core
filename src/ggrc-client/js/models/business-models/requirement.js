@@ -40,7 +40,7 @@ export default Cacheable('CMS.Models.Requirement', {
     modified_by: Stub,
   },
   tree_view_options: {
-    attr_view: '/static/mustache/requirements/tree-item-attr.mustache',
+    attr_view: '/static/mustache/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
       {attr_title: 'Effective Date', attr_name: 'start_date'},
@@ -66,7 +66,6 @@ export default Cacheable('CMS.Models.Requirement', {
         attr_name: 'review_status',
         order: 80,
       }]),
-    add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
   },
   sub_tree_view_options: {
     default_filter: ['Objective'],

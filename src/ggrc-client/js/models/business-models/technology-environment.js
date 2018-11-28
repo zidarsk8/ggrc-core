@@ -57,8 +57,6 @@ export default Cacheable('CMS.Models.TechnologyEnvironment', {
         disable_sorting: true,
       },
     ]),
-    add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-    link_buttons: true,
     display_attr_names: ['title', 'status', 'updated_at'],
   },
   is_custom_attributable: true,

@@ -9,12 +9,12 @@ import time
 from selenium.webdriver.common.by import By
 
 from lib import base
+from lib.app_entity_factory import entity_factory_common
 from lib.constants import (
     locator, objects, element, roles, regex, messages)
 from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import (
     info_widget_three_bbs, page_elements, tables, tab_element, tab_containers)
-from lib.entities import app_entity_factory
 from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
 from lib.page.widget import (
     info_panel, object_modal, object_page, related_proposals)
@@ -131,7 +131,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Returns some text part from footer."""
     footer_regexp = r"Created date (.+)   {4}Last updated by\n(.+)\non (.+)"
     footer_el = self._browser.element(class_name="info-widget-footer")
-    footer_el.element(class_name="person-name").wait_until_present()
+    footer_el.element(class_name="person-name").wait_until(lambda e: e.present)
     return re.search(footer_regexp, footer_el.text).group(group_idx)
 
   @staticmethod
@@ -175,7 +175,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     # pylint: disable=expression-not-assigned
     _header_msg, _value_msg = (
         "people header: {}, count: {}", "people list: {}, count: {}")
-    people_scopes = self._active_tab_root.locate().find_elements(
+    people_scopes = self._active_tab_root.wd.find_elements(
         *self._locators.PEOPLE_HEADERS_AND_VALUES_CSS)
     [selenium_utils.wait_until_stops_moving(people_scope)
      for people_scope in people_scopes]
@@ -281,6 +281,8 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
         "state": self.status(),
         "title": self.title()
     }
+    if self.is_comments_panel_present:
+      scope["comments"] = self.comments_panel.scopes
     if self.is_info_page:
       scope.update(
           created_at=self.created_at(),
@@ -322,7 +324,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Returns changelog validation result."""
     self.tabs.ensure_tab(self._changelog_tab_name)
     return tab_containers.changelog_tab_validate(
-        self._browser.driver, self._active_tab_root.locate())
+        self._browser.driver, self._active_tab_root.wd)
 
   def edit_obj(self, **changes):
     """Makes changes `changes` to object."""
@@ -334,6 +336,17 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   def delete_obj(self):
     """Deletes object."""
     self.three_bbs.select_delete().confirm_delete()
+
+  @property
+  def comments_panel(self):
+    """Returns comments panel."""
+    return base.CommentsPanel(self._root.wd,
+                              (By.CSS_SELECTOR, "comment-data-provider"))
+
+  @property
+  def is_comments_panel_present(self):
+    """Returns whether comments panel exists on the page."""
+    return self._comment_area().exists
 
 
 class Programs(WithObjectReview, InfoWidget):
@@ -394,6 +407,11 @@ class Workflow(InfoWidget):
     """Returns whether workflow is archived."""
     return self._browser.element(class_name="state-archived").present
 
+  def archive(self):
+    """Archives the workflow."""
+    self.three_bbs.select_archive()
+    selenium_utils.wait_for_js_to_load(self._driver)
+
   @property
   def workflow_members(self):
     """Returns Workflow Members page element."""
@@ -407,8 +425,10 @@ class CycleTask(InfoWidget):
     """Returns obj scope."""
     return {
         "title": self.title(),
-        "status": self.status(),
-        "due_date": self.due_date
+        "state": self.status(),
+        "assignees": self.assignees.get_people_emails(),
+        "due_date": self.due_date,
+        "comments": self.comments_panel.scopes
     }
 
   def wait_to_be_init(self):
@@ -439,9 +459,15 @@ class CycleTask(InfoWidget):
       obj_id = int(obj_row.data_id)
       entity_obj_name = obj_row.data_object_type
       obj_title = obj_row.text
-      factory = app_entity_factory.get_factory_by_obj_name(entity_obj_name)()
+      factory = entity_factory_common.get_factory_by_obj_name(
+          entity_obj_name)()
       objs.append(factory.create_empty(obj_id=obj_id, title=obj_title))
     return objs
+
+  @property
+  def assignees(self):
+    """Returns Task Assignees page element."""
+    return self._related_people_list("Task Assignees")
 
 
 class Audits(WithAssignFolder, InfoWidget):
@@ -501,7 +527,6 @@ class Assessments(InfoWidget):
         creators=self.creators.get_people_emails(),
         assignees=self.assignees.get_people_emails(),
         verifiers=self.verifiers.get_people_emails(),
-        comments=self.comments_panel.scopes,
         custom_attributes=self.custom_attributes(),
         primary_contacts=self.primary_contacts.get_people_emails(),
         mapped_objects=self.mapped_objects_titles()
@@ -548,8 +573,13 @@ class Assessments(InfoWidget):
   def comments_panel(self):
     """Returns comments panel."""
     self.tabs.ensure_tab(self._assessment_tab_name)
-    return base.CommentsPanel(
-        self._root.locate(), self._locators.COMMENTS_CSS)
+    return base.CommentsPanel(self._root.wd, self._locators.COMMENTS_CSS)
+
+  @property
+  def is_comments_panel_present(self):
+    """Returns whether comments panel exists on the page."""
+    self.tabs.ensure_tab(self._assessment_tab_name)
+    return self._comment_area().exists
 
   def description(self):
     """Switch to tab with description and return a text of description."""
@@ -607,14 +637,14 @@ class Assessments(InfoWidget):
     """
     self.tabs.ensure_tab(self._related_assessments_tab_name)
     return tables.AssessmentRelatedAsmtsTable(
-        self._browser.driver, self._active_tab_root.locate())
+        self._browser.driver, self._active_tab_root.wd)
 
   @property
   def related_issues_table(self):
     """Switches to Related Issues tab and returns RelatedIssuesTable."""
     self.tabs.ensure_tab(self._related_issues_tab_name)
     return tables.AssessmentRelatedIssuesTable(
-        self._browser.driver, self._active_tab_root.locate())
+        self._browser.driver, self._active_tab_root.wd)
 
   def fill_global_cas_inline(self, custom_attributes):
     """Fills GCAs inline."""

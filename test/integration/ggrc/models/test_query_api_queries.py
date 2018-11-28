@@ -76,7 +76,7 @@ class TestAllModels(WithQueryApi, TestCase):
       ggrc_factories.ProductGroupFactory,
       wf_factories.CycleFactory,
       wf_factories.CycleTaskGroupFactory,
-      wf_factories.CycleTaskFactory,
+      wf_factories.CycleTaskGroupObjectTaskFactory,
       wf_factories.TaskGroupFactory,
       wf_factories.TaskGroupTaskFactory,
       wf_factories.WorkflowFactory,

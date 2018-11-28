@@ -28,14 +28,14 @@ class TestMetric(TestCase):
     creator = self.gen.generate_object
 
     for metric_data, is_created in data:
+      response, metric = creator(
+          all_models.Metric,
+          metric_data
+      )
       if is_created:
-        _, metric = creator(
-            all_models.Metric,
-            metric_data
-        )
         self.assertEqual(metric.title, metric_data["title"])
       else:
-        self.assertRaises(Exception, creator, all_models.Metric, metric_data)
+        self.assertEqual(response.status_code, 400)
 
   def test_auto_slug_generation(self):
     """Test auto slug generation"""

@@ -18,7 +18,6 @@ export default Cacheable('CMS.Models.CustomAttributeDefinition', {
   attributes: {
     modified_by: Stub,
   },
-  links_to: {},
   defaults: {
     title: '',
     attribute_type: 'Text',

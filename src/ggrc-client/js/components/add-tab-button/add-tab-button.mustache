@@ -17,8 +17,8 @@
     </a>
     <div class="dropdown-menu" role="menu">
       {{#widgetList}}
-        <div class="inner-nav-item">
-          {{#filterWidgets .}}
+        {{#filterWidgets .}}
+          <div class="inner-nav-item">
             {{#shouldCreateObject instance model.shortName}}
               <a
                 href="{{urlPath}}{{internav_href}}"
@@ -70,8 +70,8 @@
                 </div>
               </a>
             {{/shouldCreateObject}}
-          {{/filterWidgets}}
-        </div>
+          </div>
+        {{/filterWidgets}}
       {{/widgetList}}
     </div>
   </li>

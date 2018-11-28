@@ -47,6 +47,8 @@ from ggrc.converters.handlers import document
 from ggrc.converters.handlers import evidence
 from ggrc.converters.handlers import custom_attribute
 from ggrc.converters.handlers import acl
+from ggrc.converters.handlers import issue_tracker
+
 from ggrc.converters.handlers.snapshot_instance_column_handler import (
     SnapshotInstanceColumnHandler
 )
@@ -96,6 +98,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "notes": handlers.TextColumnHandler,
     "operationally": handlers.ConclusionColumnHandler,
     "review_status": handlers.ExportOnlyColumnHandler,
+    "reviewers": handlers.ReviewersColumnHandler,
     "program": handlers.ProgramColumnHandler,
     "ra_counsel": handlers.UserColumnHandler,
     "ra_manager": handlers.UserColumnHandler,
@@ -118,6 +121,15 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "threat_source": handlers.TextColumnHandler,
     "threat_event": handlers.TextColumnHandler,
     "vulnerability": handlers.TextColumnHandler,
+
+    # IssueTracker fields
+    "component_id": issue_tracker.IssueTrackerAddsColumnHandler,
+    "hotlist_id": issue_tracker.IssueTrackerAddsColumnHandler,
+    "issue_priority": issue_tracker.IssueTrackerWithValidStates,
+    "issue_severity": issue_tracker.IssueTrackerWithValidStates,
+    "issue_title": issue_tracker.IssueTrackerTitleColumnHandler,
+    "issue_type": issue_tracker.IssueTrackerWithValidStates,
+    "enabled": issue_tracker.IssueTrackerEnabledHandler,
 
     # Mapping column handlers
     "__mapping__:person": handlers.PersonMappingColumnHandler,

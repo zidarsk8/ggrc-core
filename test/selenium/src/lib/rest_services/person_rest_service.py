@@ -2,13 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST service for people."""
 from lib import decorator
-from lib.entities import app_entity
+from lib.app_entity import person_entity
 from lib.rest import base_rest_service, rest_convert
 
 
 class PersonRestService(base_rest_service.ObjectRestService):
   """REST service for Person app entities."""
-  app_entity_cls = app_entity.Person
+  app_entity_cls = person_entity.Person
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):
@@ -31,7 +31,7 @@ class PersonRestService(base_rest_service.ObjectRestService):
 
 class GlobalRoleRestService(base_rest_service.ObjectRestService):
   """REST service for GlobalRole app entities."""
-  app_entity_cls = app_entity.GlobalRole
+  app_entity_cls = person_entity.GlobalRole
   _obj_name = "role"
 
   @staticmethod
@@ -50,13 +50,13 @@ def all_global_roles():
 
 
 def global_role_with_name(name):
-  """Returns a global role (app_entity.GlobalRole) by name."""
+  """Returns a global role (GlobalRole) by name."""
   return next(role for role in all_global_roles() if role.name == name)
 
 
 class UserRoleRestService(base_rest_service.ObjectRestService):
   """REST service for UserRole app entities."""
-  app_entity_cls = app_entity.UserRole
+  app_entity_cls = person_entity.UserRole
 
   @staticmethod
   def _map_to_rest_for_create_obj(obj):

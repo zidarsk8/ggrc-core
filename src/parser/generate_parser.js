@@ -5,11 +5,11 @@
 */
 
 /*
-Script used to generate ggrc_filter_query_parser.js 
+Script used to generate ggrc_filter_query_parser.js
 
--- updating dev environment by running: 
+-- updating dev environment by running:
 
-  vagrant provision 
+  vagrant provision
 
 -- manual dev env setup:
 

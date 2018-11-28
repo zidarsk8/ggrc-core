@@ -650,96 +650,27 @@ describe('assessment-info-pane component', () => {
     });
   });
 
-  describe('afterCreate() method', () => {
+  describe('removeItems() method', () => {
     const itemsType = 'comments';
-    let items;
 
-    beforeEach(() => {
-      items = [{
-        data: 'Fake data 1',
-        _stamp: 1,
-      }, {
-        data: 'Fake data 2',
-        _stamp: 2,
-      }, {
-        data: 'Fake data 3',
-        _stamp: 3,
-      }, {
-        data: 'Fake data 4',
-        _stamp: 4,
-      }];
-
-      vm.attr(itemsType, items);
-    });
-
-    it('shoud set "isUpdating" property to false', () => {
-      const expectedProp = `isUpdating${can.capitalize(itemsType)}`;
-      vm.attr(expectedProp, true);
-      vm.afterCreate({success: true, items: []}, itemsType);
-      expect(vm.attr(expectedProp)).toBe(false);
+    let items = new can.List(Array(3)).map((item, index) => {
+      return {
+        id: index,
+        type: itemsType,
+      };
     });
 
     it('should remove all unsaved items from list', () => {
-      let newItems = new can.List([{
-        data: 'Updated data 2',
-        _stamp: 2,
-      }, {
-        data: 'Update data 4',
-        _stamp: 4,
-      }]);
+      vm.attr(itemsType, items);
 
       let event = {
-        items: newItems,
-        success: false,
+        items: [items[0], items[2]],
       };
 
-      vm.afterCreate(event, itemsType);
+      vm.removeItems(event, itemsType);
       let actualItems = vm.attr(itemsType);
-      expect(actualItems.length).toBe(2);
-      expect(actualItems[0].attr('data')).toEqual(items[0].data);
-      expect(actualItems[1].attr('data')).toEqual(items[2].data);
-    });
-
-    it('should update items with the same stam in list', () => {
-      let newItems = new can.List([{
-        data: 'Updated data 2',
-        _stamp: 2,
-      }, {
-        data: 'Update data 4',
-        _stamp: 4,
-      }, {
-        data: 'No stamp item',
-      }]);
-
-      let event = {
-        items: newItems,
-        success: true,
-      };
-
-      vm.afterCreate(event, itemsType);
-      let actualItems = vm.attr(itemsType);
-      expect(actualItems.length).toBe(4);
-      expect(actualItems[0].attr('data')).toEqual(items[0].data);
-      expect(actualItems[1].attr('data')).toEqual(newItems[0].data);
-      expect(actualItems[2].attr('data')).toEqual(items[2].data);
-      expect(actualItems[3].attr('data')).toEqual(newItems[1].data);
-    });
-
-    it('should remove "_stamp" attrs from updated items', () => {
-      let newItems = new can.List([{
-        data: 'Updated data 1',
-        _stamp: 1,
-      }]);
-
-      let event = {
-        items: newItems,
-        success: true,
-      };
-
-      vm.afterCreate(event, itemsType);
-      let actualItems = vm.attr(itemsType);
-      expect(actualItems[0].attr('data')).toEqual(newItems[0].data);
-      expect(actualItems[0].attr('_stamp')).toBeUndefined();
+      expect(actualItems.length).toBe(1);
+      expect(actualItems[0].attr('id')).toEqual(1);
     });
   });
 
@@ -861,7 +792,7 @@ describe('assessment-info-pane component', () => {
       });
 
       spyOn(vm, 'addAction');
-      spyOn(vm, 'afterCreate');
+      spyOn(vm, 'removeItems');
     });
 
     describe('within executed deferred function into deferredSave', () => {
@@ -886,18 +817,17 @@ describe('assessment-info-pane component', () => {
         dfd.resolve(assessment);
       });
 
-      it('calls afterCreate with appropriate params with success equals ' +
-      'to true', function (done) {
-        vm.addRelatedItem(event, type);
-        dfd.then(() => {
-          expect(vm.afterCreate.calls.count()).toBe(1);
-          expect(vm.afterCreate).toHaveBeenCalledWith({
-            items: [event.item],
-            success: true,
-          }, type);
-          done();
+      it('sets "isUpdating{<passed capitalized type>}" property to false',
+        function (done) {
+          const expectedProp = `isUpdating${can.capitalize(type)}`;
+
+          vm.addRelatedItem(event, type);
+
+          dfd.always(() => {
+            expect(vm.attr(expectedProp)).toBe(false);
+            done();
+          });
         });
-      });
 
       it('removes actions for assessment', function (done) {
         vm.addRelatedItem(event, type);
@@ -936,15 +866,25 @@ describe('assessment-info-pane component', () => {
         dfd.reject(assessment);
       });
 
-      it('calls afterCreate with appropriate params with success equals to ' +
-      'false', function (done) {
+      it('sets "isUpdating{<passed capitalized type>}" property to false',
+        function (done) {
+          const expectedProp = `isUpdating${can.capitalize(type)}`;
+
+          vm.addRelatedItem(event, type);
+
+          dfd.always(() => {
+            expect(vm.attr(expectedProp)).toBe(false);
+            done();
+          });
+        });
+
+      it('calls removeItems with appropriate params', (done) => {
         dfd.reject(assessment);
         vm.addRelatedItem(event, type);
         dfd.fail(() => {
-          expect(vm.afterCreate.calls.count()).toBe(1);
-          expect(vm.afterCreate).toHaveBeenCalledWith({
+          expect(vm.removeItems.calls.count()).toBe(1);
+          expect(vm.removeItems).toHaveBeenCalledWith({
             items: [event.item],
-            success: false,
           }, type);
           done();
         });

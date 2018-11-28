@@ -8,26 +8,9 @@ import {getComponentVM} from '../../../js_specs/spec_helpers';
 
 describe('ggrc-modal-connector component', function () {
   let viewModel;
-  let events;
 
-  beforeAll(function () {
-    events = Component.prototype.events;
-  });
   beforeEach(function () {
     viewModel = getComponentVM(Component);
-  });
-  describe('init() method', function () {
-    let handler;
-
-    beforeEach(function () {
-      handler = events.init.bind({viewModel});
-    });
-
-    it('sets instance of component to viewModel.controller', function () {
-      handler();
-      expect(viewModel.attr('controller').viewModel)
-        .toEqual(viewModel);
-    });
   });
 
   describe('addMappings() method', function () {

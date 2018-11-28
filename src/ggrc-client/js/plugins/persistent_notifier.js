@@ -26,8 +26,8 @@ export default can.Construct({
     let oldlen = this.list_empty_cbs.length;
     let that = this;
     if (!dfd || !dfd.then) {
-      throw 'ERROR: attempted to queue something other than a ' +
-            'Deferred or Promise';
+      throw new Error('ERROR: attempted to queue something other than a ' +
+                      'Deferred or Promise');
     }
     idx = this.dfds.indexOf(dfd);
 

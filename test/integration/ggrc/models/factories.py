@@ -562,7 +562,7 @@ def get_model_factory(model_name):
       "Control": ControlFactory,
       "Cycle": wf_factories.CycleFactory,
       "CycleTaskGroup": wf_factories.CycleTaskGroupFactory,
-      "CycleTaskGroupObjectTask": wf_factories.CycleTaskFactory,
+      "CycleTaskGroupObjectTask": wf_factories.CycleTaskGroupObjectTaskFactory,
       "CycleTaskEntry": wf_factories.CycleTaskEntryFactory,
       "DataAsset": DataAssetFactory,
       "Document": DocumentFactory,

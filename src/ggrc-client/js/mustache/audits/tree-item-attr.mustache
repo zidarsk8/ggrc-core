@@ -4,11 +4,6 @@
 }}
 
 {{#switch attr_name}}
-  {{#case 'audit_lead'}}
-    <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
-    </model-loader>
-  {{/case}}
   {{#case 'modified_by'}}
     <model-loader {path}="'business-models/person'">
       <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>

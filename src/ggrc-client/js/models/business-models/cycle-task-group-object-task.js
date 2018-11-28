@@ -106,6 +106,7 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     },
   },
   tree_view_options: {
+    add_item_view: _mustachePath + '/tree_add_item.mustache',
     attr_view: _mustachePath + '/tree-item-attr.mustache',
     attr_list: [
       {
@@ -160,7 +161,6 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
       'start_date',
       'end_date'],
     mandatory_attr_name: ['title'],
-    draw_children: true,
   },
   sub_tree_view_options: {
     default_filter: ['Control'],
@@ -200,6 +200,12 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
         }
 
         ctg.dispatch(REFRESH_SUB_TREE);
+
+        // All set's status is dependant on newly created Cycle Task,
+        // thus needs to refresh all after new CT was created.
+        // Example: Cycle, Cycle Task Group and Cycle Task are
+        // in FINISHED state, create new CT: Cycle, CTG should
+        // change status to In Progress.
         instance.refresh_all_force('cycle_task_group', 'cycle', 'workflow');
       }
     });

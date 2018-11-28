@@ -193,8 +193,8 @@ def group_revisions(attributes, revisions):
 def _objects_from_snapshots(snapshots):
   """Get snapshot child objects set."""
   if not snapshots:
-    return set()
-  return set(db.session.query(
+    return list()
+  return list(db.session.query(
       models.Snapshot.child_type,
       models.Snapshot.child_id,
   ).filter(
@@ -211,12 +211,12 @@ def _get_objects_from_aggregates(aggregate_objects, computed_object_type):
         attribute. Object to which the computed attribute belongs.
   """
   if not aggregate_objects:
-    return set()
+    return list()
 
   # Related original objects
   src = db.session.query(
-      models.Relationship.source_type,
-      models.Relationship.source_id,
+      models.Relationship.source_type.label('type'),
+      models.Relationship.source_id.label('id'),
   ).filter(
       sa.tuple_(
           models.Relationship.destination_type,
@@ -225,8 +225,8 @@ def _get_objects_from_aggregates(aggregate_objects, computed_object_type):
       models.Relationship.source_type == computed_object_type,
   )
   dst = db.session.query(
-      models.Relationship.destination_type,
-      models.Relationship.destination_id,
+      models.Relationship.destination_type.label('type'),
+      models.Relationship.destination_id.label('id'),
   ).filter(
       sa.tuple_(
           models.Relationship.source_type,
@@ -237,8 +237,8 @@ def _get_objects_from_aggregates(aggregate_objects, computed_object_type):
 
   # Related snapshots
   snap_dst = db.session.query(
-      models.Snapshot.child_type,
-      models.Snapshot.child_id,
+      models.Snapshot.child_type.label('type'),
+      models.Snapshot.child_id.label('id'),
   ).join(
       models.Relationship,
       sa.and_(
@@ -253,8 +253,8 @@ def _get_objects_from_aggregates(aggregate_objects, computed_object_type):
       ).in_(aggregate_objects),
   )
   snap_src = db.session.query(
-      models.Snapshot.child_type,
-      models.Snapshot.child_id,
+      models.Snapshot.child_type.label('type'),
+      models.Snapshot.child_id.label('id'),
   ).join(
       models.Relationship,
       sa.and_(
@@ -270,9 +270,7 @@ def _get_objects_from_aggregates(aggregate_objects, computed_object_type):
   )
   # Missing snapshots related to snapshot parent (currently only Audit)
 
-  # TODO: benchmark and compare with:
-  # return set(src.union(dst, snap_src, snap_dst))
-  return set(src) | set(dst) | set(snap_src) | set(snap_dst)
+  return list(src.union(dst, snap_src, snap_dst).distinct())
 
 
 def _get_objects_from_deleted(aggregate_deleted, aggregate_field):
@@ -282,8 +280,8 @@ def _get_objects_from_deleted(aggregate_deleted, aggregate_field):
   to a currently deleted aggregate object.
   """
   if not aggregate_deleted:
-    return set()
-  return set(db.session.query(
+    return list()
+  return list(db.session.query(
       models.Attributes.object_type,
       models.Attributes.object_id,
   ).filter(
@@ -292,7 +290,7 @@ def _get_objects_from_deleted(aggregate_deleted, aggregate_field):
           models.Attributes.source_id,
       ).in_(aggregate_deleted),
       models.Attributes.source_attr == aggregate_field,
-  ))
+  ).distinct())
 
 
 def get_affected_objects(attribute_groups):
@@ -395,13 +393,13 @@ def _get_relationships(aggregate_type, objects):
   """Get all mappings between aggregate_type and objects."""
   # Related original objects
   if not objects:
-    return set()
+    return list()
 
   src = db.session.query(
-      models.Relationship.source_type,
-      models.Relationship.source_id,
-      models.Relationship.destination_type,
-      models.Relationship.destination_id,
+      models.Relationship.source_type.label('aggregate_type'),
+      models.Relationship.source_id.label('aggregate_id'),
+      models.Relationship.destination_type.label('computed_type'),
+      models.Relationship.destination_id.label('computed_id'),
   ).filter(
       sa.tuple_(
           models.Relationship.destination_type,
@@ -410,10 +408,10 @@ def _get_relationships(aggregate_type, objects):
       models.Relationship.source_type == aggregate_type,
   )
   dst = db.session.query(
-      models.Relationship.destination_type,
-      models.Relationship.destination_id,
-      models.Relationship.source_type,
-      models.Relationship.source_id,
+      models.Relationship.destination_type.label('aggregate_type'),
+      models.Relationship.destination_id.label('aggregate_id'),
+      models.Relationship.source_type.label('computed_type'),
+      models.Relationship.source_id.label('computed_id'),
   ).filter(
       sa.tuple_(
           models.Relationship.source_type,
@@ -425,10 +423,10 @@ def _get_relationships(aggregate_type, objects):
   # Related snapshots
   # These queries should be optimized to not use full outer join.
   snap_dst = db.session.query(
-      models.Relationship.destination_type,
-      models.Relationship.destination_id,
-      models.Snapshot.child_type,
-      models.Snapshot.child_id,
+      models.Relationship.destination_type.label('aggregate_type'),
+      models.Relationship.destination_id.label('aggregate_id'),
+      models.Snapshot.child_type.label('computed_type'),
+      models.Snapshot.child_id.label('computed_id'),
   ).filter(
       models.Relationship.source_type == models.Snapshot.__name__,
       models.Relationship.source_id == models.Snapshot.id,
@@ -439,10 +437,10 @@ def _get_relationships(aggregate_type, objects):
       ).in_(objects),
   )
   snap_src = db.session.query(
-      models.Relationship.source_type,
-      models.Relationship.source_id,
-      models.Snapshot.child_type,
-      models.Snapshot.child_id,
+      models.Relationship.source_type.label('aggregate_type'),
+      models.Relationship.source_id.label('aggregate_id'),
+      models.Snapshot.child_type.label('computed_type'),
+      models.Snapshot.child_id.label('computed_id'),
   ).filter(
       models.Relationship.destination_type == models.Snapshot.__name__,
       models.Relationship.destination_id == models.Snapshot.id,
@@ -454,9 +452,7 @@ def _get_relationships(aggregate_type, objects):
   )
   # Missing snapshots related to snapshot parent (currently only Audit)
 
-  # TODO: benchmark and compare with:
-  # return set(src.union(dst, snap_src, snap_dst))
-  return set(src) | set(dst) | set(snap_src) | set(snap_dst)
+  return list(src.union(dst, snap_src, snap_dst).distinct())
 
 
 def get_relationships(affected_objects):

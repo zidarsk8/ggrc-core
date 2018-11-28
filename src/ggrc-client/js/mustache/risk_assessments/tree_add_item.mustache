@@ -4,9 +4,7 @@
 }}
 
 
-{{#if allow_mapping_or_creating}}
 {{#if_instance_of parent_instance 'Program'}}
-    {{#if allow_creating}}
     {{#is_allowed 'update' parent_instance}}
       <a
         href="javascript://"
@@ -23,7 +21,6 @@
         Create
       </a>
     {{/is_allowed}}
-    {{/if}}
 {{else}}
     {{#is_allowed_to_map parent_instance model.shortName}}
       <a
@@ -42,4 +39,3 @@
       </a>
     {{/is_allowed_to_map}}
 {{/if_instance_of}}
-{{/if}}
