@@ -3,9 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './issue-unmap';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
-import template from './issue-unmap-dropdown-item.stache';
+import '../issue/issue-unmap';
+import template from './unmap-dropdown-item.stache';
 import Mappings from '../../models/mappers/mappings';
 import {
   isAuditScopeModel,
@@ -17,7 +17,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
-  tag: 'issue-unmap-dropdown-item',
+  tag: 'unmap-dropdown-item',
   template,
   leakScope: true,
   viewModel: {

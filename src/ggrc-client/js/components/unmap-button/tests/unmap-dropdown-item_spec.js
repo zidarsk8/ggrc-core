@@ -4,9 +4,9 @@
 */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../issue-unmap-dropdown-item';
+import Component from '../unmap-dropdown-item';
 
-describe('issue-unmap-dropdown-item component', function () {
+describe('unmap-dropdown-item component', function () {
   describe('viewModel scope', function () {
     let viewModel;
 

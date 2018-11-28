@@ -39,7 +39,7 @@ import '../../components/related-objects/related-urls';
 import '../../components/inline/inline';
 import '../../components/inline/base-inline-control-title';
 import '../../components/global-custom-attributes/global-custom-attributes';
-import '../../components/issue/issue-unmap-dropdown-item';
+import '../../components/unmap-button/unmap-dropdown-item';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/dashboard-workflows/dashboard-workflows';
 import '../../components/questionnaire-link/questionnaire-link';
