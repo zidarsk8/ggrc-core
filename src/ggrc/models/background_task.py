@@ -165,7 +165,6 @@ def create_task(name, url, queued_callback=None, parameters=None,
           bg_task=bg_task,
           queued_callback=queued_callback,
           queue=queue,
-
           retry_options=retry_options)
     return bg_task
 
@@ -350,3 +349,24 @@ def queued_task(func):
     task.finish("Success", result)
     return result
   return decorated_view
+
+
+def reindex_on_commit():
+  """Decide to reindex changed objects synchronously on commit
+  or in background indexing task
+
+  Adding indexing background task doesn't make sense
+  if request already running in background
+  """
+  return running_in_background()
+
+
+def running_in_background():
+  """Check that current request is running in background task"""
+  value = False
+  try:
+    if request.path.startswith("/_background_tasks/"):
+      value = True  # running in BackgroundTask
+  except RuntimeError:
+    value = True  # running not in flask(possibly in deferred task)
+  return value

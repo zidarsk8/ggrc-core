@@ -248,12 +248,12 @@ def _display_request_time():
   # pylint: disable=unused-variable
   @app.before_request
   def before_request():
-    """Mesure time when before the request starts"""
+    """Measure time when before the request starts"""
     flask.g.request_start = (time.time(), time.clock())
 
   @app.after_request
   def after_request(response):
-    """Print out requst time"""
+    """Print out request time"""
     queries = get_debug_queries()
     query_time = sum(query.duration for query in queries)
     start_time, start_clock = flask.g.request_start
@@ -274,6 +274,37 @@ def _display_request_time():
       performance_logger.info(str_, *payload)
     return response
 
+
+def register_indexing():
+  """Register indexing after request hook"""
+  from ggrc.models import background_task
+  from ggrc.views import bg_update_ft_records
+
+  # pylint: disable=unused-variable
+  @app.after_request
+  def create_indexing_bg_task(response):
+    """Create background task for indexing
+    Adds header 'X-GGRC-Indexing-Task-Id' with BG task id
+    """
+    if hasattr(db.session, "reindex_set"):
+      model_ids = db.session.reindex_set.model_ids_to_reindex
+      if model_ids:
+        with benchmark("Create indexing bg task"):
+          chunk_size = db.session.reindex_set.CHUNK_SIZE
+          bg_task = background_task.create_task(
+              name="indexing",
+              url=url_for(bg_update_ft_records.__name__),
+              parameters={"models_ids": model_ids,
+                          "chunk_size": chunk_size},
+              queued_callback=bg_update_ft_records
+          )
+          db.session.expunge_all()  # improves plain_commit time
+          db.session.add(bg_task)
+          db.session.plain_commit()
+          response.headers.add("X-GGRC-Indexing-Task-Id", bg_task.id)
+    return response
+
+
 setup_error_handlers(app)
 init_models(app)
 configure_flask_login(app)
@@ -285,6 +316,7 @@ init_gdrive_routes(app)
 init_permissions_provider()
 init_extra_listeners()
 notifications.register_notification_listeners()
+register_indexing()
 
 _enable_debug_toolbar()
 _enable_jasmine()

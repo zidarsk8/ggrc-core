@@ -14,6 +14,7 @@ from ggrc import fulltext
 from ggrc import utils
 from ggrc.models import all_models, get_model
 from ggrc.fulltext import mixin
+from ggrc.models.background_task import reindex_on_commit
 from ggrc.utils import benchmark, helpers
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
@@ -50,20 +51,31 @@ class ReindexSet(threading.local):
       self.model_ids_to_reindex[type_name].add(id_value)
 
   @helpers.without_sqlalchemy_cache
-  def push_ft_records(self):
-    """Function that clear and push new full text records in DB."""
-    with benchmark("push ft records into DB"):
+  def indexing_hook(self):
+    """Function that collect changed models for after request hook
+    or push new full text records in DB in case of background request."""
+    with benchmark("pre commit indexing hook"):
       self.warmup()
-      for obj in db.session:
-        if not isinstance(obj, mixin.Indexed):
-          continue
-        if obj.id in self.model_ids_to_reindex.get(obj.type, set()):
-          db.session.expire(obj)
-      for model_name in self.model_ids_to_reindex.keys():
-        ids = self.model_ids_to_reindex.pop(model_name)
-        chunk_list = utils.list_chunks(list(ids), chunk_size=self.CHUNK_SIZE)
-        for ids_chunk in chunk_list:
-          get_model(model_name).bulk_record_update_for(ids_chunk)
+      if self.model_ids_to_reindex:
+        if reindex_on_commit():
+          update_ft_records(self.model_ids_to_reindex, self.CHUNK_SIZE)
+      # else: Indexing task will be created in after_request hook
+
+
+@helpers.without_sqlalchemy_cache
+def update_ft_records(model_ids_to_reindex, chunk_size):
+  """Update fulltext records in DB"""
+  with benchmark("indexing. expire objects in session"):
+    for obj in db.session:
+      if (isinstance(obj, mixin.Indexed) and
+              obj.id in model_ids_to_reindex.get(obj.type, set())):
+        db.session.expire(obj)
+  with benchmark("indexing. update ft records in db"):
+    for model_name in model_ids_to_reindex.keys():
+      ids = model_ids_to_reindex.pop(model_name)
+      chunk_list = utils.list_chunks(list(ids), chunk_size=chunk_size)
+      for ids_chunk in chunk_list:
+        get_model(model_name).bulk_record_update_for(ids_chunk)
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument

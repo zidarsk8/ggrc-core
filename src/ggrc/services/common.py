@@ -1208,7 +1208,7 @@ class Resource(ModelView):
 
       if 'X-GGRC-BackgroundTask' in request.headers:
         with benchmark("collection post > finish BackgroundTask"):
-          if status == 200:
+          if 200 <= status < 300:
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
