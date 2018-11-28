@@ -48,31 +48,27 @@
                     </a>
                   </li>
                   <li>
-                    <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_url}}" />
+                    <permalink {instance}="instance"/>
                   </li>
-
-                    <li>
-                      {{#if_equals instance.status 'Deprecated'}}
-                        <object-change-state
-                          {to-state}="initialState"
-                          (on-state-change)="onStateChange(%event)"
-                        >
-                          <a href="#">
-                            <i class="fa fa-reply"></i> Restore
-                          </a>
-                        </object-change-state>
-                      {{else}}
-                        <object-change-state
-                          to-state="Deprecated"
-                          (on-state-change)="onStateChange(%event)"
-                        >
-                          <a href="#">
-                            <i class="fa fa-times-circle"></i> Deprecate
-                          </a>
-                        </object-change-state>
-                      {{/if_equals}}
-                    </li>
-
+                  <li>
+                    {{#if_equals instance.status 'Deprecated'}}
+                      <object-change-state
+                        {to-state}="initialState"
+                        (on-state-change)="onStateChange(%event)">
+                        <a href="#">
+                          <i class="fa fa-reply"></i> Restore
+                        </a>
+                      </object-change-state>
+                    {{else}}
+                      <object-change-state
+                        to-state="Deprecated"
+                        (on-state-change)="onStateChange(%event)">
+                        <a href="#">
+                          <i class="fa fa-times-circle"></i> Deprecate
+                        </a>
+                      </object-change-state>
+                    {{/if_equals}}
+                  </li>
                   {{#is_allowed 'delete' instance context='for'}}
                     <li>
                       <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
@@ -81,7 +77,6 @@
                       </a>
                     </li>
                   {{/is_allowed}}
-
                 </ul>
               </div>
             {{/is_allowed}}

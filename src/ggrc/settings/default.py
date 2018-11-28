@@ -33,6 +33,7 @@ exports = [
     "MAX_INSTANCES",
     "CREATE_ISSUE_URL",
     "CREATE_ISSUE_BUTTON_NAME",
+    "ASSESSMENT_SHORT_URL_PREFIX",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -217,6 +218,10 @@ GAPI_CLIENT_SECRET = os.environ.get('GGRC_GAPI_CLIENT_SECRET', "")
 RISK_ASSESSMENT_URL = os.environ.get(
     'GGRC_RISK_ASSESSMENT_URL',
     'http://localhost:8080'
+)
+ASSESSMENT_SHORT_URL_PREFIX = os.environ.get(
+    'GGRC_ASSESSMENT_SHORT_URL_PREFIX',
+    ''
 )
 
 # Link for creation issue tracker issue
