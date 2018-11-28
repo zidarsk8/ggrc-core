@@ -15,6 +15,7 @@ logger = getLogger(__name__)
 
 
 def send_error_notification(message):
+  """Send error notification to APPENGINE_EMAIL user."""
   try:
     user_email = common.get_app_engine_email()
     common.send_email(user_email, "Error in nightly cron job", message)
