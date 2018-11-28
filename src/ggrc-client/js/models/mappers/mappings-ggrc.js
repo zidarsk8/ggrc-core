@@ -52,6 +52,22 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
 const roleableObjects = getRoleableModels()
   .map((model) => model.model_singular);
 
+const coreObjectConfig = {
+  map: _.difference(businessObjects, ['Assessment']),
+  unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
+  indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+};
+
+const scopingObjectConfig = {
+  map: _.difference(businessObjects,
+    ['Assessment', 'Control', 'Standard', 'Regulation']),
+  externalMap: ['Control'],
+  unmap: _.difference(businessObjects,
+    ['Assessment', 'Audit', 'Standard', 'Regulation']),
+  indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+    'TaskGroup', 'Workflow'],
+};
+
 new Mappings({
   Person: {
     indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
@@ -79,47 +95,50 @@ new Mappings({
   },
   Contract: {
     map: _.difference(businessObjects, ['Assessment', 'Contract']),
+    unmap: _.difference(businessObjects, ['Assessment', 'Audit', 'Contract']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
     map: _.difference(businessObjects,
       ['Assessment', ...scopingObjects, ...externalDirectiveObjects]),
     externalMap: [...scopingObjects, ...externalDirectiveObjects],
+    unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Objective: {
-    map: _.difference(businessObjects, ['Assessment']),
-    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    ...coreObjectConfig,
   },
   Policy: {
     map: _.difference(businessObjects, ['Assessment', 'Policy']),
+    unmap: _.difference(businessObjects, ['Assessment', 'Audit', 'Policy']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Requirement: {
-    map: _.difference(businessObjects, ['Assessment']),
-    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    ...coreObjectConfig,
   },
   Regulation: {
     map: _.difference(businessObjects,
       [...scopingObjects, 'Assessment', 'Control', 'Regulation']),
     externalMap: ['Control'],
+    unmap: _.difference(businessObjects,
+      [...scopingObjects, 'Assessment', 'Audit', 'Regulation']),
     indirectMappings:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Risk: {
-    map: _.difference(businessObjects, ['Assessment']),
-    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    ...coreObjectConfig,
   },
   Standard: {
     map: _.difference(businessObjects,
       [...scopingObjects, 'Assessment', 'Control', 'Standard']),
     externalMap: ['Control'],
+    unmap: _.difference(businessObjects,
+      [...scopingObjects, 'Assessment', 'Audit', 'Standard']),
     indirectMappings:
       [...scopingObjects, 'Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Threat: {
-    map: _.difference(businessObjects, ['Assessment']),
-    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
+    ...coreObjectConfig,
   },
 
   // Scoping objects
@@ -127,104 +146,55 @@ new Mappings({
     map: _.difference(businessObjects,
       ['Assessment', 'AccessGroup', 'Control', 'Standard', 'Regulation']),
     externalMap: ['Control'],
+    unmap: _.difference(businessObjects,
+      ['Assessment', 'AccessGroup', 'Audit', 'Standard', 'Regulation']),
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
   DataAsset: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Facility: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   KeyReport: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Market: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Metric: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   OrgGroup: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Process: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Product: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   ProductGroup: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Project: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   System: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   TechnologyEnvironment: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   Vendor: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
 
   // Audit
   Audit: {
     map: [...snapshotableObjects, 'Issue'],
+    unmap: ['Issue'],
     indirectMappings:
       ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person', 'Program'],
   },

@@ -6,7 +6,6 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../unmap-dropdown-item';
 import Mappings from '../../../models/mappers/mappings';
-import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('unmap-dropdown-item component', function () {
@@ -70,8 +69,6 @@ describe('unmap-dropdown-item component', function () {
     describe('isAllowedToUnmap get() method', () => {
       beforeEach(() => {
         spyOn(Mappings, 'allowedToUnmap');
-        spyOn(SnapshotUtils, 'isAuditScopeModel');
-        spyOn(SnapshotUtils, 'isSnapshotParent');
         spyOn(CurrentPageUtils, 'isAllObjects');
         spyOn(CurrentPageUtils, 'isMyWork');
 
@@ -82,8 +79,6 @@ describe('unmap-dropdown-item component', function () {
       it('returns false if unmapping is not allowed', () => {
         Mappings.allowedToUnmap.and.returnValue(false);
 
-        SnapshotUtils.isAuditScopeModel.and.returnValue(false);
-        SnapshotUtils.isSnapshotParent.and.returnValue(false);
         CurrentPageUtils.isAllObjects.and.returnValue(false);
         CurrentPageUtils.isMyWork.and.returnValue(false);
         viewModel.attr('options.isDirectlyRelated', true);
@@ -95,8 +90,6 @@ describe('unmap-dropdown-item component', function () {
       it('returns false when user is on "My Work" page', () => {
         Mappings.allowedToUnmap.and.returnValue(true);
 
-        SnapshotUtils.isAuditScopeModel.and.returnValue(false);
-        SnapshotUtils.isSnapshotParent.and.returnValue(false);
         CurrentPageUtils.isAllObjects.and.returnValue(false);
         CurrentPageUtils.isMyWork.and.returnValue(true);
         viewModel.attr('options.isDirectlyRelated', true);
@@ -107,8 +100,6 @@ describe('unmap-dropdown-item component', function () {
       it('returns false when user is on "All Objects" page', () => {
         Mappings.allowedToUnmap.and.returnValue(true);
 
-        SnapshotUtils.isAuditScopeModel.and.returnValue(false);
-        SnapshotUtils.isSnapshotParent.and.returnValue(false);
         CurrentPageUtils.isAllObjects.and.returnValue(true);
         CurrentPageUtils.isMyWork.and.returnValue(false);
         viewModel.attr('options.isDirectlyRelated', true);
@@ -120,34 +111,6 @@ describe('unmap-dropdown-item component', function () {
         'parent instance', () => {
         Mappings.allowedToUnmap.and.returnValue(true);
 
-        SnapshotUtils.isAuditScopeModel.and.returnValue(false);
-        SnapshotUtils.isSnapshotParent.and.returnValue(false);
-        CurrentPageUtils.isAllObjects.and.returnValue(false);
-        CurrentPageUtils.isMyWork.and.returnValue(false);
-
-        viewModel.attr('options.isDirectlyRelated', false);
-
-        expect(viewModel.attr('isAllowedToUnmap')).toBe(false);
-      });
-
-      it('returns false when instance is in Audit scope', () => {
-        Mappings.allowedToUnmap.and.returnValue(true);
-
-        SnapshotUtils.isAuditScopeModel.and.returnValue(true);
-        SnapshotUtils.isSnapshotParent.and.returnValue(false);
-        CurrentPageUtils.isAllObjects.and.returnValue(false);
-        CurrentPageUtils.isMyWork.and.returnValue(false);
-
-        viewModel.attr('options.isDirectlyRelated', false);
-
-        expect(viewModel.attr('isAllowedToUnmap')).toBe(false);
-      });
-
-      it('returns false when instance is snapshot parent', () => {
-        Mappings.allowedToUnmap.and.returnValue(true);
-
-        SnapshotUtils.isAuditScopeModel.and.returnValue(false);
-        SnapshotUtils.isSnapshotParent.and.returnValue(true);
         CurrentPageUtils.isAllObjects.and.returnValue(false);
         CurrentPageUtils.isMyWork.and.returnValue(false);
 

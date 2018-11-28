@@ -8,10 +8,6 @@ import '../issue/issue-unmap';
 import template from './unmap-dropdown-item.stache';
 import Mappings from '../../models/mappers/mappings';
 import {
-  isAuditScopeModel,
-  isSnapshotParent,
-} from '../../plugins/utils/snapshot-utils';
-import {
   isAllObjects,
   isMyWork,
 } from '../../plugins/utils/current-page-utils';
@@ -43,8 +39,6 @@ export default can.Component.extend({
           let options = this.attr('options');
 
           return Mappings.allowedToUnmap(pageInstance, instance)
-            && !isAuditScopeModel(instance.type)
-            && !isSnapshotParent(instance.type)
             && !(isAllObjects() || isMyWork())
             && options.attr('isDirectlyRelated');
         },
