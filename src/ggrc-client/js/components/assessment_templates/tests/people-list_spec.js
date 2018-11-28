@@ -1,0 +1,195 @@
+/*
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import Component from '../people-list';
+
+describe('people-list component', function () {
+  let viewModel;
+
+  beforeEach(function () {
+    viewModel = getComponentVM(Component);
+    viewModel.attr('instance', {default_people: {}});
+  });
+
+  describe('init() method', function () {
+    it('calls unpackPeopleData ', function () {
+      const init = Component.prototype.init.bind({viewModel});
+
+      spyOn(viewModel, 'unpackPeopleData');
+
+      init();
+
+      expect(viewModel.unpackPeopleData).toHaveBeenCalled();
+    });
+  });
+
+  describe('packPeopleData() method', function () {
+    it('packs  selectedValue data into a string', function () {
+      let result;
+
+      viewModel.attr('selectedValue', 'Rabbits');
+
+      result = viewModel.packPeopleData();
+
+      expect(result).toEqual('Rabbits');
+    });
+
+    it('uses the list of chosen peopleList if selectedValue' +
+      'is set to "other"',
+    function () {
+      const assessorIds = [125, 256, 278];
+
+      viewModel.attr('selectedValue', 'other');
+      viewModel.attr('peopleList', assessorIds);
+
+      const result = viewModel.packPeopleData();
+
+      expect(Array.from(result)).toEqual(assessorIds);
+    });
+  });
+
+  describe('unpackPeopleData() method', function () {
+    const defaultPeopleType = 'assignees';
+
+    beforeEach(() => {
+      viewModel.attr('peopleListAttr', `default_people.${defaultPeopleType}`);
+    });
+
+    it('builds an IDs array from the peopleList', function () {
+      const peopleList = [5, 7, 12];
+      viewModel.attr('instance.default_people', {
+        [defaultPeopleType]: new can.List(peopleList),
+      });
+
+      viewModel.attr('peopleList', []);
+      viewModel.unpackPeopleData();
+
+      const actualData = Array.from(viewModel.attr('peopleList'));
+
+      expect(actualData).toEqual(peopleList);
+    });
+
+    it(`sets the selectedValue to "other"
+      when there is type of default people`, function () {
+      viewModel.attr('instance.default_people', {
+        [defaultPeopleType]: new can.List([5, 7, 12]),
+      });
+
+      viewModel.unpackPeopleData();
+
+      expect(viewModel.attr('selectedValue')).toEqual('other');
+    });
+
+    it(`clears the peopleList IDs array when type of default people
+      not instanceof can.List`, function () {
+      viewModel.attr('peopleList', [42, 2, 3]);
+      viewModel.attr('instance.default_people', {
+        [defaultPeopleType]: 'Some User Group',
+      });
+
+      viewModel.unpackPeopleData();
+
+      const actualData = Array.from(viewModel.attr('peopleList'));
+
+      expect(actualData).toEqual([]);
+    });
+
+    it('sets the selectedValue to type of default people', function () {
+      const data = 'Some User Group';
+      viewModel.attr('peopleList', [42, 2, 3]);
+      viewModel.attr('instance.default_people', {
+        [defaultPeopleType]: data,
+      });
+
+      viewModel.unpackPeopleData();
+
+      expect(viewModel.attr('selectedValue')).toEqual(data);
+    });
+  });
+
+  describe('personAdded() method', function () {
+    let eventObj;
+
+    beforeEach(function () {
+      eventObj = $.Event();
+    });
+
+    it('adds the new person ID to the persons list', function () {
+      eventObj.selectedItem = {id: 42};
+
+      viewModel.attr('peopleList', [7, 1]);
+      viewModel.personAdded(eventObj);
+
+      const actualData = Array.from(viewModel.attr('peopleList'));
+
+      expect(actualData).toEqual([7, 1, 42]);
+    });
+
+    it('silently ignores duplicate entries', function () {
+      const peopleList = [7, 9];
+      eventObj.selectedItem = {id: 7};
+
+      viewModel.attr('peopleList', peopleList);
+      viewModel.personAdded(eventObj);
+
+      const actualData = Array.from(viewModel.attr('peopleList'));
+
+      expect(actualData).toEqual(peopleList);
+    });
+  });
+
+  describe('removePerson() method', function () {
+    it('removes the new person ID from the persons list', function () {
+      const person = {id: 4};
+
+      viewModel.attr('peopleList', [7, 4, 3]);
+      viewModel.removePerson(person);
+
+      const actualData = Array.from(viewModel.attr('peopleList'));
+
+      expect(actualData).toEqual([7, 3]);
+    });
+
+    it('silently ignores removing non-existing entries', function () {
+      const person = {id: 50};
+      const peopleList = [7, 5, 10];
+
+      viewModel.attr('peopleList', peopleList);
+      viewModel.removePerson(person);
+
+      const actualData = Array.from(viewModel.attr('peopleList'));
+
+      expect(actualData).toEqual(peopleList);
+    });
+  });
+
+  describe('dropdownChanged() method', function () {
+    it('calls updatePeopleList method ',
+      function () {
+        spyOn(viewModel, 'updatePeopleList');
+
+        viewModel.dropdownChanged();
+
+        expect(viewModel.updatePeopleList).toHaveBeenCalled();
+      }
+    );
+  });
+
+  describe('updatePeopleList() method', function () {
+    it('sets data in instance', function () {
+      const peopleListAttr = 'default_people.assignees';
+      const packData = 'some data';
+
+      spyOn(viewModel, 'packPeopleData').and.returnValue(packData);
+
+      viewModel.attr('peopleListAttr', peopleListAttr);
+      viewModel.updatePeopleList();
+
+      expect(viewModel.attr(`instance.${peopleListAttr}`))
+        .toEqual(packData);
+    });
+  });
+});
