@@ -83,8 +83,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   ]
 
   AUTO_REINDEX_RULES = [
-      mixin.ReindexRule("Audit", lambda x: x.assessments, ["archived"]),
-      mixin.ReindexRule("Audit", lambda x: x.related_evidences, ["archived"]),
+      mixin.ReindexRule(
+        "Audit", lambda x: x.all_related_evidences, ["archived"]
+      ),
   ]
 
   _sanitize_html = [
