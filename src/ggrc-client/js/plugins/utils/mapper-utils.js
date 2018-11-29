@@ -4,7 +4,6 @@
 */
 
 import RefreshQueue from '../../models/refresh_queue';
-import Mappings from '../../models/mappers/mappings';
 import {backendGdriveClient} from '../ggrc-gapi-client';
 import TaskGroupObject from '../../models/join-models/task-group-object';
 import Relationship from '../../models/service-models/relationship';
@@ -19,7 +18,6 @@ async function mapObjects(instance, objects, {
     let context = instance.context || null;
     objects.forEach((destination) => {
       let modelInstance;
-      let isAllowed;
       // Use simple Relationship Model to map Snapshot
       if (useSnapshots) {
         modelInstance = new Relationship({
@@ -33,12 +31,6 @@ async function mapObjects(instance, objects, {
         });
 
         return defer.push(modelInstance.save());
-      }
-
-      isAllowed = Mappings.allowedToMap(instance, destination);
-
-      if (!isAllowed) {
-        return;
       }
 
       modelInstance = getMapping(instance, destination, context);
