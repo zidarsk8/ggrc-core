@@ -82,13 +82,13 @@ export default Cacheable('CMS.Models.Requirement', {
   created() {
     this._super(...arguments);
 
-    if (!this.directive || !this.directive.id) {
+    if (!this._directive || !this._directive.id) {
       return;
     }
 
     let directiveDfd = new Relationship({
       source: this,
-      destination: this.directive,
+      destination: this._directive,
       context: this.context,
     }).save();
 
