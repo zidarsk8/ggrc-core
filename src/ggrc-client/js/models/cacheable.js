@@ -208,7 +208,7 @@ export default can.Model('can.Model.Cacheable', {
       this.table_singular = staticProps.table_singular || this.root_object;
     }
 
-    if (!can.isFunction(this.findAll)) {
+    if (!_.isFunction(this.findAll)) {
       this.findPage = this.makeFindPage(this.findAll);
     }
 
@@ -745,16 +745,16 @@ export default can.Model('can.Model.Cacheable', {
         } else {
           serial[name] = val;
         }
-      } else if (val && can.isFunction(val.save)) {
+      } else if (val && _.isFunction(val.save)) {
         serial[name] = (new Stub(val)).serialize();
       } else if (typeof val === 'object' && val !== null && val.length) {
         serial[name] = can.map(val, function (v) {
-          let isModel = v && can.isFunction(v.save);
+          let isModel = v && _.isFunction(v.save);
           return isModel ?
             (new Stub(v)).serialize() :
             (v && v.serialize) ? v.serialize() : v;
         });
-      } else if (!can.isFunction(val)) {
+      } else if (!_.isFunction(val)) {
         if (this[name] && this[name].isComputed) {
           serial[name] = val && val.serialize ? val.serialize() : val;
         } else {

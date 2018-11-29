@@ -12,6 +12,7 @@ import {getPageInstance} from '../utils/current-page-utils';
 import Person from '../../models/business-models/person';
 import Audit from '../../models/business-models/audit';
 import Stub from '../../models/stub';
+import tracker from '../../tracker';
 import * as businessModels from '../../models/business-models';
 
 /**
@@ -19,11 +20,6 @@ import * as businessModels from '../../models/business-models';
  */
 
 const inScopeModels = ['Assessment', 'AssessmentTemplate'];
-const outOfScopeModels = ['Person', 'Program'];
-
-function getInScopeModels() {
-  return inScopeModels;
-}
 
 /**
  * Set extra attrs for snapshoted objects or snapshots
@@ -85,6 +81,15 @@ function isSnapshotModel(modelName) {
 function isSnapshotRelated(parent, child) {
   return isSnapshotParent(parent) && isSnapshotModel(child) ||
     isInScopeModel(parent) && isSnapshotModel(child);
+}
+
+/**
+ * Check if object type related to snapshots.
+ * @param {String} type - Type of object
+ * @return {Boolean} True or False
+ */
+function isSnapshotRelatedType(type) {
+  return GGRC.config.snapshot_related.indexOf(type) > -1;
 }
 
 function isInScopeModel(model) {
@@ -237,13 +242,36 @@ function getSnapshotItemQuery(instance, childId, childType) {
   return {data: [query]};
 }
 
+/**
+ * get snapshot counts
+ * @param {Object} instance - Object instance
+ * @param {Array} data - Array of snapshot names
+ * @return {Promise} Promise
+ */
+function getSnapshotsCounts(instance) {
+  let url = `${instance.selfLink}/snapshot_counts`;
+
+  const stopFn = tracker.start(
+    tracker.FOCUS_AREAS.COUNTS,
+    tracker.USER_JOURNEY_KEYS.API,
+    tracker.USER_ACTIONS[instance.type.toUpperCase()].SNAPSHOTS_COUNT);
+
+  return $.get(url)
+    .then((counts) => {
+      stopFn();
+      return counts;
+    })
+    .fail(() => {
+      stopFn(true);
+    });
+}
+
 export {
-  getInScopeModels,
-  outOfScopeModels,
   isSnapshot,
   isSnapshotScope,
   isSnapshotParent,
   isSnapshotRelated,
+  isSnapshotRelatedType,
   isSnapshotModel,
   isInScopeModel,
   toObject,
@@ -253,4 +281,5 @@ export {
   getSnapshotItemQuery,
   isSnapshotType,
   getParentUrl,
+  getSnapshotsCounts,
 };

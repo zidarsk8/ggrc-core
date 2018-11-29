@@ -5,7 +5,6 @@
 
 import RefreshQueue from '../../models/refresh_queue';
 import Mappings from '../../models/mappers/mappings';
-import {allowedToMap} from '../ggrc_utils';
 import {backendGdriveClient} from '../ggrc-gapi-client';
 import * as mappingModels from '../../models/mapping-models';
 
@@ -38,7 +37,7 @@ async function mapObjects(instance, objects, {
         return defer.push(modelInstance.save());
       }
 
-      isAllowed = allowedToMap(instance, destination);
+      isAllowed = Mappings.allowedToMap(instance, destination);
 
       if (!isAllowed) {
         return;

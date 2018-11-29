@@ -36,7 +36,7 @@ function failAll(done) {
 function getComponentVM(Component) {
   const viewModelConfig = Component.prototype.viewModel;
 
-  if (can.isFunction(viewModelConfig)) {
+  if (_.isFunction(viewModelConfig)) {
     return new viewModelConfig();
   }
   return new (can.Map.extend(viewModelConfig));

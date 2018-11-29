@@ -187,8 +187,12 @@ class AttributeInfo(object):
   def gather_attr_dicts(cls, tgt_class, src_attr):
     """ Gather dictionaries from target class parets """
     result = {}
-    for base in reversed(tgt_class.__mro__):
-      result.update(getattr(base, src_attr, None) or {})
+    _complete = getattr(tgt_class, src_attr + "_complete", None)
+    if _complete:
+      result.update(_complete)
+    else:
+      for base in reversed(tgt_class.__mro__):
+        result.update(getattr(base, src_attr, None) or {})
     return result
 
   @classmethod

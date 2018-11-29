@@ -1,6 +1,6 @@
 Object type,,,,,,,,,,,,
 Person,Name,Email*,Role,,,,,,,,,
-,user@example.com,user@example.com,Administrator,,,,,,,,,
+,Test User,testuser@example.com,Administrator,,,,,,,,,
 ,Admin,admin@test.com,Administrator,,,,,,,,,
 ,Creator PM,creatorpm@test.com,Creator,,,,,,,,,
 ,Creator,creator@test.com,Creator,,,,,,,,,

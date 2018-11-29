@@ -115,19 +115,19 @@ If using the `docker-compose.yml` file, the mysql query logs are enabled
 by default and can be monitored with:
 
 ```
-docker exec ggrccore_db_1 tail -f /tmp/mysql.log
+docker exec $(docker container ls -f name=ggrccore_db_1 -q -a) tail -f /tmp/mysql.log
 ```
 
 Error logs, with all deadlock information: 
 
 ```
-docker exec ggrccore_db_1 tail -f /tmp/mysql_error.log
+docker exec $(docker container ls -f name=ggrccore_db_1 -q -a) tail -f /tmp/mysql_error.log
 ```
 
 Or slow queries, that take more than 0.5s, with:
 
 ```
-docker exec ggrccore_db_1 tail -f /tmp/slow_query.log
+docker exec $(docker container ls -f name=ggrccore_db_1 -q -a) tail -f /tmp/slow_query.log
 ```
 
 ## Running Tests

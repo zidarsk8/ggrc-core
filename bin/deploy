@@ -94,7 +94,7 @@ main () {
 
   echo "Running deploy"
 
-  docker exec -i "${PROJECT}_cleandev_1" su root -c "
+  docker exec -i "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su root -c "
     /vagrant/bin/do_deploy $SETTINGS_FILE $ACCOUNT $KEY_FILE
   " ; rc=$?
 

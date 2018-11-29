@@ -8,6 +8,7 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import builder
+from ggrc import utils
 from ggrc.access_control import role
 from ggrc.access_control import roleable
 from ggrc.login import get_current_user
@@ -116,11 +117,17 @@ class Reviewable(rest_handable.WithPutHandable,
     """Serialize to JSON"""
     out_json = super(Reviewable, self).log_json()
     out_json["review_status"] = self.review_status
-    out_json["review"] = self.review
+
+    # put proper review stub to have it in the revision content
+    review_stub = None
+    if self.review:
+      review_stub = utils.create_stub(self.review, self.review.context_id)
+    out_json["review"] = review_stub
+
     out_json["review_issue_link"] = self.review_issue_link
     return out_json
 
-  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by_id",
+  ATTRS_TO_IGNORE = {"review", "updated_at", "modified_by", "modified_by_id",
                      "slug", "_access_control_list", "folder"}
 
   def _update_status_on_attr(self):
@@ -191,7 +198,8 @@ class Reviewable(rest_handable.WithPutHandable,
     self._update_status_on_mapping(counterparty)
 
   def handle_proposal_applied(self):
-    self._set_review_status_unreviewed()
+    self._update_status_on_attr()
+    self._update_status_on_custom_attrs()
 
   def handle_mapping_via_import_created(self, counterparty):
     if self._is_counterparty_snapshottable(counterparty):

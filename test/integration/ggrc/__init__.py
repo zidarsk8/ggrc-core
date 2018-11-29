@@ -173,10 +173,13 @@ class TestCase(BaseTestCase, object):
 
   def setUp(self):
     """Setup method."""
+    from ggrc.fulltext import listeners
+
     self.clear_data()
     self._custom_headers = {}
     self.headers = {}
     api_helper.wrap_client_calls(self.client)
+    listeners.reindex_on_commit = lambda: True  # Turn off background indexing
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
@@ -372,6 +375,7 @@ class TestCase(BaseTestCase, object):
     argument as objects to make template
     """
     request_body = {
+        "export_to": "csv",
         "objects": objects,
     }
     return self.client.post("/_service/export_csv_template",

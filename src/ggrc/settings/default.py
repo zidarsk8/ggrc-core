@@ -33,6 +33,7 @@ exports = [
     "MAX_INSTANCES",
     "CREATE_ISSUE_URL",
     "CREATE_ISSUE_BUTTON_NAME",
+    "ASSESSMENT_SHORT_URL_PREFIX",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -54,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.32.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.33.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -218,7 +219,20 @@ RISK_ASSESSMENT_URL = os.environ.get(
     'GGRC_RISK_ASSESSMENT_URL',
     'http://localhost:8080'
 )
+ASSESSMENT_SHORT_URL_PREFIX = os.environ.get(
+    'GGRC_ASSESSMENT_SHORT_URL_PREFIX',
+    ''
+)
 
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
 CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
+
+# BackgroundTask default settings
+RETRY_OPTIONS = {
+    "min_backoff_seconds": 30,
+    "max_backoff_seconds": 3600,
+    "max_doublings": 5,
+    "task_retry_limit": 10,
+}
+DEFAULT_QUEUE = "ggrc"

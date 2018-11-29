@@ -15,7 +15,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.Metric', {
   root_object: 'metric',
   root_collection: 'metrics',
-  category: 'business',
+  category: 'scope',
   findAll: '/api/metrics',
   findOne: '/api/metrics/{id}',
   create: 'POST /api/metrics',

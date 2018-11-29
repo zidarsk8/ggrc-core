@@ -53,15 +53,24 @@ describe('workflow-activate component', function () {
       spyOn(helpers, 'redirectToCycle');
     });
 
-    it('should be in waiting state while refresh is in progress', function () {
-      viewModel.repeatOnHandler();
-      expect(viewModel.attr('waiting')).toBe(true);
-    });
+    it('should be in waiting state while refresh is in progress',
+      function (done) {
+        viewModel.repeatOnHandler(workflow);
+        expect(viewModel.attr('waiting')).toBe(true);
+        done();
+      }
+    );
 
-    it('should init workflow before refresh the permissions', function () {
-      viewModel.repeatOnHandler(workflow);
-      expect(viewModel.initWorkflow).toHaveBeenCalledWith(workflow);
-    });
+    it('should init workflow before refresh the permissions',
+      async function (done) {
+        await viewModel.repeatOnHandler(workflow);
+        expect(viewModel.initWorkflow).toHaveBeenCalledWith(workflow);
+        expect(viewModel.initWorkflow).toHaveBeenCalledBefore(
+          Permission.refresh
+        );
+        done();
+      }
+    );
 
     it('should refresh permissions', async function (done) {
       await viewModel.repeatOnHandler(workflow);

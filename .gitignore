@@ -23,12 +23,7 @@ src/ggrc/settings/build_number.py
 
 # Asset-pipeline/cache related files
 src/ggrc/static
-src/ggrc/assets/assets.manifest
 src/ggrc/manifest.json
-src/ggrc/assets/stylesheets/dashboard.css
-src/ggrc/assets/stylesheets/*.js
-src/ggrc/assets/stylesheets/design.css
-src/ggrc/.sass-cache
 
 # sphinx build files
 doc/_build
