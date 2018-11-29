@@ -23,23 +23,25 @@ export default class PersistentNotifier {
 
     if (!this.dfds.includes(dfd)) {
       this.dfds.push(dfd);
-      dfd.always(function () {
-        let dfdIndex = this.dfds.indexOf(dfd);
-        if (dfdIndex > -1) {
-          this.dfds.splice(dfdIndex, 1);
-        }
-
-        if (this.dfds.length === 0) {
-          this.onEmptyCallbacksList.forEach((fn) => fn());
-          this.onEmptyCallbacksList = [];
-          this.whenQueueEmpties();
-        }
-      });
+      dfd.always(this._whenDeferredResolved.bind(this, dfd));
     }
 
     let pendingCallbacks = this.onEmptyCallbacksList.length;
     if (pendingCallbacks === 0 && this.dfds.length > 0) {
       this.whileQueueHasElements();
+    }
+  }
+
+  _whenDeferredResolved(dfd) {
+    let dfdIndex = this.dfds.indexOf(dfd);
+    if (dfdIndex > -1) {
+      this.dfds.splice(dfdIndex, 1);
+    }
+
+    if (this.dfds.length === 0) {
+      this.onEmptyCallbacksList.forEach((fn) => fn());
+      this.onEmptyCallbacksList = [];
+      this.whenQueueEmpties();
     }
   }
 
