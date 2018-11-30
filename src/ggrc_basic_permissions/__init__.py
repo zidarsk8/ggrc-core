@@ -199,8 +199,8 @@ def load_default_permissions(permissions):
           {
               "type": "NotificationConfig",
               "terms": {
-                  "property_name": "person",
-                  "value": "$current_user"
+                  "property_name": "person_id",
+                  "value": "$current_user.id"
               },
               "condition": "is"
           },
@@ -209,8 +209,8 @@ def load_default_permissions(permissions):
           {
               "type": "NotificationConfig",
               "terms": {
-                  "property_name": "person",
-                  "value": "$current_user"
+                  "property_name": "person_id",
+                  "value": "$current_user.id"
               },
               "condition": "is"
           },
@@ -219,8 +219,8 @@ def load_default_permissions(permissions):
           {
               "type": "NotificationConfig",
               "terms": {
-                  "property_name": "person",
-                  "value": "$current_user"
+                  "property_name": "person_id",
+                  "value": "$current_user.id"
               },
               "condition": "is"
           },
