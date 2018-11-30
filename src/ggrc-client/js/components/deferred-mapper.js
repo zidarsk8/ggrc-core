@@ -198,10 +198,6 @@ export default can.Component.extend({
     '{instance} created'() {
       this.viewModel.deferredUpdate();
     },
-    'a[data-object-source] modal:success'(el, ev, object) {
-      ev.stopPropagation();
-      this.viewModel.addMappings([object]);
-    },
     [`{instance} ${DEFERRED_MAP_OBJECTS.type}`](el, {objects}) {
       this.viewModel.addMappings(objects);
     },
