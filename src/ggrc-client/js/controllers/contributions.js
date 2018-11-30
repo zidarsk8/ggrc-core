@@ -104,7 +104,7 @@ const userRolesModalSelector = can.Control.extend({
 
   init_context: function () {
     if (!this.context) {
-      this.context = new can.Observe($.extend({
+      this.context = new can.Map($.extend({
         objects: this.object_list,
         options: this.option_list,
         joins: this.join_list,
@@ -121,7 +121,7 @@ const userRolesModalSelector = can.Control.extend({
 
     self.active_list.replace(
       can.map(self.join_list, function (join) {
-        return new can.Observe({
+        return new can.Map({
           join: join,
         });
       }));

@@ -22,7 +22,7 @@ can.Control.extend({
   defaults: {},
 }, {
   init: function () {
-    this.obs = new can.Observe();
+    this.obs = new can.Map();
 
     this.init_lhn();
 
@@ -369,8 +369,8 @@ can.Control.extend({
     actions_content_selector: 'ul.sub-actions',
     limit: 50,
     observer: null,
-    filter_params: new can.Observe(),
-    counts: new can.Observe(),
+    filter_params: new can.Map(),
+    counts: new can.Map(),
   },
 }, {
   display: function () {

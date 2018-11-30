@@ -47,8 +47,8 @@ export default can.Control({
     }
     this.options.attr('counts', getCounts());
     this.options.attr('instance', instance);
-    if (!(this.options.contexts instanceof can.Observe)) {
-      this.options.attr('contexts', new can.Observe(this.options.contexts));
+    if (!(this.options.contexts instanceof can.Map)) {
+      this.options.attr('contexts', new can.Map(this.options.contexts));
     }
 
     router.bind('widget', (ev, newVal) => {
@@ -181,7 +181,7 @@ export default can.Control({
 
     // Only create the observable once, this gets updated elsewhere
     if (!widget) {
-      widget = new can.Observe({
+      widget = new can.Map({
         selector: '#' + widgetId,
         has_count: false,
         placeInAddTab: false,

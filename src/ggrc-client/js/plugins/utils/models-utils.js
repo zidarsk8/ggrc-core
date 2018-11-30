@@ -184,7 +184,7 @@ const getModelByType = (type) => {
 };
 
 
-can.Observe.prototype.reify = function () {
+can.Map.prototype.reify = function () {
   let type;
   let model;
 

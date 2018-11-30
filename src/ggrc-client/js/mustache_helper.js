@@ -304,7 +304,7 @@ Mustache.registerHelper('pack', function () {
       }
     }
   }
-  pack = new can.Observe(pack);
+  pack = new can.Map(pack);
   return options.fn(pack);
 });
 
@@ -585,7 +585,7 @@ Mustache.registerHelper('show_long', function () {
 
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
-  let frame = new can.Observe();
+  let frame = new can.Map();
   let args = can.makeArray(arguments);
   let i;
   let arg;
@@ -616,7 +616,7 @@ Mustache.registerHelper('using', function (options) {
 
 Mustache.registerHelper('with_mapping', function (binding, options) {
   let context = arguments.length > 2 ? resolveComputed(options) : this;
-  let frame = new can.Observe();
+  let frame = new can.Map();
   let loader;
 
   if (!context) { // can't find an object to map to.  Do nothing;
@@ -1253,7 +1253,7 @@ Mustache.registerHelper('if_config_exist', function (key, options) {
 });
 
 Mustache.registerHelper('switch', function (value, options) {
-  let frame = new can.Observe({});
+  let frame = new can.Map({});
   value = resolveComputed(value);
   frame.attr(value || 'default', true);
   frame.attr('default', true);

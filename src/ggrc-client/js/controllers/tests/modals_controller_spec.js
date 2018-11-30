@@ -220,13 +220,13 @@ describe('ModalsController', function () {
       });
     });
 
-    it('sets new can.Observe object into _transient ' +
+    it('sets new can.Map object into _transient ' +
     'if it is not defined', () => {
       instance.attr('_transient', undefined);
 
       method(instance);
 
-      expect(instance.attr('_transient') instanceof can.Observe).toBe(true);
+      expect(instance.attr('_transient') instanceof can.Map).toBe(true);
       expect(instance.attr('_transient').serialize()).toEqual({});
     });
 

@@ -44,9 +44,9 @@ export default TreeLoader({
     if (!this.options.search_params) {
       this.options.search_params = {};
     }
-    this.options.state = new can.Observe();
+    this.options.state = new can.Map();
 
-    this.context = new can.Observe({
+    this.context = new can.Map({
       // FIXME: Needed?  Default `pager` to avoid binding issues.
       pager: {
         has_next: function () {
