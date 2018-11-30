@@ -55,14 +55,14 @@ describe('PersistentNotifier class', () => {
         expect(() => {
           pn.queue();
         }).toThrow(new Error('Attempted to queue something other than a ' +
-          'Deferred or Promise'));
+          'Deferred'));
       });
 
       it('throws error if dfd is not Deferred', () => {
         expect(() => {
           pn.queue({});
         }).toThrow(new Error('Attempted to queue something other than a ' +
-          'Deferred or Promise'));
+          'Deferred'));
       });
 
       it('pushes "dfd" into "dfds"', () => {

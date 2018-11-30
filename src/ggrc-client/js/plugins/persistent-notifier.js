@@ -16,9 +16,8 @@ export default class PersistentNotifier {
   whenQueueEmpties() {}
 
   queue(dfd) {
-    if (!dfd || !dfd.then) {
-      throw new Error('Attempted to queue something other than a ' +
-                      'Deferred or Promise');
+    if (!dfd || !dfd.always) {
+      throw new Error('Attempted to queue something other than a Deferred');
     }
 
     if (!this.dfds.includes(dfd)) {
