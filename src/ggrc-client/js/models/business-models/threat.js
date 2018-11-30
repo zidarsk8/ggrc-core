@@ -35,6 +35,7 @@ export default Cacheable('CMS.Models.Threat', {
     attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
+      {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {
         attr_title: 'State',
