@@ -17,19 +17,11 @@
           {value}="instance.issue_tracker.enabled"
           prop-name="issue_tracker.enabled"
           type="dropdown">
-            <confirm-edit-action
-              (set-edit-mode)="setEditModeInline(%event)"
-              (set-in-progress)="setInProgressState()"
-              {is-edit-icon-denied}="isEditIconDenied"
-              is-confirmation-needed="false"
-              {instance}="instance"
-              {on-state-change-dfd}="onStateChangeDfd"
-              {edit-mode}="editMode">
                 <base-inline-control-title
                   class="inline__header"
                   {edit-mode}="editMode"
                   {is-edit-icon-denied}="isEditIconDenied"
-                  (set-edit-mode-inline)="confirmEdit()">
+                  (set-edit-mode-inline)="setEditModeInline(%event)">
                     <div class="ticket-info-header">
                       <span class="ggrc-form__title">Ticket Tracker</span>
                       {{#if instance.issueCreated}}
@@ -44,7 +36,6 @@
                         </div>
                     </div>
                 </base-inline-control-title>
-            </confirm-edit-action>
         </inline-edit-control>
     </issue-tracker-switcher>
   </div>
