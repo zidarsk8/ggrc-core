@@ -22,7 +22,7 @@ export default Mixin(
     'before:refresh'() {
       issueTrackerUtils.cleanUpWarnings(this);
     },
-    'after:refresh'() {
+    after_refresh() {
       this.initIssueTracker();
     },
     after_save() {

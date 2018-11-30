@@ -706,6 +706,10 @@ export default can.Model('can.Model.Cacheable', {
             .then($.proxy(that, 'cleanupAcl'))
             .then($.proxy(that, 'cleanupCollections'))
             .then($.proxy(that.constructor, 'model'))
+            .then((model) => {
+              that.after_refresh && that.after_refresh();
+              return model;
+            })
             .done(function (response) {
               response.backup();
               stopFn();
