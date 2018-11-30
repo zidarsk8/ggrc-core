@@ -549,7 +549,7 @@ export default can.Control({
 
     if (name.length > 1) {
       if (can.isArray(value)) {
-        value = new can.Observe.List(can.map(value, function (v) {
+        value = new can.List(can.map(value, function (v) {
           return new can.Observe({}).attr(name.slice(1).join('.'), v);
         }));
       } else if ($elem.is('[data-lookup]')) {

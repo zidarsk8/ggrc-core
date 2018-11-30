@@ -686,8 +686,8 @@ can.Control.extend({
       let modelName;
       $list = $($list);
       modelName = self.get_list_model($list);
-      self.options.results_lists[modelName] = new can.Observe.List();
-      self.options.visible_lists[modelName] = new can.Observe.List();
+      self.options.results_lists[modelName] = new can.List();
+      self.options.visible_lists[modelName] = new can.List();
       self.options.visible_lists[modelName].attr('is_loading', true);
     });
   },

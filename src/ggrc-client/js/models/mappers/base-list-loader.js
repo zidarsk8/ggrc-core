@@ -161,7 +161,7 @@ import RefreshQueue from '../refresh_queue';
     remove_instance: function (binding, instance, mappings) {
       let indexesToRemove = [];
 
-      if (!(can.isArray(mappings) || mappings instanceof can.Observe.List)) {
+      if (!(can.isArray(mappings) || mappings instanceof can.List)) {
         mappings = [mappings];
       }
 

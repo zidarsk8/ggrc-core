@@ -43,7 +43,7 @@ export default can.Control({
 
     this.options = new can.Map(this.options);
     if (!this.options.widget_list) {
-      this.options.attr('widget_list', new can.Observe.List([]));
+      this.options.attr('widget_list', new can.List([]));
     }
     this.options.attr('counts', getCounts());
     this.options.attr('instance', instance);

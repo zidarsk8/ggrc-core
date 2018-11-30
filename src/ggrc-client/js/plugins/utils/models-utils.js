@@ -202,8 +202,8 @@ can.Observe.prototype.reify = function () {
   }
 };
 
-can.Observe.List.prototype.reify = function () {
-  return new can.Observe.List(can.map(this, function (obj) {
+can.List.prototype.reify = function () {
+  return new can.List(can.map(this, function (obj) {
     return obj.reify();
   }));
 };

@@ -21,7 +21,7 @@ describe('InnerNav Controller', function () {
 
     beforeEach(function () {
       options = {
-        widget_list: new can.Observe.List([]),
+        widget_list: new can.List([]),
       };
 
       ctrlInst = {
@@ -77,7 +77,7 @@ describe('InnerNav Controller', function () {
 
     beforeEach(() => {
       options = new can.Map({
-        widget_list: new can.Observe.List([
+        widget_list: new can.List([
           {name: 'aaa'},
           {name: 'bbb'},
           {name: 'ccc'},
@@ -135,7 +135,7 @@ describe('InnerNav Controller', function () {
 
     beforeEach(() => {
       options = {
-        widget_list: new can.Observe.List([
+        widget_list: new can.List([
           {selector: '#control', model: Control},
           {selector: '#requirement', model: Requirement},
           {selector: '#assessment', model: Assessment},

@@ -56,10 +56,10 @@ const userRolesModalSelector = can.Control.extend({
   },
 }, {
   init: function () {
-    this.object_list = new can.Observe.List();
-    this.option_list = new can.Observe.List();
-    this.join_list = new can.Observe.List();
-    this.active_list = new can.Observe.List();
+    this.object_list = new can.List();
+    this.option_list = new can.List();
+    this.join_list = new can.List();
+    this.active_list = new can.List();
 
     this.init_context();
     this.init_bindings();

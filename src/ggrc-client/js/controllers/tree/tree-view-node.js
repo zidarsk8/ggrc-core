@@ -151,7 +151,7 @@ export default can.Control.extend({
     if (this.options.attr('_added_child_list')) {
       return;
     }
-    this.options.attr('child_options', new can.Observe.List());
+    this.options.attr('child_options', new can.List());
 
     if (originalChildList.length === null) {
       originalChildList = [originalChildList];
