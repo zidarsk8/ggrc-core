@@ -230,33 +230,31 @@ class Audit(Snapshotable,
     """
     from ggrc.models.assessment import Assessment
     evid_as_dest = db.session.query(
-      Relationship.destination_id.label("id")
+      Relationship.destination_id.label("id"),
     ).join(
       Assessment,
-      Assessment.id == Relationship.source_id
+      Assessment.id == Relationship.source_id,
     ).filter(
       Relationship.destination_type == Evidence.__name__,
       Relationship.source_type == Assessment.__name__,
-      Assessment.audit_id == self.id
+      Assessment.audit_id == self.id,
     )
     evid_as_source = db.session.query(
-      Relationship.source_id.label("id")
+      Relationship.source_id.label("id"),
     ).join(
       Assessment,
-      Assessment.id == Relationship.destination_id
+      Assessment.id == Relationship.destination_id,
     ).filter(
       Relationship.source_type == Evidence.__name__,
-      Relationship.destination_type ==
-      Assessment.__name__,
-      Assessment.audit_id == self.id
+      Relationship.destination_type == Assessment.__name__,
+      Assessment.audit_id == self.id,
     )
     evidence_assessment = evid_as_dest.union(evid_as_source)
     if objects:
       return db.session.query(Evidence).filter(
-        Evidence.id.in_(evidence_assessment)
+        Evidence.id.in_(evidence_assessment),
       )
-    else:
-      return evidence_assessment
+    return evidence_assessment
 
   def get_evidences_from_audit(self, objects=False):
     """Return all related evidence. In relation audit <--> evidence
@@ -267,26 +265,25 @@ class Audit(Snapshotable,
     """
 
     evid_a_source = db.session.query(
-      Relationship.source_id.label("id")
+      Relationship.source_id.label("id"),
     ).filter(
       Relationship.source_type == Evidence.__name__,
       Relationship.destination_type == Audit.__name__,
-      Relationship.destination_id == self.id
+      Relationship.destination_id == self.id,
     )
     evid_a_dest = db.session.query(
-      Relationship.destination_id.label("id")
+      Relationship.destination_id.label("id"),
     ).filter(
       Relationship.destination_type == Evidence.__name__,
       Relationship.source_type == Audit.__name__,
-      Relationship.source_id == self.id
+      Relationship.source_id == self.id,
     )
     evidence_audit = evid_a_dest.union(evid_a_source)
     if objects:
       return db.session.query(Evidence).filter(
-        Evidence.id.in_(evidence_audit)
+        Evidence.id.in_(evidence_audit),
       )
-    else:
-      return evidence_audit
+    return evidence_audit
 
   @simple_property
   def all_related_evidences(self):
