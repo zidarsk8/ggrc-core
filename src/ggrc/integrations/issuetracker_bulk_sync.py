@@ -271,6 +271,8 @@ class IssueTrackerBulkCreator(object):
 
   def _update_failed_items(self, errors):
     """Update items in DB we couldn't sync to Issue Tracker"""
+    if not errors:
+      return
     issuetracker = all_models.IssuetrackerIssue.__table__
     stmt = issuetracker.update().where(
         sa.and_(
