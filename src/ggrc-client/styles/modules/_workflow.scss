@@ -272,26 +272,6 @@
 // need to be removed after Task Add/Edit modals redesign
 .modal {
   .form {
-    .form {
-      &__label {
-        text-transform: uppercase;
-        font-size: 12px;
-        font-weight: bold;
-        margin-bottom: 5px;
-
-        &--hideable {
-          display: inline;
-        }
-      }
-    }
-
-    i.fa-asterisk {
-      color: $icon-color-empty;
-      font-size: 11px;
-      opacity: 1;
-      vertical-align: middle;
-    }
-
     .people-groups {
       .people-group {
         flex-basis: auto;
@@ -302,13 +282,6 @@
           &__title {
             line-height: 18px;
             margin-bottom: 5px;
-
-            i.fa-asterisk {
-              align-self: center;
-              height: 11px;
-              margin-left: 4px;
-              width: 12px;
-            }
           }
         }
       }
