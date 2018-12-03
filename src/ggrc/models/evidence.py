@@ -84,7 +84,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   AUTO_REINDEX_RULES = [
       mixin.ReindexRule(
-        "Audit", lambda x: x.all_related_evidences, ["archived"]
+          "Audit", lambda x: x.all_related_evidences, ["archived"]
       ),
   ]
 
