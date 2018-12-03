@@ -9,6 +9,7 @@ import '../../components/access_control_list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
 import '../../components/assessment_templates/assessment-template-attributes';
+import '../../components/assessment_templates/people-list';
 import '../../components/assessment_templates/template-field';
 import '../../components/assessment_templates/add-template-field';
 import '../../components/textarea-array/textarea-array';
