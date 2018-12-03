@@ -1076,7 +1076,7 @@ export default can.Control({
         });
         instance.attr('custom_attribute_definitions', cad);
       }
-      instance.notifier.on_empty(() => {
+      instance.notifier.onEmpty(() => {
         instance.refresh();
       });
       instance.dispatch(REFRESH_MAPPING);
