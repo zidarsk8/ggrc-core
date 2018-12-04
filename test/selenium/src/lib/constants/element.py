@@ -86,8 +86,8 @@ class AdminWidgetRoles(object):
 
 class AdminWidgetEvents(object):
   """Elements' labels and properties (regular expression) for Event widget
- at Admin Dashboard.
- """
+  at Admin Dashboard.
+  """
   WIDGET_HEADER = "Events"
   TREE_VIEW_ROW_REGEXP = r"^.+\s(by\s.+)\son\s" + \
       r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
@@ -95,8 +95,8 @@ class AdminWidgetEvents(object):
 
 class AdminWidgetCustomAttributes(object):
   """Elements' labels (custom attributes scopes) for Custom Attributes
- widget at Admin Dashboard.
- """
+  widget at Admin Dashboard.
+  """
   WIDGET_HEADER = "Custom Attributes"
   # possible types of custom attributes
   TEXT = "Text"
@@ -140,7 +140,7 @@ class Common(object):
 
 class CommonModalCreate(object):
   """Common elements' labels and properties for Modal to Create object.
- """
+  """
   HIDE_ALL_OPT_FIELDS = "Hide all optional fields"
   SHOW_ALL_OPT_FIELDS = "Show all optional fields"
   SAVE_AND_CLOSE = "Save & Close"
@@ -148,8 +148,8 @@ class CommonModalCreate(object):
 
 class CommonModalSetVisibleFields(Common):
   """Common elements' labels and properties for Modal widow that Select visible
- fields for Tree View.
- """
+  fields for Tree View.
+  """
   MODAL_HEADER_FORMAT = "Set visible fields for {}"
   TITLE = Common.TITLE
   CODE = Common.CODE
@@ -161,8 +161,8 @@ class CommonModalSetVisibleFields(Common):
 
 class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   """To transformation elements' labels and properties for Modal to Set
- visible fields for object as Tree View headers.
- """
+  visible fields for object as Tree View headers.
+  """
   ADMIN = roles.ADMIN
   PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS

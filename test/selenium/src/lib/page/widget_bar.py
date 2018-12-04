@@ -145,7 +145,7 @@ class AdminDashboard(_WidgetBar):
     self.tab_custom_attributes = widget_bar.Tab(
         self._driver, locator.WidgetBar.ADMIN_CUSTOM_ATTRIBUTE)
     self.tab_custom_roles = widget_bar.Tab(
-        self._driver, locator.WidgetBar.ADMIN_CUSTOM_ATTRIBUTE)
+        self._driver, locator.WidgetBar.ADMIN_CUSTOM_ROLES)
 
   def select_people(self):
     """
@@ -176,8 +176,11 @@ class AdminDashboard(_WidgetBar):
     return admin_widget.CustomAttributes(self._driver)
 
   def select_custom_roles(self):
-    # todo: Return: lib.page.widget.admin_widget.CustomRoles
-    raise NotImplementedError
+    """
+    Return: lib.page.widget.admin_widget.CustomRoles
+    """
+    self.tab_custom_roles.click()
+    return admin_widget.CustomRoles(self._driver)
 
 
 class Dashboard(_ObjectWidgetBar):
