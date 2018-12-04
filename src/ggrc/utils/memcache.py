@@ -24,7 +24,8 @@ def blob_delete(cache, key):
   return cache.delete_multi(chunk_keys)
 
 
-def blob_set(cache, key, value, exp_time=0, key_prefix="", namespace=None):  # pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments
+def blob_set(cache, key, value, exp_time=0, key_prefix="", namespace=None):
   """Save object into memcache.
 
   Object will be compressed and pickled. If size of object bigger 10^6 bytes,
