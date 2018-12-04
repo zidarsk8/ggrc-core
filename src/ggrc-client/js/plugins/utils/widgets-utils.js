@@ -10,6 +10,8 @@ import {
 } from './query-api-utils';
 import {
   isSnapshotRelated,
+  isSnapshotRelatedType,
+  getSnapshotsCounts,
 } from './snapshot-utils';
 import {
   isObjectVersion,
@@ -108,18 +110,35 @@ function getCounts() {
 }
 
 function initWidgetCounts(widgets, type, id) {
-  let result;
+  let resultsArray = [];
 
   // custom endpoint we use only in order to initialize counts for all tabs.
   // In order to update counter for individual tab need to use Query API
   if (widgets.length !== 1 && CUSTOM_COUNTERS[getPageType()]) {
-    result = CUSTOM_COUNTERS[getPageType()]();
+    resultsArray.push(CUSTOM_COUNTERS[getPageType()](type, id));
   } else {
-    result = _initWidgetCounts(widgets, type, id);
+    resultsArray.push(_initWidgetCounts(widgets, type, id));
   }
 
-  return result.then((counts) => {
-    getCounts().attr(counts);
+  if (isSnapshotRelatedType(type)) {
+    resultsArray.push(getSnapshotsCounts(getPageInstance()));
+  }
+
+  let baseCounts = widgets.reduce((result, val) => ({...result, [val]: 0}), {});
+
+  return Promise.all(resultsArray).then((values) => {
+    let combinedValue = _.chain(values)
+      .compact()
+      .reduce((sum, value) => {
+        return Object.assign(sum, value);
+      }, {})
+      .value();
+
+    combinedValue = Object.assign({}, baseCounts, combinedValue);
+
+    if (!_.isEmpty(combinedValue)) {
+      getCounts().attr(combinedValue);
+    }
   });
 }
 
@@ -135,26 +154,26 @@ function _initWidgetCounts(widgets, type, id) {
   // a separate place
   let widgetsObject = getWidgetConfigs(can.makeArray(widgets));
 
-  let params = widgetsObject.map(function (widgetObject) {
+  let params = [];
+  _.each(widgetsObject, function (widgetObject) {
     let param;
     let expression = TreeViewUtils
       .makeRelevantExpression(widgetObject.name, type, id);
 
-    if (isSnapshotRelated(type, widgetObject.name) ||
-        widgetObject.isObjectVersion) {
-      param = buildParam('Snapshot', {}, expression, null,
-        QueryParser.parse('child_type = ' + widgetObject.name));
-    } else {
+    let snapshotRelatedOrVersion = isSnapshotRelated(type, widgetObject.name) ||
+                            widgetObject.isObjectVersion;
+
+    if (!snapshotRelatedOrVersion) {
       param = buildParam(widgetObject.name,
         {}, expression, null,
         widgetObject.additionalFilter ?
           QueryParser.parse(widgetObject.additionalFilter) :
           null
       );
-    }
 
-    param.type = 'count';
-    return batchRequests(param);
+      param.type = 'count';
+      params.push(batchRequests(param));
+    }
   });
 
   // Perform requests only if params are defined
@@ -165,13 +184,12 @@ function _initWidgetCounts(widgets, type, id) {
   return $.when(...params).then((...data) => {
     let countsMap = {};
     data.forEach(function (info, i) {
-      let widget = widgetsObject[i];
-      let name = widget.name;
+      let name = Object.keys(info)[0];
+      let widget = _.find(widgetsObject, (widgetObj) => {
+        return widgetObj.name === name;
+      });
       let countsName = widget.countsName || widget.name;
 
-      if (isSnapshotRelated(type, name) || widget.isObjectVersion) {
-        name = 'Snapshot';
-      }
       countsMap[countsName] = info[name].total;
     });
     return countsMap;

@@ -12,6 +12,7 @@ description = """
 permissions = {
     "read": [
         "AccessControlRole",
+        "BackgroundTask",
         "Workflow",
         "TaskGroup",
         "TaskGroupObject",
@@ -74,6 +75,7 @@ permissions = {
     ],
     "create": [
         "Audit",
+        "BackgroundTask",
         "Snapshot",
         "Workflow",
         "TaskGroup",

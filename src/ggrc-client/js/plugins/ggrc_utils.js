@@ -4,12 +4,9 @@
  */
 
 import RefreshQueue from '../models/refresh_queue';
-import Permission from '../permission';
 import {getRolesForType} from '../plugins/utils/acl-utils';
-import Mappings from '../models/mappers/mappings';
 import {notifier} from '../plugins/utils/notifiers-utils';
 import Person from '../models/business-models/person';
-import TreeViewConfig from '../apps/base_widgets';
 
 /**
  * A module containing various utility functions.
@@ -168,163 +165,6 @@ function hasPending(parentInstance, instance, how) {
 }
 
 /**
- * Get list of mappable objects for certain type
- *
- * @param {String} type - Type of object we want to
- *                      get list of mappable objects for
- * @param {Object} options - Options
- *   @param {Array} options.whitelist - List of objects that will always appear
- *   @param {Array} options.forbidden - List of objects that will always be removed
- *
- * @return {Array} - List of mappable objects
- */
-function getMappableTypes(type, options) {
-  let result;
-  let canonical = Mappings.get_canonical_mappings_for(type);
-  let list = TreeViewConfig.attr('base_widgets_by_type')[type];
-  let forbidden;
-  let forbiddenList = {
-    Program: ['Audit'],
-    Audit: ['Assessment', 'Program'],
-  };
-  options = options || {};
-  if (!type) {
-    return [];
-  }
-  forbidden = _.union(forbiddenList[type] || [], options.forbidden || []);
-  const compacted = _.compact([_.keys(canonical), list]);
-  result = _.intersection(...compacted);
-
-  result = _.difference(result, forbidden);
-
-  if (options.whitelist) {
-    result = _.union(result, options.whitelist);
-  }
-  return result;
-}
-
-/**
- * Determine if two types of models can be mapped
- *
- * @param {String} target - the target type of model
- * @param {String} source - the source type of model
- * @param {Object} options - accepts:
- *        {Array} whitelist - list of added objects
- *        {Array} forbidden - list blacklisted objects
- *
- * @return {Boolean} - true if mapping is allowed, false otherwise
- */
-function isMappableType(target, source, options) {
-  let result;
-  if (!target || !source) {
-    return false;
-  }
-  result = getMappableTypes(target, options);
-  return _.includes(result, source);
-}
-
-/**
- * Determine if `source` is allowed to be mapped to `target`.
- *
- * By symmetry, this method can be also used to check whether `source` can
- * be unmapped from `target`.
- *
- * @param {Object} source - the source object the mapping
- * @param {Object} target - the target object of the mapping
- * @param {Object} options - the options objects, similar to the one that is
- *   passed as an argument to Mustache helpers
- *
- * @return {Boolean} - true if mapping is allowed, false otherwise
- */
-function allowedToMap(source, target, options) {
-  let canMap = false;
-  let types;
-  let targetType;
-  let sourceType;
-  let targetContext;
-  let sourceContext;
-  let createContexts;
-
-  let FORBIDDEN = Object.freeze({
-    oneWay: Object.freeze({
-      // mapping audit to issue is not allowed,
-      // but unmap can be possible
-      'issue audit': !(options && options.isIssueUnmap),
-    }),
-    // NOTE: the names in every type pair must be sorted alphabetically!
-    twoWay: Object.freeze({
-      'audit program': true,
-    }),
-  });
-
-  targetType = getType(target);
-  sourceType = getType(source);
-  types = [sourceType.toLowerCase(), targetType.toLowerCase()];
-
-  // One-way check
-  // special case check:
-  // - mapping an Audit to a Issue is not allowed
-  // (but vice versa is allowed)
-  if (FORBIDDEN.oneWay[types.join(' ')]) {
-    return false;
-  }
-
-  // Two-way check:
-  // special case check:
-  // - mapping an Audit to a Program is not allowed
-  // (and vice versa)
-  if (FORBIDDEN.twoWay[types.sort().join(' ')]) {
-    return false;
-  }
-
-  // special check for snapshot:
-  if (options &&
-    options.context &&
-    options.context.parent_instance &&
-    options.context.parent_instance.snapshot) {
-    // Avoid add mapping for snapshot
-    return false;
-  }
-
-  if (!isMappableType(sourceType, targetType)) {
-    return false;
-  }
-
-  targetContext = _.exists(target, 'context.id');
-  sourceContext = _.exists(source, 'context.id');
-  createContexts = _.exists(
-    GGRC, 'permissions.create.Relationship.contexts');
-
-  canMap = Permission.is_allowed_for('update', source) ||
-    _.includes(createContexts, sourceContext) ||
-    // Also allow mapping to source if the source is about to be created.
-    _.isUndefined(source.created_at);
-
-  if (target instanceof can.Map && targetType) {
-    canMap = canMap &&
-      (Permission.is_allowed_for('update', target) ||
-      _.includes(createContexts, targetContext));
-  }
-  return canMap;
-}
-
-function getType(object) {
-  let type;
-
-  if (object instanceof can.Model) {
-    type = object.constructor.shortName;
-  } else {
-    type = object.type || object;
-  }
-
-  if (type === 'Snapshot') {
-    type = object.child_type; // check Snapshot original object type
-  }
-
-  return type;
-}
-
-/**
  * Remove all HTML tags from the string
  * @param {String} originalText - original string for parsing
  * @return {string} - plain text without tags
@@ -400,9 +240,6 @@ export {
   getPickerElement,
   loadScript,
   hasPending,
-  getMappableTypes,
-  isMappableType,
-  allowedToMap,
   getPlainText,
   getHighestAssigneeRole,
   getAssigneeType,

@@ -29,7 +29,7 @@ import {
   BEFORE_MAPPING,
   DEFERRED_MAP_OBJECTS,
 } from '../../events/eventTypes';
-import {allowedToMap} from '../../plugins/ggrc_utils';
+import Mappings from '../../models/mappers/mappings';
 import {mapObjects as mapObjectsUtil} from '../../plugins/utils/mapper-utils';
 import * as businessModels from '../../models/business-models';
 import TreeViewConfig from '../../apps/base_widgets';
@@ -241,7 +241,7 @@ export default can.Component.extend({
     deferredSave: function (objects) {
       let source = this.viewModel.attr('deferred_to').instance;
       const deferredObjects = objects
-        .filter((destination) => allowedToMap(source, destination))
+        .filter((destination) => Mappings.allowedToMap(source, destination))
         .map((object) => {
           object.isNeedRefresh = true;
           return object;

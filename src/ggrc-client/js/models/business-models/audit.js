@@ -9,7 +9,6 @@ import accessControlList from '../mixins/access-control-list';
 import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
-import mappingLimit from '../mixins/mapping-limit';
 import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 
@@ -27,7 +26,6 @@ export default Cacheable('CMS.Models.Audit', {
     uniqueTitle,
     caUpdate,
     timeboxed,
-    mappingLimit,
     issueTracker,
   ],
   is_custom_attributable: true,

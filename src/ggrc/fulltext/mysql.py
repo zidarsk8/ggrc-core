@@ -13,7 +13,6 @@ from ggrc.fulltext.sql import SqlIndexer
 from ggrc.models import all_models
 from ggrc.query import my_objects
 from ggrc.rbac import permissions
-from ggrc.utils import benchmark
 
 
 # pylint: disable=too-few-public-methods
@@ -138,6 +137,7 @@ class MysqlIndexer(SqlIndexer):
       model_names.append(model_name)
     return model_names
 
+  # pylint: disable=too-many-arguments
   def search(self, terms, types=None, permission_type='read',
              contact_id=None, extra_params=None):
     """Prepare the search query and return the results set based on the
@@ -179,6 +179,7 @@ class MysqlIndexer(SqlIndexer):
     return db.session.execute(
         select([all_queries.c.key, all_queries.c.type]).distinct())
 
+  # pylint: disable=too-many-arguments
   def counts(self, terms, types=None, contact_id=None,
              extra_params=None, extra_columns=None):
     """Prepare the search query, but return only count for each of
@@ -218,16 +219,6 @@ class MysqlIndexer(SqlIndexer):
 
 
 Indexer = MysqlIndexer
-
-
-@event.listens_for(db.session.__class__, 'before_commit')
-def update_indexer(session):  # pylint:disable=unused-argument
-  """General function to update index
-
-  for all updated related instance before commit"""
-  if hasattr(db.session, "reindex_set"):
-    with benchmark("Update indexer before commit"):
-      db.session.reindex_set.warmup()
 
 
 # pylint:disable=unused-argument

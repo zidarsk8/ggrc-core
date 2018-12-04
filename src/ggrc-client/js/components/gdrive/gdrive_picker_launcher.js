@@ -52,7 +52,7 @@ export default can.Component.extend({
     onClickHandler: function (scope, el, event) {
       let eventType = this.attr('click_event');
       let handler = this[eventType] || function () {};
-      let confirmation = can.isFunction(this.confirmationCallback) ?
+      let confirmation = _.isFunction(this.confirmationCallback) ?
         this.confirmationCallback() :
         null;
       let args = arguments;

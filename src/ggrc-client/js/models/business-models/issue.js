@@ -73,12 +73,6 @@ export default Cacheable('CMS.Models.Issue', {
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active', 'Fixed', 'Fixed and Verified'],
-  getAllowedMappings() {
-    return _.union(
-      GGRC.config.snapshotable_objects,
-      ['Issue', 'Program', 'Project', 'Document']
-    );
-  },
   buildIssueTrackerConfig(instance) {
     return {
       hotlist_id: '864697',

@@ -59,7 +59,7 @@ def get_db():  # noqa
         return
       database.session.flush()
       if hasattr(database.session, "reindex_set"):
-        database.session.reindex_set.push_ft_records()
+        database.session.reindex_set.indexing_hook()
 
   def post_commit_hooks():
     """All post commit hooks handler."""

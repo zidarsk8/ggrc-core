@@ -13,6 +13,7 @@ GAPI_ADMIN_GROUP='<Google Group Email Address>'
 BOOTSTRAP_ADMIN_USERS='user@example.com'
 MIGRATOR='Default Migrator <migrator@example.com>'
 RISK_ASSESSMENT_URL='http://localhost:8080'
+ASSESSMENT_SHORT_URL_PREFIX="$GGRC_ASSESSMENT_SHORT_URL_PREFIX"
 CUSTOM_URL_ROOT=''
 ABOUT_URL='#'
 ABOUT_TEXT='About GGRC'

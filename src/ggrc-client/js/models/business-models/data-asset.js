@@ -15,7 +15,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.DataAsset', {
   root_object: 'data_asset',
   root_collection: 'data_assets',
-  category: 'business',
+  category: 'scope',
   findAll: 'GET /api/data_assets',
   findOne: 'GET /api/data_assets/{id}',
   create: 'POST /api/data_assets',

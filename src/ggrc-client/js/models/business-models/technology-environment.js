@@ -15,7 +15,7 @@ import Stub from '../stub';
 export default Cacheable('CMS.Models.TechnologyEnvironment', {
   root_object: 'technology_environment',
   root_collection: 'technology_environments',
-  category: 'business',
+  category: 'scope',
   findAll: '/api/technology_environments',
   findOne: '/api/technology_environments/{id}',
   create: 'POST /api/technology_environments',

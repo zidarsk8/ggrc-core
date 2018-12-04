@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import Mappings from '../../../models/mappers/mappings';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
@@ -18,19 +17,13 @@ describe('object-operations-base viewModel', function () {
   });
 
   describe('availableTypes() method', function () {
-    beforeAll(function () {
-      spyOn(SnapshotUtils, 'getInScopeModels')
-        .and.returnValue(['test1', 'test2']);
-    });
-
     it('correctly calls getMappingTypes', function () {
       let result;
       spyOn(Mappings, 'getMappingTypes').and.returnValue('types');
       baseVM.attr('object', 'testObject');
 
       result = baseVM.availableTypes();
-      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
-        [], ['test1', 'test2', 'TaskGroup']);
+      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject');
       expect(result).toEqual('types');
     });
   });

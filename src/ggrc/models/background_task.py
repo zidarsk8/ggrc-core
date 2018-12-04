@@ -18,14 +18,13 @@ from werkzeug.datastructures import Headers
 from ggrc import db
 from ggrc import settings
 from ggrc.login import get_current_user
-from ggrc.access_control import people
-from ggrc.access_control import roleable
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
 from ggrc.models import reflection
+from ggrc.utils import benchmark
 
 
 logger = getLogger(__name__)
@@ -38,12 +37,14 @@ BANNED_HEADERS = {
     "X-Appengine-Tasketa",
     "X-Appengine-Taskexecutioncount",
     "X-Appengine-Taskretrycount",
-    "X-Task-Id",
+    "X-Task-Name",
 }
 
+RETRY_OPTIONS = settings.RETRY_OPTIONS
+DEFAULT_QUEUE = settings.DEFAULT_QUEUE
 
-class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
-                     db.Model):
+
+class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
   """Background task model."""
   __tablename__ = 'background_tasks'
 
@@ -53,8 +54,9 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
       "Success",
       "Failure"
   ]
-  name = deferred(db.Column(db.String), 'BackgroundTask')
+  name = db.Column(db.String, nullable=False, unique=True)
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')
+  payload = deferred(db.Column(CompressedType), 'BackgroundTask')
   result = deferred(db.Column(CompressedType), 'BackgroundTask')
 
   bg_operation = db.relationship(
@@ -63,7 +65,7 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
       uselist=False
   )
 
-  _api_attrs = reflection.ApiAttributes('name', 'result')
+  _api_attrs_complete = reflection.ApiAttributes("id", "status", "type")
 
   _aliases = {
       "status": {
@@ -126,21 +128,6 @@ class BackgroundTask(roleable.Roleable, base.ContextRBAC, Base, Stateful,
     return content
 
 
-def _add_task_acl(task):
-  """Add ACP entry for the current users background task."""
-  admin_acl = task.acr_name_acl_map.get("Admin")
-  if admin_acl:
-    people.AccessControlPerson(
-        ac_list=admin_acl,
-        person=get_current_user(),
-    )
-  db.session.add(task)
-  db.session.commit()
-  if admin_acl:
-    from ggrc.cache.utils import clear_users_permission_cache
-    clear_users_permission_cache([get_current_user().id])
-
-
 def collect_task_headers():
   """Get headers required for appengine background task run."""
   headers = {}
@@ -150,53 +137,36 @@ def collect_task_headers():
 
 
 # pylint: disable=too-many-arguments
-def create_task(name, url, queued_callback=None, parameters=None, method=None,
-                operation_type=None):
-  """Create a enqueue a bacground task."""
-  if not method:
-    method = request.method
-
-  # task name must be unique
-  if not parameters:
-    parameters = {}
-
-  parent_type, parent_id = None, None
-  if isinstance(parameters, dict):
-    parent_type = parameters.get("parent", {}).get("type")
-    parent_id = parameters.get("parent", {}).get("id")
-
-  if bg_operation_running(operation_type, parent_type, parent_id):
-    raise exceptions.BadRequest(
-        "Task '{}' already run for {} {}.".format(
-            operation_type, parent_type, parent_id
-        )
-    )
-  bg_operation = create_bg_operation(operation_type, parent_type, parent_id)
-
-  task = BackgroundTask(
-      name=name + str(int(time())),
-      bg_operation=bg_operation,
-  )
-  task.parameters = parameters
-  task.modified_by = get_current_user()
-  _add_task_acl(task)
-
-  # schedule a task queue
-  if getattr(settings, 'APP_ENGINE', False):
-    from google.appengine.api import taskqueue
-    headers = collect_task_headers()
-    headers.add('X-Task-Id', task.id)
-    taskqueue.add(
-        queue_name="ggrc",
-        url=url,
-        name="{}_{}".format(task.name, task.id),
-        params={'task_id': task.id},
-        method=method,
-        headers=headers
-    )
-  elif queued_callback:
-    queued_callback(task)
-  return task
+def create_task(name, url, queued_callback=None, parameters=None,
+                method="POST", operation_type=None, payload=None,
+                queue=DEFAULT_QUEUE, retry_options=None):
+  """Create and enqueue a background task."""
+  with benchmark("Create background task"):
+    parameters = parameters or dict()
+    retry_options = retry_options or RETRY_OPTIONS
+    bg_operation = None
+    if operation_type:
+      with benchmark("Create background task. Create BackgroundOperation"):
+        bg_operation = _check_and_create_bg_operation(operation_type,
+                                                      parameters)
+    with benchmark("Create background task. Create BackgroundTask"):
+      bg_task_name = "{}_{}".format(uuid.uuid4(), name)
+      bg_task = _create_bg_task(
+          name=bg_task_name,
+          parameters=parameters,
+          payload=payload,
+          bg_operation=bg_operation)
+    with benchmark("Create background task. Enqueue task"):
+      _enqueue_task(
+          name=bg_task_name,
+          url=url,
+          method=method,
+          parameters={"task_id": bg_task.id},
+          bg_task=bg_task,
+          queued_callback=queued_callback,
+          queue=queue,
+          retry_options=retry_options)
+    return bg_task
 
 
 def create_lightweight_task(name, url, queued_callback=None, parameters=None,
@@ -228,6 +198,79 @@ def create_lightweight_task(name, url, queued_callback=None, parameters=None,
     raise ValueError(
         "Either queued_callback should be provided or APP_ENGINE set to true."
     )
+
+
+def _check_and_create_bg_operation(operation_type, parameters):
+  """Check if there is running BackgroundOperation, if not create it"""
+  parent_type, parent_id = None, None
+  if isinstance(parameters, dict):
+    parent_type = parameters.get("parent", {}).get("type")
+    parent_id = parameters.get("parent", {}).get("id")
+  if not (parent_type and parent_id):
+    raise ValueError("parameters should contain parent.id and parent.type "
+                     "if operation_type specified")
+  if bg_operation_running(operation_type, parent_type, parent_id):
+    raise exceptions.BadRequest(
+        "Task '{}' already run for {} {}.".format(
+            operation_type, parent_type, parent_id
+        )
+    )
+  return create_bg_operation(operation_type, parent_type, parent_id)
+
+
+def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
+  """Create BackgroundTasks object"""
+  parameters = parameters or dict()
+  bg_task = BackgroundTask(
+      name=name,
+      bg_operation=bg_operation,
+      parameters=parameters,
+      payload=payload,
+      modified_by=get_current_user(),
+  )
+  db.session.add(bg_task)
+  return bg_task
+
+
+# pylint: disable=too-many-arguments
+def _enqueue_task(name, url, bg_task=None, queued_callback=None,
+                  parameters=None, method="POST", payload=None,
+                  queue=DEFAULT_QUEUE, retry_options=None):
+  """Create task in queue if running in AppEngine,
+  otherwise execute queued_callback() """
+  parameters = parameters or dict()
+  retry_options = retry_options or RETRY_OPTIONS
+  if getattr(settings, "APP_ENGINE", False):
+    from google.appengine.api import taskqueue
+    headers = collect_task_headers()
+    if bg_task:
+      headers.add("X-Task-Name", bg_task.name)
+    try:
+      task = taskqueue.Task(
+          url=url,
+          name=name,
+          params=parameters,
+          payload=payload,
+          method=method,
+          headers=headers,
+          retry_options=taskqueue.TaskRetryOptions(**retry_options))
+      queue_task = taskqueue.Queue(queue).add_async(task)
+    except taskqueue.Error as error:
+      logger.warning(error)
+      if bg_task:
+        bg_task.status = "Failure"
+    if not getattr(settings, "CLOUD_APPSERVER", False):
+      # On local SDK development appserver we need to wait result to
+      # enqueue task. In Google Cloud async adding tasks works properly.
+      queue_task.get_result()
+  elif queued_callback:
+    if bg_task:
+      queued_callback(bg_task)
+    else:
+      queued_callback(**parameters)
+  else:
+    raise ValueError("Either queued_callback should be provided "
+                     "or APP_ENGINE set to true.")
 
 
 def create_bg_operation(operation_type, object_type, object_id):
@@ -270,12 +313,6 @@ def bg_operation_running(operation_type, object_type, object_id):
   return db.session.query(tasks.exists()).scalar()
 
 
-def make_task_response(id_):
-  """Make a response for a task with the given id."""
-  task = BackgroundTask.query.get(id_)
-  return task.make_response()
-
-
 def queued_task(func):
   """Decorator for task queues."""
   from ggrc.app import app
@@ -290,8 +327,12 @@ def queued_task(func):
     if args and isinstance(args[0], BackgroundTask):
       task = args[0]
     else:
-      task_id = request.headers.get("X-Task-Id", request.values.get("task_id"))
-      task = BackgroundTask.query.get(task_id)
+      task_name = request.headers.get("X-Task-Name")
+      task = BackgroundTask.query.filter_by(name=task_name).first()
+    if not task:
+      return app.make_response(('BackgroundTask not found. Retry later.',
+                                503,
+                                [('Content-Type', 'text/html')]))
     task.start()
     try:
       result = func(task)
@@ -308,3 +349,24 @@ def queued_task(func):
     task.finish("Success", result)
     return result
   return decorated_view
+
+
+def reindex_on_commit():
+  """Decide to reindex changed objects synchronously on commit
+  or in background indexing task
+
+  Adding indexing background task doesn't make sense
+  if request already running in background
+  """
+  return running_in_background()
+
+
+def running_in_background():
+  """Check that current request is running in background task"""
+  value = False
+  try:
+    if request.path.startswith("/_background_tasks/"):
+      value = True  # running in BackgroundTask
+  except RuntimeError:
+    value = True  # running not in flask(possibly in deferred task)
+  return value

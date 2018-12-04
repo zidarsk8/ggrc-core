@@ -12,7 +12,6 @@ import '../../components/mapping-controls/mapping-type-selector';
 import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-search.mustache';
-import Mappings from '../../models/mappers/mappings';
 
 export default can.Component.extend({
   tag: 'object-search',
@@ -21,9 +20,6 @@ export default can.Component.extend({
     return ObjectOperationsBaseVM.extend({
       object: 'MultitypeSearch',
       type: 'Control',
-      availableTypes: function () {
-        return Mappings.getMappingTypes(this.attr('object'));
-      },
       resultsRequested: false,
       onSubmit: function () {
         this.attr('resultsRequested', true);

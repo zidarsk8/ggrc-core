@@ -16,6 +16,8 @@ import {
   download,
   deleteImportJob,
   stopImportJob,
+  PRIMARY_TIMEOUT,
+  SECONDARY_TIMEOUT,
 } from '../../plugins/utils/import-export-utils';
 import '../show-more/show-more';
 import './download-template/download-template';
@@ -83,6 +85,7 @@ export default can.Component.extend({
       },
     },
     quickTips,
+    importedObjectsCount: 0,
     importDetails: null,
     fileId: '',
     fileName: '',
@@ -137,6 +140,7 @@ export default can.Component.extend({
         this.attr('message', messages.EMPTY_FILE);
       } else {
         this.attr('importStatus', errorLevel);
+        this.attr('importedObjectsCount', rows);
       }
     },
     resetFile: function () {
@@ -199,6 +203,9 @@ export default can.Component.extend({
           this.attr('jobId', jobInfo.id);
 
           if (counts.some((number) => number > 0)) {
+            const importedObjectsCount = counts.reduce((a, b) => a + b, 0);
+
+            this.attr('importedObjectsCount', importedObjectsCount);
             this.attr('message', messages.FILE_STATS(response.objects));
           } else {
             this.processLoadedInfo(jobInfo.results);
@@ -245,7 +252,7 @@ export default can.Component.extend({
           }
         });
     },
-    trackStatusOfImport(jobId, timeout = 2000) {
+    trackStatusOfImport(jobId, timeout = PRIMARY_TIMEOUT) {
       let timioutId = setTimeout(() => {
         getImportJobInfo(jobId)
           .done((info) => {
@@ -255,7 +262,7 @@ export default can.Component.extend({
             this.attr('fileName', info.title);
             this.attr('state', info.status);
 
-            strategy(info, timeout * 2);
+            strategy(info, SECONDARY_TIMEOUT);
           })
           .fail((jqxhr, textStatus, errorThrown) => {
             if (isConnectionLost()) {

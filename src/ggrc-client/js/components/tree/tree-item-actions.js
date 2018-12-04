@@ -13,16 +13,10 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
+import Mapper from '../../models/mappers/mappings';
 
 const tag = 'tree-item-actions';
 const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
-const forbiddenMapList = [
-  'Workflow',
-  'RiskAssessment',
-  'Evidence',
-  'AssessmentTemplate',
-  'Person',
-];
 
 const viewModel = can.Map.extend({
   define: {
@@ -75,9 +69,9 @@ const viewModel = can.Map.extend({
           return false;
         }
         let isAllowedToEdit = this.attr('isAllowedToEdit');
-        let isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
+        let mappingTypes = Mapper.getMappingList(type);
 
-        return isAllowedToEdit && !isInForbiddenList;
+        return isAllowedToEdit && !!mappingTypes.length;
       },
     },
   },

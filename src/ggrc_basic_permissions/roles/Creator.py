@@ -22,6 +22,7 @@ owner_base = [
 owner_read = owner_base + [
     "AccessControlList",
     "AccessControlRole",
+    "BackgroundTask",
     {
         "type": "Relationship",
         "terms": {
@@ -100,6 +101,7 @@ permissions = {
             }
         },
         "AssessmentTemplate",
+        "BackgroundTask",
         {
             "type": "TaskGroup",
             "condition": "is_workflow_admin",

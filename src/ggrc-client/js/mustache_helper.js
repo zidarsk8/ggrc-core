@@ -23,10 +23,6 @@ import {
   buildCountParams,
   batchRequests,
 } from './plugins/utils/query-api-utils';
-import {
-  isMappableType,
-  allowedToMap,
-} from './plugins/ggrc_utils';
 import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
@@ -474,19 +470,6 @@ Mustache.registerHelper('option_select',
     return deferRender(tagPrefix, getSelectHtml, optionsDfd);
   });
 
-Mustache.registerHelper('get_permalink_url', function () {
-  return window.location.href;
-});
-
-Mustache.registerHelper('get_permalink_for_object',
-  function (instance, options) {
-    instance = resolveComputed(instance);
-    if (!instance.viewLink) {
-      return '';
-    }
-    return window.location.origin + instance.viewLink;
-  });
-
 /**
    * Generate an anchor element that opens the instance's view page in a
    * new browser tab/window.
@@ -890,7 +873,7 @@ Mustache.registerHelper('is_allowed_to_map',
 
     source = resolveComputed(source);
     target = resolveComputed(target);
-    canMap = allowedToMap(source, target, options);
+    canMap = Mappings.allowedToMap(source, target, options);
 
     if (canMap) {
       return options.fn(options.contexts || this);
@@ -1016,20 +999,6 @@ Mustache.registerHelper('assignee_types', function (value, options) {
     return lowercaseType;
   }));
   return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
-});
-
-Mustache.registerHelper('visibility_delay', function (delay, options) {
-  delay = resolveComputed(delay);
-
-  return function (el) {
-    setTimeout(function () {
-      if ($(el.parentNode).is(':visible')) {
-        $(el).append(options.fn(options.contexts));
-      }
-      can.view.hookup($(el).children()); // FIXME dubious indentation - was this intended to be in the 'if'?
-    }, delay);
-    return el;
-  };
 });
 
 Mustache.registerHelper('is_dashboard', function (options) {
@@ -1677,7 +1646,7 @@ Mustache.registerHelper('is_mappable_type',
   function (source, target, options) {
     target = Mustache.resolve(target);
     source = Mustache.resolve(source);
-    if (isMappableType(source, target)) {
+    if (Mappings.isMappableType(source, target)) {
       return options.fn(options.contexts);
     }
     return options.inverse(options.contexts);
@@ -1728,7 +1697,7 @@ Mustache.registerHelper(
 
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
-  modelName = can.isFunction(modelName) ? modelName() : modelName;
+  modelName = _.isFunction(modelName) ? modelName() : modelName;
   isInScope = isInScopeModel(modelName);
   // Temporary Modification to remove possibility to unmap Audit
   isInScope = isInScope || isSnapshotParent(modelName);

@@ -103,6 +103,8 @@ Settings from ``settings.sh``
 +------------------------------------+---------------------------------------------------------------------------+
 | RISK_ASSESSMENT_URL                | Link to Risk Assessment application                                       |
 +------------------------------------+---------------------------------------------------------------------------+
+| ASSESSMENT_SHORT_URL_PREFIX        | Assessment short link prefix                                              |
++------------------------------------+---------------------------------------------------------------------------+
 | CUSTOM_URL_ROOT                    | Equal to the URL where the app is supposed to be deployed too; used to    |
 |                                    | generate links to internal objects in email notifications                 |
 +------------------------------------+---------------------------------------------------------------------------+
