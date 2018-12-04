@@ -236,7 +236,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_type", "Issue Type", "PARABOLA"),
   )
   @ddt.unpack
-  def test_default_value_set_correctly(self, missed_field, alias, value):
+  def test_issue_default_value_set_correctly(self, missed_field, alias, value):
     """Test correct default value was set to {1} during import"""
     expected_warning = (
         errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
@@ -315,3 +315,97 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ]))
     send_mock.assert_called_once()
     update_mock.assert_called_once()
+
+  @ddt.data(
+      ("component_id", "Component ID", "", 123),
+      ("component_id", "Component ID", "sss", 456),
+      ("hotlist_id", "Hotlist ID", "", 789),
+      ("hotlist_id", "Hotlist ID", "aaa", 589),
+      ("issue_priority", "Priority", "", "P4"),
+      ("issue_priority", "Priority", "P6", "P0"),
+      ("issue_severity", "Severity", "", "S1"),
+      ("issue_severity", "Severity", "aa", "S3"),
+      ("issue_type", "Issue Type", "", "PROCESS"),
+      ("issue_type", "Issue Type", "PARABOLA", "PROCESS"),
+  )
+  @ddt.unpack
+  def test_assmt_default_values_from_audit(self,
+                                           missed_field,
+                                           alias,
+                                           value,
+                                           audit_value):
+    """Test correct default value was set from audit to {0}"""
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
+    )
+    expected_messages = {
+        "Assessment": {
+            "row_warnings": {expected_warning},
+        }
+    }
+
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      iti = factories.IssueTrackerIssueFactory(issue_tracked_obj=audit)
+      setattr(iti, missed_field, audit_value)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", "OBJ-1"),
+        ("Audit*", audit.slug),
+        ("Assignees*", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Object Title"),
+        (alias, value),
+    ]))
+
+    self._check_csv_response(response, expected_messages)
+    obj = all_models.Assessment.query.one()
+    self.assertEqual(str(obj.issue_tracker[missed_field]),
+                     str(audit_value))
+
+  @ddt.data(
+      ("component_id", "Component ID", ""),
+      ("component_id", "Component ID", "sss"),
+      ("hotlist_id", "Hotlist ID", ""),
+      ("hotlist_id", "Hotlist ID", "aaa"),
+      ("issue_priority", "Priority", ""),
+      ("issue_priority", "Priority", "P6"),
+      ("issue_severity", "Severity", ""),
+      ("issue_severity", "Severity", "aa"),
+      ("issue_type", "Issue Type", ""),
+      ("issue_type", "Issue Type", "PARABOLA"),
+  )
+  @ddt.unpack
+  def test_assmt_default_values_from_default(self,
+                                             missed_field,
+                                             alias,
+                                             value):
+    """Test correct default value was set to {0} if audit doesn't have one"""
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
+    )
+
+    expected_messages = {
+        "Assessment": {
+            "row_warnings": {expected_warning},
+        }
+    }
+
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(issue_tracked_obj=audit)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", "OBJ-1"),
+        ("Audit*", audit.slug),
+        ("Assignees*", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Object Title"),
+        (alias, value),
+    ]))
+
+    self._check_csv_response(response, expected_messages)
+    obj = all_models.Assessment.query.one()
+    self.assertEqual(str(obj.issue_tracker[missed_field]),
+                     str(default_values[missed_field]))
