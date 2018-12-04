@@ -486,9 +486,10 @@ class TestIssueIntegration(ggrc.TestCase):
         issue_tracked_obj=factories.IssueFactory()
     )
     comment = factories.CommentFactory(description="test comment")
+    builder_class = params_builder.BaseIssueTrackerParamsBuilder
     expected_result = {
         "comment":
-            params_builder.BaseIssueTrackerParamsBuilder.COMMENT_TMPL.format(
+            builder_class.COMMENT_TMPL.format(
                 author=client_user.name,
                 comment=comment.description,
                 model="Issue",
