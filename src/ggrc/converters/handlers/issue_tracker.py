@@ -7,6 +7,7 @@ import re
 from ggrc.converters.handlers import handlers
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
+from ggrc.models import Assessment
 from ggrc.converters import errors
 from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
     default_values
@@ -15,7 +16,7 @@ from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
 class IssueTrackerColumnHandler(handlers.ColumnHandler):
   """Column handler used for Issue Tracker related fields.
 
-  This class provides method for Issue Tracker fields export and Issue Traceker
+  This class provides method for Issue Tracker fields export and Issue Tracker
   default values.
   """
 
@@ -23,9 +24,19 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
     return self.row_converter.issue_tracker.get(self.key, "")
 
   def set_obj_attr(self):
+    if not self.value:
+      self.value = self._get_default_value()
     if self.dry_run or not self.value:
       return
     self.row_converter.issue_tracker[self.key] = self.value
+
+  def _get_default_value(self):
+    """Get default value for missed value in Issue Tracker attribute column."""
+    value = None
+    if isinstance(self.row_converter.obj, Assessment):
+      value = self.row_converter.obj.audit.issue_tracker.get(self.key)
+    default_value = value or default_values.get(self.key)
+    return default_value
 
 
 class IssueTrackerWithValidStates(IssueTrackerColumnHandler):
@@ -51,7 +62,7 @@ class IssueTrackerWithValidStates(IssueTrackerColumnHandler):
     if value not in self.valid_states:
       self.add_warning(errors.WRONG_VALUE_DEFAULT,
                        column_name=self.display_name)
-      return default_values.get(self.key)
+      return None
     return value
 
 
@@ -64,7 +75,7 @@ class IssueTrackerAddsColumnHandler(IssueTrackerColumnHandler):
     except ValueError:
       self.add_warning(errors.WRONG_VALUE_DEFAULT,
                        column_name=self.display_name)
-      return default_values.get(self.key)
+      return None
     return value
 
 
