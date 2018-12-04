@@ -50,9 +50,9 @@ class BaseIssueTrackerParamsBuilder(object):
   )
 
   COMMENT_TMPL = (
-      u"A new comment is added by '{author}' to the '{model}': '{comment}'.\n"
-      u"Use the following to link to get more information from the "
-      u"GGRC '{model}'. Link - {link}"
+      u"A new comment is added by '{author}' to the '{model}': \n\n"
+      u"'{comment}'\n\n Use the following to link to get more "
+      u"information from the GGRC '{model}'. Link - {link}"
   )
 
   ISSUE_TRACKER_INFO_FIELDS_TO_CHECK = (
