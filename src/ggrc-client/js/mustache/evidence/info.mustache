@@ -51,14 +51,12 @@
               <comment-data-provider {instance}="instance" class="flex-box flex-col">
                 <div class="info-pane__section-title">Responses/Comments</div>
                 {{^if instance.archived}}
-                  {{^if isEditDenied}}
                     <comment-add-form class="comment-add-form"
                       {instance}="instance"
                       {is-saving}="isLoading"
                       (before-create)="addComment(%event)"
                       (after-create)="processComment(%event)">
                     </comment-add-form>
-                  {{/if}}
                 {{/if}}
                 <mapped-comments {mapped-items}="comments"></mapped-comments>
               </comment-data-provider>
