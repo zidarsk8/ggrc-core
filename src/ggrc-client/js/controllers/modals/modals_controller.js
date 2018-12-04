@@ -194,7 +194,7 @@ export default can.Control({
       instance.attr('_transient', new can.Observe({}));
     }
 
-    can.reduce(name.slice(0, -1), function (current, next) {
+    _.reduce(name.slice(0, -1), function (current, next) {
       current = current + '.' + next;
       if (!instance.attr(current)) {
         instance.attr(current, new can.Observe({}));
