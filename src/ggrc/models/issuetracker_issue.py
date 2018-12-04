@@ -6,6 +6,7 @@
 # pylint: disable=too-many-instance-attributes
 
 from ggrc import db
+from ggrc.integrations import constants
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models import utils
@@ -23,7 +24,11 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   title = db.Column(db.String(250), nullable=True)
   component_id = db.Column(db.String(50), nullable=True)
   hotlist_id = db.Column(db.String(50), nullable=True)
-  issue_type = db.Column(db.String(50), nullable=True)
+  issue_type = db.Column(
+      db.String(50),
+      nullable=True,
+      default=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
+  )
   issue_priority = db.Column(db.String(50), nullable=True)
   issue_severity = db.Column(db.String(50), nullable=True)
   assignee = db.Column(db.String(250), nullable=True)
