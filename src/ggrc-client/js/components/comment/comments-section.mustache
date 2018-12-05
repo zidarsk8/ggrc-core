@@ -4,7 +4,7 @@
 }}
 
 <comment-data-provider {instance}="instance">
-  {{^if instance.archived}}
+  {{^if isDeniedToAddComment}}
     <comment-add-form class="comment-add-form"
       {instance}="instance"
       {is-saving}="isLoading"
