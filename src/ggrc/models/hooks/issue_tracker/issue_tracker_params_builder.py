@@ -62,6 +62,8 @@ class BaseIssueTrackerParamsBuilder(object):
       "issue_priority",
   )
 
+  OBSOLET_ISSUE_STATUS = "OBSOLETE"
+
   def __init__(self):
     """Basic initialization."""
     self.params = params_container.IssueTrackerParamsContainer()
@@ -251,6 +253,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 
   def build_detach_comment(self, new_ticket):
     self.params.add_comment(self.DETACH_TMPL.format(new_ticket_id=new_ticket))
+    self.params.status = self.OBSOLET_ISSUE_STATUS
     return self.params
 
   def _handle_emails_from_response(self, response):
@@ -351,4 +354,5 @@ class AssessmentParamsBuilder(BaseIssueTrackerParamsBuilder):
 
   def build_detach_comment(self, new_ticket):
     self.params.add_comment(self.DETACH_TMPL.format(new_ticket_id=new_ticket))
+    self.params.status = self.OBSOLET_ISSUE_STATUS
     return self.params
