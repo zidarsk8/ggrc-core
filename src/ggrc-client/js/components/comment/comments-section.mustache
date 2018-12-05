@@ -1,0 +1,18 @@
+{{!
+    Copyright (C) 2018 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<comment-data-provider {instance}="instance">
+  {{^if instance.archived}}
+    <comment-add-form class="comment-add-form"
+      {instance}="instance"
+      {is-saving}="isLoading"
+      (before-create)="addComment(%event)"
+      (after-create)="processComment(%event)"
+      {notifications-info}="notification">
+    </comment-add-form>
+  {{/if}}
+  <mapped-comments {base-instance}="instance" 
+    {mapped-items}="comments"></mapped-comments>
+</comment-data-provider>
