@@ -76,6 +76,20 @@ class Roles(Widget):
     return dict([item.text.splitlines() for item in tree_view_items])
 
 
+class CustomRoles(Widget):
+  """Admin custom roles widget on Admin Dashboard."""
+
+  def __init__(self, driver):
+    super(CustomRoles, self).__init__(driver)
+    self.custom_roles_tree_view = base.AdminTreeView(self._driver)
+
+  def get_objects_text_as_set(self):
+    """Get set of objects labels displayed in Tree View on Custom Roles widget.
+    """
+    tree_view_items = self.custom_roles_tree_view.tree_view_items()
+    return set(item.text for item in tree_view_items)
+
+
 class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
   """Custom attributes widget on Admin Dashboard page."""
 

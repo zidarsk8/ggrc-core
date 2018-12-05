@@ -7,6 +7,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 # pylint: disable=too-many-lines
 
 import collections
+import datetime
 import json
 import logging
 
@@ -28,7 +29,7 @@ from ggrc.query import views as query_views
 from ggrc.rbac import permissions
 from ggrc.services import common as services_common
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
-from ggrc.utils import benchmark, helpers, revisions
+from ggrc.utils import benchmark, helpers, log_event, revisions
 from ggrc.views import converters, cron, filters, notifications, registry, \
     utils
 
@@ -263,6 +264,54 @@ def _merge_errors(create_errors, update_errors):
     errors = create_errors.extend(update_errors) \
         if update_errors else create_errors
   return errors
+
+
+@app.route("/_background_tasks/update_cad_related_objects", methods=["POST"])
+def update_cad_related_objects(*_, **kwargs):
+  """Update CAD related objects"""
+  event_id = ggrc_utils.get_task_attr("event_id", kwargs)
+  model_name = ggrc_utils.get_task_attr("model_name", kwargs)
+  need_revisions = ggrc_utils.get_task_attr("need_revisions", kwargs)
+  modified_by_id = ggrc_utils.get_task_attr("modified_by_id", kwargs)
+
+  event = models.all_models.Event.query.filter_by(id=event_id).first()
+  cad = models.all_models.CustomAttributeDefinition.query.filter_by(
+      id=event.resource_id
+  ).first()
+  model = models.get_model(model_name)
+  query = db.session.query(model if need_revisions else model.id)
+  objects_count = query.count()
+  handled_objects = 0
+  for chunk in ggrc_utils.generate_query_chunks(query):
+    handled_objects += chunk.count()
+    logger.info(
+        "Updating CAD related objects: %s/%s", handled_objects, objects_count
+    )
+    if need_revisions:
+      for obj in chunk:
+        obj.updated_at = datetime.datetime.utcnow()
+        obj.modified_by_id = modified_by_id
+    else:
+      model.bulk_record_update_for([obj_id for obj_id, in chunk])
+    log_event.log_event(db.session, cad, event=event)
+    db.session.commit()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+def start_update_cad_related_objs(event_id, model_name, need_revisions=None):
+  """Start a background task to update related objects of CAD."""
+  background_task.create_lightweight_task(
+      name="update_cad_related_objects",
+      url=flask.url_for(update_cad_related_objects.__name__),
+      parameters={
+          "event_id": event_id,
+          "model_name": model_name,
+          "modified_by_id": login.get_current_user_id(),
+          "need_revisions": need_revisions,
+      },
+      method="POST",
+      queued_callback=update_cad_related_objects
+  )
 
 
 def start_compute_attributes(revision_ids=None, event_id=None):

@@ -59,6 +59,15 @@ describe('prev-next-buttons component', function () {
 
         expect(result).toBeFalsy();
       });
+
+    it('returns false if "disabled" attr is true',
+      function () {
+        viewModel.attr('disabled', true);
+        viewModel.attr('currentIndex', 1);
+        viewModel.attr('totalCount', 3);
+
+        expect(viewModel.attr('hasNext')).toBeFalsy();
+      });
   });
 
   describe('hasPrev getter', function () {
@@ -86,6 +95,14 @@ describe('prev-next-buttons component', function () {
         result = viewModel.attr('hasPrev');
 
         expect(result).toBeFalsy();
+      });
+
+    it('returns false if "disabled" attr is true',
+      function () {
+        viewModel.attr('disabled', true);
+        viewModel.attr('currentIndex', 1);
+
+        expect(viewModel.attr('hasPrev')).toBeFalsy();
       });
   });
 

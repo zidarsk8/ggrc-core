@@ -3,48 +3,74 @@
 
 """Custom Attribute Definition hooks"""
 
-import datetime
-
-from ggrc.models import all_models
+from ggrc import models, views
 from ggrc.services import signals
-from ggrc.login import get_current_user_id
-from ggrc.models import custom_attribute_definition
+from ggrc.models import custom_attribute_definition as cad
 
 
 def invalidate_cache(sender, obj, src=None, service=None):
   """Invalidate cache related to cads."""
   # pylint: disable=unused-argument
-  custom_attribute_definition.get_cads_counts.invalidate_cache()
+  cad.get_cads_counts.invalidate_cache()
   if obj.definition_id:
-    custom_attribute_definition.get_local_cads.invalidate_cache(
+    cad.get_local_cads.invalidate_cache(
         obj.definition_type,
         obj.definition_id)
   else:
-    custom_attribute_definition.get_global_cads.invalidate_cache(
+    cad.get_global_cads.invalidate_cache(
         obj.definition_type)
 
 
 def init_hook():
   """Initialize CAD hooks"""
   # pylint: disable=unused-variable
-  @signals.Restful.model_deleted.connect_via(
-      all_models.CustomAttributeDefinition)
-  def handle_cad_delete(sender, obj, src=None, service=None):
-    """Make sure create revision after deleting CAD from admin panel"""
-    # pylint: disable=unused-argument
-    now = datetime.datetime.utcnow()
-    current_user_id = get_current_user_id()
-    for model in all_models.all_models:
-      if model._inflector.table_singular != obj.definition_type:
-        continue
-      for instance in model.eager_query():
-        instance.updated_at = now
-        instance.modified_by_id = current_user_id
-      return
+  # pylint: disable=too-many-arguments
+  @signals.Restful.model_put_after_commit.connect_via(
+      models.all_models.CustomAttributeDefinition)
+  @signals.Restful.model_posted_after_commit.connect_via(
+      models.all_models.CustomAttributeDefinition)
+  def handle_cad_creating_editing(sender, obj=None, src=None, service=None,
+                                  event=None, initial_state=None):
+    """Make reindex without creating revisions for related objects after
+      creating/editing CAD from admin panel
 
-  signals.Restful.model_posted.connect(invalidate_cache,
-                                       all_models.CustomAttributeDefinition,
-                                       weak=False)
-  signals.Restful.model_deleted.connect(invalidate_cache,
-                                        all_models.CustomAttributeDefinition,
-                                        weak=False)
+    Args:
+      sender: A class of Resource handling the POST request.
+      obj: A list of model instances created from the POSTed JSON.
+      src: A list of original POSTed JSON dictionaries.
+      service: The instance of Resource handling the PUT request.
+      event: Instance of an Event (if change took place) or None otherwise
+      initial_state: A named tuple of initial values of an object before
+        applying any change.
+    """
+    # pylint: disable=unused-argument
+    model_name = cad.get_inflector_model_name_dict()[obj.definition_type]
+    views.start_update_cad_related_objs(event.id, model_name)
+
+  @signals.Restful.model_deleted_after_commit.connect_via(
+      models.all_models.CustomAttributeDefinition)
+  def handle_cad_deleting(sender, obj=None, service=None, event=None):
+    """Make reindex after deleting CAD from admin panel
+
+    Args:
+      sender: A class of Resource handling the POST request.
+      obj: A list of model instances created from the POSTed JSON.
+      service: The instance of Resource handling the PUT request.
+      event: Instance of an Event (if change took place) or None otherwise
+    """
+    # pylint: disable=unused-argument
+    model_name = cad.get_inflector_model_name_dict()[obj.definition_type]
+    views.start_update_cad_related_objs(
+        event.id, model_name, need_revisions=True
+    )
+
+  signals.Restful.model_posted.connect(
+      invalidate_cache,
+      models.all_models.CustomAttributeDefinition,
+      weak=False
+  )
+  signals.Restful.model_deleted.connect(
+      invalidate_cache,
+      models.all_models.CustomAttributeDefinition,
+      weak=False
+  )

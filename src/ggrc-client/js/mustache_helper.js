@@ -824,45 +824,6 @@ Mustache.registerHelper('any_allowed', function (action, data, options) {
   return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
 });
 
-Mustache.registerHelper('is_allowed_all',
-  function (action, instances, options) {
-    let passed = true;
-
-    action = resolveComputed(action);
-    instances = resolveComputed(instances);
-
-    can.each(instances, function (instance) {
-      let resourceType;
-      let contextId;
-      let baseMappings = [];
-
-      if (instance instanceof GGRC.ListLoaders.MappingResult) {
-        instance.walk_instances(function (inst, mapping) {
-          if (can.reduce(mapping.mappings, function (a, b) {
-            return a || (b.instance === true);
-          }, false)) {
-            baseMappings.push(inst);
-          }
-        });
-      } else {
-        baseMappings.push(instance);
-      }
-
-      can.each(baseMappings, function (instance) {
-        resourceType = instance.constructor.shortName;
-        contextId = instance.context ? instance.context.id : null;
-        passed = passed && Permission
-          .is_allowed(action, resourceType, contextId);
-      });
-    });
-
-    if (passed) {
-      return options.fn(options.contexts || this);
-    } else {
-      return options.inverse(options.contexts || this);
-    }
-  });
-
 Mustache.registerHelper('is_allowed_to_map',
   function (source, target, options) {
     //  For creating mappings, we only care if the user has update permission on

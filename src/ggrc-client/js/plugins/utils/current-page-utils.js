@@ -13,7 +13,7 @@ import {
 } from './snapshot-utils';
 import Mappings from '../../models/mappers/mappings';
 import {inferObjectType} from './models-utils';
-import PersistentNotifier from '../persistent_notifier';
+import PersistentNotifier from '../persistent-notifier';
 import {changeUrl, reloadPage} from '../../router';
 
 /**
@@ -117,31 +117,24 @@ function isObjectContextPage() {
   return !GGRC.pageType;
 }
 
-function _onbeforeunload(evnt) {
-  evnt = evnt || window.event;
-  let message = 'There are operations in progress. ' +
-  'Are you sure you want to leave the page?';
-
-  if (evnt) {
-    evnt.returnValue = message;
-  }
-  return message;
+function _beforeUnloadHandler(event) {
+  event.preventDefault();
+  event.returnValue = '';
 }
 
 const notifier = new PersistentNotifier({
-  while_queue_has_elements() {
-    window.onbeforeunload = _onbeforeunload;
+  whileQueueHasElements() {
+    window.addEventListener('beforeunload', _beforeUnloadHandler);
   },
-  when_queue_empties() {
-    window.onbeforeunload = $.noop;
+  whenQueueEmpties() {
+    window.removeEventListener('beforeunload', _beforeUnloadHandler);
   },
-  name: 'GGRC/window',
 });
 
 const delayLeavingPageUntil = $.proxy(notifier, 'queue');
 
 function navigate(url) {
-  notifier.on_empty(_goToUrl.bind(null, url));
+  notifier.onEmpty(_goToUrl.bind(null, url));
 }
 
 function _goToUrl(url) {

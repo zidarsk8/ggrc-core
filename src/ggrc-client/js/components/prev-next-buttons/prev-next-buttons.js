@@ -20,16 +20,17 @@ export default can.Component.extend({
         get: function () {
           let current = this.attr('currentIndex');
           let total = this.attr('totalCount');
-          return current < total - 1;
+          return !this.attr('disabled') && (current < total - 1);
         },
       },
       hasPrev: {
         get: function () {
           let current = this.attr('currentIndex');
-          return current > 0;
+          return !this.attr('disabled') && current > 0;
         },
       },
     },
+    disabled: false,
     setNext: function () {
       let current = this.attr('currentIndex');
       let hasNext = this.attr('hasNext');

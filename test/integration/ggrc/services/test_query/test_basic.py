@@ -1409,3 +1409,88 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
     keys = [(prog[self.CAD_TITLE2], prog[self.CAD_TITLE1])
             for prog in programs]
     self.assertEqual(keys, sorted(keys))
+
+
+@ddt.ddt
+class TestFilteringAttributes(WithQueryApi, TestCase):
+  """Test query API filtering by attributes."""
+
+  @classmethod
+  def setUpClass(cls):
+    cls.clear_data()
+
+  def setUp(self):
+    self.client.get("/login")
+
+    generator_ = generator.ObjectGenerator()
+
+    _, self.person = generator_.generate_person({'name': 'old_name'})
+    generator_.modify(self.person, 'person', {'name': 'new_name'})
+
+  def test_filtering_by_two_attrs(self):
+    """Test filtering by two attributes."""
+    revisions = self._get_first_result_set(
+        self._make_query_dict(
+            "Revision",
+            expression=[
+                {
+                    "left": "resource_id",
+                    "op": {
+                        "name": "="
+                    },
+                    "right": self.person.id
+                },
+                'AND',
+                {
+                    "left": "resource_type",
+                    "op": {
+                        "name": "="
+                    },
+                    "right": "Person"
+                }
+            ]
+        ),
+        "Revision", "values",
+    )
+
+    self.assertEqual(len(revisions), 2)
+
+  def test_filtering_by_three_attrs(self):
+    """Test filtering by three attributes."""
+    revisions = self._get_first_result_set(
+        self._make_query_dict(
+            "Revision",
+            expression=[
+                {
+                    "left": {
+                        "left": "resource_id",
+                        "op": {
+                            "name": "="
+                        },
+                        "right": self.person.id
+                    },
+                    "op": {
+                        "name": "AND"
+                    },
+                    "right": {
+                        "left": "resource_type",
+                        "op": {
+                            "name": "="
+                        },
+                        "right": "Person"
+                    }
+                },
+                'AND',
+                {
+                    "left": "action",
+                    "op": {
+                        "name": "="
+                    },
+                    "right": "modified"
+                }
+            ]
+        ),
+        "Revision", "values",
+    )
+
+    self.assertEqual(len(revisions), 1)

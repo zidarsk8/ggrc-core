@@ -470,12 +470,17 @@ class MappingColumnHandler(ColumnHandler):
 
     for slug in slugs:
       obj = class_.query.filter_by(slug=slug).first()
+
       if obj:
         is_allowed_by_type = self._is_allowed_mapping_by_type(
             source_type=self.row_converter.obj.__class__.__name__,
-            destination_type=class_.__name__
+            destination_type=class_.__name__,
         )
         if not is_allowed_by_type:
+          self._add_mapping_warning(
+              source=self.row_converter.obj,
+              destination=obj,
+          )
           continue
         if not permissions.is_allowed_update_for(obj):
           self.add_warning(
@@ -500,20 +505,26 @@ class MappingColumnHandler(ColumnHandler):
     return objects
 
   def _is_allowed_mapping_by_type(self, source_type, destination_type):
+    # pylint: disable=no-self-use
     """Checks if a mapping is allowed between given types."""
     scoping_models_names = [m.__name__ for m in all_models.all_models
                             if issubclass(m, ScopeObject)]
-    if source_type in scoping_models_names and \
-       destination_type in ("Regulation", "Standard") or \
-       destination_type in scoping_models_names and \
-       source_type in ("Regulation", "Standard"):
+
+    return not (source_type in scoping_models_names and
+                destination_type in ("Regulation", "Standard") or
+                destination_type in scoping_models_names and
+                source_type in ("Regulation", "Standard"))
+
+  def _add_mapping_warning(self, source, destination):
+    """Add warning if we have changes mappings """
+    mapping = all_models.Relationship.find_related(source, destination)
+
+    if (self.unmap and mapping) or (not self.unmap and not mapping):
       self.add_warning(
           errors.MAPPING_SCOPING_ERROR,
-          object_type=destination_type,
+          object_type=destination.__class__.__name__,
           action="unmap" if self.unmap else "map"
       )
-      return False
-    return True
 
   def set_obj_attr(self):
     self.value = self.parse_item()
