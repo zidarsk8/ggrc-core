@@ -14,5 +14,8 @@
     </comment-add-form>
   {{/if}}
   <mapped-comments {base-instance}="instance" 
-    {mapped-items}="comments"></mapped-comments>
+    {mapped-items}="comments"
+    {is-loading}="isLoading"
+    {show-no-items-text}="isDeniedToAddComment">
+  </mapped-comments>
 </comment-data-provider>

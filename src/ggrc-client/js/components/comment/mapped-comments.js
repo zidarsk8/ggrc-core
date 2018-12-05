@@ -17,10 +17,17 @@ export default can.Component.extend({
     define: {
       noItemsText: {
         type: 'string',
-        value: '',
+        get() {
+          if (this.attr('showNoItemsText') && !this.attr('isLoading')) {
+            return 'No comments';
+          }
+          return '';
+        },
       },
     },
+    isLoading: false,
     mappedItems: [],
     baseInstance: {},
+    showNoItemsText: false,
   },
 });
