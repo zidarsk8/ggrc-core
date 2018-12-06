@@ -279,35 +279,6 @@ Mustache.registerHelper('is_empty', (data, options) => {
   return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
-Mustache.registerHelper('pack', function () {
-  let options = arguments[arguments.length - 1];
-  let objects = can.makeArray(arguments).slice(0, arguments.length - 1);
-  let pack = {};
-  can.each(objects, function (obj, i) {
-    if (typeof obj === 'function') {
-      objects[i] = obj = obj();
-    }
-
-    if (obj._data) {
-      obj = obj._data;
-    }
-    for (let k in obj) {
-      if (obj.hasOwnProperty(k)) {
-        pack[k] = obj[k];
-      }
-    }
-  });
-  if (options.hash) {
-    for (let k in options.hash) {
-      if (options.hash.hasOwnProperty(k)) {
-        pack[k] = options.hash[k];
-      }
-    }
-  }
-  pack = new can.Map(pack);
-  return options.fn(pack);
-});
-
 // Render a named template with the specified context, serialized and
 // augmented by 'options.hash'
 Mustache.registerHelper('render', function (template, context, options) {
