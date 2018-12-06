@@ -30,7 +30,7 @@ export default Cacheable('CMS.Models.Role', {
   allowed: function (operation, objectOrClass) {
     let cls = typeof objectOrClass === 'function' ?
       objectOrClass : objectOrClass.constructor;
-    return !!~can.inArray(cls.model_singular, this.permissions[operation]);
+    return _.includes(this.permissions[operation], cls.model_singular);
   },
   not_system_role: function () {
     return this.attr('scope') !== 'System';

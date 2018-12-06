@@ -159,7 +159,7 @@ Mustache.registerHelper('in_array', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack);
 
-  return options[~can.inArray(needle, haystack) ?
+  return options[_.includes(haystack, needle) ?
     'fn' : 'inverse'](options.contexts);
 });
 
@@ -749,7 +749,7 @@ Mustache.registerHelper('is_allowed', function () {
       arg = arg();
     }
 
-    if (typeof arg === 'string' && can.inArray(arg, allowedActions) > -1) {
+    if (typeof arg === 'string' && allowedActions.includes(arg)) {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
@@ -1683,8 +1683,9 @@ Mustache.registerHelper('displayWidgetTab',
     widget = Mustache.resolve(widget);
     instance = Mustache.resolve(instance);
 
-    inForceShowList = can.inArray(widget.attr('internav_display'),
-      instance.constructor.obj_nav_options.force_show_list) > -1;
+    inForceShowList = _.includes(
+      instance.constructor.obj_nav_options.force_show_list,
+      widget.attr('internav_display'));
 
     displayTab = widget.attr('has_count') &&
         widget.attr('count') ||
