@@ -56,16 +56,6 @@ jQuery(function ($) {
   });
 });
 
-jQuery(function ($) {
-  $body.on('click', '.show-long', function (e) {
-    let $this = $(this);
-    let $descField = $this.closest('.span12').find('.tree-description');
-    $this.hide();
-    $descField.removeClass('short');
-  });
-});
-
-
 $(function () {
   $('body').on(
     'click',

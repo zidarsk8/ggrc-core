@@ -260,19 +260,7 @@ ul.new-tree {
   .parent {
     @include opacity(0.6);
   }
-  .tree-description {
-    line-height:18px;
-    margin-right:60px;
-    font-size:13px;
-    &.short {
-      height:36px;
-      overflow:hidden;
-    }
-    p {
-      line-height:18px;
-      font-size:13px;
-    }
-  }
+
   .view-more-paging {
     line-height: 31px;
     min-height: 31px;
@@ -283,18 +271,7 @@ ul.new-tree {
       margin-top: 7px;
     }
   }
-  a.show-long {
-    color:$disabled;
-    float:left;
-    display:block;
-    font-size:13px;
-    line-height:18px;
-    text-decoration:underline;
-    &:hover {
-      color:$link;
-      text-decoration:underline;
-    }
-  }
+
   .tree-info {
     @extend %oneline;
     vertical-align: middle;
