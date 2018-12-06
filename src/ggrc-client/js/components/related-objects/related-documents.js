@@ -21,6 +21,7 @@ import Context from '../../models/service-models/context';
 import Evidence from '../../models/business-models/evidence';
 import Document from '../../models/business-models/document';
 import * as businessModels from '../../models/business-models';
+import Permission from '../../permission';
 
 let DOCUMENT_KIND_MAP = {
   FILE: 'documents_file',
@@ -35,7 +36,6 @@ export default can.Component.extend({
     kind: '@',
     documents: [],
     isLoading: false,
-    pendingItemsChanged: false,
     pubsub,
     define: {
 
@@ -43,10 +43,6 @@ export default can.Component.extend({
       autorefresh: {
         type: 'boolean',
         value: true,
-      },
-      customLoader: {
-        type: 'boolean',
-        value: false,
       },
     },
     getDocumentsQuery: function () {
@@ -91,10 +87,6 @@ export default can.Component.extend({
       let documentPath;
       let documents;
 
-      // don't load documents if they are comes from outside
-      if (this.attr('customLoader')) {
-        return;
-      }
       // load documents for non-snapshots objects
       if (!this.attr('isSnapshot')) {
         this.loadDocuments();
@@ -196,24 +188,26 @@ export default can.Component.extend({
       });
 
       this.attr('documents', documents);
-      this.instance.mark_for_deletion('related_objects_as_source', document);
-      this.attr('pendingItemsChanged', true);
+      this.dispatch({
+        type: 'removeMappings',
+        object: document,
+      });
     },
     markDocumentForAddition: function (data) {
-      let self = this;
       let document = this.createDocument(data);
 
       this.attr('documents').unshift(document);
       this.attr('isLoading', true);
 
-      this.attr('pendingItemsChanged', true);
-      return this.saveDocument(document).then(function () {
-        self.instance.mark_for_addition(
-          'related_objects_as_source',
-          document
-        );
-        self.attr('isLoading', false);
-      });
+      return this.saveDocument(document)
+        .then(() => Permission.refresh())
+        .then(() => {
+          this.dispatch({
+            type: 'addMappings',
+            objects: [document],
+          });
+        })
+        .always(() => this.attr('isLoading', false));
     },
     refreshRelatedDocuments: function () {
       if (this.autorefresh) {
@@ -242,9 +236,6 @@ export default can.Component.extend({
     }
   },
   events: {
-    '{viewModel.instance} resolvePendingBindings': function () {
-      this.viewModel.refreshRelatedDocuments();
-    },
     [`{viewModel.instance} ${REFRESH_MAPPING.type}`](instance, event) {
       if (this.viewModel.attr('modelType') === event.destinationType) {
         this.viewModel.refreshRelatedDocuments();
