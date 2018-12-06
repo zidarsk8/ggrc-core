@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {getPlainText} from '../../ggrc_utils';
+
 /**
  * Checks if the [custom attribute object]{@link CustomAttributeObject} has
  * an empty value.
@@ -13,7 +15,7 @@ function hasEmptyValue(caObject) {
   const value = caObject.value;
 
   if (typeof value === 'string') {
-    return _.flow(_.trim, _.isEmpty)(value);
+    return _.flow(getPlainText, _.trim, _.isEmpty)(value);
   }
 
   return Boolean(value) === false;
