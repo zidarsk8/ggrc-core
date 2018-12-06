@@ -57,6 +57,9 @@
       }
     }
   }
+  &.widget-area > .widget:not(.treeview) {
+    margin: 0 40px;
+  }
   &.widget-area,
   &.widget-area .widget,
   &.widget-area .widget .content

@@ -8,8 +8,7 @@ import {
 } from '../plugins/utils/widgets-utils';
 import {getPageModel} from '../plugins/utils/current-page-utils';
 
-export default can.Control({
-  pluginName: 'dashboard_widgets',
+export default can.Control.extend({
   defaults: {
     model: null,
     widget_id: '',
