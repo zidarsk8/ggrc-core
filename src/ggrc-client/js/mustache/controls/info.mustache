@@ -209,7 +209,7 @@
                   {is-saving}="isLoading"
                   (before-create)="addComment(%event)"
                   (after-create)="processComment(%event)"
-                  {notifications-info}="'Notify Admins, Primary and Secondary Contacts'">
+                  {notifications-info}="'Notify Admins, Control Operators and Control Owners'">
                 </comment-add-form>
                 {{/unless}}
                 <mapped-comments {base-instance}="instance" {mapped-items}="comments"></mapped-comments>
