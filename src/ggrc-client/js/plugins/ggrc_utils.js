@@ -144,24 +144,10 @@ function loadScript(url, callback) {
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-function hasPending(parentInstance, instance, how) {
+function hasPending(parentInstance) {
   let list = parentInstance._pendingJoins;
-  how = how || 'add';
 
-  if (!list || !list.length) {
-    return false;
-  }
-  if (list instanceof can.List) {
-    list = list.serialize();
-  }
-
-  return _.find(list, function (pending) {
-    let method = pending.how === how;
-    if (!instance) {
-      return method;
-    }
-    return method && pending.what === instance;
-  });
+  return !!(list && list.length);
 }
 
 /**
