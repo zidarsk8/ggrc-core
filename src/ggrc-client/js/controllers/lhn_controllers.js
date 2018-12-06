@@ -17,6 +17,7 @@ import {
 import * as businessModels from '../models/business-models';
 import Relationship from '../models/service-models/relationship';
 import '../components/recently-viewed/recently-viewed';
+import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 
 can.Control.extend({
   pluginName: 'cms_controllers_lhn',
@@ -163,7 +164,7 @@ can.Control.extend({
       .control('cms_controllers_lhn_search')
       .display();
 
-    $lhs.cms_controllers_lhn_tooltips();
+    new LhnTooltipsControl($lhs);
 
     let checked = this.obs.attr('my_work');
     let value = checked ? 'my_work' : 'all';
@@ -387,9 +388,10 @@ can.Control.extend({
 
     this.element.html(frag);
     this.post_init();
-    this.element.find('.sub-level')
-      .cms_controllers_infinite_scroll()
-      .on('scroll', _.debounce(function () {
+
+    let subLevelElements = this.element.find('.sub-level');
+    new InfiniteScrollControl(subLevelElements);
+    subLevelElements.on('scroll', _.debounce(function () {
         setLHNState({category_scroll: this.scrollTop});
       }, 250));
 
