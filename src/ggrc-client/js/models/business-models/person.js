@@ -49,13 +49,6 @@ export default Cacheable('CMS.Models.Person', {
       return ((val && val.trim) ? val.trim() : val).toLowerCase();
     },
   },
-  findInCacheByEmail: function (email) {
-    let cache = this.cache || {};
-
-    return _.find(Object.keys(cache),
-      (person) => cache[person].email === email) ||
-      null;
-  },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/people/tree-item-attr.mustache',
     attr_list: [{
