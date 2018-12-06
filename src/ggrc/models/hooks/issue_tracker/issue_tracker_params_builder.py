@@ -33,12 +33,12 @@ class BaseIssueTrackerParamsBuilder(object):
 
   INITIAL_COMMENT_TMPL = (
       u"This bug was auto-generated to track a GGRC {model}. "
-      "Use the following link to find the {model} - {link}."
+      u"Use the following link to find the {model} - {link}."
   )
 
   DELETE_TMPL = (
       u"GGRC object has been deleted. GGRC changes will "
-      "no longer be tracked within this bug."
+      u"no longer be tracked within this bug."
   )
 
   DISABLE_TMPL = (
@@ -51,8 +51,8 @@ class BaseIssueTrackerParamsBuilder(object):
 
   COMMENT_TMPL = (
       u"A new comment is added by '{author}' to the '{model}': '{comment}'.\n"
-      "Use the following to link to get more information from the "
-      "GGRC '{model}'. Link - {link}"
+      u"Use the following to link to get more information from the "
+      u"GGRC '{model}'. Link - {link}"
   )
 
   ISSUE_TRACKER_INFO_FIELDS_TO_CHECK = (
@@ -153,7 +153,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
   )
   EXCLUDE_REPORTER_EMAIL_ERROR_MSG = (
       u"Issue tracker integration is not activated because the reporter "
-      "is an Global auditor."
+      u"is an Global auditor."
   )
   ISSUE_LINK_TMPL = (
       u"This bug was linked to a GGRC Issue. Use the following link to find "
@@ -252,6 +252,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     return self.params
 
   def build_detach_comment(self, new_ticket):
+    """Build request for old Issue Tracker ticket detach."""
     self.params.add_comment(self.DETACH_TMPL.format(new_ticket_id=new_ticket))
     self.params.status = self.OBSOLET_ISSUE_STATUS
     return self.params
@@ -347,12 +348,13 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
 class AssessmentParamsBuilder(BaseIssueTrackerParamsBuilder):
   """Issue tracker query builder for GGRC Assessment object."""
   DETACH_TMPL = (
-      'Another bug {new_ticket_id} has been linked to track changes to the '
-      'GGRC Assessment. Changes to the GGRC Assessment will no longer be '
-      'tracked within this bug.'
+      "Another bug {new_ticket_id} has been linked to track changes to the "
+      "GGRC Assessment. Changes to the GGRC Assessment will no longer be "
+      "tracked within this bug."
   )
 
   def build_detach_comment(self, new_ticket):
+    """Build request for old Issue Tracker ticket detach."""
     self.params.add_comment(self.DETACH_TMPL.format(new_ticket_id=new_ticket))
     self.params.status = self.OBSOLET_ISSUE_STATUS
     return self.params
