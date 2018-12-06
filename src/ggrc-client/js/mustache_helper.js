@@ -1071,8 +1071,8 @@ Mustache.registerHelper('urlPath', function () {
   FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
-    conjunctions and disjunctions to one using a can.reduce(Array, function (Deferred, item) {}, $.when())
-    pattern instead of can.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
+    conjunctions and disjunctions to one using a _.reduce(Array, function (Deferred, item) {}, $.when())
+    pattern instead of _.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
 Mustache.registerHelper('if_helpers', function () {
   let args = arguments;
@@ -1147,13 +1147,13 @@ Mustache.registerHelper('if_helpers', function () {
 
   if (disjunctions.length) {
     // Evaluate statements
-    let result = can.reduce(disjunctions,
+    let result = _.reduce(disjunctions,
       function (disjunctiveResult, conjunctions) {
         if (disjunctiveResult) {
           return true;
         }
 
-        let conjunctiveResult = can.reduce(conjunctions,
+        let conjunctiveResult = _.reduce(conjunctions,
           function (currentResult, stmt) {
             if (!currentResult) {
               return false;
@@ -1212,10 +1212,7 @@ Mustache.registerHelper('if_instance_of', function (inst, cls, options) {
     cls = [cls];
   }
 
-  result = can.reduce(cls, function (res, cl) {
-    return res || inst instanceof cl;
-  }, false);
-
+  result = _.find(cls, (cl) => inst instanceof cl);
   return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 

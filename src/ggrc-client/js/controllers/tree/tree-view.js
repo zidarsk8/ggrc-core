@@ -327,7 +327,7 @@ export default TreeLoader({
     let parent;
     ev.stopPropagation();
     instanceId = el.closest('.tree-item').data('object-id');
-    parent = can.reduce(this.options.list, function (a, b) {
+    parent = _.reduce(this.options.list, function (a, b) {
       switch (true) {
         case !!a: return a;
         case b.instance.id === instanceId: return b;

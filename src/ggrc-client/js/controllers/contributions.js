@@ -255,21 +255,7 @@ const userRolesModalSelector = can.Control.extend({
   // HELPERS
 
   find_join: function (optionId) {
-    let self = this
-      ;
-
-    return can.reduce(
-      this.join_list,
-      function (result, join) {
-        if (result) {
-          return result;
-        }
-        if (self.match_join(optionId, join)) {
-          return join;
-        }
-      },
-      null
-    );
+    return _.find(this.join_list, (join) => this.match_join(optionId, join));
   },
 
   match_join: function (optionId, join) {

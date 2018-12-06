@@ -64,19 +64,6 @@
       });
     };
 
-  // Adding reduce, a generally useful array comprehension.
-  //  Bitovi decided against including it in core CanJS, but
-  //  adding it here for easy universal use across can.List
-  //  as well as arrays.
-  if (!can.reduce) {
-    can.reduce = function (ctx, arg1, arg2) {
-      if (_.isNull(ctx)) {
-        return null;
-      }
-      return [].reduce.apply(ctx, arguments.length < 3 ? [arg1] : [arg1, arg2]);
-    };
-  }
-
   // Turn camelCase or snake-case strings into Camel Space strings
   can.spaceCamelCase = function (string) {
     if (!_.isString(string)) {

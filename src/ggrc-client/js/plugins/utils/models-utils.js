@@ -87,8 +87,8 @@ const inferObjectType = (data) => {
   if (!data) {
     return null;
   } else {
-    return can.reduce(Object.keys(data), (a, b) =>
-      a || objectTypeDecisionTree[b] || null, null);
+    let obj = _.find(Object.keys(data), (key) => objectTypeDecisionTree[key]);
+    return objectTypeDecisionTree[obj];
   }
 };
 

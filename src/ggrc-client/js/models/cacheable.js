@@ -58,7 +58,7 @@ function dateConverter(date, oldValue, fn, key) {
 
 function makeDateUnpacker(keys) {
   return function (date, oldValue, fn, attr) {
-    return can.reduce(keys, function (curr, key) {
+    return _.reduce(keys, function (curr, key) {
       return curr || (date[key] && dateConverter(
         date[key], oldValue, fn, attr));
     }, null) || date;
