@@ -195,7 +195,7 @@ describe('Cacheable model', () => {
           return item.id;
         });
         return can.map(dummyInsts, function (inst) {
-          return ~can.inArray(inst.id, ids) ? inst : undefined;
+          return _.includes(ids, inst.id) ? inst : undefined;
         });
       });
       DummyModel.findAll().then(() => {

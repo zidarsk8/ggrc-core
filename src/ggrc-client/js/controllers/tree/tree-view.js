@@ -258,7 +258,7 @@ export default TreeLoader({
       v = new TreeViewOptions();
       v.attr('instance', tmp);
       this.options.each(function (val, k) {
-        if (can.inArray(k, that.constructor.do_not_propagate) === -1) {
+        if (!_.includes(that.constructor.do_not_propagate, k)) {
           v.attr(k, val);
         }
       });
@@ -312,10 +312,7 @@ export default TreeLoader({
     let realAdd = [];
 
     can.each(newVals, function (newVal) {
-      let _newVal = newVal.instance ? newVal.instance : newVal;
-      if (that.oldList && ~can.inArray(_newVal, that.oldList)) {
-        that.oldList.splice(can.inArray(_newVal, that.oldList), 1);
-      } else if (that.element) {
+      if (that.element) {
         realAdd.push(newVal);
       }
     });
