@@ -140,31 +140,14 @@ jQuery(function ($) {
 
   $body.on('click', 'input[name=notifications]', function (ev, el) {
     let li = $(ev.target).closest('.notify-wrap');
-    let inputs = li.find('input');
     let active = [];
-    let emailNow = li.find('input[value="Email_Now"]');
-    let emailNowLabel = emailNow.closest('label');
     let emailDigest = li.find('input[value="Email_Digest"]');
-
+    emailDigest.prop('disabled', true);
     if (emailDigest[0].checked) {
-      emailNowLabel.removeClass('disabled');
-      emailNow.prop('disabled', false);
-    } else if (!emailDigest[0].checked) {// uncheck email_now
-      emailNow.prop('checked', false);
-      emailNowLabel.addClass('disabled');
+      active.push('Email_Digest');
     }
-
-    inputs.prop('disabled', true);
-    active = $.map(inputs, function (input) {
-      if (input.checked) {
-        return input.value;
-      }
-    });
     NotificationConfig.setActive(active).always(function (response) {
       emailDigest.prop('disabled', false);
-      if (emailDigest[0].checked) {
-        emailNow.prop('disabled', false);
-      }
     });
   });
 });
