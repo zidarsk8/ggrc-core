@@ -371,7 +371,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     # check detach comment was sent
     detach_comment_tmpl = params_builder.AssessmentParamsBuilder.DETACH_TMPL
     comment = detach_comment_tmpl.format(new_ticket_id=new_ticket_id)
-    expected_args = (TICKET_ID, {"comment": comment})
+    expected_args = (TICKET_ID, {"status": "OBSOLETE", "comment": comment})
     self.assertEqual(expected_args, update_mock.call_args[0])
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
