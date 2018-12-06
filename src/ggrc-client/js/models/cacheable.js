@@ -773,22 +773,6 @@ export default can.Model('can.Model.Cacheable', {
   autocomplete_label: function () {
     return this.title;
   },
-  get_permalink: function () {
-    let dfd = can.Deferred();
-    let ctor = this.constructor;
-    if (!ctor.permalink_options) {
-      return dfd.resolve(this.viewLink);
-    }
-    let poBaseItems = ctor.permalink_options.base.split(':');
-    $.when(this.refresh_all(...poBaseItems))
-      .then(function (base) {
-        return dfd.resolve(_.template(constructor.permalink_options.url)({
-          base: base,
-          instance: this,
-        }));
-      }.bind(this));
-    return dfd.promise();
-  },
 
   delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
