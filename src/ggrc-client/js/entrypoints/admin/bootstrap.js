@@ -20,11 +20,11 @@ import Person from '../../models/business-models/person';
 import WidgetList from '../../modules/widget_list';
 import ListView from '../../controllers/tree/list_view_controller';
 import TreeView from '../../controllers/tree/tree-view';
+import {DashboardControl} from '../../controllers/dashboard_controller';
 
 const path = GGRC.mustache_path || '/static/mustache';
 const HEADER_VIEW = `${path}/base_objects/page_header.mustache`;
 
-const $area = $('.area').first();
 const sortByNameEmail = (list) => {
   return new list.constructor(can.makeArray(list).sort(function (a, b) {
     a = a.person || a;
@@ -195,7 +195,7 @@ new WidgetList('ggrc_admin', {
   },
 });
 
-$area.cms_controllers_dashboard({
+new DashboardControl('#pageContent', {
   widget_descriptors: WidgetList.get_widget_list_for('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
   header_view: HEADER_VIEW,

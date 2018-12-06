@@ -20,8 +20,8 @@ import routes from './routes';
 import '../../plugins/utils/it-enable/issue-tracker-enable';
 import {gapiClient} from '../../plugins/ggrc-gapi-client';
 import {saveRecentlyViewedObject} from '../../plugins/utils/recently-viewed-utils';
+import {PageObjectControl} from '../../controllers/dashboard_controller';
 
-const $area = $('.area').first();
 const instance = getPageInstance();
 const location = window.location.pathname;
 const isAssessmentsView = isMyAssessments();
@@ -43,7 +43,7 @@ if (!isAssessmentsView && getPageType() !== 'Workflow') {
   initCounts(widgetModels, instance.type, instance.id);
 }
 
-$area.cms_controllers_page_object({
+new PageObjectControl('#pageContent', {
   widget_descriptors: widgetList,
   default_widgets: defaults || [],
   instance: getPageInstance(),

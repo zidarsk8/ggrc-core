@@ -13,8 +13,7 @@ import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 import TreeViewConfig from '../apps/base_widgets';
 
-const Dashboard = can.Control({
-  pluginName: 'cms_controllers_dashboard',
+const DashboardControl = can.Control.extend({
   defaults: {
     widget_descriptors: null,
   },
@@ -210,9 +209,7 @@ const Dashboard = can.Control({
   },
 });
 
-Dashboard({
-  pluginName: 'cms_controllers_page_object',
-}, {
+const PageObjectControl = DashboardControl.extend({}, {
   init: function () {
     this.options.model = this.options.instance.constructor;
     this._super();
@@ -246,3 +243,8 @@ Dashboard({
     this.options.widget_descriptors = this.options.widget_descriptors || {};
   },
 });
+
+export {
+  DashboardControl,
+  PageObjectControl,
+};

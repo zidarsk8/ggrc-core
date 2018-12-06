@@ -224,14 +224,13 @@ can.Control.extend({
   hide_lhn: function () {
     // UI-revamp
     // Here we should hide the button ||| also
-    let $area = $('.area');
     let $lhsHolder = $('.lhs-holder');
     let $bar = $('.bar-v');
     let $lhnTrigger = $('.lhn-trigger');
 
     this.element.hide();
     $lhsHolder.css('width', 0);
-    $area.css('margin-left', 0);
+    $('.page-content').css('margin-left', 0);
     $bar.hide();
     $lhnTrigger.hide();
     $lhnTrigger.addClass('hide');
