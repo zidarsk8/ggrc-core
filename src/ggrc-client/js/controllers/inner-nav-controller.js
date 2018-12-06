@@ -288,27 +288,6 @@ export default can.Control({
     this.update_add_more_link();
     return false; // Prevent the url change back to the widget we are hiding
   },
-
-  // top nav dropdown position
-  '.dropdown-toggle click': function (el, ev) {
-    let $dropdown = el.closest('.hidden-widgets-list').find('.dropdown-menu');
-    let $menuItem = $dropdown.find('.inner-nav-item').find('a');
-    let offset = el.offset();
-    let leftPos = offset.left;
-    let win = $(window);
-    let winWidth = win.width();
-
-    if (winWidth - leftPos < 322) {
-      $dropdown.addClass('right-pos');
-    } else {
-      $dropdown.removeClass('right-pos');
-    }
-    if ($menuItem.length === 1) {
-      $dropdown.addClass('one-item');
-    } else {
-      $dropdown.removeClass('one-item');
-    }
-  },
   '.not-priority-hide click': function (el) {
     this.options.attr('isMenuVisible', !this.options.isMenuVisible);
   },
