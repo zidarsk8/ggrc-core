@@ -145,7 +145,7 @@ function loadScript(url, callback) {
 }
 
 function hasPending(parentInstance, instance, how) {
-  let list = parentInstance._pending_joins;
+  let list = parentInstance._pendingJoins;
   how = how || 'add';
 
   if (!list || !list.length) {

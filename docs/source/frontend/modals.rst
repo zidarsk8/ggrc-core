@@ -81,13 +81,6 @@ Naming conventions in the forms:
 -  if name is name='contact.email' value="{{contact.email}}" - special
    cases for null in data-lookup onkeyup so that it clears the field
 
-'Deferred' modal elements
--------------------------
-
-``mark_for_deletion``/``mark_for_addition`` in ``cacheable.js``
-adds/removes items into ``_pending_joins``. These pending joins are then
-handled in ``deferred-mapper`` component.
-
 .. _mapping-and-global-search:
 
 Mapping and global search modals:
