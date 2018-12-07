@@ -263,14 +263,13 @@ class TestWorkflowsApiPost(TestCase):
          all_models.CycleTaskGroupObjectTask.__name__),
     )
     related_count = len(related_objects) * 2  # *2 is for relationships
-    bd_tasks_count = all_models.BackgroundTask.query.count()
 
     all_acls = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.parent_id_nn != 0
     ).count()
     self.assertEqual(
         all_acls,
-        bd_tasks_count + roles_count * related_count
+        roles_count * related_count
     )
 
   def test_assign_workflow_acl(self):
