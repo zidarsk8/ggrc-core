@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Spinner from 'spin.js';
-
 let $body = $('body');
 let $window = $(window);
 
@@ -19,28 +17,6 @@ $body.on('click', '.lhn-no-init', function () {
     .then(function () {
       $('#lhn').cms_controllers_lhn();
     });
-});
-
-// Initialize delegated event handlers
-jQuery(function ($) {
-  // After the modal template has loaded from the server, but before the
-  //  data has loaded to populate into the body, show a spinner
-  $body.on('loaded', '.modal.modal-slim, .modal.modal-wide', function (e) {
-    let spin = function () {
-      $(this).html(
-        $(new Spinner().spin().el)
-          .css({
-            width: '100px', height: '100px',
-            left: '50%', top: '50%',
-            zIndex: calculate_spinner_z_index,
-          })
-      ).one('loaded', function () {
-        $(this).find('.source').each(spin);
-      });
-    };
-
-    $(e.target).find('.modal-body .source').each(spin);
-  });
 });
 
 // Make all external links open in new window.
