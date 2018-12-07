@@ -4,7 +4,6 @@
 */
 
 import Spinner from 'spin.js';
-import NotificationConfig from './models/service-models/notification-config';
 import Control from './models/business-models/control';
 
 let $body = $('body');
@@ -103,52 +102,6 @@ jQuery(function ($) {
     };
 
     $(e.target).find('.modal-body .source').each(spin);
-  });
-});
-
-jQuery(function ($) {
-  function checkActive(notificationConfigs) {
-    let inputs = $('.notify-wrap').find('input');
-    let activeNotifications = $.map(notificationConfigs, function (a) {
-      if (a.enable_flag) {
-        return a.notif_type;
-      }
-    });
-    $.map(inputs, function (input) {
-      // Handle the default case, in case notification objects are not set:
-      if (notificationConfigs.length === 0) {
-        input.checked = input.value === 'Email_Digest';
-      } else {
-        input.checked = activeNotifications.indexOf(input.value) > -1;
-      }
-    });
-  }
-  function updateNotifications() {
-    NotificationConfig.findActive().then(checkActive);
-    $body.off('click',
-      '.user-dropdown > .dropdown-toggle',
-      updateNotifications
-    );
-  }
-
-  $body.on('click', '.user-dropdown > .dropdown-toggle', updateNotifications);
-
-  // Don't close the dropdown if clicked on checkbox
-  $body.on('click', '.notify-wrap', function (ev) {
-    ev.stopPropagation();
-  });
-
-  $body.on('click', 'input[name=notifications]', function (ev, el) {
-    let li = $(ev.target).closest('.notify-wrap');
-    let active = [];
-    let emailDigest = li.find('input[value="Email_Digest"]');
-    emailDigest.prop('disabled', true);
-    if (emailDigest[0].checked) {
-      active.push('Email_Digest');
-    }
-    NotificationConfig.setActive(active).always(function (response) {
-      emailDigest.prop('disabled', false);
-    });
   });
 });
 
