@@ -34,8 +34,7 @@ export const pinContentHiddenClass = 'pin-content--hidden';
 export const pinContentMaximizedClass = 'pin-content--maximized';
 export const pinContentMinimizedClass = 'pin-content--minimized';
 
-export default can.Control({
-  pluginName: 'cms_controllers_info_pin',
+export default can.Control.extend({
   defaults: {
     view: GGRC.mustache_path + '/base_objects/info.mustache',
   },

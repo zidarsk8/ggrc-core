@@ -1053,7 +1053,7 @@ export default can.Control({
       return false;
     }
     return $trigger.data('updateHash') ||
-      !$trigger.closest('.modal, .cms_controllers_info_pin').length;
+      !$trigger.closest('.modal, .pin-content').length;
   },
 
   update_hash_fragment: function () {
