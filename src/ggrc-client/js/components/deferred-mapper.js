@@ -80,7 +80,7 @@ export default can.Component.extend({
     afterDeferredUpdate(objects) {
       const instance = this.attr('instance');
       const objectTypes = _.uniq(objects
-        .map((object) => object.constructor.shortName)
+        .map((object) => object.type)
       );
 
       objectTypes.forEach((objectType) => {
