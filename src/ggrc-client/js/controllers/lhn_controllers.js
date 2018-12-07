@@ -19,10 +19,7 @@ import Relationship from '../models/service-models/relationship';
 import '../components/recently-viewed/recently-viewed';
 import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 
-can.Control.extend({
-  pluginName: 'cms_controllers_lhn',
-  defaults: {},
-}, {
+const LhnControl = can.Control.extend({}, {
   init: function () {
     this.obs = new can.Map();
 
@@ -157,12 +154,10 @@ can.Control.extend({
     }
     this.obs.attr('my_work', myWorkTab);
 
-    $lhs
-      .cms_controllers_lhn_search({
-        observer: this.obs,
-      })
-      .control('cms_controllers_lhn_search')
-      .display();
+    let searchControl = new LhnSearchControl($lhs, {
+      observer: this.obs,
+    });
+    searchControl.display();
 
     new LhnTooltipsControl($lhs);
 
@@ -354,8 +349,7 @@ can.Control.extend({
   },
 });
 
-can.Control.extend({
-  pluginName: 'cms_controllers_lhn_search',
+const LhnSearchControl = can.Control.extend({
   defaults: {
     list_view: GGRC.mustache_path + '/base_objects/search_result.mustache',
     actions_view: GGRC.mustache_path + '/base_objects/search_actions.mustache',
@@ -392,8 +386,8 @@ can.Control.extend({
     let subLevelElements = this.element.find('.sub-level');
     new InfiniteScrollControl(subLevelElements);
     subLevelElements.on('scroll', _.debounce(function () {
-        setLHNState({category_scroll: this.scrollTop});
-      }, 250));
+      setLHNState({category_scroll: this.scrollTop});
+    }, 250));
 
     let initialTerm = lhnPrefs.search_text || '';
     if (this.options.observer.my_work) {
@@ -970,3 +964,7 @@ can.Control.extend({
     this.run_search(term, param);
   },
 });
+
+export {
+  LhnControl,
+};
