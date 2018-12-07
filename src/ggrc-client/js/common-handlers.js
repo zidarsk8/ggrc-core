@@ -11,14 +11,6 @@ $window.on('load', function () {
   $('html').removeClass('no-js');
 });
 
-$body.on('click', '.lhn-no-init', function () {
-  $(this).removeClass('lhn-no-init');
-  import(/* webpackChunkName: "lhn" */'./controllers/lhn_controllers')
-    .then(function () {
-      $('#lhn').cms_controllers_lhn();
-    });
-});
-
 // Make all external links open in new window.
 jQuery(function ($) {
   $body.on('click', 'a[href]:not([target])', function (e) {
