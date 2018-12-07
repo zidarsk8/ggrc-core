@@ -9,7 +9,8 @@
 </span>
 <div class="inner-list">
   <label>
-    <input type="checkbox" name="notifications" value="Email_Digest">
+    <input type="checkbox" name="notifications" can-value="emailDigest"
+      {{#if isSaving}} disabled="disabled" {{/if}}>
     Daily email digest
   </label>
 </div>
