@@ -123,6 +123,7 @@ let viewModel = can.Map.extend({
       value: GGRC.config.enable_release_notes,
     },
   },
+  menuInitialized: false,
   showHideTitles: function (element) {
     let elWidth = element.width();
     let $menu = element.find('.menu');
@@ -135,6 +136,9 @@ let viewModel = can.Map.extend({
     } else {
       this.attr('showTitles', true);
     }
+  },
+  handleMenuOpening() {
+    this.attr('menuInitialized', true);
   },
 });
 

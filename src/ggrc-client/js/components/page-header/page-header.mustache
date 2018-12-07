@@ -99,7 +99,8 @@
     </a>
   </li>
   <li class="user user-dropdown dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+      ($click)="handleMenuOpening">
       <div class="oneline">
         <i class="fa fa-user"></i>
         <i class="fa fa-caret-down"></i>
@@ -140,8 +141,10 @@
         </li>
       {{/if}}
       <li class="notify-wrap">
-        <notifications-menu-item>
-        </notifications-menu-item>
+        <lazy-render trigger="menuInitialized">
+          <notifications-menu-item>
+          </notifications-menu-item>
+        </lazy-render>
       </li>
       <li>
         <a class="nav-logout" href="/logout" tabindex="-1">
