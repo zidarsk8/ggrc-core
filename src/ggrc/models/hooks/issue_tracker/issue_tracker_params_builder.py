@@ -124,7 +124,7 @@ class BaseIssueTrackerParamsBuilder(object):
 
   def build_params_for_comment(self, sync_obj, comment, author):
     """Build query to Issue tracker for adding comment to issue."""
-    comment = html2text.HTML2Text().handle(comment).strip("\n")
+    comment = html2text.HTML2Text().handle(comment).strip()
     self.params.add_comment(self.COMMENT_TMPL.format(
         author=author,
         comment=comment,

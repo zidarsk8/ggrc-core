@@ -710,7 +710,7 @@ def _get_added_comment_text(src):
       desc, creator_email, creator_name = comment_row
       if not creator_name:
         creator_name = creator_email
-      return html2text.HTML2Text().handle(desc).strip('\n'), creator_name
+      return html2text.HTML2Text().handle(desc).strip(), creator_name
   return None, None
 
 
