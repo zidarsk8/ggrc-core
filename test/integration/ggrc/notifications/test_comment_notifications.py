@@ -89,7 +89,7 @@ class TestCommentNotification(TestCase):
     """
 
     factories.AuditFactory(slug="Audit")
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmt1 = Assessment.query.filter_by(slug="A 1").first()
     self.generator.generate_comment(
@@ -114,7 +114,7 @@ class TestCommentNotification(TestCase):
     """Test that comments are grouped by parent object in daily digest data."""
 
     factories.AuditFactory(slug="Audit")
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmt1 = Assessment.query.filter_by(slug="A 1").first()
     asmt4 = Assessment.query.filter_by(slug="A 4").first()
