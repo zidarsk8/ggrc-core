@@ -7,21 +7,7 @@ import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
 import UserRole from '../models/service-models/user-role';
 
-/* Role Assignment Modal Selector
-  *
-  * parameters:
-  *   Templates:
-  *     base_modal_view:
-  *     option_column_view:
-  *     option_detail_view:
-  *
-  *   Models and Queries:
-  *     option_model: The model being "selected" (the "many")
-  *     join_model: The model representing the join table
-  *
-  *   Customizable text components:
-  *     modal_title:
-  */
+// Role Assignment Modal Selector
 const userRolesModalSelector = can.Control.extend({
   defaults: {
     base_modal_view:
@@ -31,62 +17,41 @@ const userRolesModalSelector = can.Control.extend({
     object_detail_view:
       GGRC.mustache_path + '/people_roles/object_detail.mustache',
 
-    option_model: Role,
-    object_model: Person,
-    join_model: UserRole,
-    join_id_field: 'person_id',
-    option_attr: 'role',
-    join_attr: 'person',
-    selected_id: null,
-    modal_title: 'User Role Assignments',
+    personId: null,
   },
 
-  launch: function ($trigger, options) {
-    // Extract parameters from data attributes
-    let href = $trigger.attr('data-href') || $trigger.attr('href');
-    let modalId =
-      'ajax-modal-' + href.replace(/[/?=&#%]/g, '-').replace(/^-/, '');
+  launch($trigger, options) {
     let $target = $(
-      '<div id="' + modalId + '" class="modal modal-selector hide"></div>'
+      '<div id="ajax-modal-user-roles" class="modal modal-selector hide"></div>'
     );
 
     $target.modal_form({}, $trigger);
-    this.newInstance($target[0], $.extend({$trigger: $trigger}, options));
+    this.newInstance($target[0], options);
     return $target;
   },
 }, {
-  init: function () {
-    this.object_list = new can.List();
-    this.option_list = new can.List();
-    this.join_list = new can.List();
-    this.active_list = new can.List();
+  init() {
+    this.rolesList = new can.List();
+    this.userRolesList = new can.List();
 
-    this.init_context();
-    this.init_bindings();
-    this.init_view();
-    this.init_data();
+    this.initContext();
+    this.initView();
+    this.initData();
   },
 
-  '.option_column li click': 'select_option',
-  '.confirm-buttons a.btn:not(.disabled) click': 'change_option',
+  '.option_column li click': 'selectOption',
+  '.confirm-buttons a.btn click': 'changeOption',
 
-  init_bindings: function () {
-    this.join_list.bind('change', this.proxy('update_active_list'));
-    this.context.bind('selected_object', this.proxy('refresh_join_list'));
-    this.option_list.bind('change', this.proxy('update_option_radios'));
-  },
-
-  init_view: function () {
-    let self = this;
+  initView() {
     let deferred = $.Deferred();
 
     can.view(
       this.options.base_modal_view,
       this.context,
-      function (frag) {
-        $(self.element).html(frag);
+      (frag) => {
+        $(this.element).html(frag);
         deferred.resolve();
-        self.element.trigger('loaded');
+        this.element.trigger('loaded');
       });
 
     this.on(); // Start listening for events
@@ -94,224 +59,144 @@ const userRolesModalSelector = can.Control.extend({
     return deferred;
   },
 
-  init_data: function () {
+  initData() {
     return $.when(
-      this.refresh_object_list(),
-      this.refresh_option_list(),
-      this.refresh_join_list()
+      this.refreshPerson(),
+      this.refreshRoles(),
+      this.refreshUserRole(),
     );
   },
 
-  init_context: function () {
-    if (!this.context) {
-      this.context = new can.Map($.extend({
-        objects: this.object_list,
-        options: this.option_list,
-        joins: this.join_list,
-        actives: this.active_list,
-        selected_object: null,
-        selected_option: null,
-      }, this.options));
-    }
-    return this.context;
+  initContext() {
+    this.context = new can.Map($.extend({
+      rolesList: this.rolesList,
+      selectedPerson: null,
+      selectedOption: null,
+    }, this.options));
   },
 
-  update_active_list: function () {
-    let self = this;
-
-    self.active_list.replace(
-      can.map(self.join_list, function (join) {
-        return new can.Map({
-          join: join,
-        });
-      }));
-  },
-
-  refresh_object_list: function () {
-    let self = this;
-
-    return this.options.object_model.findAll(
-      $.extend({}, this.options.object_query),
-      function (objects) {
-        self.object_list.replace(objects);
-        if (self.object_list.length === 1) {
-          self.context.attr('selected_object', self.object_list[0]);
-        }
+  refreshPerson() {
+    return Person.findOne({id: this.options.personId})
+      .then((person) => {
+        this.context.attr('selectedPerson', person);
       });
   },
 
-  refresh_option_list: function () {
+  refreshRoles() {
     let params = {
       scope__in: 'System,Admin',
     };
 
-    return this.options.option_model.findAll(
+    return Role.findAll(
       params,
       (options) => {
         options = can.makeArray(_.sortBy(options, 'role_order'));
-        let description =
+        const description =
           'This role allows a user access to the MyWork dashboard and ' +
           'applications Help files.';
 
         options.unshift({
           name: 'No role',
           id: 0,
-          description: description,
-          scope: params.scope || 'System',
+          description,
+          scope: 'System',
         });
-        this.option_list.replace(options);
+        this.rolesList.replace(options);
       });
   },
 
-  refresh_join_list: function () {
-    let self = this;
-    let joinObject = this.get_join_object();
-    let joinQuery = {};
-
-    if (joinObject) {
-      joinQuery[this.options.join_id_field] = this.get_join_object_id();
-
-      return this.options.join_model.findAll(
-        $.extend({}, joinQuery),
-        function (joins) {
-          self.join_list.replace(joins);
-          self.update_option_radios();
-        });
-    }
-
-    return $.Deferred().resolve();
+  refreshUserRole() {
+    return UserRole.findAll({person_id: this.options.personId},
+      (userRoles) => {
+        this.userRolesList.replace(userRoles);
+        this.updateSelectedOption();
+      });
   },
 
-  update_option_radios: function () {
-    let allowedIds = can.map(this.context.options, function (join) {
-      return join.id;
-    });
-    if (!allowedIds.length) {
+  updateSelectedOption() {
+    if (!this.userRolesList.length) {
+      this.context.attr('selectedOption', 0);
       return;
     }
-    if (!this.join_list.length) {
-      this.context.attr('selected_id', 0);
-    }
-    this.join_list.forEach(function (join) {
-      let id = join[this.options.option_attr].id;
-      if (allowedIds.indexOf(id) >= 0) {
-        this.context.attr('selected_id', id);
-      }
-    }.bind(this));
+
+    let id = this.userRolesList[0].role.id;
+    this.context.attr('selectedOption', id);
   },
 
-  select_option: function (el) {
-    el.closest('.option_column').find('li').removeClass('selected');
-    el.addClass('selected');
-    this.context.attr('selected_option', el.data('option'));
+  selectOption(el) {
+    this.context.attr('selectedOption', el.data('option'));
   },
 
-  change_option: function (el_, ev) {
-    let self = this;
-    let el = $('.people-selector').find('input[type=radio]:checked');
-    let li = el.closest('li');
-    let clickedOption = li.data('option') || {};
-    let join;
-    let deleteDfds;
-    let alreadyExists = false;
+  changeOption() {
+    let clickedOption = this.context.attr('selectedOption');
+    let deleteDfd = $.Deferred().resolve();
 
     // Look for and remove the existing join.
-    deleteDfds = $.map(li.parent().children(), function (el) {
-      let $el = $(el);
-      let option = $el.closest('li').data('option');
-      let join = self.find_join(option.id);
-
-      if (join && join.role.id === clickedOption.id) {
-        // Don't delete the role we marked to add.
-        alreadyExists = true;
+    let existingUserRole = this.getExistingUserRole();
+    if (existingUserRole) {
+      if (existingUserRole.role.id !== clickedOption.id) {
+        deleteDfd = existingUserRole.refresh()
+          .then(() => {
+            return existingUserRole.destroy();
+          })
+          .then(() => {
+            this.refreshPerson();
+          });
+      } else {
+        // haven't changed
         return;
       }
-      if (join) {
-        return join.refresh().then(function () {
-          return join.destroy();
-        }).then(function () {
-          self.refresh_object_list();
-        });
-      }
-    });
+    }
 
     // Create the new join (skipping "No Role" role, with id == 0)
-    if (clickedOption.id > 0 && !alreadyExists) {
-      $.when(...deleteDfds).then(function () {
-        join = self.get_new_join(
-          clickedOption.id,
-          clickedOption.scope,
-          clickedOption.constructor.shortName
-        );
-        join.save().then(function () {
-          self.join_list.push(join);
-          self.refresh_option_list();
-          self.refresh_object_list();
+    if (clickedOption.id > 0) {
+      deleteDfd
+        .then(() => {
+          let userRole = this.getUserRole(
+            clickedOption.id,
+            clickedOption.scope,
+          );
+          return userRole.save();
+        })
+        .then((userRole) => {
+          this.userRolesList.replace([userRole]);
+          this.refreshPerson();
         });
-      });
     }
   },
 
   // HELPERS
+  getExistingUserRole() {
+    if (!this.userRolesList.length) {
+      return null;
+    }
 
-  find_join: function (optionId) {
-    return _.find(this.join_list, (join) => this.match_join(optionId, join));
+    return this.userRolesList[0];
   },
 
-  match_join: function (optionId, join) {
-    return (
-      join[this.options.option_attr] &&
-      join[this.options.option_attr].id === optionId
-    );
-  },
+  getUserRole(optionId, optionScope) {
+    let joinParams = {
+      role: {
+        id: optionId,
+        type: 'Role',
+      },
+      person: {
+        id: this.getPerson().id,
+        type: 'Person',
+      },
+      context: {id: null},
+    };
 
-  get_new_join: function (optionId, optionScope, optionType) {
-    let joinParams = {};
-    joinParams[this.options.option_attr] = {};
-    joinParams[this.options.option_attr].id = optionId;
-    joinParams[this.options.option_attr].type = optionType;
-    joinParams[this.options.join_attr] = {};
-    joinParams[this.options.join_attr].id = this.get_join_object_id();
-    joinParams[this.options.join_attr].type = this.get_join_object_type();
-
-    $.extend(joinParams, this.options.extra_join_fields);
     if (optionScope === 'Admin') {
       joinParams.context = {id: 0, type: 'Context'};
     }
-    return new (this.options.join_model)(joinParams);
+
+    return new UserRole(joinParams);
   },
 
-  get_join_object: function () {
-    return this.context.attr('selected_object');
-  },
-
-  get_join_object_id: function () {
-    return this.get_join_object().id;
-  },
-
-  get_join_object_type: function () {
-    let joinObject = this.get_join_object();
-    return (joinObject ? joinObject.constructor.shortName : null);
+  getPerson() {
+    return this.context.attr('selectedPerson');
   },
 });
-
-function getOptionSet(name, data) {
-  // Construct options for Authorizations selector
-  let objectQuery = {};
-  if (data.person_id) {
-    objectQuery = {id: data.person_id};
-  }
-
-  return {
-    object_query: objectQuery,
-    extra_join_fields: {
-      context: {id: null},
-    },
-  };
-}
-
-export {
-  getOptionSet,
-};
 
 export default userRolesModalSelector;
