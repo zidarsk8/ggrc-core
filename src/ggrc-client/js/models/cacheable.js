@@ -909,10 +909,10 @@ export default can.Model('can.Model.Cacheable', {
   },
 });
 
-/* TODO: hack on can.Observe should be removed or at least placed outside of Cacheable Model Class */
-let _oldAttr = can.Observe.prototype.attr;
-can.Observe.prototype.attr = function (key, val) {
-  if (key instanceof can.Observe) {
+/* TODO: hack on can.Map should be removed or at least placed outside of Cacheable Model Class */
+let _oldAttr = can.Map.prototype.attr;
+can.Map.prototype.attr = function (key, val) {
+  if (key instanceof can.Map) {
     if (arguments[0] === this) {
       return this;
     }

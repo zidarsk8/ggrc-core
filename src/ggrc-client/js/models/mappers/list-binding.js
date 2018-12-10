@@ -13,7 +13,7 @@ import RefreshQueue from '../refresh_queue';
       this.instance = instance;
       this.loader = loader;
 
-      this.list = new can.Observe.List();
+      this.list = new can.List();
     },
 
     refresh_stubs: function () {

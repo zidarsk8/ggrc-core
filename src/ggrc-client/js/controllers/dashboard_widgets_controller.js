@@ -39,7 +39,7 @@ export default can.Control({
       this.options.object_category = this.options.model.category;
     }
 
-    this.options.widget_count = new can.Observe();
+    this.options.widget_count = new can.Map();
 
     this.element
       .addClass('widget')
