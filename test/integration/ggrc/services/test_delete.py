@@ -27,7 +27,7 @@ class TestDelete(TestCase, WithQueryApi):
     control = factories.ControlFactory()
 
     with mock.patch(
-        "ggrc.models.background_task.create_lightweight_task",
+        "ggrc.models.background_task.create_task",
     ) as create_task:
       result = self.api.delete(control)
       controls = db.session.query(all_models.Control).all()
