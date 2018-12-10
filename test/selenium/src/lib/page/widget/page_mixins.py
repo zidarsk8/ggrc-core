@@ -10,13 +10,15 @@ from lib.element import page_elements
 class WithPageElements(base.WithBrowser):
   """A mixin for page elements"""
 
-  def _related_people_list(self, label):
+  def _related_people_list(self, label, root_elem=None):
     """Return RelatedPeopleList page element with label `label`"""
-    return page_elements.RelatedPeopleList(self._browser, label)
+    return page_elements.RelatedPeopleList(
+        root_elem if root_elem else self._browser, label)
 
-  def _related_urls(self, label):
+  def _related_urls(self, label, root_elem=None):
     """Return RelatedUrls page element with label `label`"""
-    return page_elements.RelatedUrls(self._browser, label)
+    return page_elements.RelatedUrls(
+        root_elem if root_elem else self._browser, label)
 
   def _assessment_evidence_urls(self):
     """Return AssessmentEvidenceUrls page element"""
@@ -26,9 +28,10 @@ class WithPageElements(base.WithBrowser):
     """Return CommentArea page element"""
     return page_elements.CommentArea(self._browser)
 
-  def _simple_field(self, label):
+  def _simple_field(self, label, root_elem=None):
     """Returns SimpleField page element."""
-    return page_elements.SimpleField(self._browser, label)
+    return page_elements.SimpleField(
+        root_elem if root_elem else self._browser, label)
 
   def _info_pane_form_field(self, label):
     """Returns InfoPaneFormField page element."""

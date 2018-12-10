@@ -27,13 +27,16 @@ class ProposalsService(rest_service.HelpRestService):
 
   def get_proposal_creation_date(self, obj, proposal):
     """Get proposal creation date."""
+    proposals = self.get_obj_proposals(obj)
+    prop_value = string_utils.escape_html(
+        proposal.changes[0]["proposed_value"])
     try:
       actual_proposal = next(
-          prop for prop in self.get_obj_proposals(obj)
-          if string_utils.escape_html(proposal.changes[0]["proposed_value"])
-          in prop["content"]["fields"]["description"])
+          prop for prop in proposals
+          if prop_value in prop["content"]["fields"]["description"])
     except StopIteration as exception:
-      print self.get_obj_proposals(obj)
+      print proposals
+      print prop_value
       raise exception
     return parser.parse(actual_proposal["created_at"]).replace(
         tzinfo=tz.tzutc())
