@@ -358,8 +358,8 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
   @ddt.data(
       ("principal_assessor", "Principal Assignees"),
       ("secondary_assessor", "Secondary Assignees"),
-      ("contact", "Primary Contacts"),
-      ("secondary_contact", "Secondary Contacts"),
+      ("contact", "Control Operators"),
+      ("secondary_contact", "Control Owners"),
   )
   @ddt.unpack
   def test_search_no_acl_in_content(self, field, role_name):

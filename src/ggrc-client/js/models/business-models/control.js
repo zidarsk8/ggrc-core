@@ -8,7 +8,6 @@ import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/base-notifications';
 import proposable from '../mixins/proposable';
 import assertionsCategories from '../mixins/assertions-categories';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
@@ -28,7 +27,6 @@ export default Cacheable('CMS.Models.Control', {
     caUpdate,
     timeboxed,
     accessControlList,
-    baseNotifications,
     proposable,
     assertionsCategories,
     relatedAssessmentsLoader,
@@ -49,6 +47,8 @@ export default Cacheable('CMS.Models.Control', {
     description: '',
     url: '',
     status: 'Draft',
+    send_by_default: true,
+    recipients: 'Admin,Control Operators,Control Owners',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/controls/tree-item-attr.mustache',
