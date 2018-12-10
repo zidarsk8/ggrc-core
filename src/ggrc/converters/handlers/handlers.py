@@ -12,8 +12,7 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 
 from ggrc import db
-from ggrc.converters import errors
-from ggrc.converters import get_exportables
+from ggrc.converters import get_exportables, errors
 from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.mixins import ScopeObject
