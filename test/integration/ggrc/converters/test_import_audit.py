@@ -11,6 +11,7 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 from ggrc.converters import errors
 
+
 class TestAuditImport(TestCase):
   """Audit import test class."""
 
@@ -100,33 +101,34 @@ class TestAuditImport(TestCase):
       new_program = factories.ProgramFactory()
 
     self.import_data(OrderedDict([
-            ("object_type", "Audit"),
-            ("Code", audit.slug),
-            ("Title", audit.title),
-            ("State", "In Progress"),
-            ("Audit Captains", "user@example.com"),
-            ("Program", new_program.slug),
-            ("map:control versions", ""),
+        ("object_type", "Audit"),
+        ("Code", audit.slug),
+        ("Title", audit.title),
+        ("State", "In Progress"),
+        ("Audit Captains", "user@example.com"),
+        ("Program", new_program.slug),
+        ("map:control versions", ""),
     ]))
     actual_program_slug = all_models.Audit.query.get(audit.id).program.slug
     self.assertEqual(actual_program_slug, original_program_slug)
 
   def test_show_warning_message_for_import_of_audit_with_changed_program(self):
     """Test whether warning message occurred
-    after attempt of changing program for existing audit by importing it (audit) with changed program field"""
+    after attempt of changing program for existing audit by
+    importing it (audit) with changed program field"""
     with factories.single_commit():
       original_program = factories.ProgramFactory()
       audit = factories.AuditFactory(program=original_program)
       new_program = factories.ProgramFactory()
 
     response = self.import_data(OrderedDict([
-            ("object_type", "Audit"),
-            ("Code", audit.slug),
-            ("Title", audit.title),
-            ("State", "In Progress"),
-            ("Audit Captains", "user@example.com"),
-            ("Program", new_program.slug),
-            ("map:control versions", ""),
+        ("object_type", "Audit"),
+        ("Code", audit.slug),
+        ("Title", audit.title),
+        ("State", "In Progress"),
+        ("Audit Captains", "user@example.com"),
+        ("Program", new_program.slug),
+        ("map:control versions", ""),
     ]))
 
     expected_warnings = {

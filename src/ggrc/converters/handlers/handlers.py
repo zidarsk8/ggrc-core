@@ -698,9 +698,10 @@ class ProgramColumnHandler(ParentColumnHandler):
       super(ProgramColumnHandler, self).set_obj_attr()
     else:
       owned_program_id = self.row_converter.obj.program_id
-      given_program_id =  self.value.id
+      given_program_id = self.value.id
       if owned_program_id != given_program_id:
-        self.add_warning(errors.UNMODIFIABLE_COLUMN, column_name=self.display_name)
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
 
 
 class RequirementDirectiveColumnHandler(MappingColumnHandler):
