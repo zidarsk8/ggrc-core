@@ -38,7 +38,10 @@ import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
-import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals';
+import {
+  bindXHRToButton,
+  BUTTON_VIEW_DONE,
+} from '../../plugins/utils/modals';
 import {
   checkPreconditions,
   becameDeprecated,
@@ -853,32 +856,6 @@ export default can.Control({
       return false;
     }
   },
-
-  // make buttons non-clickable when saving, make it disable afterwards
-  bindXHRToButton_disable: function (xhr, el, newtext, disable) {
-    // binding of an ajax to a click is something we do manually
-    let $el = $(el);
-    let oldtext = $el.text();
-
-    if (newtext) {
-      $el[0].innerHTML = newtext;
-    }
-    $el.addClass('disabled');
-    if (disable !== false) {
-      $el.attr('disabled', true);
-    }
-    xhr.fail(function () {
-      if ($el.length) {
-        $el.removeClass('disabled');
-      }
-    }).always(function () {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      if ($el.length) {
-        $el.removeAttr('disabled')[0].innerHTML = oldtext;
-      }
-    });
-  },
-
   // make element non-clickable when saving
   bindXHRToDisableElement(xhr, el) {
     // binding of an ajax to a click is something we do manually
@@ -925,13 +902,12 @@ export default can.Control({
       ajd.always(() => {
         this.options.attr('isSaving', false);
       });
-
       if (this.options.add_more) {
-        this.bindXHRToButton_disable(ajd, saveCloseBtn);
-        this.bindXHRToButton_disable(ajd, saveAddmoreBtn);
+        bindXHRToButton(ajd, saveCloseBtn);
+        bindXHRToButton(ajd, saveAddmoreBtn, 'Saving, please wait...');
       } else {
-        this.bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
-        this.bindXHRToButton(ajd, saveAddmoreBtn);
+        bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
+        bindXHRToButton(ajd, saveAddmoreBtn);
       }
 
       this.bindXHRToDisableElement(ajd, deleteBtn);

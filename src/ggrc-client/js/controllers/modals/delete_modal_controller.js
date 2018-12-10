@@ -5,6 +5,7 @@
 
 import ModalsController from './modals_controller';
 import pubsub from '../../pub-sub';
+import {bindXHRToButton} from '../../plugins/utils/modals';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default ModalsController({
@@ -22,7 +23,7 @@ export default ModalsController({
     let cancelButton = this.element.find('a.btn[data-dismiss=modal]');
     let modalBackdrop = this.element.data('modal_form').$backdrop;
 
-    this.bindXHRToButton(this.options.instance.refresh()
+    bindXHRToButton(this.options.instance.refresh()
       .then(function (instance) {
         return instance.destroy();
       }).then(function (instance) {

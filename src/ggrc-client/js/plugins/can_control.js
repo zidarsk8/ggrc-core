@@ -16,26 +16,4 @@ export default can.extend(can.Control.prototype, {
       return fn.apply(this, arguments);
     };
   },
-
-  // make buttons non-clickable when saving
-  bindXHRToButton(xhr, el, newtext, disable) {
-    // binding of an ajax to a click is something we do manually
-    let $el = $(el);
-    let oldtext = $el[0] ? $el[0].innerHTML : '';
-
-    if (newtext) {
-      $el[0].innerHTML = newtext;
-    }
-    $el.addClass('disabled');
-    if (disable !== false) {
-      $el.attr('disabled', true);
-    }
-    xhr.always(() => {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      if ($el.length) {
-        $el.removeAttr('disabled')
-          .removeClass('disabled')[0].innerHTML = oldtext;
-      }
-    });
-  },
 });
