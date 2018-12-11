@@ -201,5 +201,12 @@ export default can.Component.extend({
     [`{instance} ${DEFERRED_MAP_OBJECTS.type}`](el, {objects}) {
       this.viewModel.addMappings(objects);
     },
+    removed() {
+      const instance = this.viewModel.attr('instance');
+
+      if (instance) {
+        instance.removeAttr('_pendingJoins');
+      }
+    },
   },
 });
