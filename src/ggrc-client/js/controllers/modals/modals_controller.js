@@ -530,15 +530,7 @@ export default can.Control({
     model = $elem.attr('model');
 
     if (model) {
-      if (item.value instanceof Array) {
-        value = can.map(item.value, function (id) {
-          return getInstance(model, id);
-        });
-      } else if (item.value instanceof Object) {
-        value = getInstance(model, item.value.id);
-      } else {
-        value = getInstance(model, item.value);
-      }
+      value = getInstance(model, item.value);
     } else if ($elem.is('[type=checkbox]')) {
       value = $elem.is(':checked');
     } else {
