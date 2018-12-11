@@ -61,12 +61,14 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY_LOGO_TEXT, "Company")
     self.assertEqual(default.CREATE_ISSUE_URL, "")
     self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "")
+    self.assertEqual(default.CHANGE_REQUEST_URL, "")
 
   @patch.dict(os.environ, {
       "COMPANY": "TestCompany",
       "COMPANY_LOGO_TEXT": "TestCompanyLogo",
       "CREATE_ISSUE_URL": "TestRMCCreateIssueURL",
       "CREATE_ISSUE_BUTTON_NAME": "TestCreateButtonName",
+      "CHANGE_REQUEST_URL": "TestChangeRequestURL",
   })
   def test_loading_vars_from_env(self):
     """Test loading settings variables from environment."""
@@ -75,6 +77,7 @@ class TestSettings(unittest.TestCase):
     self.assertEqual(default.COMPANY_LOGO_TEXT, "TestCompanyLogo")
     self.assertEqual(default.CREATE_ISSUE_URL, "TestRMCCreateIssueURL")
     self.assertEqual(default.CREATE_ISSUE_BUTTON_NAME, "TestCreateButtonName")
+    self.assertEqual(default.CHANGE_REQUEST_URL, "TestChangeRequestURL")
 
 
 @mock.patch("ggrc.utils.flask")

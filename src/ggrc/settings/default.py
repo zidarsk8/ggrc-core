@@ -33,6 +33,7 @@ exports = [
     "CREATE_ISSUE_URL",
     "CREATE_ISSUE_BUTTON_NAME",
     "ASSESSMENT_SHORT_URL_PREFIX",
+    "CHANGE_REQUEST_URL",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -226,6 +227,9 @@ ASSESSMENT_SHORT_URL_PREFIX = os.environ.get(
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
 CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
+
+# Link for change request on my task page
+CHANGE_REQUEST_URL = os.environ.get("CHANGE_REQUEST_URL", "")
 
 # BackgroundTask default settings
 RETRY_OPTIONS = {
