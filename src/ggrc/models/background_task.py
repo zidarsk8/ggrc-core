@@ -301,7 +301,7 @@ def create_bg_operation(operation_type, object_type, object_id):
           object_type=object_type,
           object_id=object_id,
           bg_operation_type=bg_operation_type,
-          modified_by=get_current_user()
+          modified_by=_bg_task_user()
       )
   return bg_operation
 
