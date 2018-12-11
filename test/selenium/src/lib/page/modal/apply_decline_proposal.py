@@ -3,7 +3,8 @@
 """Modal for comparing object versions and apply or decline the proposal."""
 
 from lib import base
-from lib.utils import selenium_utils, date_utils
+from lib.constants import ux
+from lib.utils import date_utils, selenium_utils
 
 
 class CompareApplyDeclineModal(base.Modal):
@@ -44,4 +45,5 @@ class CompareApplyDeclineModal(base.Modal):
     """Click on the button with btn_text."""
     selenium_utils.wait_for_js_to_load(self._driver)
     self.modal.button(text=btn_text).click()
-    self.modal.wait_until_not_present()
+    self.modal.wait_until_not(
+        method=lambda e: e.present, timeout=ux.MAX_USER_WAIT_SECONDS)
