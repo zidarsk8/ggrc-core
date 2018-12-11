@@ -92,13 +92,6 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     context: Stub,
     cycle: Stub,
   },
-  permalink_options: {
-    url: '<%= base.viewLink %>#current' +
-    '/cycle/<%= instance.cycle.id %>' +
-    '/cycle_task_group/<%= instance.cycle_task_group.id %>' +
-    '/cycle_task_group_object_task/<%= instance.id %>',
-    base: 'cycle:workflow',
-  },
   info_pane_options: {
     mapped_objects: {
       mapping: 'info_related_objects',
