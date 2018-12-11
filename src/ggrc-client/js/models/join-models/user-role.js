@@ -3,12 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Join from './join';
 import Role from '../service-models/role';
-import Person from '../business-models/person';
+import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Join('CMS.Models.UserRole', {
+export default Cacheable('CMS.Models.UserRole', {
   root_object: 'user_role',
   root_collection: 'user_roles',
   findAll: 'GET /api/user_roles',
@@ -20,10 +19,6 @@ export default Join('CMS.Models.UserRole', {
     modified_by: Stub,
     person: Stub,
     role: Stub,
-  },
-  join_keys: {
-    person: Person,
-    role: Role,
   },
 }, {
   save: function () {

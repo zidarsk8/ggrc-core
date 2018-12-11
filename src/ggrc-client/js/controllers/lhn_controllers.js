@@ -15,6 +15,7 @@ import {
   setLHNState,
 } from '../plugins/utils/display-prefs-utils';
 import * as businessModels from '../models/business-models';
+import Relationship from '../models/service-models/relationship';
 import '../components/recently-viewed/recently-viewed';
 
 can.Control.extend({
@@ -436,8 +437,8 @@ can.Control.extend({
       let modelNames;
       let modelName;
 
-      if (instance instanceof can.Model.Join) {
-        // Don't refresh LHN counts when joins are created
+      if (instance instanceof Relationship) {
+        // Don't refresh LHN counts when relationships are created
         return;
       }
       if (!lhnCtr.is_lhn_open()) {
