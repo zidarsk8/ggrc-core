@@ -536,6 +536,18 @@ class ImportExportFactory(ModelFactory):
     """Stub to disable parent method"""
 
 
+class BackgroundTaskFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.BackgroundTask
+
+
+class BackgroundOperationFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.BackgroundOperation
+
+
 class MetricFactory(TitledFactory):
 
   class Meta:
