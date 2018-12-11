@@ -2,8 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Provides an HTML cleaner function with sqalchemy compatible API"""
-
-from HTMLParser import HTMLParser
+import HTMLParser
 
 import bleach
 
@@ -28,6 +27,13 @@ for tag in BLEACH_TAGS:
   BLEACH_ATTRS[tag] = ATTRS
 
 
+CLEANER = bleach.sanitizer.Cleaner(
+    tags=BLEACH_TAGS, attributes=BLEACH_ATTRS, strip=True
+)
+
+PARSER = HTMLParser.HTMLParser()
+
+
 def cleaner(dummy, value, *_):
   """Cleans out unsafe HTML tags.
 
@@ -39,20 +45,18 @@ def cleaner(dummy, value, *_):
   Returns:
     Html (string) without unsafe tags.
   """
-  # Some cases don't use the title value and it's nullable, so check for that
   if value is None:
-    return value
-  if not isinstance(value, basestring):
-    # no point in sanitizing non-strings
+    # No point in sanitizing None values
     return value
 
-  parser = HTMLParser()
+  if not isinstance(value, basestring):
+    # No point in sanitizing non-strings
+    return value
+
   value = unicode(value)
   while True:
     lastvalue = value
-    value = parser.unescape(
-        bleach.clean(value, BLEACH_TAGS, BLEACH_ATTRS, strip=True)
-    )
+    value = PARSER.unescape(CLEANER.clean(value))
     if value == lastvalue:
       break
   return value
