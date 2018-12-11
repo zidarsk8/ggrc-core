@@ -10,7 +10,7 @@
   },
 
   "parser": "babel-eslint",
-  
+
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"
@@ -39,7 +39,8 @@
     // Webpack variables
     "DEV_MODE": false,
     "GOOGLE_ANALYTICS_ID": false,
-    "RELEASE_NOTES_DATE": false
+    "RELEASE_NOTES_DATE": false,
+    "BUILD_DATE": false
   },
 
   "rules": {
