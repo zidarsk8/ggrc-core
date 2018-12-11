@@ -1,0 +1,13 @@
+/*
+ * Copyright (C) 2018 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+.calendar-activation {
+  display: flex;
+  margin: 6px 0 0;
+
+  .calendar-activation__checkbox {
+    margin-right: 8px;
+  }
+}

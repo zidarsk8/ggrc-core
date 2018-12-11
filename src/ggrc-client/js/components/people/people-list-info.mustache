@@ -103,6 +103,22 @@
             </p>
           </div>
         </div>
+
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Calendar events</h6>
+              <label class="calendar-activation">
+                <input
+                  class="calendar-activation__checkbox"
+                  type="checkbox"
+                  ($change)="onSendCalendarEventsChange(%element)"
+                  {{#if profile.send_calendar_events}}checked{{/if}}
+                  {{#if isSaving}}disabled{{/if}}
+                >
+                Turn on calendar events
+              </label>
+          </div>
+        </div>
       </div>
       {{#using instance isAttributesDisabled}}
           {{>'/static/mustache/custom_attributes/info.mustache'}}
