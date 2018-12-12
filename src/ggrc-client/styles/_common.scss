@@ -323,8 +323,14 @@ select.input-block-level {
   margin-left:10px;
 }
 
+.form-header,
 .form-label {
-  display: flex; 
+  display: flex;
+  align-items: center;
+}
+
+.form-label__extended {
+  line-height: 28px;
 }
 
 .fa-asterisk {
@@ -337,14 +343,14 @@ select.input-block-level {
   opacity: 0.2;
   color: $black;
   margin-left: 4px;
-  
+
   &:hover {
     opacity: 0.7;
     cursor: pointer;
   }
 }
 
-.hidable-container {
+.form-header-container {
   display: flex;
   justify-content: space-between;
 }

@@ -21,10 +21,6 @@
 
     .editable-people-group__label {
       margin-bottom: 0;
-
-      .fa-asterisk {
-        padding-top: 4px;
-      }
     }
 
     .people-group__title-tooltip {
@@ -37,6 +33,7 @@
       display: flex;
       font-weight: bold;
       margin-bottom: 0px;
+      line-height: 28px;
     }
 
     .people-group__title {

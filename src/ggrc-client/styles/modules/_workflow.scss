@@ -279,9 +279,12 @@
         max-width: none;
 
         .people-group {
+          &__title-content {
+            margin-bottom: 5px;
+          }
+
           &__title {
             line-height: 18px;
-            margin-bottom: 5px;
           }
         }
       }
