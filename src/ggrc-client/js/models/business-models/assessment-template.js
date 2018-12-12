@@ -127,5 +127,9 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
         this.attr('audit', pageInstance);
       }
     }
+
+    if (!this.custom_attribute_definitions) {
+      this.attr('custom_attribute_definitions', new can.List());
+    }
   },
 });
