@@ -145,6 +145,10 @@ class TestIssueIntegration(ggrc.TestCase):
                           "issue_id": TICKET_ID}},
        {"comment": "Changes to this GGRC object will no longer be "
                    "tracked within this bug."}),
+      ({"issue_tracker": {"title": "test_iti_title",
+                          "enabled": True,
+                          "issue_id": TICKET_ID}},
+       {"title": "test_iti_title"}),
   )
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
@@ -601,6 +605,9 @@ class TestDisabledIssueIntegration(ggrc.TestCase):
                          "enabled": False}},
       {"issue_tracker": {"issue_id": TICKET_ID,
                          "issue_severity": "S2",
+                         "enabled": False}},
+      {"issue_tracker": {"issue_id": TICKET_ID,
+                         "title": "title1",
                          "enabled": False}},
   )
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
