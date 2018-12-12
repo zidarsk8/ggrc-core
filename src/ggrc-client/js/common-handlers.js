@@ -199,7 +199,7 @@ $(function () {
     async function (ev) {
       let $this = $(this);
       let options = $this.data('modal-selector-options');
-      let dataSet = can.extend({}, $this.data());
+      let dataSet = Object.assign({}, $this.data());
       let objectParams = $this.attr('data-object-params');
       const {
         getOptionSet,

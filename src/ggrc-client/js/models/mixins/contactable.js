@@ -10,7 +10,7 @@ export default Mixin({
   // NB : Because the attributes object
   //  isn't automatically cloned into subclasses by CanJS (this is an intentional
   //  exception), when subclassing a class that uses this mixin, be sure to pull in the
-  //  parent class's attributes using `can.extend(this.attributes, <parent_class>.attributes);`
+  //  parent class's attributes using `Object.assign(this.attributes, <parent_class>.attributes);`
   //  in the child class's static init function.
   'extend:attributes': {
     contact: Stub,

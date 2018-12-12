@@ -52,7 +52,7 @@ export default can.Construct.extend('can.Model.Mixin', {
                 break;
             }
           } else if (aspect === 'extend') {
-            obj[key] = can.extend(obj[key], fn);
+            obj[key] = Object.assign(obj[key], fn);
           } else {
             obj[key] = fn;
           }

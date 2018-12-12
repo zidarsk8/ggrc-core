@@ -35,7 +35,7 @@ export default Directive('CMS.Models.Contract', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, Directive.attributes);
+    Object.assign(this.attributes, Directive.attributes);
     this._super(...arguments);
   },
 }, {});

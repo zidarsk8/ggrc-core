@@ -1049,7 +1049,7 @@ Mustache.registerHelper('if_helpers', function () {
   let args = arguments;
   let options = arguments[arguments.length - 1];
   let helperResult;
-  let helperOptions = can.extend({}, options, {
+  let helperOptions = Object.assign({}, options, {
     fn: function () {
       helperResult = 'fn';
     },
@@ -1132,7 +1132,7 @@ Mustache.registerHelper('if_helpers', function () {
 
             helperResult = null;
             stmt.helper.fn(...stmt.args.concat([
-              can.extend({}, helperOptions,
+              Object.assign({}, helperOptions,
                 {hash: stmt.hash || helperOptions.hash}),
             ]));
             helperResult = helperResult === stmt.fn_name;

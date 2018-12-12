@@ -20,7 +20,7 @@ export default Cacheable('CMS.Models.CustomAttributable', {
       'category', false);
 
     return can.when(can.map(types, (type, i) => {
-      return new this(can.extend({}, type, {
+      return new this(Object.assign({}, type, {
         id: i,
       }));
     }));

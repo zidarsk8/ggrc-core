@@ -95,7 +95,7 @@ function confirm(options, success, dismiss) {
     .then(() => {
       $target
         .modal({backdrop: 'static'})
-        .ggrc_controllers_modals(can.extend({
+        .ggrc_controllers_modals(Object.assign({
           new_object_form: false,
           button_view: BUTTON_VIEW_CONFIRM_CANCEL,
           modal_confirm: 'Confirm',

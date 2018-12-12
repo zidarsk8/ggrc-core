@@ -463,7 +463,7 @@ export default can.Construct.extend({
           if (!definitions[mixin]) {
             console.warn('Undefined mixin: ' + mixin, definitions);
           } else {
-            can.extend(true, finalDefinition,
+            _.merge(finalDefinition,
               that.reify_mixins(definitions[mixin], definitions));
           }
         } else if (_.isFunction(mixin)) {
@@ -472,7 +472,7 @@ export default can.Construct.extend({
         } else {
           // Otherwise, assume object and extend
           if (finalDefinition._canonical && mixin._canonical) {
-            mixin = can.extend({}, mixin);
+            mixin = Object.assign({}, mixin);
 
             can.each(mixin._canonical, function (types, mapping) {
               if (finalDefinition._canonical[mapping]) {
@@ -487,15 +487,15 @@ export default can.Construct.extend({
                 finalDefinition._canonical[mapping] = types;
               }
             });
-            finalDefinition._canonical = can.extend({}, mixin._canonical,
+            finalDefinition._canonical = Object.assign({}, mixin._canonical,
               finalDefinition._canonical);
             delete mixin._canonical;
           }
-          can.extend(finalDefinition, mixin);
+          Object.assign(finalDefinition, mixin);
         }
       });
     }
-    can.extend(true, finalDefinition, definition);
+    _.merge(finalDefinition, definition);
     delete finalDefinition._mixins;
     return finalDefinition;
   },
