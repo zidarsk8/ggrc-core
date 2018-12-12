@@ -12,8 +12,8 @@
 export default can.Component.extend({
   tag: 'assessment-template-attributes',
   viewModel: {
-    fields: new can.List(),
-    types: new can.List([{
+    fields: [],
+    types: [{
       type: 'Text',
       name: 'Text',
       text: 'Enter description',
@@ -37,7 +37,7 @@ export default can.Component.extend({
       type: 'Map:Person',
       name: 'Person',
       text: '',
-    }]),
+    }],
 
     /**
      * A handler for when a user removes a Custom Attribute Definition.
@@ -45,18 +45,18 @@ export default can.Component.extend({
      * It removes the corresponding CA definition object from the list to
      * keep it in sync with the definitions listed in DOM.
      *
-     * @param {CustomAttributeDefinition} instance -
+     * @param {CustomAttributeDefinition} field -
      *   the definition that was removed
      * @param {jQuery.Element} $el - the source of the event `ev`
      * @param {jQuery.Event} ev - the onRemove event object
      */
-    fieldRemoved: function (instance, $el, ev) {
-      let idx = _.findIndex(this.fields, {title: instance.title});
+    fieldRemoved: function (field) {
+      let idx = _.findIndex(this.fields, {title: field.title});
       if (idx >= 0) {
         this.fields.splice(idx, 1);
       } else {
         console.warn('The list of CAD doesn\'t contain item with "' +
-          instance.title + '" title');
+          field.title + '" title');
       }
     },
   },

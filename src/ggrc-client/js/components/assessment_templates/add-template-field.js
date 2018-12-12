@@ -8,81 +8,78 @@ import template from './templates/add-template-field.mustache';
 export default can.Component.extend({
   tag: 'add-template-field',
   template,
-  viewModel(attrs, parentScope) {
-    return new can.Map({
-      selected: new can.Map(),
-      fields: parentScope.attr('fields'),
-      types: parentScope.attr('types'),
-      // the field types that require a list of possible values to be defined
-      valueAttrs: ['Dropdown'],
-      /*
-       * Create a new field.
-       *
-       * Field must contain value title, type, values.
-       * Opts are populated, once we start changing checkbox values
-       *
-       * @param {can.Map} viewModel - the current (add-template-field) viewModel
-       * @param {jQuery.Object} el - the clicked DOM element
-       * @param {Object} ev - the event object
-       */
-      addField(viewModel, el, ev) {
-        let fields = viewModel.attr('fields');
-        let selected = viewModel.attr('selected');
-        let title = _.trim(selected.title);
-        let type = _.trim(selected.type);
-        let values = _.splitTrim(selected.values, {
-          unique: true,
-        }).join(',');
-        ev.preventDefault();
-        viewModel.attr('selected.invalidValues', false);
-        viewModel.attr('selected.invalidTitleError', '');
+  viewModel: {
+    selected: [],
+    fields: [],
+    types: [],
+    // the field types that require a list of possible values to be defined
+    valueAttrs: ['Dropdown'],
+    /*
+     * Create a new field.
+     *
+     * Field must contain value title, type, values.
+     * Opts are populated, once we start changing checkbox values
+     *
+     * @param {can.Map} viewModel - the current (add-template-field) viewModel
+     * @param {jQuery.Object} el - the clicked DOM element
+     * @param {Object} ev - the event object
+     */
+    addField() {
+      let fields = this.attr('fields');
+      let selected = this.attr('selected');
+      let title = _.trim(selected.title);
+      let type = _.trim(selected.type);
+      let values = _.splitTrim(selected.values, {
+        unique: true,
+      }).join(',');
+      this.attr('selected.invalidValues', false);
+      this.attr('selected.invalidTitleError', '');
 
-        let validators = this.getValidators(title, fields);
-        this.validateTitle(validators);
-        this.validateValues(viewModel, type, values);
+      let validators = this.getValidators(title, fields);
+      this.validateTitle(validators);
+      this.validateValues(type, values);
 
-        if (
-          viewModel.attr('selected.invalidValues') ||
-          viewModel.attr('selected.invalidTitleError')
-        ) {
-          return;
+      if (
+        this.attr('selected.invalidValues') ||
+        this.attr('selected.invalidTitleError')
+      ) {
+        return;
+      }
+
+      fields.push({
+        id: this.attr('id'),
+        title: title,
+        attribute_type: type,
+        multi_choice_options: values,
+      });
+      _.forEach(['title', 'values', 'multi_choice_options'],
+        (type) => {
+          selected.attr(type, '');
+        });
+    },
+    validateValues(type, values) {
+      let invalidValues = _.includes(this.valueAttrs, type) && !values;
+      this.attr('selected.invalidValues', invalidValues);
+    },
+    validateTitle(validators) {
+      const errorMessage = validators.reduce((prev, next) => {
+        if (prev) {
+          return prev;
         }
 
-        fields.push({
-          id: viewModel.attr('id'),
-          title: title,
-          attribute_type: type,
-          multi_choice_options: values,
-        });
-        _.forEach(['title', 'values', 'multi_choice_options'],
-          (type) => {
-            selected.attr(type, '');
-          });
-      },
-      validateValues(viewModel, type, values) {
-        let invalidValues = _.includes(viewModel.valueAttrs, type) && !values;
-        viewModel.attr('selected.invalidValues', invalidValues);
-      },
-      validateTitle(validators) {
-        const errorMessage = validators.reduce((prev, next) => {
-          if (prev) {
-            return prev;
-          }
+        return next();
+      }, '');
 
-          return next();
-        }, '');
-
-        this.attr('selected.invalidTitleError', errorMessage);
-      },
-      getValidators(title, fields) {
-        return [
-          isEmptyTitle.bind(null, title),
-          isDublicateTitle.bind(null, fields, title),
-          isReservedByCustomAttr.bind(null, title),
-          isReservedByModelAttr.bind(null, title),
-        ];
-      },
-    });
+      this.attr('selected.invalidTitleError', errorMessage);
+    },
+    getValidators(title, fields) {
+      return [
+        isEmptyTitle.bind(null, title),
+        isDublicateTitle.bind(null, fields, title),
+        isReservedByCustomAttr.bind(null, title),
+        isReservedByModelAttr.bind(null, title),
+      ];
+    },
   },
   events: {
     /*
