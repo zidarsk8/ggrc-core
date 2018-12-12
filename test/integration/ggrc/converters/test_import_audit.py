@@ -6,10 +6,10 @@
 from collections import OrderedDict
 
 from ggrc.models import all_models
+from ggrc.converters import errors
 
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
-from ggrc.converters import errors
 
 
 class TestAuditImport(TestCase):
