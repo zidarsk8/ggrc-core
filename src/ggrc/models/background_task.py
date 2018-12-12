@@ -6,6 +6,7 @@
 import json
 import traceback
 import uuid
+from email.utils import parseaddr
 from logging import getLogger
 from functools import wraps
 
@@ -198,10 +199,23 @@ def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
       bg_operation=bg_operation,
       parameters=parameters,
       payload=payload,
-      modified_by=get_current_user(),
+      modified_by=_bg_task_user(),
   )
   db.session.add(bg_task)
   return bg_task
+
+
+def _bg_task_user():
+  """Returns user for background task creation
+  In case of log in request of new user without assigning Creator role
+  get_current_user() returns Anonymous and function change it to Migrator"""
+  current_user = get_current_user()
+  if not current_user or (hasattr(current_user, "is_anonymous") and
+                          current_user.is_anonymous()):
+    from ggrc.models import Person
+    _, email = parseaddr(settings.MIGRATOR)
+    return Person.query.filter_by(email=email).first()
+  return current_user
 
 
 # pylint: disable=too-many-arguments
@@ -259,7 +273,7 @@ def create_bg_operation(operation_type, object_type, object_id):
           object_type=object_type,
           object_id=object_id,
           bg_operation_type=bg_operation_type,
-          modified_by=get_current_user()
+          modified_by=_bg_task_user()
       )
   return bg_operation
 
