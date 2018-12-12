@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../assessment_templates/assessment_templates';
+import '../assessment-templates/assessment-templates-dropdown/assessment-templates-dropdown';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-mapping-container';

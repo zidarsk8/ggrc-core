@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../assessment-template-attributes';
+import Component from './assessment-template-attributes';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('assessment-template-attributes component', function () {

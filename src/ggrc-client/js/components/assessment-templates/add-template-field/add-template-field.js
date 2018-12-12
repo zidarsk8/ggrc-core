@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/add-template-field.mustache';
+import template from './add-template-field.mustache';
 
 export default can.Component.extend({
   tag: 'add-template-field',

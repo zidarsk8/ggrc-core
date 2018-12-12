@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component, * as Validations from '../add-template-field';
+import Component, * as Validations from './add-template-field';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('add-template-field component', () => {
