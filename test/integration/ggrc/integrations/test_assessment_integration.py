@@ -23,7 +23,7 @@ from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
 from ggrc.integrations.synchronization_jobs import sync_utils
-from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES
+from ggrc.integrations import constants
 from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
     ASSESSMENT_STATUSES_MAPPING
 from ggrc.integrations import synchronization_jobs
@@ -226,7 +226,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           issue_tracked_obj=audit,
           component_id=213,
           hotlist_id=333,
-          issue_type="BUG",
+          issue_type=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
           issue_priority="S0",
           issue_severity="P0",
       )
@@ -259,7 +259,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           issue_tracked_obj=audit,
           component_id=213,
           hotlist_id=333,
-          issue_type="BUG",
+          issue_type=constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
           issue_priority="P0",
           issue_severity="S0",
       )
@@ -282,7 +282,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         'title': assmt.title,
         'hotlist_ids': [333, ],
         'priority': u'P0',
-        'type': u'BUG',
+        'type': constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
     }
     self.assertEqual(expected_info, with_info)
     self.assertEqual(without_info, with_info)
@@ -305,7 +305,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                        "issue_priority", "issue_severity"]
     for field in fields_to_check:
       self.assertEqual(assmt_issue_tracker_info[field],
-                       DEFAULT_ISSUETRACKER_VALUES[field])
+                       constants.DEFAULT_ISSUETRACKER_VALUES[field])
 
   def test_fill_missing_values_from_assmt(self):
     """Check prepare_json_method get missed values from default values."""
@@ -581,7 +581,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           iti_issue_id[0], {
               'status': 'ASSIGNED',
               'priority': u'P4',
-              'type': None,
+              'type': constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
               'severity': u'S3',
               'ccs': [],
               'component_id': 11111

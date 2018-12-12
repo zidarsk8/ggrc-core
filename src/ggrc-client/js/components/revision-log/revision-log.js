@@ -737,7 +737,8 @@ export default can.Component.extend({
         _.map(perPersonMappings, function (revisions, pid) {
           let history = _.map(revisions, function (rev) {
             // Add extra check to fix possible issue with inconsistent data
-            if (rev.action === 'deleted' || !rev.content.attrs.AssigneeType) {
+            if (rev.action === 'deleted' || !rev.content.attrs ||
+                !rev.content.attrs.AssigneeType) {
               return {
                 updated_at: rev.updated_at,
                 role: 'none',

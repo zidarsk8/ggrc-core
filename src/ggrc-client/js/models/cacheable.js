@@ -11,7 +11,7 @@ import {
   setAttrs,
 } from '../plugins/utils/snapshot-utils';
 import resolveConflict from './conflict-resolution/conflict-resolution';
-import PersistentNotifier from '../plugins/persistent_notifier';
+import PersistentNotifier from '../plugins/persistent-notifier';
 import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
@@ -575,9 +575,7 @@ export default can.Model('can.Model.Cacheable', {
       cache[this[idKey]] = this;
     }
     this.attr('class', this.constructor);
-    this.notifier = new PersistentNotifier({
-      name: this.constructor.model_singular,
-    });
+    this.notifier = new PersistentNotifier();
 
     if (!this._pending_joins) {
       this.attr('_pending_joins', []);
@@ -849,67 +847,56 @@ export default can.Model('can.Model.Cacheable', {
   delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
   },
-  _save: function () {
-    let that = this;
-    let _super = Array.prototype.pop.call(arguments);
+  _save: function (saveCallback) {
     let isNew = this.isNew();
-    let xhr;
-    let dfd = this._dfd;
-    let preSaveNotifier =
-      new PersistentNotifier({name:
-      this.constructor.model_singular + ' (pre-save)'});
+    let saveDfd = this._dfd;
 
-    that.dispatch('modelBeforeSave');
+    this.dispatch('modelBeforeSave');
 
-    if (this.before_save) {
-      this.before_save(preSaveNotifier);
-    }
     if (isNew) {
       this.attr('provisional_id', 'provisional_' + Date.now());
       can.getObject('provisional_cache',
         can.Model.Cacheable, true)[this.provisional_id] = this;
       if (this.before_create) {
-        this.before_create(preSaveNotifier);
+        this.before_create();
       }
     }
 
-    preSaveNotifier.on_empty(function () {
-      xhr = _super.apply(that, arguments)
-        .then(function (result) {
-          if (isNew) {
-            that.after_create && that.after_create();
-          } else {
-            that.after_update && that.after_update();
-          }
-          that.after_save && that.after_save();
-          return result;
-        }, function (xhr, status, message) {
-          that.save_error && that.save_error(xhr.responseText);
-          return new can.Deferred().reject(xhr, status, message);
-        })
-        .fail(function (response) {
-          that.notifier.on_empty(function () {
-            dfd.reject(that, response);
-          });
-        })
-        .done(function () {
-          that.notifier.on_empty(function () {
-            dfd.resolve(that);
-          });
-        })
-        .always(function () {
-          that.dispatch('modelAfterSave');
+    let saveXHR = saveCallback.call(this)
+      .then((result) => {
+        if (!isNew) {
+          this.after_update && this.after_update();
+        }
+        this.after_save && this.after_save();
+        return result;
+      }, (xhr, status, message) => {
+        this.save_error && this.save_error(xhr.responseText);
+        return new can.Deferred().reject(xhr, status, message);
+      })
+      .fail((response) => {
+        this.notifier.onEmpty(() => {
+          saveDfd.reject(this, response);
         });
+      })
+      .done(() => {
+        this.notifier.onEmpty(() => {
+          saveDfd.resolve(this);
+        });
+      })
+      .always(() => {
+        this.dispatch('modelAfterSave');
+      });
 
-      delayLeavingPageUntil(xhr);
-      delayLeavingPageUntil(dfd);
-    });
-    return dfd;
+    delayLeavingPageUntil(saveXHR);
+
+    return saveDfd;
   },
   save: function () {
-    Array.prototype.push.call(arguments, this._super);
     this._dfd = new can.Deferred();
-    GGRC.SaveQueue.enqueue(this, arguments);
+    delayLeavingPageUntil(this._dfd);
+
+    GGRC.SaveQueue.enqueue(this, this._super);
+
     return this._dfd;
   },
   refresh_all: function () {

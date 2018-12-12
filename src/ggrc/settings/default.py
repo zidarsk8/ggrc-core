@@ -16,7 +16,6 @@ SQLALCHEMY_POOL_RECYCLE = 120
 
 # Settings in app.py
 AUTOBUILD_ASSETS = False
-ENABLE_JASMINE = False
 DEBUG_ASSETS = False
 FULLTEXT_INDEXER = None
 USER_PERMISSIONS_PROVIDER = \
@@ -55,7 +54,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.33.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.34.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(

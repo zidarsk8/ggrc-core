@@ -7,6 +7,7 @@ from ggrc import builder
 from ggrc import db
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
+from ggrc.models.mixins.filterable import Filterable
 from ggrc.models import reflection
 from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
@@ -15,7 +16,7 @@ from ggrc.utils import referenced_objects
 from ggrc.utils.revisions_diff import meta_info
 
 
-class Revision(base.ContextRBAC, Base, db.Model):
+class Revision(Filterable, base.ContextRBAC, Base, db.Model):
   """Revision object holds a JSON snapshot of the object at a time."""
 
   __tablename__ = 'revisions'
@@ -60,6 +61,16 @@ class Revision(base.ContextRBAC, Base, db.Model):
       reflection.Attribute('diff_with_current', create=False, update=False),
       reflection.Attribute('meta', create=False, update=False),
   )
+
+  _filterable_attrs = [
+      'action',
+      'resource_id',
+      'resource_type',
+      'source_type',
+      'source_id',
+      'destination_type',
+      'destination_id',
+  ]
 
   @classmethod
   def eager_query(cls):

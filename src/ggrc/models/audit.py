@@ -8,6 +8,7 @@ from werkzeug.exceptions import Forbidden
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.builder import simple_property
 from ggrc.login import get_current_user
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
@@ -23,7 +24,8 @@ from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
-from ggrc.models.relationship import Relatable
+from ggrc.models.evidence import Evidence
+from ggrc.models.relationship import Relatable, Relationship
 from ggrc.models.snapshot import Snapshotable
 
 
@@ -216,6 +218,81 @@ class Audit(Snapshotable,
     return query.options(
         orm.joinedload('program'),
         orm.subqueryload('object_people').joinedload('person'),
+    )
+
+  def get_evidences_from_assessments(self, objects=False):
+    """Return all related evidences from assessments.
+      audit <--> assessment -> evidence
+
+    :param objects: bool. optional argument.
+          If True object Evidence ORM objects return
+    :return: sqlalchemy.Query or sqlalchemy.orm.query.Query objects
+    """
+    from ggrc.models.assessment import Assessment
+    evid_as_dest = db.session.query(
+        Relationship.destination_id.label("id"),
+    ).join(
+        Assessment,
+        Assessment.id == Relationship.source_id,
+    ).filter(
+        Relationship.destination_type == Evidence.__name__,
+        Relationship.source_type == Assessment.__name__,
+        Assessment.audit_id == self.id,
+    )
+    evid_as_source = db.session.query(
+        Relationship.source_id.label("id"),
+    ).join(
+        Assessment,
+        Assessment.id == Relationship.destination_id,
+    ).filter(
+        Relationship.source_type == Evidence.__name__,
+        Relationship.destination_type == Assessment.__name__,
+        Assessment.audit_id == self.id,
+    )
+    evidence_assessment = evid_as_dest.union(evid_as_source)
+    if objects:
+      return db.session.query(Evidence).filter(
+          Evidence.id.in_(evidence_assessment),
+      )
+    return evidence_assessment
+
+  def get_evidences_from_audit(self, objects=False):
+    """Return all related evidence. In relation audit <--> evidence
+
+    :param objects: bool. optional argument.
+          If True object Evidence ORM objects return
+    :return: sqlalchemy.Query or sqlalchemy.orm.query.Query objects
+    """
+
+    evid_a_source = db.session.query(
+        Relationship.source_id.label("id"),
+    ).filter(
+        Relationship.source_type == Evidence.__name__,
+        Relationship.destination_type == Audit.__name__,
+        Relationship.destination_id == self.id,
+    )
+    evid_a_dest = db.session.query(
+        Relationship.destination_id.label("id"),
+    ).filter(
+        Relationship.destination_type == Evidence.__name__,
+        Relationship.source_type == Audit.__name__,
+        Relationship.source_id == self.id,
+    )
+    evidence_audit = evid_a_dest.union(evid_a_source)
+    if objects:
+      return db.session.query(Evidence).filter(
+          Evidence.id.in_(evidence_audit),
+      )
+    return evidence_audit
+
+  @simple_property
+  def all_related_evidences(self):
+    """Return all related evidences of audit"""
+    evidence_assessment = self.get_evidences_from_assessments()
+    evidence_audit = self.get_evidences_from_audit()
+    evidence_ids = evidence_assessment.union(evidence_audit)
+    return db.session.query(Evidence).filter(
+        Evidence.id.in_(evidence_ids)
     )
 
 

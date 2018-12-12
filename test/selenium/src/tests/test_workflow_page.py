@@ -4,6 +4,7 @@
 # pylint: disable=no-self-use
 # pylint: disable=unused-argument
 # pylint: disable=redefined-outer-name
+# pylint: disable=invalid-name
 import datetime
 
 import pytest
@@ -193,7 +194,9 @@ class TestActivateWorkflow(base.Test):
         app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
-  def test_activate_repeat_on_workflow(self, app_repeat_on_workflow, selenium):
+  def test_destructive_activate_repeat_on_workflow(
+      self, app_repeat_on_workflow, selenium
+  ):
     """Test activation of repeat on workflow.
     It should be checked separately as different requests are sent when
     repeat off and repeat on workflows are activated.

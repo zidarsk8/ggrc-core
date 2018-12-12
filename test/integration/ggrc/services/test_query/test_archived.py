@@ -16,6 +16,7 @@ from integration.ggrc.query_helper import WithQueryApi
 @ddt.ddt
 class TestArchived(WithQueryApi, TestCase):
   """Tests for filtering by Archived field."""
+  # pylint: disable=invalid-name
   def setUp(self):
     super(TestArchived, self).setUp()
     self.client.get("/login")
@@ -69,3 +70,65 @@ class TestArchived(WithQueryApi, TestCase):
         field="ids"
     )
     self.assertItemsEqual(ids, expected_ids)
+
+  def _archive_audit_and_check_evidence(self, audit, evidence_ids):
+    """Helper function archive audit and check evidences is archived"""
+    response = self.api.put(audit, {"archived": True})
+    self.assert200(response)
+    ids = self.simple_query(
+        "Evidence",
+        expression=["archived", "=", "true"],
+        type_="ids",
+        field="ids"
+    )
+    self.assertItemsEqual(ids, evidence_ids)
+
+  def test_archived_evidence_forward(self):
+    """Test evidence archived with audit in audit -> assessment"""
+    expected_evidence_ids = []
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=audit,
+                                    destination=assessment)
+      factories.RelationshipFactory(source=evidence,
+                                    destination=assessment)
+      expected_evidence_ids.append(evidence.id)
+    self._archive_audit_and_check_evidence(audit, expected_evidence_ids)
+
+  def test_archived_evidence_backward(self):
+    """Test evidence archived with audit in assessment -> audit"""
+    expected_evidence_ids = []
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=assessment,
+                                    destination=audit)
+      factories.RelationshipFactory(source=assessment,
+                                    destination=evidence)
+      expected_evidence_ids.append(evidence.id)
+    self._archive_audit_and_check_evidence(audit, expected_evidence_ids)
+
+  def test_archived_evidence_from_audit_forward(self):
+    """Test evidence archived with audit in audit -> evidence"""
+    expected_evidence_ids = []
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=audit,
+                                    destination=evidence)
+      expected_evidence_ids.append(evidence.id)
+    self._archive_audit_and_check_evidence(audit, expected_evidence_ids)
+
+  def test_archived_evidence_from_audit_backward(self):
+    """Test evidence archived with audit in evidence -> audit"""
+    expected_evidence_ids = []
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=evidence,
+                                    destination=audit)
+      expected_evidence_ids.append(evidence.id)
+    self._archive_audit_and_check_evidence(audit, expected_evidence_ids)
