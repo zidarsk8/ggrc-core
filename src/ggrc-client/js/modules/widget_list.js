@@ -120,16 +120,4 @@ export default can.Construct.extend({
       this[pageType][id] = descriptor;
     }
   },
-  suppress_widget: function (pageType, id) {
-    this[pageType] = this[pageType] || {};
-    if (this[pageType][id]) {
-      can.extend(true, this[pageType][id], {
-        suppressed: true,
-      });
-    } else {
-      this[pageType][id] = {
-        suppressed: true,
-      };
-    }
-  },
 });
