@@ -36,6 +36,64 @@ class TestTaskGroupImport(WorkflowTestCase):
       factories.PersonFactory(email="valid_user@example.com")
 
   @ddt.data(
+      ("valid_user@example.com\nuser1@example.com",
+       [errors.MULTIPLE_ASSIGNEES.format(line=3, column_name="Assignee")]),
+      ("valid_user@example.com", []),
+  )
+  @ddt.unpack
+  def test_import_assignee(self, assignee, expected_warnings):
+    """Tests Assignee imported and set correctly for Task Group."""
+    data = collections.OrderedDict([
+        ("object_type", "TaskGroup"),
+        ("code", self.TG_SLUG),
+        ("workflow", self.WF_SLUG),
+        ("Assignee", assignee)
+    ])
+
+    response = self.import_data(data)
+
+    expected_messages = {
+        "Task Group": {
+            "row_warnings": set(expected_warnings),
+        },
+    }
+    self._check_csv_response(response, expected_messages)
+    task_group = all_models.TaskGroup.query.one()
+    self.assertEqual(task_group.contact.email, "valid_user@example.com")
+
+  @ddt.data(
+      ("user1@example.com", [],
+       [errors.NO_VALID_USERS_ERROR.format(line=3, column_name="Assignee")]),
+      ("user2@example.com\nuser1@example.com",
+       [errors.MULTIPLE_ASSIGNEES.format(line=3, column_name="Assignee")],
+       [errors.NO_VALID_USERS_ERROR.format(line=3, column_name="Assignee")]),
+      ("", [], [errors.MISSING_VALUE_ERROR.format(line=3,
+                                                  column_name="Assignee")]),
+  )
+  @ddt.unpack
+  def test_import_invalid_assignee(self,
+                                   assignee,
+                                   expected_warnings,
+                                   expected_errors):
+    """Tests Assignee import failed for Task Group."""
+    data = collections.OrderedDict([
+        ("object_type", "TaskGroup"),
+        ("code", self.TG_SLUG),
+        ("workflow", self.WF_SLUG),
+        ("Assignee", assignee)
+    ])
+    response = self.import_data(data)
+    expected_messages = {
+        "Task Group": {
+            "row_warnings": set(expected_warnings),
+            "row_errors": set(expected_errors),
+        },
+    }
+    self._check_csv_response(response, expected_messages)
+    task_group = all_models.TaskGroup.query.one()
+    self.assertFalse(task_group.contact)
+
+  @ddt.data(
       (all_models.OrgGroup.__name__, True),
       (all_models.Vendor.__name__, True),
       (all_models.AccessGroup.__name__, True),
