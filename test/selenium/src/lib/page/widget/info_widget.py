@@ -398,7 +398,8 @@ class Workflow(InfoWidget):
         "code": self.code(),
         "created_at": self.created_at(),
         "modified_by": self.modified_by(),
-        "updated_at": self.updated_at()
+        "updated_at": self.updated_at(),
+        "repeat_workflow": self.repeat_workflow
     }
 
   @property
@@ -415,6 +416,11 @@ class Workflow(InfoWidget):
   def workflow_members(self):
     """Returns Workflow Members page element."""
     return self._related_people_list("Workflow Member")
+
+  @property
+  def repeat_workflow(self):
+    """Returns repeat workflow."""
+    return self._simple_field("Repeat Workflow", self._root).text
 
 
 class CycleTask(InfoWidget):

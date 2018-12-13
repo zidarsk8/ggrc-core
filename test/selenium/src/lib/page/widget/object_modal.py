@@ -9,6 +9,7 @@ from lib import base
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.modal import unified_mapper, delete_object
+from lib.page.modal.repeat_workflow_modal import RepeatWorkflowModal
 from lib.utils import ui_utils
 
 
@@ -35,7 +36,8 @@ _FIELD_METHOD_MAPPING = {
     "assignees": "set_assignees",  # task
     "start_date": "set_start_date",  # task
     "due_date": "set_due_date",  # task
-    "risk_type": "set_risk_type"
+    "risk_type": "set_risk_type",
+    "repeat_unit": "set_repeat_workflow"
 }
 
 
@@ -168,7 +170,7 @@ class WorkflowModal(BaseObjectModal):
 
   def __init__(self):
     super(WorkflowModal, self).__init__()
-    self._fields = ["title", "task_groups"]
+    self._fields = ["title", "task_groups", "repeat_unit"]
 
   def set_first_task_group_title(self, task_groups):
     """Sets First task group's title field."""
@@ -177,6 +179,16 @@ class WorkflowModal(BaseObjectModal):
     text_field = label_el.following_sibling(
         class_name="input-block-level").to_subtype()
     text_field.set(task_groups[0].title)
+
+  def set_repeat_workflow(self, repeat_unit=None):
+    """Set repeat workflow."""
+    if repeat_unit:
+      self._root.element(tag_name="repeat-on-button").element(
+          tag_name="a").to_subtype().click()
+      repeat_modal = RepeatWorkflowModal()
+      repeat_modal.set_repeat_checkbox()
+      repeat_modal.set_repeats_select(repeat_unit)
+      repeat_modal.click_save_and_close_btn()
 
 
 class TaskGroupTaskModal(BaseObjectModal):
