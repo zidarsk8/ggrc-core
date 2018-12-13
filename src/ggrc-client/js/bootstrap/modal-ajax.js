@@ -398,7 +398,7 @@ $.fn.modal.Constructor.prototype.show = function () {
 
   if (!(shownevents = $._data($el[0], 'events').shown) ||
     $(shownevents).filter(function () {
-      return $.inArray('arrange', this.namespace.split('.')) > -1;
+      return this.namespace.split('.').includes('arrange');
     }).length < 1) {
     $el.on('shown.arrange, loaded.arrange', function (ev) {
       if (ev.target === ev.currentTarget) {

@@ -33,7 +33,7 @@ RiskAssessmentsExtension.init_widgets = function () {
     treeWidgets[type] = treeWidgets[type].concat(['RiskAssessment']);
   });
   if (pageInstance
-    && ~can.inArray(pageInstance.constructor.shortName, allowedObjectTypes)) {
+    && allowedObjectTypes.includes(pageInstance.constructor.shortName)) {
     descriptor[pageInstance.constructor.shortName] = {
       RiskAssessment: {
         widget_id: 'risk_assessments',

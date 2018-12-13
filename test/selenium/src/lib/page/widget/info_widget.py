@@ -2,12 +2,11 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Info widgets."""
 # pylint: disable=useless-super-delegation
+# pylint: disable=too-many-lines
 
 import re
 import time
-
 from selenium.webdriver.common.by import By
-
 from lib import base
 from lib.app_entity_factory import entity_factory_common
 from lib.constants import (
@@ -15,11 +14,11 @@ from lib.constants import (
 from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import (
     info_widget_three_bbs, page_elements, tables, tab_element, tab_containers)
-from lib.page.modal.set_value_for_asmt_ca import SetValueForAsmtDropdown
+from lib.page.modal import apply_decline_proposal, set_value_for_asmt_ca
 from lib.page.widget import (
     info_panel, object_modal, object_page, related_proposals)
-from lib.page.widget.page_mixins import (WithAssignFolder, WithObjectReview,
-                                         WithPageElements)
+from lib.page.widget.page_mixins import (
+    WithAssignFolder, WithObjectReview, WithPageElements)
 from lib.utils import selenium_utils, help_utils, ui_utils
 
 
@@ -43,9 +42,6 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
         self.child_cls_name.lower() == objects.ASSESSMENTS)
     self.list_all_headers_txt = []
     self.list_all_values_txt = []
-    self.info_widget_locator = (
-        self._locators.INFO_PAGE_ELEM if self.is_info_page else
-        self._locators.INFO_PANEL_ELEM)
     self.inline_edit_controls = self._browser.elements(
         class_name="set-editable-group")
     self.tabs = tab_element.Tabs(self._browser, tab_element.Tabs.INTERNAL)
@@ -78,7 +74,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Returns info widget elem (obsolete).
     Use `self._root` or `self._active_tab_root` instead."""
     return selenium_utils.get_when_visible(
-        self._driver, self.info_widget_locator)
+        self._driver, self._locators.INFO_PAGE_ELEM)
 
   @property
   def panel(self):
@@ -90,7 +86,8 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   @property
   def is_info_page(self):
     """Returns whether the page is info page."""
-    return self.get_current_url_fragment() == self._url_fragment()
+    return (self.get_current_url_fragment() == self._url_fragment() and
+            not apply_decline_proposal.CompareApplyDeclineModal().modal.exists)
 
   @property
   def is_snapshot_panel(self):
@@ -104,11 +101,11 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
 
   def title(self):
     """Returns object title."""
-    return self._browser.element(class_name="pane-header__title").h3().text
+    return self._root.element(class_name="pane-header__title").h3().text
 
   def status(self):
     """Returns object status."""
-    return self._browser.element(
+    return self._root.element(
         class_name=re.compile("state-value state")).text_content
 
   def code(self):
@@ -175,10 +172,8 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     # pylint: disable=expression-not-assigned
     _header_msg, _value_msg = (
         "people header: {}, count: {}", "people list: {}, count: {}")
-    people_scopes = self._active_tab_root.wd.find_elements(
-        *self._locators.PEOPLE_HEADERS_AND_VALUES_CSS)
-    [selenium_utils.wait_until_stops_moving(people_scope)
-     for people_scope in people_scopes]
+    people_scopes = self._active_tab_root.locate().elements(
+        class_name="editable-people-group")
     matched_people_scopes = [people_scope for people_scope in people_scopes
                              if header_text in people_scope.text]
     if len(matched_people_scopes) != 1:
@@ -190,11 +185,10 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
                    for matched_people_scope in matched_people_scopes],
                   len(matched_people_scopes))))
     people_scope = matched_people_scopes[0]
-    _people_header = people_scope.find_element(
-        *self._locators.PEOPLE_HEADER_CSS).text
-    _people_value = people_scope.find_element(
-        *self._locators.PEOPLE_VALUE_CSS).text
-    # 'ASSIGNEE(S)\n(2)' to str 'ASSIGNEE(S)' and int '2'
+    _people_header = people_scope.element(
+        tag_name="editable-people-group-header").text
+    _people_value = people_scope.element(
+        tag_name="object-list").text
     _people_header_parts = _people_header.splitlines()
     people_header_txt = _people_header_parts[0]
     people_count_from_header = (
@@ -216,12 +210,17 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
 
   def description(self):
     """Returns the text of description."""
-    return self._simple_field("Description").text
+    return self._simple_field("Description", self._root).text
 
   @property
   def admins(self):
     """Returns Admin page element."""
-    return self._related_people_list("Admin")
+    return self._related_people_list("Admin", self._root)
+
+  @property
+  def primary_contacts(self):
+    """Returns Primary Contacts page element"""
+    return self._related_people_list("Primary Contacts", self._root)
 
   def global_custom_attributes(self):
     """Returns GCA values."""
@@ -236,7 +235,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """
     custom_attributes = {}
     ca_manager = page_elements.CustomAttributeManager(
-        self._browser,
+        self._root,
         obj_type=self.child_cls_name.lower(),
         is_global=is_gcas_not_lcas,
         is_inline=True)
@@ -420,7 +419,6 @@ class Workflow(InfoWidget):
 
 class CycleTask(InfoWidget):
   """Model for CycleTask object Info panel."""
-
   def obj_scope(self):
     """Returns obj scope."""
     return {
@@ -436,8 +434,7 @@ class CycleTask(InfoWidget):
     # Element with class `nav-tabs` appears in DOM at start of panel rendering.
     # But a class "tab-container_hidden-tabs" that makes it "display: none"
     #   is removed only at end.
-    self._root.element(class_name="nav-tabs").wait_until(
-        lambda e: e.present)
+    self._root.element(class_name="nav-tabs").wait_until(lambda e: e.present)
 
   @property
   def due_date(self):
@@ -581,6 +578,12 @@ class Assessments(InfoWidget):
     self.tabs.ensure_tab(self._assessment_tab_name)
     return self._comment_area().exists
 
+  @property
+  def primary_contacts(self):
+    """Returns Primary Contacts page element"""
+    self.tabs.ensure_tab(self._other_attributes_tab_name)
+    return self._related_people_list("Primary Contacts")
+
   def description(self):
     """Switch to tab with description and return a text of description."""
     self.tabs.ensure_tab(self._other_attributes_tab_name)
@@ -590,12 +593,6 @@ class Assessments(InfoWidget):
     """Switch to tab with code and return the text of code."""
     self.tabs.ensure_tab(self._other_attributes_tab_name)
     return self._info_pane_form_field("Code").text
-
-  @property
-  def primary_contacts(self):
-    """Switch to tab with primary contacts and return a page element"""
-    self.tabs.ensure_tab(self._other_attributes_tab_name)
-    return self._related_people_list("Primary Contacts")
 
   def mapped_objects_titles(self):
     """Returns list of mapped snapshots' titles."""
@@ -675,7 +672,8 @@ class Assessments(InfoWidget):
   def choose_and_fill_dropdown_lca(self, dropdown_id, option_title, **kwargs):
     """Choose and fill comment or url for Assessment dropdown."""
     self.select_ca_dropdown_option(dropdown_id, option_title)
-    SetValueForAsmtDropdown(self._driver).fill_dropdown_lca(**kwargs)
+    set_value_for_asmt_ca.SetValueForAsmtDropdown(
+        self._driver).fill_dropdown_lca(**kwargs)
     selenium_utils.get_when_clickable(
         self._driver, WidgetInfoAssessment.BUTTON_COMPLETE)
 
@@ -764,26 +762,42 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
   _locators = locator.WidgetInfoControl
   _elements = element.ControlInfoWidget
 
-  def __init__(self, driver):
+  def __init__(self, driver, root_elem=None):
     super(Controls, self).__init__(driver)
-    self.admin_text, self.admin_entered_text = (
-        self.get_header_and_value_txt_from_people_scopes(
-            self._elements.ADMIN.upper()))
-    self.primary_contact_text, self.primary_contact_entered_text = (
-        self.get_header_and_value_txt_from_people_scopes(
-            self._elements.PRIMARY_CONTACTS.upper()))
-    self._assertions = self._browser.element(
+    self.root_element = root_elem if root_elem else self._browser
+    self.admin_text = roles.ADMIN.upper()
+    self.admin_entered_text = self.admins.get_people_emails()
+    self.control_operator_text = roles.CONTROL_OPERATORS.upper()
+    self.control_operator_entered_text = (
+        self.control_operators.get_people_emails())
+    self._assertions = self._root.element(
         class_name="custom-attr-wrap").element(
         text="Assertions").parent().text.splitlines()
     self.assertions_text = self._assertions[0]
     self.assertions_entered_text = self._assertions[1:]
-    self.reference_urls = self._related_urls(self._reference_url_label)
+    self.reference_urls = self._related_urls(
+        self._reference_url_label, self._root)
     self._extend_list_all_scopes(
-        [self.admin_text, self.primary_contact_text, self.assertions_text],
-        [self.admin_entered_text, self.primary_contact_entered_text,
+        [self.admin_text, self.control_operator_text, self.assertions_text],
+        [self.admin_entered_text, self.control_operator_entered_text,
          self.assertions_entered_text])
     self._add_obj_review_to_lsopes()
     self.proposals_tab = "Change Proposals"
+
+  @property
+  def _root(self):
+    """Returns root element (including title, 3bbs)."""
+    if self.is_info_page:
+      return self._browser.element(class_name="ggrc_controllers_info_widget")
+    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
+      return self.root_element
+    return self._browser.element(class_name="sticky-info-panel")
+
+  @property
+  def control_operators(self):
+    """Returns Primary Contacts page element"""
+    return self._related_people_list(
+        roles.CONTROL_OPERATORS, self._root)
 
   def _add_obj_review_to_lsopes(self):
     """Extend list of scopes by object review section """
@@ -805,9 +819,9 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
 
   def select_first_available_date(self):
     """Select first available day on datepicker on submit for review popup."""
-    date_picker = base.DatePicker(self._driver,
-                                  WidgetInfoControl.DATE_PICKER_FIELD,
-                                  WidgetInfoControl.DATE_PICKER_LOCATOR)
+    date_picker = base.DatePicker(
+        self._driver, WidgetInfoControl.DATE_PICKER_FIELD,
+        WidgetInfoControl.DATE_PICKER_LOCATOR)
     date_picker.select_month_start()
 
   def click_request(self):
@@ -865,9 +879,7 @@ class OrgGroups(InfoWidget):
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""
-    scope.update(
-        admin=self.admins.get_people_emails()
-    )
+    scope.update(admin=self.admins.get_people_emails())
 
 
 class Vendors(InfoWidget):
@@ -978,7 +990,6 @@ class People(base.Widget):
 class Dashboard(base.Widget):
   """Model for Dashboard object Info pages and Info panels."""
   # pylint: disable=too-few-public-methods
-
   _locators = locator.Dashboard
 
   def __init__(self, driver):

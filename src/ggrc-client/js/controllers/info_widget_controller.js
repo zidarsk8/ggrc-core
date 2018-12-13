@@ -35,7 +35,7 @@ export default can.Control({
     if (this.options.instance.info_pane_preload) {
       this.options.instance.info_pane_preload();
     }
-    this.options.context = new can.Observe({
+    this.options.context = new can.Map({
       model: this.options.model,
       instance: this.options.instance,
       start_menu: this.options.start_menu,

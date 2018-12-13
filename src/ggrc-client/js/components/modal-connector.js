@@ -113,9 +113,7 @@ export default can.Component.extend({
 
       this.preparePendingJoins();
 
-      // We need to remove all _pending_joins from the instance (via splice())
-      // in order to resolveDeferredBindings util after instance.save
-      // via modal functionality doesn't handle it second time.
+      // Extract _pending_joins from instance
       const pendingJoins = instance._pending_joins.splice(0);
       await this.handlePendingOperations(pendingJoins);
       const objects = pendingJoins.map((pj) => pj.what);

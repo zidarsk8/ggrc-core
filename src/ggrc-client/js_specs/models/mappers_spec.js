@@ -585,8 +585,8 @@ describe('mappers', function () {
               instance: instance,
               mappings: ['a', 'b'],
               remove_mapping: function (mapping) {
-                let idx = can.inArray(mapping, this.mappings);
-                if (~idx) {
+                const idx = this.mappings.indexOf(mapping);
+                if (idx !== -1) {
                   this.mappings.splice(idx, 1);
                   return true;
                 }
@@ -604,8 +604,8 @@ describe('mappers', function () {
               instance: instance,
               mappings: ['a', 'b'],
               remove_mapping: function (mapping) {
-                let idx = can.inArray(mapping, this.mappings);
-                if (~idx) {
+                let idx = this.mappings.indexOf(mapping);
+                if (idx !== -1) {
                   this.mappings.splice(idx, 1);
                   return true;
                 }

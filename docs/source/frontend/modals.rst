@@ -86,10 +86,7 @@ Naming conventions in the forms:
 
 ``mark_for_deletion``/``mark_for_addition`` in ``cacheable.js``
 adds/removes items into ``_pending_joins``. These pending joins are then
-handled in ``resolveDeferredBindings``. Removes are easy - it just
-destroys the mapping. The "add" case is a bit more complex than the
-"remove" case, as we must check we aren't re-mapping something which is
-already mapped.
+handled in ``ggrc-modal-connector`` component.
 
 ``ggrc_modal_connector`` Component used for mapping audits inside
 modals. Double layer of indirection in this case because context is not

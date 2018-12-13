@@ -13,6 +13,12 @@ describe('detailed-business-object-list-item component', function () {
   const snapshotParentUrl = '/controls/55';
   const vendorObjectTitle = 'Vendor title 123';
   const vendorObjectLink = '/vendors/33';
+  const controlVisibleRoles = [
+    'Admin', 'Control Operators', 'Control Owners',
+  ];
+  const defaultVisibleRoles = [
+    'Admin', 'Primary Contacts', 'Secondary Contacts',
+  ];
 
   let snapshotObject = {
     selfLink: '/api/snapshots/123',
@@ -33,6 +39,14 @@ describe('detailed-business-object-list-item component', function () {
     type: 'Vendor',
     title: vendorObjectTitle,
     id: 33,
+  };
+
+  let controlObject = {
+    selfLink: '/api/controls/12',
+    viewLink: '/controls/12',
+    type: 'Control',
+    title: 'Control title12',
+    id: 12,
   };
 
   describe('objectLink property', function () {
@@ -68,6 +82,25 @@ describe('detailed-business-object-list-item component', function () {
     it('check objectTitle of Snapshot object', function () {
       viewModel.attr('instance', snapshotObject);
       expect(viewModel.attr('objectTitle')).toEqual(snapshotParentTitle);
+    });
+  });
+
+  describe('visibleRoles property', function () {
+    let viewModel;
+
+    beforeEach(function () {
+      viewModel = getComponentVM(Component);
+    });
+
+    it('returns correct roles for Control object', function () {
+      viewModel.attr('instance', controlObject);
+      expect(viewModel.attr('visibleRoles'))
+        .toEqual(controlVisibleRoles);
+    });
+
+    it('returns default roles for not Control object', function () {
+      viewModel.attr('instance', vendorObject);
+      expect(viewModel.attr('visibleRoles')).toEqual(defaultVisibleRoles);
     });
   });
 });

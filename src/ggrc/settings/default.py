@@ -33,6 +33,7 @@ exports = [
     "CREATE_ISSUE_URL",
     "CREATE_ISSUE_BUTTON_NAME",
     "ASSESSMENT_SHORT_URL_PREFIX",
+    "CHANGE_REQUEST_URL",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -54,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.34.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.35.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -227,6 +228,9 @@ ASSESSMENT_SHORT_URL_PREFIX = os.environ.get(
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
 CREATE_ISSUE_BUTTON_NAME = os.environ.get('CREATE_ISSUE_BUTTON_NAME', "")
 
+# Link for change request on my task page
+CHANGE_REQUEST_URL = os.environ.get("CHANGE_REQUEST_URL", "")
+
 # BackgroundTask default settings
 RETRY_OPTIONS = {
     "min_backoff_seconds": 30,
@@ -235,3 +239,6 @@ RETRY_OPTIONS = {
     "task_retry_limit": 10,
 }
 DEFAULT_QUEUE = "ggrc"
+
+APPENGINE_INSTANCE = os.environ.get('APPENGINE_INSTANCE')
+APPENGINE_LOCATION = os.environ.get('APPENGINE_LOCATION', 'us-central1')

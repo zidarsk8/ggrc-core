@@ -3,7 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.SaveQueue', function () {
+import SaveQueue from '../save_queue';
+
+describe('SaveQueue module', function () {
   'use strict';
 
   describe('_process_save_responses() method', function () {
@@ -13,7 +15,7 @@ describe('GGRC.SaveQueue', function () {
     beforeEach(function () {
       let thisContext = {};
 
-      method = GGRC.SaveQueue._process_save_responses.bind(thisContext);
+      method = SaveQueue._process_save_responses.bind(thisContext);
 
       bucket = {
         objs: [],

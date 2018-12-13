@@ -33,14 +33,14 @@ class TestBackgroundTask(TestCase):
         {"X-GGRC-BackgroundTask": "true"},
     )
     self.assertEqual(response.status_code, 201)
-    bg_tasks = all_models.BackgroundTask.query.all()
+    bg_tasks = all_models.BackgroundTask.query.filter(
+        all_models.BackgroundTask.name.like("%POST%")).all()
     self.assertEqual(len(bg_tasks), 1)
 
     content = self.api.client.get("/api/background_tasks")
     self.assert200(content)
     bg_tasks_content = \
         content.json['background_tasks_collection']['background_tasks']
-    self.assertEqual(len(bg_tasks_content), 1)
     self.assertEqual(set(bg_tasks_content[0].keys()),
                      {"id", "selfLink", "status", "type"})
 
@@ -98,4 +98,7 @@ class TestPermissions(TestCase):
       self.assert200(content)
       bg_tasks_content = \
           content.json['background_tasks_collection']['background_tasks']
-      self.assertEqual(len(bg_tasks_content), 1)
+      for bg_task_content in bg_tasks_content:
+        self.assertEqual(set(bg_task_content.keys()),
+                         {"id", "selfLink", "status", "type"})
+      self.assertTrue(len(bg_tasks_content) >= 1)

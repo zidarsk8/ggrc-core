@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate Proposal objects via UI."""
+# pylint: disable=invalid-name
+# pylint: disable=too-many-lines
 from lib import factory, base
 from lib.constants import objects, object_states
 from lib.entities import entities_factory
@@ -40,6 +42,35 @@ class ProposalsService(base.WithBrowser):
   def has_proposal_apply_btn(self, obj, proposal):
     """Check if proposal apply btn exists for an obj."""
     return self.open_obj_change_proposals_tab(obj).has_apply_btn(proposal)
+
+  def assert_objs_diff_corresponds_to_proposal(self, obj, proposal):
+    """Check if objs difference corresponds to the proposal."""
+    self.open_obj_change_proposals_tab(obj).click_review_apply_btn(proposal)
+    comparison_window = apply_decline_proposal.CompareApplyDeclineModal()
+    comparison_window.modal.wait_until(lambda e: e.exists)
+    obj_name = objects.get_plural(obj.type)
+    service_cls = factory.get_cls_webui_service(obj_name)(self._driver)
+    current_obj = service_cls.build_obj_from_page(
+        comparison_window.curr_version_obj_root_elem.wait_until(
+            lambda e: e.exists))
+    obj_after_proposal = service_cls.build_obj_from_page(
+        comparison_window.proposal_version_obj_root_elem.wait_until(
+            lambda e: e.exists))
+    actual_proposal = entities_factory.ProposalsFactory().create()
+    proposal_obj_dict = obj_after_proposal.__dict__
+    current_obj_dict = current_obj.__dict__
+    actual_proposal.changes = []
+    for key in obj_after_proposal.__dict__.keys():
+      if proposal_obj_dict[key] != current_obj_dict[key]:
+        actual_proposal.changes.append(
+            {"obj_attr_type": key.title(),
+             "cur_value": current_obj_dict[key],
+             "proposed_value": proposal_obj_dict[key]})
+    actual_proposal.author = comparison_window.get_proposal_version_author()
+    actual_proposal.datetime = (
+        comparison_window.get_proposal_version_datetime())
+    comparison_window.click_cancel_btn()
+    assert actual_proposal == proposal
 
   def apply_proposal(self, obj, proposal):
     """Apply an obj proposal."""

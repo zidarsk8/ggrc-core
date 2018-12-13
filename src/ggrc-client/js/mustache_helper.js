@@ -159,7 +159,7 @@ Mustache.registerHelper('in_array', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack);
 
-  return options[~can.inArray(needle, haystack) ?
+  return options[_.includes(haystack, needle) ?
     'fn' : 'inverse'](options.contexts);
 });
 
@@ -277,35 +277,6 @@ Mustache.registerHelper('is_empty', (data, options) => {
     can.isPlainObject(data) ? data : data.attr()
   );
   return options[result ? 'fn' : 'inverse'](options.contexts);
-});
-
-Mustache.registerHelper('pack', function () {
-  let options = arguments[arguments.length - 1];
-  let objects = can.makeArray(arguments).slice(0, arguments.length - 1);
-  let pack = {};
-  can.each(objects, function (obj, i) {
-    if (typeof obj === 'function') {
-      objects[i] = obj = obj();
-    }
-
-    if (obj._data) {
-      obj = obj._data;
-    }
-    for (let k in obj) {
-      if (obj.hasOwnProperty(k)) {
-        pack[k] = obj[k];
-      }
-    }
-  });
-  if (options.hash) {
-    for (let k in options.hash) {
-      if (options.hash.hasOwnProperty(k)) {
-        pack[k] = options.hash[k];
-      }
-    }
-  }
-  pack = new can.Observe(pack);
-  return options.fn(pack);
 });
 
 // Render a named template with the specified context, serialized and
@@ -585,7 +556,7 @@ Mustache.registerHelper('show_long', function () {
 
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
-  let frame = new can.Observe();
+  let frame = new can.Map();
   let args = can.makeArray(arguments);
   let i;
   let arg;
@@ -616,7 +587,7 @@ Mustache.registerHelper('using', function (options) {
 
 Mustache.registerHelper('with_mapping', function (binding, options) {
   let context = arguments.length > 2 ? resolveComputed(options) : this;
-  let frame = new can.Observe();
+  let frame = new can.Map();
   let loader;
 
   if (!context) { // can't find an object to map to.  Do nothing;
@@ -749,7 +720,7 @@ Mustache.registerHelper('is_allowed', function () {
       arg = arg();
     }
 
-    if (typeof arg === 'string' && can.inArray(arg, allowedActions) > -1) {
+    if (typeof arg === 'string' && allowedActions.includes(arg)) {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
@@ -1071,8 +1042,8 @@ Mustache.registerHelper('urlPath', function () {
   FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
-    conjunctions and disjunctions to one using a can.reduce(Array, function (Deferred, item) {}, $.when())
-    pattern instead of can.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
+    conjunctions and disjunctions to one using a _.reduce(Array, function (Deferred, item) {}, $.when())
+    pattern instead of _.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
 Mustache.registerHelper('if_helpers', function () {
   let args = arguments;
@@ -1147,13 +1118,13 @@ Mustache.registerHelper('if_helpers', function () {
 
   if (disjunctions.length) {
     // Evaluate statements
-    let result = can.reduce(disjunctions,
+    let result = _.reduce(disjunctions,
       function (disjunctiveResult, conjunctions) {
         if (disjunctiveResult) {
           return true;
         }
 
-        let conjunctiveResult = can.reduce(conjunctions,
+        let conjunctiveResult = _.reduce(conjunctions,
           function (currentResult, stmt) {
             if (!currentResult) {
               return false;
@@ -1212,10 +1183,7 @@ Mustache.registerHelper('if_instance_of', function (inst, cls, options) {
     cls = [cls];
   }
 
-  result = can.reduce(cls, function (res, cl) {
-    return res || inst instanceof cl;
-  }, false);
-
+  result = _.find(cls, (cl) => inst instanceof cl);
   return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
@@ -1253,7 +1221,7 @@ Mustache.registerHelper('if_config_exist', function (key, options) {
 });
 
 Mustache.registerHelper('switch', function (value, options) {
-  let frame = new can.Observe({});
+  let frame = new can.Map({});
   value = resolveComputed(value);
   frame.attr(value || 'default', true);
   frame.attr('default', true);
@@ -1683,8 +1651,9 @@ Mustache.registerHelper('displayWidgetTab',
     widget = Mustache.resolve(widget);
     instance = Mustache.resolve(instance);
 
-    inForceShowList = can.inArray(widget.attr('internav_display'),
-      instance.constructor.obj_nav_options.force_show_list) > -1;
+    inForceShowList = _.includes(
+      instance.constructor.obj_nav_options.force_show_list,
+      widget.attr('internav_display'));
 
     displayTab = widget.attr('has_count') &&
         widget.attr('count') ||

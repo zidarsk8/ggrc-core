@@ -56,10 +56,10 @@ const userRolesModalSelector = can.Control.extend({
   },
 }, {
   init: function () {
-    this.object_list = new can.Observe.List();
-    this.option_list = new can.Observe.List();
-    this.join_list = new can.Observe.List();
-    this.active_list = new can.Observe.List();
+    this.object_list = new can.List();
+    this.option_list = new can.List();
+    this.join_list = new can.List();
+    this.active_list = new can.List();
 
     this.init_context();
     this.init_bindings();
@@ -104,7 +104,7 @@ const userRolesModalSelector = can.Control.extend({
 
   init_context: function () {
     if (!this.context) {
-      this.context = new can.Observe($.extend({
+      this.context = new can.Map($.extend({
         objects: this.object_list,
         options: this.option_list,
         joins: this.join_list,
@@ -121,7 +121,7 @@ const userRolesModalSelector = can.Control.extend({
 
     self.active_list.replace(
       can.map(self.join_list, function (join) {
-        return new can.Observe({
+        return new can.Map({
           join: join,
         });
       }));
@@ -255,21 +255,7 @@ const userRolesModalSelector = can.Control.extend({
   // HELPERS
 
   find_join: function (optionId) {
-    let self = this
-      ;
-
-    return can.reduce(
-      this.join_list,
-      function (result, join) {
-        if (result) {
-          return result;
-        }
-        if (self.match_join(optionId, join)) {
-          return join;
-        }
-      },
-      null
-    );
+    return _.find(this.join_list, (join) => this.match_join(optionId, join));
   },
 
   match_join: function (optionId, join) {

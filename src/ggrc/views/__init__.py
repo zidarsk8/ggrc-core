@@ -82,11 +82,12 @@ def full_reindex(_):
 
 
 @app.route("/_background_tasks/compute_attributes", methods=["POST"])
-def compute_attributes(*_, **kwargs):
+@background_task.queued_task
+def compute_attributes(task):
   """Web hook to update the full text search index."""
   with benchmark("Run compute_attributes background task"):
-    event_id = ggrc_utils.get_task_attr("event_id", kwargs)
-    revision_ids = ggrc_utils.get_task_attr("revision_ids", kwargs)
+    event_id = task.parameters.get("event_id")
+    revision_ids = task.parameters.get("revision_ids")
 
     if event_id and not revision_ids:
       rows = db.session.query(
@@ -267,12 +268,13 @@ def _merge_errors(create_errors, update_errors):
 
 
 @app.route("/_background_tasks/update_cad_related_objects", methods=["POST"])
-def update_cad_related_objects(*_, **kwargs):
+@background_task.queued_task
+def update_cad_related_objects(task):
   """Update CAD related objects"""
-  event_id = ggrc_utils.get_task_attr("event_id", kwargs)
-  model_name = ggrc_utils.get_task_attr("model_name", kwargs)
-  need_revisions = ggrc_utils.get_task_attr("need_revisions", kwargs)
-  modified_by_id = ggrc_utils.get_task_attr("modified_by_id", kwargs)
+  event_id = task.parameters.get("event_id")
+  model_name = task.parameters.get("model_name")
+  need_revisions = task.parameters.get("need_revisions")
+  modified_by_id = task.parameters.get("modified_by_id")
 
   event = models.all_models.Event.query.filter_by(id=event_id).first()
   cad = models.all_models.CustomAttributeDefinition.query.filter_by(
@@ -300,7 +302,7 @@ def update_cad_related_objects(*_, **kwargs):
 
 def start_update_cad_related_objs(event_id, model_name, need_revisions=None):
   """Start a background task to update related objects of CAD."""
-  background_task.create_lightweight_task(
+  background_task.create_task(
       name="update_cad_related_objects",
       url=flask.url_for(update_cad_related_objects.__name__),
       parameters={
@@ -312,17 +314,19 @@ def start_update_cad_related_objs(event_id, model_name, need_revisions=None):
       method="POST",
       queued_callback=update_cad_related_objects
   )
+  db.session.commit()
 
 
 def start_compute_attributes(revision_ids=None, event_id=None):
   """Start a background task for computed attributes."""
-  background_task.create_lightweight_task(
+  background_task.create_task(
       name="compute_attributes",
       url=flask.url_for(compute_attributes.__name__),
       parameters={"revision_ids": revision_ids, "event_id": event_id},
       method="POST",
       queued_callback=compute_attributes
   )
+  db.session.commit()
 
 
 def start_update_audit_issues(audit_id, message):

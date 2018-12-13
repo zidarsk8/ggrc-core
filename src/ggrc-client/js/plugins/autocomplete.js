@@ -227,7 +227,7 @@ import * as businessModels from '../models/business-models';
 
     _renderMenu: function (ul, items) {
       let template = this.element.data('template');
-      let context = new can.Observe(this._setup_menu_context(items));
+      let context = new can.Map(this._setup_menu_context(items));
       let model = context.model;
       let $ul = $(ul);
 

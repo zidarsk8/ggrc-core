@@ -3,15 +3,22 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import {
+  getComponentVM,
+  makeFakeInstance,
+} from '../../../../js_specs/spec_helpers';
 import Component from '../people-list';
+import AssessmentTemplate from '../../../models/business-models/assessment-template';
 
 describe('people-list component', function () {
   let viewModel;
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', {default_people: {}});
+    let instance = makeFakeInstance({model: AssessmentTemplate})({
+      default_people: {},
+    });
+    viewModel.attr('instance', instance);
   });
 
   describe('init() method', function () {
@@ -190,6 +197,53 @@ describe('people-list component', function () {
 
       expect(viewModel.attr(`instance.${peopleListAttr}`))
         .toEqual(packData);
+    });
+  });
+
+  describe('peopleValues() setter', function () {
+    const peopleValues = new can.List([
+      {value: 'Auditors', title: 'Auditors'},
+      {value: 'Secondary Assignees', title: 'Secondary Assignees'},
+      {value: 'Control Operators', title: 'Control Operators'},
+      {value: 'Admin', title: 'Object Admins'},
+    ]);
+    const defaultValue = AssessmentTemplate.defaults.default_people.verifiers;
+
+    beforeEach(function () {
+      viewModel.attr('listName', 'verifiers');
+    });
+
+    it(`does not change selectedValue if it is present
+    in new peopleValues list`,
+    function () {
+      viewModel.attr('selectedValue', 'Admin');
+      spyOn(viewModel, 'updatePeopleList');
+
+      viewModel.attr('peopleValues', peopleValues);
+
+      expect(viewModel.attr('selectedValue')).toBe('Admin');
+    });
+
+    it(`sets selectedValue to default if it is not present in
+    new peopleValues list`,
+    function () {
+      viewModel.attr('selectedValue', 'Primary Contacts');
+      spyOn(viewModel, 'updatePeopleList');
+
+      viewModel.attr('peopleValues', peopleValues);
+
+      expect(viewModel.attr('selectedValue')).toBe(defaultValue);
+    });
+
+    it(`calls updatePeopleList if selectedValue is not present in
+    new peopleValues list`,
+    function () {
+      viewModel.attr('selectedValue', 'Primary Contacts');
+      spyOn(viewModel, 'updatePeopleList');
+
+      viewModel.attr('peopleValues', peopleValues);
+
+      expect(viewModel.updatePeopleList).toHaveBeenCalled();
     });
   });
 });

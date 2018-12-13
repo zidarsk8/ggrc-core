@@ -131,6 +131,14 @@ class TestProposals(base.Test):
         selenium, test_data["control"], test_data[proposal],
         test_data[proposal_author])
 
+  def test_check_proposals_comparison_window(
+      self, test_data, selenium
+  ):
+    """Check if proposal comparison window has correct info."""
+    users.set_current_user(test_data["control_creator"])
+    proposal_ui_facade.assert_proposal_comparison_window_has_correct_info(
+        selenium, test_data["control"], test_data["proposal"])
+
   @pytest.mark.parametrize(
       "login_user",
       ["control_creator", "global_reader", "proposal_creator"]

@@ -335,9 +335,9 @@ class TestReviewNotification(TestCase):
       control = factories.ControlFactory()
       control.add_person_with_role_name(control_admin, "Admin")
       control.add_person_with_role_name(control_primary_contact,
-                                        "Primary Contacts")
+                                        "Control Operators")
       control.add_person_with_role_name(control_secondary_contact,
-                                        "Secondary Contacts")
+                                        "Control Owners")
     email_message = "email email_message"
     _, review = self.generator.generate_object(
         all_models.Review,

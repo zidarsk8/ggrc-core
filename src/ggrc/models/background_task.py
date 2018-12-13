@@ -6,9 +6,9 @@
 import json
 import traceback
 import uuid
+from email.utils import parseaddr
 from logging import getLogger
 from functools import wraps
-from time import time
 
 from flask import request
 from flask.wrappers import Response
@@ -157,47 +157,20 @@ def create_task(name, url, queued_callback=None, parameters=None,
           payload=payload,
           bg_operation=bg_operation)
     with benchmark("Create background task. Enqueue task"):
+      # Task request have to contain data to pass content_type validation.
+      payload = payload or "{}"
+      # Task is limited to 100 KB by taskqueue, data should be extracted
+      # from BackgroundTask object.
       _enqueue_task(
           name=bg_task_name,
           url=url,
           method=method,
-          parameters={"task_id": bg_task.id},
+          payload=payload,
           bg_task=bg_task,
           queued_callback=queued_callback,
           queue=queue,
           retry_options=retry_options)
     return bg_task
-
-
-def create_lightweight_task(name, url, queued_callback=None, parameters=None,
-                            method=None):
-  """Create background task.
-
-  This function create an app engine background task without handling
-  related BackgroundTask object.
-  """
-  if not method:
-    method = request.method
-
-  if not parameters:
-    parameters = {}
-
-  if getattr(settings, 'APP_ENGINE', False):
-    from google.appengine.api import taskqueue
-    taskqueue.add(
-        queue_name="ggrc",
-        url=url,
-        name="{}_{}".format(name + str(int(time())), uuid.uuid4()),
-        payload=json.dumps(parameters),
-        method=method,
-        headers=collect_task_headers()
-    )
-  elif queued_callback:
-    queued_callback(**parameters)
-  else:
-    raise ValueError(
-        "Either queued_callback should be provided or APP_ENGINE set to true."
-    )
 
 
 def _check_and_create_bg_operation(operation_type, parameters):
@@ -226,10 +199,23 @@ def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
       bg_operation=bg_operation,
       parameters=parameters,
       payload=payload,
-      modified_by=get_current_user(),
+      modified_by=_bg_task_user(),
   )
   db.session.add(bg_task)
   return bg_task
+
+
+def _bg_task_user():
+  """Returns user for background task creation
+  In case of log in request of new user without assigning Creator role
+  get_current_user() returns Anonymous and function change it to Migrator"""
+  current_user = get_current_user()
+  if not current_user or (hasattr(current_user, "is_anonymous") and
+                          current_user.is_anonymous()):
+    from ggrc.models import Person
+    _, email = parseaddr(settings.MIGRATOR)
+    return Person.query.filter_by(email=email).first()
+  return current_user
 
 
 # pylint: disable=too-many-arguments
@@ -287,7 +273,7 @@ def create_bg_operation(operation_type, object_type, object_id):
           object_type=object_type,
           object_id=object_id,
           bg_operation_type=bg_operation_type,
-          modified_by=get_current_user()
+          modified_by=_bg_task_user()
       )
   return bg_operation
 

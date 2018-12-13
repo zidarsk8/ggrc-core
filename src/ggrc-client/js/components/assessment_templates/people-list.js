@@ -16,16 +16,29 @@ export default can.Component.extend({
     peopleListAttr: '',
     listName: '',
     labelName: '',
-    peopleValues: [
-      {value: 'Admin', title: 'Object Admins'},
-      {value: 'Audit Lead', title: 'Audit Captain'},
-      {value: 'Auditors', title: 'Auditors'},
-      {value: 'Principal Assignees', title: 'Principal Assignees'},
-      {value: 'Secondary Assignees', title: 'Secondary Assignees'},
-      {value: 'Primary Contacts', title: 'Primary Contacts'},
-      {value: 'Secondary Contacts', title: 'Secondary Contacts'},
-      {value: 'other', title: 'Others...'},
-    ],
+    peopleValues: [],
+
+    define: {
+      peopleValues: {
+        value: [],
+        set: function (newValue) {
+          if (this.attr('selectedValue')) {
+            let listName = this.attr('listName');
+            let defaultValue = this.attr('instance')
+              .class.defaults.default_people[listName];
+            let currentValue = this.attr('selectedValue');
+            let isPresent = newValue.attr().findIndex((el) => {
+              return el.value === currentValue;
+            }) !== -1;
+            if (!isPresent) {
+              this.attr('selectedValue', defaultValue);
+              this.updatePeopleList();
+            }
+          }
+          return newValue;
+        },
+      },
+    },
     /**
    * Event handler when a person is picked in an autocomplete form field.
    * It adds the picked person ID to the people list.
