@@ -372,9 +372,13 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
 
   def populate_review_status(self):
     """Replace os_state with review state for old revisions"""
+    from ggrc.models import review
     result = {}
     if "os_state" in self._content:
-      result = {"review_status": self._content["os_state"]}
+      if self._content["os_state"] is not None:
+        result["review_status"] = self._content["os_state"]
+      else:
+        result["review_status"] = review.Review.STATES.UNREVIEWED
     return result
 
   def _document_evidence_hack(self):
