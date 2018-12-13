@@ -151,27 +151,6 @@ Mustache.registerHelper('in_array', function (needle, haystack, options) {
     'fn' : 'inverse'](options.contexts);
 });
 
-Mustache.registerHelper('if_null', function (val1, options) {
-  let that = this;
-  let _val1;
-  function exec() {
-    if (_val1 === null || _val1 === undefined) return options.fn(that);
-    else return options.inverse(that);
-  }
-  if (typeof val1 === 'function') {
-    if (val1.isComputed) {
-      val1.bind('change', function (ev, newVal) {
-        _val1 = newVal;
-        return exec();
-      });
-    }
-    _val1 = val1.call(this);
-  } else {
-    _val1 = val1;
-  }
-  return exec();
-});
-
 /**
    * Check if the given argument is a string and render the corresponding
    * block in the template.

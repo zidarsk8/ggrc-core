@@ -21,14 +21,13 @@
   </div>
   <div class="row-fluid">
     <div class="span8">
-      {{#if_helpers '\n #if_equals' instance.task_type 'text' '\n or #if_equals' instance.task_type '' '\n or #if_null' instance.task_type}}
+      {{#if_equals instance.task_type 'text'}}
         <label class="form-label">Task Description</label>
         <div class="rich-text">
-          <rich-text
-            tabindex="2"
-            {hidden-toolbar}="true"
-            {placeholder}="'Enter Description'"
-            {(content)}="instance.description">
+          <rich-text tabindex="2"
+                     {hidden-toolbar}="true"
+                     {placeholder}="'Enter Description'"
+                     {(content)}="instance.description">
           </rich-text>
         </div>
       {{else}}
@@ -36,7 +35,7 @@
           Selection Response Options (Comma Separated)
         </label>
           <textarea-array array="instance.response_options" class-name="span12 double" placeholder="Enter Description" tabindex="2"></textarea-array>
-      {{/if_helpers}}
+      {{/if_equals}}
       <br>
       <select name="task_type">
         <option value="text" {{#if_equals instance.task_type 'text'}}selected="selected"{{/if_equals}}>Rich text</option>

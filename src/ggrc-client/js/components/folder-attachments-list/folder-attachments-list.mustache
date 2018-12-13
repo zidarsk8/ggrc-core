@@ -14,13 +14,6 @@
                                         {^current_folder}="*currentFolder"
                                         {(folder_error)}="folderError"
             ></ggrc-gdrive-folder-picker>
-        {{^if_null instance._mandatory_attachment_msg}}
-            <div class="alert alert-info alert-dismissible" role="alert">
-                {{instance._mandatory_attachment_msg}}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
-            </div>
-        {{/if_null}}
-
         <object-list {items}="documents" {empty-message}="noItemsText" {show-more}="showMore">
             <editable-document-object-list-item {document}="{.}">
             {{#unless readonly}}
