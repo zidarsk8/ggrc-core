@@ -17,6 +17,13 @@ import Mappings from '../../models/mappers/mappings';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {reify as reifyUtil, isReifiable} from '../../plugins/utils/reify-utils';
 
+import {
+  buildParam,
+  batchRequests,
+  buildCountParams,
+} from '../../plugins/utils/query-api-utils';
+import QueryParser from '../../generated/ggrc_filter_query_parser';
+
 const EMPTY_DIFF_VALUE = '—';
 
 let _DATE_FIELDS = {
@@ -66,6 +73,42 @@ export default can.Component.extend({
     fullHistory: [],
     showLastReviewUpdates: false,
     currentPage: 0,
+    queryRevisions() {
+      const instance = this.attr('instance');
+      const filter = QueryParser.parse(
+        `resource_type = ${instance.type} AND
+         resource_id = ${instance.id} OR
+         source_type = ${instance.type} AND
+         source_id = ${instance.id} OR
+         destination_type = ${instance.type} AND
+         destination_id = ${instance.id}
+        `);
+      const pageInfo = {
+        current: 1,
+        pageSize: 10,
+        sort: [{
+          direction: 'desc',
+          key: 'created_at',
+        }],
+      };
+      let params = buildParam(
+        'Revision',
+        pageInfo,
+        null,
+        null,
+        filter
+      );
+
+      return batchRequests(params).then((data) => {
+        let revisions = data['Revision'].values;
+
+        revisions = revisions.map(function (source) {
+          return Revision.model(source, 'Revision');
+        });
+
+        return revisions;
+      });
+    },
 
     fetchItems: function () {
       const stopFn = tracker.start(
@@ -73,7 +116,7 @@ export default can.Component.extend({
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CHANGE_LOG);
 
-      return this._fetchRevisionsData()
+      return this._fetchRevisionsDataByQuery()
         .done(function (revisions) {
           let fullHistory;
           // calculate history of role changes
@@ -176,6 +219,59 @@ export default can.Component.extend({
             });
           });
       }.bind(this));
+    },
+    _fetchRevisionsDataByQuery() {
+      return this.queryRevisions().then((revisions) => {
+        let rq = new RefreshQueue();
+
+        _.forEach(revisions, (revision) => {
+          if (revision.modified_by) {
+            rq.enqueue(revision.modified_by);
+          }
+          if (revision.destination_type && revision.destination_id) {
+            revision.destination = new Stub({
+              id: revision.destination_id,
+              type: revision.destination_type,
+            });
+            rq.enqueue(revision.destination);
+          }
+          if (revision.source_type && revision.source_id) {
+            revision.source = new Stub({
+              id: revision.source_id,
+              type: revision.source_type,
+            });
+            rq.enqueue(revision.source);
+          }
+        });
+
+        return this._fetchEmbeddedRevisionData(rq.objects, rq)
+          .then(function (embedded) {
+            return rq.trigger().then(function () {
+              let reify = function (revision) {
+                _.forEach(['modified_by', 'source', 'destination'],
+                  function (field) {
+                    if (revision[field] && revision[field].reify) {
+                      revision.attr(field, revision[field].reify());
+                    }
+                  });
+                return revision;
+              };
+              let objRevisions = [];
+              let mappings = [...embedded];
+              _.forEach(revisions, (revision) => {
+                if (revision.destination || revision.source) {
+                  mappings.push(revision);
+                } else {
+                  objRevisions.push(revision);
+                }
+              });
+              return {
+                object: _.map(objRevisions, reify),
+                mappings: _.map(mappings, reify),
+              };
+            });
+          });
+      });
     },
     /**
      * Fetch revisions of indirect mappings.
