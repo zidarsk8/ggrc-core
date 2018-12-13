@@ -744,23 +744,6 @@ Mustache.registerHelper('lowercase', function (value, options) {
   return value.toLowerCase();
 });
 
-Mustache.registerHelper('assignee_types', function (value, options) {
-  function capitalizeFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-  value = resolveComputed(value) || '';
-  value = _.head(_.map(value.split(','), function (type) {
-    let lowercaseType = _.trim(type).toLowerCase();
-
-    if (lowercaseType === 'assessor') {
-      lowercaseType = 'assignee';
-    }
-
-    return lowercaseType;
-  }));
-  return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
-});
-
 Mustache.registerHelper('is_dashboard', function (options) {
   return /dashboard/.test(window.location) ?
     options.fn(options.contexts) :

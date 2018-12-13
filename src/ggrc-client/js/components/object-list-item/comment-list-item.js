@@ -52,7 +52,16 @@ export default can.Component.extend({
       },
       commentAuthorType: {
         get: function () {
-          return this.attr('itemData.assignee_type') || false;
+          function capitalizeFirst(type) {
+            return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+          }
+
+          const assignee = _.chain(this.attr('itemData.assignee_type'))
+            .split(',')
+            .head()
+            .trim()
+            .value();
+          return assignee ? `(${capitalizeFirst(assignee)})` : '';
         },
       },
       hasRevision: {
