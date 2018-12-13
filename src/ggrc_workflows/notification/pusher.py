@@ -18,7 +18,7 @@ REPEATABLE_NOTIFICATIONS = {"cycle_task_overdue", }
 
 def get_notification_query(*objs, **kwargs):
   # maybe we shouldn't return different thigs here.
-  keys = [(obj.id, obj.type) for obj in objs]
+  keys = {(obj.id, obj.type) for obj in objs}
   notif_key = tuple_(Notification.object_id, Notification.object_type)
   query = Notification.query.filter(
       or_(Notification.sent_at.is_(None), Notification.repeating == true())
