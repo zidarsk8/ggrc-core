@@ -15,10 +15,6 @@ import template from './templates/tree-item-extra-info.mustache';
 
 let viewModel = can.Map.extend({
   define: {
-    isSubTreeItem: {
-      type: 'htmlbool',
-      value: false,
-    },
     isActive: {
       type: 'boolean',
       get: function () {
