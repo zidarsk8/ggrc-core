@@ -104,3 +104,10 @@ class TestControlRolesPropagation(base.TestACLPropagation):
     """Test control owner role access."""
     self.control_role = "Control Owners"
     self.runtest(role, model, action_name, expected_result)
+
+  @helpers.unwrap(PERMISSIONS)
+  def test_control_other_contacts(self, role, model, action_name,
+                                  expected_result):
+    """Test Control Other Contacts access."""
+    self.control_role = "Other Contacts"
+    self.runtest(role, model, action_name, expected_result)
