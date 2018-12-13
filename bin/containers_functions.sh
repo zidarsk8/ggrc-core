@@ -72,7 +72,7 @@ echo "
 provision_dev() {
   local dev_server=$1
   echo "Provisioning ${PROJECT}_$dev_server"
-  docker exec -i ${PROJECT}_${dev_server} su -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_${dev_server} -q -a) su -c "
     source /vagrant/bin/init_vagrant_env
     ln -s /vagrant-dev/node_modules /vagrant/node_modules
     build_assets
@@ -83,7 +83,7 @@ provision_dev() {
 
 provision_dev_for_selenium() {
   local dev_server=$1
-  docker exec -i ${PROJECT}_${dev_server} bash -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_${dev_server} -q -a) bash -c "
     source /vagrant/bin/init_vagrant_env
     source /vagrant/bin/init_test_env
     ln -s /vagrant-dev/node_modules /vagrant/node_modules
@@ -94,7 +94,7 @@ provision_dev_for_selenium() {
     db_reset -d ggrcdevtest
   "
   echo "Running dev server $dev_server"
-  docker exec -id ${PROJECT}_${dev_server} bash -c "
+  docker exec -id $(docker container ls -f name=${PROJECT}_${dev_server} -q -a) bash -c "
     source /vagrant/bin/init_vagrant_env
     launch_gae_ggrc &> test/selenium/logs/${dev_server}.txt
   "
@@ -185,7 +185,7 @@ selenium_tests () {
   print_line
 
   echo "Running Selenium tests"
-  docker exec -i ${PROJECT}_selenium_1 sh -c "
+  docker exec -i $(docker container ls -f name=${PROJECT}_selenium_1 -q -a) sh -c "
     python /selenium/run_selenium.py" && rc=$? || rc=$?
 
   mv ./test/selenium/logs/results.xml ./test/selenium.xml || true
