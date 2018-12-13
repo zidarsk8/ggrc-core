@@ -467,11 +467,15 @@ class TestIssueIntegration(ggrc.TestCase):
       self.api.delete(iti.issue_tracked_obj)
     mock_update_issue.assert_called_with(iti.issue_id, expected_query)
 
+  @ddt.data("test comment",
+            "  \n\ntest comment\n\n"
+            "  \n\n  \n\n")
   @mock.patch.object(params_builder.BaseIssueTrackerParamsBuilder,
                      "get_ggrc_object_url",
                      return_value="http://issue_url.com")
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
-  def test_adding_comment_to_issue(self, update_issue_mock, url_builder_mock):
+  def test_adding_comment_to_issue(self, desc, update_issue_mock,
+                                   url_builder_mock):
     """Test adding comment to issue."""
     role = all_models.Role.query.filter(
         all_models.Role.name == "Administrator"
@@ -485,13 +489,13 @@ class TestIssueIntegration(ggrc.TestCase):
         enabled=True,
         issue_tracked_obj=factories.IssueFactory()
     )
-    comment = factories.CommentFactory(description="test comment")
+    comment = factories.CommentFactory(description=desc)
     builder_class = params_builder.BaseIssueTrackerParamsBuilder
     expected_result = {
         "comment":
             builder_class.COMMENT_TMPL.format(
                 author=client_user.name,
-                comment=comment.description,
+                comment="test comment",
                 model="Issue",
                 link="http://issue_url.com",
             )
