@@ -20,9 +20,7 @@
         {{/case}}
 
         {{#case 'default'}}
-          {{#instance}}
-            {{> attrTemplate}}
-          {{/instance}}
+          <tree-item-attr {instance}="instance" {name}="attr_name"></tree-item-attr>
         {{/case}}
       {{/switch}}
     </div>
