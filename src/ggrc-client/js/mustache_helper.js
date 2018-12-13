@@ -143,17 +143,6 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
   return exec();
 });
 
-Mustache.registerHelper('if_match', function (val1, val2, options) {
-  let _val1 = resolveComputed(val1);
-  let _val2 = resolveComputed(val2);
-  function exec() {
-    let re = new RegExp(_val2);
-    if (re.test(_val1)) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-  return exec();
-});
-
 Mustache.registerHelper('in_array', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack);
@@ -842,8 +831,8 @@ Mustache.registerHelper('urlPath', function () {
 
   Example:
     {{#if_helpers '\
-      #if_match' page_object.constructor.shortName 'Project' '\
-      and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
+      #if_equals' instance.status 'Assigned' '\
+      and ^if_equals' instance.type 'Audit|Program|Person' '\
     ' _1_hash_arg_for_second_statement=something}}
       matched all conditions
     {{else}}
