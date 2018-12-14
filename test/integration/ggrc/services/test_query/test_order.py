@@ -68,7 +68,9 @@ class TestOrder(TestCase, WithQueryApi):
             "Control Operators",
             "Control Owners",
             "Principal Assignees",
-            "Secondary Assignees")
+            "Secondary Assignees",
+            "Other Contacts",
+            )
   def test_control_roles(self, role):
     """Control roles ordering"""
     sorted_titles = [
