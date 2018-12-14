@@ -244,11 +244,13 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   init: function () {
+    this.cache = {};
+
     let idKey = this.id;
     let _update = this.update;
     let _create = this.create;
     this.bind('created', function (ev, newObj) {
-      let cache = can.getObject('cache', newObj.constructor, true);
+      let cache = newObj.constructor.cache;
       if (newObj[idKey] || newObj[idKey] === 0) {
         if (!isSnapshot(newObj)) {
           cache[newObj[idKey]] = newObj;
@@ -259,7 +261,7 @@ export default can.Model('can.Model.Cacheable', {
       }
     });
     this.bind('destroyed', function (ev, oldObj) {
-      delete can.getObject('cache', oldObj.constructor, true)[oldObj[idKey]];
+      delete oldObj.constructor.cache[oldObj[idKey]];
     });
 
     // FIXME:  This gets set up in a chain of multiple calls to the function defined
@@ -301,15 +303,15 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   findInCacheById: function (id) {
-    return can.getObject('cache', this, true)[id];
+    return this.cache[id];
   },
 
   removeFromCacheById: function (key) {
-    return delete this.store[key];
+    return delete this.cache[key];
   },
 
   newInstance: function (args) {
-    let cache = can.getObject('cache', this, true);
+    let cache = this.cache;
     let isKeyExists = args && args[this.id];
     let isObjectExists = isKeyExists && cache[args[this.id]];
     let notSnapshot = args && !isSnapshot(args);
@@ -422,17 +424,8 @@ export default can.Model('can.Model.Cacheable', {
       this.removeFromCacheById(params[this.id]);
       delete this.cache[params[this.id]];
     }
-    model = this.findInCacheById(params[this.id]) ||
-      (params.provisional_id &&
-        can.getObject('provisional_cache',
-          can.Model.Cacheable, true)[params.provisional_id]);
+    model = this.findInCacheById(params[this.id]);
     if (model && !isSnapshot(params)) {
-      if (model.provisional_id && params.id) {
-        delete can.Model.Cacheable.provisional_cache[model.provisional_id];
-        model.removeAttr('provisional_id');
-        model.constructor.cache[params.id] = model;
-        model.attr('id', params.id);
-      }
       if (model.cleanupAcl && params.access_control_list) {
         // Clear ACL to avoid "merge" of arrays.
         // "params" has valid ACL array.
@@ -565,7 +558,7 @@ export default can.Model('can.Model.Cacheable', {
   },
 }, {
   init: function () {
-    let cache = can.getObject('cache', this.constructor, true);
+    let cache = this.constructor.cache;
     let idKey = this.constructor.id;
     setAttrs(this);
     if ((this[idKey] || this[idKey] === 0) &&
@@ -852,9 +845,6 @@ export default can.Model('can.Model.Cacheable', {
     this.dispatch('modelBeforeSave');
 
     if (isNew) {
-      this.attr('provisional_id', 'provisional_' + Date.now());
-      can.getObject('provisional_cache',
-        can.Model.Cacheable, true)[this.provisional_id] = this;
       if (this.before_create) {
         this.before_create();
       }

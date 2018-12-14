@@ -93,7 +93,7 @@ function getPersonInfo(person) {
     return dfd;
   }
 
-  actualPerson = Person.store[person.id] || {};
+  actualPerson = Person.findInCacheById(person.id) || {};
   if (actualPerson.email) {
     dfd.resolve(actualPerson);
   } else {

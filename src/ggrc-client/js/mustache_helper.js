@@ -1208,12 +1208,12 @@ Mustache.registerHelper('ggrc_config_value', function (key, default_, options) {
   }
   default_ = resolveComputed(default_);
   default_ = default_ || '';
-  return can.getObject(key, [GGRC.config]) || default_;
+  return _.get(GGRC.config, key) || default_;
 });
 
 Mustache.registerHelper('if_config_exist', function (key, options) {
   key = resolveComputed(key);
-  let configValue = can.getObject(key, [GGRC.config]);
+  let configValue = _.get(GGRC.config, key);
 
   return configValue ?
     options.fn(options.contexts) :

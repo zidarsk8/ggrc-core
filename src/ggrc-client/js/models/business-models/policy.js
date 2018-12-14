@@ -25,7 +25,6 @@ export default Directive('CMS.Models.Policy', {
   isRoleable: true,
   attributes: {},
   mixins: [accessControlList],
-  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['DataAsset'],
   },

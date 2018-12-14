@@ -82,7 +82,6 @@ const ObjectMapper = can.Control.extend({
     // each object type will be perceived as a snapshot, except types with
     // special config
     function openForSnapshots(data) {
-      let inScopeObject;
       let config = getBaseConfig();
       let special = [{
         types: ['Issue'],
@@ -116,8 +115,10 @@ const ObjectMapper = can.Control.extend({
       }
 
       self.isLoading = true;
-      inScopeObject =
-        businessModels[data.join_object_type].store[data.join_object_id];
+
+      let model = businessModels[data.join_object_type];
+      let inScopeObject =
+        model.findInCacheById(data.join_object_id);
       inScopeObject.updateScopeObject().then(function () {
         let scopeObject = inScopeObject.attr('audit');
 

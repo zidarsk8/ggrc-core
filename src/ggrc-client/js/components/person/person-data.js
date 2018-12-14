@@ -32,7 +32,7 @@ export default can.Component.extend({
             return;
           }
 
-          actualPerson = Person.store[newVal.id] || {};
+          actualPerson = Person.findInCacheById(newVal.id) || {};
           if (actualPerson.email) {
             setVal(actualPerson);
           } else if (newVal.email) {

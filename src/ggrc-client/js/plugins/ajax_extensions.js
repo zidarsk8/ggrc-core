@@ -32,12 +32,6 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   let data = originalOptions.data;
   let resourceUrl = originalOptions.url.split('?')[0];
 
-  function attachProvisionalId(prop) {
-    jqXHR.done(function (obj) {
-      obj[prop].provisional_id = data[prop].provisional_id;
-    });
-  }
-
   if (/^\/api\//.test(options.url)
     && /PUT|POST|DELETE/.test(options.type.toUpperCase())) {
     options.dataType = 'json';
@@ -48,12 +42,6 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 
     options.data = options.type.toUpperCase() === 'DELETE' ? ''
       : JSON.stringify(data);
-
-    for (let i in data) {
-      if (data.hasOwnProperty(i) && data[i] && data[i].provisional_id) {
-        attachProvisionalId(i);
-      }
-    }
   }
   if (/^\/api\//.test(options.url) && (options.type.toUpperCase() === 'GET')) {
     options.cache = false;

@@ -47,7 +47,6 @@ export default can.Component.extend({
         delete serial.selfLink;
         delete serial.created_at;
         delete serial.updated_at;
-        delete serial.provisional_id;
         serial[el.attr('name')] = new Stub(ui.item);
         that.viewModel.instance.destroy().then(function () {
           new that.viewModel.model(serial).save();
