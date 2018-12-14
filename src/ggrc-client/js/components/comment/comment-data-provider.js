@@ -8,7 +8,7 @@ import {REFRESH_COMMENTS} from '../../events/eventTypes';
 import Relationship from '../../models/service-models/relationship';
 import Context from '../../models/service-models/context';
 
-export default can.Component.extend('commentDataProvider', {
+export default can.Component.extend({
   tag: 'comment-data-provider',
   viewModel: {
     instance: null,

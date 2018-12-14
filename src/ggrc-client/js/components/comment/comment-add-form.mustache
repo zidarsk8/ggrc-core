@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if isAllowedToAddComment}}
 <div class="comment-add-form__section">
     <comment-input {(value)}="*commentValue"
                    {disabled}="isSaving"></comment-input>
@@ -22,4 +21,3 @@
                             (comment-created)="onCommentCreated(%event)"
                             {is-saving}="isSaving">Add</comment-add-button>
 </div>
-{{/if}}

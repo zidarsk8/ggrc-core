@@ -3,9 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../components/comment/comment-data-provider';
-import '../components/comment/comment-add-form';
-import '../components/comment/mapped-comments';
+import '../components/comment/comments-section';
 import '../components/proposal/create-proposal-button';
 import '../components/related-objects/proposals/related-proposals';
 import '../components/related-objects/proposals/related-proposals-item';
