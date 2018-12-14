@@ -108,15 +108,15 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
 
 
 class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
-  """Column handler for integration enabled column.
+  """Column handler for ticket tracker integration column.
 
   Enabled flag stored as tinyint(1) in our DB.
   """
-  _true = "true"
-  _false = "false"
+  _true = "on"
+  _false = "off"
 
-  TRUE_VALUES = {"yes", _true}
-  FALSE_VALUES = {"no", _false}
+  TRUE_VALUES = {"yes", "true", _true}
+  FALSE_VALUES = {"no", "false", _false}
 
   def set_obj_attr(self):
     if self.dry_run:
