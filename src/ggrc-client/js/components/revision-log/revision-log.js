@@ -116,7 +116,7 @@ export default can.Component.extend({
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CHANGE_LOG);
 
-      return this._fetchRevisionsDataByQuery()
+      return this._fetchRevisionsData()
         .done(function (revisions) {
           let fullHistory;
           // calculate history of role changes
@@ -244,33 +244,30 @@ export default can.Component.extend({
           }
         });
 
-        return this._fetchEmbeddedRevisionData(rq.objects, rq)
-          .then(function (embedded) {
-            return rq.trigger().then(function () {
-              let reify = function (revision) {
-                _.forEach(['modified_by', 'source', 'destination'],
-                  function (field) {
-                    if (revision[field] && revision[field].reify) {
-                      revision.attr(field, revision[field].reify());
-                    }
-                  });
-                return revision;
-              };
-              let objRevisions = [];
-              let mappings = [...embedded];
-              _.forEach(revisions, (revision) => {
-                if (revision.destination || revision.source) {
-                  mappings.push(revision);
-                } else {
-                  objRevisions.push(revision);
+        return rq.trigger().then(function () {
+          let reify = function (revision) {
+            _.forEach(['modified_by', 'source', 'destination'],
+              function (field) {
+                if (revision[field] && revision[field].reify) {
+                  revision.attr(field, revision[field].reify());
                 }
               });
-              return {
-                object: _.map(objRevisions, reify),
-                mappings: _.map(mappings, reify),
-              };
-            });
+            return revision;
+          };
+          let objRevisions = [];
+          let mappings = [];
+          _.forEach(revisions, (revision) => {
+            if (revision.destination || revision.source) {
+              mappings.push(revision);
+            } else {
+              objRevisions.push(revision);
+            }
           });
+          return {
+            object: _.map(objRevisions, reify),
+            mappings: _.map(mappings, reify),
+          };
+        });
       });
     },
     /**
