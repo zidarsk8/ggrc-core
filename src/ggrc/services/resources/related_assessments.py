@@ -72,7 +72,8 @@ class RelatedAssessmentsResource(common.Resource):
       ).join(
           acr
       ).join(
-          acp
+          acp,
+          acl.base_id == acp.ac_list_id
       ).filter(
           acr.read == 1,
           acl.object_type == "Assessment",
