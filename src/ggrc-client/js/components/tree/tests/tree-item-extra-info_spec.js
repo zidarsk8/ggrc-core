@@ -113,4 +113,98 @@ describe('tree-item-extra-info component', function () {
         expect(result).toBe(false);
       });
   });
+
+  describe('processPendingContent() method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'addContent');
+    });
+
+    it('extracts pending content from pendingContent field', () => {
+      const pendingContent = [
+        () => Promise.resolve(),
+        () => Promise.resolve(),
+      ];
+      viewModel.attr('pendingContent').push(...pendingContent);
+
+      viewModel.processPendingContent();
+
+      expect(viewModel.attr('pendingContent.length')).toBe(0);
+    });
+
+    it('calls addContent() with resolved pending content', () => {
+      const expected = [
+        Promise.resolve('Content 1'),
+        Promise.resolve('Content 2'),
+      ];
+      const pendingContent = expected.map((promise) => () => promise);
+      viewModel.attr('pendingContent').push(...pendingContent);
+
+      viewModel.processPendingContent();
+
+      expect(viewModel.addContent).toHaveBeenCalledWith(...expected);
+    });
+  });
+
+  describe('addDeferredContent() method', () => {
+    it('pushes passed callback from event to pendingContent', () => {
+      const event = {
+        deferredCallback: () => Promise.resolve(),
+      };
+      viewModel.attr('pendingContent', []);
+
+      viewModel.addDeferredContent(event);
+
+      expect(viewModel.attr('pendingContent').serialize()).toEqual([
+        event.deferredCallback,
+      ]);
+    });
+  });
+
+  describe('addContent() method', () => {
+    beforeEach(() => {
+      spyOn($, 'when').and.returnValue(new Promise(() => {}));
+    });
+
+    it('sets spin field to true', () => {
+      viewModel.addContent();
+      expect(viewModel.attr('spin')).toBe(true);
+    });
+
+    it('pushes passed deferred objects to contentPromises', () => {
+      const promises = [
+        Promise.resolve(),
+        Promise.resolve(),
+      ];
+
+      viewModel.addContent(...promises);
+
+      expect(viewModel.attr('contentPromises').serialize()).toEqual(promises);
+    });
+
+    it('updates dfdReady field with updated contentPromises', () => {
+      const promises = [
+        Promise.resolve(),
+        Promise.resolve(),
+      ];
+
+      viewModel.addContent(promises);
+
+      expect(viewModel.attr('dfdReady')).toEqual(jasmine.any(Promise));
+    });
+
+    describe('after resolving of contentPromises', () => {
+      beforeEach(() => {
+        $.when.and.returnValue(Promise.resolve());
+      });
+
+      it('sets spin field to false', async (done) => {
+        viewModel.addContent();
+
+        await viewModel.attr('dfdReady');
+
+        expect(viewModel.attr('spin')).toBe(false);
+        done();
+      });
+    });
+  });
 });
