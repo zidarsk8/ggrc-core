@@ -199,6 +199,17 @@ const DEFERRED_MAP_OBJECTS = {
   type: 'deferredMapObjects',
 };
 
+/**
+ * Refreshes counter of mapped objects.
+ * @event refreshMappedCounter
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} modelType - Type of model.
+ */
+const REFRESH_MAPPED_COUNTER = {
+  type: 'refreshMappedCounter',
+};
+
 export {
   REFRESH_SUB_TREE,
   REFRESH_RELATED,
@@ -219,4 +230,5 @@ export {
   DOCUMENT_CREATE_FAILED,
   MAP_OBJECTS,
   DEFERRED_MAP_OBJECTS,
+  REFRESH_MAPPED_COUNTER,
 };

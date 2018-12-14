@@ -8,6 +8,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 import Mappings from '../../models/mappers/mappings';
+import {REFRESH_MAPPED_COUNTER} from '../../events/eventTypes';
 
 let titlesMap = {
   Total: {
@@ -43,6 +44,12 @@ let viewModel = can.Map.extend({
   instance: null,
   type: '@',
   count: 0,
+  /**
+   * Just to avoid multiple dispatching of deferredUpdateCounter event,
+   * we lock it. It helps us to avoid extra queries, which might be produced
+   * by load method.
+   */
+  lockUntilDeferredUpdate: false,
   load: function () {
     let instance = this.attr('instance');
     let type = this.attr('type');
@@ -64,6 +71,25 @@ let viewModel = can.Map.extend({
       this.attr('count', total);
     }.bind(this));
   },
+  deferredUpdateCounter() {
+    const isLocked = this.attr('lockUntilDeferredUpdate');
+
+    if (isLocked) {
+      return;
+    }
+
+    this.attr('lockUntilDeferredUpdate', true);
+
+    const deferredCallback = () => this.load()
+      .always(() => {
+        this.attr('lockUntilDeferredUpdate', false);
+      });
+
+    this.dispatch({
+      type: 'deferredUpdateCounter',
+      deferredCallback,
+    });
+  },
 });
 
 export default can.Component.extend({
@@ -77,6 +103,15 @@ export default can.Component.extend({
 
       if (vm.addContent) {
         vm.addContent(promise);
+      }
+    },
+    [`{viewModel.instance} ${REFRESH_MAPPED_COUNTER.type}`](instance, {
+      modelType,
+    }) {
+      const viewModel = this.viewModel;
+
+      if (viewModel.attr('type') === modelType) {
+        viewModel.deferredUpdateCounter();
       }
     },
   },
