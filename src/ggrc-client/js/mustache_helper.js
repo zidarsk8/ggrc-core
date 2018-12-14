@@ -829,6 +829,15 @@ Mustache.registerHelper('localize_date_today', function (value) {
   return localizeDate(value, value, 'MM/DD/YYYY');
 });
 
+Mustache.registerHelper('normalizeLink', (value) => {
+  let link = resolveComputed(value);
+  if (link) {
+    link = link.replace(/^(?!(?:\w+:)?\/)/, 'http://');
+  }
+
+  return link;
+});
+
 Mustache.registerHelper('capitalize', function (value, options) {
   value = resolveComputed(value) || '';
   return can.capitalize(value);
