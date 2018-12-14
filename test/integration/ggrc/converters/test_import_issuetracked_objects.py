@@ -82,7 +82,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
 
   def _assert_integration_state(self, obj, value):
-    """Make assertion to check integration enabled field"""
+    """Make assertion to check Ticket Tracker Integration field."""
     expected_res = bool(value in
                         issue_tracker.IssueTrackerEnabledHandler.TRUE_VALUES)
 
@@ -92,16 +92,20 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.data(
       ("Issue", "yes"),
       ("Issue", "no"),
+      ("Issue", "on"),
+      ("Issue", "off"),
       ("Issue", "true"),
       ("Issue", "false"),
       ("Assessment", "yes"),
       ("Assessment", "no"),
+      ("Assessment", "on"),
+      ("Assessment", "off"),
       ("Assessment", "true"),
       ("Assessment", "false"),
   )
   @ddt.unpack
   def test_import_enabled_update_succeed(self, model, value):
-    """Test {0} integration state {1} set correctly during update via import"""
+    """Test {0} integration state {1} set correctly when updated via import."""
     with factories.single_commit():
       factory = factories.get_model_factory(model)
       obj = factory()
@@ -112,13 +116,13 @@ class TestIssueTrackedImport(ggrc.TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", model),
         ("Code*", obj.slug),
-        ("Integration Enabled", value),
+        ("Ticket Tracker Integration", value),
     ]))
     obj = models.get_model(model).query.one()
     self._check_csv_response(response, {})
     self._assert_integration_state(obj, value)
 
-  @ddt.data("yes", "no", "true", "false")
+  @ddt.data("yes", "no", "on", "off", "true", "false")
   def test_enabled_state_issue_create_succeed(self, value):
     """Test Issue integration state set correctly during create via import."""
     response = self.import_data(OrderedDict([
@@ -126,14 +130,14 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Code*", "OBJ-1"),
         ("Admin", "user@example.com"),
         ("Title", "Object Title"),
-        ("Integration Enabled", value),
+        ("Ticket Tracker Integration", value),
     ]))
 
     self._check_csv_response(response, {})
     obj = all_models.Issue.query.one()
     self._assert_integration_state(obj, value)
 
-  @ddt.data("yes", "no", "true", "false")
+  @ddt.data("yes", "no", "on", "off", "true", "false")
   def test_enabled_state_assmt_create_succeed(self, value):
     """Test Assessment integration state set correctly during create."""
     audit = factories.AuditFactory()
@@ -144,7 +148,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
         ("Title", "Object Title"),
-        ("Integration Enabled", value),
+        ("Ticket Tracker Integration", value),
     ]))
 
     self._check_csv_response(response, {})
@@ -153,12 +157,14 @@ class TestIssueTrackedImport(ggrc.TestCase):
 
   @ddt.data("Issue", "Assessment")
   def test_enabled_state_default_value(self, model):
-    """Test correct default value was set to {0} Issue Title during import"""
+    """Test correct default value was set to {0} Issue Title during import."""
     factory = factories.get_model_factory(model)
     obj = factory(title="Object Title")
     expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3,
-                                          column_name="Integration Enabled")
+        errors.WRONG_VALUE_DEFAULT.format(
+            line=3,
+            column_name="Ticket Tracker Integration",
+        )
     )
     expected_messages = {
         model: {
@@ -168,7 +174,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", model),
         ("Code*", obj.slug),
-        ("Integration Enabled", ""),
+        ("Ticket Tracker Integration", ""),
     ]))
     self._check_csv_response(response, expected_messages)
     obj = models.get_model(model).query.one()
@@ -236,8 +242,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_type", "Issue Type", "PARABOLA"),
   )
   @ddt.unpack
-  def test_issue_default_value_set_correctly(self, missed_field, alias, value):
-    """Test correct default value was set to {1} during import"""
+  def test_default_value_set_correctly(self, missed_field, alias, value):
+    """Test correct default value was set to {1} during import."""
     expected_warning = (
         errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
     )
@@ -260,7 +266,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
 
   @ddt.data("Issue", "Assessment")
   def test_default_value_title(self, model):
-    """Test correct default value was set to {0} Issue Title during import"""
+    """Test correct default value was set to {0} Issue Title during import."""
     factory = factories.get_model_factory(model)
     obj = factory(title="Object Title")
     expected_warning = (
