@@ -45,7 +45,7 @@ function create(key, data) {
   window.localStorage.setItem(`${key}:ids`, JSON.stringify(ids));
 
   // create new
-  let item = can.extend({id}, data);
+  let item = Object.assign({id}, data);
   window.localStorage.setItem(`${key}:${id}`, JSON.stringify(item));
 
   return item;

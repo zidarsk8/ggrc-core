@@ -235,7 +235,7 @@ export default can.Model('can.Model.Cacheable', {
     }
 
     // set up default attribute converters/serializers for all classes
-    can.extend(this.attributes, {
+    Object.assign(this.attributes, {
       created_at: 'datetime',
       updated_at: 'datetime',
     });
@@ -519,7 +519,7 @@ export default can.Model('can.Model.Cacheable', {
     }
 
     function findPageFunc(url, data, params, scope) {
-      let ajaxOptions = can.extend({
+      let ajaxOptions = Object.assign({
         url: url,
         data: data,
       }, params);

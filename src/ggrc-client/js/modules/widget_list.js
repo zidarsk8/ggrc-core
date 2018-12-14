@@ -41,7 +41,7 @@ export default can.Construct.extend({
         if (!widgets[id]) {
           widgets[id] = descriptor;
         } else {
-          can.extend(true, widgets[id], descriptor);
+          _.merge(widgets[id], descriptor);
         }
       });
     });
@@ -101,7 +101,7 @@ export default can.Construct.extend({
 }, {
   init: function (name, opts) {
     this.constructor.modules[name] = this;
-    can.extend(this, opts);
+    Object.assign(this, opts);
   },
   /*
     Here instead of using the object format described in the class comments, you may instead
@@ -115,21 +115,9 @@ export default can.Construct.extend({
   add_widget: function (pageType, id, descriptor) {
     this[pageType] = this[pageType] || {};
     if (this[pageType][id]) {
-      can.extend(true, this[pageType][id], descriptor);
+      _.merge(this[pageType][id], descriptor);
     } else {
       this[pageType][id] = descriptor;
-    }
-  },
-  suppress_widget: function (pageType, id) {
-    this[pageType] = this[pageType] || {};
-    if (this[pageType][id]) {
-      can.extend(true, this[pageType][id], {
-        suppressed: true,
-      });
-    } else {
-      this[pageType][id] = {
-        suppressed: true,
-      };
     }
   },
 });

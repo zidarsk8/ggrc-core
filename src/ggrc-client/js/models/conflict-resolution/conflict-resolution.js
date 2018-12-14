@@ -52,11 +52,11 @@ export function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
 }
 
 export default function resolveConflict(xhr, obj) {
-  let attrs = can.extend(true, {}, obj.attr());
-  let baseAttrs = can.extend(true, {}, obj._backupStore()) || {};
+  let attrs = _.merge({}, obj.attr());
+  let baseAttrs = _.merge({}, obj._backupStore()) || {};
   return obj.refresh().then(function (obj) {
     let conflict = false;
-    let remoteAttrs = can.extend(true, {}, obj.attr());
+    let remoteAttrs = _.merge({}, obj.attr());
 
     if (can.Object.same(remoteAttrs, attrs)) {
       // current state is same as server state -- do nothing.

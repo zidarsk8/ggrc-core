@@ -3,27 +3,21 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('can.Control', function () {
-  'use strict';
+import {bindXHRToButton} from '../../utils/modals';
 
-  let Control;
-
-  beforeEach(function () {
-    Control = can.Control.prototype;
-  });
-
-  describe('bindXHRToButton() method', function () {
+describe('modal utils', () => {
+  describe('bindXHRToButton() method', () => {
     let dfd;
 
-    beforeEach(function () {
+    beforeEach(() => {
       dfd = new can.Deferred();
     });
 
-    function callBindXHRToButton(done, actualInnerHtml, newtext, disable) {
+    const callBindXHRToButton = (done, actualInnerHtml, newtext, disable) => {
       let element = $('<button>' + actualInnerHtml + '</button>');
 
       // call bindXHRToButton()
-      Control.bindXHRToButton(dfd, element, newtext, disable);
+      bindXHRToButton(dfd, element, newtext, disable);
 
       // button should have 'disabled' class after call bindXHRToButton
       expect(element.hasClass('disabled')).toEqual(true);
@@ -39,7 +33,7 @@ describe('can.Control', function () {
       }
 
       dfd.then(
-        setTimeout(function () {
+        setTimeout(() => {
           expect(element[0].innerHTML).toEqual(actualInnerHtml);
 
           // button should not have 'disabled' class after dfd.resolve()
@@ -54,57 +48,53 @@ describe('can.Control', function () {
       );
 
       dfd.resolve();
-    }
+    };
 
-    it('bindXHRToButton() should save text of button', function (done) {
+    it('bindXHRToButton() should save text of button', (done) => {
       callBindXHRToButton(done, 'HELLO WORLD');
     });
 
-    it('bindXHRToButton() should save icon inside button', function (done) {
+    it('bindXHRToButton() should save icon inside button', (done) => {
       callBindXHRToButton(done, '<i class="fa fa-icon"></i>');
     });
 
-    it('bindXHRToButton() should save icon and text inside button',
-      function (done) {
-        callBindXHRToButton(done, '<i class="fa fa-icon"></i>My text');
-      }
-    );
+    it('bindXHRToButton() should save icon and text inside button', (done) => {
+      callBindXHRToButton(done, '<i class="fa fa-icon"></i>My text');
+    });
 
     it('bindXHRToButton() should save text of button. Disable button',
-      function (done) {
+      (done) => {
         callBindXHRToButton(done, 'HELLO WORLD', '', true);
       }
     );
 
     it('bindXHRToButton() should save icon inside button. New text',
-      function (done) {
+      (done) => {
         callBindXHRToButton(done, '<i class="fa fa-icon"></i>', 'My new text');
       }
     );
 
     it('bindXHRToButton() should save text of button. New text. Disable button',
-      function (done) {
+      (done) => {
         callBindXHRToButton(done, 'HELLO WORLD', '<i class="fa"></i>', true);
       }
     );
 
-    it('bindXHRToButton() should resolve empty element',
-      function (done) {
-        let element = $('');
+    it('bindXHRToButton() should resolve empty element', (done) => {
+      let element = $('');
 
-        // call bindXHRToButton()
-        Control.bindXHRToButton(dfd, element);
+      // call bindXHRToButton()
+      bindXHRToButton(dfd, element);
 
-        dfd.then(
-          setTimeout(function () {
-            // button should not have 'disabled' class after dfd.resolve()
-            expect(element.hasClass('disabled')).toEqual(false);
-            done();
-          }, 3)
-        );
+      dfd.then(
+        setTimeout(() => {
+          // button should not have 'disabled' class after dfd.resolve()
+          expect(element.hasClass('disabled')).toEqual(false);
+          done();
+        }, 3)
+      );
 
-        dfd.resolve();
-      }
-    );
+      dfd.resolve();
+    });
   });
 });
