@@ -92,8 +92,7 @@ class TestAuditImport(TestCase):
     self.assertEqual(all_models.Audit.query.count(), 1)
 
   def test_audit_import_program_omit(self):
-    """Test whether audit's program remains the same (new value is ignored)
-    after updating audit by importing it with changed program field"""
+    """If program value for existing audit has changed ignore it"""
     with factories.single_commit():
       original_program = factories.ProgramFactory()
       original_program_slug = original_program.slug
@@ -113,8 +112,7 @@ class TestAuditImport(TestCase):
     self.assertEqual(actual_program_slug, original_program_slug)
 
   def test_audit_import_program_warn(self):
-    """Test whether warning message occurred after attempt of changing program
-    for existing audit by importing it (audit) with changed program field"""
+    """Test warning on import of existing audit with changed program"""
     with factories.single_commit():
       original_program = factories.ProgramFactory()
       audit = factories.AuditFactory(program=original_program)
