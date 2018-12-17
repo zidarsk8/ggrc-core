@@ -48,7 +48,7 @@ export default Cacheable('CMS.Models.Control', {
     url: '',
     status: 'Draft',
     send_by_default: true,
-    recipients: 'Admin,Control Operators,Control Owners',
+    recipients: 'Admin,Control Operators,Control Owners,Other Contacts',
   },
   tree_view_options: {
     attr_view: GGRC.mustache_path + '/controls/tree-item-attr.mustache',

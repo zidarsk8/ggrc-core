@@ -56,7 +56,9 @@ export default can.Component.extend({
         get: function () {
           let roles;
           if (this.attr('itemData.type') === 'Control') {
-            roles = ['Admin', 'Control Operators', 'Control Owners'];
+            roles = [
+              'Admin', 'Control Operators', 'Control Owners', 'Other Contacts',
+            ];
           } else {
             roles = ['Admin', 'Primary Contacts', 'Secondary Contacts'];
           }
