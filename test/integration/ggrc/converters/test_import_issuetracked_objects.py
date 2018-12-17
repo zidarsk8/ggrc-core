@@ -58,6 +58,12 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("Assessment", "issue_severity", "Severity", "S1"),
       ("Assessment", "issue_type", "Issue Type", "BUG"),
       ("Assessment", "title", "Issue Title", "iti_title"),
+      ("Audit", "component_id", "Component ID", 123),
+      ("Audit", "hotlist_id", "Hotlist ID", 321),
+      ("Audit", "issue_priority", "Priority", "P1"),
+      ("Audit", "issue_severity", "Severity", "S1"),
+      ("Audit", "issue_type", "Issue Type", "BUG"),
+      ("Audit", "title", "Issue Title", "iti_title"),
   )
   @ddt.unpack
   def test_import_update_succeed(self, model, field, alias, value):
@@ -91,6 +97,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("Issue", "off"),
       ("Assessment", "on"),
       ("Assessment", "off"),
+      ("Audit", "on"),
+      ("Audit", "off"),
   )
   @ddt.unpack
   def test_import_enabled_update_succeed(self, model, value):
@@ -144,7 +152,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = all_models.Assessment.query.one()
     self._assert_integration_state(obj, value)
 
-  @ddt.data("Issue", "Assessment")
+  @ddt.data("Issue", "Assessment", "Audit")
   def test_enabled_state_default_value(self, model):
     """Test correct default value was set to {0} Issue Title during import."""
     factory = factories.get_model_factory(model)
@@ -252,6 +260,87 @@ class TestIssueTrackedImport(ggrc.TestCase):
     issue = all_models.Issue.query.one()
     self.assertEqual(str(issue.issue_tracker[missed_field]),
                      str(default_values[missed_field]))
+
+  @ddt.data(
+      ("component_id", "Component ID", ""),
+      ("component_id", "Component ID", "sss"),
+      ("hotlist_id", "Hotlist ID", ""),
+      ("hotlist_id", "Hotlist ID", "aaa"),
+      ("issue_priority", "Priority", ""),
+      ("issue_priority", "Priority", "P6"),
+      ("issue_severity", "Severity", ""),
+      ("issue_severity", "Severity", "aa"),
+      ("issue_type", "Issue Type", ""),
+      ("issue_type", "Issue Type", "PARABOLA"),
+  )
+  @ddt.unpack
+  def test_audit_default_value_set_correctly(self, missed_field, alias, value):
+    """Test correct default value was set to Audit {1} during import"""
+    program = factories.ProgramFactory()
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
+    )
+    expected_messages = {
+        "Audit": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "slug-1"),
+        ("Program", program.slug),
+        ("Title", "Audit Title"),
+        ("State", "Planned"),
+        ("Audit Captains", "user@example.com"),
+        (alias, value),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    issue = all_models.Audit.query.one()
+    self.assertEqual(str(issue.issue_tracker[missed_field]),
+                     str(default_values[missed_field]))
+
+  @ddt.data(
+      ("component_id", "Component ID", 123),
+      ("hotlist_id", "Hotlist ID", 321),
+      ("issue_priority", "Priority", "P1"),
+      ("issue_severity", "Severity", "S1"),
+      ("issue_type", "Issue Type", "BUG"),
+  )
+  @ddt.unpack
+  def test_audit_import_create_succeed(self, field, alias, value):
+    """Test Audit {1} set correctly during create via import."""
+    program = factories.ProgramFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "slug-1"),
+        ("Program", program.slug),
+        ("Title", "Audit Title"),
+        ("State", "Planned"),
+        ("Audit Captains", "user@example.com"),
+        (alias, value),
+    ]))
+
+    self._check_csv_response(response, {})
+    obj = all_models.Audit.query.one()
+    self.assertEqual(str(obj.issue_tracker[field]), str(value))
+
+  @ddt.data("yes", "no", "true", "false")
+  def test_enabled_state_audit_create_succeed(self, value):
+    """Test Audit integration state set correctly during create via import."""
+    program = factories.ProgramFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "slug-1"),
+        ("Program", program.slug),
+        ("Title", "Audit Title"),
+        ("State", "Planned"),
+        ("Audit Captains", "user@example.com"),
+        ("Integration Enabled", value),
+    ]))
+
+    self._check_csv_response(response, {})
+    obj = all_models.Audit.query.one()
+    self._assert_integration_state(obj, value)
 
   @ddt.data("Issue", "Assessment")
   def test_default_value_title(self, model):
