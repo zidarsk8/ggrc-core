@@ -8,6 +8,7 @@
 # pylint: disable=too-many-locals
 
 import pytest
+from tenacity import RetryError
 
 from lib import base, url, users
 from lib.constants import messages, objects, object_states, roles
@@ -554,6 +555,7 @@ class TestSnapshots(base.Test):
     return user
 
   @pytest.mark.smoke_tests
+  @pytest.mark.xfail(raises=RetryError)
   @pytest.mark.parametrize(
       "dynamic_objects, dynamic_relationships",
       [(None, None),

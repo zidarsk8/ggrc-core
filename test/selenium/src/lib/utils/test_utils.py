@@ -30,13 +30,13 @@ class HtmlParser(object):
     return re.sub(r'\s+', " ", text)
 
 
-def wait_for(func):
+def wait_for(func, timeout=constants.ux.MAX_USER_WAIT_SECONDS):
   """Waits for function to return truthy value."""
   def is_falsy(value):
     """Return whether value if falsy (None or False)."""
     return not value
   return tenacity.Retrying(
-      stop=tenacity.stop_after_delay(constants.ux.MAX_USER_WAIT_SECONDS),
+      stop=tenacity.stop_after_delay(timeout),
       retry=tenacity.retry_if_result(is_falsy))(func)
 
 
