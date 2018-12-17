@@ -24,7 +24,6 @@ import {
   batchRequests,
 } from './plugins/utils/query-api-utils';
 import Search from './models/service-models/search';
-import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import Mappings from './models/mappers/mappings';
@@ -293,24 +292,6 @@ function deferRender(tagPrefix, funcs, deferred) {
   hook = can.view.hook(hookup);
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 }
-
-Mustache.registerHelper('with_current_user_as', function (name, options) {
-  if (!options) {
-    options = name;
-    name = 'current_user';
-  }
-  let pageObject = Person.findInCacheById(GGRC.current_user.id) ||
-    Person.model(GGRC.current_user);
-
-  if (pageObject) {
-    let po = {};
-    po[name] = pageObject;
-    options.contexts = options.contexts.add(po);
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
 
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
