@@ -893,17 +893,6 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   };
 });
 
-Mustache.registerHelper('grdive_msg_to_id', function (message) {
-  let msg = Mustache.resolve(message);
-
-  if (!msg) {
-    return;
-  }
-
-  msg = msg.split(' ');
-  return msg[msg.length-1];
-});
-
 Mustache.registerHelper('disable_if_errors', function (instance) {
   let ins;
   let res;

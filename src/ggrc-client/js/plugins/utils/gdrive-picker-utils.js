@@ -115,3 +115,11 @@ export function findGDriveItemById(id) {
   return gapiClient.authorizeGapi(['https://www.googleapis.com/auth/drive'])
     .then(() => gapiClient.makeGapiRequest({path, method: 'get'}));
 }
+
+export function getGDriveItemId(msg) {
+  if (!msg) {
+    return;
+  }
+  msg = msg.split(' ');
+  return msg[msg.length-1];
+}
