@@ -12,8 +12,7 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 
 from ggrc import db
-from ggrc.converters import errors
-from ggrc.converters import get_exportables
+from ggrc.converters import get_exportables, errors
 from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.mixins import ScopeObject
@@ -696,6 +695,12 @@ class ProgramColumnHandler(ParentColumnHandler):
   def set_obj_attr(self):
     if self.row_converter.is_new:
       super(ProgramColumnHandler, self).set_obj_attr()
+    else:
+      owned_program_id = self.row_converter.obj.program_id
+      given_program_id = self.value.id
+      if owned_program_id != given_program_id:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
 
 
 class RequirementDirectiveColumnHandler(MappingColumnHandler):

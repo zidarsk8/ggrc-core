@@ -94,7 +94,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     """Test if importing new assessments results in notifications for all."""
     self.assertEqual(self._get_notifications().count(), 0)
 
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     titles = [asmt.title for asmt in Assessment.query]
 
@@ -113,7 +113,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_updated_notifications(self, send_email):
     """Test if updating an assessment results in a notification."""
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -325,7 +325,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     """Test if updating assessment state results in notifications."""
     # pylint: disable=too-many-statements
 
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -527,7 +527,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     Users should only be notificed about the last state change, and not about
     every state change that happened.
     """
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -567,7 +567,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_reopen_notifications_on_edit(self, send_email):
     """Test if updating assessment results in reopen notification."""
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -754,7 +754,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     with freeze_time("2015-04-01"):
 
       self.assertEqual(self._get_notifications().count(), 0)
-      self.import_file("assessment_template_no_warnings.csv")
+      self.import_file("assessment_template_no_warnings.csv", safe=False)
       self.import_file("assessment_with_templates.csv")
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
@@ -812,7 +812,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     """
     with freeze_time("2015-04-01"):
       self.assertEqual(self._get_notifications().count(), 0)
-      self.import_file("assessment_template_no_warnings.csv")
+      self.import_file("assessment_template_no_warnings.csv", safe=False)
       self.import_file("assessment_with_templates.csv")
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
@@ -891,7 +891,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     """Test that starting an Assessment results in a notification."""
 
     with freeze_time("2015-04-01"):
-      self.import_file("assessment_template_no_warnings.csv")
+      self.import_file("assessment_template_no_warnings.csv", safe=False)
       self.import_file("assessment_with_templates.csv")
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
       self.client.get("/_notifications/send_daily_digest")
@@ -913,7 +913,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     """Test that Assessment started notification masks updated notification.
     """
     with freeze_time("2015-04-01"):
-      self.import_file("assessment_template_no_warnings.csv")
+      self.import_file("assessment_template_no_warnings.csv", safe=False)
       self.import_file("assessment_with_templates.csv")
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
       self.client.get("/_notifications/send_daily_digest")
@@ -939,7 +939,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     clicks the Undo button to revert the change. A status change notification
     should not be sent in such cases.
     """
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
@@ -981,7 +981,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     Users should only be notificed about the last state change, and not about
     every state change that happened.
     """
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -1018,7 +1018,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_reopen_notifications_on_edit(self, send_email):
     """Test if updating assessment results in reopen notification."""
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -1054,7 +1054,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     CAD(definition_type="assessment", title="CA 1",)
     cad2 = CAD(definition_type="assessment", title="CA 2",)
 
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
@@ -1114,7 +1114,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     "Completed", or the "In Review" state, skipping the "In Progress"
     state.
     """
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
@@ -1144,7 +1144,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     Adding (removing) a person to (from) Assessment should be detected and
     considered an Assessment change.
     """
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
@@ -1250,7 +1250,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     Adding (removing) a URL to (from) Assessment should be detected and
     considered an Assessment change.
     """
-    self.import_file("assessment_template_no_warnings.csv")
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
