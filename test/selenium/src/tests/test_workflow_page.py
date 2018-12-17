@@ -12,7 +12,7 @@ import pytest
 from lib import base, users
 from lib.app_entity_factory import (
     entity_factory_common, workflow_entity_factory)
-from lib.constants import roles
+from lib.constants import roles, workflow_repeat_units
 from lib.entities import cycle_entity_population, ui_dict_convert
 from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.rest_facades import (
@@ -69,6 +69,19 @@ class TestCreateWorkflow(base.Test):
     actual_task_groups = workflow_ui_facade.task_group_objs(
         workflow)
     test_utils.list_obj_assert(actual_task_groups, workflow.task_groups)
+
+  def test_create_repeate_on_workflow(
+      self, login_as_creator_or_reader, selenium
+  ):
+    """Test creation repeat on workflow."""
+    workflow = workflow_entity_factory.WorkflowFactory().create(
+        repeat_every=1, repeat_unit=workflow_repeat_units.WEEKDAY)
+    workflow_entity_factory.TaskGroupFactory().create(workflow=workflow)
+    workflow_ui_facade.create_workflow(workflow)
+    actual_workflow = ui_facade.get_obj(workflow)
+    object_rest_facade.set_attrs_via_get(workflow, ["created_at"])
+    object_rest_facade.set_attrs_via_get(workflow, ["updated_at"])
+    test_utils.obj_assert(actual_workflow, workflow)
 
 
 class TestWorkflowInfoPage(base.Test):
