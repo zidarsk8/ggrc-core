@@ -324,64 +324,6 @@ Mustache.registerHelper('using', function (options) {
   return deferRender('span', finish, refreshQueue.trigger());
 });
 
-Mustache.registerHelper('person_roles', function (person, scope, options) {
-  let rolesDeferred = new $.Deferred();
-  let refreshQueue = new RefreshQueue();
-
-  if (!options) {
-    options = scope;
-    scope = null;
-  }
-
-  person = Mustache.resolve(person);
-  person = person.reify();
-  refreshQueue.enqueue(person);
-  // Force monitoring of changes to `person.user_roles`
-  person.attr('user_roles');
-  refreshQueue.trigger().then(function () {
-    let userRoles = person.user_roles.reify();
-    let userRolesRefreshQueue = new RefreshQueue();
-
-    userRolesRefreshQueue.enqueue(userRoles);
-    userRolesRefreshQueue.trigger().then(function () {
-      let roles = can.map(
-        can.makeArray(userRoles),
-        function (userRole) {
-          if (userRole.role) {
-            return userRole.role.reify();
-          }
-        });
-      let rolesRefreshQueue = new RefreshQueue();
-      rolesRefreshQueue.enqueue(roles.splice());
-      rolesRefreshQueue.trigger().then(function () {
-        roles = can.map(can.makeArray(roles), function (role) {
-          if (!scope || new RegExp(scope).test(role.scope)) {
-            return role;
-          }
-        });
-
-        //  "Superuser" roles are determined from config
-        //  FIXME: Abstraction violation
-        if ((!scope || new RegExp(scope).test('System'))
-            && GGRC.config.BOOTSTRAP_ADMIN_USERS
-            && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
-          roles.unshift({
-            permission_summary: 'Superuser',
-            name: 'Superuser',
-          });
-        }
-        rolesDeferred.resolve(roles);
-      });
-    });
-  });
-
-  function finish(roles) {
-    return options.fn({roles: roles});
-  }
-
-  return deferRender('span', finish, rolesDeferred);
-});
-
 /**
  *  Helper for rendering date or datetime values in current local time
  *
