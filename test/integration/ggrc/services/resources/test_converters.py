@@ -15,11 +15,8 @@ import json
 
 from datetime import datetime
 
-import threading
 import ddt
 import mock
-
-from google.appengine.ext import deferred
 
 from ggrc import db
 from ggrc.models import all_models
@@ -29,48 +26,59 @@ from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
 
 
+class TestImportExportBase(TestCase):
+  """Base class for imports/exports tests."""
+
+  def setUp(self):
+    super(TestImportExportBase, self).setUp()
+    self.client.get("/login")
+
+  def run_full_import(self, user, data):
+    """Emulate full cycle of data importing.
+
+    Args:
+        user: User object under which import should be run.
+        data: data that should be imported.
+    """
+    imp_exp = factories.ImportExportFactory(
+        job_type="Import",
+        status="Blocked",
+        created_by=user,
+        created_at=datetime.now(),
+        content=data,
+    )
+
+    with mock.patch("ggrc.views.converters.check_for_previous_run"):
+      return self.client.put(
+          "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+          headers=self.headers,
+      )
+
+  def run_full_export(self, user, obj):
+    """Run export of test data through the /api/people/{}/exports endpoint."""
+    with mock.patch("ggrc.views.converters.check_for_previous_run"):
+      return self.client.post(
+          "/api/people/{}/exports".format(user.id),
+          data=json.dumps({
+              "objects": [{
+                  "object_name": obj.type,
+                  "ids": [obj.id]}],
+              "current_time": str(datetime.now())}),
+          headers=self.headers
+      )
+
+
 @ddt.ddt
-class TestImportExports(TestCase):
+class TestImportExports(TestImportExportBase):
   """Tests for imports/exports endpoints."""
 
   def setUp(self):
     super(TestImportExports, self).setUp()
-    self.client.get("/login")
     self.headers = {
         "Content-Type": "application/json",
         "X-Requested-By": ["GGRC"],
     }
     self.api = api_helper.Api()
-    self.init_taskqueue()
-
-  def run_full_import(self, user, imp_exp_obj):
-    """Emulate full cycle of data importing.
-
-    Args:
-        user: User object under which import should be run.
-        imp_exp_obj: Instance of ImportExport containing data
-          should be imported.
-    """
-    response = self.client.put(
-        "/api/people/{}/imports/{}/start".format(user.id, imp_exp_obj.id),
-        headers=self.headers,
-    )
-    self.assert200(response)
-
-    tasks = self.taskqueue_stub.get_filtered_tasks()
-    self.assertEqual(len(tasks), 1)
-
-    def run_task():
-      """Run deferred import job."""
-      # check_for_previous_run is mocked as we don't use webapp2
-      # in test environment
-      with mock.patch("ggrc.views.converters.check_for_previous_run"):
-        deferred.run(tasks[0].payload)
-
-    # Run import job in separate thread to emulate work of appengine queue
-    task_thread = threading.Thread(target=run_task, args=())
-    task_thread.start()
-    task_thread.join()
 
   @mock.patch("ggrc.gdrive.file_actions.get_gdrive_file_data",
               new=lambda x: (x, None, ''))
@@ -177,9 +185,11 @@ class TestImportExports(TestCase):
                                         status="Not Started",
                                         created_by=user,
                                         created_at=datetime.now())
-    response = self.client.put(
-        "/api/people/{}/imports/{}/start".format(user.id, ie1.id),
-        headers=self.headers)
+    with mock.patch("ggrc.views.converters.run_background_import"):
+      response = self.client.put(
+          "/api/people/{}/imports/{}/start".format(user.id, ie1.id),
+          headers=self.headers
+      )
     self.assert200(response)
     self.assertEqual(response.json["id"], ie1.id)
     self.assertEqual(response.json["status"], "Analysis")
@@ -378,17 +388,9 @@ class TestImportExports(TestCase):
            ",,Test control,user@example.com,Privacy"
 
     user = all_models.Person.query.first()
-    imp_exp = factories.ImportExportFactory(
-        job_type="Import",
-        status="Blocked",
-        created_by=user,
-        created_at=datetime.now(),
-        content=data,
-    )
 
-    self.run_full_import(user, imp_exp)
-    # We need to reopen session to grab newly created data
-    db.session.close()
+    response = self.run_full_import(user, data)
+    self.assert200(response)
 
     control = all_models.Control.query.filter_by(title="Test control").first()
     self.assertIsNotNone(control)
@@ -411,24 +413,14 @@ class TestImportExports(TestCase):
            ",,Control3,user@example.com,Privacy"
 
     user = all_models.Person.query.first()
-    with factories.single_commit():
-      imp_exp = factories.ImportExportFactory(
-          job_type="Import",
-          status="Blocked",
-          created_at=datetime.now(),
-          created_by=user,
-          content=data,
-      )
-      audit_id = factories.AuditFactory().id
 
-    self.run_full_import(user, imp_exp)
-    # We need to reopen session to grab newly created data
-    db.session.close()
+    response = self.run_full_import(user, data)
+    self.assert200(response)
 
     controls = all_models.Control.query
     self.assertEqual(3, controls.count())
 
-    audit = all_models.Audit.query.get(audit_id)
+    audit = factories.AuditFactory()
     snapshots = self._create_snapshots(audit, controls.all())
     self.assertEqual(3, len(snapshots))
 

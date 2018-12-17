@@ -358,3 +358,15 @@ def validate_mimetype(accepted_mimetype):
       return function(*args, **kwargs)
     return inner
   return mimetype_decorator
+
+
+def make_simple_response(error=None):
+  """Create a response with error message and proper status code."""
+  from ggrc.app import app
+  if error:
+    return app.make_response((
+        "Failed with error: {}".format(error),
+        500,
+        [("Content-Type", "text/html")]
+    ))
+  return app.make_response(("Success", 200, [("Content-Type", "text/html")]))
