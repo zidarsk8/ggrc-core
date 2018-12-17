@@ -2,8 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for control model."""
-import unittest
-
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
@@ -20,7 +18,7 @@ class TestControl(TestCase):
     self.api = api_helper.Api()
 
   def test_simple_categorization(self):
-    """Check append category append to control."""
+    """Check category append to control."""
     category = factories.ControlCategoryFactory()
     control = factories.ControlFactory()
     control.categories.append(category)
@@ -29,6 +27,44 @@ class TestControl(TestCase):
     # be really really sure
     control = db.session.query(all_models.Control).get(control.id)
     self.assertIn(category, control.categories)
+
+  def test_create_without_assertions(self):
+    """Check control creation without assertions fail"""
+    response = self.api.post(all_models.Control, {
+        "control": {
+            "title": "Control title",
+            "context": None,
+            "recipients": "Admin,Control Operators,Control Owners",
+            "send_by_default": 0,
+            "assertions": []
+        }
+    })
+
+    self.assert400(response)
+    control = all_models.Control.query.first()
+    self.assertIsNone(control)
+
+  def test_create_with_assertions(self):
+    """Check control creation with assertions pass"""
+    with factories.single_commit():
+      assertion = factories.ControlAssertionFactory()
+
+    response = self.api.post(all_models.Control, {
+        "control": {
+            "title": "Control title",
+            "context": None,
+            "recipients": "Admin,Control Operators,Control Owners",
+            "send_by_default": 0,
+            "assertions": [{
+                "id": assertion.id
+            }]
+        }
+    })
+
+    self.assertEqual(response.status_code, 201)
+    control = all_models.Control.query.first()
+    self.assertIsNotNone(control)
+    self.assertEqual(assertion.id, control.assertions[0].id)
 
   def test_has_test_plan(self):
     """Check test plan setup to control."""
@@ -53,6 +89,8 @@ class TestControl(TestCase):
 
   def test_create_commentable(self):
     """Test if commentable fields are set on creation"""
+    with factories.single_commit():
+      assertion = factories.ControlAssertionFactory()
     recipients = "Admin,Control Operators,Control Owners"
     send_by_default = 0
     response = self.api.post(all_models.Control, {
@@ -61,6 +99,9 @@ class TestControl(TestCase):
             "context": None,
             "recipients": recipients,
             "send_by_default": send_by_default,
+            "assertions": [{
+                "id": assertion.id
+            }]
         },
     })
     self.assertEqual(response.status_code, 201)
@@ -85,7 +126,6 @@ class TestControl(TestCase):
     self.assertEqual(control.recipients, recipients)
     self.assertEqual(control.send_by_default, send_by_default)
 
-  @unittest.skip("Skipped until control not Reviewable")
   def test_review_get(self):
     """Test that review data is present in control get response"""
     with factories.single_commit():

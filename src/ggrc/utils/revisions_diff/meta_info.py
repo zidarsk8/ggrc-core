@@ -57,9 +57,17 @@ class MetaInfo(object):
         self.instance.__class__
     ).all_orm_descriptors
     for key, proxy in dict(descriptors).iteritems():
-      if proxy.extension_type is sa.ext.associationproxy.ASSOCIATION_PROXY:
-        if key in self._updateable_attributes:
+      if key in self._updateable_attributes:
+
+        if proxy.extension_type is sa.ext.associationproxy.ASSOCIATION_PROXY:
           relations_dict[True].add(key)
+
+        elif proxy.extension_type is sa.ext.hybrid.HYBRID_PROPERTY:
+          attribute = reflection.AttributeInfo.get_attr(
+              self.instance.__class__, "_api_attrs", key)
+          if isinstance(attribute, reflection.HybridAttribute):
+            relations_dict[True].add(key)
+
     return relations_dict
 
   @cached_property.cached_property
