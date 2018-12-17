@@ -155,11 +155,18 @@ class AttributeInfo(object):
       "delete",
       "repeat_every",
       "unit",
-      "issue_tracker",
       ALIASES_PREFIX,
       "comments",
       "last_comment",
       CUSTOM_ATTR_PREFIX,
+      "issue_tracker",
+      "component_id",
+      "enabled",
+      "hotlist_id",
+      "issue_priority",
+      "issue_severity",
+      "issue_title",
+      "issue_type",
   )
 
   class Type(object):
@@ -280,7 +287,7 @@ class AttributeInfo(object):
 
   @classmethod
   def _generate_mapping_definition(cls, rules_set, prefix, display_name_tmpl):
-    "Generate definition from template"
+    """Generate definition from template"""
     definitions = {}
     from ggrc.snapshotter.rules import Types
     read_only = Types.parents | Types.scoped
