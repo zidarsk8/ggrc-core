@@ -372,7 +372,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
         orm.Load(cls).joinedload("cycle").load_only(
             "id",
             "title",
-            "next_due_date"
+            "next_due_date",
+            "is_verification_needed",
         ),
         orm.Load(cls).joinedload("cycle_task_group").joinedload(
             "contact"
