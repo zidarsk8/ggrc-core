@@ -83,7 +83,7 @@
                 {(content)}="instance.description">
               </rich-text>
           </div>
-          
+
         </div>
         <div class="span6 hide-wrap hidable">
           <div class="row-fluid inner-hide">
@@ -151,7 +151,7 @@
         <ggrc-gdrive-folder-picker instance="instance" deferred="true" tabindex="13"></ggrc-gdrive-folder-picker>
       </div>
       <div class="span3 hidable">
-        <ggrc-modal-connector 
+        <deferred-mapper
           {instance}="instance">
           <related-documents
             {instance}="instance"
@@ -176,7 +176,7 @@
               </label>
             </related-urls>
           </related-documents>
-        </ggrc-modal-connector>  
+        </deferred-mapper>
       </div>
     </div>
 

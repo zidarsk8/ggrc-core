@@ -160,12 +160,6 @@ ul.new-tree {
         }
       }
     }
-    > .snapshot-object {
-       background: $snapshotBgnd;
-       border: 1px solid $shapshotBorder;
-       border-radius: 2px;
-       margin: 2px 0;
-    }
     &:last-child {
       > .item-wrap {
         border-bottom: none;
@@ -586,4 +580,3 @@ ul.new-tree {
 .ordered-item-data {
   padding-left: 5px;
 }
-

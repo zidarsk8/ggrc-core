@@ -43,7 +43,7 @@
         <option value="menu" {{#if_equals instance.task_type 'menu'}}selected="selected"{{/if_equals}}>Dropdown</option>
         <option value="checkbox" {{#if_equals instance.task_type 'checkbox'}}selected="selected"{{/if_equals}}>Checkbox</option>
       </select>
-      <ggrc-modal-connector
+      <deferred-mapper
           {instance}="instance"
           {mapped-objects}="mappedObjects"
           {pre-mapped-objects}="preMappedObjects"
@@ -56,11 +56,9 @@
               ($click)="removeMappings(.)">
               <i class="fa fa-trash"></i>
             </a>
-            {{#update_link .}}
-              <a class="url" href="{{schemed_url link}}" target="_blank">
-                {{firstexist title name email link}}
-              </a>
-            {{/update_link}}
+            <a class="url" href="{{viewLink}}" target="_blank">
+              {{title}}
+            </a>
           </div>
         {{/each}}
         {{^list.length}}
@@ -76,7 +74,6 @@
               data-placement="left"
               data-toggle="unified-mapper"
               data-deferred="true"
-              data-object-source="true"
               data-join-object-id="{{instance.id}}"
               data-join-object-type="{{instance.class.model_singular}}"
               tabindex="6">
@@ -85,7 +82,7 @@
             {{/if_in}}
           </div>
         </div>
-      </ggrc-modal-connector>
+      </deferred-mapper>
     </div>
     <div class="span4">
       <div class="{{#instance.computed_errors.contact}} field-failure {{/instance.computed_errors.contact}}">

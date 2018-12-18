@@ -441,83 +441,6 @@ Mustache.registerHelper('option_select',
     return deferRender(tagPrefix, getSelectHtml, optionsDfd);
   });
 
-/**
-   * Generate an anchor element that opens the instance's view page in a
-   * new browser tab/window.
-   *
-   * If the instance does not have such a page, an empty string is returned.
-   * The inner content of the tag is used as the text for the link.
-   *
-   * Example usage:
-   *
-   *   {{{#view_object_link instance}}}
-   *     Open {{firstexist instance.name instance.title}}
-   *   {{{/view_object_link}}}
-   *
-   * NOTE: Since an HTML snippet is generated, the helper should be used with
-   * an unescaping block (tripple braces).
-   *
-   * @param {can.Model} instance - the object to generate the link for
-   * @param {Object} options - a CanJS options argument passed to every helper
-   * @return {String} - the link HTML snippet
-   */
-Mustache.registerHelper('view_object_link', function (instance, options) {
-  let linkText;
-
-  function onRenderComplete(link) {
-    let html = [
-      '<a ',
-      '  href="' + link + '"',
-      '  target="_blank"',
-      '  class="view-link">',
-      linkText,
-      '</a>',
-    ].join('');
-    return html;
-  }
-
-  instance = resolveComputed(instance);
-  if (!instance.viewLink && !instance.get_permalink) {
-    return '';
-  }
-
-  linkText = options.fn(options.contexts);
-
-  return deferRender('a', onRenderComplete, instance.get_permalink());
-});
-
-Mustache.registerHelper('schemed_url', function (url) {
-  let domain;
-  let maxLabel;
-  let urlSplit;
-
-  url = Mustache.resolve(url);
-  if (!url) {
-    return;
-  }
-
-  if (!url.match(/^[a-zA-Z]+:/)) {
-    url = (window.location.protocol === 'https:' ?
-      'https://' : 'http://') + url;
-  }
-
-  // Make sure we can find the domain part of the url:
-  urlSplit = url.split('/');
-  if (urlSplit.length < 3) {
-    return 'javascript://';
-  }
-
-  domain = urlSplit[2];
-  maxLabel = _.max(domain.split('.').map(function (label) {
-    return label.length;
-  }));
-  if (maxLabel > 63 || domain.length > 253) {
-    // The url is invalid and might crash user's chrome tab
-    return 'javascript://';
-  }
-  return url;
-});
-
 Mustache.registerHelper('show_long', function () {
   return [
     '<a href="javascript://" class="show-long"',
@@ -1191,15 +1114,6 @@ Mustache.registerHelper('prune_context', function (options) {
   return options.fn(new can.view.Scope(options.context));
 });
 
-Mustache.registerHelper('mixed_content_check', function (url, options) {
-  url = Mustache.getHelper('schemed_url', options.contexts).fn(url);
-  if (window.location.protocol === 'https:' && !/^https:/.test(url)) {
-    return options.inverse(options.contexts);
-  } else {
-    return options.fn(options.contexts);
-  }
-});
-
 Mustache.registerHelper('ggrc_config_value', function (key, default_, options) {
   key = resolveComputed(key);
   if (!options) {
@@ -1397,15 +1311,6 @@ Mustache.registerHelper('debugger', function () {
   debugger; // eslint-disable-line no-debugger
 
   let options = arguments[arguments.length - 1];
-  return options.fn(options.contexts);
-});
-
-Mustache.registerHelper('update_link', function (instance, options) {
-  instance = Mustache.resolve(instance);
-  if (instance.viewLink) {
-    let link = window.location.host + instance.viewLink;
-    instance.attr('link', link);
-  }
   return options.fn(options.contexts);
 });
 

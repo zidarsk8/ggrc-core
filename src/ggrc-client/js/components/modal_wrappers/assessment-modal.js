@@ -20,7 +20,6 @@ export default can.Component.extend({
             let object = toObject(snapshot);
 
             snapshot.class = object.class;
-            snapshot.snapshot_object_class = 'snapshot-object';
             snapshot.title = object.title;
             snapshot.description = object.description;
             snapshot.viewLink = object.originalLink;

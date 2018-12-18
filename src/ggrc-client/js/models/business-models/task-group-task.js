@@ -25,11 +25,6 @@ export default Cacheable('CMS.Models.TaskGroupTask', {
   destroy: 'DELETE /api/task_group_tasks/{id}',
 
   mixins: [contactable, timeboxed, accessControlList],
-  permalink_options: {
-    url: '<%= base.viewLink %>#task_group/' +
-    'task_group/<%= instance.task_group.id %>',
-    base: 'task_group:workflow',
-  },
   attributes: {
     context: Stub,
     modified_by: Stub,

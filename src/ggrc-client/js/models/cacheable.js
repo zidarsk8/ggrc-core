@@ -568,10 +568,6 @@ export default can.Model('can.Model.Cacheable', {
     this.attr('class', this.constructor);
     this.notifier = new PersistentNotifier();
 
-    if (!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-
     if (this.isCustomAttributable()) {
       this._customAttributeAccess = new CustomAttributeAccess(this);
     }
@@ -769,70 +765,6 @@ export default can.Model('can.Model.Cacheable', {
   },
   autocomplete_label: function () {
     return this.title;
-  },
-  get_permalink: function () {
-    let dfd = can.Deferred();
-    let ctor = this.constructor;
-    if (!ctor.permalink_options) {
-      return dfd.resolve(this.viewLink);
-    }
-    let poBaseItems = ctor.permalink_options.base.split(':');
-    $.when(this.refresh_all(...poBaseItems))
-      .then(function (base) {
-        return dfd.resolve(_.template(constructor.permalink_options.url)({
-          base: base,
-          instance: this,
-        }));
-      }.bind(this));
-    return dfd.promise();
-  },
-
-  /*
-    * Set up a deferred join object deletion when this object is updated.
-    */
-  mark_for_deletion: function (joinAttr, obj, extraAttrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({
-      how: 'remove',
-      what: obj,
-      through: joinAttr,
-      opts: options,
-    });
-  },
-
-  /*
-    * Set up a deferred join object creation when this object is updated.
-    */
-  mark_for_addition: function (joinAttr, obj, extraAttrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-    extraAttrs = _.isEmpty(extraAttrs) ? undefined : extraAttrs;
-
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({
-      how: 'add',
-      what: obj,
-      through: joinAttr,
-      extra: extraAttrs,
-      opts: options,
-    });
-  },
-
-  remove_duplicate_pending_joins: function (obj) {
-    let joins;
-    let len;
-    if (!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-    len = this._pending_joins.length;
-    joins = _.filter(this._pending_joins, function (val) {
-      return val.what !== obj;
-    });
-
-    if (len !== joins.length) {
-      this.attr('_pending_joins').replace(joins);
-    }
   },
 
   delay_resolving_save_until: function (dfd) {

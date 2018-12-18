@@ -60,7 +60,7 @@ function getMapping(source, destination, context) {
 }
 
 function unmapObjects(instance, objects) {
-  const pendingUnmap = objects.map((object) =>
+  const pendingUnmap = _.map(objects, (object) =>
     Relationship.findRelationship(instance, object)
       .then((relationship) => relationship.destroy())
   );
