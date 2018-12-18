@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for CSV column definition tests."""
+# pylint: disable=too-many-lines
+
 from copy import deepcopy
 
 import ddt
