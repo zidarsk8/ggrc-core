@@ -12,7 +12,7 @@ import pytest
 from lib import base, users
 from lib.app_entity_factory import (
     entity_factory_common, workflow_entity_factory)
-from lib.constants import roles, workflow_repeat_units
+from lib.constants import roles, workflow_repeat_units, messages
 from lib.entities import cycle_entity_population, ui_dict_convert
 from lib.page.widget import workflow_tabs, object_modal, object_page
 from lib.rest_facades import (
@@ -207,6 +207,15 @@ class TestActivateWorkflow(base.Test):
         app_workflow)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
+  @classmethod
+  def check_ggrc_6490(cls, actual_due_date, expected_due_date):
+    """Particular check if issue in app exist or not according to GGRC-6490."""
+    if actual_due_date != expected_due_date:
+      pytest.xfail(
+          reason="\nWorkflow actual and expected due dates are not equal:\n" +
+                 messages.AssertionMessages.format_err_msg_equal(
+                     actual_due_date, expected_due_date))
+
   def test_destructive_activate_repeat_on_workflow(
       self, app_repeat_on_workflow, selenium
   ):
@@ -222,6 +231,8 @@ class TestActivateWorkflow(base.Test):
         app_repeat_on_workflow)
     expected_workflow_cycle = cycle_entity_population.create_workflow_cycle(
         app_repeat_on_workflow)
+    self.check_ggrc_6490(
+        expected_workflow_cycle.due_date, workflow_cycles[0].due_date)
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
 
