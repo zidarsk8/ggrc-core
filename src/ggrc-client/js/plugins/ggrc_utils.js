@@ -3,10 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import RefreshQueue from '../models/refresh_queue';
 import {getRolesForType} from '../plugins/utils/acl-utils';
-import {notifier} from '../plugins/utils/notifiers-utils';
-import Person from '../models/business-models/person';
 
 /**
  * A module containing various utility functions.
@@ -82,37 +79,6 @@ function inViewport(el) {
   window.innerWidth > bounds.right;
 
   return isVisible;
-}
-
-function getPersonInfo(person) {
-  const dfd = can.Deferred();
-  let actualPerson;
-
-  if (!person || !person.id) {
-    dfd.resolve(person);
-    return dfd;
-  }
-
-  actualPerson = Person.findInCacheById(person.id) || {};
-  if (actualPerson.email) {
-    dfd.resolve(actualPerson);
-  } else {
-    actualPerson = new Person({id: person.id});
-    new RefreshQueue()
-      .enqueue(actualPerson)
-      .trigger()
-      .done((personItem) => {
-        personItem = Array.isArray(personItem) ? personItem[0] : personItem;
-        dfd.resolve(personItem);
-      })
-      .fail(function () {
-        notifier('error',
-          'Failed to fetch data for person ' + person.id + '.');
-        dfd.reject();
-      });
-  }
-
-  return dfd;
 }
 
 function getPickerElement(picker) {
@@ -222,7 +188,6 @@ export {
   applyTypeFilter,
   isInnerClick,
   inViewport,
-  getPersonInfo,
   getPickerElement,
   loadScript,
   hasPending,

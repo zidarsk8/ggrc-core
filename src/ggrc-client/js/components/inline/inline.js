@@ -11,7 +11,7 @@ import '../form/fields/person-form-field';
 import '../form/fields/rich-text-form-field';
 import '../form/fields/text-form-field';
 import '../form/fields/numberbox-form-field';
-import {isInnerClick} from '../../plugins/ggrc_utils';
+import {isInnerClick, getPlainText} from '../../plugins/ggrc_utils';
 import template from './inline.mustache';
 
 export default can.Component.extend({
@@ -21,7 +21,16 @@ export default can.Component.extend({
     define: {
       isValid: {
         get() {
-          return !this.attr('mandatory') || !!this.attr('context.value');
+          if (this.attr('mandatory')) {
+            let value = this.attr('context.value');
+
+            if (this.attr('type') === 'text') {
+              value = getPlainText(value).trim();
+            }
+
+            return !!value;
+          }
+          return true;
         },
       },
       isShowContent: {
