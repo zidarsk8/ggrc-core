@@ -7,7 +7,7 @@ import re
 from ggrc.converters.handlers import handlers
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
-from ggrc.models import Assessment
+from ggrc.models import Assessment, AssessmentTemplate
 from ggrc.converters import errors
 from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
     default_values
@@ -33,7 +33,9 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
   def _get_default_value(self):
     """Get default value for missed value in Issue Tracker attribute column."""
     value = None
-    if isinstance(self.row_converter.obj, Assessment):
+    is_assmt = isinstance(self.row_converter.obj, Assessment)
+    is_assmt_template = isinstance(self.row_converter.obj, AssessmentTemplate)
+    if is_assmt or is_assmt_template:
       value = self.row_converter.obj.audit.issue_tracker.get(self.key)
     default_value = value or default_values.get(self.key)
     return default_value
