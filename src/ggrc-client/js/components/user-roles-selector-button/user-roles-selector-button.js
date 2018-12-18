@@ -13,7 +13,7 @@ export default can.Component.extend({
         'default': userRolesModalSelector,
       } = await import(
         /* webpackChunkName: "userRoleModalSelector" */
-        '../../controllers/contributions'
+        '../../controllers/user-roles-selector-controller'
       );
 
       let options = {personId: this.attr('personId')};
