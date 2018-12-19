@@ -212,9 +212,28 @@ class TestActivateWorkflow(base.Test):
     """Particular check if issue in app exist or not according to GGRC-6490."""
     if actual_due_date != expected_due_date:
       pytest.xfail(
-          reason="\nWorkflow actual and expected due dates are not equal:\n" +
+          reason="\nGGRC-6490 Workflow actual and expected due dates are not "
+                 "equal:\n" +
                  messages.AssertionMessages.format_err_msg_equal(
                      actual_due_date, expected_due_date))
+
+  @classmethod
+  def check_ggrc_6491(cls, actual_wf_cycles, expected_wf_cycles):
+    """Particular check if issue in app exist or not according to GGRC-6491.
+    This issue is about 2 wf cycles created with the same titles instead of 1.
+    """
+    cls.check_ggrc_6490(
+        actual_wf_cycles[0].due_date, expected_wf_cycles[0].due_date)
+    if (
+        len(actual_wf_cycles) > len(expected_wf_cycles) and
+        datetime.utcnow().hour in range(0, 9)
+    ):
+      pytest.xfail(
+          reason="\nGGRC-6491 There are more than 1 equal workflows:\n" +
+                 actual_wf_cycles)
+    elif len(actual_wf_cycles) != len(expected_wf_cycles):
+      pytest.fail(msg="\nThere are different workflow count:\n" +
+                      actual_wf_cycles)
 
   def test_destructive_activate_repeat_on_workflow(
       self, app_repeat_on_workflow, selenium
@@ -231,8 +250,7 @@ class TestActivateWorkflow(base.Test):
         app_repeat_on_workflow)
     expected_workflow_cycle = cycle_entity_population.create_workflow_cycle(
         app_repeat_on_workflow)
-    self.check_ggrc_6490(
-        expected_workflow_cycle.due_date, workflow_cycles[0].due_date)
+    self.check_ggrc_6491(workflow_cycles, [expected_workflow_cycle])
     test_utils.list_obj_assert(workflow_cycles, [expected_workflow_cycle])
 
 
