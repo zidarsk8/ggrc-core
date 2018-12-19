@@ -480,7 +480,7 @@ class Resource(ModelView):
     """POST operation handler."""
     raise NotImplementedError()
 
-  def get(self, id):
+  def get(self, id):  # pylint: disable=redefined-builtin
     """Default JSON request handlers"""
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -584,7 +584,7 @@ class Resource(ModelView):
       raise Forbidden()
 
   @utils.validate_mimetype("application/json")
-  def put(self, id):
+  def put(self, id):  # pylint: disable=redefined-builtin
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -679,7 +679,7 @@ class Resource(ModelView):
     else:
       flask.g.referenced_object_stubs = {obj.type: {obj.id}}
 
-  def delete(self, id):
+  def delete(self, id):  # pylint: disable=redefined-builtin
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
