@@ -759,14 +759,6 @@ Mustache.registerHelper('if_helpers', function (...args) {
   }
 });
 
-Mustache.registerHelper('with_model_as',
-  function (varName, modelName, options) {
-    let frame = {};
-    modelName = resolveComputed(Mustache.resolve(modelName));
-    frame[varName] = modalModels[modelName];
-    return options.fn(options.contexts.add(frame));
-  });
-
 Mustache.registerHelper('if_in', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack).split(',');
