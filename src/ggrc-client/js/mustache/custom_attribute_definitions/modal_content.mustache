@@ -9,8 +9,9 @@
   <input type="hidden" name="definition_type" value="{{definition_type}}">
   <div class="row-fluid">
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-      <label>Attribute title
-        <span class="required">*</span>
+      <label class="form-label">
+        Attribute title
+        <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name."></i>
       </label>
       <input-filter
@@ -23,9 +24,9 @@
       </input-filter>
     </div>
     <div class="span4">
-      <label>
+      <label class="form-label">
         Attribute type
-        <span class="required">*</span>
+        <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
         <dropdown options-list="model.attributeTypes"
@@ -86,9 +87,9 @@
     <div class='row-fluid'>
       <div
         class="span12 {{#if instance.computed_errors.multi_choice_options}}field-failure{{/if}}">
-        <label>
+        <label class="form-label">
           Possible values (separated by comma ",")
-          <span class="required">*</span>
+          <i class="fa fa-asterisk"></i>
           <i class="fa fa-question-circle" rel="tooltip"
             title="Provide a list of values from which users will be able to choose."></i>
         </label>

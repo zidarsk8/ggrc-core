@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<label class="action-toolbar editable-people-group__label form-label required-label">
+<label class="action-toolbar editable-people-group__label form-label form-label__extended">
   <div class="people-group__title-content">
     <div class="people-group__title">
       {{#unless editableMode}}
@@ -11,7 +11,7 @@
       {{/unless}}
       {{title}}
     </div>
-    <div>
+    <div class="people-group__count">
       ({{peopleCount}})
     </div>
   </div>
