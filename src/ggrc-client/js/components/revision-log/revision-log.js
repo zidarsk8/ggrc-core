@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../tree_pagination/tree_pagination';
 import './revision-log-data';
 import '../paginate/paginate';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
@@ -23,6 +24,7 @@ import {
   buildCountParams,
 } from '../../plugins/utils/query-api-utils';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import Pagination from '../base-objects/pagination';
 
 const EMPTY_DIFF_VALUE = '—';
 
@@ -65,6 +67,14 @@ export default can.Component.extend({
             !!this.attr('review.last_reviewed_by');
         },
       },
+      pageInfo: {
+        value: function () {
+          return new Pagination({
+            pageSizeSelect: [10, 25, 50],
+            pageSize: 10,
+          });
+        },
+      },
     },
     instance: null,
     review: null,
@@ -73,19 +83,14 @@ export default can.Component.extend({
     fullHistory: [],
     showLastReviewUpdates: false,
     currentPage: 0,
-    queryRevisions() {
+    getOriginRevision() {
       const instance = this.attr('instance');
       const filter = QueryParser.parse(
         `resource_type = ${instance.type} AND
-         resource_id = ${instance.id} OR
-         source_type = ${instance.type} AND
-         source_id = ${instance.id} OR
-         destination_type = ${instance.type} AND
-         destination_id = ${instance.id}
-        `);
-      const pageInfo = {
+         resource_id = ${instance.id}`);
+      const page = {
         current: 1,
-        pageSize: 10,
+        pageSize: 2,
         sort: [{
           direction: 'desc',
           key: 'created_at',
@@ -93,7 +98,7 @@ export default can.Component.extend({
       };
       let params = buildParam(
         'Revision',
-        pageInfo,
+        page,
         null,
         null,
         filter
@@ -109,14 +114,56 @@ export default can.Component.extend({
         return revisions;
       });
     },
+    queryRevisions() {
+      const instance = this.attr('instance');
+      const filter = QueryParser.parse(
+        `resource_type = ${instance.type} AND
+         resource_id = ${instance.id} OR
+         source_type = ${instance.type} AND
+         source_id = ${instance.id} OR
+         destination_type = ${instance.type} AND
+         destination_id = ${instance.id}`);
+      let pageInfo = this.attr('pageInfo');
+      const page = {
+        current: pageInfo.current,
+        pageSize: pageInfo.pageSize,
+        sort: [{
+          direction: 'desc',
+          key: 'created_at',
+        }],
+      };
+      let params = buildParam(
+        'Revision',
+        page,
+        null,
+        null,
+        filter
+      );
+
+      return batchRequests(params).then((data) => {
+        data = data.Revision;
+        const total = data.total;
+        this.attr('pageInfo.total', total);
+
+        let revisions = data.values;
+        revisions = revisions.map(function (source) {
+          return Revision.model(source, 'Revision');
+        });
+
+        return revisions;
+      });
+    },
 
     fetchItems: function () {
+      this.attr('isLoading', true);
+      this.attr('changeHistory', []);
+
       const stopFn = tracker.start(
         this.attr('instance.type'),
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CHANGE_LOG);
 
-      return this._fetchRevisionsData()
+      return this._fetchRevisionsDataByQuery()
         .done(function (revisions) {
           let fullHistory;
           // calculate history of role changes
@@ -145,6 +192,27 @@ export default can.Component.extend({
         .always(function () {
           this.attr('isLoading', false);
         }.bind(this));
+    },
+    _fetchAdditionalInfoForRevisions(refreshQueue, revisions) {
+      _.forEach(revisions, (revision) => {
+        if (revision.modified_by) {
+          refreshQueue.enqueue(revision.modified_by);
+        }
+        if (revision.destination_type && revision.destination_id) {
+          revision.destination = new Stub({
+            id: revision.destination_id,
+            type: revision.destination_type,
+          });
+          refreshQueue.enqueue(revision.destination);
+        }
+        if (revision.source_type && revision.source_id) {
+          revision.source = new Stub({
+            id: revision.source_id,
+            type: revision.source_type,
+          });
+          refreshQueue.enqueue(revision.source);
+        }
+      });
     },
     /**
      * Fetch the instance's Revisions data from the server, including the
@@ -220,55 +288,41 @@ export default can.Component.extend({
           });
       }.bind(this));
     },
+    _reifyRevision(revision) {
+      _.forEach(['modified_by', 'source', 'destination'],
+        function (field) {
+          if (revision[field] && revision[field].reify) {
+            revision.attr(field, revision[field].reify());
+          }
+        });
+      return revision;
+    },
     _fetchRevisionsDataByQuery() {
-      return this.queryRevisions().then((revisions) => {
-        let rq = new RefreshQueue();
+      return $.when(this.queryRevisions(), this.getOriginRevision()).then(
+        (revisions, originalRevisions) => {
+          let rq = new RefreshQueue();
 
-        _.forEach(revisions, (revision) => {
-          if (revision.modified_by) {
-            rq.enqueue(revision.modified_by);
-          }
-          if (revision.destination_type && revision.destination_id) {
-            revision.destination = new Stub({
-              id: revision.destination_id,
-              type: revision.destination_type,
-            });
-            rq.enqueue(revision.destination);
-          }
-          if (revision.source_type && revision.source_id) {
-            revision.source = new Stub({
-              id: revision.source_id,
-              type: revision.source_type,
-            });
-            rq.enqueue(revision.source);
-          }
-        });
+          this._fetchAdditionalInfoForRevisions(rq, revisions);
+          this._fetchAdditionalInfoForRevisions(rq, originalRevisions);
 
-        return rq.trigger().then(function () {
-          let reify = function (revision) {
-            _.forEach(['modified_by', 'source', 'destination'],
-              function (field) {
-                if (revision[field] && revision[field].reify) {
-                  revision.attr(field, revision[field].reify());
-                }
-              });
-            return revision;
-          };
-          let objRevisions = [];
-          let mappings = [];
-          _.forEach(revisions, (revision) => {
-            if (revision.destination || revision.source) {
-              mappings.push(revision);
-            } else {
-              objRevisions.push(revision);
-            }
+          return rq.trigger().then(function () {
+            let objRevisions = [];
+            let mappings = [];
+            _.forEach(revisions, (revision) => {
+              if (revision.destination || revision.source) {
+                mappings.push(revision);
+              } else {
+                objRevisions.push(revision);
+              }
+            });
+
+            return {
+              object: _.map(objRevisions, this._reifyRevision),
+              mappings: _.map(mappings, this._reifyRevision),
+              originalRevisions: _.map(originalRevisions, this._reifyRevision),
+            };
           });
-          return {
-            object: _.map(objRevisions, reify),
-            mappings: _.map(mappings, reify),
-          };
         });
-      });
     },
     /**
      * Fetch revisions of indirect mappings.
@@ -988,6 +1042,18 @@ export default can.Component.extend({
   },
   events: {
     '{viewModel.instance} refreshInstance': function () {
+      this.viewModel.fetchItems();
+    },
+    '{viewModel.pageInfo} current'() {
+      const viewModel = this.viewModel;
+
+      viewModel.fetchItems()
+        .then(() => {
+          const showLastUpdates = viewModel.getLastUpdatesFlag();
+          viewModel.showRevisionsHistory(showLastUpdates);
+        });
+    },
+    '{viewModel.pageInfo} pageSize'() {
       this.viewModel.fetchItems();
     },
   },

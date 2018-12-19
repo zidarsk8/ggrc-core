@@ -16,9 +16,11 @@
         </label>
       </div>
     {{/if}}
-    <paginate list="changeHistory" per-page="10" current="currentPage">
+      <div class="grid-data__toolbar flex-box">
+        <tree-pagination {paging}="pageInfo"></tree-pagination>
+      </div>
       <ul class="entry-list">
-        {{#entries}}
+        {{#changeHistory}}
           <li {{#reviewWasChanged}} class="revision-log__status-{{reviewWasChanged}}" {{/reviewWasChanged}}>
             <span class="person-label {{lowercase role }}"></span>
             <div class="w-status">
@@ -49,18 +51,17 @@
               {{/changes}}
             </div>
           </li>
-        {{/entries}}
+        {{/changeHistory}}
 
-        {{^list}}
-          {{#isLoading}}
-            <li class="spinner">
-              <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-            </li>
-          {{else}}
+        {{#if isLoading}}
+          <li class="spinner">
+            <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+          </li>
+        {{else}}
+          {{^if changeHistory.length}}
             <li>The history of changes is currently empty.</li>
-          {{/isLoading}}
-        {{/list}}
+          {{/if}}
+        {{/if}}
       </ul>
-    </paginate>
   </div>
 {{/revisions_diff}}
