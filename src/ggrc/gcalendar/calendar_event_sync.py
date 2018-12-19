@@ -10,8 +10,7 @@ from sqlalchemy.orm import load_only
 from ggrc import db
 from ggrc import settings
 from ggrc.models import all_models
-from ggrc.gcalendar import calendar_api_service
-from ggrc.utils import generate_query_chunks
+from ggrc.gcalendar import calendar_api_service, utils
 
 
 logger = logging.getLogger(__name__)
@@ -27,7 +26,7 @@ class CalendarEventsSync(object):
 
   def sync_cycle_tasks_events(self):
     """Generates Calendar Events descriptions."""
-    columns = all_models.CalendarEvent.query.options(
+    events = all_models.CalendarEvent.query.options(
         load_only(
             all_models.CalendarEvent.id,
             all_models.CalendarEvent.external_event_id,
@@ -36,26 +35,21 @@ class CalendarEventsSync(object):
             all_models.CalendarEvent.due_date,
             all_models.CalendarEvent.last_synced_at
         )
+    ).all()
+    _, event_mappings = utils.get_related_mapping(
+        left=all_models.CalendarEvent,
+        right=all_models.CycleTaskGroupObjectTask
     )
-    all_count = columns.count()
-    handled = 0
-    logger.info("Starting sync of Calendar Events...")
-    for query_chunk in generate_query_chunks(columns):
-      handled += query_chunk.count()
-      logger.info("CalendarEvents: %s/%s", handled, all_count)
-      for event in query_chunk:
-        related_tasks = event.related_objects(
-            all_models.CycleTaskGroupObjectTask.__name__
-        )
-        if not related_tasks:
-          self._delete_event(event)
-          db.session.delete(event)
-          continue
-        if not event.is_synced:
-          self._create_event(event)
-          continue
-        self._update_event(event)
-      db.session.commit()
+    for event in events:
+      if event.id not in event_mappings or not event_mappings[event.id]:
+        self._delete_event(event)
+        db.session.delete(event)
+        continue
+      if not event.is_synced:
+        self._create_event(event)
+        continue
+      self._update_event(event)
+    db.session.commit()
     logger.info("Sync of Calendar Events is finished.")
 
   def _update_event(self, event):

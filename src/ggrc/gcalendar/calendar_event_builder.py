@@ -1,51 +1,18 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Module wuth CalendarEventBuilder class."""
+"""Module with CalendarEventBuilder class."""
 
-import datetime
 import logging
-import urllib
-from urlparse import urljoin
 from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import settings
 from ggrc.models import all_models
-from ggrc.utils import generate_query_chunks, get_url_root
+from ggrc.gcalendar import utils
 
 
 logger = logging.getLogger(__name__)
-
-
-def get_event_by_date_and_attendee(attendee_id, due_date):
-  """Get calendar events by attendee and due date."""
-  events = all_models.CalendarEvent.query.filter(
-      all_models.CalendarEvent.attendee_id == attendee_id,
-      all_models.CalendarEvent.due_date == due_date,
-  )
-  return events.first()
-
-
-def get_active_cycle_tasks_url(due_date):
-  """Get CycleTask notification url."""
-  base = urljoin(get_url_root(), u"dashboard#!task&query=")
-  active_filter = (
-      u'(("Task Status" IN ("Finished","Declined")'
-      u' and "Needs Verification"=true) or ('
-      u'"Task Status" IN ("Assigned","In Progress")'
-      u')) and "Task Due Date"={due_date}'
-  ).format(due_date=due_date)
-  return base + urllib.quote(active_filter.encode('utf-8'))
-
-
-def get_task_persons_ids_to_notify(task):
-  """Returns set of person ids for which calendar event should be created."""
-  roles_to_notify = [u"Task Assignees", u"Task Secondary Assignees"]
-  person_ids = []
-  for role in roles_to_notify:
-    person_ids.extend(task.get_person_ids_for_rolename(role))
-  return set(person_ids)
 
 
 # pylint: disable=too-few-public-methods
@@ -64,6 +31,9 @@ class CalendarEventBuilder(object):
 
   def __init__(self):
     """Initialize CalendarEventBuilder."""
+    self.task_mappings = {}
+    self.event_mappings = {}
+    self.tasks = []
     self.title_prefix = ""
     if settings.NOTIFICATION_PREFIX:
       self.title_prefix = "[{}] ".format(settings.NOTIFICATION_PREFIX)
@@ -71,13 +41,18 @@ class CalendarEventBuilder(object):
   def build_cycle_tasks(self):
     """Builds CalendarEvents based on CycleTaskGroupObjectTasks."""
     logger.info("Generating of events for cycle tasks...")
+    self._preload_data()
     self._generate_events()
     self._generate_event_descriptions()
-    logger.info("Generating of events is completed.")
+    logger.info("Generating of events has completed.")
 
-  def _generate_events(self):
-    """Generates CalendarEvents."""
-    columns = all_models.CycleTaskGroupObjectTask.query.options(
+  def _preload_data(self):
+    """Preload data for Calendar Event generation."""
+    self.event_mappings, self.task_mappings = utils.get_related_mapping(
+        left=all_models.CycleTaskGroupObjectTask,
+        right=all_models.CalendarEvent
+    )
+    self.tasks = all_models.CycleTaskGroupObjectTask.query.options(
         load_only(
             all_models.CycleTaskGroupObjectTask.id,
             all_models.CycleTaskGroupObjectTask.end_date,
@@ -85,49 +60,48 @@ class CalendarEventBuilder(object):
             all_models.CycleTaskGroupObjectTask.title,
             all_models.CycleTaskGroupObjectTask.verified_date,
         )
-    )
-    all_count = columns.count()
-    handled = 0
-    for query_chunk in generate_query_chunks(columns):
-      handled += query_chunk.count()
-      logger.info("CycleTaskGroupObjectTasks: %s/%s", handled, all_count)
-      for task in query_chunk:
-        self._generate_events_for_task(task)
-        db.session.flush()
-      db.session.commit()
+    ).all()
+
+  def _generate_events(self):
+    """Generates Calendar Events."""
+    for task in self.tasks:
+      self._generate_events_for_task(task)
+    db.session.commit()
 
   def _generate_events_for_task(self, task):
     """Generates CalendarEvents for CycleTaskGroupObjectTask."""
     events_ids = set()
-    for event in task.related_objects(all_models.CalendarEvent.__name__):
-      events_ids.add(event.id)
+    if task.id in self.task_mappings:
+      events_ids = self.task_mappings[task.id].copy()
+
     if self._should_create_event_for(task):
-      for person_id in get_task_persons_ids_to_notify(task):
-        event = get_event_by_date_and_attendee(attendee_id=person_id,
-                                               due_date=task.end_date)
+      for person_id in utils.get_task_persons_ids_to_notify(task):
+        event = utils.get_event_by_date_and_attendee(
+            attendee_id=person_id,
+            due_date=task.end_date
+        )
         if not event:
           self._create_event_with_relationship(task, person_id)
         else:
           self._create_event_relationship(task, event)
-          if event.id in events_ids:
-            events_ids.remove(event.id)
+          events_ids.discard(event.id)
     for event_id in events_ids:
-      self._delete_event_relationship(event_id, task)
+      self._delete_event_relationship(event_id, task.id)
 
-  @staticmethod
-  def _delete_event_relationship(event_id, task):
+  def _delete_event_relationship(self, event_id, task_id):
     """Deletes calendar event relationship to task."""
     if not event_id:
       return
-    rel_model = all_models.Relationship
-    relationship = rel_model.query.filter(
-        rel_model.source_id == task.id,
-        rel_model.source_type == all_models.CycleTaskGroupObjectTask.__name__,
-        rel_model.destination_id == event_id,
-        rel_model.destination_type == all_models.CalendarEvent.__name__,
-    ).first()
+    relationship = utils.get_relationship(
+        left_id=event_id,
+        left_model_name="CalendarEvent",
+        right_id=task_id,
+        right_model_name="CycleTaskGroupObjectTask",
+    )
     if relationship:
       db.session.delete(relationship)
+      self.task_mappings[task_id].discard(event_id)
+      self.event_mappings[event_id].discard(task_id)
 
   def _create_event_with_relationship(self, task, person_id):
     """Creates calendar event and relationship based on task and person id."""
@@ -142,23 +116,34 @@ class CalendarEventBuilder(object):
         source=task,
         destination=event,
     ))
+    db.session.flush()
+    self._add_task_event_mapping(event_id=event.id, task_id=task.id)
     return event
 
-  @staticmethod
-  def _create_event_relationship(task, event):
+  def _create_event_relationship(self, task, event):
     """Creates event relationship is it is not exists."""
-    rel_model = all_models.Relationship
-    relationship = rel_model.query.filter(
-        rel_model.destination_id == event.id,
-        rel_model.destination_type == all_models.CalendarEvent.__name__,
-        rel_model.source_id == task.id,
-        rel_model.source_type == all_models.CycleTaskGroupObjectTask.__name__,
-    ).first()
+    relationship = utils.get_relationship(
+        left_id=event.id,
+        left_model_name="CalendarEvent",
+        right_id=task.id,
+        right_model_name="CycleTaskGroupObjectTask",
+    )
     if not relationship:
       db.session.add(all_models.Relationship(
           source=task,
           destination=event,
       ))
+      self._add_task_event_mapping(event_id=event.id, task_id=task.id)
+
+  def _add_task_event_mapping(self, task_id, event_id):
+    """Add mapping between task and event."""
+    if task_id not in self.task_mappings:
+      self.task_mappings[task_id] = set()
+    self.task_mappings[task_id].add(event_id)
+
+    if event_id not in self.event_mappings:
+      self.event_mappings[event_id] = set()
+    self.event_mappings[event_id].add(task_id)
 
   def _should_create_event_for(self, task):
     """Determines should we create a Calendar Event for the task or not.
@@ -184,29 +169,25 @@ class CalendarEventBuilder(object):
 
   def _generate_event_descriptions(self):
     """Generates CalendarEvents descriptions."""
-    columns = all_models.CalendarEvent.query.options(
+    events = all_models.CalendarEvent.query.options(
         load_only(
             all_models.CalendarEvent.id,
             all_models.CalendarEvent.description,
         )
-    )
-    for query_chunk in generate_query_chunks(columns):
-      for event in query_chunk:
-        self._generate_description_for_event(event)
-      db.session.commit()
+    ).all()
+    for event in events:
+      task_ids = self.event_mappings[event.id]
+      self._generate_description_for_event(event, task_ids)
+    db.session.commit()
 
-  def _generate_description_for_event(self, event):
+  def _generate_description_for_event(self, event, task_ids):
     """Generates CalendarEvent descriptions based on tasks."""
-    tasks = event.related_objects(
-        all_models.CycleTaskGroupObjectTask.__name__
-    )
-    tasks = sorted(tasks, key=lambda x: x.title)
-    titles = ["- {}".format(task.title) for task in tasks]
-
+    titles = ["- {}".format(task.title) for task in self.tasks
+              if task.id in task_ids]
     event.description = (
         self.TASK_DESCRIPTION_HEADER +
         "\n".join(titles) + "\n" + self.TASK_DESCRIPTION_SUMMARY.format(
-            link=get_active_cycle_tasks_url(
+            link=utils.get_active_cycle_tasks_url(
                 due_date=event.due_date.strftime('%m/%d/%Y')
             )
         )

@@ -9,7 +9,7 @@ from freezegun import freeze_time
 
 from ggrc import db
 from ggrc.models import all_models
-from ggrc.gcalendar import calendar_event_builder
+from ggrc.gcalendar import calendar_event_builder, utils
 from integration.ggrc.models import factories
 from integration.ggrc.gcalendar import BaseCalendarEventTest
 from integration.ggrc_workflows.models import factories as wf_factories
@@ -39,7 +39,7 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
         if acl.ac_role.name in recipient_types:
           for person in persons:
             factories.AccessControlPersonFactory(ac_list=acl, person=person)
-    ids = calendar_event_builder.get_task_persons_ids_to_notify(obj)
+    ids = utils.get_task_persons_ids_to_notify(obj)
     self.assertEqual(ids, set(persons_ids))
 
   def test_generate_description_for_event(self):
@@ -62,7 +62,9 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
       ]
       for task in tasks:
         factories.RelationshipFactory(source=task, destination=event)
-    self.builder._generate_description_for_event(event)
+      task_ids = [task.id for task in tasks]
+    self.builder._preload_data()
+    self.builder._generate_description_for_event(event, task_ids)
     link_not_encoded = (
         u'(("Task Status" IN ("Finished","Declined") and '
         u'"Needs Verification"=true) '
@@ -107,8 +109,8 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
       for acl in task._access_control_list:
         factories.AccessControlPersonFactory(ac_list=acl, person=person)
     with freeze_time("2015-01-1 12:00:00"):
-      self.builder._generate_events_for_task(task)
-      db.session.commit()
+      self.builder._preload_data()
+      self.builder._generate_events()
     event = self.get_event(person.id, task.end_date)
     self.assertIsNotNone(event)
     relationship = self.get_relationship(task.id, event.id)
@@ -128,7 +130,8 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
       for acl in task._access_control_list:
         factories.AccessControlPersonFactory(ac_list=acl, person=person)
     with freeze_time("2015-01-1 12:00:00"):
-      self.builder._generate_events_for_task(task)
+      self.builder._preload_data()
+      self.builder._generate_events()
       db.session.commit()
     event = self.get_event(person.id, task.end_date)
     self.assertIsNotNone(event)
@@ -150,7 +153,8 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
       )
       factories.RelationshipFactory(source=task, destination=event)
     with freeze_time("2015-01-5 12:00:00"):
-      self.builder._generate_events_for_task(task)
+      self.builder._preload_data()
+      self.builder._generate_events()
       db.session.commit()
     event = self.get_event(person.id, task.end_date)
     self.assertIsNotNone(event)
@@ -178,7 +182,7 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
     with freeze_time("2015-01-01 12:00:00"):
       self.builder.build_cycle_tasks()
     self.assertEquals(all_models.CalendarEvent.query.count(), 1)
-    event = self.get_event(person.id, task.end_date)
+    event = self.get_event(person.id, tasks[0].end_date)
     self.assertIsNotNone(event)
     self.assertEquals(event.title, u"Your tasks are due today")
     link_not_encoded = (
