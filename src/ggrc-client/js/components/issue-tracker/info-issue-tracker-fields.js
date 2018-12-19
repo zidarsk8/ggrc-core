@@ -15,5 +15,6 @@ export default can.Component.extend({
     showTitle: false,
     note: '',
     linkingNote: '',
+    snowId: false,
   },
 });

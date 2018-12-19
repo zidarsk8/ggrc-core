@@ -363,6 +363,7 @@ export default Cacheable('CMS.Models.Assessment', {
               delete that._pending_refresh;
               if (model) {
                 model = that.constructor.model(model, that);
+                that.after_refresh && that.after_refresh();
                 model.backup();
                 return model;
               }

@@ -15,7 +15,6 @@ export default can.Component.extend({
   template,
   viewModel: {
     instance: {},
-    showId: false,
   },
   events: {
     '{viewModel.instance.issue_tracker} hotlist_id'() {

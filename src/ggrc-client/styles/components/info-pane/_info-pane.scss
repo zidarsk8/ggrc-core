@@ -179,3 +179,20 @@
 .assessment-comments {
   // Please do not remove this class. It's used in Selenium tests.
 }
+
+.ticket-id-modal {
+  .simple-modal {
+    &__header {
+      border-bottom: none;
+      padding-bottom: 5px;
+    }
+
+    &__header-text {
+      font-size: 24px;
+    }
+
+    &__footer {
+      border-top: none;
+    }
+  }
+}
