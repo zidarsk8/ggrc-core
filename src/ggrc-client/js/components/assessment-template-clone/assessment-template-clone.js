@@ -20,6 +20,15 @@ export default can.Component.extend({
       isAuditPage() {
         return getPageInstance().type === 'Audit';
       },
+      extendInstanceData(instance) {
+        instance = instance().serialize();
+        let audit = _.pick(instance, ['id', 'type', 'issue_tracker']);
+        let context = {
+          id: instance.context.id,
+          type: instance.context.type,
+        };
+        return JSON.stringify({audit, context});
+      },
     });
   },
   events: {

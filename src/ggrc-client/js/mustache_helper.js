@@ -496,17 +496,6 @@ Mustache.registerHelper('attach_spinner', function (spinOpts, styles) {
   };
 });
 
-Mustache.registerHelper('json_escape', function (obj, options) {
-  let str = JSON.stringify(String(resolveComputed(obj) || ''));
-  return str.substr(1, str.length - 2);
-});
-
-Mustache.registerHelper('json_stringify', function (obj, options) {
-  let fields = (options.hash && options.hash.fields || '').split(',');
-  obj = Mustache.resolve(obj);
-  return JSON.stringify(_.pick(obj.serialize(), fields));
-});
-
 function localizeDate(date, options, tmpl, allowNonISO) {
   let formats = [
     'YYYY-MM-DD',
