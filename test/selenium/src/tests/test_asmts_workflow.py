@@ -9,7 +9,6 @@
 # pylint: disable=redefined-outer-name
 
 import random
-import time
 
 import pytest
 
@@ -35,6 +34,8 @@ def _create_mapped_asmt(audit, assessment_type, objs_to_map):
   for obj in objs_to_map:
     rest_facade.map_to_snapshot(assessment, obj=obj, parent_obj=audit)
   assessment.update_attrs(mapped_objects=objs_to_map)
+  # wait for indexing task to be completed.
+  rest_facade.get_obj(assessment)
   return assessment
 
 
@@ -794,10 +795,6 @@ class TestRelatedAssessments(base.Test):
                                  objs_to_map=[control_mapped_to_program])
       related_asmts_titles.append(
           (asmt.title, control_mapped_to_program.title, audit.title))
-      # If two assessments are created within the same second, they may have
-      # the same `created_at` so will be sorted in an unexpected order.
-      if audit != audits[-1]:
-        time.sleep(2)
     assert self._related_asmts_of_obj(control_mapped_to_program, selenium) ==\
         related_asmts_titles[::-1]
 
@@ -818,13 +815,9 @@ class TestRelatedAssessments(base.Test):
       -> Asmt-2 mapped to Obj, asmt type="obj_type"
     Check Related Assessments on Obj's page"""
     assessments = []
-    for i in xrange(2):
+    for _ in xrange(2):
       assessments.append(_create_mapped_asmt(
           audit=audit, assessment_type=obj.type, objs_to_map=[obj]))
-      if i == 0:
-        # If two assessments are created within the same second, they may have
-        # the same `created_at` so will be sorted in an unexpected order.
-        time.sleep(2)
     related_asmts_titles = [
         (assessment.title, obj.title, audit.title)
         for assessment in assessments]
