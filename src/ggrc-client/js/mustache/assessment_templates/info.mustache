@@ -65,21 +65,15 @@
             <div class="span4">
               <h6>Default Assignees</h6>
               {{#if default_people.assignees}}
-                {{#if_string default_people.assignees}}
-                  {{get_item DEFAULT_PEOPLE_LABELS default_people.assignees}}
+                {{#if default_people.assignees.length}}
+                  <ul class="person-info-list">
+                    {{#each default_people.assignees}}
+                      <li><person-data {person-id}="{{.}}"></person-data></li>
+                    {{/each}}
+                  </ul>
                 {{else}}
-                  {{#if default_people.assignees.length}}
-                    <ul class="person-info-list">
-                      {{#each default_people.assignees}}
-                        <li>
-                          <person-data {person-id}="{{.}}"></person-data>
-                        </li>
-                      {{/each}}
-                    </ul>
-                  {{else}}
-                    <span class="empty-message">None</span>
-                  {{/if}}
-                {{/if_string}}
+                  {{get_item DEFAULT_PEOPLE_LABELS default_people.assignees}}
+                {{/if}}
               {{else}}
                 <span class="empty-message">None</span>
               {{/if}}
@@ -88,21 +82,15 @@
             <div class="span4">
               <h6>Default Verifiers</h6>
               {{#if default_people.verifiers}}
-                {{#if_string default_people.verifiers}}
-                  {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
+                {{#if default_people.verifiers.length}}
+                  <ul class="person-info-list">
+                    {{#each default_people.verifiers}}
+                      <li><person-data {person-id}="{{.}}"></person-data></li>
+                    {{/each}}
+                  </ul>
                 {{else}}
-                  {{#if default_people.verifiers.length}}
-                    <ul class="person-info-list">
-                      {{#each default_people.verifiers}}
-                        <li>
-                          <person-data {person-id}="{{.}}"></person-data>
-                        </li>
-                      {{/each}}
-                    </ul>
-                  {{else}}
-                    <span class="empty-message">None</span>
-                  {{/if}}
-                {{/if_string}}
+                  {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
+                {{/if}}
               {{else}}
                 <span class="empty-message">None</span>
               {{/if}}

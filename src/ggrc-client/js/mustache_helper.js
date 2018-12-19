@@ -152,41 +152,6 @@ Mustache.registerHelper('in_array', function (needle, haystack, options) {
 });
 
 /**
-   * Check if the given argument is a string and render the corresponding
-   * block in the template.
-   *
-   * Example usage:
-   *
-   *   {{#if_string someValue}}
-   *      {{someValue}} is a string
-   *   {{else}}
-   *     {{someValue}} is NOT a string
-   *   {{/if_string}}
-   *
-   * @param {*} thing - the argument to check
-   * @param {Object} options - a CanJS options argument passed to every helper
-   *
-   */
-Mustache.registerHelper('if_string', function (thing, options) {
-  let resolved;
-
-  if (arguments.length !== 2) {
-    throw new Error(
-      'Invalid number of arguments (' +
-        (arguments.length - 1) + // do not count the auto-provided options arg
-        '), expected 1.');
-  }
-
-  resolved = Mustache.resolve(thing);
-
-  if (_.isString(resolved)) {
-    return options.fn(options.context);
-  }
-
-  return options.inverse(options.context);
-});
-
-/**
    * Return the value of the given object's property.
    *
    * If the first argument is not an object, an error is raised.
