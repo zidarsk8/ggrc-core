@@ -410,10 +410,14 @@ def show_daily_digest_notifications():
 
 def send_calendar_events():
   """Sends calendar events."""
-  builder = calendar_event_builder.CalendarEventBuilder()
-  builder.build_cycle_tasks()
-  sync = calendar_event_sync.CalendarEventsSync()
-  sync.sync_cycle_tasks_events()
+  try:
+    builder = calendar_event_builder.CalendarEventBuilder()
+    builder.build_cycle_tasks()
+    sync = calendar_event_sync.CalendarEventsSync()
+    sync.sync_cycle_tasks_events()
+  except Exception as exp:
+    logger.error(exp.message)
+    return utils.make_simple_response(exp.message)
   return utils.make_simple_response()
 
 

@@ -7,7 +7,6 @@ from datetime import date
 from freezegun import freeze_time
 import mock
 
-from ggrc import settings
 from ggrc.gcalendar import calendar_event_sync, calendar_api_service
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
@@ -39,7 +38,7 @@ class TestCalendarEventSync(TestCase):
     with freeze_time("2015-01-1 12:00:00"):
       self.sync._create_event(event)
     create_event_mock.assert_called_with(
-        calendar_id=settings.DEFAULT_SERVICE_ACCOUNT,
+        calendar_id="primary",
         summary=event.title,
         description=event.description,
         start="2015-01-15",
@@ -74,7 +73,7 @@ class TestCalendarEventSync(TestCase):
       self.sync._update_event(event)
     update_event_mock.assert_called_with(
         event_id="eventId",
-        calendar_id=settings.DEFAULT_SERVICE_ACCOUNT,
+        calendar_id="primary",
         description="new description",
         summary="summary",
         start="2015-01-15",

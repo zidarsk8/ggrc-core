@@ -8,7 +8,6 @@ import datetime
 from sqlalchemy.orm import load_only
 
 from ggrc import db
-from ggrc import settings
 from ggrc.models import all_models
 from ggrc.gcalendar import calendar_api_service, utils
 
@@ -22,7 +21,7 @@ class CalendarEventsSync(object):
 
   def __init__(self):
     self.service = calendar_api_service.CalendarApiService()
-    self.calendar_id = settings.DEFAULT_SERVICE_ACCOUNT
+    self.calendar_id = "primary"
 
   def sync_cycle_tasks_events(self):
     """Generates Calendar Events descriptions."""

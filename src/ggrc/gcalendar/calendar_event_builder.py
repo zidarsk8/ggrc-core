@@ -176,6 +176,8 @@ class CalendarEventBuilder(object):
         )
     ).all()
     for event in events:
+      if event.id not in self.event_mappings:
+        continue
       task_ids = self.event_mappings[event.id]
       self._generate_description_for_event(event, task_ids)
     db.session.commit()
