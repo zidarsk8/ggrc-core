@@ -225,7 +225,7 @@ describe('Assessment model', function () {
 
   describe('getRelatedObjects() method', () => {
     beforeEach(() => {
-      spyOn($, 'get').and.returnValue(can.Deferred().resolve({
+      spyOn($, 'get').and.returnValue($.Deferred().resolve({
         Audit: {
           title: 'FooBar',
         },

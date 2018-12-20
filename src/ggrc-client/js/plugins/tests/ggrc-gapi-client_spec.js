@@ -41,7 +41,7 @@ describe('backendGdriveClient', () => {
       let error = {
         status: 404,
       };
-      action.and.returnValue(can.Deferred().reject(error));
+      action.and.returnValue($.Deferred().reject(error));
 
       backendGdriveClient.withAuth(action).fail((e) => {
         expect(e).toBe(error);
@@ -54,7 +54,7 @@ describe('backendGdriveClient', () => {
         status: 401,
       };
       beforeEach(() => {
-        action.and.returnValue(can.Deferred().reject(error));
+        action.and.returnValue($.Deferred().reject(error));
         spyOn(backendGdriveClient, 'runBackendAuth');
         backendGdriveClient.authDfd = null;
       });
@@ -62,7 +62,7 @@ describe('backendGdriveClient', () => {
       describe('runs backend auth', () => {
         beforeEach(() => {
           backendGdriveClient.runBackendAuth.and.callFake(() => {
-            backendGdriveClient.authDfd = can.Deferred();
+            backendGdriveClient.authDfd = $.Deferred();
           });
         });
 
@@ -80,17 +80,17 @@ describe('backendGdriveClient', () => {
         });
 
         it('if there auth dfd was in resolved state', () => {
-          backendGdriveClient.authDfd = can.Deferred().resolve();
+          backendGdriveClient.authDfd = $.Deferred().resolve();
         });
 
         it('if there auth dfd was in rejected state', () => {
-          backendGdriveClient.authDfd = can.Deferred().reject();
+          backendGdriveClient.authDfd = $.Deferred().reject();
         });
       });
 
       it('returns provided response if auth was not successful', (done) => {
         backendGdriveClient.runBackendAuth.and.callFake(() => {
-          backendGdriveClient.authDfd = can.Deferred().reject();
+          backendGdriveClient.authDfd = $.Deferred().reject();
         });
 
         backendGdriveClient.withAuth(action, 'failed')
@@ -102,8 +102,8 @@ describe('backendGdriveClient', () => {
 
       it('returns result of original action if auth was successful', (done) => {
         backendGdriveClient.runBackendAuth.and.callFake(() => {
-          backendGdriveClient.authDfd = can.Deferred().resolve();
-          action.and.returnValue(can.Deferred().resolve('response'));
+          backendGdriveClient.authDfd = $.Deferred().resolve();
+          action.and.returnValue($.Deferred().resolve('response'));
         });
 
         backendGdriveClient.withAuth(action).then((result) => {
@@ -159,11 +159,11 @@ describe('backendGdriveClient', () => {
       };
       spyOn(backendGdriveClient, 'showAuthModal').and.returnValue(popup);
       spyOn(backendGdriveClient, 'checkBackendAuth')
-        .and.returnValue(can.Deferred().resolve());
+        .and.returnValue($.Deferred().resolve());
     });
 
     it('checkBackendAuth after closing popup', (done) => {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       backendGdriveClient.authorizeBackendGapi(dfd);
 
       let timer = setInterval(() => {
@@ -197,7 +197,7 @@ describe('gapiClient', () => {
       let gapiObj = {
         test: 'gapi',
       };
-      gapiClient.client = can.Deferred();
+      gapiClient.client = $.Deferred();
       appendChildSpy.and.callFake(() => {
         window.gapi = gapiObj;
         window.resolvegapi();
@@ -262,8 +262,8 @@ describe('gapiClient', () => {
           getToken: jasmine.createSpy().and.returnValue('token'),
         },
       };
-      gapiClient.client = can.Deferred().resolve(gapi);
-      gapiClient.oauthResult = can.Deferred();
+      gapiClient.client = $.Deferred().resolve(gapi);
+      gapiClient.oauthResult = $.Deferred();
       spyOn(gapiClient, 'addNewScopes');
       spyOn(gapiClient, 'runAuthorization');
       spyOn(gapiClient, 'checkLoggedUser');
@@ -308,7 +308,7 @@ describe('gapiClient', () => {
     });
 
     it('calls checkLoggedUser() when oauthResult was resolved', (done) => {
-      gapiClient.oauthResult = can.Deferred();
+      gapiClient.oauthResult = $.Deferred();
       gapiClient.addNewScopes.and.returnValue(true);
 
       gapiClient.authorizeGapi();
@@ -323,7 +323,7 @@ describe('gapiClient', () => {
   describe('runAuthorization() method', () => {
     let authDfd;
     beforeEach(() => {
-      authDfd = can.Deferred();
+      authDfd = $.Deferred();
       spyOn(gapiClient, 'makeGapiAuthRequest').and.returnValue(authDfd);
       spyOn(gapiClient, 'showGapiModal');
     });
@@ -335,7 +335,7 @@ describe('gapiClient', () => {
     });
 
     it('resolves oauth if auth request was successful', (done) => {
-      gapiClient.oauthResult = can.Deferred();
+      gapiClient.oauthResult = $.Deferred();
       authDfd.resolve('authResult');
 
       gapiClient.runAuthorization();
@@ -373,7 +373,7 @@ describe('gapiClient', () => {
 
         describe('and gapi modal was declined', () => {
           it('rejects oauth', (done) => {
-            gapiClient.oauthResult = can.Deferred();
+            gapiClient.oauthResult = $.Deferred();
             gapiClient.showGapiModal.and.callFake(({onDecline}) => {
               spyOn(gapiClient, 'runAuthorization');
               onDecline();
@@ -391,7 +391,7 @@ describe('gapiClient', () => {
 
       describe('and immediate flag was turned off', () => {
         it('rejects oauth', () => {
-          gapiClient.oauthResult = can.Deferred();
+          gapiClient.oauthResult = $.Deferred();
 
           gapiClient.runAuthorization();
 
@@ -426,7 +426,7 @@ describe('gapiClient', () => {
       gapiClient.loadedClientLibraries = [];
       gapi.client.load.and.callFake(() => {
         gapi.client['testlib'] = 'loaded';
-        return can.Deferred().resolve();
+        return $.Deferred().resolve();
       });
 
       gapiClient.loadClientLibrary('testlib').then((lib) => {
@@ -440,7 +440,7 @@ describe('gapiClient', () => {
   describe('makeGapiRequest() method', () => {
     let requestDfd;
     beforeEach(() => {
-      requestDfd = can.Deferred();
+      requestDfd = $.Deferred();
       window.gapi = {
         client: {
           request: jasmine.createSpy().and.returnValue(requestDfd),

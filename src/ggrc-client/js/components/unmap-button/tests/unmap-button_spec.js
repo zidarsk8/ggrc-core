@@ -46,7 +46,7 @@ describe('unmap-button component', function () {
   describe('unmapInstance() method', function () {
     let refreshDfd;
     beforeEach(function () {
-      refreshDfd = can.Deferred();
+      refreshDfd = $.Deferred();
       spyOn(viewModel, 'getMapping').and.returnValue(refreshDfd);
       spyOn(console, 'warn');
     });
@@ -76,7 +76,7 @@ describe('unmap-button component', function () {
       it('after destroy() success', async function (done) {
         refreshDfd.resolve({
           destroy: jasmine.createSpy()
-            .and.returnValue(can.Deferred().resolve()),
+            .and.returnValue($.Deferred().resolve()),
         });
         await viewModel.unmapInstance();
         expect(viewModel.attr('isUnmapping')).toBe(false);
@@ -86,7 +86,7 @@ describe('unmap-button component', function () {
       it('when destroy() was failed', async function (done) {
         refreshDfd.resolve({
           destroy: jasmine.createSpy()
-            .and.returnValue(can.Deferred().reject()),
+            .and.returnValue($.Deferred().reject()),
         });
         await viewModel.unmapInstance();
         expect(viewModel.attr('isUnmapping')).toBe(false);

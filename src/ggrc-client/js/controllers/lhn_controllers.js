@@ -829,7 +829,7 @@ can.Control.extend({
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
-      return can.Deferred().resolve();
+      return $.Deferred().resolve();
     }
 
 
@@ -856,7 +856,7 @@ can.Control.extend({
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
-      return can.Deferred().resolve();
+      return $.Deferred().resolve();
     }
 
     models = can.map(models, function (modelName) {

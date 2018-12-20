@@ -33,7 +33,7 @@ describe('ca-object-modal-content component', () => {
     });
 
     it('call "addComment" when saveDfd resolved', (done) => {
-      let saveDfd = can.Deferred();
+      let saveDfd = $.Deferred();
       viewModel.attr('content.saveDfd', saveDfd);
       spyOn(viewModel, 'addComment');
       spyOn(Utils, 'getAssigneeType');

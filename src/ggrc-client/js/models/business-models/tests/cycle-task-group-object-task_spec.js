@@ -115,7 +115,7 @@ describe('CycleTaskGroupObjectTask model', function () {
       });
 
       spyOn(workflow, 'refresh_all').and
-        .returnValue(can.Deferred().resolve(cycles));
+        .returnValue($.Deferred().resolve(cycles));
 
       instance.form_preload(true, {workflow: workflow});
 

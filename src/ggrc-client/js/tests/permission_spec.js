@@ -609,7 +609,7 @@ describe('Permission', function () {
     });
     beforeEach(function () {
       spyOn($, 'ajax')
-        .and.returnValue(new can.Deferred().resolve('permissions'));
+        .and.returnValue(new $.Deferred().resolve('permissions'));
     });
     afterEach(function () {
       GGRC.permissions = GGRC_PERMISSIONS;

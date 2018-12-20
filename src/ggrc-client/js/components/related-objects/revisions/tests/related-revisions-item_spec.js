@@ -36,7 +36,7 @@ describe('RelatedRevisionsItem component', () => {
     let getPersonInfoDfd;
 
     beforeEach(() => {
-      getPersonInfoDfd = can.Deferred();
+      getPersonInfoDfd = $.Deferred();
       spyOn(Utils, 'getPersonInfo').and.returnValue(getPersonInfoDfd);
     });
 

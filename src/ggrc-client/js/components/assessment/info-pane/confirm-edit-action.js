@@ -14,7 +14,7 @@ export default can.Component.extend({
     editMode: false,
     isEditIconDenied: false,
     isConfirmationNeeded: true,
-    onStateChangeDfd: can.Deferred().resolve(),
+    onStateChangeDfd: $.Deferred().resolve(),
     openEditMode: function (el) {
       this.attr('onStateChangeDfd').then(function () {
         if (this.isInEditableState()) {
@@ -28,7 +28,7 @@ export default can.Component.extend({
     },
     showConfirm: function () {
       let self = this;
-      let confirmation = can.Deferred();
+      let confirmation = $.Deferred();
       confirm({
         modal_title: 'Confirm moving Assessment to "In Progress"',
         modal_description: 'You are about to move Assessment from "' +

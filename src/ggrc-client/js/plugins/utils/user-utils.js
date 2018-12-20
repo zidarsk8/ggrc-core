@@ -45,7 +45,7 @@ function updateUserProfile(profile) {
 }
 
 function getPersonInfo(person) {
-  const dfd = can.Deferred();
+  const dfd = $.Deferred();
   let actualPerson;
 
   if (!person || !person.id) {

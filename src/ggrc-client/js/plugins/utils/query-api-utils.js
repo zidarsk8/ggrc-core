@@ -36,7 +36,7 @@ let batchTimeout = null;
  * @return {Promise} Promise on Query API request.
  */
 function batchRequests(params) {
-  let dfd = can.Deferred();
+  let dfd = $.Deferred();
   batchQueue.push({dfd: dfd, params: params});
 
   if (_.isNumber(batchTimeout)) {

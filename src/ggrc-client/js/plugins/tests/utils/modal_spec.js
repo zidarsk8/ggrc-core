@@ -10,7 +10,7 @@ describe('modal utils', () => {
     let dfd;
 
     beforeEach(() => {
-      dfd = new can.Deferred();
+      dfd = new $.Deferred();
     });
 
     const callBindXHRToButton = (done, actualInnerHtml, newtext, disable) => {

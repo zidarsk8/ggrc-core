@@ -50,7 +50,7 @@ describe('download-template component', () => {
   describe('downloadCSV method', () => {
     it('should do ajax call in proper format', (done) => {
       spyOn(Utils, 'downloadTemplate')
-        .and.returnValue(can.Deferred().resolve('FooBar'));
+        .and.returnValue($.Deferred().resolve('FooBar'));
       spyOn(Utils, 'download');
 
       vm.attr('selected', [{name: 'Foo'}, {name: 'Bar'}, {name: 'Baz'}]);
@@ -78,7 +78,7 @@ describe('download-template component', () => {
     it('should not download CSV and should close the modal after error during' +
       '"downloadTemplate" phase', (done) => {
       spyOn(Utils, 'downloadTemplate')
-        .and.returnValue(can.Deferred().reject());
+        .and.returnValue($.Deferred().reject());
       spyOn(Utils, 'download');
 
       vm.attr('selected', [1, 2, 3]);
@@ -105,7 +105,7 @@ describe('download-template component', () => {
     });
 
     it('should do ajax call in proper format', (done) => {
-      downloadSpy.and.returnValue(can.Deferred().resolve('FooBar'));
+      downloadSpy.and.returnValue($.Deferred().resolve('FooBar'));
 
       vm.attr('selected', [{name: 'Foo'}, {name: 'Bar'}, {name: 'Baz'}]);
 
@@ -131,7 +131,7 @@ describe('download-template component', () => {
 
     it('should not download Sheet and should close the modal after error' +
       'during "downloadTemplate" phase', (done) => {
-      downloadSpy.and.returnValue(can.Deferred().reject());
+      downloadSpy.and.returnValue($.Deferred().reject());
 
       vm.attr('selected', [1, 2, 3]);
 

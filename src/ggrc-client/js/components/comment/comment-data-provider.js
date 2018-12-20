@@ -32,7 +32,7 @@ export default can.Component.extend({
       return query;
     },
     getComments(query) {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       this.attr('isLoading', true);
       QueryAPI.batchRequests(query)
         .done((response) => {

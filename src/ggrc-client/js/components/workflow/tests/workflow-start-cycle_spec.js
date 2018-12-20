@@ -21,7 +21,7 @@ describe('workflow-start-cycle component', function () {
     beforeEach(function () {
       handler = events.click;
       workflowMock = jasmine.createSpyObj('workflow', ['refresh_all']);
-      generateDfd = can.Deferred();
+      generateDfd = $.Deferred();
 
       spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue(workflowMock);

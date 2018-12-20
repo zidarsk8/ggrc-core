@@ -434,7 +434,7 @@ function applyChangesToCAValue(values, changes) {
 function ensureGlobalCA(instance) {
   let definitions;
   let values;
-  let def = can.Deferred();
+  let def = $.Deferred();
   if (instance.attr('id')) {
     def.resolve();
     return def.promise();

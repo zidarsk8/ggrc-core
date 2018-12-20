@@ -125,9 +125,9 @@ describe('external-data-provider component', () => {
       });
 
       it('processes callbacks only for latest request', (done) => {
-        let request1 = can.Deferred();
+        let request1 = $.Deferred();
         let response1 = ['res1'];
-        let request2 = can.Deferred();
+        let request2 = $.Deferred();
         let response2 = ['res2'];
 
         $getSpy.and.returnValue(request1);

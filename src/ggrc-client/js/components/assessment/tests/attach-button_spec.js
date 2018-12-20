@@ -38,7 +38,7 @@ describe('attach-button component', function () {
         viewModel.attr('instance.folder', 'gdrive_folder_id');
 
         spyOn(viewModel, 'findFolder').and
-          .returnValue(can.Deferred().resolve({}));
+          .returnValue($.Deferred().resolve({}));
 
         viewModel.checkFolder();
         expect(viewModel.attr('isFolderAttached')).toBe(true);
@@ -50,7 +50,7 @@ describe('attach-button component', function () {
         viewModel.attr('instance.folder', null);
 
         spyOn(viewModel, 'findFolder').and
-          .returnValue(can.Deferred().resolve());
+          .returnValue($.Deferred().resolve());
 
         viewModel.checkFolder();
         expect(viewModel.attr('isFolderAttached')).toBe(false);
@@ -58,7 +58,7 @@ describe('attach-button component', function () {
 
     it('set correct isFolderAttached if instance refreshes during ' +
       'request to GDrive', function () {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       spyOn(gDriveUtils, 'findGDriveItemById').and.returnValue(dfd);
 
       viewModel.attr('instance.folder', 'gdrive_folder_id');

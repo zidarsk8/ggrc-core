@@ -31,7 +31,7 @@ describe('ObjectMapper', function () {
     });
 
     beforeEach(function () {
-      updateScopeObject = can.Deferred();
+      updateScopeObject = $.Deferred();
       scopeObject = new can.Map({
         id: 1,
       });

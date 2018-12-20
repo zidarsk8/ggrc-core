@@ -71,7 +71,7 @@ describe('tasks-counter component', function () {
         spyOn(Person, 'findInCacheById')
           .and.callFake(() => {
             return {
-              getTasksCount: () => can.Deferred().resolve({
+              getTasksCount: () => $.Deferred().resolve({
                 open_task_count: 5,
                 has_overdue: true,
               }),

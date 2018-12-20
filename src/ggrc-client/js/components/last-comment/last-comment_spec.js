@@ -86,7 +86,7 @@ describe('last-comment component', () => {
 
     describe('"{this} mouseover" handler', () => {
       beforeEach(() => {
-        dfd = new can.Deferred();
+        dfd = new $.Deferred();
         spyOn(RefreshQueue.prototype, 'enqueue').and.returnValue({
           trigger: jasmine.createSpy().and.returnValue(dfd),
         });

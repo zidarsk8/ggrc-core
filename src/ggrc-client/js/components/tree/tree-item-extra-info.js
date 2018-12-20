@@ -155,7 +155,7 @@ let viewModel = can.Map.extend({
     }
   },
   contentPromises: [],
-  dfdReady: can.Deferred(),
+  dfdReady: $.Deferred(),
   classes: [],
   instance: null,
 });

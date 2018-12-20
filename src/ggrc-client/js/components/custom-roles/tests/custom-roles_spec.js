@@ -84,7 +84,7 @@ describe('custom-roles component', () => {
 
     beforeEach(() => {
       args = {};
-      saveDfd = new can.Deferred();
+      saveDfd = new $.Deferred();
       vm.attr('instance', {
         save: jasmine.createSpy().and.returnValue(saveDfd),
       });
@@ -119,7 +119,7 @@ describe('custom-roles component', () => {
       let instanceSave;
 
       beforeEach(() => {
-        instanceSave = can.Deferred();
+        instanceSave = $.Deferred();
         vm.attr('instance', {
           save: () => instanceSave,
         });

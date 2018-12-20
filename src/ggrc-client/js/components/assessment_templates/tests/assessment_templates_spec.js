@@ -116,7 +116,7 @@ describe('assessment-templates component', () => {
     });
 
     beforeEach(() => {
-      batchRequestsDfd = can.Deferred();
+      batchRequestsDfd = $.Deferred();
       viewModel.attr('instance', {
         id: 1,
         type: 'AssessmentTemplate',

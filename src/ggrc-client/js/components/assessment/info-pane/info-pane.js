@@ -254,7 +254,7 @@ export default can.Component.extend({
       return query;
     },
     requestQuery: function (query, type) {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       type = type || '';
       this.attr('isUpdating' + can.capitalize(type), true);
 
@@ -489,10 +489,10 @@ export default can.Component.extend({
       };
 
       if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
-        return can.Deferred().resolve();
+        return $.Deferred().resolve();
       }
 
-      this.attr('onStateChangeDfd', can.Deferred());
+      this.attr('onStateChangeDfd', $.Deferred());
 
       if (isUndo) {
         instance.attr('previousStatus', undefined);
@@ -551,7 +551,7 @@ export default can.Component.extend({
         value: scope.attr('value'),
         title: scope.attr('title'),
         type: scope.attr('type'),
-        saveDfd: e.saveDfd || can.Deferred().resolve(),
+        saveDfd: e.saveDfd || $.Deferred().resolve(),
       };
 
       let title = 'Required ' + getLCAPopupTitle(errors);

@@ -61,7 +61,7 @@ export default can.Component.extend({
     instance: null,
     review: null,
     isLoading: true,
-    personLoadingDfd: can.Deferred,
+    personLoadingDfd: $.Deferred,
     fullHistory: [],
     showLastReviewUpdates: false,
     currentPage: 0,
@@ -109,7 +109,7 @@ export default can.Component.extend({
      * The `instance` here refers to the instance of an object currently being
      * handled by the component.
      *
-     * @return {can.Deferred} - an object representing the async operation of
+     * @return {$.Deferred} - an object representing the async operation of
      *   fetching the data from the server. On success it is resolved with an
      *   object containing the following Revision data, order by date from
      *   oldest to newest:
@@ -329,7 +329,7 @@ export default can.Component.extend({
       if (refreshQueue.objects.length) {
         this.attr('personLoadingDfd', refreshQueue.trigger());
       } else {
-        this.attr('personLoadingDfd', can.Deferred().resolve());
+        this.attr('personLoadingDfd', $.Deferred().resolve());
       }
     },
     /**

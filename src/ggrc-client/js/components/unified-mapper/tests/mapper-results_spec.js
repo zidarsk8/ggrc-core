@@ -712,7 +712,7 @@ describe('mapper-results component', function () {
 
     beforeEach(function () {
       viewModel.attr({});
-      dfdRequest = can.Deferred();
+      dfdRequest = $.Deferred();
       spyOn(QueryAPI, 'batchRequests');
       spyOn(can, 'when')
         .and.returnValue(dfdRequest.promise());
