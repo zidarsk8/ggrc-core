@@ -21,7 +21,6 @@ import {reify as reifyUtil, isReifiable} from '../../plugins/utils/reify-utils';
 import {
   buildParam,
   batchRequests,
-  buildCountParams,
 } from '../../plugins/utils/query-api-utils';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Pagination from '../base-objects/pagination';
@@ -58,9 +57,6 @@ export default can.Component.extend({
     _DATE_FIELDS: _DATE_FIELDS,
     _EMBED_MAPPINGS: _EMBED_MAPPINGS,
     define: {
-      changeHistory: {
-        Value: can.List,
-      },
       showFilter: {
         get() {
           return (this.attr('review.status') === 'Unreviewed') &&
@@ -75,14 +71,22 @@ export default can.Component.extend({
           });
         },
       },
+      showLastReviewUpdates: {
+        get() {
+          const review = this.attr('review');
+
+          return (review && review.getShowLastReviewUpdates) ?
+            review.getShowLastReviewUpdates() :
+            false;
+        },
+      },
     },
     instance: null,
     review: null,
     isLoading: true,
     personLoadingDfd: $.Deferred,
     fullHistory: [],
-    showLastReviewUpdates: false,
-    currentPage: 0,
+    changeHistory: [],
     getOriginRevision() {
       const instance = this.attr('instance');
       const filter = QueryParser.parse(
@@ -105,16 +109,10 @@ export default can.Component.extend({
       );
 
       return batchRequests(params).then((data) => {
-        let revisions = data['Revision'].values;
-
-        revisions = revisions.map(function (source) {
-          return Revision.model(source, 'Revision');
-        });
-
-        return revisions;
+        return this.makeRevisionModels(data.Revision);
       });
     },
-    queryRevisions() {
+    getAllRevisions() {
       const instance = this.attr('instance');
       const filter = QueryParser.parse(
         `resource_type = ${instance.type} AND
@@ -145,13 +143,55 @@ export default can.Component.extend({
         const total = data.total;
         this.attr('pageInfo.total', total);
 
-        let revisions = data.values;
-        revisions = revisions.map(function (source) {
-          return Revision.model(source, 'Revision');
-        });
-
-        return revisions;
+        return this.makeRevisionModels(data);
       });
+    },
+    getAfterReviewRevisions() {
+      const instance = this.attr('instance');
+      const reviewDate = moment(this.attr('review.last_reviewed_at'))
+        .format('YYYY-MM-DD HH:mm:ss');
+      const filter = QueryParser.parse(
+        `resource_type = ${instance.type} AND
+         resource_id = ${instance.id} AND
+         created_at >= ${reviewDate} OR
+         source_type = ${instance.type} AND
+         source_id = ${instance.id} AND
+         created_at >= ${reviewDate} OR
+         destination_type = ${instance.type} AND
+         destination_id = ${instance.id} AND
+         created_at >= ${reviewDate}`);
+      let pageInfo = this.attr('pageInfo');
+      const page = {
+        current: pageInfo.current,
+        pageSize: pageInfo.pageSize,
+        sort: [{
+          direction: 'desc',
+          key: 'created_at',
+        }],
+      };
+      let params = buildParam(
+        'Revision',
+        page,
+        null,
+        null,
+        filter
+      );
+
+      return batchRequests(params).then((data) => {
+        data = data.Revision;
+        const total = data.total;
+        this.attr('pageInfo.total', total);
+
+        return this.makeRevisionModels(data);
+      });
+    },
+    makeRevisionModels(data) {
+      let revisions = data.values;
+      revisions = revisions.map(function (source) {
+        return Revision.model(source, 'Revision');
+      });
+
+      return revisions;
     },
 
     fetchItems: function () {
@@ -164,25 +204,10 @@ export default can.Component.extend({
         tracker.USER_ACTIONS.CHANGE_LOG);
 
       return this._fetchRevisionsDataByQuery()
-        .done(function (revisions) {
-          let fullHistory;
-          // calculate history of role changes
-          this.attr('roleHistory',
-            this._computeRoleChanges(revisions));
-
-          // load not cached people
-          this._loadACLPeople(revisions.object);
-
-          // combine all the changes and sort them by date descending
-          fullHistory = _([]).concat(
-            can.makeArray(this._computeObjectChanges(revisions.object)),
-            can.makeArray(this._computeMappingChanges(revisions.mappings)))
-            .sortBy('updatedAt')
-            .reverse()
-            .value();
-          this.attr('fullHistory', fullHistory);
+        .done((revisions) => {
+          this.calculateFullHistory(revisions);
           stopFn();
-        }.bind(this))
+        })
         .fail(function () {
           stopFn(true);
           $('body').trigger(
@@ -192,6 +217,24 @@ export default can.Component.extend({
         .always(function () {
           this.attr('isLoading', false);
         }.bind(this));
+    },
+    calculateFullHistory(revisions) {
+      let fullHistory;
+      // calculate history of role changes
+      this.attr('roleHistory',
+        this._computeRoleChanges(revisions));
+
+      // load not cached people
+      this._loadACLPeople(revisions.object);
+
+      // combine all the changes and sort them by date descending
+      fullHistory = _([]).concat(
+        can.makeArray(this._computeObjectChanges(revisions.object)),
+        can.makeArray(this._computeMappingChanges(revisions.mappings)))
+        .sortBy('updatedAt')
+        .reverse()
+        .value();
+      this.attr('fullHistory', fullHistory);
     },
     _fetchAdditionalInfoForRevisions(refreshQueue, revisions) {
       _.forEach(revisions, (revision) => {
@@ -298,7 +341,11 @@ export default can.Component.extend({
       return revision;
     },
     _fetchRevisionsDataByQuery() {
-      return $.when(this.queryRevisions(), this.getOriginRevision()).then(
+      let fetchRevisions = this.attr('showLastReviewUpdates') ?
+        this.getAfterReviewRevisions.bind(this) :
+        this.getAllRevisions.bind(this);
+
+      return $.when(fetchRevisions(), this.getOriginRevision()).then(
         (revisions, originalRevisions) => {
           let rq = new RefreshQueue();
 
@@ -980,16 +1027,12 @@ export default can.Component.extend({
     changeLastUpdatesFilter(element) {
       const isChecked = element.checked;
 
-      this.showRevisionsHistory(isChecked);
-    },
-    showRevisionsHistory(showLastReviewUpdates) {
-      this.attr('currentPage', 0);
-
-      if (showLastReviewUpdates) {
-        this.showFilteredHistory();
-      } else {
-        this.showFullHistory();
+      const review = this.attr('review');
+      if (review) {
+        review.setShowLastReviewUpdates(isChecked);
       }
+      this.attr('pageInfo.current', 1);
+      this.loadPage();
     },
     showFilteredHistory() {
       const fullHistory = this.attr('fullHistory');
@@ -999,13 +1042,9 @@ export default can.Component.extend({
 
       this.attr('changeHistory', filteredData);
     },
-    showFullHistory() {
-      const fullHistory = this.attr('fullHistory');
-      this.attr('changeHistory', fullHistory);
-    },
     getLastUpdatesFlag() {
       return this.attr('showFilter') &&
-        this.attr('review').getShowLastReviewUpdates();
+        this.attr('showLastReviewUpdates');
     },
     resetLastUpdatesFlag() {
       const review = this.attr('review');
@@ -1021,6 +1060,13 @@ export default can.Component.extend({
         this.attr('review', reifyUtil(review));
       }
     },
+    loadPage() {
+      this.fetchItems()
+        .then(() => {
+          const fullHistory = this.attr('fullHistory');
+          this.attr('changeHistory', fullHistory);
+        });
+    },
   },
   /**
    * The component's entry point. Invoked when a new component instance has
@@ -1031,30 +1077,20 @@ export default can.Component.extend({
 
     viewModel.initObjectReview();
 
-    const showLastUpdates = viewModel.getLastUpdatesFlag();
-    viewModel.attr('showLastReviewUpdates', showLastUpdates);
-
-    viewModel.fetchItems()
-      .then(() => {
-        viewModel.showRevisionsHistory(showLastUpdates);
-        viewModel.resetLastUpdatesFlag();
-      });
+    this.viewModel.loadPage();
   },
   events: {
     '{viewModel.instance} refreshInstance': function () {
       this.viewModel.fetchItems();
     },
     '{viewModel.pageInfo} current'() {
-      const viewModel = this.viewModel;
-
-      viewModel.fetchItems()
-        .then(() => {
-          const showLastUpdates = viewModel.getLastUpdatesFlag();
-          viewModel.showRevisionsHistory(showLastUpdates);
-        });
+      this.viewModel.loadPage();
     },
     '{viewModel.pageInfo} pageSize'() {
-      this.viewModel.fetchItems();
+      this.viewModel.loadPage();
+    },
+    removed() {
+      this.viewModel.resetLastUpdatesFlag();
     },
   },
 });
