@@ -18,7 +18,7 @@
     </div><!-- inner-content end -->
   </div>
   <!-- Right side workflow and task trees area -->
-  <dashboard-widgets class="span9 content-wrap">
+  <dashboard-workflows class="span9 content-wrap">
       <div class="inner-content">
         <section class="widget dashboard small-margin">
           <header class="header widget-nav">
@@ -43,5 +43,5 @@
         </section><!-- Widget end -->
 
       </div><!-- inner-content end -->
-  </dashboard-widgets>
+  </dashboard-workflows>
 </div>

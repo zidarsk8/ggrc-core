@@ -8,7 +8,7 @@ import '../inline/people-with-role-inline-field';
 import Search from '../../models/service-models/search';
 
 export default can.Component.extend({
-  tag: 'dashboard-widgets',
+  tag: 'dashboard-workflows',
   template: '<content/>',
   leakScope: true,
   scope: {
