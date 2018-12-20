@@ -13,7 +13,6 @@ import '../apps/risk_assessments';
 // ggrc_workflows
 import '../apps/workflow-config';
 import '../apps/workflows';
-import '../controllers/dashboard_page';
 import '../components/workflow/workflow_clone';
 import '../components/workflow/taskgroup_clone';
 import '../components/workflow/end_cycle';

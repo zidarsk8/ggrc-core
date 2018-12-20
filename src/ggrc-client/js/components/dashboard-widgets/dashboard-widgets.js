@@ -3,9 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import RefreshQueue from '../models/refresh_queue';
-import '../components/inline/people-with-role-inline-field';
-import Search from '../models/service-models/search';
+import RefreshQueue from '../../models/refresh_queue';
+import '../inline/people-with-role-inline-field';
+import Search from '../../models/service-models/search';
 
 export default can.Component.extend({
   tag: 'dashboard-widgets',
