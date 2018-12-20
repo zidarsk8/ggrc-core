@@ -26,8 +26,8 @@ class TestRiskAssessmentImport(TestCase):
   def test_ra_import_counsels(self, counsel, expected_warnings):
     """Tests Risk Counsel for Risk Assessment imported and set correctly"""
     with factories.single_commit():
-      risk_assessment = factories.RiskAssessmentFactory()
       program = factories.ProgramFactory()
+      risk_assessment = factories.RiskAssessmentFactory(program=program)
       factories.PersonFactory(email="valid_user@example.com")
 
     data = OrderedDict([
@@ -66,8 +66,8 @@ class TestRiskAssessmentImport(TestCase):
   def test_ra_import_wrong_counsels(self, counsel, expected_warnings):
     """Test import Risk Assessment counsel failed"""
     with factories.single_commit():
-      risk_assessment = factories.RiskAssessmentFactory()
       program = factories.ProgramFactory()
+      risk_assessment = factories.RiskAssessmentFactory(program=program)
       factories.PersonFactory(email="valid_user@example.com")
 
     data = OrderedDict([
@@ -100,8 +100,8 @@ class TestRiskAssessmentImport(TestCase):
     """Tests Risk Manager for Risk Assessment imported and set correctly"""
 
     with factories.single_commit():
-      risk_assessment = factories.RiskAssessmentFactory()
       program = factories.ProgramFactory()
+      risk_assessment = factories.RiskAssessmentFactory(program=program)
       factories.PersonFactory(email="valid_user@example.com")
 
     data = OrderedDict([
@@ -141,8 +141,8 @@ class TestRiskAssessmentImport(TestCase):
     """Test import Risk Assessment manager failed"""
 
     with factories.single_commit():
-      risk_assessment = factories.RiskAssessmentFactory()
       program = factories.ProgramFactory()
+      risk_assessment = factories.RiskAssessmentFactory(program=program)
       factories.PersonFactory(email="valid_user@example.com")
 
     data = OrderedDict([
