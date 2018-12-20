@@ -35,9 +35,12 @@ def automapping_count_limit(new_limit):
 class TestAutomappings(TestCase):
   """Test automappings"""
 
+  @classmethod
+  def setUpClass(cls):
+    cls.gen = generator.ObjectGenerator()
+
   def setUp(self):
     super(TestAutomappings, self).setUp()
-    self.gen = generator.ObjectGenerator()
     self.api = self.gen.api
 
   @classmethod
@@ -52,7 +55,7 @@ class TestAutomappings(TestCase):
     """Helper function for creating an object"""
     name = cls._inflector.table_singular
     data['context'] = None
-    res, obj = self.gen.generate(cls, name, {name: data})
+    res, obj = self.gen.generate_object(cls, data={name: data})
     self.assertIsNotNone(obj, '%s, %s: %s' % (name, str(data), str(res)))
     return obj
 
@@ -240,7 +243,7 @@ class TestAutomappings(TestCase):
 
   def test_mapping_nested_controls(self):
     """Test mapping of nested controls"""
-    objective = self.create_object(models.Objective, {
+    objective = self.create_object(models.Objective, data={
         'title': make_name('Test Objective')
     })
     control_p = self.create_object(models.Control, {

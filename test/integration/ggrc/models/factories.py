@@ -125,18 +125,9 @@ class ControlFactory(TitledFactory):
   class Meta:
     model = all_models.Control
 
+  assertions = factory.LazyAttribute(lambda m: [ControlAssertionFactory(), ])
   directive = factory.LazyAttribute(lambda m: RegulationFactory())
   recipients = ""
-
-  @classmethod
-  def _create(cls, target_class, *args, **kwargs):
-    """Add assertions to control being created"""
-    instance = super(ControlFactory, cls)._create(
-        target_class, *args, **kwargs)
-    instance.assertions.append(ControlAssertionFactory())
-    if getattr(db.session, "single_commit", True):
-      db.session.commit()
-    return instance
 
 
 class IssueFactory(TitledFactory):
