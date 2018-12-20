@@ -3,14 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import template from './templates/dashboard-workflows.stache';
 import RefreshQueue from '../../models/refresh_queue';
 import '../inline/people-with-role-inline-field';
 import Search from '../../models/service-models/search';
 
 export default can.Component.extend({
   tag: 'dashboard-workflows',
-  template: '<content/>',
   leakScope: true,
+  template,
   scope: {
     initial_wf_size: 5,
     workflow_view: GGRC.templates_path +
