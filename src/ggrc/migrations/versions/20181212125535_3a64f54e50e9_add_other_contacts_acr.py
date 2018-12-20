@@ -22,6 +22,14 @@ revision = '3a64f54e50e9'
 down_revision = '8737b9b51407'
 
 
+def update_control_recipients():
+  """Update recipients for existing controls."""
+  op.execute("""
+      UPDATE controls
+      SET recipients = concat(recipients, ',Other Contacts')
+  """)
+
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
@@ -51,6 +59,7 @@ def upgrade():
       with_update=True
   )
 
+  update_control_recipients()
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
