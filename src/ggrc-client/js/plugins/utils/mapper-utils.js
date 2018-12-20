@@ -4,28 +4,24 @@
 */
 
 import RefreshQueue from '../../models/refresh_queue';
-import Mappings from '../../models/mappers/mappings';
 import {backendGdriveClient} from '../ggrc-gapi-client';
-import * as mappingModels from '../../models/mapping-models';
+import TaskGroupObject from '../../models/join-models/task-group-object';
+import Relationship from '../../models/service-models/relationship';
 
 async function mapObjects(instance, objects, {
   useSnapshots,
 } = {}) {
-  let mapping;
-  let Model;
-  let data = {};
   let defer = [];
   let que = new RefreshQueue();
 
   return que.enqueue(instance).trigger().then(async (inst) => {
-    data.context = instance.context || null;
+    let context = instance.context || null;
     objects.forEach((destination) => {
       let modelInstance;
-      let isAllowed;
       // Use simple Relationship Model to map Snapshot
       if (useSnapshots) {
-        modelInstance = new mappingModels.Relationship({
-          context: data.context,
+        modelInstance = new Relationship({
+          context,
           source: instance,
           destination: {
             href: '/api/snapshots/' + destination.id,
@@ -37,20 +33,7 @@ async function mapObjects(instance, objects, {
         return defer.push(modelInstance.save());
       }
 
-      isAllowed = Mappings.allowedToMap(instance, destination);
-
-      if (!isAllowed) {
-        return;
-      }
-      mapping = Mappings.get_canonical_mapping(instance.type, destination.type);
-      Model = mappingModels[mapping.model_name];
-      data[mapping.object_attr] = {
-        href: instance.href,
-        type: instance.type,
-        id: instance.id,
-      };
-      data[mapping.option_attr] = destination;
-      modelInstance = new Model(data);
+      modelInstance = getMapping(instance, destination, context);
       defer.push(backendGdriveClient.withAuth(() => {
         return modelInstance.save();
       }));
@@ -60,10 +43,25 @@ async function mapObjects(instance, objects, {
   });
 }
 
+function getMapping(source, destination, context) {
+  if (source.type === 'TaskGroup') {
+    return new TaskGroupObject({
+      task_group: source,
+      object: destination,
+      context,
+    });
+  }
+
+  return new Relationship({
+    source,
+    destination,
+    context,
+  });
+}
+
 function unmapObjects(instance, objects) {
   const pendingUnmap = objects.map((object) =>
-    mappingModels.Relationship
-      .findRelationship(instance, object)
+    Relationship.findRelationship(instance, object)
       .then((relationship) => relationship.destroy())
   );
 

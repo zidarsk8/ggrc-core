@@ -40,10 +40,15 @@ class FullInstanceContentFased(utils.FasadeProperty):
 
   def prepare(self, data):
     data = super(FullInstanceContentFased, self).prepare(data)
-    return builder.prepare(
+    content = builder.prepare(
         referenced_objects.get(data["instance"]["type"],
                                data["instance"]["id"]),
         data["full_instance_content"])
+
+    # pop out unused object_people field out of mapping_list_fields
+    if 'mapping_list_fields' in content:
+      content['mapping_list_fields'].pop('object_people', None)
+    return content
 
 
 # pylint: enable=too-few-public-methods

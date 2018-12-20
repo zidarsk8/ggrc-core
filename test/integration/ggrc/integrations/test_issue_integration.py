@@ -375,7 +375,7 @@ class TestIssueIntegration(ggrc.TestCase):
     # check detach comment was sent
     detach_comment_template = params_builder.IssueParamsBuilder.DETACH_TMPL
     comment = detach_comment_template.format(new_ticket_id=new_ticket_id)
-    expected_args = (TICKET_ID, {"comment": comment})
+    expected_args = (TICKET_ID, {"status": "OBSOLETE", "comment": comment})
     self.assertEqual(expected_args, update_mock.call_args[0])
 
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)

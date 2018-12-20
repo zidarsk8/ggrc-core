@@ -4,8 +4,10 @@
 */
 
 import '../three-dots-menu/three-dots-menu';
+import '../change-request-link/change-request-link';
 import {
   isMyAssessments,
+  isMyWork,
 } from '../../plugins/utils/current-page-utils';
 import {
   isAuditor,
@@ -66,6 +68,19 @@ export default can.Component.extend({
         type: 'boolean',
         get: function () {
           return this.attr('options.showBulkUpdate');
+        },
+      },
+      showChangeRequest: {
+        get() {
+          const isCycleTask = (
+            this.attr('model').shortName === 'CycleTaskGroupObjectTask'
+          );
+
+          return (
+            isCycleTask &&
+            isMyWork() &&
+            !!GGRC.config.CHANGE_REQUEST_URL
+          );
         },
       },
       showImport: {

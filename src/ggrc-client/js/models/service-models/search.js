@@ -61,7 +61,7 @@ export default can.Model('GGRC.Models.Search', {
     let entries;
 
     if (!(this.entries instanceof Array ||
-      this.entries instanceof can.Observe.List)) {
+      this.entries instanceof can.List)) {
       entries = this.entries[modelName] || [];
     } else {
       entries = can.map(this.entries, function (v) {

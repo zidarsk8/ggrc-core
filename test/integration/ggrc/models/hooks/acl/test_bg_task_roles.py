@@ -120,7 +120,7 @@ class TestBackgroundTaskRolePropagation(TestCase):
     )
     self.assertEqual(response.status_code, 200)
     bg_tasks = all_models.BackgroundTask.query.all()
-    self.assertEqual(len(bg_tasks), 1)
+    self.assertEqual(len(bg_tasks), 2)
 
     content = self.api.client.get(
         "/api/background_tasks?id__in={}".format(bg_tasks[0].id)

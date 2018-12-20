@@ -87,8 +87,8 @@ export default can.Control({
     let currentUser;
     let userFetch;
 
-    if (!(this.options instanceof can.Observe)) {
-      this.options = new can.Observe(this.options);
+    if (!(this.options instanceof can.Map)) {
+      this.options = new can.Map(this.options);
     }
 
     if (!this.element.find('.modal-body').length) {
@@ -191,13 +191,13 @@ export default can.Control({
     name.pop(); // set the owner to null, not the email
 
     if (!instance._transient) {
-      instance.attr('_transient', new can.Observe({}));
+      instance.attr('_transient', new can.Map({}));
     }
 
-    can.reduce(name.slice(0, -1), function (current, next) {
+    _.reduce(name.slice(0, -1), function (current, next) {
       current = current + '.' + next;
       if (!instance.attr(current)) {
-        instance.attr(current, new can.Observe({}));
+        instance.attr(current, new can.Map({}));
       }
       return current;
     }, '_transient');
@@ -310,7 +310,7 @@ export default can.Control({
         });
       }
     } else {
-      this.options.attr('instance', new can.Observe(params));
+      this.options.attr('instance', new can.Map(params));
       that.on();
       dfd = new $.Deferred().resolve(instance);
     }
@@ -346,7 +346,7 @@ export default can.Control({
       this.element.trigger('loaded');
     }
     if (!instance._transient) {
-      instance.attr('_transient', new can.Observe({}));
+      instance.attr('_transient', new can.Map({}));
     }
     if (instance.form_preload) {
       preloadDfd = instance.form_preload(
@@ -549,8 +549,8 @@ export default can.Control({
 
     if (name.length > 1) {
       if (can.isArray(value)) {
-        value = new can.Observe.List(can.map(value, function (v) {
-          return new can.Observe({}).attr(name.slice(1).join('.'), v);
+        value = new can.List(can.map(value, function (v) {
+          return new can.Map({}).attr(name.slice(1).join('.'), v);
         }));
       } else if ($elem.is('[data-lookup]')) {
         if (!value) {
@@ -576,7 +576,7 @@ export default can.Control({
         value = moment(this.options.instance.attr(name.join('.')))
           .startOf('day').add(parseInt(value, 10)).toDate();
       } else {
-        value = new can.Observe({}).attr(name.slice(1).join('.'), value);
+        value = new can.Map({}).attr(name.slice(1).join('.'), value);
       }
     }
 

@@ -74,8 +74,12 @@ function remove(key, id) {
 
     if (ids) {
       ids = JSON.parse(ids);
-      ids.splice(can.inArray(id, ids), 1);
-      window.localStorage.setItem(`${key}:ids`, JSON.stringify(ids));
+      const index = ids.indexOf(id);
+
+      if (index !== -1) {
+        ids.splice(index, 1);
+        window.localStorage.setItem(`${key}:ids`, JSON.stringify(ids));
+      }
     }
   }
 }

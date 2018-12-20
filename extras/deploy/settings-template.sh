@@ -39,6 +39,8 @@ COMPANY="Company, Inc."
 COMPANY_LOGO_TEXT="Company GRC"
 CREATE_ISSUE_URL=""
 CREATE_ISSUE_BUTTON_NAME=""
+APPENGINE_LOCATION="us-central1"
+CHANGE_REQUEST_URL=""
 
 ## generated values:
 

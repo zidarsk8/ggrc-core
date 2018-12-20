@@ -13,7 +13,7 @@ function modelListLoader(controller, params) {
     let collectionName = model.root_collection + '_collection';
     let collection = results[collectionName] || [];
 
-    page.resolve(new can.Observe.List(collection), results.paging);
+    page.resolve(new can.List(collection), results.paging);
   });
   return page;
 }
@@ -44,9 +44,9 @@ export default TreeLoader({
     if (!this.options.search_params) {
       this.options.search_params = {};
     }
-    this.options.state = new can.Observe();
+    this.options.state = new can.Map();
 
-    this.context = new can.Observe({
+    this.context = new can.Map({
       // FIXME: Needed?  Default `pager` to avoid binding issues.
       pager: {
         has_next: function () {
@@ -148,7 +148,7 @@ export default TreeLoader({
 
     if (list) {
       if (!this.options.list) {
-        this.options.list = new can.Observe.List();
+        this.options.list = new can.List();
         list.on('add', function (list, item, index) {
           that.enqueue_items(item);
         }).on('remove', function (list, item, index) {

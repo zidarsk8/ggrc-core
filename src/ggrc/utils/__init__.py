@@ -15,8 +15,6 @@ import json
 import re
 import sys
 
-from werkzeug import exceptions
-
 import sqlalchemy
 from sqlalchemy.orm import class_mapper
 
@@ -360,19 +358,3 @@ def validate_mimetype(accepted_mimetype):
       return function(*args, **kwargs)
     return inner
   return mimetype_decorator
-
-
-def get_task_attr(attr_name, params=None):
-  """Get attribute value from params dict or request data."""
-  attr = None
-
-  try:
-    json_data = flask.request.get_json(force=True)
-  except exceptions.BadRequest:
-    json_data = None
-
-  if params and attr_name in params:
-    attr = params.get(attr_name)
-  elif json_data and attr_name in json_data:
-    attr = json_data.get(attr_name)
-  return attr

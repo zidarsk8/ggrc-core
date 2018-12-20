@@ -23,7 +23,6 @@ export default can.Component.extend({
   viewModel: {
     instance: {},
     customAttributes: null,
-    visibleRoles: ['Admin', 'Primary Contacts', 'Secondary Contacts'],
     deletableAdmin: false,
     define: {
       isSnapshot: {
@@ -51,6 +50,17 @@ export default can.Component.extend({
             this.attr('itemData.description_inline') ||
             this.attr('itemData.name') ||
             this.attr('itemData.email') || false;
+        },
+      },
+      visibleRoles: {
+        get: function () {
+          let roles;
+          if (this.attr('itemData.type') === 'Control') {
+            roles = ['Admin', 'Control Operators', 'Control Owners'];
+          } else {
+            roles = ['Admin', 'Primary Contacts', 'Secondary Contacts'];
+          }
+          return roles;
         },
       },
     },

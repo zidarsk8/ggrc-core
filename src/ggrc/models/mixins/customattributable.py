@@ -30,6 +30,8 @@ logger = getLogger(__name__)
 class CustomAttributable(object):
   """Custom Attributable mixin."""
 
+  MODELS_WITH_LOCAL_CADS = {"Assessment", "AssessmentTemplate"}
+
   _api_attrs = reflection.ApiAttributes(
       'custom_attribute_values',
       reflection.Attribute('custom_attribute_definitions',

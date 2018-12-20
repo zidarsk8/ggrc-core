@@ -12,6 +12,7 @@ import {
 } from '../plugins/utils/snapshot-utils';
 import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent-notifier';
+import SaveQueue from './save_queue';
 import RefreshQueue from './refresh_queue';
 import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
@@ -57,7 +58,7 @@ function dateConverter(date, oldValue, fn, key) {
 
 function makeDateUnpacker(keys) {
   return function (date, oldValue, fn, attr) {
-    return can.reduce(keys, function (curr, key) {
+    return _.reduce(keys, function (curr, key) {
       return curr || (date[key] && dateConverter(
         date[key], oldValue, fn, attr));
     }, null) || date;
@@ -266,25 +267,22 @@ export default can.Model('can.Model.Cacheable', {
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
     this.update = async function (id, params) {
-      const {resolveDeferredBindings} = await import('./pending-joins');
       let ret = _update
         .call(this, id, this.process_args(params))
-        .then(resolveDeferredBindings,
-          function (xhr) {
+        .then((obj) => obj,
+          (xhr) => {
             if (xhr.status === 409) {
-              return resolveConflict(xhr, this.findInCacheById(id));
+              let dfd = resolveConflict(xhr, this.findInCacheById(id));
+              return dfd;
             }
             return xhr;
-          }.bind(this)
-        );
+          });
       delete ret.hasFailCallback;
       return ret;
     };
     this.create = async function (params) {
-      const {resolveDeferredBindings} = await import('./pending-joins');
       let ret = _create
-        .call(this, this.process_args(params))
-        .then(resolveDeferredBindings);
+        .call(this, this.process_args(params));
       delete ret.hasFailCallback;
       return ret;
     };
@@ -895,7 +893,7 @@ export default can.Model('can.Model.Cacheable', {
     this._dfd = new can.Deferred();
     delayLeavingPageUntil(this._dfd);
 
-    GGRC.SaveQueue.enqueue(this, this._super);
+    SaveQueue.enqueue(this, this._super);
 
     return this._dfd;
   },
@@ -911,10 +909,10 @@ export default can.Model('can.Model.Cacheable', {
   },
 });
 
-/* TODO: hack on can.Observe should be removed or at least placed outside of Cacheable Model Class */
-let _oldAttr = can.Observe.prototype.attr;
-can.Observe.prototype.attr = function (key, val) {
-  if (key instanceof can.Observe) {
+/* TODO: hack on can.Map should be removed or at least placed outside of Cacheable Model Class */
+let _oldAttr = can.Map.prototype.attr;
+can.Map.prototype.attr = function (key, val) {
+  if (key instanceof can.Map) {
     if (arguments[0] === this) {
       return this;
     }
