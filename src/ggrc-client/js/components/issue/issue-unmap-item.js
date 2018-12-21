@@ -129,8 +129,6 @@ export default can.Component.extend({
         await relationship.unmap(true);
         if (currentObject === this.attr('issueInstance')) {
           navigate(this.attr('issueInstance.viewLink'));
-        } else {
-          this.attr('modalState.open', false);
         }
       } catch (error) {
         notifier('error', 'There was a problem with unmapping.');
