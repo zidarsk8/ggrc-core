@@ -4,46 +4,46 @@
 }}
 
 <ul class="entry-list">
-  {{#changeHistory}}
-    <li {{#reviewWasChanged}} class="revision-log__status-{{reviewWasChanged}}" {{/reviewWasChanged}}>
-      <span class="person-label {{lowercase role }}"></span>
-      <div class="w-status">
-        <div class="entry-author">
-          <person-data {person}="madeBy"></person-data>made changes &mdash; {{dateTime updatedAt}}
-        </div>
-          <div class="third-col">
-            <p class="instruction">Field</p>
-          </div>
-          <div class="third-col">
-            <p class="instruction">Original value</p>
-          </div>
-          <div class="third-col">
-            <p class="instruction">New value</p>
-          </div>
-        {{#changes}}
-          <div class="clearfix {{#if isRole}}role-row{{/if}}">
-            <div class="third-col revision-log__field-name">
-              {{{fieldName}}}
-            </div>
-            <div class="third-col">
-              <revision-log-data {is-loading}="isLoading" {data}="origVal"></revision-log-data>
-            </div>
-            <div class="third-col">
-              <revision-log-data {is-loading}="isLoading" {data}="newVal"></revision-log-data>
-            </div>
-          </div>
-        {{/changes}}
-      </div>
-    </li>
-  {{/changeHistory}}
-
-
   {{#if isLoading}}
     <li class="spinner">
       <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
     </li>
-  {{/if}}
-  {{^if changeHistory.length}}
-    <li>The history of changes is currently empty.</li>
+  {{else}}
+    {{#changeHistory}}
+      <li {{#reviewWasChanged}} class="revision-log__status-{{reviewWasChanged}}" {{/reviewWasChanged}}>
+        <span class="person-label {{lowercase role }}"></span>
+        <div class="w-status">
+          <div class="entry-author">
+            <person-data {person}="madeBy"></person-data>made changes &mdash; {{dateTime updatedAt}}
+          </div>
+            <div class="third-col">
+              <p class="instruction">Field</p>
+            </div>
+            <div class="third-col">
+              <p class="instruction">Original value</p>
+            </div>
+            <div class="third-col">
+              <p class="instruction">New value</p>
+            </div>
+          {{#changes}}
+            <div class="clearfix {{#if isRole}}role-row{{/if}}">
+              <div class="third-col revision-log__field-name">
+                {{{fieldName}}}
+              </div>
+              <div class="third-col">
+                <revision-log-data {is-loading}="isLoading" {data}="origVal"></revision-log-data>
+              </div>
+              <div class="third-col">
+                <revision-log-data {is-loading}="isLoading" {data}="newVal"></revision-log-data>
+              </div>
+            </div>
+          {{/changes}}
+        </div>
+      </li>
+    {{/changeHistory}}
+
+    {{^if changeHistory.length}}
+      <li>The history of changes is currently empty.</li>
+    {{/if}}
   {{/if}}
 </ul>
