@@ -20,19 +20,6 @@ describe('tree-item-attr component', () => {
     expect(result).toEqual('');
   });
 
-  it('returns an empty string if the attribute is not considered as "default"',
-    () => {
-      viewModel.attr({
-        name: 'is_not_default',
-        instance: {
-          is_not_default: true,
-        },
-      });
-
-      let result = viewModel.getDefaultValue();
-      expect(result).toEqual('');
-    });
-
   describe('retrieving a "default" (non-date) attribute', () => {
     it('returns a correct value through the .attr() method', () => {
       viewModel.attr({

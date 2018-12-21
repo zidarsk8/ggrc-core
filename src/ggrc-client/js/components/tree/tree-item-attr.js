@@ -18,15 +18,6 @@ const DATE_ATTRS = Object.freeze({
   last_assessment_date: 1,
 });
 
-// attribute names considered "default" and not representing a date
-const NON_DATE_ATTRS = Object.freeze({
-  archived: 1,
-  design: 1,
-  operationally: 1,
-  slug: 1,
-  verified: 1,
-});
-
 // attribute names considered "default" and representing rich text fields
 const RICH_TEXT_ATTRS = Object.freeze({
   notes: 1,
@@ -76,16 +67,14 @@ export default can.Component.extend({
       const regexNewLines = /<\/p>?/g;
 
       if (result !== undefined && result !== null) {
-        if (attrName in NON_DATE_ATTRS) {
-          return typeof result === 'boolean' ? String(result) : result;
-        }
         if (attrName in DATE_ATTRS) {
           return formatDate(result, true);
         }
         if (attrName in RICH_TEXT_ATTRS) {
-          return result.replace(regexNewLines, '\n').replace(regexTags, ' ')
-            .trim();
+          return result
+            .replace(regexNewLines, '\n').replace(regexTags, ' ').trim();
         }
+        return String(result);
       }
       return '';
     },
