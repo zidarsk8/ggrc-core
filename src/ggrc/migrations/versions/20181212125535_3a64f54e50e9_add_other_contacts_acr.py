@@ -19,15 +19,24 @@ from ggrc.migrations.utils import (
 )
 
 revision = '3a64f54e50e9'
-down_revision = '8737b9b51407'
+down_revision = '5bb7c74d2089'
 
 
-def update_control_recipients():
+def update_control_recipients(connection):
   """Update recipients for existing controls."""
   op.execute("""
       UPDATE controls
       SET recipients = concat(recipients, ',Other Contacts')
   """)
+
+  controls = connection.execute("""SELECT id FROM controls;""").fetchall()
+  control_ids = [c.id for c in controls]
+  utils.add_to_objects_without_revisions_bulk(
+      connection,
+      control_ids,
+      "Control",
+      action="modified",
+  )
 
 
 def upgrade():
@@ -59,7 +68,8 @@ def upgrade():
       with_update=True
   )
 
-  update_control_recipients()
+  update_control_recipients(connection)
+
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
