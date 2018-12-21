@@ -206,85 +206,11 @@ export default can.Component.extend({
         }
       });
     },
-    /**
-     * Fetch the instance's Revisions data from the server, including the
-     * Revisions of the instance's mappings.
-     *
-     * The `instance` here refers to the instance of an object currently being
-     * handled by the component.
-     *
-     * @return {$.Deferred} - an object representing the async operation of
-     *   fetching the data from the server. On success it is resolved with an
-     *   object containing the following Revision data, order by date from
-     *   oldest to newest:
-     *   - {Array} object - the list of Revisions of the instance itself,
-     *   - {Array} mappings - the list of Revisions of all the instance's
-     *      mappings
-     */
-    _fetchRevisionsData: function () {
-      let findAll = function (attr) {
-        let query = {__sort: 'updated_at'};
-        query[attr + '_type'] = this.attr('instance.type');
-        query[attr + '_id'] = this.attr('instance.id');
-        return Revision.findAll(query);
-      }.bind(this);
-
-      return $.when(
-        findAll('resource'), findAll('source'), findAll('destination')
-      ).then(function (objRevisions, mappingsSrc, mappingsDest) {
-        // manually include people for modified_by since using __include would
-        // result in a lot of duplication
-        let rq = new RefreshQueue();
-        _.forEach(objRevisions.concat(mappingsSrc, mappingsDest),
-          function (revision) {
-            if (revision.modified_by) {
-              rq.enqueue(revision.modified_by);
-            }
-          });
-        _.forEach(mappingsSrc, function (revision) {
-          if (revision.destination_type && revision.destination_id) {
-            revision.destination = new Stub({
-              id: revision.destination_id,
-              type: revision.destination_type,
-            });
-            rq.enqueue(revision.destination);
-          }
-        });
-        _.forEach(mappingsDest, function (revision) {
-          if (revision.source_type && revision.source_id) {
-            revision.source = new Stub({
-              id: revision.source_id,
-              type: revision.source_type,
-            });
-            rq.enqueue(revision.source);
-          }
-        });
-        return this._fetchEmbeddedRevisionData(rq.objects, rq)
-          .then(function (embedded) {
-            return rq.trigger().then(function () {
-              let reify = function (revision) {
-                _.forEach(['modified_by', 'source', 'destination'],
-                  function (field) {
-                    if (revision[field] && isReifiable(revision[field])) {
-                      revision.attr(field, reifyUtil(revision[field]));
-                    }
-                  });
-                return revision;
-              };
-              let mappings = mappingsSrc.concat(mappingsDest, embedded);
-              return {
-                object: _.map(objRevisions, reify),
-                mappings: _.map(mappings, reify),
-              };
-            });
-          });
-      }.bind(this));
-    },
     _reifyRevision(revision) {
       _.forEach(['modified_by', 'source', 'destination'],
         function (field) {
-          if (revision[field] && revision[field].reify) {
-            revision.attr(field, revision[field].reify());
+          if (revision[field] && isReifiable(revision[field])) {
+            revision.attr(field, reifyUtil(revision[field]));
           }
         });
       return revision;
@@ -320,86 +246,6 @@ export default can.Component.extend({
           });
         });
     },
-    /**
-     * Fetch revisions of indirect mappings.
-     *
-     * @param {Array} mappedObjects - the list of object instances to fetch
-     *   mappings to (objects mapped to the current instance).
-     *
-     * @param {RefreshQueue} rq - current refresh queue to use for fetching
-     *   full objects.
-     *
-     * @return {Deferred} - A deferred that will resolve into a array of
-     *   revisons of the indirect mappings.
-     */
-    _fetchEmbeddedRevisionData: function (mappedObjects, rq) {
-      let instance = this.attr('instance');
-      let id = this.attr('instance.id');
-      let type = this.attr('instance.type');
-      let filterElegible = function (obj) {
-        return _.includes(this.attr('_EMBED_MAPPINGS')[type], obj.type);
-      }.bind(this);
-      let dfds;
-
-      function fetchRevisions(obj) {
-        return [
-          Revision.findAll({
-            source_type: obj.type,
-            source_id: obj.id,
-            __sort: 'updated_at',
-          }).then(function (revisions) {
-            return _.map(revisions, function (revision) {
-              revision = new can.Map(revision.serialize());
-              revision.attr({
-                updated_at: new Date(revision.updated_at),
-                source_type: type,
-                source_id: id,
-                source: instance,
-                destination: new Stub({
-                  type: revision.destination_type,
-                  id: revision.destination_id,
-                }),
-              });
-              rq.enqueue(revision.destination);
-              return revision;
-            });
-          }),
-          Revision.findAll({
-            destination_type: obj.type,
-            destination_id: obj.id,
-            __sort: 'updated_at',
-          }).then(function (revisions) {
-            return _.map(revisions, function (revision) {
-              revision = new can.Map(revision.serialize());
-              revision.attr({
-                updated_at: new Date(revision.updated_at),
-                destination_type: type,
-                destination_id: id,
-                destination: instance,
-                source: new Stub({
-                  type: revision.source_type,
-                  id: revision.source_id,
-                }),
-              });
-              rq.enqueue(revision.source);
-              return revision;
-            });
-          }),
-        ];
-      }
-
-      dfds = _.chain(mappedObjects).filter(filterElegible)
-        .map(fetchRevisions)
-        .flatten()
-        .value();
-      return $.when(...dfds).then(function () {
-        return _.filter(_.flatten(arguments), function (revision) {
-          // revisions where source == destination will be introduced when
-          // spoofing the obj <-> instance mapping
-          return revision.source.href !== revision.destination.href;
-        });
-      });
-    },
     changeLastUpdatesFilter(element) {
       const isChecked = element.checked;
 
@@ -408,7 +254,7 @@ export default can.Component.extend({
         review.setShowLastReviewUpdates(isChecked);
       }
       this.attr('pageInfo.current', 1);
-      this.loadPage();
+      this.fetchItems();
     },
     getLastUpdatesFlag() {
       return this.attr('showFilter') &&
@@ -428,13 +274,6 @@ export default can.Component.extend({
         this.attr('review', reifyUtil(review));
       }
     },
-    loadPage() {
-      this.fetchItems()
-        .then(() => {
-          const fullHistory = this.attr('fullHistory');
-          this.attr('changeHistory', fullHistory);
-        });
-    },
   },
   /**
    * The component's entry point. Invoked when a new component instance has
@@ -445,17 +284,17 @@ export default can.Component.extend({
 
     viewModel.initObjectReview();
 
-    this.viewModel.loadPage();
+    viewModel.fetchItems();
   },
   events: {
     '{viewModel.instance} refreshInstance': function () {
       this.viewModel.fetchItems();
     },
     '{viewModel.pageInfo} current'() {
-      this.viewModel.loadPage();
+      this.viewModel.fetchItems();
     },
     '{viewModel.pageInfo} pageSize'() {
-      this.viewModel.loadPage();
+      this.viewModel.fetchItems();
     },
     removed() {
       this.viewModel.resetLastUpdatesFlag();
