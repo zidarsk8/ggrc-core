@@ -186,7 +186,7 @@ PYTHONPATH=src DEV_URL=http://localhost:8080 DEV_DESTRUCTIVE_URL=http://localhos
 To run Selenium tests inside docker container you can do:
 
 ```sh
-docker container exec -it selenium_selenium_1 bash
+docker container exec -it $(docker container ls -f name=selenium_selenium_1 -q -a) bash
 pytest -n=0
 ```
 
@@ -215,7 +215,7 @@ Because Docker provisioning is done with Dockerfile which can not modify content
 
 ```
 docker-compose up -d --force-recreate
-docker exec -it ggrccore_cleandev_1 su vagrant
+docker exec -it $(docker container ls -f name=ggrccore_cleandev_1 -q -a) su vagrant
 ```
 
 

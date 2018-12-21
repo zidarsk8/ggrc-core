@@ -4,13 +4,14 @@
  */
 
 import template from './templates/tree-filter-input.mustache';
+import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 
 let viewModel = can.Map.extend({
   define: {
     filter: {
       type: 'string',
-      set: function (newValue) {
+      set: function (newValue = '') {
         this.onFilterChange(newValue);
         return newValue;
       },
@@ -45,6 +46,8 @@ let viewModel = can.Map.extend({
     if (this.registerFilter) {
       this.registerFilter(options);
     }
+
+    this.setupFilterFromUrl();
   },
   submit: function () {
     this.dispatch('submit');
@@ -58,6 +61,9 @@ let viewModel = can.Map.extend({
     this.attr('isExpression', isExpression);
 
     this.attr('options.query', newValue.length ? filter : null);
+  },
+  setupFilterFromUrl() {
+    this.attr('filter', router.attr('query'));
   },
   openAdvancedFilter: function () {
     this.dispatch('openAdvanced');

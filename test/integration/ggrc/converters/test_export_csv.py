@@ -17,7 +17,9 @@ THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
 
 
+@ddt.ddt
 class TestExportEmptyTemplate(TestCase):
+  """Tests for export of import templates."""
 
   def setUp(self):
     self.client.get("/login")
@@ -60,6 +62,29 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Contract", response.data)
     self.assertIn("Requirement", response.data)
     self.assertIn("Org Group", response.data)
+
+  @ddt.data("Assessment", "Issue")
+  def test_ticket_tracker_field_order(self, model):
+    """Tests if Ticket Tracker fields come before mapped objects."""
+
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": model, "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+
+    ticket_tracker_fields = ["Ticket Tracker", "Component ID",
+                             "Integration Enabled", "Hotlist ID",
+                             "Priority", "Severity", "Issue Title",
+                             "Issue Type"]
+    first_mapping_field_pos = response.data.find("map:")
+
+    for field in ticket_tracker_fields:
+      self.assertEquals(response.data.find(field) < first_mapping_field_pos,
+                        True)
 
 
 class TestExportSingleObject(TestCase):

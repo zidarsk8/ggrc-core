@@ -13,9 +13,9 @@
       <div class="row-fluid">
         <div class="span6  {{#instance.computed_errors.program}}field-failure{{/instance.computed_errors.program}}">
           <div class="spacing-bottom">
-            <label>
+            <label class="form-label">
               Program
-            <span class="required">*</span>
+              <i class="fa fa-asterisk"></i>
             </label>
             <input data-id="program_dd" type="text" class="input-block-level" name="program.id" tabindex="1" data-permission-type="update" {{autocomplete_select}} data-lookup="Program" autofocus/>
           </div>
@@ -30,9 +30,9 @@
     {{/if}}
     <div class="row-fluid">
       <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-        <label>
+        <label class="form-label">
           Title
-          <span class="required">*</span>
+          <i class="fa fa-asterisk"></i>
           <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
         </label>
         {{#if new_object_form}}
@@ -83,7 +83,7 @@
                 {(content)}="instance.description">
               </rich-text>
           </div>
-          
+
         </div>
         <div class="span6 hide-wrap hidable">
           <div class="row-fluid inner-hide">
@@ -151,7 +151,7 @@
         <ggrc-gdrive-folder-picker instance="instance" deferred="true" tabindex="13"></ggrc-gdrive-folder-picker>
       </div>
       <div class="span3 hidable">
-        <ggrc-modal-connector 
+        <deferred-mapper
           {instance}="instance">
           <related-documents
             {instance}="instance"
@@ -176,7 +176,7 @@
               </label>
             </related-urls>
           </related-documents>
-        </ggrc-modal-connector>  
+        </deferred-mapper>
       </div>
     </div>
 

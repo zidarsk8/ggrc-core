@@ -68,7 +68,8 @@ def update_ft_records(model_ids_to_reindex, chunk_size):
   with benchmark("indexing. expire objects in session"):
     for obj in db.session:
       if (isinstance(obj, mixin.Indexed) and
-              obj.id in model_ids_to_reindex.get(obj.type, set())):
+              ('id' not in obj.__dict__ or  # check if the object is expired
+               obj.id in model_ids_to_reindex.get(obj.type, set()))):
         db.session.expire(obj)
   with benchmark("indexing. update ft records in db"):
     for model_name in model_ids_to_reindex.keys():

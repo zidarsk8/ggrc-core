@@ -1,0 +1,46 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<content></content>
+
+<simple-modal 
+  {state}="modalState" 
+  {replace-content}="true" 
+  {extra-css-class}="'ticket-id-modal'">
+  <div class="simple-modal__header">
+        <div class="simple-modal__header-text">
+          Ticket ID
+        </div>
+        <button type="button" class="btn btn-small btn-icon" ($click)="cancel">
+            <i class="fa fa-times black"></i>
+        </button>
+    </div>
+    <div class="simple-modal__body">
+        <div class="simple-modal__section simple-modal__sub-header-section">
+            <p>
+                Provide the existing Ticket ID if don't want to create a new one.
+            </p>
+        </div>
+        <div class="simple-modal__section {{^isValid}} field-failure {{/isValid}}">    
+          <numberbox
+            {placeholder}="'Enter Ticket ID'"
+            {(value)}="ticketId">
+          </numberbox>
+          {{^isValid}}<label class="help-inline warning">Please fill in the Ticket ID.</label>{{/isValid}}
+        </div>
+    </div>
+    <div class="simple-modal__footer">
+        <div class="simple-modal__toolbar">
+            <button type="button" class="btn btn-small btn-green simple-modal__toolbar-item"
+                    ($click)="linkWithExistingTicket">
+                Link with existing Ticket
+            </button>
+            <button type="button" class="btn btn-small btn-link simple-modal__toolbar-item"
+                    ($click)="generateNewTicket">
+                Generate new Ticket
+            </button>
+        </div>
+    </div>
+</simple-modal>

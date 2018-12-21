@@ -19,6 +19,16 @@ describe('ObjectMapper', function () {
     let fakeData;
     let updateScopeObject;
     let scopeObject;
+    let cacheBackup;
+
+    beforeAll(function () {
+      cacheBackup = Assessment.cache;
+      Assessment.cache = {};
+    });
+
+    afterAll(function () {
+      Assessment.cache = cacheBackup;
+    });
 
     beforeEach(function () {
       updateScopeObject = can.Deferred();
@@ -26,7 +36,7 @@ describe('ObjectMapper', function () {
         id: 1,
       });
 
-      Assessment.store = [
+      Assessment.cache = [
         new can.Map({
           updateScopeObject: jasmine.createSpy('updateScopeObject')
             .and

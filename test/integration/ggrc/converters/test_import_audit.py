@@ -6,6 +6,7 @@
 from collections import OrderedDict
 
 from ggrc.models import all_models
+from ggrc.converters import errors
 
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -89,3 +90,52 @@ class TestAuditImport(TestCase):
     ]))
     self._check_csv_response(response, {})
     self.assertEqual(all_models.Audit.query.count(), 1)
+
+  def test_audit_import_program_omit(self):
+    """If program value for existing audit has changed ignore it"""
+    with factories.single_commit():
+      original_program = factories.ProgramFactory()
+      original_program_slug = original_program.slug
+      audit = factories.AuditFactory(program=original_program)
+      new_program = factories.ProgramFactory()
+
+    self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code", audit.slug),
+        ("Title", audit.title),
+        ("State", "In Progress"),
+        ("Audit Captains", "user@example.com"),
+        ("Program", new_program.slug),
+        ("map:control versions", ""),
+    ]))
+    actual_program_slug = all_models.Audit.query.get(audit.id).program.slug
+    self.assertEqual(actual_program_slug, original_program_slug)
+
+  def test_audit_import_program_warn(self):
+    """Test warning on import of existing audit with changed program"""
+    with factories.single_commit():
+      original_program = factories.ProgramFactory()
+      audit = factories.AuditFactory(program=original_program)
+      new_program = factories.ProgramFactory()
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code", audit.slug),
+        ("Title", audit.title),
+        ("State", "In Progress"),
+        ("Audit Captains", "user@example.com"),
+        ("Program", new_program.slug),
+        ("map:control versions", ""),
+    ]))
+
+    expected_warnings = {
+        'Audit': {
+            'row_warnings': {
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=3,
+                    column_name=original_program.type
+                )
+            },
+        }
+    }
+    self._check_csv_response(response, expected_warnings)

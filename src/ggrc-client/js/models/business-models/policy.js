@@ -25,7 +25,6 @@ export default Directive('CMS.Models.Policy', {
   isRoleable: true,
   attributes: {},
   mixins: [accessControlList],
-  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['DataAsset'],
   },
@@ -35,9 +34,8 @@ export default Directive('CMS.Models.Policy', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, Directive.attributes);
-    can.extend(true, this.tree_view_options, Directive.tree_view_options);
-
+    Object.assign(this.attributes, Directive.attributes);
+    Object.assign(this.tree_view_options, Directive.tree_view_options);
     this.tree_view_options.attr_list.push({
       attr_title: 'Kind/Type',
       attr_name: 'kind',

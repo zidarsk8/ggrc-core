@@ -7,6 +7,7 @@ import logging
 import time
 
 from selenium.common import exceptions
+from selenium.common.exceptions import UnexpectedAlertPresentException
 from selenium.webdriver.common import action_chains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -34,9 +35,15 @@ def open_url(url, is_via_js=False):
   opened yet and wait till the moment when web document will be fully loaded.
   If 'is_via_js' then use JS to perform opening.
   """
-  driver = browsers.get_driver()
-  _login_if_needed(driver)
-  if driver.current_url != url:
+  cur_url = None
+  try:
+    driver = browsers.get_driver()
+    _login_if_needed(driver)
+    cur_url = driver.current_url
+  except UnexpectedAlertPresentException as exc:
+    print "Automatically accepting alert: {0}".format(str(exc))
+    handle_alert(driver, accept=True)
+  if cur_url != url:
     if not is_via_js:
       driver.get(url)
     else:

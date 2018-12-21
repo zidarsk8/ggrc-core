@@ -135,6 +135,7 @@ module.exports = function (env) {
       new webpack.DefinePlugin({
         GOOGLE_ANALYTICS_ID: JSON.stringify(ENV.GOOGLE_ANALYTICS_ID),
         DEV_MODE: JSON.stringify(!isProd),
+        BUILD_DATE: JSON.stringify(new Date()),
         RELEASE_NOTES_DATE: JSON.stringify(
           getReleaseNotesDate(`${contextDir}/js/components/release-notes-list/release-notes.md`)
         ),

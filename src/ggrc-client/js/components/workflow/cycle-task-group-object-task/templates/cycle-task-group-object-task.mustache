@@ -229,7 +229,10 @@
                 {notifications-info}="'Notify Task Assignees and Task Secondary Assignees'">
               </comment-add-form>
             {{/unless}}
-            <mapped-comments {base-instance}="instance" {mapped-items}="comments"></mapped-comments>
+            <mapped-comments {base-instance}="instance" 
+              {mapped-items}="comments"
+              {is-loading}="isLoading"
+              {show-no-items-text}="isEditDenied"></mapped-comments>
           </comment-data-provider>
         </div>
       </div>

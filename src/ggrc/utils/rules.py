@@ -161,7 +161,7 @@ def _all_rules():
       "AccessGroup": all_models - {'AccessGroup'},
       "Contract": all_models - {'Contract'},
       "Control": all_models,
-      "CycleTaskGroupObjectTask": (all_models -
+      "CycleTaskGroupObjectTask": ((all_models | {'Audit'}) -
                                    {'CycleTaskGroupObjectTask'}),
       "DataAsset": all_models,
       "Facility": all_models,

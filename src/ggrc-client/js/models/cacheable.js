@@ -235,7 +235,7 @@ export default can.Model('can.Model.Cacheable', {
     }
 
     // set up default attribute converters/serializers for all classes
-    can.extend(this.attributes, {
+    Object.assign(this.attributes, {
       created_at: 'datetime',
       updated_at: 'datetime',
     });
@@ -244,11 +244,13 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   init: function () {
+    this.cache = {};
+
     let idKey = this.id;
     let _update = this.update;
     let _create = this.create;
     this.bind('created', function (ev, newObj) {
-      let cache = can.getObject('cache', newObj.constructor, true);
+      let cache = newObj.constructor.cache;
       if (newObj[idKey] || newObj[idKey] === 0) {
         if (!isSnapshot(newObj)) {
           cache[newObj[idKey]] = newObj;
@@ -259,7 +261,7 @@ export default can.Model('can.Model.Cacheable', {
       }
     });
     this.bind('destroyed', function (ev, oldObj) {
-      delete can.getObject('cache', oldObj.constructor, true)[oldObj[idKey]];
+      delete oldObj.constructor.cache[oldObj[idKey]];
     });
 
     // FIXME:  This gets set up in a chain of multiple calls to the function defined
@@ -301,15 +303,15 @@ export default can.Model('can.Model.Cacheable', {
   },
 
   findInCacheById: function (id) {
-    return can.getObject('cache', this, true)[id];
+    return this.cache[id];
   },
 
   removeFromCacheById: function (key) {
-    return delete this.store[key];
+    return delete this.cache[key];
   },
 
   newInstance: function (args) {
-    let cache = can.getObject('cache', this, true);
+    let cache = this.cache;
     let isKeyExists = args && args[this.id];
     let isObjectExists = isKeyExists && cache[args[this.id]];
     let notSnapshot = args && !isSnapshot(args);
@@ -422,17 +424,8 @@ export default can.Model('can.Model.Cacheable', {
       this.removeFromCacheById(params[this.id]);
       delete this.cache[params[this.id]];
     }
-    model = this.findInCacheById(params[this.id]) ||
-      (params.provisional_id &&
-        can.getObject('provisional_cache',
-          can.Model.Cacheable, true)[params.provisional_id]);
+    model = this.findInCacheById(params[this.id]);
     if (model && !isSnapshot(params)) {
-      if (model.provisional_id && params.id) {
-        delete can.Model.Cacheable.provisional_cache[model.provisional_id];
-        model.removeAttr('provisional_id');
-        model.constructor.cache[params.id] = model;
-        model.attr('id', params.id);
-      }
       if (model.cleanupAcl && params.access_control_list) {
         // Clear ACL to avoid "merge" of arrays.
         // "params" has valid ACL array.
@@ -519,7 +512,7 @@ export default can.Model('can.Model.Cacheable', {
     }
 
     function findPageFunc(url, data, params, scope) {
-      let ajaxOptions = can.extend({
+      let ajaxOptions = Object.assign({
         url: url,
         data: data,
       }, params);
@@ -565,7 +558,7 @@ export default can.Model('can.Model.Cacheable', {
   },
 }, {
   init: function () {
-    let cache = can.getObject('cache', this.constructor, true);
+    let cache = this.constructor.cache;
     let idKey = this.constructor.id;
     setAttrs(this);
     if ((this[idKey] || this[idKey] === 0) &&
@@ -574,10 +567,6 @@ export default can.Model('can.Model.Cacheable', {
     }
     this.attr('class', this.constructor);
     this.notifier = new PersistentNotifier();
-
-    if (!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
 
     if (this.isCustomAttributable()) {
       this._customAttributeAccess = new CustomAttributeAccess(this);
@@ -702,6 +691,10 @@ export default can.Model('can.Model.Cacheable', {
             .then($.proxy(that, 'cleanupAcl'))
             .then($.proxy(that, 'cleanupCollections'))
             .then($.proxy(that.constructor, 'model'))
+            .then((model) => {
+              that.after_refresh && that.after_refresh();
+              return model;
+            })
             .done(function (response) {
               response.backup();
               stopFn();
@@ -777,70 +770,6 @@ export default can.Model('can.Model.Cacheable', {
   autocomplete_label: function () {
     return this.title;
   },
-  get_permalink: function () {
-    let dfd = can.Deferred();
-    let ctor = this.constructor;
-    if (!ctor.permalink_options) {
-      return dfd.resolve(this.viewLink);
-    }
-    let poBaseItems = ctor.permalink_options.base.split(':');
-    $.when(this.refresh_all(...poBaseItems))
-      .then(function (base) {
-        return dfd.resolve(_.template(constructor.permalink_options.url)({
-          base: base,
-          instance: this,
-        }));
-      }.bind(this));
-    return dfd.promise();
-  },
-
-  /*
-    * Set up a deferred join object deletion when this object is updated.
-    */
-  mark_for_deletion: function (joinAttr, obj, extraAttrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({
-      how: 'remove',
-      what: obj,
-      through: joinAttr,
-      opts: options,
-    });
-  },
-
-  /*
-    * Set up a deferred join object creation when this object is updated.
-    */
-  mark_for_addition: function (joinAttr, obj, extraAttrs, options) {
-    obj = obj.reify ? obj.reify() : obj;
-    extraAttrs = _.isEmpty(extraAttrs) ? undefined : extraAttrs;
-
-    this.remove_duplicate_pending_joins(obj);
-    this._pending_joins.push({
-      how: 'add',
-      what: obj,
-      through: joinAttr,
-      extra: extraAttrs,
-      opts: options,
-    });
-  },
-
-  remove_duplicate_pending_joins: function (obj) {
-    let joins;
-    let len;
-    if (!this._pending_joins) {
-      this.attr('_pending_joins', []);
-    }
-    len = this._pending_joins.length;
-    joins = _.filter(this._pending_joins, function (val) {
-      return val.what !== obj;
-    });
-
-    if (len !== joins.length) {
-      this.attr('_pending_joins').replace(joins);
-    }
-  },
 
   delay_resolving_save_until: function (dfd) {
     return this.notifier.queue(dfd);
@@ -852,9 +781,6 @@ export default can.Model('can.Model.Cacheable', {
     this.dispatch('modelBeforeSave');
 
     if (isNew) {
-      this.attr('provisional_id', 'provisional_' + Date.now());
-      can.getObject('provisional_cache',
-        can.Model.Cacheable, true)[this.provisional_id] = this;
       if (this.before_create) {
         this.before_create();
       }

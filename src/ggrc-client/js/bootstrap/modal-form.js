@@ -177,7 +177,6 @@ import {changeUrl} from '../router';
 
     hide: function (e, verifyChanges) {
       let instance = this.instance;
-      let pending;
       let hasPending;
       let changedInstance;
 
@@ -233,10 +232,6 @@ import {changeUrl} from '../router';
 
       // Hide the modal like normal
       if (instance) {
-        pending = instance.attr('_pending_joins');
-        if (pending && pending.length) {
-          instance.attr('_pending_joins', []);
-        }
         can.trigger(instance, 'modal:dismiss');
       }
       $.fn.modal.Constructor.prototype.hide.apply(this, [e]);

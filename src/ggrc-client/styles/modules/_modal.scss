@@ -329,14 +329,6 @@
         color: $red;
         font-weight: bold;
       }
-      i {
-        @include opacity(0.2);
-        cursor: pointer;
-        margin: 0 4px 0 0;
-        &:hover {
-          @include opacity(0.7);
-        }
-      }
     }
     h2 {
       margin-top:10px;
@@ -374,19 +366,8 @@
       }
     }
     .mandatory-dropdown {
-      .field-title {
-        display: flex;
-
-        .fa-asterisk {
-          margin-left: 5px;
-          color: $icon-color-empty;
-          font-size: 11px;
-          opacity: 1;
-        }
-      }
-
       &.select-failure {
-        .field-title {
+        .form-label {
           color: $red;
         }
 

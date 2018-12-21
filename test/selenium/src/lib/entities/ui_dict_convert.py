@@ -30,7 +30,10 @@ def workflow_ui_to_app(ui_dict):
           ui_dict["updated_at"]),
       modified_by=email_to_app_person(ui_dict["modified_by"]),
       task_groups=[],
-      code=ui_dict["code"]
+      code=ui_dict["code"],
+      repeat_every=convert_workflow_repeat_frequency(
+          ui_dict["repeat_workflow"]),
+      repeat_unit=convert_workflow_repeat_unit(ui_dict["repeat_workflow"])
   )
 
 
@@ -94,3 +97,31 @@ def comment_dict_to_entity(comment_dict):
       description=comment_dict["description"],
       modified_by=email_to_app_person(comment_dict["modified_by"])
   )
+
+
+def convert_workflow_repeat_unit(repeat_workflow):
+  """Convert workflow repeat unit."""
+  repeat_unit_dict = {"weekday": "day", "weekdays": "day", "week": "week",
+                      "weeks": "week", "month": "month", "months": "month"}
+  repeat_unit = None
+  if repeat_workflow != "Repeat Off":
+    # Repeat unit is the last word in the phrase
+    repeat_unit = (
+        repeat_unit_dict[repeat_workflow.replace(
+            "Repeat every ", "").split()[-1]])
+  return repeat_unit
+
+
+def convert_workflow_repeat_frequency(repeat_workflow):
+  """Convert workflow repeat frequency."""
+  # pylint: disable=invalid-name
+  repeat_frequency = None
+  if repeat_workflow != "Repeat Off":
+    # If repeat workflow phrase has 4 words than frequency is the 3rd word
+    # If repeat workflow phrase has 3 words than frequency equals 1
+    # For example: "Repeat every weekday(week/month)"
+    # or "Repeat every 2 weekdays(weeks/months)"
+    repeat_frequency = 1
+    if len(repeat_workflow.split()) == 4:
+      repeat_frequency = repeat_workflow.split()[3]
+  return repeat_frequency

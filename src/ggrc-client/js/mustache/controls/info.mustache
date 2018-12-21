@@ -147,7 +147,10 @@
                   </div>
                   <div class="row-fluid wrap-row">
                     <div class="span8">
-                      <h6>Assertions <i class="fa fa-asterisk"></i></h6>
+                      <h6 class="form-header">
+                        Assertions
+                        <i class="fa fa-asterisk"></i>
+                      </h6>
                       {{#if assertions}}
                         {{#if_helpers '\n #if' instance.snapshot '\n or #if' instance.isRevision}}
                             <ul>
@@ -201,19 +204,11 @@
             </div>
             {{^if isSnapshot}}
             <div class="info-pane__sidebar">
-              <comment-data-provider {instance}="instance" class="flex-box flex-col">
-                <div class="info-pane__section-title">Responses/Comments</div>
-                {{#unless isEditDenied}}
-                <comment-add-form class="comment-add-form"
-                  {instance}="instance"
-                  {is-saving}="isLoading"
-                  (before-create)="addComment(%event)"
-                  (after-create)="processComment(%event)"
-                  {notifications-info}="'Notify Admins, Control Operators and Control Owners'">
-                </comment-add-form>
-                {{/unless}}
-                <mapped-comments {base-instance}="instance" {mapped-items}="comments"></mapped-comments>
-              </comment-data-provider>
+              <div class="info-pane__section-title">Responses/Comments</div>
+              <comments-section class="flex-box flex-col"
+                {instance}="instance"
+                {notification}="'Notify Admins, Control Operators and Control Owners'">
+              </comments-section>
             </div>
             {{/if}}
           </div>

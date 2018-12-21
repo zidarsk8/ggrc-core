@@ -26,7 +26,7 @@
                 {edit-mode}="editMode"
                 {is-edit-icon-denied}="isEditIconDenied"
                 (set-edit-mode-inline)="setEditModeInline(%event)">
-                  <div class="info-pane__section-title {{#if mandatory}}form-label required-label{{/if}}">
+                  <div class="info-pane__section-title {{#if mandatory}}form-label form-label__extended{{/if}}">
                     {{title}}
                     {{#if mandatory}}
                       <i class="fa fa-asterisk"></i>

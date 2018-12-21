@@ -22,20 +22,16 @@
               <div class="tree-title-area">
                 <i class="fa fa-{{instance.class.table_singular}} color"></i>
 
-                {{{#view_object_link instance}}}
+                <a href="{{instance.viewLink}}" target="_blank" class="view-link">
                   {{firstexist instance.name instance.title instance.description}}
-                {{{/view_object_link}}}
-
-                <span class="url-link">
-                  {{firstexist instance.email instance.link}}
-                </span>
+                </a>
               </div>
-            </div> <!-- span8 end -->
-          </div> <!-- row-fluid end -->
-        </div> <!-- item-data end -->
-      </div> <!-- select end -->
-    </div> <!-- item-wrap end -->
-  </div> <!-- item-main end -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   {{#if isExpandable}}
   <div class="tier-2-info item-content">

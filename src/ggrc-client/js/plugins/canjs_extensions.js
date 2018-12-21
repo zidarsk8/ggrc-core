@@ -3,6 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 (function ($, can) {
+  // Returns a function which will be halted unless `this.element` exists
+  // - useful for callbacks which depend on the controller's presence in the DOM
+  can.Control.prototype._ifNotRemoved = function (fn) {
+    let isPresent = this.element;
+    return function () {
+      return isPresent ? fn.apply(this, arguments) : null;
+    };
+  },
+
   // a few core CanJS extensions below.
   // Core validation for fields not being "blank", i.e.
   // having no content when outside spaces are trimmed away.

@@ -171,7 +171,7 @@ class TestReviewApi(TestCase):
         resource_id=control_id,
         resource_type=control.type
     ).order_by(
-        all_models.Revision.created_at,
+        all_models.Revision.id,
     ).all()
     self.assertEquals(2, len(control_revisions))
     self.assertEquals(all_models.Review.STATES.UNREVIEWED,
@@ -208,7 +208,7 @@ class TestReviewApi(TestCase):
         resource_id=control_id,
         resource_type=control.type
     ).order_by(
-        all_models.Revision.created_at,
+        all_models.Revision.id,
     ).all()
     self.assertEquals(4, len(control_revisions))
     self.assertEquals(all_models.Review.STATES.UNREVIEWED,

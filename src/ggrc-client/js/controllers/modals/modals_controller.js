@@ -28,7 +28,7 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/person/person-data';
 import '../../components/rich_text/rich_text';
 import '../../components/modal_wrappers/checkboxes_to_list';
-import '../../components/modal-connector';
+import '../../components/deferred-mapper';
 import '../../components/modal_wrappers/assessment-modal';
 import '../../components/assessment/map-button-using-assessment-type';
 import '../../components/gca-controls/gca-controls';
@@ -38,7 +38,10 @@ import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
-import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals';
+import {
+  bindXHRToButton,
+  BUTTON_VIEW_DONE,
+} from '../../plugins/utils/modals';
 import {
   checkPreconditions,
   becameDeprecated,
@@ -100,7 +103,7 @@ export default can.Control({
     // loaded before rendering the form, otherwise initial validation can
     // incorrectly fail for form fields whose values rely on current user's
     // attributes.
-    currentUser = Person.store[GGRC.current_user.id];
+    currentUser = Person.findInCacheById(GGRC.current_user.id);
 
     if (currentUser) {
       currentUser = currentUser.reify();
@@ -427,8 +430,7 @@ export default can.Control({
     }
   },
 
-  [`input:not(isolate-form input), textarea:not(isolate-form textarea),
-    select:not(isolate-form select) change`]:
+  'input, textarea, select change':
     function (el, ev) {
       this.options.instance.removeAttr('_suppress_errors');
       // Set the value if it isn't a search field
@@ -440,7 +442,7 @@ export default can.Control({
       }
     },
 
-  'input:not([data-lookup], isolate-form *), textarea keyup':
+  'input:not([data-lookup]), textarea keyup':
     function (el, ev) {
       // TODO: If statement doesn't work properly. This is the right one:
       //       if (el.attr('value').length ||
@@ -471,7 +473,7 @@ export default can.Control({
   serialize_form: function () {
     let $form = this.options.$content.find('form');
     let $elements = $form
-      .find(':input:not(isolate-form *):not([data-no-serialization])');
+      .find(':input');
 
     can.each($elements.toArray(), this.proxy('set_value_from_element'));
   },
@@ -524,7 +526,7 @@ export default can.Control({
           instance.serialize() : instance);
     }
     $elem = this.options.$content
-      .find("[name='" + item.name + "']:not(isolate-form *)");
+      .find("[name='" + item.name + "']");
     model = $elem.attr('model');
 
     if (model) {
@@ -566,7 +568,7 @@ export default can.Control({
         } else {
           value = this.options.model.convert.date(value);
           $other = this.options.$content
-            .find("[name='" + name.join('.') + ".time']:not(isolate-form *)");
+            .find("[name='" + name.join('.') + ".time']");
           if ($other.length) {
             value = moment(value).add(parseInt($other.val(), 10)).toDate();
           }
@@ -853,32 +855,6 @@ export default can.Control({
       return false;
     }
   },
-
-  // make buttons non-clickable when saving, make it disable afterwards
-  bindXHRToButton_disable: function (xhr, el, newtext, disable) {
-    // binding of an ajax to a click is something we do manually
-    let $el = $(el);
-    let oldtext = $el.text();
-
-    if (newtext) {
-      $el[0].innerHTML = newtext;
-    }
-    $el.addClass('disabled');
-    if (disable !== false) {
-      $el.attr('disabled', true);
-    }
-    xhr.fail(function () {
-      if ($el.length) {
-        $el.removeClass('disabled');
-      }
-    }).always(function () {
-      // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
-      if ($el.length) {
-        $el.removeAttr('disabled')[0].innerHTML = oldtext;
-      }
-    });
-  },
-
   // make element non-clickable when saving
   bindXHRToDisableElement(xhr, el) {
     // binding of an ajax to a click is something we do manually
@@ -925,13 +901,12 @@ export default can.Control({
       ajd.always(() => {
         this.options.attr('isSaving', false);
       });
-
       if (this.options.add_more) {
-        this.bindXHRToButton_disable(ajd, saveCloseBtn);
-        this.bindXHRToButton_disable(ajd, saveAddmoreBtn);
+        bindXHRToButton(ajd, saveCloseBtn);
+        bindXHRToButton(ajd, saveAddmoreBtn, 'Saving, please wait...');
       } else {
-        this.bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
-        this.bindXHRToButton(ajd, saveAddmoreBtn);
+        bindXHRToButton(ajd, saveCloseBtn, 'Saving, please wait...');
+        bindXHRToButton(ajd, saveAddmoreBtn);
       }
 
       this.bindXHRToDisableElement(ajd, deleteBtn);

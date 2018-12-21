@@ -75,7 +75,7 @@ function saveObject() {
 function createNestedProps(prefs, keyArgs) {
   let object = prefs;
   can.each(keyArgs, function (arg) {
-    let value = can.getObject(arg, object);
+    let value = _.get(object, arg);
     if (!value) {
       value = new can.Map();
       object.attr(arg, value);
@@ -92,7 +92,7 @@ function createNestedProps(prefs, keyArgs) {
 function getObject(...args) {
   let prefs = getPreferences();
 
-  let object = can.getObject(args.join('.'), prefs) || {};
+  let object = _.get(prefs, args) || {};
   return new can.Map(object);
 }
 

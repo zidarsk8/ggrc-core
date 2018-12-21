@@ -95,6 +95,9 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       ft_attributes.MultipleSubpropertyFullTextAttr("comments",
                                                     "cycle_task_entries",
                                                     ["description"]),
+      ft_attributes.BooleanFullTextAttr("needs verification",
+                                        "is_verification_needed",
+                                        with_template=False),
       "folder",
   ]
 
@@ -369,7 +372,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
         orm.Load(cls).joinedload("cycle").load_only(
             "id",
             "title",
-            "next_due_date"
+            "next_due_date",
+            "is_verification_needed",
         ),
         orm.Load(cls).joinedload("cycle_task_group").joinedload(
             "contact"

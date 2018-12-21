@@ -9,6 +9,7 @@ import {
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh_queue';
 import Search from '../models/service-models/search';
+import {bindXHRToButton} from '../plugins/utils/modals';
 import {getInstance} from '../plugins/utils/models-utils';
 import * as businessModels from '../models/business-models';
 
@@ -76,8 +77,7 @@ import * as businessModels from '../models/business-models';
         }.bind(this));
 
         if (this.options.controller) {
-          this.options.controller.bindXHRToButton(dfd,
-            $(this.element), null, false);
+          bindXHRToButton(dfd, $(this.element), null, false);
         }
       }, SEARCH_DEBOUNCE),
 

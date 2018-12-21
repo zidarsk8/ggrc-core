@@ -3,10 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import RefreshQueue from '../models/refresh_queue';
 import {getRolesForType} from '../plugins/utils/acl-utils';
-import {notifier} from '../plugins/utils/notifiers-utils';
-import Person from '../models/business-models/person';
 
 /**
  * A module containing various utility functions.
@@ -84,37 +81,6 @@ function inViewport(el) {
   return isVisible;
 }
 
-function getPersonInfo(person) {
-  const dfd = can.Deferred();
-  let actualPerson;
-
-  if (!person || !person.id) {
-    dfd.resolve(person);
-    return dfd;
-  }
-
-  actualPerson = Person.store[person.id] || {};
-  if (actualPerson.email) {
-    dfd.resolve(actualPerson);
-  } else {
-    actualPerson = new Person({id: person.id});
-    new RefreshQueue()
-      .enqueue(actualPerson)
-      .trigger()
-      .done((personItem) => {
-        personItem = Array.isArray(personItem) ? personItem[0] : personItem;
-        dfd.resolve(personItem);
-      })
-      .fail(function () {
-        notifier('error',
-          'Failed to fetch data for person ' + person.id + '.');
-        dfd.reject();
-      });
-  }
-
-  return dfd;
-}
-
 function getPickerElement(picker) {
   return _.find(_.values(picker), function (val) {
     if (val instanceof Node) {
@@ -144,24 +110,10 @@ function loadScript(url, callback) {
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 
-function hasPending(parentInstance, instance, how) {
-  let list = parentInstance._pending_joins;
-  how = how || 'add';
+function hasPending(parentInstance) {
+  let list = parentInstance._pendingJoins;
 
-  if (!list || !list.length) {
-    return false;
-  }
-  if (list instanceof can.List) {
-    list = list.serialize();
-  }
-
-  return _.find(list, function (pending) {
-    let method = pending.how === how;
-    if (!instance) {
-      return method;
-    }
-    return method && pending.what === instance;
-  });
+  return !!(list && list.length);
 }
 
 /**
@@ -236,7 +188,6 @@ export {
   applyTypeFilter,
   isInnerClick,
   inViewport,
-  getPersonInfo,
   getPickerElement,
   loadScript,
   hasPending,

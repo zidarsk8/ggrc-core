@@ -87,19 +87,11 @@
             </div>
             {{^if isSnapshot}}
             <div class="info-pane__sidebar">
-              <comment-data-provider {instance}="instance" class="flex-box flex-col">
-                <div class="info-pane__section-title">Responses/Comments</div>
-                {{#unless isEditDenied}}
-                <comment-add-form class="comment-add-form"
-                  {instance}="instance"
-                  {is-saving}="isLoading"
-                  (before-create)="addComment(%event)"
-                  (after-create)="processComment(%event)"
-                  {notifications-info}="'Notify Admins, Primary and Secondary Contacts'">
-                </comment-add-form>
-                {{/unless}}
-                <mapped-comments {base-instance}="instance" {mapped-items}="comments"></mapped-comments>
-              </comment-data-provider>
+              <div class="info-pane__section-title">Responses/Comments</div>
+              <comments-section class="flex-box flex-col"
+                {instance}="instance"
+                {notification}="'Notify Admins, Primary and Secondary Contacts'">
+              </comments-section>
             </div>
             {{/if}}
           </div>

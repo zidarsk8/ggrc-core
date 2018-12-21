@@ -39,13 +39,6 @@
         justify-content: flex-end;
       }
     }
-
-    h6 {
-      i.fa-asterisk {
-        color: $icon-color-empty;
-        font-size: 11px;
-      }
-    }
   }
 
   &__section-content {
@@ -185,4 +178,21 @@
 
 .assessment-comments {
   // Please do not remove this class. It's used in Selenium tests.
+}
+
+.ticket-id-modal {
+  .simple-modal {
+    &__header {
+      border-bottom: none;
+      padding-bottom: 5px;
+    }
+
+    &__header-text {
+      font-size: 24px;
+    }
+
+    &__footer {
+      border-top: none;
+    }
+  }
 }

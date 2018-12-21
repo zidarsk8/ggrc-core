@@ -12,8 +12,7 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 
 from ggrc import db
-from ggrc.converters import errors
-from ggrc.converters import get_exportables
+from ggrc.converters import get_exportables, errors
 from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.mixins import ScopeObject
@@ -258,17 +257,55 @@ class UserColumnHandler(ColumnHandler):
         return None
     return new_objects[all_models.Person].get(email)
 
-  def parse_item(self):
-    email = self.raw_value.lower()
-    person = self.get_person(email)
-    if not person:
-      if email != "":
-        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
-      elif self.mandatory:
+  def _parse_raw_data_to_emails(self):
+    """Parse raw data: split emails if necessary"""
+    email_list = re.split("[, ;\n]+", self.raw_value.lower().strip())
+    email_list = filter(None, email_list)
+    return sorted(email_list)
+
+  def _parse_emails(self, email_list):
+    """Parse user email. If it were multiply emails in this column parse them.
+
+    We use next rules:
+      - Return first valid user.
+      - If this field is mandatory and there were no emails provided
+        MISSING_VALUE error occurs.
+      - If field is mandatory and there were no valid users NO_VALID_USERS
+        error occurs.
+      - If field isn't mandatory and there were no valid users UNKNOWN_USER
+        warning occurs for each invalid email.
+    """
+    person = None
+
+    for email in email_list:
+      person = self.get_person(email)
+      if person:
+        break
+    if self.mandatory:
+      if not email_list:
         self.add_error(
             errors.MISSING_VALUE_ERROR, column_name=self.display_name
         )
+      elif not person:
+        self.add_error(
+            errors.NO_VALID_USERS_ERROR, column_name=self.display_name
+        )
+    else:
+      if email_list and not person:
+        for email in email_list:
+          self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+
     return person
+
+  def parse_item(self):
+    email_list = self._parse_raw_data_to_emails()
+
+    if len(email_list) > 1:
+      self.add_warning(
+          errors.MULTIPLE_ASSIGNEES, column_name=self.display_name
+      )
+
+    return self._parse_emails(email_list)
 
   def get_value(self):
     person = getattr(self.row_converter.obj, self.key)
@@ -696,6 +733,12 @@ class ProgramColumnHandler(ParentColumnHandler):
   def set_obj_attr(self):
     if self.row_converter.is_new:
       super(ProgramColumnHandler, self).set_obj_attr()
+    else:
+      owned_program_id = self.row_converter.obj.program_id
+      given_program_id = self.value.id
+      if owned_program_id != given_program_id:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
 
 
 class RequirementDirectiveColumnHandler(MappingColumnHandler):

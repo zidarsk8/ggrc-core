@@ -374,6 +374,42 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     expected_args = (TICKET_ID, {"status": "OBSOLETE", "comment": comment})
     self.assertEqual(expected_args, update_mock.call_args[0])
 
+  # pylint: disable=protected-access
+  @ddt.data("test comment",
+            "  \n\ntest comment\n\n"
+            "  \n\n  \n\n")
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_adding_comment_to_assessment(self, desc, mocked_update_issue):
+    """Test adding comment with blank lines in the end."""
+    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
+                           return_value=True):
+      iti_issue_id = []
+      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      iti_issue_id.append(iti.issue_id)
+      asmt = iti.issue_tracked_obj
+      comment = factories.CommentFactory(description=desc)
+      self.api.put(asmt, {
+          "actions": {"add_related": [{"id": comment.id,
+                                       "type": "Comment"}]},
+      })
+    asmt = db.session.query(models.Assessment).get(asmt.id)
+    builder_class = params_builder.BaseIssueTrackerParamsBuilder
+    expected_comment = builder_class.COMMENT_TMPL.format(
+        author=None,
+        comment="test comment",
+        model="Assessment",
+        link=assessment_integration._get_assessment_url(asmt),
+    )
+    kwargs = {'status': 'ASSIGNED',
+              'component_id': None,
+              'severity': None,
+              'title': asmt.title,
+              'hotlist_ids': [],
+              'priority': None,
+              'comment': expected_comment}
+    mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
+
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_cc_list_during_link(self, update_mock):

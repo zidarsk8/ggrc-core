@@ -9,6 +9,7 @@ import {
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils.js';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
+import {bindXHRToButton} from '../../plugins/utils/modals';
 import tracker from '../../tracker';
 import template from './templates/gdrive_file.mustache';
 import {
@@ -111,7 +112,7 @@ export default can.Component.extend({
 
         parentFolderDfd = findGDriveItemById(folderId);
       }
-      can.Control.prototype.bindXHRToButton(parentFolderDfd, el);
+      bindXHRToButton(parentFolderDfd, el);
 
       parentFolderDfd
         .done(function (parentFolder) {

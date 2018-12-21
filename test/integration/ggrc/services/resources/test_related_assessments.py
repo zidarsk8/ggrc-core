@@ -13,6 +13,7 @@ import ddt
 
 from ggrc import db
 from ggrc import views
+from ggrc import models
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
 
@@ -62,6 +63,20 @@ class TestRelatedAssessments(TestCase):
     db.session.commit()
     response = self._get_related_assessments(self.assessment1).json
     self.assertEqual(bool(verified_date), response["data"][0]["verified"])
+
+  def test_permission_query(self):
+    """Test basic response users without global read access."""
+
+    assessment2_title = self.assessment2.title
+    user = models.Person.query.first()
+    self.assessment1.audit.add_person_with_role_name(user, "Auditors")
+    self.assessment2.audit.add_person_with_role_name(user, "Auditors")
+    db.session.commit()
+    with mock.patch("ggrc.rbac.permissions.has_system_wide_read",
+                    return_value=False):
+      response = self._get_related_assessments(self.assessment1).json
+      self.assertEqual(response["total"], 1)
+      self.assertEqual(response["data"][0]["title"], assessment2_title)
 
   def test_basic_response(self):
     """Test basic response for a valid query."""

@@ -63,7 +63,7 @@ if (!isAssessmentsView && getPageType() !== 'Workflow') {
   initCounts(widgetModels, instance.type, instance.id);
 }
 
-$area.cms_controllers_page_object(can.extend({
+$area.cms_controllers_page_object(Object.assign({
   widget_descriptors: widgetList,
   default_widgets: defaults || [],
   instance: getPageInstance(),

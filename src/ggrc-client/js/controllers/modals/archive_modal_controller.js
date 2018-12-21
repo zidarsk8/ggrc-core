@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {bindXHRToButton} from '../../plugins/utils/modals';
 import ModalsController from './modals_controller';
 
 export default ModalsController({
@@ -19,7 +20,7 @@ export default ModalsController({
     let cancelButton = this.element.find('a.btn[data-dismiss=modal]');
     let modalBackdrop = this.element.data('modal_form').$backdrop;
 
-    this.bindXHRToButton(this.options.instance.refresh()
+    bindXHRToButton(this.options.instance.refresh()
       .then(function () {
         let instance = this.options.instance;
         instance.attr('archived', true);

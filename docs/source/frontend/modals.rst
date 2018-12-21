@@ -81,23 +81,6 @@ Naming conventions in the forms:
 -  if name is name='contact.email' value="{{contact.email}}" - special
    cases for null in data-lookup onkeyup so that it clears the field
 
-'Deferred' modal elements
--------------------------
-
-``mark_for_deletion``/``mark_for_addition`` in ``cacheable.js``
-adds/removes items into ``_pending_joins``. These pending joins are then
-handled in ``ggrc-modal-connector`` component.
-
-``ggrc_modal_connector`` Component used for mapping audits inside
-modals. Double layer of indirection in this case because context is not
-yet available when we are creating a new audit. When autocomplete
-selects a person the app is using ``this.scope.changes`` to handle the
-double deferred. Otherwise we just ``mark_for_addition`` (adding
-responses). ``data-object-source`` used for picker additions.
-``.ui-autocomplete-input`` we listen on this for when a new object is
-created in the mapping modal. That object is created even if we cancel
-the modal.
-
 .. _mapping-and-global-search:
 
 Mapping and global search modals:

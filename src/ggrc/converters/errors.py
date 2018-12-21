@@ -184,3 +184,12 @@ TASKGROUP_MAPPED_TO_ANOTHER_WORKFLOW = (u"Line {line}: TaskGroup '{slug}' "
                                         u"and mapped to another "
                                         u"workflow. Please, use different "
                                         u"code for this TaskGroup")
+
+MULTIPLE_ASSIGNEES = (u"Line {line}: Only one assignee (column "
+                      u"'{column_name}') can be imported. Please click "
+                      u"'Proceed' to choose the first user in alphabetical "
+                      u"order as an assignee.")
+
+NO_VALID_USERS_ERROR = (u"Line {line}: Required field '{column_name}' "
+                        u"contains not valid users. Only registered users "
+                        u"can be assigned to Task Groups.")

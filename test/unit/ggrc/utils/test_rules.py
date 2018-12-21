@@ -48,7 +48,7 @@ class TestMappingRules(BaseTestMappingRules):
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                     'ProductGroup', 'TechnologyEnvironment', 'Standard',
                     'Policy', 'Regulation']
-  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Contract',
+  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Audit', 'Contract',
                                     'Control', 'DataAsset', 'Facility',
                                     'Issue', 'Market', 'Objective', 'OrgGroup',
                                     'Person', 'Policy', 'Process', 'Product',
@@ -172,7 +172,7 @@ class TestUnMappingRules(BaseTestMappingRules):
                     'Requirement', 'System', 'Threat', 'Vendor', 'Metric',
                     'ProductGroup', 'TechnologyEnvironment', 'Standard',
                     'Policy', 'Regulation']
-  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Contract',
+  cycletaskgroupobjecttask_rules = ['AccessGroup', 'Audit', 'Contract',
                                     'Control', 'DataAsset', 'Facility',
                                     'Issue', 'Market', 'Objective', 'OrgGroup',
                                     'Person', 'Policy', 'Process', 'Product',

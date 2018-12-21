@@ -25,7 +25,6 @@ export default Directive('CMS.Models.Contract', {
   isRoleable: true,
   attributes: {
   },
-  cache: can.getObject('cache', Directive, true),
   sub_tree_view_options: {
     default_filter: ['Requirement'],
   },
@@ -35,7 +34,7 @@ export default Directive('CMS.Models.Contract', {
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
-    can.extend(this.attributes, Directive.attributes);
+    Object.assign(this.attributes, Directive.attributes);
     this._super(...arguments);
   },
 }, {});
