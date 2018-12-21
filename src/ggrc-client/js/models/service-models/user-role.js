@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Role from '../service-models/role';
+import Role from './role';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 

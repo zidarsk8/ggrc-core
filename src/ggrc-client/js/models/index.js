@@ -8,5 +8,4 @@ import './save_queue';
 import './stub';
 
 import './business-models';
-import './join-models';
 import './service-models';

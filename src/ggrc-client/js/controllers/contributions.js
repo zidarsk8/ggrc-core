@@ -5,7 +5,7 @@
 
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
-import UserRole from '../models/join-models/user-role';
+import UserRole from '../models/service-models/user-role';
 
 /* Role Assignment Modal Selector
   *

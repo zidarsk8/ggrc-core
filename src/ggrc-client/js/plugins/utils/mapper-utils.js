@@ -5,7 +5,7 @@
 
 import RefreshQueue from '../../models/refresh_queue';
 import {backendGdriveClient} from '../ggrc-gapi-client';
-import TaskGroupObject from '../../models/join-models/task-group-object';
+import TaskGroupObject from '../../models/service-models/task-group-object';
 import Relationship from '../../models/service-models/relationship';
 
 async function mapObjects(instance, objects, {
