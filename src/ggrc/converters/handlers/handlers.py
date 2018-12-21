@@ -257,17 +257,55 @@ class UserColumnHandler(ColumnHandler):
         return None
     return new_objects[all_models.Person].get(email)
 
-  def parse_item(self):
-    email = self.raw_value.lower()
-    person = self.get_person(email)
-    if not person:
-      if email != "":
-        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
-      elif self.mandatory:
+  def _parse_raw_data_to_emails(self):
+    """Parse raw data: split emails if necessary"""
+    email_list = re.split("[, ;\n]+", self.raw_value.lower().strip())
+    email_list = filter(None, email_list)
+    return sorted(email_list)
+
+  def _parse_emails(self, email_list):
+    """Parse user email. If it were multiply emails in this column parse them.
+
+    We use next rules:
+      - Return first valid user.
+      - If this field is mandatory and there were no emails provided
+        MISSING_VALUE error occurs.
+      - If field is mandatory and there were no valid users NO_VALID_USERS
+        error occurs.
+      - If field isn't mandatory and there were no valid users UNKNOWN_USER
+        warning occurs for each invalid email.
+    """
+    person = None
+
+    for email in email_list:
+      person = self.get_person(email)
+      if person:
+        break
+    if self.mandatory:
+      if not email_list:
         self.add_error(
             errors.MISSING_VALUE_ERROR, column_name=self.display_name
         )
+      elif not person:
+        self.add_error(
+            errors.NO_VALID_USERS_ERROR, column_name=self.display_name
+        )
+    else:
+      if email_list and not person:
+        for email in email_list:
+          self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+
     return person
+
+  def parse_item(self):
+    email_list = self._parse_raw_data_to_emails()
+
+    if len(email_list) > 1:
+      self.add_warning(
+          errors.MULTIPLE_ASSIGNEES, column_name=self.display_name
+      )
+
+    return self._parse_emails(email_list)
 
   def get_value(self):
     person = getattr(self.row_converter.obj, self.key)
