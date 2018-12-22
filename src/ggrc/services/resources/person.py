@@ -28,6 +28,17 @@ from ggrc.models.person import Person
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
 
+ALL_MODELS = {
+    "Issue", "AccessGroup", "Assessment", "Audit", "Contract", "Control",
+    "DataAsset", "Document", "Evidence", "Facility", "Market", "Objective",
+    "OrgGroup", "Policy", "Process", "Product", "Program", "Project",
+    "Regulation", "Risk", "Requirement", "Standard", "System",
+    "TechnologyEnvironment", "Threat", "Vendor", "CycleTaskGroupObjectTask",
+    "Workflow", "Metric", "ProductGroup",
+}
+
+MY_WORK_MODELS = ALL_MODELS - {"Workflow"}
+
 
 class PersonResource(common.ExtendedResource):
   """Resource handler for people."""
@@ -35,70 +46,9 @@ class PersonResource(common.ExtendedResource):
   # method post is abstract and not used.
   # pylint: disable=abstract-method
 
-  MY_WORK_OBJECTS = {
-      "Issue": 0,
-      "AccessGroup": 0,
-      "Assessment": 0,
-      "Audit": 0,
-      "Contract": 0,
-      "Control": 0,
-      "DataAsset": 0,
-      "Document": 0,
-      "Evidence": 0,
-      "Facility": 0,
-      "Market": 0,
-      "Objective": 0,
-      "OrgGroup": 0,
-      "Policy": 0,
-      "Process": 0,
-      "Product": 0,
-      "Program": 0,
-      "Project": 0,
-      "Regulation": 0,
-      "Risk": 0,
-      "Requirement": 0,
-      "Standard": 0,
-      "System": 0,
-      "TechnologyEnvironment": 0,
-      "Threat": 0,
-      "Vendor": 0,
-      "CycleTaskGroupObjectTask": 0,
-      "Metric": 0,
-      "ProductGroup": 0,
-  }
+  MY_WORK_OBJECTS = {item: 0 for item in MY_WORK_MODELS}
 
-  ALL_OBJECTS = {
-      "Issue": 0,
-      "AccessGroup": 0,
-      "Assessment": 0,
-      "Audit": 0,
-      "Contract": 0,
-      "Control": 0,
-      "DataAsset": 0,
-      "Document": 0,
-      "Evidence": 0,
-      "Facility": 0,
-      "Market": 0,
-      "Objective": 0,
-      "OrgGroup": 0,
-      "Policy": 0,
-      "Process": 0,
-      "Product": 0,
-      "Program": 0,
-      "Project": 0,
-      "Regulation": 0,
-      "Risk": 0,
-      "Requirement": 0,
-      "Standard": 0,
-      "System": 0,
-      "TechnologyEnvironment": 0,
-      "Threat": 0,
-      "Vendor": 0,
-      "CycleTaskGroupObjectTask": 0,
-      "Workflow": 0,
-      "Metric": 0,
-      "ProductGroup": 0,
-  }
+  ALL_OBJECTS = {item: 0 for item in ALL_MODELS}
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
@@ -106,9 +56,9 @@ class PersonResource(common.ExtendedResource):
     super(PersonResource, cls).add_to(app, url, model_class, decorators)
     view_func = cls.as_view(cls.endpoint_name())
     app.add_url_rule(
-        '{url}/<{type}:{pk}>/<command>'.format(url=url,
-                                               type=cls.pk_type,
-                                               pk=cls.pk),
+        '{url}/<{type}:{pk}>/<command>'.format(
+            url=url, type=cls.pk_type, pk=cls.pk
+        ),
         view_func=view_func,
         methods=['GET', 'PUT', 'POST', 'DELETE'])
     app.add_url_rule(

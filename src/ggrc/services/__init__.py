@@ -55,6 +55,7 @@ def contributed_services():
       service('org_groups', models.OrgGroup),
       service('vendors', models.Vendor),
       service('people', models.Person, PersonResource),
+      service('people_profiles', models.PersonProfile),
       service('products', models.Product),
       service('projects', models.Project),
       service('programs', models.Program),

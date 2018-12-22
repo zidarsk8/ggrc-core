@@ -39,6 +39,11 @@ class CalendarEvent(Relatable, Base, db.Model):
     """Indicates whether the event was synced or not."""
     return self.last_synced_at is not None
 
+  @property
+  def needs_sync(self):
+    """Indicates should we send this event to user or not."""
+    return self.attendee.profile.send_calendar_events
+
   def json_equals(self, event_response):
     """Checks if event is equal to json representation."""
     return (event_response['description'] == self.description and

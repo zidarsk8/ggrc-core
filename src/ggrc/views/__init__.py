@@ -489,6 +489,7 @@ def get_current_user_json():
         "language": person.language,
         "name": person.name,
         "system_wide_role": person.system_wide_role,
+        "profile": person.profile,
     })
 
 

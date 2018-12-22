@@ -28,6 +28,9 @@ class CalendarEventsSync(object):
           orm.joinedload("attendee").load_only(
               "email",
           ),
+          orm.joinedload("attendee").joinedload("profile").load_only(
+              "send_calendar_events",
+          ),
           load_only(
               all_models.CalendarEvent.id,
               all_models.CalendarEvent.external_event_id,
@@ -35,7 +38,7 @@ class CalendarEventsSync(object):
               all_models.CalendarEvent.description,
               all_models.CalendarEvent.attendee_id,
               all_models.CalendarEvent.due_date,
-              all_models.CalendarEvent.last_synced_at
+              all_models.CalendarEvent.last_synced_at,
           )
       ).all()
       event_mappings, _ = utils.get_related_mapping(
@@ -43,6 +46,8 @@ class CalendarEventsSync(object):
           right=all_models.CycleTaskGroupObjectTask
       )
       for event in events:
+        if not event.needs_sync:
+          continue
         if event.id not in event_mappings or not event_mappings[event.id]:
           self._delete_event(event)
           db.session.delete(event)

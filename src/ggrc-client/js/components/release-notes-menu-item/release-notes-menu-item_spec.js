@@ -55,7 +55,7 @@ describe('"release-notes-menu-item" component', () => {
             id: 12345,
           },
         };
-        profileDfd = can.Deferred();
+        profileDfd = $.Deferred();
         spyOn(PersonProfile, 'findOne').and.returnValue(profileDfd);
       });
 
