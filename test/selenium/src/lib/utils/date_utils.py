@@ -25,6 +25,15 @@ def first_working_day(date):
   return date
 
 
+def first_working_day_after_today(date):
+  """Returns the nearest working day today or in future.
+  """
+  date = date + datetime.timedelta(days=1)
+  while _is_weekend(date) or date in holidays.UnitedStates():
+    date += datetime.timedelta(days=1)
+  return date
+
+
 def _is_weekend(date):
   """Returns whether the date is a weekend."""
   return date.isoweekday() in (6, 7)  # Saturday, Sunday

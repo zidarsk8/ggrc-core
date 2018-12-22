@@ -1,6 +1,8 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Base functions for app_entity factories."""
+import copy
+
 from lib.utils import random_utils, string_utils
 
 
@@ -37,8 +39,9 @@ class BaseFactory(object):
 
   def create(self, **attrs):
     """Creates a random app entity with `args`."""
-    attrs.update(self._default_attrs)
-    return self.create_empty(**attrs)
+    attrs_to_set = copy.deepcopy(self._default_attrs)
+    attrs_to_set.update(**attrs)
+    return self.create_empty(**attrs_to_set)
 
   def create_empty(self, **attrs):
     """Creates an app entity from `args`. Attributes that are not passed,
