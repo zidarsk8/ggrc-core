@@ -19,6 +19,7 @@ from sqlalchemy.sql import tuple_
 from ggrc.models.relationship import Relationship
 from ggrc.models.revision import Revision
 from ggrc.models.snapshot import Snapshot
+from ggrc.migrations.utils.migrator import get_migration_user_id
 
 
 relationships_table = Relationship.__table__  # pylint: disable=invalid-name
@@ -27,6 +28,8 @@ snapshots_table = Snapshot.__table__  # pylint: disable=invalid-name
 
 
 Stub = namedtuple("Stub", ["type", "id"])
+
+_USE_DEFAULT_MIGRATOR = object()
 
 
 def get_relationships(connection, type_, id_, filter_types=None):
@@ -172,20 +175,37 @@ def last_insert_id(connection):
 
 
 # pylint: disable=invalid-name
-def add_to_objects_without_revisions(connection, obj_id,
-                                     obj_type, action='created'):
-  """Add object to objects_without_revisions table"""
+def _check_modified_by_id_column_exists(connection):
+  """Return True if column modified_by_id exists"""
+
   sql = """
-      INSERT IGNORE INTO objects_without_revisions (obj_id, obj_type, action)
-      VALUES (:obj_id, :obj_type, :action)
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'objects_without_revisions' and
+                column_name = 'modified_by_id';
   """
-  connection.execute(text(sql), obj_id=obj_id,
-                     obj_type=obj_type, action=action)
+
+  result = connection.execute(sql)
+  return True if result.scalar() else False
 
 
 # pylint: disable=invalid-name
-def add_to_objects_without_revisions_bulk(connection, obj_ids,
-                                          obj_type, action='created'):
+def add_to_objects_without_revisions(connection, obj_id,
+                                     obj_type, action='created',
+                                     modified_by_id=_USE_DEFAULT_MIGRATOR):
+  """Add object to objects_without_revisions table"""
+
+  add_to_objects_without_revisions_bulk(connection, [obj_id], obj_type,
+                                        action, modified_by_id)
+
+
+# pylint: disable=invalid-name
+def add_to_objects_without_revisions_bulk(
+    connection,
+    obj_ids,
+    obj_type,
+    action='created',
+    modified_by_id=_USE_DEFAULT_MIGRATOR
+):
   """Add object to objects_without_revisions table bulk"""
 
   rev_table = table('objects_without_revisions',
@@ -193,31 +213,28 @@ def add_to_objects_without_revisions_bulk(connection, obj_ids,
                     column('obj_type', String),
                     column('action', String))
 
-  data = [{'obj_id': obj_id, 'obj_type': obj_type,
-           'action': action} for obj_id in obj_ids]
+  if not _check_modified_by_id_column_exists(connection):
+    # This function is called by older migrations, which don't expect
+    # that column modified_by_id exists
+    data = [{'obj_id': obj_id,
+             'obj_type': obj_type,
+             'action': action} for obj_id in obj_ids]
+  else:
+    rev_table.append_column(column('modified_by_id', Integer))
+
+    if modified_by_id is _USE_DEFAULT_MIGRATOR:
+      modified_by_id = get_migration_user_id(connection)
+    data = [{'obj_id': obj_id,
+             'obj_type': obj_type,
+             'action': action,
+             'modified_by_id': modified_by_id} for obj_id in obj_ids]
+
   connection.execute(rev_table.insert().prefix_with('IGNORE'), data)
 
 
 def clean_new_revisions(connection):
   """Clean objects_without_revisions table"""
   connection.execute(text("truncate objects_without_revisions"))
-
-
-def add_to_missing_revisions(connection, table_with_id,
-                             object_type, action="modified"):
-  """Add modified object to objects_without_revisions to create revisions"""
-  sql = """
-      INSERT IGNORE INTO objects_without_revisions (
-        obj_id,
-        obj_type,
-        action
-      )
-      SELECT twi.id, :object_type, :action FROM {} twi
-  """.format(table_with_id)
-  connection.execute(text(sql),
-                     object_type=object_type,
-                     action=action,
-                     )
 
 
 # pylint: disable=too-many-arguments
