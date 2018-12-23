@@ -32,6 +32,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   issue_priority = db.Column(db.String(50), nullable=True)
   issue_severity = db.Column(db.String(50), nullable=True)
   assignee = db.Column(db.String(250), nullable=True)
+  reporter = db.Column(db.String(250), nullable=True)
   cc_list = db.Column(db.Text, nullable=False, default="")
   due_date = db.Column(db.Date, nullable=True)
 
@@ -83,6 +84,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
     if include_private:
       res['object_id'] = self.object_id
       res['object_type'] = self.object_type
+      res['reporter'] = self.reporter
       res['assignee'] = self.assignee
       res['cc_list'] = self.cc_list.split(',') if self.cc_list else []
 
@@ -139,6 +141,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
         issue_priority=info.get('issue_priority'),
         issue_severity=info.get('issue_severity'),
 
+        reporter=info.get('reporter'),
         assignee=info.get('assignee'),
         cc_list=cc_list,
 
@@ -178,6 +181,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
     self.issue_type = info['issue_type']
     self.issue_priority = info['issue_priority']
     self.issue_severity = info['issue_severity']
+    self.reporter = info['reporter']
     self.assignee = info['assignee']
     self.cc_list = info['cc_list']
 

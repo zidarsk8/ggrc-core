@@ -4,6 +4,7 @@
 """Unit tests for client module."""
 # pylint: disable=protected-access
 
+import datetime
 import unittest
 
 import mock
@@ -225,10 +226,23 @@ class BaseClientTest(unittest.TestCase):
       "_get_ccs",
       lambda obj, reporter, assignee, assessment: []
   )
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      '_is_tracker_enabled',
+      lambda obj, audit: True
+  )
   def test_sync_issue_statuses(self):  # pylint: disable=invalid-name
     """Tests issue synchronization flow."""
-    assessment_in_review = mock.MagicMock(id=1, status='In Review')
-    assessment_not_started = mock.MagicMock(id=2, status='Not Started')
+    assessment_in_review = mock.MagicMock(
+        id=1,
+        status='In Review',
+        start_date=datetime.datetime.utcnow()
+    )
+    assessment_not_started = mock.MagicMock(
+        id=2,
+        status='Not Started',
+        start_date=datetime.datetime.utcnow()
+    )
     assessment_issues = {
         '1': {
             'object_id': 1,

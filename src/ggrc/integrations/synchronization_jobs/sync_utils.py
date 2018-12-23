@@ -36,8 +36,7 @@ def _add_assessment_ccs(issue_object, assessment):
   return list(audit_ccs.union(assessment_ccs))
 
 
-def collect_issue_tracker_info(model_name, include_object=False,
-                               include_ccs=False):
+def collect_issue_tracker_info(model_name):
   """Returns issue tracker info associated with GGRC object."""
   issue_params = {}
   issue_objects = get_active_issue_info(model_name=model_name)
@@ -58,22 +57,18 @@ def collect_issue_tracker_info(model_name, include_object=False,
 
     issue_params[iti.issue_id] = {
         "object_id": sync_object.id,
-        "component_id": iti.component_id,
+        "object": sync_object,
         "state": {
+            "component_id": iti.component_id,
             "status": status_value,
             "type": iti.issue_type,
             "priority": iti.issue_priority,
             "severity": iti.issue_severity,
             "due_date": iti.due_date,
+            "assignee": iti.assignee,
+            "reporter": iti.reporter
         },
     }
-
-    if include_object:
-      issue_params[iti.issue_id]["object"] = sync_object
-
-    if include_ccs:
-      grouped_ccs = _add_assessment_ccs(iti, sync_object)
-      issue_params[iti.issue_id]["state"]["ccs"] = grouped_ccs
 
   return issue_params
 
@@ -88,7 +83,7 @@ def get_active_issue_info(model_name):
   ).order_by(issuetracker_cls.object_id).all()
 
 
-def iter_issue_batches(ids, include_emails=False):
+def iter_issue_batches(ids):
   """Generates a sequence of batches of issues from Issue Tracker by IDs."""
   cli = issues.Client()
 
@@ -115,15 +110,11 @@ def iter_issue_batches(ids, include_emails=False):
           'priority': state.get('priority'),
           'severity': state.get('severity'),
           'custom_fields': state.get('custom_fields', []),
-          'ccs': state.get('ccs', [])
+          'ccs': state.get('ccs', []),
+          'assignee': state.get('assignee'),
+          'reporter': state.get('reporter'),
+          'verifier': state.get('verifier')
       }
-
-      if include_emails:
-        issue_info.update({
-            'assignee': state.get('assignee'),
-            'reporter': state.get('reporter'),
-            'verifier': state.get('verifier'),
-        })
 
       issue_infos[info['issueId']] = issue_info
 
@@ -131,10 +122,10 @@ def iter_issue_batches(ids, include_emails=False):
       yield issue_infos
 
 
-def update_issue(cli, issue_id, params, max_attempts=5, interval=1):
+def update_issue(cli, issue_id, params):
   """Performs issue update request."""
   last_error = integrations_errors.Error
-  for _ in range(max_attempts):
+  for _ in range(constants.MAX_REQUEST_ATTEMPTS):
     try:
       return cli.update_issue(issue_id, params)
     except integrations_errors.HttpError as error:
@@ -143,18 +134,21 @@ def update_issue(cli, issue_id, params, max_attempts=5, interval=1):
         logger.warning(
             'The request updating ticket ID=%s was '
             'rate limited and will be re-tried: %s', issue_id, error)
-        time.sleep(interval)
+        time.sleep(constants.REQUEST_TIMEOUT)
         continue
     break
   else:
-    logger.warning("Attempts limit(%s) was reached.", max_attempts)
+    logger.warning(
+        "Attempts limit(%s) was reached.",
+        constants.MAX_REQUEST_ATTEMPTS
+    )
     raise last_error
 
 
-def create_issue(cli, params, max_attempts=5, interval=1):
+def create_issue(cli, params):
   """Performs issue create request."""
   last_error = integrations_errors.Error
-  for _ in range(max_attempts):
+  for _ in range(constants.MAX_REQUEST_ATTEMPTS):
     try:
       return cli.create_issue(params)
     except integrations_errors.HttpError as error:
@@ -163,18 +157,21 @@ def create_issue(cli, params, max_attempts=5, interval=1):
         logger.warning(
             'The request creating ticket was rate limited and '
             'will be re-tried: %s', error)
-        time.sleep(interval)
+        time.sleep(constants.REQUEST_TIMEOUT)
         continue
     break
   else:
-    logger.warning("Attempts limit(%s) was reached.", max_attempts)
+    logger.warning(
+        "Attempts limit(%s) was reached.",
+        constants.MAX_REQUEST_ATTEMPTS
+    )
   raise last_error
 
 
 def parse_due_date(custom_fields_issuetracker):
   """Parse custom fields for return due date."""
   for row in custom_fields_issuetracker:
-    due_date_value = row.get(constants.CUSTOM_FIELDS_DUE_DATE)
+    due_date_value = row.get(constants.CustomFields.DUE_DATE)
     if due_date_value:
       return due_date_value.strip()
   return None

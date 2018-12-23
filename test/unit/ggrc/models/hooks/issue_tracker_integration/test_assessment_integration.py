@@ -148,7 +148,7 @@ class TestUtilityFunctions(unittest.TestCase):
       tracker_handler = assessment_integration.AssessmentTrackerHandler()
       reporter = "reporter@test.com"
       reporter_tracker = tracker_handler._get_reporter_on_sync(
-          mock_object.id,
+          mock_object,
           reporter
       )
       self.assertEqual(reporter, reporter_tracker)
@@ -170,8 +170,8 @@ class TestUtilityFunctions(unittest.TestCase):
       tracker_handler = assessment_integration.AssessmentTrackerHandler()
       reporter = "reporter@test.com"
       reporter_tracker = tracker_handler._get_reporter_on_sync(
-          mock_object.id,
-          reporter
+          audit=mock_object,
+          reporter_db=reporter
       )
       self.assertEqual(
           "repoter2@test.com",
@@ -190,7 +190,7 @@ class TestUtilityFunctions(unittest.TestCase):
       tracker_handler = assessment_integration.AssessmentTrackerHandler()
       assignee = "assignee@test.com"
       assignee_tracker = tracker_handler._get_assignee_on_sync(
-          assmt_object.id,
+          assmt_object,
           assignee
       )
       self.assertEqual(assignee, assignee_tracker)
@@ -212,7 +212,7 @@ class TestUtilityFunctions(unittest.TestCase):
       tracker_handler = assessment_integration.AssessmentTrackerHandler()
       reporter = "assignee@test.com"
       reporter_tracker = tracker_handler._get_assignee_on_sync(
-          assmt_object.id,
+          assmt_object,
           reporter
       )
       self.assertEqual(
