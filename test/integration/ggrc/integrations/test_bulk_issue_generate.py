@@ -413,8 +413,8 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
           for id_ in assessment_ids
       ]
       self.assertEqual(response.json.get("errors"), expected_errors)
-      # 10 times for each assessment
-      self.assertEqual(create_issue_mock.call_count, 30)
+      # 3 times for each assessment
+      self.assertEqual(create_issue_mock.call_count, 9)
 
   def test_exception_notification(self):
     """Test notification about failed bulk update."""
@@ -918,8 +918,8 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
         for id_ in assessment_ids
     ]
     self.assertEqual(response.json.get("errors"), expected_errors)
-    # 10 times for each assessment
-    self.assertEqual(update_issue_mock.call_count, 30)
+    # 3 times for each assessment
+    self.assertEqual(update_issue_mock.call_count, 9)
 
   @ddt.data("Issue", "Assessment")
   def test_get_issue_json(self, model):

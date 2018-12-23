@@ -12,6 +12,7 @@ import ddt
 from google.appengine.api import urlfetch_errors
 
 from ggrc.integrations import client
+from ggrc.integrations import constants
 from ggrc.integrations import integrations_errors
 from ggrc.integrations import issues
 
@@ -52,7 +53,7 @@ class BaseClientTest(unittest.TestCase):
           payload=None,
           headers={'X-URLFetch-Service-Id': 'SERVICE'},
           follow_redirects=False,
-          deadline=30,
+          deadline=constants.REQUEST_DEADLINE,
       )
 
   @mock.patch('ggrc.integrations.client.urlfetch.fetch')
@@ -81,7 +82,7 @@ class BaseClientTest(unittest.TestCase):
           payload='some payload',
           headers={'X-URLFetch-Service-Id': 'SERVICE'},
           follow_redirects=False,
-          deadline=30,
+          deadline=constants.REQUEST_DEADLINE,
       )
 
   @mock.patch('ggrc.integrations.client.urlfetch.fetch')

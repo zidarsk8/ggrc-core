@@ -16,17 +16,16 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import models
 from ggrc import settings
-from ggrc.app import app
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
+from ggrc.integrations import integrations_errors
 from ggrc.integrations.synchronization_jobs import sync_utils
-from ggrc.integrations import constants
 from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
     ASSESSMENT_STATUSES_MAPPING
-from ggrc.integrations import synchronization_jobs
+from ggrc.integrations import synchronization_jobs, constants
 from ggrc.access_control.role import AccessControlRole
 
 from integration.ggrc.models import factories
@@ -76,6 +75,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       "title": "test title",
       "verifier": "user@example.com",
       "assignee": "user@example.com",
+      "reporter": "user@example.com",
       "ccs": ["user@example.com"],
   }
 
@@ -117,6 +117,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         "title": payload_attrs["title"],
         "verifier": payload_attrs["verifier"],
         "assignee": payload_attrs["assignee"],
+        "reporter": payload_attrs["reporter"],
         "ccs": payload_attrs["ccs"],
     }}
     return payload
@@ -204,8 +205,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     assmt_request_payload = self.request_payload_builder(assmt_attrs, audit)
     response_payload = self.response_payload_builder(ticket_attrs)
 
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       with mock.patch("ggrc.integrations.issues.Client.get_issue",
                       return_value=response_payload) as get_mock:
         response = self.api.post(all_models.Assessment, assmt_request_payload)
@@ -272,10 +276,13 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           issue_tracked_obj=assmt,
           title='',
       )
-    without_info = assessment_integration.prepare_issue_update_json(assmt)
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    without_info = tracker_handler.prepare_issue_update_json(assmt)
     issue_info = assmt.issue_tracker
-    with_info = assessment_integration.prepare_issue_update_json(assmt,
-                                                                 issue_info)
+    with_info = tracker_handler.prepare_issue_update_json(
+        assmt,
+        issue_info
+    )
     expected_info = {
         'component_id': 213,
         'severity': u'S0',
@@ -352,8 +359,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     new_data = {"issue_id": new_ticket_id}
     issue_request_payload = self.put_request_payload_builder(new_data)
     response_payload = self.response_payload_builder(new_data)
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       with mock.patch("ggrc.integrations.issues.Client.get_issue",
                       return_value=response_payload) as get_mock:
         response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
@@ -371,7 +381,10 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     # check detach comment was sent
     detach_comment_tmpl = params_builder.AssessmentParamsBuilder.DETACH_TMPL
     comment = detach_comment_tmpl.format(new_ticket_id=new_ticket_id)
-    expected_args = (TICKET_ID, {"status": "OBSOLETE", "comment": comment})
+    expected_args = (
+        str(TICKET_ID),
+        {"status": "OBSOLETE", "comment": comment}
+    )
     self.assertEqual(expected_args, update_mock.call_args[0])
 
   # pylint: disable=protected-access
@@ -382,33 +395,45 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_adding_comment_to_assessment(self, desc, mocked_update_issue):
     """Test adding comment with blank lines in the end."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
-      iti_issue_id = []
-      iti = factories.IssueTrackerIssueFactory(enabled=True)
-      iti_issue_id.append(iti.issue_id)
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          component_id="11111",
+          hotlist_id="222222",
+          issue_type="PROCESS",
+          issue_priority="P2",
+          issue_severity="S2"
+      )
+      iti_title = iti.title
+      iti_issue_id = iti.issue_id
       asmt = iti.issue_tracked_obj
       comment = factories.CommentFactory(description=desc)
       self.api.put(asmt, {
           "actions": {"add_related": [{"id": comment.id,
                                        "type": "Comment"}]},
       })
+
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
     asmt = db.session.query(models.Assessment).get(asmt.id)
     builder_class = params_builder.BaseIssueTrackerParamsBuilder
     expected_comment = builder_class.COMMENT_TMPL.format(
         author=None,
         comment="test comment",
         model="Assessment",
-        link=assessment_integration._get_assessment_url(asmt),
+        link=tracker_handler._get_assessment_page_url(asmt),
     )
     kwargs = {'status': 'ASSIGNED',
-              'component_id': None,
-              'severity': None,
-              'title': asmt.title,
-              'hotlist_ids': [],
-              'priority': None,
+              'component_id': 11111,
+              'severity': "S2",
+              'title': iti_title,
+              'hotlist_ids': [222222],
+              'priority': "P2",
               'comment': expected_comment}
-    mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
+    mocked_update_issue.assert_called_once_with(iti_issue_id, kwargs)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
@@ -416,6 +441,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     """Test assessment linking functionality sync appropriate cc list"""
     with factories.single_commit():
       audit = factories.AuditFactory()
+      reporter = factories.PersonFactory(email="r@e.com")
+      audit.add_person_with_role_name(
+          reporter,
+          "Audit Captains",
+      )
       factories.IssueTrackerIssueFactory(
           enabled=True,
           issue_tracked_obj=audit
@@ -441,18 +471,24 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     issue_request_payload = self.put_request_payload_builder(new_data)
     new_data["ccs"] = ["3@e.com", "4@e.com"]
     response_payload = self.response_payload_builder(new_data)
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       with mock.patch("ggrc.integrations.issues.Client.get_issue",
                       return_value=response_payload) as get_mock:
         response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
     get_mock.assert_called_once()
     self.assertEqual(set(update_mock.call_args_list[0][0][1]['ccs']),
-                     {"2@e.com", "3@e.com", "4@e.com"})
+                     {"2@e.com", "3@e.com", "4@e.com", "r@e.com"})
     self.assert200(response)
 
-  @mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                     return_value=True)
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      '_is_tracker_enabled',
+      return_value=True
+  )
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_already_linked_ticket(self, enabled_mock):
     """Test Assessment w/o IT couldn't be linked to already linked ticket"""
@@ -499,8 +535,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       )
     new_data = {"issue_id": ''}
     issue_request_payload = self.put_request_payload_builder(new_data)
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       with mock.patch("ggrc.integrations.issues.Client.create_issue",
                       return_value={"issueId": TICKET_ID + 1}) as create_mock:
         response = self.api.put(iti.issue_tracked_obj, issue_request_payload)
@@ -508,7 +547,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     # Detach comment should be sent to previous ticket
     update_mock.assert_called_once()
-    self.assertEqual(TICKET_ID, update_mock.call_args[0][0])
+    self.assertEqual(TICKET_ID, int(update_mock.call_args[0][0]))
     create_mock.assert_called_once()
 
     # check if data was changed in our DB
@@ -538,15 +577,19 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     })
     asmt = all_models.Assessment.query.filter_by(title='Assessment1').one()
 
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       issue_params = {
           'enabled': True,
-          'component_id': hash('Default Component id'),
-          'hotlist_id': hash('Default Hotlist id'),
-          'issue_type': 'Default Issue type',
-          'issue_priority': 'Default Issue priority',
-          'issue_severity': 'Default Issue severity',
+          'component_id': 123123,
+          'hotlist_id': 123123,
+          'issue_type': 'PROCESS',
+          'issue_priority': 'P2',
+          'issue_severity': 'S2',
+          'title': 'Default Title'
       }
       self.api.put(asmt, {'issue_tracker': issue_params})
       mock_create_issue.assert_called_once()
@@ -558,9 +601,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   def test_update_issuetracker_info(self):
     """Test that Issue Tracker issues are updated by the utility."""
     cli_patch = mock.patch.object(sync_utils.issues, 'Client')
-    hook_patch = mock.patch.object(assessment_integration,
-                                   '_is_issue_tracker_enabled',
-                                   return_value=True)
+    hook_patch = mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    )
     with cli_patch, hook_patch:
       iti_issue_id = []
       for _ in xrange(2):
@@ -582,6 +627,14 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'enabled': True,
                 'component_id': '11111',
                 'hotlist_id': '222222',
+                'issue_type': 'PROCESS',
+                'issue_priority': 'P2',
+                'issue_severity': 'S2',
+                'title': 'Default Title',
+                'issue_id': iti.issue_id,
+                'issue_url': integration_utils.build_issue_tracker_url(
+                    iti.issue_id
+                )
             },
         })
         asmt = db.session.query(models.Assessment).get(asmt_id)
@@ -591,7 +644,13 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'component_id': '11111',
                 'hotlist_id': '222222',
                 'issue_priority': 'P4',
+                'issue_type': 'PROCESS',
                 'issue_severity': 'S3',
+                'title': 'Default Title',
+                'issue_id': iti.issue_id,
+                'issue_url': integration_utils.build_issue_tracker_url(
+                    iti.issue_id
+                )
             },
         })
       self.api.delete(asmt)
@@ -619,6 +678,9 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
               'priority': u'P4',
               'type': constants.DEFAULT_ISSUETRACKER_VALUES['issue_type'],
               'severity': u'S3',
+              'assignee': '',
+              'verifier': '',
+              'reporter': '',
               'ccs': [],
               'component_id': 11111
           })
@@ -627,7 +689,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_assignee(self, mocked_update_issue):
-    """Test assignee sync in case it has been updated."""
+    """Assigneee shouldn't be update, only on synchronization"""
     email1 = "email1@example.com"
     email2 = "email2@example.com"
     assignee_role_id = AccessControlRole.query.filter_by(
@@ -637,45 +699,76 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     assignees = [factories.PersonFactory(email=email2),
                  factories.PersonFactory(email=email1)]
     iti_issue_id = []
-    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=True,
+        component_id=12345,
+        issue_type="PROCESS",
+        issue_severity="S4",
+        issue_priority="P4"
+    )
     iti_issue_id.append(iti.issue_id)
     asmt = iti.issue_tracked_obj
-    asmt_title = asmt.title
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
              for assignee in assignees]
       self.api.put(asmt, {
           "access_control_list": acl
       })
       kwargs = {'status': 'ASSIGNED',
-                'component_id': None,
-                'severity': None,
-                'title': asmt_title,
+                'component_id': 12345,
+                'severity': "S4",
+                'title': iti.title,
                 'hotlist_ids': [],
-                'priority': None,
-                'assignee': email1,
-                'verifier': email1}
+                'priority': "P4"}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
   @mock.patch('ggrc.integrations.issues.Client.update_issue')
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_title(self, mocked_update_issue):
     """Test title sync in case it has been updated."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       iti_issue_id = []
-      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          component_id='123123',
+          issue_severity='S2',
+          issue_priority='P2'
+      )
       iti_issue_id.append(iti.issue_id)
       asmt = iti.issue_tracked_obj
       new_title = "New Title"
-      self.api.put(asmt, {"title": new_title})
+      self.api.put(
+          asmt,
+          {
+              "issue_tracker": {
+                  "component_id": iti.component_id,
+                  "enabled": True,
+                  "issue_priority": iti.issue_priority,
+                  "issue_severity": iti.issue_severity,
+                  "issue_type": constants.DEFAULT_ISSUETRACKER_VALUES[
+                      "issue_type"
+                  ],
+                  "title": new_title,
+                  "issue_id": iti.issue_id,
+                  "issue_url": integration_utils.build_issue_tracker_url(
+                      iti.issue_id
+                  )
+              }
+          })
       kwargs = {'status': 'ASSIGNED',
-                'component_id': None,
-                'severity': None,
+                'component_id': int(iti.component_id),
+                'severity': iti.issue_severity,
                 'title': new_title,
                 'hotlist_ids': [],
-                'priority': None}
+                'priority': iti.issue_priority}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
       issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
@@ -685,10 +778,19 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_due_date(self, mocked_update_issue):
     """Test title sync in case it has been updated."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       iti_issue_id = []
-      iti = factories.IssueTrackerIssueFactory(enabled=True)
+      iti = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          component_id="123123",
+          issue_type="PROCESS",
+          issue_priority="P2",
+          issue_severity="S2"
+      )
       iti_issue_id.append(iti.issue_id)
       asmt = iti.issue_tracked_obj
       new_due_date = '2018-09-25'
@@ -703,11 +805,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           'title': 'title'
       })
       kwargs = {'status': 'ASSIGNED',
-                'component_id': None,
-                'severity': None,
-                'title': 'title',
+                'component_id': 123123,
+                'severity': "S2",
+                'title': iti.title,
                 'hotlist_ids': [],
-                'priority': None,
+                'priority': "P2",
                 'custom_fields': custom_fields}
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
@@ -717,17 +819,25 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   # pylint: disable=protected-access
   # pylint: disable=too-many-locals
   @ddt.data(
-      ('Not Started', {'status': 'ASSIGNED'}),
-      ('In Progress', {'status': 'ASSIGNED'}),
-      ('In Review', {'status': 'FIXED'}),
-      ('Rework Needed', {'status': 'ASSIGNED'}),
+      ('Not Started', {
+          'status': 'ASSIGNED'
+      }),
+      ('In Progress', {
+          'status': 'ASSIGNED'
+      }),
+      ('In Review', {
+          'status': 'FIXED'
+      }),
+      ('Rework Needed', {
+          'status': 'ASSIGNED'
+      }),
       ('Completed', {
           'status': 'VERIFIED',
-          'comment': assessment_integration._STATUS_CHANGE_COMMENT_TMPL
+          'comment': constants.STATUS_CHANGE_TMPL
       }),
       ('Deprecated', {
           'status': 'OBSOLETE',
-          'comment': assessment_integration._STATUS_CHANGE_COMMENT_TMPL
+          'comment': constants.STATUS_CHANGE_TMPL
       }),
   )
   @ddt.unpack
@@ -745,109 +855,44 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     ).first().id
     assignees = [factories.PersonFactory(email=email1)]
     iti_issue_id = []
-    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    iti = factories.IssueTrackerIssueFactory(
+        enabled=True,
+        component_id="123123",
+        issue_type="PROCESS",
+        issue_priority="P2",
+        issue_severity="S2"
+    )
     iti_issue_id.append(iti.issue_id)
     asmt = iti.issue_tracked_obj
-    asmt_title = asmt.title
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
              for assignee in assignees]
       self.api.put(asmt, {
           "access_control_list": acl,
           "status": status,
       })
-      kwargs = {'component_id': None,
-                'severity': None,
-                'title': asmt_title,
+      kwargs = {'component_id': 123123,
+                'severity': "S2",
+                'title': iti.title,
                 'hotlist_ids': [],
-                'priority': None,
-                'assignee': email1,
-                'verifier': email1}
-      asmt_link = assessment_integration._get_assessment_url(asmt)
+                'priority': "P2"}
+      asmt_link = tracker_handler._get_assessment_page_url(asmt)
       if 'comment' in additional_kwargs:
-        additional_kwargs['comment'] = \
-            additional_kwargs['comment'] % (status, asmt_link)
+        try:
+          additional_kwargs['comment'] = \
+              additional_kwargs['comment'] % (status, asmt_link)
+        except TypeError:
+          pass
       kwargs.update(additional_kwargs)
       mocked_update_issue.assert_called_once_with(iti_issue_id[0], kwargs)
 
       issue = db.session.query(models.IssuetrackerIssue).get(iti.id)
-      self.assertEqual(issue.assignee, email1)
       self.assertEqual(issue.cc_list, "")
-
-  def test_collect_audit_emails(self):
-    """Test _collect_audit_emails function."""
-    audit_captains = factories.PersonFactory.create_batch(3)
-    auditors = factories.PersonFactory.create_batch(3)
-
-    audit_captain_role_id = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name == "Audit Captains",
-        all_models.AccessControlRole.object_type == "Audit",
-    ).one().id
-    auditor_role_id = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name == "Auditors",
-        all_models.AccessControlRole.object_type == "Audit",
-    ).one().id
-
-    acl_data = self._prepare_acl(
-        {
-            audit_captain_role_id: audit_captains,
-            auditor_role_id: auditors
-        }
-    )
-    with app.app_context():
-      # pylint: disable=protected-access
-      reporter_email, cc_list = assessment_integration._collect_audit_emails(
-          acl_data
-      )
-    audit_reporter = audit_captains[0].email
-    audit_ccs = set(captain.email for captain in audit_captains[1:])
-    self.assertEquals(reporter_email, audit_reporter)
-    self.assertEquals(set(cc_list), audit_ccs)
-
-  def test_audit_emails_wh_captains(self):
-    """Test _collect_audit_emails without Audit Captains."""
-    auditors = factories.PersonFactory.create_batch(3)
-    auditor_role_id = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name == "Auditors",
-        all_models.AccessControlRole.object_type == "Audit",
-    ).one().id
-
-    acl_data = self._prepare_acl(
-        {
-            auditor_role_id: auditors,
-        }
-    )
-    with app.app_context():
-      # pylint: disable=protected-access
-      reporter_email, cc_list = assessment_integration._collect_audit_emails(
-          acl_data
-      )
-    self.assertEquals(reporter_email, "")
-    self.assertEquals(cc_list, [])
-
-  def test_audit_emails_wh_auditors(self):
-    """Test _collect_audit_emails without Auditors."""
-    audit_captains = factories.PersonFactory.create_batch(3)
-    audit_captain_role_id = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name == "Audit Captains",
-        all_models.AccessControlRole.object_type == "Audit",
-    ).one().id
-
-    acl_data = self._prepare_acl(
-        {
-            audit_captain_role_id: audit_captains
-        }
-    )
-    with app.app_context():
-      # pylint: disable=protected-access
-      reporter_email, cc_list = assessment_integration._collect_audit_emails(
-          acl_data
-      )
-    audit_reporter = audit_captains[0].email
-    audit_ccs = set(captain.email for captain in audit_captains[1:])
-    self.assertEquals(reporter_email, audit_reporter)
-    self.assertEquals(set(cc_list), audit_ccs)
 
   @staticmethod
   def _prepare_acl(configurations):
@@ -872,36 +917,37 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_basic_import(self, mock_create_issue, mock_update_issue):
     """Test basic import functionality."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
-      # update existing object
-      iti = factories.IssueTrackerIssueFactory(enabled=True)
-      asmt = iti.issue_tracked_obj
-      audit = asmt.audit
-      response = self.import_data(OrderedDict([
-          ('object_type', 'Assessment'),
-          ('Code*', asmt.slug),
-          ('Audit', audit.slug),
-      ]))
-      self._check_csv_response(response, {})
+    # update existing object
+    iti = factories.IssueTrackerIssueFactory(enabled=True)
+    asmt = iti.issue_tracked_obj
+    audit = asmt.audit
+    response = self.import_data(OrderedDict([
+        ('object_type', 'Assessment'),
+        ('Code*', asmt.slug),
+        ('Audit', audit.slug),
+    ]))
+    self._check_csv_response(response, {})
 
-      # import new object
-      response = self.import_data(OrderedDict([
-          ('object_type', 'Assessment'),
-          ('Code*', 'Test Code'),
-          ('Audit', audit.slug),
-          ('Creators', 'user@example.com'),
-          ('Assignees*', 'user@example.com'),
-          ('Title', 'Some Title'),
-      ]))
-      self._check_csv_response(response, {})
+    # import new object
+    response = self.import_data(OrderedDict([
+        ('object_type', 'Assessment'),
+        ('Code*', 'Test Code'),
+        ('Audit', audit.slug),
+        ('Creators', 'user@example.com'),
+        ('Assignees*', 'user@example.com'),
+        ('Title', 'Some Title'),
+    ]))
+    self._check_csv_response(response, {})
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_audit_delete(self, mock_create_issue):
     """Test deletion of an audit."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       audit = factories.AuditFactory()
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=audit,
@@ -923,16 +969,20 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_ccs_many_audit_captains(self, mock_update_issue):
-    """CCS of assessment should include secondary audit captains."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
+    """CCS shouldn't be calculated on update, only synchronization"""
+    del mock_update_issue  # Unused
+    with mock.patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       audit = factories.AuditFactory()
       audit_captains = factories.PersonFactory.create_batch(2)
       audit_captain_role = all_models.AccessControlRole.query.filter_by(
           name="Audit Captains",
           object_type="Audit"
       ).one()
-      response_audit = self.api.put(
+      self.api.put(
           audit,
           {
               "access_control_list": [
@@ -945,17 +995,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                   } for audit_captain in audit_captains]
           }
       )
-      self.assert200(response_audit)
-      issue_tracker_audit = all_models.IssuetrackerIssue.query.filter_by(
-          object_id=audit.id,
-          object_type=audit.type
-      ).one()
-      audit_cc = issue_tracker_audit.cc_list
-      self.assertEqual(
-          audit_cc,
-          audit_captains[1].email
-      )
-
       assessment = factories.AssessmentFactory(
           audit=audit
       )
@@ -983,8 +1022,12 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                   "hotlist_id": "222222",
                   "issue_priority": "P2",
                   "issue_severity": "S2",
+                  "title": "Assessment Title",
                   "issue_type": "PROCESS",
-                  "issue_id": assessment_issue.issue_id
+                  "issue_id": assessment_issue.issue_id,
+                  "issue_url": integration_utils.build_issue_tracker_url(
+                      assessment_issue.issue_id
+                  )
               },
               "access_control_list": [
                   {
@@ -1013,12 +1056,61 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           object_type=assessment.type
       ).one()
       issue_tracker_cc = issue_tracker_assessment.cc_list.split(',')[0]
-      assessment_emails = [person.email for person in assessment_persons]
-      self.assertIn(issue_tracker_cc, assessment_emails)
+      self.assertIn(issue_tracker_cc, "")
+
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      '_is_tracker_enabled',
+      return_value=True
+  )
+  @ddt.data((True, 123),)
+  @ddt.unpack
+  def test_issue_tracker_error(self, issue_tracker_enabled, issue_id,
+                               issue_enabled):
+    """Test that issue tracker does not change state
+    in case receiving an error."""
+    del issue_enabled  # Unused
+    with mock.patch.object(
+        sync_utils,
+        'update_issue'
+    ) as update_issue_mock:
+      error_data = integrations_errors.Error('data')
+      update_issue_mock.side_effect = error_data
+      issue = factories.IssueTrackerIssueFactory(
+          enabled=issue_tracker_enabled,
+          issue_id=issue_id
+      )
+      src = {
+          'issue_tracker': {
+              'enabled': issue_tracker_enabled,
+              'issue_id': issue_id,
+              'issue_url': integration_utils.build_issue_tracker_url(
+                  issue_id
+              ),
+              'component_id': '1111',
+              'issue_type': 'PROCESS',
+              'issue_priority': 'P2',
+              'issue_severity': 'S2',
+              'title': 'Title'
+          }
+      }
+      assessment_integration._hook_assmt_issue_update(
+          sender=None,
+          obj=issue.issue_tracked_obj,
+          src=src,
+          initial_state=issue.issue_tracked_obj
+      )
+      update_issue_mock.assert_called_once()
+      issue_obj = models.IssuetrackerIssue.get_issue(
+          "Assessment",
+          issue.issue_tracked_obj.id
+      )
+      self.assertEqual(issue_obj.enabled, issue_tracker_enabled)
 
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'
-            'assessment_integration._is_issue_tracker_enabled',
+            'assessment_integration.AssessmentTrackerHandler.'
+            '_is_tracker_enabled',
             return_value=True)
 @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
 @mock.patch('ggrc.integrations.issues.Client')
@@ -1117,11 +1209,12 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     })
     issue_tracker_with_defaults = {
         'enabled': True,
-        'component_id': hash('Default Component id'),
-        'hotlist_id': hash('Default Hotlist id'),
-        'issue_type': 'Default Issue type',
-        'issue_priority': 'Default Issue priority',
-        'issue_severity': 'Default Issue severity',
+        'component_id': 123123,
+        'hotlist_id': 123123,
+        'issue_type': 'PROCESS',
+        'issue_priority': 'P2',
+        'issue_severity': 'S2',
+        'title': 'Default Title'
     }
     issue_tracker_with_defaults.update(issue_tracker or {})
 
@@ -1146,11 +1239,12 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
         if role_name in ('Audit Captains', 'Auditors')
     })
 
-    component_id = hash('Component id')
-    hotlist_id = hash('Hotlist id')
-    issue_type = 'Issue type'
-    issue_priority = 'Issue priority'
-    issue_severity = 'Issue severity'
+    component_id = constants.DEFAULT_ISSUETRACKER_VALUES['component_id']
+    hotlist_id = constants.DEFAULT_ISSUETRACKER_VALUES['hotlist_id']
+    issue_type = constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
+    issue_priority = constants.DEFAULT_ISSUETRACKER_VALUES['issue_priority']
+    issue_severity = constants.DEFAULT_ISSUETRACKER_VALUES['issue_severity']
+    title = 'Issue Title'
 
     asmt = self.create_asmt_with_issue_tracker(
         role_name_to_people={
@@ -1163,25 +1257,29 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
             'issue_type': issue_type,
             'issue_priority': issue_priority,
             'issue_severity': issue_severity,
+            'title': title
         },
     )
 
     expected_cc_list = list(
         self.EMAILS["Assessment", "Assignees"] -
         {min(self.EMAILS["Assessment", "Assignees"])}
+    ) + list(
+        self.EMAILS["Audit", "Audit Captains"] -
+        {min(self.EMAILS["Audit", "Audit Captains"])}
     )
-
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
     # pylint: disable=protected-access; we assert by non-exported constants
     client_instance.create_issue.assert_called_once_with({
         # common fields
-        'comment': (assessment_integration._INITIAL_COMMENT_TMPL %
-                    assessment_integration._get_assessment_url(asmt)),
+        'comment': (constants.INITIAL_COMMENT_TMPL %
+                    tracker_handler._get_assessment_page_url(asmt)),
         'component_id': component_id,
         'hotlist_ids': [hotlist_id],
         'priority': issue_priority,
         'severity': issue_severity,
         'status': 'ASSIGNED',
-        'title': asmt.title,
+        'title': title,
         'type': issue_type,
 
         # person-related fields
@@ -1209,5 +1307,4 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     )
 
     client_instance.create_issue.assert_called_once()
-    self.assertIs(client_instance.create_issue.call_args[0][0]['reporter'],
-                  None)
+    self.assertIs(client_instance.create_issue.call_args[0][0]['reporter'], '')

@@ -12,7 +12,6 @@ import mock
 
 from ggrc import settings, models, db
 from ggrc.models import all_models
-from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.converters import errors
 from ggrc.converters.handlers import issue_tracker
 from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
@@ -36,9 +35,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   def test_asmt_creation_detached(self, mock_create_issue):
     """Test assessment creation via import detached from IssueTracker hooks."""
-    with mock.patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                           return_value=True):
-      self.import_file("assessment_full_no_warnings.csv")
+    self.import_file("assessment_full_no_warnings.csv")
     mock_create_issue.assert_not_called()
 
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
