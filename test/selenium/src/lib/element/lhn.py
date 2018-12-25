@@ -3,6 +3,7 @@
 """LHN elements."""
 # pylint: disable=not-callable
 # pylint: disable=not-an-iterable
+# pylint: disable=duplicate-code
 
 from selenium.common import exceptions as selenium_exception
 
@@ -48,6 +49,18 @@ class DropdownStatic(base.Dropdown):
 
   def __init__(self, driver):
     super(DropdownStatic, self).__init__(driver, self._locator_element)
+
+  def toggle(self, menu_item):
+    """Toggle menu item by name"""
+    return getattr(self, 'toggle_' + menu_item)
+
+  def is_selectable(self, menu_item):
+    """Check menu item is selectable by name"""
+    return hasattr(self, 'select_' + menu_item)
+
+  def select(self, menu_item):
+    """Select menu item by name"""
+    return getattr(self, 'select_' + menu_item)()
 
 
 class AccordionGroup(base.DropdownDynamic):
@@ -123,3 +136,7 @@ class AccordionGroup(base.DropdownDynamic):
       return extended_info.ExtendedInfo(self._driver)
     except selenium_exception.StaleElementReferenceException:
       return self.hover_over_visible_member(member_title)
+
+  def toggle(self, menu_item):
+    """Toggle menu item by name"""
+    return getattr(self, 'toggle_' + menu_item)
