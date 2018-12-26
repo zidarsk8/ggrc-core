@@ -338,10 +338,12 @@ class TestSnapshots(base.Test):
   @pytest.mark.parametrize(
       "control_for_mapper, control_for_tree_view, dynamic_objects, "
       "dynamic_relationships, expected_map_statuses, expected_is_found",
-      [("new_control_rest", "update_control_rest", "new_audit_rest",
-        None, (True, True), False),
-       ("update_control_rest", "update_control_rest", "new_audit_rest",
-        None, (True, True), True),
+      [pytest.param(
+          "new_control_rest", "new_control_rest", None, None, (True, True),
+          False, marks=pytest.mark.xfail(reason="GGRC-6523")),
+       pytest.param(
+           "update_control_rest", "new_control_rest", None, None, (True, True),
+           True, marks=pytest.mark.xfail(reason="GGRC-6523")),
        ("new_control_rest", None, "new_assessment_rest",
         None, (False, False), True),
        ("update_control_rest", None, "new_assessment_rest",
@@ -350,9 +352,9 @@ class TestSnapshots(base.Test):
         "map_new_audit_rest_to_new_issue_rest", (False, False), False),
        ("update_control_rest", None, "new_issue_rest",
         "map_new_audit_rest_to_new_issue_rest", (False, False), True)],
-      ids=["Mapper: snapshoted version is not found for new Audit "
+      ids=["Mapper: snapshoted version is not found for Audit "
            "which based on Program w' updated Control; "
-           "Tree View: snapshotable Control is mapped to new Audit.",
+           "Tree View: snapshotable Control is mapped to Audit.",
            "Mapper: Actual snapshotable Control is found and mapped to new "
            "Audit which based on Program w' updated Control; "
            "Tree View: snapshotable Control is mapped to new Audit.",
@@ -378,7 +380,9 @@ class TestSnapshots(base.Test):
     Mapper modal and check their correct mapping.
     """
     audit_with_one_control = create_audit_with_control_and_update_control
-    source_obj = dynamic_objects
+    source_obj = (
+        audit_with_one_control["new_audit_rest"][0] if not dynamic_objects else
+        dynamic_objects)
     expected_control_from_mapper = (
         audit_with_one_control[control_for_mapper][0].repr_ui())
     expected_control_from_tree_view = (
