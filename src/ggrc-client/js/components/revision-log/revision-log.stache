@@ -10,7 +10,7 @@
         <label class="flex-box">
           <input type="checkbox"
                  ($change)="changeLastUpdatesFilter(%element)"
-                 {($checked)}="showLastReviewUpdates"
+                 {($checked)}="options.showLastReviewUpdates"
           />
           Show updates after last review
         </label>

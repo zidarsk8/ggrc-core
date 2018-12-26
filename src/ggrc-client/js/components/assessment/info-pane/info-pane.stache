@@ -494,7 +494,7 @@
 
           <tab-panel {(panels)}="panels" title-text="Change Log">
               {{#instance}}
-                <revision-log {instance}="instance"></revision-log>
+                <revision-log {instance}="instance" {options}="tabOptions"></revision-log>
               {{/instance}}
           </tab-panel>
       </tab-container>

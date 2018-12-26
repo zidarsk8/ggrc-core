@@ -40,16 +40,8 @@ export default can.Component.extend({
           });
         },
       },
-      showLastReviewUpdates: {
-        get() {
-          const review = this.attr('review');
-
-          return (review && review.getShowLastReviewUpdates) ?
-            review.getShowLastReviewUpdates() :
-            false;
-        },
-      },
     },
+    options: {},
     instance: null,
     review: null,
     isLoading: false,
@@ -216,7 +208,7 @@ export default can.Component.extend({
       return revision;
     },
     _fetchRevisionsDataByQuery() {
-      let fetchRevisions = this.attr('showLastReviewUpdates') ?
+      let fetchRevisions = this.attr('options.showLastReviewUpdates') ?
         this.getAfterReviewRevisions.bind(this) :
         this.getAllRevisions.bind(this);
 
@@ -248,24 +240,14 @@ export default can.Component.extend({
     },
     changeLastUpdatesFilter(element) {
       const isChecked = element.checked;
+      this.attr('options.showLastReviewUpdates', isChecked);
 
-      const review = this.attr('review');
-      if (review) {
-        review.setShowLastReviewUpdates(isChecked);
-      }
       this.attr('pageInfo.current', 1);
       this.fetchItems();
     },
     getLastUpdatesFlag() {
       return this.attr('showFilter') &&
-        this.attr('showLastReviewUpdates');
-    },
-    resetLastUpdatesFlag() {
-      const review = this.attr('review');
-
-      if (review) {
-        review.setShowLastReviewUpdates(false);
-      }
+        this.attr('options.showLastReviewUpdates');
     },
     initObjectReview() {
       const review = this.attr('instance.review');
@@ -297,7 +279,7 @@ export default can.Component.extend({
       this.viewModel.fetchItems();
     },
     removed() {
-      this.viewModel.resetLastUpdatesFlag();
+      this.viewModel.attr('options.showLastReviewUpdates', false);
     },
   },
 });
