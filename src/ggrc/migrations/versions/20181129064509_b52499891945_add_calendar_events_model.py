@@ -43,5 +43,5 @@ def upgrade():
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  op.drop_index('ix_calendar_events_due_date', table_name='calendar_events')
+  op.drop_index('ix_calendar_events', table_name='calendar_events')
   op.drop_table('calendar_events')

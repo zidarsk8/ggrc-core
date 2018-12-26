@@ -410,6 +410,7 @@ def show_daily_digest_notifications():
 
 def send_calendar_events():
   """Sends calendar events."""
+  error_msg = None
   try:
     builder = calendar_event_builder.CalendarEventBuilder()
     builder.build_cycle_tasks()
@@ -417,8 +418,8 @@ def send_calendar_events():
     sync.sync_cycle_tasks_events()
   except Exception as exp:
     logger.error(exp.message)
-    return utils.make_simple_response(exp.message)
-  return utils.make_simple_response()
+    error_msg = exp.message
+  return utils.make_simple_response(error_msg)
 
 
 def get_app_engine_email():

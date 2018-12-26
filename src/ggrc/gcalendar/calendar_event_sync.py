@@ -6,6 +6,7 @@
 import logging
 import datetime
 from sqlalchemy.orm import load_only
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models import all_models
@@ -26,16 +27,20 @@ class CalendarEventsSync(object):
   def sync_cycle_tasks_events(self):
     """Generates Calendar Events descriptions."""
     events = all_models.CalendarEvent.query.options(
+        orm.joinedload("attendee").load_only(
+            "email",
+        ),
         load_only(
             all_models.CalendarEvent.id,
             all_models.CalendarEvent.external_event_id,
+            all_models.CalendarEvent.title,
             all_models.CalendarEvent.description,
             all_models.CalendarEvent.attendee_id,
             all_models.CalendarEvent.due_date,
             all_models.CalendarEvent.last_synced_at
         )
     ).all()
-    _, event_mappings = utils.get_related_mapping(
+    event_mappings, _ = utils.get_related_mapping(
         left=all_models.CalendarEvent,
         right=all_models.CycleTaskGroupObjectTask
     )
