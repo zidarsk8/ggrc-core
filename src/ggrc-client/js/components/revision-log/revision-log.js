@@ -46,14 +46,19 @@ export default can.Component.extend({
     review: null,
     isLoading: false,
     revisions: null,
-    getOriginRevision() {
+    // for last revision where properties of objects was changed,
+    // we need fetch additional revision for calculating diff
+    getRevisionForCompare(lastRevision) {
       const instance = this.attr('instance');
+      const createdAt = moment(lastRevision.created_at)
+        .format('YYYY-MM-DD HH:mm:ss');
       const filter = QueryParser.parse(
         `resource_type = ${instance.type} AND
-         resource_id = ${instance.id}`);
+         resource_id = ${instance.id} AND
+         created_at < "${createdAt}"`);
       const page = {
         current: 1,
-        pageSize: 2,
+        pageSize: 1,
         sort: [{
           direction: 'desc',
           key: 'created_at',
@@ -69,6 +74,11 @@ export default can.Component.extend({
 
       return batchRequests(params).then((data) => {
         return this.makeRevisionModels(data.Revision);
+      }).then((revisions) => {
+        let rq = new RefreshQueue();
+        this._fetchAdditionalInfoForRevisions(rq, revisions);
+
+        return rq.trigger().then(() => revisions);
       });
     },
     getAllRevisions() {
@@ -163,8 +173,8 @@ export default can.Component.extend({
         tracker.USER_ACTIONS.CHANGE_LOG);
 
       return this._fetchRevisionsDataByQuery()
-        .done((revisions) => {
-          this.attr('revisions', revisions);
+        .done((revisionsData) => {
+          this.attr('revisions', revisionsData);
           stopFn();
         })
         .fail(function () {
@@ -212,31 +222,42 @@ export default can.Component.extend({
         this.getAfterReviewRevisions.bind(this) :
         this.getAllRevisions.bind(this);
 
-      return $.when(fetchRevisions(), this.getOriginRevision()).then(
-        (revisions, originalRevisions) => {
+      return fetchRevisions().then(
+        (revisions) => {
           let rq = new RefreshQueue();
-
           this._fetchAdditionalInfoForRevisions(rq, revisions);
-          this._fetchAdditionalInfoForRevisions(rq, originalRevisions);
 
-          return rq.trigger().then(function () {
-            let objRevisions = [];
-            let mappings = [];
-            _.forEach(revisions, (revision) => {
-              if (revision.destination || revision.source) {
-                mappings.push(revision);
-              } else {
-                objRevisions.push(revision);
-              }
+          let dfdForCompare = $.Deferred().resolve([]);
+          // find last revision with modified content by excluding revisions with mappings
+          const lastModifiedRevision = _.findLast(revisions,
+            (revision) => !revision.source && !revision.destination);
+
+          if (lastModifiedRevision) {
+            dfdForCompare = this.getRevisionForCompare(lastModifiedRevision);
+          }
+
+          return $.when(dfdForCompare, rq.trigger())
+            .then((revisionsForCompare) => {
+              return this.composeRevisionsData(revisions, revisionsForCompare);
             });
-
-            return {
-              object: _.map(objRevisions, this._reifyRevision),
-              mappings: _.map(mappings, this._reifyRevision),
-              originalRevisions: _.map(originalRevisions, this._reifyRevision),
-            };
-          });
         });
+    },
+    composeRevisionsData(revisions, revisionsForCompare = []) {
+      let objRevisions = [];
+      let mappings = [];
+      _.forEach(revisions, (revision) => {
+        if (revision.destination || revision.source) {
+          mappings.push(revision);
+        } else {
+          objRevisions.push(revision);
+        }
+      });
+
+      return {
+        object: _.map(objRevisions, this._reifyRevision),
+        mappings: _.map(mappings, this._reifyRevision),
+        revisionsForCompare: _.map(revisionsForCompare, this._reifyRevision),
+      };
     },
     changeLastUpdatesFilter(element) {
       const isChecked = element.checked;

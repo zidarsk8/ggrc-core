@@ -61,7 +61,8 @@ export default can.Component.extend({
 
       // combine all the changes and sort them by date descending
       changeHistory = _([]).concat(
-        can.makeArray(this._computeObjectChanges(revisions.object)),
+        can.makeArray(this._computeObjectChanges(revisions.object,
+          revisions.revisionsForCompare)),
         can.makeArray(this._computeMappingChanges(revisions.mappings)))
         .sortBy('updatedAt')
         .reverse()
@@ -232,13 +233,21 @@ export default can.Component.extend({
      * @param {Array} revisions - the list of revisions of the instance
      *   being handled by the component, sorted from oldest to newest.
      *
+     * @param {Array} revisionsForCompare - the list with one or zero revisions
+     *   if present will be used to compute changes for first revision.
+     *
      * @return {Array} - the history of changes to the instance. Each
      *   element follows the format returned by the `_objectChangeDiff` method.
      */
-    _computeObjectChanges: function (revisions) {
+    _computeObjectChanges: function (revisions, revisionsForCompare) {
+      let prevRevision = {content: {}};
+      if (revisionsForCompare.length === 1) {
+        prevRevision = revisionsForCompare[0];
+      }
+
       let diffList = _.map(revisions, function (revision, i) {
         // default to empty revision
-        let prev = revisions[i - 1] || {content: {}};
+        let prev = revisions[i - 1] || prevRevision;
         return this._objectChangeDiff(prev, revision);
       }.bind(this));
       return _.filter(diffList, 'changes.length');
