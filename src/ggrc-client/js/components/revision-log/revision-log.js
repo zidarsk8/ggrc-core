@@ -172,7 +172,7 @@ export default can.Component.extend({
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CHANGE_LOG);
 
-      return this._fetchRevisionsDataByQuery()
+      return this._fetchRevisionsData()
         .done((revisionsData) => {
           this.attr('revisions', revisionsData);
           stopFn();
@@ -217,7 +217,7 @@ export default can.Component.extend({
         });
       return revision;
     },
-    _fetchRevisionsDataByQuery() {
+    _fetchRevisionsData() {
       let fetchRevisions = this.attr('options.showLastReviewUpdates') ?
         this.getAfterReviewRevisions.bind(this) :
         this.getAllRevisions.bind(this);
