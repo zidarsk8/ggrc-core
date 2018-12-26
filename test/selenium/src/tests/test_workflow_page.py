@@ -224,10 +224,11 @@ class TestActivateWorkflow(base.Test):
     assert (test_data["wf"].task_groups[0].task_group_tasks[0].title in
             test_data["assignee_email"].assigned_tasks)
 
-  def xfail_if_big_time_dalta(self, start_date, due_date):
+  def xfail_if_time_delta_more_2d(self, start_date, due_date):
     """Xfail test when time delta is bigger than 2 days, because
     notification section with due very soon tasks will not have cycle
-    task"""
+    task.
+    """
     if due_date - start_date > datetime.timedelta(days=2):
       pytest.xfail(
           reason="\nTime difference between start date and due date is more "
@@ -239,7 +240,7 @@ class TestActivateWorkflow(base.Test):
       self, selenium, test_data
   ):
     """Test cycle task assignee has notification about due very soon tasks."""
-    self.xfail_if_big_time_dalta(
+    self.xfail_if_time_delta_more_2d(
         test_data["wf"].task_groups[0].task_group_tasks[0].start_date,
         test_data["wf"].task_groups[0].task_group_tasks[0].due_date)
     assert (test_data["wf"].task_groups[0].task_group_tasks[0].title in

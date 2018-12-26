@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Daily emails."""
 
-from lib import base, environment
+from lib import base, constants, environment
 from lib.entities import entity
 from lib.utils import selenium_utils
 
@@ -18,6 +18,8 @@ class DailyEmails(base.WithBrowser):
     """Open page with daily emails."""
     selenium_utils.open_url(self.daily_emails_url)
     selenium_utils.wait_for_doc_is_ready(self._driver)
+    self._browser.element(xpath="//h1[contains(text(),'digest')]").wait_until(
+        lambda e: e.present, timeout=constants.ux.MAX_USER_WAIT_SECONDS)
 
   def user_email_element(self, user_name):
     """Get user's email element."""
