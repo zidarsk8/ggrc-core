@@ -5,9 +5,11 @@
 """
 
 import collections
+import itertools
 from logging import getLogger
 
 from sqlalchemy import exc
+from sqlalchemy.orm import attributes
 from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import ggrc.services
@@ -312,6 +314,7 @@ class ImportRowConverter(RowConverter):
     if self.block_converter.converter.dry_run or self.ignore:
       return
     try:
+      self._mark_obj_dirty()
       modified_objects = get_modified_objects(db.session)
       import_event = log_event(db.session, None)
       cache_utils.update_memcache_before_commit(
@@ -442,6 +445,14 @@ class ImportRowConverter(RowConverter):
       all_models.IssuetrackerIssue.create_or_update_from_dict(
           self.obj, self.issue_tracker
       )
+
+  def _mark_obj_dirty(self):
+    """Mark base object as dirty if new person was assigned to it."""
+    if any(
+        acp for acp in itertools.chain(db.session.new, db.session.deleted)
+        if isinstance(acp, all_models.AccessControlPerson)
+    ):
+      attributes.flag_modified(self.obj, '_access_control_list')
 
 
 class ExportRowConverter(RowConverter):

@@ -381,3 +381,48 @@ class TestControlsImport(TestCase):
     control = all_models.Control.query.first()
     self.assertEqual(len(control.assertions), 1)
     self.assertEqual(control.assertions[0].name, assertion_name)
+
+  def test_add_person_revision(self):
+    """Test Control revision created if new person is assigned in import."""
+    user = all_models.Person.query.filter_by(email="user@example.com").first()
+    control = factories.ControlFactory(modified_by=user)
+
+    revisions = db.session.query(all_models.Revision.action).filter_by(
+        resource_type=control.type,
+        resource_id=control.id
+    )
+    self.assertEqual(revisions.all(), [("created",)])
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", control.slug),
+        ("Admin", "user@example.com"),
+        ("Control Operators", "user@example.com"),
+        ("Control Owners", "user@example.com"),
+    ]))
+    self._check_csv_response(response, {})
+    self.assertEqual(revisions.all(), [('created',), ('modified',)])
+
+  def test_change_person_revision(self):
+    """Test Control revision created if person is changed in import."""
+    user = all_models.Person.query.filter_by(email="user@example.com").first()
+    with factories.single_commit():
+      control = factories.ControlFactory(modified_by=user)
+      person = factories.PersonFactory()
+      for role_name in ("Admin", "Control Operators", "Control Owners"):
+        control.add_person_with_role(person, role_name)
+
+    revisions = db.session.query(all_models.Revision.action).filter_by(
+        resource_type=control.type,
+        resource_id=control.id
+    )
+    self.assertEqual(revisions.all(), [("created",)])
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("Code*", control.slug),
+        ("Control Operators", "user@example.com"),
+        ("Control Owners", "user@example.com"),
+    ]))
+    self._check_csv_response(response, {})
+    self.assertEqual(revisions.all(), [('created',), ('modified',)])
