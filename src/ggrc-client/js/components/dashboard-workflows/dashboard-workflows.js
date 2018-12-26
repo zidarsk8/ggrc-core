@@ -91,12 +91,4 @@ export default can.Component.extend({
 
     return 0;
   },
-  /*
-    sort_by_end_date sorts workflows in assending order with respect to task_data.first_end_date
-    This should be called with workflows with current tasks.
-  */
-  sort_by_end_date(a, b) {
-    return (a.task_data.first_end_dateD.getTime() -
-      b.task_data.first_end_dateD.getTime());
-  },
 });
