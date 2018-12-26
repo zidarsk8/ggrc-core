@@ -226,7 +226,7 @@ class TestActivateWorkflow(base.Test):
         actual_wf_cycles[0].due_date, expected_wf_cycles[0].due_date)
     if (
         len(actual_wf_cycles) > len(expected_wf_cycles) and
-        datetime.utcnow().hour in range(0, 9)
+        datetime.datetime.utcnow().hour in range(0, 9)
     ):
       pytest.xfail(
           reason="\nGGRC-6491 There are more than 1 equal workflows:\n" +
