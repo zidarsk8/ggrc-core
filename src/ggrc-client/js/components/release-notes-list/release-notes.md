@@ -2,7 +2,7 @@
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Primary and Secondary Contacts in Control object is renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.d9jpeh222p9)
+[Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.d9jpeh222p9)
 
 [You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ypafmrujihtr)
 
@@ -70,9 +70,9 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
-### Primary and Secondary Contacts in Control object is renamed (v.1.35.0, 12/20/2018)
+### Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)
 
-Primary and Secondary Contacts in Control object is renamed. The new labels for this roles are Control Operator and Control Owner respectively.
+Primary and Secondary Contacts in Control object are renamed. The new labels for these roles are Control Operator and Control Owner respectively.
 
 ### You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)
 
