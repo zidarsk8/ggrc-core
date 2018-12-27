@@ -229,11 +229,10 @@ class TestActivateWorkflow(base.Test):
         datetime.datetime.utcnow().hour in range(0, 9)
     ):
       pytest.xfail(
-          reason="\nGGRC-6491 There are more than 1 equal workflows:\n" +
-                 actual_wf_cycles)
+          reason="\nGGRC-6491 There are more than 1 equal workflows:\n")
     elif len(actual_wf_cycles) != len(expected_wf_cycles):
       pytest.fail(msg="\nThere are different workflow count:\n" +
-                      actual_wf_cycles)
+                      len(actual_wf_cycles))
 
   def test_destructive_activate_repeat_on_workflow(
       self, app_repeat_on_workflow, selenium
