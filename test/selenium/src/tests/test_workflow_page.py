@@ -217,7 +217,7 @@ class TestActivateWorkflow(base.Test):
     # pylint: disable=invalid-name
     assert ui_facade.active_tab_name() == "Active Cycles (1)"
 
-  def test_assigned_task_notification(
+  def test_destructive_assigned_task_notification(
       self, selenium, test_data
   ):
     """Test cycle task assignee has notification about assigned tasks."""
@@ -236,7 +236,7 @@ class TestActivateWorkflow(base.Test):
                  "due very soon tasks will not have this cycle "
                  "task.\n".format(start_date, due_date))
 
-  def test_due_soon_task_notification(
+  def test_destructive_due_soon_task_notification(
       self, selenium, test_data
   ):
     """Test cycle task assignee has notification about due very soon tasks."""
@@ -246,7 +246,7 @@ class TestActivateWorkflow(base.Test):
     assert (test_data["wf"].task_groups[0].task_group_tasks[0].title in
             test_data["assignee_email"].due_soon_tasks)
 
-  def test_new_wf_cycle_notification(
+  def test_destructive_new_wf_cycle_notification(
       self, selenium, test_data
   ):
     """Test cycle task creator has notification about new wf started."""
