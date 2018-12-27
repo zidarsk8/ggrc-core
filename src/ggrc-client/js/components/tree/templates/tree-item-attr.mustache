@@ -7,7 +7,7 @@
 
   {{#case 'title'}}
     {{#if_instance_of instance 'Document|Evidence'}}
-      <a class="link" href="{{instance.link}}" target="_blank">
+      <a class="link" href="{{normalizeLink instance.link}}" target="_blank">
         {{instance.title}}
       </a>
     {{else}}

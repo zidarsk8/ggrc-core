@@ -6,7 +6,7 @@
     {{#if iconCls}}<i class="fa {{iconCls}}"></i>{{/if}}
     <div class="document-object-item__body">
         <a class="link"
-           href="{{itemData.link}}"
+           href="{{normalizeLink itemData.link}}"
            target="_blank"
            rel="tooltip"
            data-original-title="{{itemTitle}}">{{itemTitle}}</a>
