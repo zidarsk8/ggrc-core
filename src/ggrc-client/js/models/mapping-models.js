@@ -4,5 +4,5 @@
 */
 
 export {default as Relationship} from './service-models/relationship';
-export {default as TaskGroupObject} from './join-models/task-group-object';
-export {default as UserRole} from './join-models/user-role';
+export {default as TaskGroupObject} from './service-models/task-group-object';
+export {default as UserRole} from './service-models/user-role';

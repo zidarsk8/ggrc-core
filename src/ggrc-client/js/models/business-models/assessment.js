@@ -288,8 +288,7 @@ export default Cacheable('CMS.Models.Assessment', {
   },
   form_preload: function (newObjectForm) {
     let pageInstance = getPageInstance();
-    let currentUser = getInstance('Person',
-      GGRC.current_user.id, GGRC.current_user);
+    let currentUser = getInstance('Person', GGRC.current_user.id);
 
     if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
       if (pageInstance.type === 'Audit') {

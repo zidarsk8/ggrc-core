@@ -12,29 +12,6 @@
 
   $.migrateMute = true; // turn off console warnings for jQuery-migrate
 
-  root.cms_singularize = function (type) {
-    let _type = type.trim().toLowerCase();
-    switch (_type) {
-      case 'facilities':
-        type = type[0] + 'acility';
-        break;
-      case 'people':
-        type = type[0] + 'erson';
-        break;
-      case 'processes':
-        type = type[0] + 'rocess';
-        break;
-      case 'policies':
-        type = type[0] + 'olicy';
-        break;
-      case 'systems_processes':
-        type = type[0] + 'ystem_' + type[8] + 'rocess';
-        break;
-      default:
-        type = type.replace(/s$/, '');
-    }
-    return type;
-  };
   root.calculate_spinner_z_index = function () {
     let zindex = 0;
     $(this).parents().each(function () {
