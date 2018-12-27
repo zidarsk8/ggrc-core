@@ -84,6 +84,7 @@ permissions = {
         "CycleTaskGroup",
         "CycleTaskGroupObjectTask",
         "CycleTaskEntry",
+        "NotificationConfig",
     ],
     "create": [
         {
