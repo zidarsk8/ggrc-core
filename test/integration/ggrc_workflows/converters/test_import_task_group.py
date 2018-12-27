@@ -21,6 +21,78 @@ from integration.ggrc_workflows.models import factories as wf_factories
 class TestTaskGroupImport(WorkflowTestCase):
   """Tests related to TaskGroup import."""
 
+  WF_SLUG = "WORKFLOW-1"
+  TG_SLUG = "TASKGROUP-1"
+
+  def setUp(self):
+    super(TestTaskGroupImport, self).setUp()
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(slug=self.WF_SLUG)
+      task_group = wf_factories.TaskGroupFactory(
+          slug=self.TG_SLUG,
+          workflow=workflow
+      )
+      wf_factories.TaskGroupTaskFactory(task_group=task_group)
+      factories.PersonFactory(email="valid_user@example.com")
+
+  @ddt.data(
+      ("valid_user@example.com\nuser1@example.com",
+       [errors.MULTIPLE_ASSIGNEES.format(line=3, column_name="Assignee")]),
+      ("valid_user@example.com", []),
+  )
+  @ddt.unpack
+  def test_import_assignee(self, assignee, expected_warnings):
+    """Tests Assignee imported and set correctly for Task Group."""
+    data = collections.OrderedDict([
+        ("object_type", "TaskGroup"),
+        ("code", self.TG_SLUG),
+        ("workflow", self.WF_SLUG),
+        ("Assignee", assignee)
+    ])
+
+    response = self.import_data(data)
+
+    expected_messages = {
+        "Task Group": {
+            "row_warnings": set(expected_warnings),
+        },
+    }
+    self._check_csv_response(response, expected_messages)
+    task_group = all_models.TaskGroup.query.one()
+    self.assertEqual(task_group.contact.email, "valid_user@example.com")
+
+  @ddt.data(
+      ("user1@example.com", [],
+       [errors.NO_VALID_USERS_ERROR.format(line=3, column_name="Assignee")]),
+      ("user2@example.com\nuser1@example.com",
+       [errors.MULTIPLE_ASSIGNEES.format(line=3, column_name="Assignee")],
+       [errors.NO_VALID_USERS_ERROR.format(line=3, column_name="Assignee")]),
+      ("", [], [errors.MISSING_VALUE_ERROR.format(line=3,
+                                                  column_name="Assignee")]),
+  )
+  @ddt.unpack
+  def test_import_invalid_assignee(self,
+                                   assignee,
+                                   expected_warnings,
+                                   expected_errors):
+    """Tests Assignee import failed for Task Group."""
+    data = collections.OrderedDict([
+        ("object_type", "TaskGroup"),
+        ("code", self.TG_SLUG),
+        ("workflow", self.WF_SLUG),
+        ("Assignee", assignee)
+    ])
+    response = self.import_data(data)
+    expected_messages = {
+        "Task Group": {
+            "row_warnings": set(expected_warnings),
+            "row_errors": set(expected_errors),
+        },
+    }
+    self._check_csv_response(response, expected_messages)
+    task_group = all_models.TaskGroup.query.one()
+    self.assertFalse(task_group.contact)
+
   @ddt.data(
       (all_models.OrgGroup.__name__, True),
       (all_models.Vendor.__name__, True),
@@ -51,19 +123,16 @@ class TestTaskGroupImport(WorkflowTestCase):
   )
   @ddt.unpack
   def test_task_group_import_objects(self, model_name, is_mapped):
-    """"Test import TaskGroup with mapping to object: {0}"""
-    wf_slug = "WORKFLOW-1"
-    tg_slug = "TASKGROUP-1"
+    """"Tests import TaskGroup with mapping to object: {0}."""
+
     mapped_slug = "MAPPEDOBJECT-1"
     with factories.single_commit():
       factories.get_model_factory(model_name)(slug=mapped_slug)
-      workflow = wf_factories.WorkflowFactory(slug=wf_slug)
-      wf_factories.TaskGroupFactory(slug=tg_slug, workflow=workflow)
 
     tg_data = collections.OrderedDict([
         ("object_type", all_models.TaskGroup.__name__),
-        ("code", tg_slug),
-        ("workflow", wf_slug),
+        ("code", self.TG_SLUG),
+        ("workflow", self.WF_SLUG),
         ("objects", "{}: {}".format(model_name, mapped_slug))
     ])
     result = self.import_data(tg_data)
@@ -83,6 +152,43 @@ class TestTaskGroupImport(WorkflowTestCase):
           )
       )
 
+  def test_tgs_with_existing_slugs(self):
+    """Tests import of task group with existing slug.
+
+    When task groups with existing slugs are imported
+    they shouldn't be unmapped from the previous workflow.
+    Proper error should be displayed.
+    """
+
+    second_wf_slug = "WORKFLOW-2"
+    wf_factories.WorkflowFactory(slug=second_wf_slug)
+
+    second_tg_data = collections.OrderedDict([
+        ("object_type", all_models.TaskGroup.__name__),
+        ("code", self.TG_SLUG),
+        ("workflow", second_wf_slug)
+    ])
+    response = self.import_data(second_tg_data)
+
+    expected_error = errors.TASKGROUP_MAPPED_TO_ANOTHER_WORKFLOW.format(
+        line=3,
+        slug=self.TG_SLUG,
+    )
+
+    self.assertEquals([expected_error], response[0]['row_errors'])
+
+    first_wf = db.session.query(models.Workflow).filter(
+        models.Workflow.slug == self.WF_SLUG
+    ).one()
+    second_wf = db.session.query(models.Workflow).filter(
+        models.Workflow.slug == second_wf_slug
+    ).one()
+
+    self.assertEqual(db.session.query(models.TaskGroup).filter(
+        models.TaskGroup.workflow_id == first_wf.id).count(), 1)
+    self.assertEqual(db.session.query(models.TaskGroup).filter(
+        models.TaskGroup.workflow_id == second_wf.id).count(), 0)
+
 
 @ddt.ddt
 class TestTaskGroupTaskImport(WorkflowTestCase):
@@ -95,18 +201,19 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
                                                  unit=models.Workflow.DAY_UNIT)
     self.task_group = wf_factories.TaskGroupFactory(workflow=self.workflow)
 
-  @ddt.data((datetime.date(2018, 7, 13), datetime.date(2018, 7, 21),
-             {u"Line 3: Task Due Date can not occur on weekends."}),
-            (datetime.date(2018, 7, 14), datetime.date(2018, 7, 20),
-             {u"Line 3: Task Start Date can not occur on weekends."}),
-            (datetime.date(2018, 7, 14), datetime.date(2018, 7, 21),
-             {u"Line 3: Task Due Date can not occur on weekends.",
-              u"Line 3: Task Start Date can not occur on weekends."})
-            )
+  @ddt.data(
+      (datetime.date(2018, 7, 13), datetime.date(2018, 7, 21),
+       {u"Line 3: Task Due Date can not occur on weekends."}),
+      (datetime.date(2018, 7, 14), datetime.date(2018, 7, 20),
+       {u"Line 3: Task Start Date can not occur on weekends."}),
+      (datetime.date(2018, 7, 14), datetime.date(2018, 7, 21),
+       {u"Line 3: Task Due Date can not occur on weekends.",
+        u"Line 3: Task Start Date can not occur on weekends."})
+  )
   @ddt.unpack
   def test_task_group_task_weekend(self, start_date, end_date,
                                    expected_errors):
-    """Test TaskGroupTask import can't start/end on weekends"""
+    """Tests TaskGroupTask import can't start/end on weekends."""
 
     tgt_data = collections.OrderedDict([
         ("object_type", "Task Group Task"),
@@ -143,7 +250,7 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
   @ddt.unpack
   def test_import_change_task_date(self, start_date, end_date,
                                    expected_errors):
-    """Test import can't change start/end from weekdays to weekends"""
+    """Tests import can't change start/end from weekdays to weekends."""
 
     wf_factories.TaskGroupTaskFactory(
         task_group=self.task_group,
@@ -183,56 +290,3 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
     self._check_csv_response(response, expected_messages)
     self.assertEquals(start_date_before, start_date_after)
     self.assertEquals(end_date_before, end_date_after)
-
-
-class TestImportTasksGroupsWithExistingSlugs(WorkflowTestCase):
-  """
-  Test case when task groups with existing slugs
-  are imported.
-  """
-  def test_import_tgs_with_existing_slugs(self):
-    """
-    When tgs with existing slugs are imported
-    they shouldn't be unmapped from the previous wf.
-    Proper error should be displayed.
-    """
-    # pylint: disable=invalid-name
-    first_wf_slug = "WORKFLOW-1"
-    first_tg_slug = "TASKGROUP-1"
-    with factories.single_commit():
-      # create first workflow, it's tg and tgt
-      first_wf = wf_factories.WorkflowFactory(slug=first_wf_slug)
-      first_task_group = wf_factories.TaskGroupFactory(slug=first_tg_slug,
-                                                       workflow=first_wf)
-      wf_factories.TaskGroupTaskFactory(task_group=first_task_group)
-
-    second_wf_slug = "WORKFLOW-2"
-
-    # create second workflow
-    wf_factories.WorkflowFactory(slug=second_wf_slug)
-
-    # second tg has slug equals to the slug of the first tg
-    second_tg_data = collections.OrderedDict([
-        ("object_type", all_models.TaskGroup.__name__),
-        ("code", first_tg_slug),
-        ("workflow", second_wf_slug)
-    ])
-    response = self.import_data(second_tg_data)
-
-    expected_error = (u"Line 3: TaskGroup '%s' already "
-                      u"exists in the system and mapped "
-                      u"to another workflow. Please, "
-                      u"use different code for this TaskGroup" % first_tg_slug)
-    self.assertEquals([expected_error], response[0]['row_errors'])
-
-    first_wf = db.session.query(models.Workflow).filter(
-        models.Workflow.slug == first_wf_slug
-    ).one()
-    second_wf = db.session.query(models.Workflow).filter(
-        models.Workflow.slug == second_wf_slug
-    ).one()
-
-    self.assertEqual(db.session.query(models.TaskGroup).filter(
-        models.TaskGroup.workflow_id == first_wf.id).count(), 1)
-    self.assertEqual(db.session.query(models.TaskGroup).filter(
-        models.TaskGroup.workflow_id == second_wf.id).count(), 0)

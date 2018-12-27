@@ -352,7 +352,8 @@ class Workflow(roleable.Roleable,
       "is_verification_needed": {
           "display_name": "Need Verification",
           "mandatory": True,
-          "description": "This field is not changeable\nafter creation.",
+          "description": "This field is not changeable\nafter "
+                         "workflow activation.",
       },
       "notify_custom_message": "Custom email message",
       "notify_on_change": {

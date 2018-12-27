@@ -10,7 +10,7 @@
 <form action="javascript://" class="form">
   <div class="row-fluid">
     <div class="span12 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-      <label class="form__label">
+      <label class="form-label">
           Task Summary
           <i class="fa fa-asterisk"></i>
       </label>
@@ -22,7 +22,7 @@
   <div class="row-fluid">
     <div class="span8">
       {{#if_helpers '\n #if_equals' instance.task_type 'text' '\n or #if_equals' instance.task_type '' '\n or #if_null' instance.task_type}}
-        <label class="form__label">Task Description</label>
+        <label class="form-label">Task Description</label>
         <div class="rich-text">
           <rich-text
             tabindex="2"
@@ -32,7 +32,7 @@
           </rich-text>
         </div>
       {{else}}
-        <label class="form__label">
+        <label class="form-label">
           Selection Response Options (Comma Separated)
         </label>
           <textarea-array array="instance.response_options" class-name="span12 double" placeholder="Enter Description" tabindex="2"></textarea-array>
@@ -43,7 +43,7 @@
         <option value="menu" {{#if_equals instance.task_type 'menu'}}selected="selected"{{/if_equals}}>Dropdown</option>
         <option value="checkbox" {{#if_equals instance.task_type 'checkbox'}}selected="selected"{{/if_equals}}>Checkbox</option>
       </select>
-      <ggrc-modal-connector
+      <deferred-mapper
           {instance}="instance"
           {mapped-objects}="mappedObjects"
           {pre-mapped-objects}="preMappedObjects"
@@ -56,11 +56,9 @@
               ($click)="removeMappings(.)">
               <i class="fa fa-trash"></i>
             </a>
-            {{#update_link .}}
-              <a class="url" href="{{schemed_url link}}" target="_blank">
-                {{firstexist title name email link}}
-              </a>
-            {{/update_link}}
+            <a class="url" href="{{viewLink}}" target="_blank">
+              {{title}}
+            </a>
           </div>
         {{/each}}
         {{^list.length}}
@@ -76,7 +74,6 @@
               data-placement="left"
               data-toggle="unified-mapper"
               data-deferred="true"
-              data-object-source="true"
               data-join-object-id="{{instance.id}}"
               data-join-object-type="{{instance.class.model_singular}}"
               tabindex="6">
@@ -85,7 +82,7 @@
             {{/if_in}}
           </div>
         </div>
-      </ggrc-modal-connector>
+      </deferred-mapper>
     </div>
     <div class="span4">
       <div class="{{#instance.computed_errors.contact}} field-failure {{/instance.computed_errors.contact}}">
@@ -97,7 +94,7 @@
       <br>
       <div class="{{#instance.computed_errors.workflow}}field-failure{{/instance.computed_errors.workflow}} {{#instance.computed_errors.cycle}}field-failure{{/instance.computed_errors.cycle}}">
         {{#using workflow=instance.workflow}}
-          <label class="form__label" title="An active workflow should be created in advance">
+          <label class="form-label" title="An active workflow should be created in advance">
             Active Workflow
             <i class="fa fa-asterisk"></i>
           </label>
@@ -127,7 +124,7 @@
       <br>
       <div class="{{#instance.computed_errors.cycle_task_group}}field-failure{{/instance.computed_errors.cycle_task_group}}">
         {{#using cycle_task_group=instance.cycle_task_group}}
-          <label class="form__label">
+          <label class="form-label">
             Task Group
             <i class="fa fa-asterisk"></i>
           </label>
@@ -157,7 +154,7 @@
       {{#instance.computed_errors.cycle_task_group}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.cycle_task_group}}
       <div class="row-fluid">
         <div class="{{#instance.computed_errors.start_date}}field-failure{{/instance.computed_errors.start_date}}">
-          <label class="form__label">
+          <label class="form-label">
               Start Date
               <i class="fa fa-asterisk"></i>
           </label>
@@ -171,7 +168,7 @@
           </div>
         </div>
         <div class="{{#instance.computed_errors.end_date}}field-failure{{/instance.computed_errors.end_date}}">
-          <label class="form__label">
+          <label class="form-label">
               Due Date
               <i class="fa fa-asterisk"></i>
           </label>

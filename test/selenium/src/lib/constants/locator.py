@@ -441,7 +441,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
   ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
-  BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
   REF_URL_CSS = (By.CSS_SELECTOR, '[data-id="reference_url_hidden"]')
   SIGNIFICANCE = (
       By.CSS_SELECTOR, '[data-test-id="control_significance_18f15545"] label')

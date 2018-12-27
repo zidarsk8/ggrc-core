@@ -64,7 +64,7 @@ export default TreeLoader({
 
     this.options = new can.Map(defaults).attr(defaultOptions).attr(opts);
     if (opts instanceof can.Map) {
-      this.options = can.extend(this.options, opts);
+      this.options = Object.assign(this.options, opts);
     }
   },
 
@@ -106,7 +106,7 @@ export default TreeLoader({
     this.options.attr('child_options', this.options.child_options.slice(0));
     can.each(this.options.child_options, function (options, i) {
       this.options.child_options.attr(i,
-        new can.Map(can.extend(options.attr(), allowed)));
+        new can.Map(Object.assign(options.attr(), allowed)));
     }.bind(this));
 
     this._attached_deferred = can.Deferred();

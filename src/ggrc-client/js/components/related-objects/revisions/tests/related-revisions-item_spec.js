@@ -5,7 +5,7 @@
 
 import Component from '../related-revisions-item';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
-import * as Utils from '../../../../plugins/ggrc_utils';
+import * as Utils from '../../../../plugins/utils/user-utils';
 
 describe('RelatedRevisionsItem component', () => {
   let viewModel;

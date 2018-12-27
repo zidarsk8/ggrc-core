@@ -21,7 +21,7 @@ export default Cacheable('CMS.Models.Roleable', {
     let types = _.orderBy(getRoleableModels(), 'category', false);
 
     let instances = can.map(types, (type, i) => {
-      let withId = can.extend({}, type, {id: i});
+      let withId = Object.assign({}, type, {id: i});
       return new this(withId);
     });
 

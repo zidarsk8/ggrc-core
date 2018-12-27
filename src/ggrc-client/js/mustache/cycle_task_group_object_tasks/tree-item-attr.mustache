@@ -27,6 +27,15 @@
       </span>
     {{/using}}
   {{/case}}
+  {{#case 'is_verification_needed'}}
+      <span>
+        {{#if instance.is_verification_needed}}
+          Yes
+        {{else}}
+          No
+        {{/if}}
+      </span>
+  {{/case}}
   {{#default}}
     {{get_default_attr_value attr_name instance}}
   {{/default}}

@@ -219,6 +219,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
       [{"os_state": "Unreviewed"}, {"review_status": "Unreviewed"}, "Control"],
       [{"os_state": "Reviewed"}, {"review_status": "Reviewed"}, "Issue"],
       [{"os_state": "Unreviewed"}, {"review_status": "Unreviewed"}, "Market"],
+      [{"os_state": None}, {"review_status": "Unreviewed"}, "Control"]
   )
   @ddt.unpack
   def test_populated_review_status(self, content, expected_content,

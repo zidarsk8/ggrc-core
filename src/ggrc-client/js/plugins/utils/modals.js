@@ -95,7 +95,7 @@ function confirm(options, success, dismiss) {
     .then(() => {
       $target
         .modal({backdrop: 'static'})
-        .ggrc_controllers_modals(can.extend({
+        .ggrc_controllers_modals(Object.assign({
           new_object_form: false,
           button_view: BUTTON_VIEW_CONFIRM_CANCEL,
           modal_confirm: 'Confirm',
@@ -169,9 +169,32 @@ function _setupWarning(confirm, settings) {
     });
 }
 
+// make buttons non-clickable when saving
+const bindXHRToButton = (xhr, el, newtext, disable) => {
+  // binding of an ajax to a click is something we do manually
+  let $el = $(el);
+  let oldtext = $el[0] ? $el[0].innerHTML : '';
+
+  if (newtext) {
+    $el[0].innerHTML = newtext;
+  }
+  $el.addClass('disabled');
+  if (disable !== false) {
+    $el.attr('disabled', true);
+  }
+  xhr.always(() => {
+    // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
+    if ($el.length) {
+      $el.removeAttr('disabled')
+        .removeClass('disabled')[0].innerHTML = oldtext;
+    }
+  });
+};
+
 export {
   warning,
   confirm,
+  bindXHRToButton,
   BUTTON_VIEW_DONE,
   BUTTON_VIEW_CLOSE,
   BUTTON_VIEW_SAVE_CANCEL,

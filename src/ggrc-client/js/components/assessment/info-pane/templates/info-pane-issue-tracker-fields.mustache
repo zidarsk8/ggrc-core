@@ -9,43 +9,38 @@
       set-issue-title="true"
       (issue-tracker-switcher-changed)="saveInlineForm(%event)"
       {instance}="instance">
+      <ticket-id-checker
+        {instance}="instance"
+        {issue-tracker-enabled}="instance.issue_tracker.enabled"
+        (value-change)="inlineDropdownValueChange(%event)">
         <inline-edit-control
-          (inline-save)="inlineDropdownValueChange(%event)"
+          (inline-save)="checkTicketId(%event)"
           {is-edit-icon-denied}="isEditDenied"
           {dropdown-options}="instance.class.issue_tracker_enable_options"
           {instance}="instance"
-          {value}="instance.issue_tracker.enabled"
-          prop-name="issue_tracker.enabled"
+          {value}="issueTrackerEnabled"
           type="dropdown">
-            <confirm-edit-action
-              (set-edit-mode)="setEditModeInline(%event)"
-              (set-in-progress)="setInProgressState()"
+            <base-inline-control-title
+              class="inline__header"
+              {edit-mode}="editMode"
               {is-edit-icon-denied}="isEditIconDenied"
-              is-confirmation-needed="false"
-              {instance}="instance"
-              {on-state-change-dfd}="onStateChangeDfd"
-              {edit-mode}="editMode">
-                <base-inline-control-title
-                  class="inline__header"
-                  {edit-mode}="editMode"
-                  {is-edit-icon-denied}="isEditIconDenied"
-                  (set-edit-mode-inline)="confirmEdit()">
-                    <div class="ticket-info-header">
-                      <span class="ggrc-form__title">Ticket Tracker</span>
-                      {{#if instance.issueCreated}}
-                          <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                              Open Ticket
-                          </a>
-                      {{/if}}
-                        <div class="ggrc-form-item__small-text">
-                          <small>
-                            <em>Turns on Ticket Tracker integration.</em>
-                          </small>
-                        </div>
+              (set-edit-mode-inline)="setEditModeInline(%event)">
+                <div class="ticket-info-header">
+                  <span class="ggrc-form__title">Ticket Tracker</span>
+                  {{#if instance.issueCreated}}
+                      <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                          Open Ticket
+                      </a>
+                  {{/if}}
+                    <div class="ggrc-form-item__small-text">
+                      <small>
+                        <em>Turns on Ticket Tracker integration.</em>
+                      </small>
                     </div>
-                </base-inline-control-title>
-            </confirm-edit-action>
+                </div>
+            </base-inline-control-title>
         </inline-edit-control>
+      </ticket-id-checker>
     </issue-tracker-switcher>
   </div>
 </div>
@@ -98,7 +93,7 @@
       {is-edit-icon-denied}="isEditDenied"
       {value}="instance.issue_tracker.component_id"
       {instance}="instance">
-        <div class="ggrc-form__title form-label required-label">
+        <div class="ggrc-form__title form-label form-label__extended">
             Component ID
           <i class="fa fa-asterisk"></i>
         </div>
@@ -158,7 +153,7 @@
       {is-edit-icon-denied}="isEditDenied"
       {value}="instance.issue_tracker.title"
       {instance}="instance">
-        <div class="ggrc-form__title form-label required-label">
+        <div class="ggrc-form__title form-label form-label__extended">
           Ticket Title
           <i class="fa fa-asterisk"></i>
         </div>

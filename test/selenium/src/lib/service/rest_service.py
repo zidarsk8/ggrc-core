@@ -7,7 +7,7 @@ import json
 
 import requests
 
-from lib import environment, factory, url
+from lib import environment, factory, url, constants
 from lib.constants import objects, messages, roles
 from lib.entities import entities_factory
 from lib.entities.entities_factory import (
@@ -77,7 +77,7 @@ class BaseRestService(object):
         self.client.update_object(href=obj.href, **attrs)), **obj.__dict__)
 
   @staticmethod  # noqa: ignore=C901
-  def get_items_from_resp(resp):
+  def get_items_from_resp(resp, timeout=constants.ux.MAX_USER_WAIT_SECONDS):
     """Check response (waiting object of requests library) from server and get
     items {key: value} from it."""
     def get_items_from_resp():
@@ -131,7 +131,7 @@ class BaseRestService(object):
       else:
         raise requests.exceptions.RequestException(
             messages.ExceptionsMessages.err_server_resp.format(resp))
-    return test_utils.wait_for(get_items_from_resp)
+    return test_utils.wait_for(get_items_from_resp, timeout)
 
   @staticmethod
   def set_obj_attrs(obj, attrs, **kwargs):

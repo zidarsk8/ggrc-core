@@ -11,6 +11,7 @@ from mock import patch
 import ddt
 
 from ggrc import settings
+from ggrc.app import app
 from ggrc.notifications.job_emails import send_email
 
 
@@ -29,9 +30,9 @@ class TestJobEmails(unittest.TestCase):
     cls.subject = "title"
 
   @ddt.data(
-      (42, "export#!&job_id=42"),
-      (561, "export#!&job_id=561"),
-      (None, "export")
+      (42, "http://test/export#!&job_id=42"),
+      (561, "http://test/export#!&job_id=561"),
+      (None, "http://test/export")
   )
   @ddt.unpack
   def test_url_in_notification(self, ie_id, url):
@@ -46,8 +47,8 @@ class TestJobEmails(unittest.TestCase):
       body = settings.EMAIL_IMPORT_EXPORT.render(
           import_export=data
       )
-
-      send_email(self.template, self.user_email, "", "", ie_id)
+      with app.test_request_context(base_url="http://test"):
+        send_email(self.template, self.user_email, "", ie_id)
       common_send_email.assert_called_with(
           self.user_email, self.subject, body
       )

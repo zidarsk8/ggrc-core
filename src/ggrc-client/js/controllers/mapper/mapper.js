@@ -41,8 +41,8 @@ const ObjectMapper = can.Control.extend({
       '" class="modal modal-selector object-modal hide"></div>');
 
     $target.modal_form({}, $trigger);
-    this.newInstance($target[0], can.extend({
-      $trigger: $trigger,
+    this.newInstance($target[0], Object.assign({
+      $trigger,
     }, options));
 
     $target.on('modal:dismiss', function () {
@@ -82,7 +82,6 @@ const ObjectMapper = can.Control.extend({
     // each object type will be perceived as a snapshot, except types with
     // special config
     function openForSnapshots(data) {
-      let inScopeObject;
       let config = getBaseConfig();
       let special = [{
         types: ['Issue'],
@@ -104,7 +103,7 @@ const ObjectMapper = can.Control.extend({
             id: data.snapshot_scope_id,
           }],
         });
-        self.launch(btn, can.extend(config, data));
+        self.launch(btn, Object.assign(config, data));
         return;
       }
 
@@ -116,8 +115,10 @@ const ObjectMapper = can.Control.extend({
       }
 
       self.isLoading = true;
-      inScopeObject =
-        businessModels[data.join_object_type].store[data.join_object_id];
+
+      let model = businessModels[data.join_object_type];
+      let inScopeObject =
+        model.findInCacheById(data.join_object_id);
       inScopeObject.updateScopeObject().then(function () {
         let scopeObject = inScopeObject.attr('audit');
 
@@ -140,8 +141,7 @@ const ObjectMapper = can.Control.extend({
             title: scopeObject.title,
           }],
         });
-
-        self.launch(btn, can.extend(config, data));
+        self.launch(btn, Object.assign(config, data));
       })
         .always(() => self.isLoading = false);
     }
@@ -150,9 +150,9 @@ const ObjectMapper = can.Control.extend({
       let config = getConfigForCommonObjects(data);
 
       if (isSearch) {
-        ObjectSearch.launch(btn, can.extend(config, data));
+        ObjectSearch.launch(btn, Object.assign(config, data));
       } else {
-        self.launch(btn, can.extend(config, data));
+        self.launch(btn, Object.assign(config, data));
       }
     }
 

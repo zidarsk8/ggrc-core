@@ -212,9 +212,6 @@ export default Cacheable('CMS.Models.Assessment', {
     return attributes;
   },
   model: function (attributes, oldModel) {
-    let model;
-    let id;
-    let backup;
     if (!attributes) {
       return;
     }
@@ -225,19 +222,19 @@ export default Cacheable('CMS.Models.Assessment', {
       attributes = this.parseModel(attributes);
     }
 
-    id = attributes[this.id];
-    if ((id || id === 0) && this.store[id]) {
-      oldModel = this.store[id];
+    if (!oldModel) {
+      let id = attributes[this.id];
+      oldModel = this.findInCacheById(id);
     }
 
-    model = oldModel && _.isFunction(oldModel.attr) ?
+    let model = oldModel && _.isFunction(oldModel.attr) ?
       oldModel.attr(attributes) :
       new this(attributes);
 
     // Sometimes we are updating model partially and asynchronous
     // for example when we load relationships.
     // In this case we have to update backup to solve isDirty issues.
-    backup = model._backupStore();
+    let backup = model._backupStore();
     if (backup) {
       _.assign(backup, attributes);
     }
@@ -248,14 +245,6 @@ export default Cacheable('CMS.Models.Assessment', {
     }
 
     return model;
-  },
-  /**
-   * Replace Cacheble#findInCacheById method with the latest feature of can.Model - store
-   * @param {String} id - Id of requested Model
-   * @return {Assessment} - already existing model
-   */
-  findInCacheById: function (id) {
-    return this.store[id];
   },
 }, {
   init: function () {
@@ -374,6 +363,7 @@ export default Cacheable('CMS.Models.Assessment', {
               delete that._pending_refresh;
               if (model) {
                 model = that.constructor.model(model, that);
+                that.after_refresh && that.after_refresh();
                 model.backup();
                 return model;
               }
@@ -411,4 +401,3 @@ export default Cacheable('CMS.Models.Assessment', {
       }, stopFn.bind(null, true));
   },
 });
-

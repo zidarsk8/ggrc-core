@@ -5,7 +5,6 @@
 
 import './comment-input';
 import './comment-add-button';
-import Permission from '../../permission';
 import template from './comment-add-form.mustache';
 import {COMMENT_CREATED} from '../../events/eventTypes';
 import tracker from '../../tracker';
@@ -23,12 +22,6 @@ export default can.Component.extend({
   template: template,
   viewModel: {
     define: {
-      isAllowedToAddComment: {
-        get() {
-          return Permission
-            .is_allowed_for('update', this.attr('instance'));
-        },
-      },
       notificationsInfo: {
         value: 'Send Notifications',
         set(newValue) {

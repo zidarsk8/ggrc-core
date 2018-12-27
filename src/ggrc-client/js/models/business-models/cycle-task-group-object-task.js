@@ -92,13 +92,6 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     context: Stub,
     cycle: Stub,
   },
-  permalink_options: {
-    url: '<%= base.viewLink %>#current' +
-    '/cycle/<%= instance.cycle.id %>' +
-    '/cycle_task_group/<%= instance.cycle_task_group.id %>' +
-    '/cycle_task_group_object_task/<%= instance.id %>',
-    base: 'cycle:workflow',
-  },
   info_pane_options: {
     mapped_objects: {
       mapping: 'info_related_objects',
@@ -154,12 +147,19 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
         attr_name: 'description',
         disable_sorting: true,
       },
+      {
+        attr_title: 'Needs Verification',
+        attr_name: 'is_verification_needed',
+        attr_sort_field: 'needs verification',
+      },
     ],
     display_attr_names: ['title',
       'status',
       'Task Assignees',
       'start_date',
-      'end_date'],
+      'end_date',
+      'is_verification_needed',
+    ],
     mandatory_attr_name: ['title'],
   },
   sub_tree_view_options: {

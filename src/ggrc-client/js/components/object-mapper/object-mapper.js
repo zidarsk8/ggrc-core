@@ -117,7 +117,7 @@ export default can.Component.extend({
       /**
        * This property is needed to work together with deferredSave() method.
        * If it's true then mapped objects shouldn't be mapped immediately to
-       * target object - they will be stored in the scope of modal-connector
+       * target object - they will be stored in the scope of deferred-mapper
        * component. This component will decide, when mapped objects should be
        * mapped to target object.
        * @property {boolean}

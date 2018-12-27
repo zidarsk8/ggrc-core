@@ -11,9 +11,9 @@
 
   <div class="row-fluid">
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-      <label>
+      <label class="form-label">
         Title
-        <span class="required">*</span>
+        <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       <input data-id="title_txtbx" data-test-id="control_title_9cc51ca3" tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
@@ -181,18 +181,24 @@
       <div data-test-id="control_assertions_5d8b7f7a"
            data-id="assertions_hidden"
            class="span4 mandatory-dropdown {{#instance.computed_errors.assertions}}select-failure{{/instance.computed_errors.assertions}}">
-        <label class="field-title">
+        <label class="form-label">
           Assertions
           <i class="fa fa-asterisk"></i>
           <i class="fa fa-question-circle" rel="tooltip" title="Select control assertions."></i>
         </label>
           <div data-id="assertions_dd" tabindex="12" class="no-outline">
             <model-loader {path}="'service-models/control-assertion'">
-              <multiselect-dropdown-wrapper
+              <dropdown-options-loader
                 {model-constructor}="loadedModel"
                 {(selected)}="instance.assertions"
                 {placeholder}="'Select Assertions'">
-              </multiselect-dropdown-wrapper>
+                <multiselect-dropdown
+                  {options}="preparedOptions"
+                  {selected}="selectedInternal"
+                  (selected-changed)="selectedChanged(%event)"
+                  {placeholder}="placeholder">
+                </multiselect-dropdown>
+              </dropdown-options-loader>
             </model-loader>
           </div>
           {{#instance.computed_errors.assertions}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.assertions}}
@@ -205,11 +211,17 @@
         </label>
           <div data-id="categories_dd" tabindex="13" class="no-outline">
             <model-loader {path}="'service-models/control-category'">
-              <multiselect-dropdown-wrapper
+              <dropdown-options-loader
                 {model-constructor}="loadedModel"
                 {(selected)}="instance.categories"
                 {placeholder}="'Select Categories'">
-              </multiselect-dropdown-wrapper>
+                <multiselect-dropdown
+                  {options}="preparedOptions"
+                  {selected}="selectedInternal"
+                  (selected-changed)="selectedChanged(%event)"
+                  {placeholder}="placeholder">
+                </multiselect-dropdown>
+              </dropdown-options-loader>
             </model-loader>
           </div>
       </div>

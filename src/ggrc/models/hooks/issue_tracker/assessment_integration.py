@@ -74,12 +74,6 @@ _STATUS_CHANGE_COMMENT_TMPL = (
     'Link - %s'
 )
 
-_COMMENT_TMPL = (
-    'A new comment is added by %s to the Assessment: %s. '
-    'Use the following to link to get more information from the '
-    'GGRC Assessment. Link - %s'
-)
-
 _ARCHIVED_TMPL = (
     'Assessment has been archived. Changes to this GGRC Assessment will '
     'not be tracked within this bug until Assessment is unlocked.'
@@ -716,7 +710,7 @@ def _get_added_comment_text(src):
       desc, creator_email, creator_name = comment_row
       if not creator_name:
         creator_name = creator_email
-      return html2text.HTML2Text().handle(desc).strip('\n'), creator_name
+      return html2text.HTML2Text().handle(desc).strip(), creator_name
   return None, None
 
 
@@ -1005,9 +999,13 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,  # noqa
   # Attach user comments if any.
   comment_text, comment_author = _get_added_comment_text(request)
   if comment_text is not None:
+    builder = issue_tracker_params_builder.AssessmentParamsBuilder()
     comments.append(
-        _COMMENT_TMPL % (
-            comment_author, comment_text, _get_assessment_url(assessment)))
+        builder.COMMENT_TMPL.format(
+            author=comment_author,
+            comment=comment_text,
+            model=_ASSESSMENT_MODEL_NAME,
+            link=_get_assessment_url(assessment)))
 
   if comments:
     issue_params['comment'] = '\n\n'.join(comments)

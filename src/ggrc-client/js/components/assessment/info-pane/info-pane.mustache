@@ -272,7 +272,9 @@
                         {notifications-info}="'Notify Assignees and Verifiers'">
                     </comment-add-form>
                 {{/unless}}
-                <mapped-comments {mapped-items}="comments"></mapped-comments>
+                <mapped-comments {mapped-items}="comments"
+                  {is-loading}="isUpdatingRelatedItems"
+                  {show-no-items-text}="isEditDenied"></mapped-comments>
               </div>
             </div>
         </div>

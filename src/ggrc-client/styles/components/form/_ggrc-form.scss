@@ -96,16 +96,7 @@
       flex-basis: 250px;
       max-width: 250px;
       margin-right: 30px;
-
-      .ggrc-form-item__label {
-        &.required-label {
-          line-height: 18px;
-
-          i.fa-asterisk {
-            height: 18px;
-          }
-        }
-      }
+      
       &--double {
         max-width: 500px;
       }

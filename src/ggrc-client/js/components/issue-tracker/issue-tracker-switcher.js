@@ -13,9 +13,6 @@ export default can.Component.extend({
         set: function (newValue, setValue) {
           // convert to bool type. dropdown returns "true" or "false" as string
           const enabled = this.convertToBool(newValue);
-          if ( enabled ) {
-            this.attr('instance').initIssueTracker();
-          }
           setValue(enabled);
         },
       },
@@ -44,10 +41,6 @@ export default can.Component.extend({
       let dropdownValue = this.convertToBool(args.value);
       args.value = dropdownValue;
       args.type = 'issueTrackerSwitcherChanged';
-
-      if (dropdownValue) {
-        this.attr('instance').initIssueTracker();
-      }
 
       this.dispatch(args);
     },

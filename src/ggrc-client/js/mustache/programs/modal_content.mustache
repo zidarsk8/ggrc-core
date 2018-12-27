@@ -13,9 +13,9 @@
   <!-- Title Row -->
   <div class="row-fluid">
     <div data-test-id="label_title_2c925d94" class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-      <label>
+      <label class="form-label">
         Title
-        <span class="required">*</span>
+        <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
       {{^if_null '1'}}

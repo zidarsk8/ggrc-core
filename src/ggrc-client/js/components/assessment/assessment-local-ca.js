@@ -13,6 +13,7 @@ import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import Permission from '../../permission';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
+import {getPlainText} from '../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'assessment-local-ca',
@@ -143,27 +144,16 @@ export default can.Component.extend({
       });
     },
     performValidation: function (field) {
-      let value = field.value;
-      let isMandatory = field.validation.mandatory;
-
-      if (field.type === 'checkbox') {
-        if (value === '1') {
-          value = true;
-        } else if (value === '0') {
-          value = false;
-        }
-
-        field.attr({
-          validation: {
-            show: isMandatory,
-            valid: isMandatory ? !!(value) : true,
-            hasMissingInfo: false,
-          },
-        });
-      } else if (field.type === 'dropdown') {
+      if (field.type === 'dropdown') {
         this.performDropdownValidation(field);
       } else {
-        // validation for all other fields
+        let value = field.value;
+        let isMandatory = field.validation.mandatory;
+
+        if (field.type === 'text') {
+          value = getPlainText(value).trim();
+        }
+
         field.attr({
           validation: {
             show: isMandatory,

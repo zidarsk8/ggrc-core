@@ -3,11 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './multiselect-dropdown-wrapper.mustache';
-
 export default can.Component.extend({
-  tag: 'multiselect-dropdown-wrapper',
-  template: template,
+  tag: 'dropdown-options-loader',
   viewModel: {
     placeholder: '',
     selected: [],
@@ -15,7 +12,7 @@ export default can.Component.extend({
     preparedOptions: [],
     define: {
       /*
-        Multiselect-dropdown wrapper when data should be fetched first
+        dropdown-options-loader wrapper when data should be fetched first
         {modelConstructor}: Model definition to fetch
         {(selected)}: Two-way binding parent`s target attribute
       */

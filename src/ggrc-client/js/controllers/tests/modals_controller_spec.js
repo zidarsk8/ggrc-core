@@ -9,9 +9,16 @@ import Person from '../../models/business-models/person';
 
 describe('ModalsController', function () {
   let Ctrl; // the controller under test
+  let cacheBackup;
 
   beforeAll(function () {
     Ctrl = ModalsController;
+    cacheBackup = Person.cache;
+    Person.cache = {};
+  });
+
+  afterAll(function () {
+    Person.cache = cacheBackup;
   });
 
   describe('init() method', function () {
@@ -66,7 +73,7 @@ describe('ModalsController', function () {
         });
 
         spyOn(partialUser, 'reify').and.returnValue(partialUser);
-        Person.store[userId] = partialUser;
+        Person.cache[userId] = partialUser;
 
         init();
 
@@ -88,7 +95,7 @@ describe('ModalsController', function () {
         });
 
         spyOn(fullUser, 'reify').and.returnValue(fullUser);
-        Person.store[userId] = fullUser;
+        Person.cache[userId] = fullUser;
 
         init();
 

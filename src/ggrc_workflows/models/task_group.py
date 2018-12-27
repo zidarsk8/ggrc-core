@@ -78,6 +78,8 @@ class TaskGroup(roleable.Roleable,
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
+          "description": ("One person could be added "
+                          "as a Task Group assignee")
       },
       "secondary_contact": None,
       "start_date": None,

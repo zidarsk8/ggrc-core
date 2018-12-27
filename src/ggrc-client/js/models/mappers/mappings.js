@@ -271,24 +271,6 @@ export default can.Construct.extend({
     return mappings;
   },
   /*
-    return the defined name of the canonical mapping between two objects.
-    object - the string type (shortName) of the "from" object's class
-    option - the string type (shortName) of the "to" object's class
-
-    return: an instance of GGRC.ListLoaders.BaseListLoader (mappings are implemented as ListLoaders)
-  */
-  get_canonical_mapping_name: function (object, option) {
-    let mappingName = null;
-    can.each(this.modules, function (mod, name) {
-      if (mod._canonical_mappings && mod._canonical_mappings[object] &&
-        mod._canonical_mappings[object][option]) {
-        mappingName = mod._canonical_mappings[object][option];
-        return false;
-      }
-    });
-    return mappingName;
-  },
-  /*
     return all canonical mappings (suitable for joining) from all modules for an object type.
     object - a string representing the object type's shortName
 
@@ -463,7 +445,7 @@ export default can.Construct.extend({
           if (!definitions[mixin]) {
             console.warn('Undefined mixin: ' + mixin, definitions);
           } else {
-            can.extend(true, finalDefinition,
+            _.merge(finalDefinition,
               that.reify_mixins(definitions[mixin], definitions));
           }
         } else if (_.isFunction(mixin)) {
@@ -472,7 +454,7 @@ export default can.Construct.extend({
         } else {
           // Otherwise, assume object and extend
           if (finalDefinition._canonical && mixin._canonical) {
-            mixin = can.extend({}, mixin);
+            mixin = Object.assign({}, mixin);
 
             can.each(mixin._canonical, function (types, mapping) {
               if (finalDefinition._canonical[mapping]) {
@@ -487,15 +469,15 @@ export default can.Construct.extend({
                 finalDefinition._canonical[mapping] = types;
               }
             });
-            finalDefinition._canonical = can.extend({}, mixin._canonical,
+            finalDefinition._canonical = Object.assign({}, mixin._canonical,
               finalDefinition._canonical);
             delete mixin._canonical;
           }
-          can.extend(finalDefinition, mixin);
+          Object.assign(finalDefinition, mixin);
         }
       });
     }
-    can.extend(true, finalDefinition, definition);
+    _.merge(finalDefinition, definition);
     delete finalDefinition._mixins;
     return finalDefinition;
   },

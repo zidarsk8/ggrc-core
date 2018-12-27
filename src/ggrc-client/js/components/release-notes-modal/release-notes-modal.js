@@ -22,7 +22,7 @@ const viewModel = can.Map.extend({
     releaseNotesDate: {
       type: 'string',
       get() {
-        return moment(RELEASE_NOTES_DATE).format('MMM D, YYYY');
+        return moment(BUILD_DATE).format('MMM D, YYYY');
       },
     },
   },

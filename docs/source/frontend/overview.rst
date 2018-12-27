@@ -227,19 +227,7 @@ This property is set on instances during modal operation. *transient is
 meant to hold data that is not sent to the server and does not need to
 be kept after the modal completes or is canceled. This is useful for
 intermediary values for validation, or calculated default values for a
-property. \* _pending*\ joins() / "deferred bindings"
-
-Model instances can be joined to other objects as part of their regular
-update cycles. After an update completes successfully, any deferred
-binding operations contained in ``<instance>._pending_joins`` are
-resolved by adding or removing join objects. These deferred bindings are
-usually created by using ``<instance>.mark_for_addition()`` and
-``<instance>.mark_for_deletion()`` \* other modal-based ops
-
-The modal includes a connector widget that allows pending join object
-creation and destruction. Since the connector widget automates the
-deferred bindings for an instance in deferred mode, no action is taken
-until the modal is saved.
+property.
 
 Are they cached?
 

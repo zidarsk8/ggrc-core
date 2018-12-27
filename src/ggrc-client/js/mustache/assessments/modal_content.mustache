@@ -11,7 +11,7 @@
 
       {{^if new_object_form}}
         {{#if_in instance.status 'Completed,Verified,In Review'}}
-          {{#if_helpers '\n #if' instance.isDirty '\n or #if' mappedObjectsChanges.length '\n or #if' referenceUrlChanged}}
+          {{#if_helpers '\n #if' instance.isDirty '\n or #if' instance._pendingJoins.length}}
           <div class="ggrc-form-item">
             <div class="alert width-100">
               <i class="fa fa-exclamation-triangle"></i>
@@ -58,7 +58,7 @@
       </div>
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-          <label class="form-label required-label ggrc-form-item__label">
+          <label class="form-label ggrc-form-item__label form-label__extended">
             Title
             <i class="fa fa-asterisk"></i>
           </label>
@@ -130,12 +130,11 @@
 
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
-          <ggrc-modal-connector
+          <deferred-mapper
                   class="width-100"
                   {instance}="instance"
                   {mapped-objects}="mappedObjects"
-                  {use-snapshots}="true"
-                  {^changes}="mappedObjectsChanges">
+                  {use-snapshots}="true">
             <label class="ggrc-form-item__label">
               Mapped Objects
             </label>
@@ -168,12 +167,10 @@
                 <map-button-using-assessment-type
                   {{data "deferred_to"}}
                   {instance}="instance">
-                    {{#if instance.audit}}
                       <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
                         href="javascript://"
                         data-placement="left"
                         data-deferred="true"
-                        data-object-source="true"
                         data-is-new="{{new_object_form}}"
                         data-join-object-id="{{instance.id}}"
                         data-join-object-type="{{instance.class.model_singular}}"
@@ -183,24 +180,10 @@
                       >
                         Map Objects
                       </a>
-                    {{else}}
-                      <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
-                        href="javascript://"
-                        data-placement="left"
-                        data-deferred="true"
-                        data-object-source="true"
-                        data-is-new="{{new_object_form}}"
-                        data-join-object-id="{{instance.id}}"
-                        data-join-object-type="{{instance.class.model_singular}}"
-                        tabindex="8"
-                      >
-                        Map Objects
-                      </a>
-                    {{/if}}
                 </map-button-using-assessment-type>
               </div>
             {{/is_allowed}}
-          </ggrc-modal-connector>
+          </deferred-mapper>
         </div>
       </div>
 
