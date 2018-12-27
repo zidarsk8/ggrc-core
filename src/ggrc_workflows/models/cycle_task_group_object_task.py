@@ -97,7 +97,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
                                                     ["description"]),
       ft_attributes.BooleanFullTextAttr("needs verification",
                                         "is_verification_needed",
-                                        with_template=False),
+                                        with_template=False,
+                                        true_value="Yes", false_value="No"),
       "folder",
   ]
 
