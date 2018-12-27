@@ -6,20 +6,20 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=invalid-name
 import datetime
-
 import pytest
+from nerodia.wait.wait import TimeoutError
 
 from lib import base, users
 from lib.app_entity_factory import (
     entity_factory_common, workflow_entity_factory)
-from lib.constants import roles, workflow_repeat_units, messages
+from lib.constants import messages, roles, workflow_repeat_units
 from lib.entities import cycle_entity_population, ui_dict_convert
-from lib.page.widget import workflow_tabs, object_modal, object_page
+from lib.page.widget import object_modal, object_page, workflow_tabs
 from lib.rest_facades import (
     object_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.rest_services import workflow_rest_service
-from lib.ui import workflow_ui_facade, ui_facade, daily_emails_ui_facade
-from lib.utils import test_utils, date_utils, ui_utils
+from lib.ui import daily_emails_ui_facade, ui_facade, workflow_ui_facade
+from lib.utils import date_utils, test_utils, ui_utils
 
 
 @pytest.fixture(params=[roles.CREATOR, roles.READER])
@@ -202,8 +202,15 @@ class TestActivateWorkflow(base.Test):
       workflow_rest_facade.create_task_group_task(
           task_group=task_group, assignees=[assignee], due_date=due_date)
       workflow_rest_service.WorkflowRestService().activate(app_workflow)
-      emails = daily_emails_ui_facade.get_emails_by_user_names(
-          [users.current_user().name, assignee.name])
+      # handle GGRC-6527 only
+      try:
+        emails = daily_emails_ui_facade.get_emails_by_user_names(
+            [users.current_user().name, assignee.name])
+      except TimeoutError as err:
+        if "digest" in err.message:
+          pytest.xfail("GGRC-6527: Digest is not opened")
+        else:
+          raise err
       TestActivateWorkflow._data = {
           "wf": app_workflow,
           "wf_creator_email": emails[users.current_user().name],
