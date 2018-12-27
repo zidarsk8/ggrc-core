@@ -24,7 +24,6 @@ let _DATE_FIELDS = {
   start_date: 1,
   end_date: 1,
   requested_on: 1,
-  due_on: 1,
   finished_date: 1,
   verified_date: 1,
 };
