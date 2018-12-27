@@ -34,15 +34,18 @@ export default can.Component.extend({
         operator: 'AND',
       });
     },
-    menu: function () {
-      // find all widget types and manually add Cycle since it's missing
-      // convert names to CMS models and prune invalid (undefined)
-      let models = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
-      models = _.uniq(models);
-      models = _.map(models, function (mapping) {
-        return businessModels[mapping];
-      });
-      return _.sortBy(_.compact(models), 'model_singular');
+    menu() {
+      const workflowRelatedTypes = ['TaskGroup', 'Workflow'];
+      const baseWidgetsTypes = can.Map.keys(
+        TreeViewConfig.attr('base_widgets_by_type')
+      );
+
+      return _(workflowRelatedTypes)
+        .concat(baseWidgetsTypes)
+        .map((mapping) => businessModels[mapping])
+        .compact()
+        .sortBy('model_singular')
+        .value();
     },
     optionHidden: function (option) {
       let type = option.model_singular;
