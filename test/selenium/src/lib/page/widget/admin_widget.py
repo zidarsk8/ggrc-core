@@ -7,15 +7,12 @@ from lib import base, exception
 from lib.constants import locator, objects
 from lib.constants.element import AdminWidgetEvents
 from lib.entities.entities_factory import PeopleFactory
+from lib.page import dashboard
 from lib.page.widget import widget_base
 from lib.utils import date_utils, selenium_utils, string_utils
 
 
-class Widget(base.Widget):
-  """Base class for Admin widgets."""
-
-
-class Events(Widget):
+class Events(dashboard.AdminDashboard):
   """Event widget on Admin Dashboard."""
   _locators = locator.WidgetAdminEvents
 
@@ -100,7 +97,7 @@ class Events(Widget):
     return self._go_to_page("PREVIOUS PAGE")
 
 
-class People(Widget):
+class People(dashboard.AdminDashboard):
   """People widget on Admin Dashboard."""
   _locators = locator.WidgetAdminPeople
 
@@ -132,7 +129,7 @@ class People(Widget):
     selenium_utils.wait_for_js_to_load(self._driver)
 
 
-class Roles(Widget):
+class Roles(dashboard.AdminDashboard):
   """Admin roles widget on Admin Dashboard."""
 
   def __init__(self, driver):
@@ -146,7 +143,7 @@ class Roles(Widget):
     return dict([item.text.splitlines() for item in tree_view_items])
 
 
-class CustomRoles(Widget):
+class CustomRoles(dashboard.AdminDashboard):
   """Admin custom roles widget on Admin Dashboard."""
 
   def __init__(self, driver):

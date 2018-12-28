@@ -92,14 +92,6 @@ class TestAdminDashboardPage(base.Test):
     self.general_contain_assert(expected_ca, actual_cas,
                                 "multi_choice_options")
 
-  def test_create_new_person_w_no_role(self, selenium):
-    """Check newly created person is on Admin People widget"""
-    expected_person = entities_factory.PeopleFactory().create(
-        system_wide_role=roles.NO_ROLE)
-    actual_person = admin_webui_service.PeopleAdminWebUiService(
-        selenium).create_new_person(expected_person)
-    self.general_equal_assert(expected_person, actual_person)
-
   @pytest.mark.smoke_tests
   def test_custom_roles_widget(self, admin_dashboard):
     """Check count and content of roles scopes."""
@@ -200,3 +192,35 @@ class TestEventLogTabDestructive(base.Test):
     assert events_on_1st_page == events_on_prev_page, (
         messages.AssertionMessages.
         format_err_msg_equal(events_on_1st_page, events_on_prev_page))
+
+
+class TestPeopleAdministration(base.Test):
+  """Test for People tab functionality."""
+  data = None
+
+  @pytest.fixture()
+  def ppl_data(self, selenium):
+    """Create person and return test data."""
+    if not self.__class__.data:
+      expected_person = entities_factory.PeopleFactory().create(
+          system_wide_role=roles.NO_ROLE)
+      ppl_admin_service = admin_webui_service.PeopleAdminWebUiService(
+          selenium)
+      self.__class__.data = {
+          "exp_person": expected_person,
+          "exp_ppl_count": ppl_admin_service.ppl_count + 1,
+          "act_person": ppl_admin_service.create_new_person(expected_person),
+          "act_ppl_count": ppl_admin_service.ppl_count
+      }
+    return self.__class__.data
+
+  def test_destructive_create_new_person_w_no_role(self, ppl_data):
+    """Check newly created person is on Admin People widget and ppl count
+    increased by one.
+    """
+    self.general_equal_assert(ppl_data["exp_person"], ppl_data["act_person"])
+
+  @pytest.mark.xfail(reason="GGRC-1234 Issue in app.")
+  def test_destructive_tab_count_increased(self, ppl_data):
+    """Check that tab count will be increased correctly."""
+    assert ppl_data["exp_ppl_count"] == ppl_data["act_ppl_count"]
