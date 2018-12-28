@@ -199,12 +199,19 @@ label) require additional checks to be performed on top of all the
 others regular checks, namely the following:
 
 -  The migration works from a clean database,
--  Downgrading and upgrading work on a clean database,
+-  Upgrading works on a clean database,
 -  Migrations work from the current database state on the main
    ``dev`` branch,
 -  Migrations work on a populated database (using the data from the
    ``ggrc-qa`` or ``ggrc-test`` instance).
--  Database state after downgrade is the same as before the upgrade.
+
+## Database downgrade.
+   Downgrade can be complicated so it is not mandatory. If you decide to
+   implement it you should be sure that downgrade works correctly after
+   db data is changed. Usually it is easier to use backup functionality during
+   deploy rather than write downgrade.
+
+   Database state after downgrade should be the same as before the upgrade.
    Before applying a migration do a mysqldump
 
    .. code-block:: bash
