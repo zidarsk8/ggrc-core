@@ -947,15 +947,13 @@ class WidgetAdminRoles(object):
 class WidgetAdminEvents(object):
   """Locators for Events widget on Admin Dashboard."""
   _BASE_CSS_SELECTOR = 'section#events_list:not([class~="hidden"])'
-  _TREE_ITEMS_SELECTOR = ".tree-item[data-model]"
-  TREE_VIEW_ITEMS = (
-      By.CSS_SELECTOR,
-      "{0} {1}".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_ITEMS = "{0} .tree-item[data-model]".format(_BASE_CSS_SELECTOR)
   TREE_VIEW_HEADER = (
       By.CSS_SELECTOR, "{} header".format(_BASE_CSS_SELECTOR))
-  FIRST_TREE_VIEW_ITEM = (
-      By.CSS_SELECTOR,
-      "{0} {1}:first-child".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_ITEMS_W_PPL = (
+      By.XPATH,
+      "//section[@id='events_list']" +
+      "//*[@class='person-name' and contains(text(), '@')]")
 
 
 class WidgetAdminPeople(object):

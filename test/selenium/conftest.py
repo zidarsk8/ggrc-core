@@ -17,7 +17,6 @@ from selenium.webdriver.remote.remote_connection import (
 
 from lib import dynamic_fixtures, environment, url, users, browsers
 from lib.constants import element, workflow_repeat_units
-from lib.constants.test_runner import DESTRUCTIVE_TEST_METHOD_PREFIX
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory
 from lib.page import dashboard
@@ -41,7 +40,7 @@ def pytest_runtest_setup(item):
   * environment.app_url
   * dev_log_retriever
   """
-  if DESTRUCTIVE_TEST_METHOD_PREFIX in item.name:
+  if CustomPytestScheduling.is_destructive_test(item.name, str(item.cls)):
     environment.app_url = os.environ["DEV_DESTRUCTIVE_URL"]
     filename = os.environ["DEV_DESTRUCTIVE_LOG"]
   else:

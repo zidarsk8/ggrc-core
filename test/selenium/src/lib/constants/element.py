@@ -89,8 +89,10 @@ class AdminWidgetEvents(object):
   at Admin Dashboard.
   """
   WIDGET_HEADER = "Events"
-  TREE_VIEW_ROW_REGEXP = r"^.+\s(by\s.+)\son\s" + \
-      r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
+  TREE_VIEW_ROW_REGEXP_WO_ACTION = r"by\s(?P<user>.+)\son\s" + \
+      r"(?P<time>\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M\s" + \
+      r"[\+,-]\d{2}:\d{2})"
+  TREE_VIEW_ROW_REGEXP = r"^(?P<action>.+)\s" + TREE_VIEW_ROW_REGEXP_WO_ACTION
 
 
 class AdminWidgetCustomAttributes(object):

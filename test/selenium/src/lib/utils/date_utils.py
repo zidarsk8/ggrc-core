@@ -67,3 +67,10 @@ def iso8601_to_datetime(iso8601_str):
   """
   return str_to_datetime(iso8601_str, "%Y-%m-%dT%H:%M:%S").replace(
       tzinfo=tz.tzutc())
+
+
+def assert_chronological_order(list_of_datetimes):
+  """Assert that items sorted by datetime desc (newer items are first)."""
+  for i in range(len(list_of_datetimes) - 1):
+    current_item, next_item = list_of_datetimes[i], list_of_datetimes[i + 1]
+    assert current_item >= next_item

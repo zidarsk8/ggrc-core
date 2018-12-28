@@ -51,4 +51,5 @@ class PeopleAdminWebUiService(AdminWebUiService):
     """Find person by email in the list on Admin People widget
       - Return: list of PersonEntities"""
     self.people_tab.filter_by_name_email_company(person.email)
+    selenium_utils.wait_for_js_to_load(self._driver)
     return self.people_tab.get_people()[0]
