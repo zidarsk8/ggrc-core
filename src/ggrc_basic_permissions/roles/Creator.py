@@ -18,6 +18,7 @@ owner_base = [
     "Option",
     "CustomAttributeDefinition",
     "CustomAttributeValue",
+    "NotificationConfig",
 ]
 owner_read = owner_base + [
     "AccessControlList",

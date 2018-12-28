@@ -572,8 +572,6 @@ Elements
 +----------------------------------+----------------------+---------------------------------------+
 | description                      | str                  | Request description                   |
 +----------------------------------+----------------------+---------------------------------------+
-| request_type                     | :ref:`request`       |                                       |
-+----------------------------------+----------------------+---------------------------------------+
 | test                             | str                  | Test message                          |
 +----------------------------------+----------------------+---------------------------------------+
 | notes                            | str                  | Notes for the request                 |
@@ -606,7 +604,6 @@ Examples
                    "type": "Audit"
                },
                "description": "Example description",
-               "request_type": "documentation",
                "test": "Example test message",
                "notes": "Example notes",
                "slug": "test code",
@@ -665,7 +662,6 @@ Examples
               "send_by_default": null,
               "task_groups": [],
               "notes": "Example notes",
-              "request_type": "documentation",
               "created_at": "2016-05-20T10:14:42",
               "selfLink": "/api/requests/1"
           }

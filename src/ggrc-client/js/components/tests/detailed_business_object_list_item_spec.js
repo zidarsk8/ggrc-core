@@ -14,7 +14,7 @@ describe('detailed-business-object-list-item component', function () {
   const vendorObjectTitle = 'Vendor title 123';
   const vendorObjectLink = '/vendors/33';
   const controlVisibleRoles = [
-    'Admin', 'Control Operators', 'Control Owners',
+    'Admin', 'Control Operators', 'Control Owners', 'Other Contacts',
   ];
   const defaultVisibleRoles = [
     'Admin', 'Primary Contacts', 'Secondary Contacts',

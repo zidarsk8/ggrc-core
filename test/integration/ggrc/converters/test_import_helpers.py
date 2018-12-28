@@ -636,6 +636,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Control Operators",
         "Control Owners",
+        "Other Contacts",
         "Principal Assignees",
         "Secondary Assignees",
         "Recipients",

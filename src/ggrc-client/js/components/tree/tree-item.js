@@ -5,19 +5,16 @@
 
 import '../lazy-render/lazy-render';
 import '../cycle-task-actions/cycle-task-actions';
+import './tree-item-attr';
 import './tree-item-custom-attribute';
 import BaseTreeItemVM from './tree-item-base-vm';
 import template from './templates/tree-item.mustache';
-import * as businessModels from '../../models/business-models';
-
-const DEFAULT_ATTR_TEMPLATE =
-  GGRC.mustache_path + '/base_objects/tree-item-attr.mustache';
 
 let viewModel = BaseTreeItemVM.extend({
   define: {
     extraClasses: {
       type: String,
-      get: function () {
+      get() {
         let classes = [];
         let instance = this.attr('instance');
 
@@ -38,7 +35,7 @@ let viewModel = BaseTreeItemVM.extend({
     },
     selectableSize: {
       type: Number,
-      get: function () {
+      get() {
         let attrCount = this.attr('selectedColumns').length;
         let result = 3;
 
@@ -51,13 +48,6 @@ let viewModel = BaseTreeItemVM.extend({
         return result;
       },
     },
-    attrTemplate: {
-      type: String,
-      get() {
-        let Model = businessModels[this.attr('instance.type')];
-        return Model.tree_view_options.attr_view || DEFAULT_ATTR_TEMPLATE;
-      },
-    },
   },
   instance: null,
   selectedColumns: [],
@@ -66,15 +56,12 @@ let viewModel = BaseTreeItemVM.extend({
   itemSelector: '.tree-item-content',
 });
 
-/**
- *
- */
 export default can.Component.extend({
   tag: 'tree-item',
   template,
   viewModel,
   events: {
-    inserted: function () {
+    inserted() {
       this.viewModel.attr('$el', this.element.find('.tree-item-wrapper'));
     },
   },

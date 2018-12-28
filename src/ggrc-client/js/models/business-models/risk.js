@@ -34,7 +34,6 @@ export default Cacheable('CMS.Models.Risk', {
     modified_by: Stub,
   },
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Reference URL', attr_name: 'reference_url', order: 85},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date', order: 110},

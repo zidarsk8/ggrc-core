@@ -250,6 +250,7 @@ class Control(WithLastAssessmentDate,
       "Admin",
       "Control Operators",
       "Control Owners",
+      "Other Contacts",
   ])
 
   @classmethod

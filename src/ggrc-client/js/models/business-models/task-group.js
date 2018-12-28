@@ -29,7 +29,6 @@ export default Cacheable('CMS.Models.TaskGroup', {
   },
 
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/task_groups/tree-item-attr.mustache',
     add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache',
     mapper_attr_list: [
       {attr_title: 'Summary', attr_name: 'title'},
