@@ -21,12 +21,10 @@ class AccessControlPerson(mixins.Base, db.Model):
       db.Integer,
       db.ForeignKey('people.id'),
       nullable=False,
-      primary_key=True,
   )
 
   ac_list_id = db.Column(
       db.Integer,
       db.ForeignKey('access_control_list.id'),
       nullable=False,
-      primary_key=True,
   )
