@@ -60,7 +60,7 @@ export default can.Control.extend({
   },
 
   init: function () {
-    this._draw_node_deferred = can.Deferred();
+    this._draw_node_deferred = $.Deferred();
 
     if (this.options.child_options) {
       this.options.child_options.each(function (option) {
@@ -273,7 +273,7 @@ export default can.Control.extend({
   /**
    * Expand the tree node to make its subnodes visible.
    *
-   * @return {can.Deferred} - a deferred object resolved when all the child
+   * @return {$.Deferred} - a deferred object resolved when all the child
    *   nodes have been loaded and displayed
    */
   expand: function () {
@@ -291,7 +291,7 @@ export default can.Control.extend({
 
     this.options.attr('expanded', true);
 
-    this._expand_deferred = can.Deferred();
+    this._expand_deferred = $.Deferred();
     setTimeout(this._ifNotRemoved(function () {
       this.display_subtrees()
         .then(this._ifNotRemoved(function () {

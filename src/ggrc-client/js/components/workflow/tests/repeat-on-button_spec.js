@@ -139,7 +139,7 @@ describe('repeat-on-button component', function () {
   describe('save method', function () {
     let saveDfd;
     beforeEach(function () {
-      saveDfd = can.Deferred();
+      saveDfd = $.Deferred();
       viewModel.attr('onSaveRepeat', function () {
         return saveDfd;
       });

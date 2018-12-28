@@ -160,8 +160,8 @@ describe('GGRC Utils Widgets', function () {
     let id = 1;
 
     beforeEach(function () {
-      queryDfd = can.Deferred();
-      snapshotCountsDfd = can.Deferred();
+      queryDfd = $.Deferred();
+      snapshotCountsDfd = $.Deferred();
       method = WidgetsUtils.initCounts;
       getCounts = WidgetsUtils.getCounts;
 
@@ -298,7 +298,7 @@ describe('GGRC Utils Widgets', function () {
 
       spyOn(QueryAPI, 'batchRequests')
         .and.callFake(function () {
-          requestDfd = can.Deferred();
+          requestDfd = $.Deferred();
           requestDfds.push(requestDfd);
           return requestDfd;
         });
@@ -364,7 +364,7 @@ describe('GGRC Utils Widgets', function () {
     beforeEach(function () {
       refreshCounts = WidgetsUtils.refreshCounts;
       countsMap = WidgetsUtils.getCounts();
-      snapshotCountsDfd = can.Deferred();
+      snapshotCountsDfd = $.Deferred();
 
       widgets =
         {
@@ -399,7 +399,7 @@ describe('GGRC Utils Widgets', function () {
 
       spyOn(can, 'ajax')
         .and.returnValues(
-          can.Deferred().resolve(
+          $.Deferred().resolve(
             [
               {Program: {count: 0, total: 0}, selfLink: null},
               {Assessment: {count: 0, total: 0}, selfLink: null},

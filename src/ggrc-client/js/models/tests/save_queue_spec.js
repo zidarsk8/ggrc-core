@@ -34,7 +34,7 @@ describe('SaveQueue module', function () {
         type: objType,
         id: objId,
         _save: jasmine.createSpy('_save'),
-        _dfd: new can.Deferred(),
+        _dfd: new $.Deferred(),
       };
 
       let response = [

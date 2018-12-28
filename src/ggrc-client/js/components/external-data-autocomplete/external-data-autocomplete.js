@@ -113,7 +113,7 @@ export default can.Component.extend({
           type: 'itemSelected',
           selectedItem: model,
         });
-      }).finally(() => {// create is async and returns Promise (not can.Deferred)
+      }).finally(() => {// create is async and returns Promise (not $.Deferred)
         this.attr('saving', false);
       });
     },

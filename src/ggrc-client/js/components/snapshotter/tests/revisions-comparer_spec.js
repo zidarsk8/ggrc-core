@@ -96,11 +96,11 @@ describe('revisions-comparer companent', function () {
         spyOn(Revision, 'findInCacheById').and.returnValue(undefined);
 
         spyOn(Revision, 'findAll').and.returnValue(
-          can.Deferred().resolve([{id: 42}, {id: 11}])
+          $.Deferred().resolve([{id: 42}, {id: 11}])
         );
 
         spyOn(Revision, 'findOne').and.returnValue(
-          can.Deferred().resolve({id: 42})
+          $.Deferred().resolve({id: 42})
         );
 
         method(42, 11).then(function (result) {
@@ -122,11 +122,11 @@ describe('revisions-comparer companent', function () {
           .returnValues({id: 42}, undefined);
 
         spyOn(Revision, 'findAll').and.returnValue(
-          can.Deferred().resolve([{id: 42}, {id: 11}])
+          $.Deferred().resolve([{id: 42}, {id: 11}])
         );
 
         spyOn(Revision, 'findOne').and.returnValue(
-          can.Deferred().resolve({id: 42})
+          $.Deferred().resolve({id: 42})
         );
 
         method(42, 11).then(function (result) {
@@ -145,11 +145,11 @@ describe('revisions-comparer companent', function () {
         spyOn(Revision, 'findInCacheById').and.returnValues({id: 42}, {id: 11});
 
         spyOn(Revision, 'findAll').and.returnValue(
-          can.Deferred().resolve([{id: 42}, {id: 11}])
+          $.Deferred().resolve([{id: 42}, {id: 11}])
         );
 
         spyOn(Revision, 'findOne').and.returnValue(
-          can.Deferred().resolve({id: 42})
+          $.Deferred().resolve({id: 42})
         );
 
         method(42, 11).then(function (result) {
@@ -209,11 +209,11 @@ describe('revisions-comparer companent', function () {
     });
 
     it('does not ajax call when all people are in cache', () => {
-      let dfd = new can.Deferred();
+      let dfd = new $.Deferred();
       spyOn(Person, 'findInCacheById').and.callFake(() => {
         return {email: 'example@email.com'};
       });
-      spyOn(can, 'Deferred').and.returnValue(dfd);
+      spyOn($, 'Deferred').and.returnValue(dfd);
       spyOn(dfd, 'resolve');
 
       method(instance);

@@ -317,7 +317,7 @@ export default can.Component.extend({
     load: function () {
       let self = this;
       let modelKey = this.getModelKey();
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       let query = this.getQuery('values', true);
       this.attr('isLoading', true);
 
@@ -391,7 +391,7 @@ export default can.Component.extend({
     },
     loadAllItemsIds: function () {
       let modelKey = this.getModelKey();
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       let queryType = 'ids';
       let query = this.getQuery(queryType, false);
 

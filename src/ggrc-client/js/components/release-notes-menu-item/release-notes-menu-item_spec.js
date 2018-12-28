@@ -41,7 +41,7 @@ describe('"release-notes-menu-item" component', () => {
         handler = events.inserted.bind({viewModel: vm});
         spyOn(vm, 'open');
 
-        profileDfd = can.Deferred();
+        profileDfd = $.Deferred();
         spyOn(UserUtils, 'loadUserProfile')
           .and.returnValue(profileDfd);
         spyOn(UserUtils, 'updateUserProfile')

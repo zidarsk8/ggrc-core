@@ -24,7 +24,7 @@ describe('generate-issues-in-bulk-button component', () => {
 
       it('should set isGeneratingInProgress flag TRUE', () => {
         spyOn(viewModel, 'generateChildrenIssues')
-          .and.returnValue(new can.Deferred());
+          .and.returnValue(new $.Deferred());
 
         viewModel.attr('isGeneratingInProgress', false);
 
@@ -35,7 +35,7 @@ describe('generate-issues-in-bulk-button component', () => {
 
       it('should make a request to generate issues', () => {
         spyOn(viewModel, 'generateChildrenIssues')
-          .and.returnValue(new can.Deferred());
+          .and.returnValue(new $.Deferred());
 
         viewModel.generate();
 
@@ -44,7 +44,7 @@ describe('generate-issues-in-bulk-button component', () => {
 
       it('should show notification if generating in progress', () => {
         spyOn(viewModel, 'generateChildrenIssues')
-          .and.returnValue(new can.Deferred().resolve());
+          .and.returnValue(new $.Deferred().resolve());
         spyOn(notifierUtils, 'notifier');
 
         viewModel.generate();
@@ -55,7 +55,7 @@ describe('generate-issues-in-bulk-button component', () => {
 
       it('should start to track status if generating in progress', () => {
         spyOn(viewModel, 'generateChildrenIssues')
-          .and.returnValue(new can.Deferred().resolve());
+          .and.returnValue(new $.Deferred().resolve());
 
         viewModel.generate();
 
@@ -67,7 +67,7 @@ describe('generate-issues-in-bulk-button component', () => {
         () => {
           viewModel.attr('isGeneratingInProgress', false);
 
-          let dfd = new can.Deferred();
+          let dfd = new $.Deferred();
           spyOn(viewModel, 'generateChildrenIssues').and.returnValue(dfd);
           spyOn(errorsUtils, 'handleAjaxError');
 
@@ -81,7 +81,7 @@ describe('generate-issues-in-bulk-button component', () => {
 
       it('should handle ajax error', () => {
         spyOn(viewModel, 'generateChildrenIssues')
-          .and.returnValue(new can.Deferred().reject());
+          .and.returnValue(new $.Deferred().reject());
         spyOn(errorsUtils, 'handleAjaxError');
 
         viewModel.generate();
@@ -123,7 +123,7 @@ describe('generate-issues-in-bulk-button component', () => {
       let dfd;
 
       beforeEach(() => {
-        dfd = new can.Deferred();
+        dfd = new $.Deferred();
         viewModel.attr('isGeneratingInProgress', true);
         spyOn(viewModel, 'getStatus').and.returnValue(dfd);
         spyOn(viewModel, 'trackStatus');
@@ -176,7 +176,7 @@ describe('generate-issues-in-bulk-button component', () => {
       let dfd;
 
       beforeEach(() => {
-        dfd = new can.Deferred();
+        dfd = new $.Deferred();
         spyOn(viewModel, 'getStatus').and.returnValue(dfd);
         spyOn(viewModel, 'trackStatus');
       });

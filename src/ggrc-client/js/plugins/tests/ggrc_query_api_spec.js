@@ -12,7 +12,7 @@ describe('GGRC Utils Query API', function () {
     beforeEach(function () {
       spyOn(can, 'ajax')
         .and.returnValues(
-          can.Deferred().resolve([1, 2, 3, 4]), can.Deferred().resolve([1]));
+          $.Deferred().resolve([1, 2, 3, 4]), $.Deferred().resolve([1]));
     });
 
     afterEach(function () {

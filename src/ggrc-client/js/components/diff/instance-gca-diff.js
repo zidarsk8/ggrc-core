@@ -75,7 +75,7 @@ const viewModel = DiffBaseVM.extend({
   buildPersonDiff(modifiedAttr, currentAttr) {
     const val = currentAttr.value;
     const def = currentAttr.def;
-    const dfd = can.Deferred();
+    const dfd = $.Deferred();
     const diffObject = {
       attrName: def.title,
       currentVal: [this.attr('emptyValue')],

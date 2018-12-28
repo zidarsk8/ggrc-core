@@ -16,8 +16,8 @@ describe('reminder component', function () {
     let $element;
 
     beforeEach(function () {
-      pendingRefresh = new can.Deferred();
-      pendingSave = new can.Deferred();
+      pendingRefresh = new $.Deferred();
+      pendingSave = new $.Deferred();
 
       instance = new can.Map({
         refresh: jasmine.createSpy('refresh')

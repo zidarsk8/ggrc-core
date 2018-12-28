@@ -68,7 +68,7 @@ describe('request-review-modal component', () => {
     let saveDfd;
     let review;
     beforeEach(() => {
-      saveDfd = can.Deferred();
+      saveDfd = $.Deferred();
       review = new Review({
         access_control_list: [],
         email_message: originalEmailComment,

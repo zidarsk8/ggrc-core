@@ -13,7 +13,7 @@ function refreshAttr(instance, attr) {
   if (instance.attr(attr).reify().selfLink) {
     result = instance.attr(attr).reify().refresh();
   } else {
-    result = can.Deferred().resolve();
+    result = $.Deferred().resolve();
   }
 
   return result;

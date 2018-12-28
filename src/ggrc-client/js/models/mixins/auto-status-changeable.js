@@ -38,7 +38,7 @@ export default Mixin({}, {
       STATUS_IN_PROGRESS, '" - are you sure about that?',
     ].join('');
 
-    let confirmation = can.Deferred();
+    let confirmation = $.Deferred();
 
     if (_.includes(IGNORED_STATES, this.status)) {
       confirmation.resolve();

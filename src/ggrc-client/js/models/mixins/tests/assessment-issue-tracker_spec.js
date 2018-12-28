@@ -29,7 +29,7 @@ describe('assessmentIssueTracker mixin', () => {
     const asmtProto = Assessment.prototype;
 
     it('should call "initIssueTrackerForAssessment" for audit', () => {
-      let dfd = new can.Deferred();
+      let dfd = new $.Deferred();
       dfd.resolve(audit);
       spyOn(asmtProto, 'ensureParentAudit').and.returnValue(dfd);
       spyOn(asmtProto, 'initIssueTrackerForAssessment');
@@ -38,7 +38,7 @@ describe('assessmentIssueTracker mixin', () => {
     });
 
     it('should call "trackAuditUpdates" method', (done) => {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       spyOn(asmtProto, 'initIssueTracker').and.returnValue(dfd);
       spyOn(asmtProto, 'trackAuditUpdates');
       makeFakeInstance({model: Assessment})({type: 'Assessment'});
@@ -87,7 +87,7 @@ describe('assessmentIssueTracker mixin', () => {
       spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue({ });
 
-      let dfd = new can.Deferred();
+      let dfd = new $.Deferred();
       dfd.resolve(_.set({}, 'Audit.values[0]', audit));
       spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
 

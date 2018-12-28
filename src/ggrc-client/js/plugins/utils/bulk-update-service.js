@@ -16,7 +16,7 @@ const toBulkModel = (instances, targetProps) => {
 export default {
   update: function (model, instances, targetProps) {
     const url = '/api/' + model.table_plural;
-    const dfd = can.Deferred();
+    const dfd = $.Deferred();
     instances = toBulkModel(instances, targetProps);
 
     $.ajax({

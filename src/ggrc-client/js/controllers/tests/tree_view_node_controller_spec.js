@@ -24,7 +24,7 @@ describe('TreeViewNode Controller', function () {
         }),
         element: $element,
         _draw_node_in_progress: false,
-        _draw_node_deferred: new can.Deferred(),
+        _draw_node_deferred: new $.Deferred(),
         add_child_lists_to_child: jasmine.createSpy(),
         _ifNotRemoved: jasmine.createSpy().and.returnValue(ifNotRemovedResult),
         replace_element: jasmine.createSpy(),
@@ -112,7 +112,7 @@ describe('TreeViewNode Controller', function () {
         '</li>',
       ].join(''));
 
-      displaySubtreesDfd = new can.Deferred();
+      displaySubtreesDfd = new $.Deferred();
 
       ctrlInst = {
         element: $tree,
@@ -133,7 +133,7 @@ describe('TreeViewNode Controller', function () {
     it('triggers displaying the subtrees if currently not expanded',
       function (done) {
         // the node has been expanded before...
-        ctrlInst._expand_deferred = new can.Deferred();
+        ctrlInst._expand_deferred = new $.Deferred();
 
         // ...but it's currently not expanded
         $tree.find('.openclose').removeClass('active');

@@ -15,7 +15,7 @@ describe('tree-field component', () => {
 
   describe('refreshItems() method', () => {
     it('sets empty result when nothing is uploaded', () => {
-      spyOn(vm, 'getItems').and.returnValue(can.Deferred().resolve([]));
+      spyOn(vm, 'getItems').and.returnValue($.Deferred().resolve([]));
       vm.refreshItems();
 
       expect(vm.attr('items').length).toBe(0);
@@ -24,7 +24,7 @@ describe('tree-field component', () => {
 
     it('shows result for uploaded items', () => {
       spyOn(vm, 'getItems').and
-        .returnValue(can.Deferred().resolve([
+        .returnValue($.Deferred().resolve([
           {title: 'asd'},
           {title: 'sdf'},
         ]));
@@ -36,7 +36,7 @@ describe('tree-field component', () => {
 
     it('adds "and more" text when limit exceeded', () => {
       spyOn(vm, 'getItems').and
-        .returnValue(can.Deferred().resolve([
+        .returnValue($.Deferred().resolve([
           {title: '1'},
           {title: '2'},
           {title: '3'},
@@ -75,7 +75,7 @@ describe('tree-field component', () => {
     it('triggers \'loadItems\' for items without required data', (done) => {
       let source = [{}, {}, {}];
       vm.attr('source', source);
-      spyOn(vm, 'loadItems').and.returnValue(can.Deferred().resolve(source));
+      spyOn(vm, 'loadItems').and.returnValue($.Deferred().resolve(source));
       vm.getItems().then((result) => {
         expect(result.length).toBe(3);
         expect(vm.loadItems).toHaveBeenCalled();
@@ -88,7 +88,7 @@ describe('tree-field component', () => {
         let source = [{email: 'foo'}, {email: 'bar'}, {email: 'baz'}];
         vm.attr('field', 'email');
         vm.attr('source', source);
-        spyOn(vm, 'loadItems').and.returnValue(can.Deferred().resolve(source));
+        spyOn(vm, 'loadItems').and.returnValue($.Deferred().resolve(source));
         vm.getItems().then((result) => {
           expect(result.length).toBe(source.length);
           expect(vm.loadItems).not.toHaveBeenCalled();

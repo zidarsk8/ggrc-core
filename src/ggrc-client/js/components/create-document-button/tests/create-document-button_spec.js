@@ -24,7 +24,7 @@ describe('create-document-button component', () => {
       let checkDocumentsExistDfd;
 
       beforeEach(() => {
-        checkDocumentsExistDfd = can.Deferred();
+        checkDocumentsExistDfd = $.Deferred();
         spyOn(viewModel, 'checkDocumentsExist').and
           .returnValue(checkDocumentsExistDfd);
       });
@@ -32,9 +32,9 @@ describe('create-document-button component', () => {
       it('should check wheteher documents already exist', () => {
         let file = {};
         spyOn(viewModel, 'createDocuments')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
         spyOn(viewModel, 'useExistingDocuments')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
 
         viewModel.mapDocuments(file);
 
@@ -44,9 +44,9 @@ describe('create-document-button component', () => {
       it('should create a new documents if they are not exist', (done) => {
         let file = {id: 1};
         spyOn(viewModel, 'createDocuments')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
         spyOn(viewModel, 'useExistingDocuments')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
 
         viewModel.mapDocuments([file]);
 
@@ -67,9 +67,9 @@ describe('create-document-button component', () => {
             object: {},
           }];
           spyOn(viewModel, 'createDocuments')
-            .and.returnValue(can.Deferred().resolve([]));
+            .and.returnValue($.Deferred().resolve([]));
           spyOn(viewModel, 'useExistingDocuments')
-            .and.returnValue(can.Deferred().resolve([]));
+            .and.returnValue($.Deferred().resolve([]));
 
           viewModel.mapDocuments([file]);
 
@@ -96,9 +96,9 @@ describe('create-document-button component', () => {
         };
 
         spyOn(viewModel, 'createDocuments')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
         spyOn(viewModel, 'useExistingDocuments')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
 
         viewModel.mapDocuments(files);
 
@@ -119,9 +119,9 @@ describe('create-document-button component', () => {
         let document2 = {};
         spyOn(viewModel, 'refreshPermissionsAndMap');
         spyOn(viewModel, 'createDocuments')
-          .and.returnValue(can.Deferred().resolve([document1]));
+          .and.returnValue($.Deferred().resolve([document1]));
         spyOn(viewModel, 'useExistingDocuments')
-          .and.returnValue(can.Deferred().resolve([document2]));
+          .and.returnValue($.Deferred().resolve([document2]));
 
         viewModel.mapDocuments([]);
 
@@ -147,7 +147,7 @@ describe('create-document-button component', () => {
         });
 
       it('should return new document after saving', (done) => {
-        let saveDfd = can.Deferred();
+        let saveDfd = $.Deferred();
         let newDocument = {};
         spyOn(Document.prototype, 'save').and.returnValue(saveDfd);
 
@@ -166,7 +166,7 @@ describe('create-document-button component', () => {
           spyOn(parentInstance, 'dispatch');
 
           spyOn(Document.prototype, 'save')
-            .and.returnValue(can.Deferred().reject());
+            .and.returnValue($.Deferred().reject());
 
           let result = viewModel.createDocuments([{}]);
 
@@ -182,7 +182,7 @@ describe('create-document-button component', () => {
       let showConfirmDfd;
 
       beforeEach(() => {
-        showConfirmDfd = can.Deferred();
+        showConfirmDfd = $.Deferred();
         spyOn(viewModel, 'showConfirm').and.returnValue(showConfirmDfd);
       });
 
@@ -238,7 +238,7 @@ describe('create-document-button component', () => {
         };
         handler = events['.pick-file click'].bind(context);
 
-        uploadFilesDfd = can.Deferred();
+        uploadFilesDfd = $.Deferred();
         spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
         spyOn(viewModel, 'mapDocuments');
       });

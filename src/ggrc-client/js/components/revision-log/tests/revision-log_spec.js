@@ -41,7 +41,7 @@ describe('revision-log component', function () {
     let dfdFetchData;
 
     beforeEach(function () {
-      dfdFetchData = new can.Deferred();
+      dfdFetchData = new $.Deferred();
       spyOn(viewModel, '_fetchRevisionsData').and.returnValue(dfdFetchData);
     });
 
@@ -494,7 +494,7 @@ describe('revision-log component', function () {
         type: 'ObjectFoo',
       });
       viewModel._fetchEmbeddedRevisionData = function () {
-        return can.Deferred().resolve([]);
+        return $.Deferred().resolve([]);
       };
     });
 
@@ -503,9 +503,9 @@ describe('revision-log component', function () {
     });
 
     beforeEach(function () {
-      dfdResource = new can.Deferred();
-      dfdSource = new can.Deferred();
-      dfdDestination = new can.Deferred();
+      dfdResource = new $.Deferred();
+      dfdSource = new $.Deferred();
+      dfdDestination = new $.Deferred();
 
       spyOn(Revision, 'findAll').and.callFake(function (options) {
         if (options.resource_type) {
@@ -1272,7 +1272,7 @@ describe('revision-log component', function () {
 
     beforeEach(() => {
       viewModel = getComponentVM(Component);
-      fetchDfd = can.Deferred();
+      fetchDfd = $.Deferred();
       method = Component.prototype.init.bind({viewModel: viewModel});
       review = new Review({
         last_reviewed_by: {id: 1},

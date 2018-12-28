@@ -118,7 +118,7 @@ export default can.Control({
       userFetch = currentUser.refresh();
     } else {
       // nothing to wait for
-      userFetch = new can.Deferred().resolve(currentUser);
+      userFetch = new $.Deferred().resolve(currentUser);
     }
 
     userFetch
@@ -361,7 +361,7 @@ export default can.Control({
         });
       }
     }
-    return preloadDfd || can.Deferred().resolve();
+    return preloadDfd || $.Deferred().resolve();
   },
 
   fetch_all: function () {
@@ -951,7 +951,7 @@ export default can.Control({
     let ajd;
 
     if (this.wasDestroyed()) {
-      return can.Deferred().reject();
+      return $.Deferred().reject();
     }
 
     if (instance.errors()) {

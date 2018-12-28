@@ -94,7 +94,7 @@ class BackendGdriveClient {
    * Shows gapi modal and runs authorization if user confirmed the action.
    */
   runBackendAuth() {
-    this.authDfd = can.Deferred();
+    this.authDfd = $.Deferred();
     this.showGapiModal({
       scopes: ['https://www.googleapis.com/auth/drive'],
       onAccept: () => {
@@ -120,7 +120,7 @@ class BackendGdriveClient {
           this.runBackendAuth();
         }
 
-        let resultDfd = can.Deferred();
+        let resultDfd = $.Deferred();
         this.authDfd.then(() => {
           action().then(resultDfd.resolve, resultDfd.reject);
         }, (error) => resultDfd.reject(rejectResponse || error));
@@ -142,8 +142,8 @@ class GGRCGapiClient {
       'https://www.googleapis.com/auth/userinfo.email',
     ];
     this.loadedClientLibraries = {};
-    this.oauthResult = can.Deferred();
-    this.client = can.Deferred();
+    this.oauthResult = $.Deferred();
+    this.client = $.Deferred();
     this.showGapiModal = showGapiModal;
   }
 
@@ -193,7 +193,7 @@ class GGRCGapiClient {
 
       if (needToRequestForNewScopes || !token) {
         this.oauthResult.reject();
-        this.oauthResult = can.Deferred();
+        this.oauthResult = $.Deferred();
         this.oauthResult.then(() => this.checkLoggedUser());
         this.runAuthorization(true);
       }
@@ -247,7 +247,7 @@ class GGRCGapiClient {
    * @return {Deferred} - Request result.
    */
   makeGapiRequest({path = '', method = ''} = {}) {
-    let result = can.Deferred();
+    let result = $.Deferred();
 
     gapi.client.request({path, method})
       .then((response) => {
@@ -265,7 +265,7 @@ class GGRCGapiClient {
    * @return {Deferred} - The requested library.
    */
   loadClientLibrary(libraryName) {
-    let result = can.Deferred();
+    let result = $.Deferred();
 
     if (this.loadedClientLibraries[libraryName]) {
       result.resolve(this.loadedClientLibraries[libraryName]);

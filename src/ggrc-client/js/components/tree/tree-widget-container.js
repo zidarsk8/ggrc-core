@@ -534,7 +534,7 @@ viewModel = can.Map.extend({
   },
   getNextItemPage: function (absoluteNumber, pageInfo) {
     let pageNumber = Math.floor(absoluteNumber / pageInfo.pageSize) + 1;
-    let dfd = can.Deferred().resolve();
+    let dfd = $.Deferred().resolve();
 
     if (pageInfo.current !== pageNumber) {
       this.attr('loading', true);
@@ -653,7 +653,7 @@ export default can.Component.extend({
             this.viewModel.closeInfoPane();
             this.viewModel.showLastPage();
 
-            return can.Deferred().resolve();
+            return $.Deferred().resolve();
           }
 
           return newInstance

@@ -39,7 +39,7 @@ describe('Relationship model', function () {
     });
 
     it('triggers "destroyed" event', function () {
-      spyOn($, 'ajax').and.returnValue(can.Deferred().resolve());
+      spyOn($, 'ajax').and.returnValue($.Deferred().resolve());
       spyOn(can, 'trigger');
 
       instance.unmap(true);

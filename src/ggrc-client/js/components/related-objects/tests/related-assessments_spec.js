@@ -57,7 +57,7 @@ describe('related-assessments component', () => {
     describe('loadRelatedAssessments() method', () => {
       const mockRelatedAsmtResponse = (response) => {
         spyOn(viewModel.attr('instance'), 'getRelatedAssessments')
-          .and.returnValue(can.Deferred().resolve(response));
+          .and.returnValue($.Deferred().resolve(response));
       };
 
       beforeEach(() => {
@@ -102,7 +102,7 @@ describe('related-assessments component', () => {
         const relatedAssessments = viewModel.attr('relatedAssessments');
 
         spyOn(viewModel.attr('instance'), 'getRelatedAssessments')
-          .and.returnValue(can.Deferred().reject());
+          .and.returnValue($.Deferred().reject());
 
         spyOn(relatedAssessments, 'replace');
 
@@ -229,7 +229,7 @@ describe('related-assessments component', () => {
           title: 'evidence1',
         }]);
 
-        saveDfd = can.Deferred();
+        saveDfd = $.Deferred();
         saveSpy = jasmine.createSpy().and.returnValue(saveDfd);
         spyOn(viewModel, 'buildEvidenceModel').and.returnValue({
           save: saveSpy,

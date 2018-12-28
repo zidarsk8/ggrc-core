@@ -416,7 +416,7 @@ describe('assessment-info-pane component', () => {
     let dfd;
 
     beforeEach(function () {
-      dfd = can.Deferred();
+      dfd = $.Deferred();
       spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
     });
 
@@ -769,7 +769,7 @@ describe('assessment-info-pane component', () => {
     let dfd;
 
     beforeEach(function () {
-      dfd = can.Deferred();
+      dfd = $.Deferred();
       type = 'type';
       event = {
         item: new can.Map({
@@ -933,7 +933,7 @@ describe('assessment-info-pane component', () => {
 
     beforeEach(function () {
       const countOfItems = 3;
-      dfd = can.Deferred();
+      dfd = $.Deferred();
       type = 'type';
       items = new can.List(
         Array(countOfItems)
@@ -1070,7 +1070,7 @@ describe('assessment-info-pane component', () => {
     let dfd;
 
     beforeEach(function () {
-      dfd = can.Deferred();
+      dfd = $.Deferred();
       vm.attr('instance', {});
       vm.attr('instance').getRelatedObjects =
         jasmine.createSpy('getRelatedObjects').and.returnValue(dfd);
@@ -1253,7 +1253,7 @@ describe('assessment-info-pane component', () => {
         let dfd;
 
         beforeEach(() => {
-          dfd = can.Deferred();
+          dfd = $.Deferred();
           completeTransaction = args[ARGS_ORDER.CALLBACK];
           vm.attr('instance', {
             save: jasmine.createSpy('save').and.returnValue(dfd),
@@ -1298,7 +1298,7 @@ describe('assessment-info-pane component', () => {
 
     beforeEach(() => {
       const {'default': DeferredTransaction} = DeferredTransactionUtil;
-      instanceSave = can.Deferred();
+      instanceSave = $.Deferred();
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
       vm.attr('instance', {
@@ -1477,7 +1477,7 @@ describe('assessment-info-pane component', () => {
 
       describe('"saveDfd" field with', () => {
         it('deferred object from event.saveDfd field', function () {
-          const expectedResult = can.Deferred();
+          const expectedResult = $.Deferred();
           event.saveDfd = expectedResult;
           vm.showRequiredInfoModal(event);
           expect(vm.attr('modal.content.saveDfd')).toBe(expectedResult);

@@ -133,7 +133,7 @@ export default can.Model('can.Model.Cacheable', {
 
   makeFindAll: function (finder) {
     return function (params, success, error) {
-      let deferred = can.Deferred();
+      let deferred = $.Deferred();
       let sourceDeferred = finder.call(this, params);
       let self = this;
 
@@ -672,11 +672,11 @@ export default can.Model('can.Model.Cacheable', {
     let that = this;
 
     if (!href) {
-      return can.Deferred().reject();
+      return $.Deferred().reject();
     }
     if (!this._pending_refresh) {
       this._pending_refresh = {
-        dfd: can.Deferred(),
+        dfd: $.Deferred(),
         fn: _.throttle(function () {
           let dfd = that._pending_refresh.dfd;
           let stopFn = tracker.start(that.type,
@@ -795,7 +795,7 @@ export default can.Model('can.Model.Cacheable', {
         return result;
       }, (xhr, status, message) => {
         this.save_error && this.save_error(xhr.responseText);
-        return new can.Deferred().reject(xhr, status, message);
+        return new $.Deferred().reject(xhr, status, message);
       })
       .fail((response) => {
         this.notifier.onEmpty(() => {
@@ -816,7 +816,7 @@ export default can.Model('can.Model.Cacheable', {
     return saveDfd;
   },
   save: function () {
-    this._dfd = new can.Deferred();
+    this._dfd = new $.Deferred();
     delayLeavingPageUntil(this._dfd);
 
     SaveQueue.enqueue(this, this._super);

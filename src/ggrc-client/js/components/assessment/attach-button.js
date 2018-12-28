@@ -65,7 +65,7 @@ export default can.Component.extend({
       let folderId = this.attr('instance.folder');
 
       if (!folderId) {
-        return can.Deferred().resolve();
+        return $.Deferred().resolve();
       }
 
       return findGDriveItemById(folderId);
