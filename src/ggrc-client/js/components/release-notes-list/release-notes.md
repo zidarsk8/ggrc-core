@@ -1,10 +1,12 @@
-[//]: <> (updated 12/12/2018)
+[//]: <> (updated 12/20/2018)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.8sjnq6mfbagk)
+[Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.d9jpeh222p9)
 
-[New roles for scoping objects (v1.29.0, 10/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fvuapgweci23)
+[You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ypafmrujihtr)
+
+[New roles for scoping objects (v1.29.0, 10/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.c6k8uylt9ww9)
 
 [Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7101oq4j5iuv)
 
@@ -68,12 +70,13 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
+### Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)
+
+Primary and Secondary Contacts in Control object are renamed. The new labels for these roles are Control Operator and Control Owner respectively.
+
 ### You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)
 
-New columns in import files are now supported for bulk import of ticket tracker integration settings.
-The columns are Integration enabled (true, false), Hotlist ID, Component ID, Priority, Severity, Ticket title.
-You can either generate a new ticket for Assessment/Issue or turn on/off integration for already linked tickets. Linking existing tickets to Assessments/Issues is not supported yet.  
-You can also export ticket tracker config for assessments and issues.
+New columns in import files are now supported for bulk import of ticket tracker integration settings. The columns are Integration enabled (true, false), Hotlist ID, Component ID, Priority, Severity, Ticket title. You can either generate a new ticket for Assessment/Issue or turn on/off integration for already linked tickets. Linking existing tickets to Assessments/Issues is not supported yet. You can also export ticket tracker config for assessments and issues.
 
 ### New roles for scoping objects (v1.29.0, 10/30/2018)
 
