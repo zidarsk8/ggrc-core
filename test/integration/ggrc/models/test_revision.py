@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """ Tests for ggrc.models.Revision """
+from datetime import datetime
+
 import ddt
 import mock
 
@@ -12,6 +14,7 @@ from integration.ggrc import TestCase
 
 from integration.ggrc.models import factories
 from integration.ggrc import api_helper
+from integration.ggrc import query_helper
 from integration.ggrc.review import build_reviewer_acl
 
 
@@ -36,7 +39,7 @@ def _project_content(content):
 
 
 @ddt.ddt
-class TestRevisions(TestCase):
+class TestRevisions(query_helper.WithQueryApi, TestCase):
   """ Tests for ggrc.models.Revision """
 
   def setUp(self):
@@ -387,3 +390,28 @@ class TestRevisions(TestCase):
     }
 
     self.assertEqual(review, expected)
+
+  def test_revision_ordering(self):
+    """Test revision ordering by created_at with query api"""
+    with factories.single_commit():
+      # pylint: disable=expression-not-assigned
+      [factories.ControlFactory() for i in range(10)]
+      # pylint: enable=expression-not-assigned
+
+    query = self._make_query_dict(
+        "Revision", expression=("resource_type", "=", "Control"),
+        order_by=[{"name": "created_at", "desc": True}]
+    )
+
+    self.client.get("/login")
+    result = self._get_first_result_set(query, "Revision")
+    count, values = result["count"], result["values"]
+
+    datetime_format = "%Y-%m-%dT%H:%M:%S"
+    for value in values:
+      value["created_at"] = datetime.strptime(value["created_at"],
+                                              datetime_format)
+    self.assertTrue(
+        all(values[i]["created_at"] >= values[i + 1]["created_at"]
+            for i in range(count - 1))
+    )
