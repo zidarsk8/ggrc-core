@@ -140,6 +140,9 @@ def secondary_check_assessment(row_converter):
           (obj.status in obj.END_STATES and obj.verified)) and
           not obj.verifiers):
     row_converter.add_warning(errors.NO_VERIFIER_WARNING, status=obj.status)
+    # In case of import new asmt with 'Rework Needed' status
+    # we can't change it to default state because of validation
+    obj.skip_rework_validation = True
     obj.status = row_converter.initial_state.status or obj.default_status()
 
 

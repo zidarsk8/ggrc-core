@@ -239,9 +239,10 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
     if self.status == self.REWORK_NEEDED:
       valid_states = [self.DONE_STATE, self.FINAL_STATE, self.DEPRECATED]
       if value not in valid_states:
-        raise ValueError("Assessment in `Rework Needed` "
-                         "state can be only moved to: [{}]".format(
-                             ",".join(valid_states)))
+        if not getattr(self, "skip_rework_validation", False):
+          raise ValueError("Assessment in `Rework Needed` "
+                           "state can be only moved to: [{}]".format(
+                               ",".join(valid_states)))
     return value
 
   @validates("operationally")
