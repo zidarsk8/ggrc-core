@@ -6,19 +6,20 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=invalid-name
 import datetime
-
 import pytest
+from nerodia.wait.wait import TimeoutError
 
 from lib import base, users
 from lib.app_entity_factory import (
     entity_factory_common, workflow_entity_factory)
-from lib.constants import roles, workflow_repeat_units, messages
+from lib.constants import messages, roles, workflow_repeat_units
 from lib.entities import cycle_entity_population, ui_dict_convert
-from lib.page.widget import workflow_tabs, object_modal, object_page
+from lib.page.widget import object_modal, object_page, workflow_tabs
 from lib.rest_facades import (
     object_rest_facade, person_rest_facade, workflow_rest_facade)
-from lib.ui import workflow_ui_facade, ui_facade
-from lib.utils import test_utils, date_utils, ui_utils
+from lib.rest_services import workflow_rest_service
+from lib.ui import daily_emails_ui_facade, ui_facade, workflow_ui_facade
+from lib.utils import date_utils, test_utils, ui_utils
 
 
 @pytest.fixture(params=[roles.CREATOR, roles.READER])
@@ -179,6 +180,7 @@ class TestWorkflowSetupTab(base.Test):
 
 class TestActivateWorkflow(base.Test):
   """Test workflow activation and actions available after activation."""
+  _data = None
 
   @pytest.fixture()
   def activate_workflow(
@@ -187,12 +189,76 @@ class TestActivateWorkflow(base.Test):
     """Activates workflow."""
     workflow_ui_facade.activate_workflow(app_workflow)
 
+  @pytest.fixture()
+  def test_data(self):
+    """Creates an activated workflow with close due date."""
+    if not TestActivateWorkflow._data:
+      app_workflow = workflow_rest_facade.create_workflow()
+      task_group = workflow_rest_facade.create_task_group(
+          workflow=app_workflow)
+      assignee = person_rest_facade.create_person_with_role(roles.CREATOR)
+      due_date = date_utils.first_working_day_after_today(
+          datetime.date.today())
+      workflow_rest_facade.create_task_group_task(
+          task_group=task_group, assignees=[assignee], due_date=due_date)
+      workflow_rest_service.WorkflowRestService().activate(app_workflow)
+      # handle GGRC-6527 only
+      try:
+        emails = daily_emails_ui_facade.get_emails_by_user_names(
+            [users.current_user().name, assignee.name])
+      except TimeoutError as err:
+        if "digest" in err.message:
+          pytest.xfail("GGRC-6527: Digest is not opened")
+        else:
+          raise err
+      TestActivateWorkflow._data = {
+          "wf": app_workflow,
+          "wf_creator_email": emails[users.current_user().name],
+          "assignee_email": emails[assignee.name]}
+    return TestActivateWorkflow._data
+
   def test_active_cycles_tab_after_workflow_activation(
       self, activate_workflow
   ):
     """Test Active Cycles tab after activation of workflow."""
     # pylint: disable=invalid-name
     assert ui_facade.active_tab_name() == "Active Cycles (1)"
+
+  def test_destructive_assigned_task_notification(
+      self, selenium, test_data
+  ):
+    """Test cycle task assignee has notification about assigned tasks."""
+    assert (test_data["wf"].task_groups[0].task_group_tasks[0].title in
+            test_data["assignee_email"].assigned_tasks)
+
+  def xfail_if_time_delta_more_2d(self, start_date, due_date):
+    """Xfail test when time delta is bigger than 2 days, because
+    notification section with due very soon tasks will not have cycle
+    task.
+    """
+    if due_date - start_date > datetime.timedelta(days=2):
+      pytest.xfail(
+          reason="\nTime difference between start date and due date is more "
+                 "than 2 days.\nStart date: {0}\nDue date: {1}\nSection with "
+                 "due very soon tasks will not have this cycle "
+                 "task.\n".format(start_date, due_date))
+
+  def test_destructive_due_soon_task_notification(
+      self, selenium, test_data
+  ):
+    """Test cycle task assignee has notification about due very soon tasks."""
+    self.xfail_if_time_delta_more_2d(
+        test_data["wf"].task_groups[0].task_group_tasks[0].start_date,
+        test_data["wf"].task_groups[0].task_group_tasks[0].due_date)
+    assert (test_data["wf"].task_groups[0].task_group_tasks[0].title in
+            test_data["assignee_email"].due_soon_tasks)
+
+  def test_destructive_new_wf_cycle_notification(
+      self, selenium, test_data
+  ):
+    """Test cycle task creator has notification about new wf started."""
+    assert (test_data["wf"].title in
+            test_data["wf_creator_email"].new_wf_cycles)
 
   def test_history_tab_after_workflow_activation(self, activate_workflow):
     """Test History tab after activation of workflow."""
