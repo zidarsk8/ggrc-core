@@ -16,7 +16,7 @@ class _WidgetBar(base.Component):
   """All widget bars."""
   # pylint: disable=too-few-public-methods
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(_WidgetBar, self).__init__(driver)
     self.tabs = tab_element.Tabs(self._browser, tab_element.Tabs.TOP)
 
@@ -38,7 +38,7 @@ class _ObjectWidgetBar(_WidgetBar):
  (e.g. each Info Widget is object specific).
  """
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(_ObjectWidgetBar, self).__init__(driver)
     self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
 

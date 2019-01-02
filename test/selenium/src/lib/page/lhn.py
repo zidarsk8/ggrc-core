@@ -681,18 +681,6 @@ class Menu(base.AnimatedComponent):
               tab_name, (element.Lhn.MY_OBJS, element.Lhn.ALL_OBJS)
           ))
 
-  def toggle(self, menu_item):
-    """Toggle menu item by name"""
-    return getattr(self, 'toggle_' + menu_item)
-
-  def is_selectable(self, menu_item):
-    """Check menu item is selectable by name"""
-    return hasattr(self, 'select_' + menu_item)
-
-  def select(self, menu_item):
-    """Select menu item by name"""
-    return getattr(self, 'select_' + menu_item)()
-
   @property
   def get_all_lhn_objects_as_set(self):
     """Retruns all LHN objects as set"""
@@ -701,10 +689,10 @@ class Menu(base.AnimatedComponent):
     for elem in element.Lhn.BASE_OBJS:
       lhn_objects.add(
           elem.title() +
-          " (" + str(lhn_menu.toggle(elem).members_count) + ')')
+          " (" + str(getattr(self, 'toggle_' + elem).members_count) + ')')
     for elem in element.Lhn.SUB_OBJS:
-      lhn_item = lhn_menu.select(elem)
+      lhn_item = getattr(lhn_menu, 'select_' + elem)()
       lhn_item.update_members()
       for elem_sub in getattr(element.Lhn, elem.upper() + '_MEMBERS'):
-        lhn_objects.add(lhn_item.toggle(elem_sub).text)
+        lhn_objects.add(getattr(lhn_item, 'toggle_' + elem_sub).text)
     return lhn_objects

@@ -99,15 +99,16 @@ class TestMyWorkPage(base.Test):
     Check LHN contains the list of the objects with number in brackets."""
     lhn_menu = header_dashboard.open_lhn_menu().select_all_objects()
     for item in element.Lhn.BASE_OBJS:
-      lhn_item = lhn_menu.toggle(item)
+      lhn_item = getattr(lhn_menu, 'toggle_' + item)
       assert lhn_item.text == \
           item.upper() + ' (' + str(lhn_item.members_count) + ')'
     for item in element.Lhn.SUB_OBJS:
-      assert lhn_menu.toggle(item).text == item.replace('_or_', '/').upper()
-      lhn_item = lhn_menu.select(item)
+      assert getattr(lhn_menu, 'toggle_' + item).text == item.replace(
+          '_or_', '/').upper()
+      lhn_item = getattr(lhn_menu, 'select_' + item)()
       lhn_item.update_members()
       for item_sub in getattr(element.Lhn, item.upper() + '_MEMBERS'):
-        lhn_item_sub = lhn_item.toggle(item_sub)
+        lhn_item_sub = getattr(lhn_item, 'toggle_' + item_sub)
         assert lhn_item_sub.text == \
             item_sub.replace('_', ' ').title() + \
             ' (' + str(lhn_item_sub.members_count) + ')'
@@ -118,14 +119,14 @@ class TestMyWorkPage(base.Test):
     Check expand/collapse objects"""
     lhn_menu = header_dashboard.open_lhn_menu().select_all_objects()
     for item in element.Lhn.BASE_OBJS:
-      assert lhn_menu.is_selectable(item) is True
-      lhn_menu.select(item)
+      assert hasattr(lhn_menu, 'select_' + item) is True
+      getattr(lhn_menu, 'select_' + item)()
     for item in element.Lhn.SUB_OBJS:
-      assert lhn_menu.is_selectable(item) is True
-      lhn_item = lhn_menu.select(item)
+      assert hasattr(lhn_menu, 'select_' + item) is True
+      lhn_item = getattr(lhn_menu, 'select_' + item)()
       for item_sub in getattr(element.Lhn, item.upper() + '_MEMBERS'):
-        assert lhn_item.is_selectable(item_sub) is True
-        lhn_item.select(item_sub)
+        assert hasattr(lhn_item, 'select_' + item_sub) is True
+        getattr(lhn_item, 'select_' + item_sub)()
 
   @pytest.mark.smoke_tests
   def test_user_menu_buttons(self, header_dashboard):

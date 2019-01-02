@@ -50,18 +50,6 @@ class DropdownStatic(base.Dropdown):
   def __init__(self, driver):
     super(DropdownStatic, self).__init__(driver, self._locator_element)
 
-  def toggle(self, menu_item):
-    """Toggle menu item by name"""
-    return getattr(self, 'toggle_' + menu_item)
-
-  def is_selectable(self, menu_item):
-    """Check menu item is selectable by name"""
-    return hasattr(self, 'select_' + menu_item)
-
-  def select(self, menu_item):
-    """Select menu item by name"""
-    return getattr(self, 'select_' + menu_item)()
-
 
 class AccordionGroup(base.DropdownDynamic):
   """Mmodel for LHN's accoridon group."""
@@ -129,14 +117,10 @@ class AccordionGroup(base.DropdownDynamic):
     Args: member_title (basestring): (unique) title of member
     """
     try:
-      el = self._get_visible_member_by_title(member_title)
-      selenium_utils.hover_over_element(self._driver, el)
+      elem = self._get_visible_member_by_title(member_title)
+      selenium_utils.hover_over_element(self._driver, elem)
       selenium_utils.get_when_visible(
           self._driver, locator.LhnMenu.EXTENDED_INFO)
       return extended_info.ExtendedInfo(self._driver)
     except selenium_exception.StaleElementReferenceException:
       return self.hover_over_visible_member(member_title)
-
-  def toggle(self, menu_item):
-    """Toggle menu item by name"""
-    return getattr(self, 'toggle_' + menu_item)
