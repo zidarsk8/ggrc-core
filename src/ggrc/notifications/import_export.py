@@ -64,7 +64,8 @@ def get_import_export_tasks():
   ).filter(
       bg_operation.object_type == "ImportExport",
       bg_type.name.in_(IMPORT_EXPORT_OPERATIONS),
-      import_export.status.in_(ACTIVE_IE_STATUSES)
+      import_export.status.in_(ACTIVE_IE_STATUSES),
+      bg_task.status == bg_task.RUNNING_STATUS
   ).options(
       sa.orm.Load(bg_task).undefer_group(
           "BackgroundTask_complete"
