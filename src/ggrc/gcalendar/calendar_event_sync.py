@@ -3,7 +3,6 @@
 
 """ Module contains CalendarEventSync class."""
 
-import logging
 import datetime
 from sqlalchemy.orm import load_only
 from sqlalchemy import orm
@@ -11,9 +10,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.gcalendar import calendar_api_service, utils
-
-
-logger = logging.getLogger(__name__)
+from ggrc.utils import benchmark
 
 
 # pylint: disable=too-few-public-methods
@@ -26,35 +23,35 @@ class CalendarEventsSync(object):
 
   def sync_cycle_tasks_events(self):
     """Generates Calendar Events descriptions."""
-    events = all_models.CalendarEvent.query.options(
-        orm.joinedload("attendee").load_only(
-            "email",
-        ),
-        load_only(
-            all_models.CalendarEvent.id,
-            all_models.CalendarEvent.external_event_id,
-            all_models.CalendarEvent.title,
-            all_models.CalendarEvent.description,
-            all_models.CalendarEvent.attendee_id,
-            all_models.CalendarEvent.due_date,
-            all_models.CalendarEvent.last_synced_at
-        )
-    ).all()
-    event_mappings, _ = utils.get_related_mapping(
-        left=all_models.CalendarEvent,
-        right=all_models.CycleTaskGroupObjectTask
-    )
-    for event in events:
-      if event.id not in event_mappings or not event_mappings[event.id]:
-        self._delete_event(event)
-        db.session.delete(event)
-        continue
-      if not event.is_synced:
-        self._create_event(event)
-        continue
-      self._update_event(event)
-    db.session.commit()
-    logger.info("Sync of Calendar Events is finished.")
+    with benchmark("Sync of calendar events."):
+      events = all_models.CalendarEvent.query.options(
+          orm.joinedload("attendee").load_only(
+              "email",
+          ),
+          load_only(
+              all_models.CalendarEvent.id,
+              all_models.CalendarEvent.external_event_id,
+              all_models.CalendarEvent.title,
+              all_models.CalendarEvent.description,
+              all_models.CalendarEvent.attendee_id,
+              all_models.CalendarEvent.due_date,
+              all_models.CalendarEvent.last_synced_at
+          )
+      ).all()
+      event_mappings, _ = utils.get_related_mapping(
+          left=all_models.CalendarEvent,
+          right=all_models.CycleTaskGroupObjectTask
+      )
+      for event in events:
+        if event.id not in event_mappings or not event_mappings[event.id]:
+          self._delete_event(event)
+          db.session.delete(event)
+          continue
+        if not event.is_synced:
+          self._create_event(event)
+          continue
+        self._update_event(event)
+      db.session.commit()
 
   def _update_event(self, event):
     """Updates the provided event using CalendarApiService."""

@@ -3,7 +3,6 @@
 
 """Module with CalendarEventBuilder class."""
 
-import logging
 from collections import defaultdict
 from sqlalchemy.orm import load_only
 from sqlalchemy import orm
@@ -12,9 +11,7 @@ from ggrc import db
 from ggrc import settings
 from ggrc.models import all_models
 from ggrc.gcalendar import utils
-
-
-logger = logging.getLogger(__name__)
+from ggrc.utils import benchmark
 
 
 # pylint: disable=too-few-public-methods
@@ -39,12 +36,11 @@ class CalendarEventBuilder(object):
 
   def build_cycle_tasks(self):
     """Builds CalendarEvents based on CycleTaskGroupObjectTasks."""
-    logger.info("Generating of events for cycle tasks...")
-    self._preload_data()
-    self._generate_events()
-    self._generate_event_descriptions()
-    db.session.commit()
-    logger.info("Generating of events has completed.")
+    with benchmark("Generating of events for cycle tasks."):
+      self._preload_data()
+      self._generate_events()
+      self._generate_event_descriptions()
+      db.session.commit()
 
   def _preload_data(self):
     """Preload data for Calendar Event generation."""

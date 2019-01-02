@@ -412,10 +412,11 @@ def send_calendar_events():
   """Sends calendar events."""
   error_msg = None
   try:
-    builder = calendar_event_builder.CalendarEventBuilder()
-    builder.build_cycle_tasks()
-    sync = calendar_event_sync.CalendarEventsSync()
-    sync.sync_cycle_tasks_events()
+    with benchmark("Send calendar events"):
+      builder = calendar_event_builder.CalendarEventBuilder()
+      builder.build_cycle_tasks()
+      sync = calendar_event_sync.CalendarEventsSync()
+      sync.sync_cycle_tasks_events()
   except Exception as exp:
     logger.error(exp.message)
     error_msg = exp.message
