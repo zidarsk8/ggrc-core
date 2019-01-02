@@ -30,3 +30,7 @@ def init_notification_views(app):
       "/_notifications/show_fast_digest",
       "show_fast_digest",
       view_func=login_required(fast_digest.present_notifications))
+
+  app.add_url_rule(
+      "/_notifications/send_calendar_events", "send_calendar_events",
+      view_func=login_required(common.send_calendar_events))
