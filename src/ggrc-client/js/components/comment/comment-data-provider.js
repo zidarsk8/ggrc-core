@@ -4,7 +4,10 @@
  */
 
 import * as QueryAPI from '../../plugins/utils/query-api-utils';
-import {REFRESH_COMMENTS} from '../../events/eventTypes';
+import {
+  REFRESH_COMMENTS,
+  REFRESH_MAPPED_COUNTER,
+} from '../../events/eventTypes';
 import Relationship from '../../models/service-models/relationship';
 import Context from '../../models/service-models/context';
 
@@ -61,7 +64,12 @@ export default can.Component.extend({
     processComment(event) {
       if (event.success) {
         this.mapToInstance(event.item).then(() => {
-          this.attr('instance').refresh();
+          const instance = this.attr('instance');
+          instance.dispatch({
+            ...REFRESH_MAPPED_COUNTER,
+            modelType: 'Comment',
+          });
+          instance.refresh();
         });
       } else {
         this.removeComment(event.item);
