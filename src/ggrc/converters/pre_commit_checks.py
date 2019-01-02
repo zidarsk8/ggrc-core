@@ -130,6 +130,22 @@ def check_assessment(row_converter):
     row_converter.add_error(errors.ARCHIVED_IMPORT_ERROR)
 
 
+def secondary_check_assessment(row_converter):
+  """Check Assessment after setup of secondary objects
+
+  Assessment can't be imported with 'Completed and verified', 'Verified',
+  'In Review', 'Rework Needed' state if don't have Verifier"""
+  obj = row_converter.obj
+  if ((obj.status in {obj.DONE_STATE, obj.REWORK_NEEDED} or
+          (obj.status in obj.END_STATES and obj.verified)) and
+          not obj.verifiers):
+    row_converter.add_warning(errors.NO_VERIFIER_WARNING, status=obj.status)
+    # In case of import new asmt with 'Rework Needed' status
+    # we can't change it to default state because of validation
+    obj.skip_rework_validation = True
+    obj.status = row_converter.initial_state.status or obj.default_status()
+
+
 def check_assessment_template(row_converter):
   """Checker for AssessmentTemplate model objects.
 
@@ -185,4 +201,8 @@ CHECKS = {
     "Workflow": check_workflows,
     "Assessment": check_assessment,
     "AssessmentTemplate": check_assessment_template,
+}
+
+SECONDARY_CHECKS = {
+    "Assessment": secondary_check_assessment
 }

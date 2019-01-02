@@ -749,6 +749,42 @@ class TestAssessmentImport(TestCase):
     response = self.import_data(data)
     self._check_csv_response(response, {})
 
+  @ddt.data(
+      ("", "In Review", "", True),
+      ("", "In Review", "user@example.com", False),
+      ("", "Rework Needed", "", True),
+      ("12/27/2018", "Completed", "", True),
+      ("", "Completed", "", False),
+      ("12/27/2018", "Completed", "user@example.com", False),
+      ("", "In Progress", "", False),
+  )
+  @ddt.unpack
+  def test_asmt_status_and_verifier(self, date, status, verifiers, warning):
+    """Test assessment status validation requiring verifier"""
+    audit = factories.AuditFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Title", "Test title"),
+        ("Audit", audit.slug),
+        ("Creators", "user@example.com"),
+        ("Assignees", "user@example.com"),
+        ("Verifiers", verifiers),
+        ("Verified Date", date),
+        ("State", status),
+    ]))
+    expected_warnings = {
+        'Assessment': {
+            'row_warnings': {
+                errors.NO_VERIFIER_WARNING.format(
+                    line=3,
+                    status=status
+                )}}}
+    if warning:
+      self._check_csv_response(response, expected_warnings)
+    else:
+      self._check_csv_response(response, {})
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):
