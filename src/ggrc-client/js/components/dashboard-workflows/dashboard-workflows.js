@@ -4,91 +4,101 @@
 */
 
 import template from './templates/dashboard-workflows.stache';
-import RefreshQueue from '../../models/refresh_queue';
-import '../inline/people-with-role-inline-field';
-import Search from '../../models/service-models/search';
+import {DATE_FORMAT, getFormattedLocalDate} from '../../plugins/utils/date-utils';
+import {getTruncatedList} from '../../plugins/ggrc_utils';
+
+const SHOWN_WORKFLOWS_COUNT = 5;
+
+const viewModel = can.Map.extend({
+  define: {
+    showAllWorkflows: {
+      type: 'boolean',
+      set(value) {
+        const list = this.attr('shownWorkflows');
+        const workflows = this.attr('workflows');
+
+        if (value) {
+          list.replace(workflows);
+        } else {
+          list.replace(workflows.slice(0, SHOWN_WORKFLOWS_COUNT));
+        }
+
+        return value;
+      },
+    },
+    showToggleListButton: {
+      get() {
+        return this.attr('workflows.length') > SHOWN_WORKFLOWS_COUNT;
+      },
+    },
+  },
+  isLoading: false,
+  workflows: [],
+  shownWorkflows: [],
+  toggleWorkflowList() {
+    this.attr('showAllWorkflows', !this.attr('showAllWorkflows'));
+  },
+  convertToWorkflowList(workflowsData) {
+    return workflowsData.map(({
+      workflow,
+      owners,
+      task_stat: {counts, due_in_date: dueInDate},
+    }) => ({
+      workflowTitle: workflow.title,
+      workflowLink: `/workflows/${workflow.id}#current`,
+      owners: {
+        tooltipContent: getTruncatedList(owners),
+        inlineList: owners.join(', '),
+      },
+      taskStatistic: {
+        total: counts.total,
+        overdue: counts.overdue,
+        dueInDate: getFormattedLocalDate(
+          dueInDate,
+          DATE_FORMAT.MOMENT_DISPLAY_FMT,
+        ),
+        completedPercent: (counts.completed * 100 / counts.total).toFixed(2),
+      },
+    }));
+  },
+  async initMyWorkflows() {
+    this.attr('isLoading', true);
+    const {workflows: rawWorkflows} = await $.get(
+      `/api/people/${GGRC.current_user.id}/my_workflows`
+    );
+    this.attr('isLoading', false);
+
+    this.attr('workflows', this.convertToWorkflowList(rawWorkflows));
+    this.attr('showAllWorkflows', false);
+  },
+});
 
 export default can.Component.extend({
   tag: 'dashboard-workflows',
   leakScope: true,
   template,
-  scope: {
-    initial_wf_size: 5,
-    workflow_data: {},
-    workflow_count: 0,
-    workflow_show_all: false,
-    loading: true,
-  },
-  events: {
-    // Click action to show all workflows
-    'a.workflow-trigger.show-all click'(el, ev) {
-      this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs);
-
-      el.text('Show top 5 workflows');
-      el.removeClass('show-all');
-      el.addClass('show-5');
-
-      ev.stopPropagation();
-    },
-    // Show onlt top 5 workflows
-    'a.workflow-trigger.show-5 click'(el, ev) {
-      this.scope.workflow_data.attr('list', this.scope.workflow_data.cur_wfs5);
-
-      el.text('Show all my workflows');
-      el.removeClass('show-5');
-      el.addClass('show-all');
-
-      ev.stopPropagation();
-    },
-
-    // Show Workflows
-    'li.workflow-tab click'(el, ev) {
-      el.addClass('active');
-      this.element.find('.workflow-wrap-main').show();
-      ev.stopPropagation();
-    },
-  },
+  viewModel,
   init() {
-    this.init_my_workflows();
+    this.viewModel.initMyWorkflows();
   },
-  init_my_workflows() {
-    let self = this;
-    let workflowData = {};
-    let curWfs5; // list of top 5 workflows with current cycle
+  helpers: {
+    overdueCountMessage(taskStatistic) {
+      const {overdue, total} = Mustache.resolve(taskStatistic);
+      const formOfTaskWord = total > 1
+        ? 'tasks'
+        : 'task';
+      const formOfVerb = overdue > 1
+        ? 'are'
+        : 'is';
 
-    if (!GGRC.current_user) {
-      return;
-    }
-
-    Search
-      .search_for_types('', ['Workflow'], {
-        contact_id: GGRC.current_user.id,
-        extra_params: 'Workflow:status=Active',
-      })
-      .then(function (resultSet) {
-        let wfData = resultSet.getResultsForType('Workflow');
-        let refreshQueue = new RefreshQueue();
-        refreshQueue.enqueue(wfData);
-        return refreshQueue.trigger();
-      }).then(function (curWfs) {
-        if (curWfs.length > 0) {
-          self.scope.attr('workflow_count', curWfs.length);
-          workflowData.cur_wfs = curWfs;
-
-          if (curWfs.length > self.scope.initial_wf_size) {
-            curWfs5 = curWfs.slice(0, self.scope.initial_wf_size);
-            self.scope.attr('workflow_show_all', true);
-          } else {
-            curWfs5 = curWfs;
-            self.scope.attr('workflow_show_all', false);
-          }
-          workflowData.cur_wfs5 = curWfs5;
-          workflowData.list = curWfs5;
-          self.scope.attr('workflow_data', workflowData);
-        }
-        self.scope.attr('loading', false);
-      });
-
-    return 0;
+      return `${overdue} of ${total} ${formOfTaskWord} ${formOfVerb} overdue`;
+    },
+    totalCountMessage(totalCount) {
+      totalCount = Mustache.resolve(totalCount);
+      const taskWord = totalCount > 1
+        ? 'tasks'
+        : 'task';
+      return `${totalCount} ${taskWord} in total`;
+    },
   },
 });

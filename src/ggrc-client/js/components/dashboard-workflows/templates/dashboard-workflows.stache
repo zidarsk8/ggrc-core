@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="inner-content">
+<div class="inner-content dashboard-workflows">
   <section class="widget dashboard small-margin">
     <header class="header widget-nav">
       <div class="row-fluid">
@@ -11,7 +11,7 @@
           <ul>
             <li class="active workflow-tab">
               <a href="javascript://">
-                My Workflows ({{workflow_count}})
+                My Workflows ({{workflows.length}})
               </a>
             </li>
           </ul>
@@ -20,9 +20,7 @@
     </header>
     <section class="content">
       <ul class="new-tree tree-one dashboard-tree workflow-tree">
-        {{#workflow_data}}
-        {{#list}}
-        {{#using ins=this}}
+        {{#shownWorkflows}}
           <li class="tree-item">
             <div class="item-wrap">
               <div class="row-fluid">
@@ -30,27 +28,58 @@
                   <div class="item-data">
                     <div class="tree-title-area">
                       <div class="oneline">
-                        <a href="{{viewLink}}#current">{{ins.title}}</a>
+                        <a href="{{workflowLink}}">{{workflowTitle}}</a>
                         <div class="tree-title-area__subtitle">
                           <div class="tree-title-area__subtitle-label">
                             Owned by:&nbsp
                           </div>
-                          <people-with-role-inline-field
-                            {instance}="ins"
-                            {role}="ins.class.tree_view_options.adminRoleName" />
+                          <div
+                            class="dashboard-workflows__owners"
+                            rel="tooltip"
+                            data-placement="top"
+                            data-original-title="{{owners.tooltipContent}}">
+                            <span class="dashboard-workflows__owners-content">{{owners.inlineList}}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                <div class="span5">
+                  <div class="tree-progress">
+                    <ul class="item-util">
+                      {{#if taskStatistic.overdue}}
+                        <li class="overdue-text">
+                          {{overdueCountMessage taskStatistic}} <span class="completed-percent">/ {{taskStatistic.completedPercent}}% completed</span>
+                        </li>
+                      {{else}}
+                        <li class="progress-text">
+                          {{totalCountMessage taskStatistic.total}} <span class="completed-percent">/ {{taskStatistic.completedPercent}}% completed</span>
+                        </li>
+                      {{/if}}
+                    </ul>
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="right">
+                    {{#if taskStatistic.overdue}}
+                      <span class="overdue">Overdue</span>
+                    {{else}}
+                      <span>Due on</span>
+                    {{/if}}
+                      <ul class="item-util">
+                        <li>
+                          <span class="due-in-date">{{taskStatistic.dueInDate}}</span>
+                        </li>
+                      </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </li>
-        {{/using}}
-        {{/list}}
-        {{/workflow_data}}
-        {{#if_equals workflow_count 0}}
-          {{#if loading}}
+        {{/shownWorkflows}}
+        {{#unless workflows.length}}
+          {{#if isLoading}}
             <li>
               <div class="zero-state">
                 <h2>Loading...</h2>
@@ -63,12 +92,23 @@
               </div>
             </li>
           {{/if}}
-        {{/if_equals}}
+        {{/unless}}
       </ul><!-- tree-structure end -->
 
-      {{#workflow_show_all}}
-        <a href="javascript://" class="workflow-trigger show-all">Show all my workflows</a>
-      {{/workflow_show_all}}
+      {{#if showToggleListButton}}
+        <a
+          href="javascript://"
+          class="workflow-trigger show-all"
+          role="button"
+          ($click)="toggleWorkflowList"
+        >
+          {{#if showAllWorkflows}}
+            Show top 5 workflows
+          {{else}}
+            Show all my workflows
+          {{/if}}
+        </a>
+      {{/if}}
     </section>
   </section><!-- Widget end -->
 
