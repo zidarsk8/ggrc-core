@@ -419,7 +419,7 @@ def handle_start(ie_job):
 def run_background_import(ie_job_id):
   """Run import job in background task."""
   from ggrc.models import all_models
-  bg_task = background_task.create_task(
+  background_task.create_task(
       name="import",
       url=flask.url_for(run_import_phases.__name__),
       parameters={
@@ -434,8 +434,6 @@ def run_background_import(ie_job_id):
       operation_type=all_models.ImportExport.IMPORT_JOB_TYPE.lower(),
       retry_options={"task_retry_limit": 0},
   )
-
-  bg_task.start()
   db.session.commit()
 
 
@@ -590,7 +588,7 @@ def handle_export_post(**kwargs):
 def run_background_export(ie_job_id, objects, exportable_objects):
   """Run export job in background task."""
   from ggrc.models import all_models
-  bg_task = background_task.create_task(
+  background_task.create_task(
       name="export",
       url=flask.url_for(run_export.__name__),
       parameters={
@@ -607,7 +605,6 @@ def run_background_export(ie_job_id, objects, exportable_objects):
       operation_type=all_models.ImportExport.EXPORT_JOB_TYPE.lower(),
       retry_options={"task_retry_limit": 0},
   )
-  bg_task.start()
   db.session.commit()
 
 
