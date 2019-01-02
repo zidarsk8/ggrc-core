@@ -28,6 +28,8 @@ GETATTR_WHITELIST = {
     "id",
     "is_current",
     "program",
+    "created_at",
+    "updated_at",
 }
 
 
