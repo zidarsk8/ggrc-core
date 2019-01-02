@@ -115,8 +115,8 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
   _true = "on"
   _false = "off"
 
-  TRUE_VALUES = {"yes", "true", _true}
-  FALSE_VALUES = {"no", "false", _false}
+  TRUE_VALUES = {_true, }
+  FALSE_VALUES = {_false, }
 
   def set_obj_attr(self):
     if self.dry_run:
