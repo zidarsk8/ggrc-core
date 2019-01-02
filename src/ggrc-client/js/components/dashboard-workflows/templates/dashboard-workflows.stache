@@ -9,7 +9,7 @@
       <div class="row-fluid">
         <div class="span12">
           <ul>
-            <li class="active workflow-tab">
+            <li class="active">
               <a href="javascript://">
                 My Workflows ({{workflows.length}})
               </a>
@@ -98,7 +98,7 @@
       {{#if showToggleListButton}}
         <a
           href="javascript://"
-          class="workflow-trigger show-all"
+          class="workflow-trigger"
           role="button"
           ($click)="toggleWorkflowList"
         >
