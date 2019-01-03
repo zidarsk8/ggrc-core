@@ -19,35 +19,6 @@ describe('tree-field component', () => {
       vm.refreshItems();
 
       expect(vm.attr('items').length).toBe(0);
-      expect(vm.attr('resultStr')).toBe('');
-    });
-
-    it('shows result for uploaded items', () => {
-      spyOn(vm, 'getItems').and
-        .returnValue($.Deferred().resolve([
-          {title: 'asd'},
-          {title: 'sdf'},
-        ]));
-      vm.refreshItems();
-
-      expect(vm.attr('items').length).toBe(2);
-      expect(vm.attr('resultStr')).toBe('asd\nsdf');
-    });
-
-    it('adds "and more" text when limit exceeded', () => {
-      spyOn(vm, 'getItems').and
-        .returnValue($.Deferred().resolve([
-          {title: '1'},
-          {title: '2'},
-          {title: '3'},
-          {title: '4'},
-          {title: '5'},
-          {title: '6'},
-        ]));
-      vm.refreshItems();
-
-      expect(vm.attr('items').length).toBe(6);
-      expect(vm.attr('resultStr')).toBe('1\n2\n3\n4\n5\n and 1 more');
     });
   });
 
