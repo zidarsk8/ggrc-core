@@ -117,6 +117,15 @@ describe('"release-notes-menu-item" component', () => {
           profileDfd.resolve(profile);
         });
 
+        it('profile shouldn\'t be saved', async (done) => {
+          profile.save = jasmine.createSpy('save');
+
+          await handler();
+
+          expect(profile.save).not.toHaveBeenCalled();
+          done();
+        });
+
         it('open() should not been called', async (done) => {
           await handler();
           expect(vm.open).not.toHaveBeenCalled();

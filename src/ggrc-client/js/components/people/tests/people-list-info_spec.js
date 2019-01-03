@@ -7,7 +7,7 @@ import Component from '../people-list-info';
 import PersonProfile from '../../../models/service-models/person-profile';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
-describe('editable-people-group', () => {
+describe('people-list-info component', () => {
   let viewModel;
 
   beforeEach(() => {
