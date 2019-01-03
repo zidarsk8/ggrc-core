@@ -90,18 +90,10 @@ class TestIssueTrackedImport(ggrc.TestCase):
                      expected_res)
 
   @ddt.data(
-      ("Issue", "yes"),
-      ("Issue", "no"),
       ("Issue", "on"),
       ("Issue", "off"),
-      ("Issue", "true"),
-      ("Issue", "false"),
-      ("Assessment", "yes"),
-      ("Assessment", "no"),
       ("Assessment", "on"),
       ("Assessment", "off"),
-      ("Assessment", "true"),
-      ("Assessment", "false"),
   )
   @ddt.unpack
   def test_import_enabled_update_succeed(self, model, value):
@@ -122,7 +114,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self._check_csv_response(response, {})
     self._assert_integration_state(obj, value)
 
-  @ddt.data("yes", "no", "on", "off", "true", "false")
+  @ddt.data("on", "off")
   def test_enabled_state_issue_create_succeed(self, value):
     """Test Issue integration state set correctly during create via import."""
     response = self.import_data(OrderedDict([
@@ -137,7 +129,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = all_models.Issue.query.one()
     self._assert_integration_state(obj, value)
 
-  @ddt.data("yes", "no", "on", "off", "true", "false")
+  @ddt.data("on", "off")
   def test_enabled_state_assmt_create_succeed(self, value):
     """Test Assessment integration state set correctly during create."""
     audit = factories.AuditFactory()
