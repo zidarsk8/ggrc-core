@@ -5,7 +5,7 @@
 
 import '../release-notes-modal/release-notes-modal';
 import template from './release-notes-menu-item.mustache';
-import {loadUserProfile, updateUserProfile} from '../../plugins/utils/user-utils';
+import PersonProfile from '../../models/service-models/person-profile';
 import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 const viewModel = can.Map.extend({
@@ -26,15 +26,20 @@ const viewModel = can.Map.extend({
 
 const events = {
   async inserted(el) {
-    let profile = await loadUserProfile();
-    const lastSeenDate = getFormattedUtcDate(profile.last_seen_whats_new);
+    let profile = await PersonProfile.findOne({
+      id: GGRC.current_user.profile.id,
+    });
+    const lastSeenDate = getFormattedUtcDate(
+      profile.attr('last_seen_whats_new')
+    );
     const releaseNotesDate = getFormattedUtcDate(RELEASE_NOTES_DATE);
 
     if (releaseNotesDate !== lastSeenDate) {
-      profile.last_seen_whats_new = releaseNotesDate;
-      updateUserProfile(profile).then(() => {
-        this.viewModel.open();
-      });
+      profile.attr('last_seen_whats_new', releaseNotesDate);
+      profile.save()
+        .then(() => {
+          this.viewModel.open();
+        });
     }
   },
 };

@@ -183,23 +183,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     Returns:
       List of tuples with (related_object_type, related_object_id)
     """
-    rsp = relationship.Relationship
-    related_objs = db.session.query(
-        rsp.destination_type,
-        rsp.destination_id
-    ).filter(
-        rsp.source_id == self.id,
-        rsp.source_type == 'CycleTaskGroupObjectTask'
-    ).union(
-        db.session.query(
-            rsp.source_type,
-            rsp.source_id
-        ).filter(
-            rsp.destination_id == self.id,
-            rsp.destination_type == 'CycleTaskGroupObjectTask'
-        )
-    ).all()
-    return related_objs
+    return [(object_.__class__.__name__, object_.id) for object_ in
+            self.related_objects()]
 
   _api_attrs = reflection.ApiAttributes(
       'cycle',
