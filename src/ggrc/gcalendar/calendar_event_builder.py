@@ -51,11 +51,29 @@ class CalendarEventBuilder(object):
     self.tasks = all_models.CycleTaskGroupObjectTask.query.options(
         orm.joinedload("cycle").load_only(
             "workflow_id",
-        )
-        .joinedload("workflow").load_only(
+            "is_current",
+            "is_verification_needed"
+        ),
+        orm.joinedload("cycle").joinedload("workflow").load_only(
             "unit",
             "recurrences",
             "next_cycle_start_date",
+        ),
+        orm.subqueryload(
+            "_access_control_list"
+        ).joinedload(
+            "ac_role"
+        ).undefer_group(
+            "AccessControlRole_complete"
+        ),
+        orm.subqueryload(
+            "_access_control_list"
+        ).joinedload(
+            "access_control_people"
+        ).joinedload(
+            "person"
+        ).undefer_group(
+            "Person_complete"
         ),
         load_only(
             all_models.CycleTaskGroupObjectTask.id,
@@ -134,13 +152,7 @@ class CalendarEventBuilder(object):
 
   def _create_event_relationship(self, task, event):
     """Creates event relationship is it is not exists."""
-    relationship = utils.get_relationship(
-        left_id=event.id,
-        left_model_name="CalendarEvent",
-        right_id=task.id,
-        right_model_name="CycleTaskGroupObjectTask",
-    )
-    if not relationship:
+    if task.id not in self.task_mappings:
       db.session.add(all_models.Relationship(
           source=task,
           destination=event,
