@@ -33,3 +33,14 @@ WRONG_PERSON_HEADER_FORMAT = u"{} should have JSON object like" \
 
 MISSING_REVISION = u"The object you are trying to update/map is broken. " \
                    u"Please contact administrator for help."
+
+
+DUPLICATE_RESERVED_NAME = u"Attribute name '{attr_name}' already exists " \
+                          u"at this object type. Please choose another " \
+                          u"attribute name and restart the import."
+
+DUPLICATE_GCAD_NAME = u"Global custom attribute '{attr_name}' already " \
+                      u"exists for this object type."
+
+DUPLICATE_CUSTOM_ROLE = u"Custom Role with a name of '{role_name}' already " \
+                        u"exists for this object type"

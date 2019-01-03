@@ -3,6 +3,7 @@
 
 """List of all error and warning messages for imports."""
 
+ERROR_TEMPLATE = u"Line {line}: {message}"
 
 WRONG_FILE_TYPE = (u"Line {line}: Wrong file type. Only .csv files are"
                    u" supported. Please upload a .csv file.")
@@ -36,10 +37,6 @@ DUPLICATE_IN_MULTI_VALUE = (
 
 DUPLICATE_VALUE_IN_CSV = (u"Line {line} has the same {column_name} '{value}' "
                           u"as {processed_line}. The line will be ignored.")
-
-DUPLICATE_CAD_NAME = (u"Line {line}: Attribute name already exists at this "
-                      u"object type. Please choose another attribute name "
-                      u"and restart the import.")
 
 MAP_UNMAP_CONFLICT = (u"Line {line}: Object '{slug}' scheduled for mapping and"
                       u" unmapping at the same time. Mapping rule update will"
@@ -203,3 +200,5 @@ NO_VALID_USERS_ERROR = (u"Line {line}: Required field '{column_name}' "
 NO_VERIFIER_WARNING = (u"Line {line}: Assessment without verifier cannot "
                        u"be moved to {status} state. "
                        u"The value will be ignored.")
+
+UNEXPECTED_ERROR = u"Unexpected error on import."

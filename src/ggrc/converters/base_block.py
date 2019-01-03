@@ -31,7 +31,6 @@ from ggrc.converters import base_row
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
-from ggrc.models.exceptions import ReservedNameError
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
@@ -429,18 +428,19 @@ class ImportBlockConverter(BlockConverter):
       for row in self.row_converters_from_csv():
         try:
           row.process_row()
-        except ReservedNameError:
+        except ValueError as err:
           db.session.rollback()
-          row.add_error(errors.DUPLICATE_CAD_NAME)
-          logger.exception(errors.DUPLICATE_CAD_NAME)
+          msg = err.message or errors.UNEXPECTED_ERROR
+          row.add_error(errors.ERROR_TEMPLATE, message=msg)
+          logger.exception(msg)
         except Exception:  # pylint: disable=broad-except
           db.session.rollback()
           row.add_error(errors.UNKNOWN_ERROR)
-          logger.exception("Unexpected error on import")
+          logger.exception(errors.UNEXPECTED_ERROR)
         self._update_info(row)
         _app_ctx_stack.top.sqlalchemy_queries = []
     except Exception:  # pylint: disable=broad-except
-      logger.exception("Unexpected error on import")
+      logger.exception(errors.UNEXPECTED_ERROR)
     finally:
       db.session.commit_hooks_enable_flag.enable()
       is_final_commit_required = not (self.converter.dry_run or self.ignore)
