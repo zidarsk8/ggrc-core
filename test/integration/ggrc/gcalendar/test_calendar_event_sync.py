@@ -9,11 +9,11 @@ import mock
 
 from ggrc.gcalendar import calendar_event_sync, calendar_api_service
 from integration.ggrc.models import factories
-from integration.ggrc import TestCase
+from integration.ggrc.gcalendar import BaseCalendarEventTest
 
 
 # pylint: disable=protected-access
-class TestCalendarEventSync(TestCase):
+class TestCalendarEventSync(BaseCalendarEventTest):
   """Test calendar event sync."""
 
   def setUp(self):
@@ -82,3 +82,14 @@ class TestCalendarEventSync(TestCase):
         attendees=[person.email],
     )
     self.assertEquals(event.last_synced_at.date(), date(2015, 1, 1))
+
+  def test_fail_to_sync_event(self):
+    """Test that sync job tried to sync the second event after a failure."""
+    create_event_mock = mock.MagicMock(side_effect=Exception("test"))
+    calendar_api_service.CalendarApiService.create_event = create_event_mock
+    with factories.single_commit():
+      self.setup_person_task_event(date(2015, 1, 5))
+      self.setup_person_task_event(date(2015, 1, 6))
+    with freeze_time("2015-01-1 12:00:00"):
+      self.sync.sync_cycle_tasks_events()
+    self.assertEqual(create_event_mock.call_count, 2)

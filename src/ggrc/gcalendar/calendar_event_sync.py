@@ -4,6 +4,8 @@
 """ Module contains CalendarEventSync class."""
 
 import datetime
+from logging import getLogger
+
 from sqlalchemy.orm import load_only
 from sqlalchemy import orm
 
@@ -11,6 +13,9 @@ from ggrc import db
 from ggrc.models import all_models
 from ggrc.gcalendar import calendar_api_service, utils
 from ggrc.utils import benchmark
+
+
+logger = getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -48,14 +53,19 @@ class CalendarEventsSync(object):
       for event in events:
         if not event.needs_sync:
           continue
-        if event.id not in event_mappings or not event_mappings[event.id]:
-          self._delete_event(event)
-          db.session.delete(event)
-          continue
-        if not event.is_synced:
-          self._create_event(event)
-          continue
-        self._update_event(event)
+        try:
+          if event.id not in event_mappings or not event_mappings[event.id]:
+            self._delete_event(event)
+            db.session.delete(event)
+            continue
+          if not event.is_synced:
+            self._create_event(event)
+            continue
+          self._update_event(event)
+        except Exception as exp:   # pylint: disable=broad-except
+          logger.warn("Sync of the event %d has failed "
+                      "with the following error %s.",
+                      event.id, exp.message)
       db.session.commit()
 
   def _update_event(self, event):
