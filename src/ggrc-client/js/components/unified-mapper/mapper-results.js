@@ -321,7 +321,7 @@ export default can.Component.extend({
       let query = this.getQuery('values', true);
       this.attr('isLoading', true);
 
-      can.when(...query.request.map((request) => batchRequests(request)))
+      $.when(...query.request.map((request) => batchRequests(request)))
         .done((...responseArr) => {
           let data = responseArr[query.queryIndex];
           let relatedData = this.buildRelatedData(
@@ -395,7 +395,7 @@ export default can.Component.extend({
       let queryType = 'ids';
       let query = this.getQuery(queryType, false);
 
-      can.when(...query.request.map((request) => batchRequests(request)))
+      $.when(...query.request.map((request) => batchRequests(request)))
         .done((...responseArr) => {
           let data = responseArr[query.queryIndex];
           let relatedData = responseArr[query.relatedQueryIndex];

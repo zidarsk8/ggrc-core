@@ -30,29 +30,29 @@ describe('gdrive-picker-launcher', function () {
       expect(viewModel.confirmationCallback).toHaveBeenCalled();
     });
 
-    it('pass callbackResult to can.when()', function () {
+    it('pass callbackResult to $.when()', function () {
       let dfd = $.Deferred();
       let thenSpy = jasmine.createSpy('then');
       spyOn(viewModel, 'confirmationCallback').and.returnValue(dfd);
-      spyOn(can, 'when').and.returnValue({
+      spyOn($, 'when').and.returnValue({
         then: thenSpy,
       });
 
       viewModel.onClickHandler(null, null, eventStub);
 
-      expect(can.when).toHaveBeenCalledWith(dfd);
+      expect($.when).toHaveBeenCalledWith(dfd);
       expect(thenSpy).toHaveBeenCalled();
     });
 
-    it('pass null to can.when() when callback is not provided', function () {
+    it('pass null to $.when() when callback is not provided', function () {
       let thenSpy = jasmine.createSpy('then');
-      spyOn(can, 'when').and.returnValue({
+      spyOn($, 'when').and.returnValue({
         then: thenSpy,
       });
 
       viewModel.onClickHandler(null, null, eventStub);
 
-      expect(can.when).toHaveBeenCalledWith(null);
+      expect($.when).toHaveBeenCalledWith(null);
       expect(thenSpy).toHaveBeenCalled();
     });
   });

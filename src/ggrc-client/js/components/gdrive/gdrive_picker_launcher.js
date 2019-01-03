@@ -60,7 +60,7 @@ export default can.Component.extend({
       let that = this;
 
       event.preventDefault();
-      can.when(confirmation).then(function () {
+      $.when(confirmation).then(function () {
         handler.apply(that, args);
       });
     },
@@ -104,7 +104,7 @@ export default can.Component.extend({
       let stopFn = () => {};
 
       if (that.instance.attr('_transient.folder')) {
-        parentFolderDfd = can.when(
+        parentFolderDfd = $.when(
           [{instance: this.instance.attr('_transient.folder')}]
         );
       } else {
@@ -188,7 +188,7 @@ export default can.Component.extend({
         });
       });
       // waiting for all docs promises
-      return can.when(...dfdDocs).then(() => {
+      return $.when(...dfdDocs).then(() => {
         this.attr('instance').refresh();
         return can.makeArray(arguments);
       }, (xhr) => {
