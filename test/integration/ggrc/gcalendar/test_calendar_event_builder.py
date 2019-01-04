@@ -100,7 +100,7 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
       db.session.commit()
 
     self.assertEquals(event.title, expected_title)
-    self.assertEquals(event.due_date.date(), date(2015, 1, 15))
+    self.assertEquals(event.due_date, date(2015, 1, 15))
     self.assertEquals(event.attendee_id, person.id)
     relationship = self.get_relationship(task.id, event.id)
     self.assertIsNotNone(relationship)

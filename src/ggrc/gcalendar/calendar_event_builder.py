@@ -109,6 +109,7 @@ class CalendarEventBuilder(object):
         else:
           self._create_event_relationship(task, event)
           events_ids.discard(event.id)
+
     for event_id in events_ids:
       self._delete_event_relationship(event_id, task.id)
 
@@ -145,18 +146,24 @@ class CalendarEventBuilder(object):
 
   def _create_event_with_relationship(self, task, person_id):
     """Creates calendar event and relationship based on task and person id."""
-    event = all_models.CalendarEvent(
+    db.session.add(all_models.CalendarEvent(
         due_date=task.end_date,
         attendee_id=person_id,
         title=self.TASK_TITLE_TEMPLATE.format(prefix=self.title_prefix),
         modified_by_id=person_id,
-    )
-    db.session.add(event)
+    ))
+    db.session.flush()
+
+    event = all_models.CalendarEvent.query.filter(
+        all_models.CalendarEvent.due_date == task.end_date,
+        all_models.CalendarEvent.attendee_id == person_id,
+    ).first()
     db.session.add(all_models.Relationship(
         source=task,
         destination=event,
     ))
     db.session.flush()
+
     self.task_mappings[task.id].add(event.id)
     self.event_mappings[event.id].add(task.id)
     self.events.append(event)
