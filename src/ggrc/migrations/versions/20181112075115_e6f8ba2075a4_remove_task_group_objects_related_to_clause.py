@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
@@ -14,7 +14,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'e6f8ba2075a4'
-down_revision = '3a64f54e50e9'
+down_revision = '53e115488aec'
 
 
 def upgrade():
