@@ -3,4 +3,18 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-
+<div class="tabs priority {{^if isAuditScope}}single-set{{/if}}">
+  <ul class="internav {{lowercase instance.type}}">
+    {{#widgetList}}
+      <li class="{{type}}">
+        <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
+          <i class="fa fa-{{ icon }} color"></i>
+          {{title}}
+        </a>
+      </li>
+    {{/widgetList}}
+  </ul>
+</div>
+{{#if isAuditScope}}
+  <div class="tabs not-priority"></div>
+{{/if}}

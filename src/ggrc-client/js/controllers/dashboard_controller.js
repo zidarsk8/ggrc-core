@@ -16,6 +16,7 @@ import TreeViewConfig from '../apps/base_widgets';
 const DashboardControl = can.Control.extend({
   defaults: {
     widget_descriptors: null,
+    innerNavDescriptors: [],
   },
 }, {
   init: function (el, options) {
@@ -23,21 +24,19 @@ const DashboardControl = can.Control.extend({
     this.init_page_title();
     this.init_page_header();
     this.init_widget_descriptors();
-    if (!this.inner_nav_controller) {
-      this.init_inner_nav();
-    }
 
     // Before initializing widgets, hide the container to not show
     // loading state of multiple widgets before reducing to one.
     this.hide_widget_area();
     this.init_default_widgets();
+    this.init_inner_nav();
     this.init_widget_area();
   },
 
   init_tree_view_settings: function () {
     let validModels;
     let savedChildTreeDisplayList;
-    if (GGRC.pageType && GGRC.pageType === 'ADMIN') { // Admin dashboard
+    if (isAdmin()) { // Admin dashboard
       return;
     }
 
@@ -87,7 +86,7 @@ const DashboardControl = can.Control.extend({
   init_inner_nav: function () {
     let $innernav = this.element.find('.inner-nav');
     if ($innernav.length && this.options.innernav_view) {
-      $innernav.html(can.view(this.options.innernav_view));
+      $innernav.html(can.view(this.options.innernav_view, this.options));
       return;
     }
 
@@ -196,6 +195,8 @@ const DashboardControl = can.Control.extend({
 
     $element
       .trigger('widgets_updated', $element);
+
+    this.options.innerNavDescriptors.push(control.options);
 
     return control;
   },
