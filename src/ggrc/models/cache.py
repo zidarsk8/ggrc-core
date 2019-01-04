@@ -75,3 +75,13 @@ class Cache:
     else:
       logger.warning("No app context - no cache created")
       return None
+
+  @staticmethod
+  def add_to_cache(obj, state="dirty"):
+    """Add object to cache."""
+    cache = Cache.get_cache()
+    state_objs = getattr(cache, state, None)
+    if state_objs is not None and \
+       hasattr(obj, 'log_json') and \
+       obj not in state_objs:
+      state_objs[obj] = obj.log_json()
