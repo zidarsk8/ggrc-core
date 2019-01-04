@@ -30,6 +30,7 @@ class CalendarEventBuilder(object):
     self.task_mappings = defaultdict(set)
     self.event_mappings = defaultdict(set)
     self.tasks = []
+    self.events = []
     self.title_prefix = ""
     if settings.NOTIFICATION_PREFIX:
       self.title_prefix = "[{}] ".format(settings.NOTIFICATION_PREFIX)
@@ -83,6 +84,7 @@ class CalendarEventBuilder(object):
             all_models.CycleTaskGroupObjectTask.verified_date,
         ),
     ).all()
+    self.events = all_models.CalendarEvent.query.all()
 
   def _generate_events(self):
     """Generates Calendar Events."""
@@ -98,9 +100,9 @@ class CalendarEventBuilder(object):
 
     if self._should_create_event_for(task):
       for person_id in self._get_task_persons_ids_to_notify(task):
-        event = utils.get_event_by_date_and_attendee(
+        event = self._get_event_by_date_and_attendee(
             attendee_id=person_id,
-            due_date=task.end_date
+            end_date=task.end_date
         )
         if not event:
           self._create_event_with_relationship(task, person_id)
@@ -109,6 +111,15 @@ class CalendarEventBuilder(object):
           events_ids.discard(event.id)
     for event_id in events_ids:
       self._delete_event_relationship(event_id, task.id)
+
+  def _get_event_by_date_and_attendee(self, attendee_id, end_date):
+    """Get calendar events by attendee and due date."""
+    filtered_events = [
+        event for event in self.events
+        if event.attendee_id == attendee_id and
+        event.due_date == end_date
+    ]
+    return filtered_events[0] if filtered_events else None
 
   @staticmethod
   def _get_task_persons_ids_to_notify(task):
@@ -148,6 +159,7 @@ class CalendarEventBuilder(object):
     db.session.flush()
     self.task_mappings[task.id].add(event.id)
     self.event_mappings[event.id].add(task.id)
+    self.events.append(event)
     return event
 
   def _create_event_relationship(self, task, event):
