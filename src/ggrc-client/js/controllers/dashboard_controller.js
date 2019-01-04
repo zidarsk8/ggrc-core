@@ -85,6 +85,12 @@ const DashboardControl = can.Control.extend({
   },
 
   init_inner_nav: function () {
+    let $innernav = this.element.find('.inner-nav');
+    if ($innernav.length && this.options.innernav_view) {
+      $innernav.html(can.view(this.options.innernav_view));
+      return;
+    }
+
     let $internav = this.element.find('.internav');
     if ($internav.length) {
       this.inner_nav_controller = new InnerNav(
@@ -120,8 +126,10 @@ const DashboardControl = can.Control.extend({
     if (_.isBoolean(updateCount) && !updateCount) {
       return;
     }
-    this.inner_nav_controller
-      .update_widget_count($(ev.target), count, updateCount);
+    if (this.inner_nav_controller) {
+      this.inner_nav_controller
+        .update_widget_count($(ev.target), count, updateCount);
+    }
   },
   update_inner_nav: function (el, ev, data) {
     if (this.inner_nav_controller) {

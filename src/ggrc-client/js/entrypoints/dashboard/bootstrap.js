@@ -48,6 +48,7 @@ new PageObjectControl('#pageContent', {
   default_widgets: defaults || [],
   instance: getPageInstance(),
   header_view: GGRC.templates_path + '/base_objects/page_header.stache',
+  innernav_view: GGRC.templates_path + '/base_objects/inner-nav.stache',
   GGRC: GGRC, // make the global object available in templates
   page_title: function (controller) {
     return controller.options.instance.title;
