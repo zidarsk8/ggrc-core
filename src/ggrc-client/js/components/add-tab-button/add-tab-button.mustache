@@ -15,9 +15,8 @@
       <i class="fa fa-plus-circle"></i>
       {{addTabTitle}}
     </a>
-    <div class="dropdown-menu" role="menu">
-      {{#widgetList}}
-        {{#filterWidgets .}}
+    <div class="dropdown-menu {{#if_equals filteredWidgets.length 1}} one-item {{/if}}" role="menu">
+      {{#filteredWidgets}}
           <div class="inner-nav-item">
             {{#shouldCreateObject instance model.shortName}}
               <a
@@ -71,8 +70,7 @@
               </a>
             {{/shouldCreateObject}}
           </div>
-        {{/filterWidgets}}
-      {{/widgetList}}
+      {{/filteredWidgets}}
     </div>
   </li>
 {{/if}}
