@@ -291,6 +291,20 @@ class PersonResource(common.ExtendedResource):
         all_models.AccessControlPerson.person_id == all_models.Person.id
     )
 
+    finish_condition = sa.or_(
+        sa.and_(
+            all_models.Workflow.is_verification_needed ==
+            sa.true(),
+            all_models.CycleTaskGroupObjectTask.status.in_(
+                ['Verified', 'Deprecated']
+            )),
+        sa.and_(
+            all_models.Workflow.is_verification_needed ==
+            sa.false(),
+            all_models.CycleTaskGroupObjectTask.status.in_(
+                ['Finished', 'Deprecated']
+    )))
+
     tasks_query = base_query.join(
         all_models.Cycle,
         all_models.Workflow.id == all_models.Cycle.workflow_id
@@ -314,26 +328,13 @@ class PersonResource(common.ExtendedResource):
         sa.func.min(
             all_models.CycleTaskGroupObjectTask.end_date).label("due_date"),
         sa.func.sum(
-            sa.func.IF(
-                sa.or_(
-                    sa.and_(
-                        all_models.Workflow.is_verification_needed ==
-                        sa.true(),
-                        all_models.CycleTaskGroupObjectTask.status.in_(
-                            ['Verified', 'Deprecated']
-                        )),
-                    sa.and_(
-                        all_models.Workflow.is_verification_needed ==
-                        sa.false(),
-                        all_models.CycleTaskGroupObjectTask.status.in_(
-                            ['Finished', 'Deprecated']
-                        ))), 1, 0)
+            sa.func.IF(finish_condition, 1, 0)
         ).label("completed"),
         sa.func.count(all_models.Workflow.id).label("total"),
         sa.func.sum(
-            sa.func.IF(
-                all_models.CycleTaskGroupObjectTask.end_date <
-                datetime.date.today(), 1, 0)
+            sa.func.IF(sa.and_(sa.not_(finish_condition),
+                               all_models.CycleTaskGroupObjectTask.end_date <
+                               datetime.date.today()), 1, 0)
         ).label("overdue")
     )
     wf_tasks_result = tasks_query.all()

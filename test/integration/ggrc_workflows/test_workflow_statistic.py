@@ -106,7 +106,7 @@ class TestPersonResource(TestCase, WithQueryApi):
                 "access_control_list": [
                     acl_helper.get_acl_json(role_id, user_id)],
                 "start_date": date(2017, 5, 5),
-                "end_date": date(2017, 8, 14)
+                "end_date": date(2017, 8, 15)
             }, {
                 "title": "task 7",
                 "description": "some task",
@@ -114,6 +114,13 @@ class TestPersonResource(TestCase, WithQueryApi):
                     acl_helper.get_acl_json(role_id, user_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17)
+            }, {
+                "title": "task 8",
+                "description": "some task",
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user_id)],
+                "start_date": date(2017, 5, 5),
+                "end_date": date(2017, 8, 14)
             }],
             "task_group_objects": []
         }]
@@ -151,6 +158,7 @@ class TestPersonResource(TestCase, WithQueryApi):
       task4 = cycle1.cycle_task_group_object_tasks[3]
       task5 = cycle2.cycle_task_group_object_tasks[0]
       task7 = cycle2.cycle_task_group_object_tasks[2]
+      task8 = cycle2.cycle_task_group_object_tasks[3]
       self.api.put(task2, {
           "status": "Finished"
       })
@@ -166,6 +174,9 @@ class TestPersonResource(TestCase, WithQueryApi):
       self.api.put(task7, {
           "status": "Deprecated"
       })
+      self.api.put(task8, {
+          "status": "Finished"
+      })
       workflow1_owners = [user_email, user1_email]
       response = self.client.get("/api/people/{}/my_workflows".format(user_id))
       expected_result = {'workflows': [{
@@ -176,9 +187,9 @@ class TestPersonResource(TestCase, WithQueryApi):
           'owners': [user_email],
           'task_stat': {
               'counts': {
-                  'completed': 2,
+                  'completed': 3,
                   'overdue': 1,
-                  'total': 3
+                  'total': 4
               },
               'due_in_date': '2017-08-14'
           }}, {
