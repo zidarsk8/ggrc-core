@@ -169,6 +169,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     # modified_by relationship
     return super(Person, cls).eager_query().options(
         orm.joinedload('language'),
+        orm.joinedload('profile'),
         orm.subqueryload('object_people'),
     )
 
