@@ -29,13 +29,6 @@ describe('inner-nav component', () => {
 
       expect(viewModel.handleDescriptors).toHaveBeenCalled();
     });
-
-    it('should subscribe on router widget change', () => {
-      spyOn(router, 'bind');
-
-      init();
-      expect(router.bind).toHaveBeenCalledWith('widget', jasmine.any(Function));
-    });
   });
 
   describe('viewModel', () => {
@@ -110,6 +103,102 @@ describe('inner-nav component', () => {
       it('should set uncountable', () => {
         let result = viewModel.createWidget({uncountable: true});
         expect(result.uncountable).toBe(true);
+      });
+
+      it('should set forceRefetch', () => {
+        let result = viewModel.createWidget({forceRefetch: true});
+        expect(result.forceRefetch).toBe(true);
+      });
+    });
+
+    describe('route(widgetId) method', () => {
+      it('should find widget in widgetList', () => {
+        spyOn(viewModel, 'findWidget');
+
+        viewModel.route('widget id');
+
+        expect(viewModel.findWidget).toHaveBeenCalledWith('widget id');
+      });
+
+      it('should select first widget from widgetList '
+        + 'if selected widget is not in the list', () => {
+        spyOn(viewModel, 'findWidget').and.returnValue(null);
+        viewModel.attr('widgetList', [{id: '1'}, {id: '2'}]);
+        spyOn(router, 'attr');
+
+        viewModel.route('selected widget id');
+        expect(router.attr).toHaveBeenCalledWith('widget', '1');
+      });
+
+      it('should set activeWidget if widget is in widgetList ', () => {
+        let widget = {id: '1'};
+        spyOn(viewModel, 'findWidget').and.returnValue(widget);
+        viewModel.attr('activeWidget', null);
+
+        viewModel.route('1');
+
+        expect(viewModel.attr('activeWidget').serialize()).toEqual(widget);
+      });
+
+      it('should dispatch "activeChanged" event if widget is in widgetList',
+        () => {
+          spyOn(viewModel, 'dispatch');
+          let widget = {id: '1'};
+          spyOn(viewModel, 'findWidget').and.returnValue(widget);
+
+          viewModel.route('1');
+
+          expect(viewModel.dispatch).toHaveBeenCalledWith({
+            type: 'activeChanged',
+            widget,
+          });
+        });
+    });
+
+    describe('findWidget(widgetId) method', () => {
+      it('should search widgets by id in widgetList', () => {
+        let widget1 = {id: '1'};
+        let widget2 = {id: '2'};
+        viewModel.attr('widgetList', [widget1, widget2]);
+
+        let result = viewModel.findWidget('2');
+
+        expect(result.serialize()).toEqual(widget2);
+      });
+
+      it('retuns undefined when widget is not found', () => {
+        let widget1 = {id: '1'};
+        let widget2 = {id: '2'};
+        viewModel.attr('widgetList', [widget1, widget2]);
+
+        let result = viewModel.findWidget('3');
+
+        expect(result).toBeUndefined();
+      });
+    });
+  });
+
+  describe('events', () => {
+    describe('inserted event', () => {
+      let event;
+      beforeEach(() => {
+        event = Component.prototype.events['inserted'].bind({viewModel});
+      });
+
+      it('should subscribe on router widget change', () => {
+        spyOn(router, 'bind');
+
+        event();
+        expect(router.bind)
+          .toHaveBeenCalledWith('widget', jasmine.any(Function));
+      });
+
+      it('should route to selected in router widget', () => {
+        spyOn(viewModel, 'route');
+        router.attr('widget', 'selected widget');
+        event();
+
+        expect(viewModel.route).toHaveBeenCalledWith('selected widget');
       });
     });
   });

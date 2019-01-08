@@ -12,14 +12,25 @@ import {
 import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 import TreeViewConfig from '../apps/base_widgets';
+import pubSub from '../pub-sub';
 
 const DashboardControl = can.Control.extend({
   defaults: {
     widget_descriptors: null,
     innerNavDescriptors: [],
+    /*
+      The widget should refetch items when opening
+      if "refetchOnce" has the model name of the widget.
+
+      For example: "refetchOnce" contains "Control" item.
+      The items of "Control" widget should be reloaded.
+    */
+    refetchOnce: new Set(),
+    pubSub,
   },
 }, {
   init: function (el, options) {
+    this.options = new can.Map(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
@@ -86,7 +97,11 @@ const DashboardControl = can.Control.extend({
   init_inner_nav: function () {
     let $innernav = this.element.find('.inner-nav');
     if ($innernav.length && this.options.innernav_view) {
-      $innernav.html(can.view(this.options.innernav_view, this.options));
+      let options = {
+        ...this.options,
+        showWidgetArea: this.showWidgetArea.bind(this),
+      };
+      $innernav.html(can.view(this.options.innernav_view, options));
       return;
     }
 
@@ -97,6 +112,47 @@ const DashboardControl = can.Control.extend({
           dashboard_controller: this,
         });
     }
+  },
+
+  showWidgetArea(event) {
+    let widget = event.widget;
+    let $widget = $('#' + widget.id);
+
+    if ($widget.length) {
+      this.show_widget_area();
+      $widget.siblings().addClass('hidden').trigger('widget_hidden');
+      $widget.removeClass('hidden').trigger('widget_shown');
+
+      let widgetController = $widget.control();
+      if (widgetController && widgetController.display) {
+        let refetch = this.tryToRefetchOnce(widget)
+          || widget.forceRefetch;
+        return widgetController.display(refetch);
+      }
+    }
+  },
+
+  tryToRefetchOnce(descriptor) {
+    const refetchOnce = this.options.attr('refetchOnce');
+
+    if (!refetchOnce.size) {
+      return false;
+    }
+
+    return refetchOnce.delete(descriptor.model.model_singular);
+  },
+
+  addRefetchOnceItems(modelNames) {
+    modelNames = typeof modelNames === 'string' ? [modelNames] : modelNames;
+    const refetchOnce = this.options.attr('refetchOnce');
+
+    modelNames.forEach((modelName) => {
+      refetchOnce.add(modelName);
+    });
+  },
+
+  '{pubSub} refetchOnce'(scope, event) {
+    this.addRefetchOnceItems(event.modelNames);
   },
 
   '.nav-logout click': function () {
@@ -251,6 +307,14 @@ const PageObjectControl = DashboardControl.extend({}, {
   init_widget_descriptors: function () {
     this.options.widget_descriptors = this.options.widget_descriptors || {};
   },
+
+  showWidgetArea(event) {
+    if (this.info_pin) {
+      this.hideInfoPin();
+    }
+
+    this._super(event);
+  }
 });
 
 export {

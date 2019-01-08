@@ -30,6 +30,7 @@ export default can.Component.extend({
         },
       },
     },
+    activeWidget: null,
     widgetDescriptors: [],
     widgetList: [],
     /**
@@ -62,19 +63,48 @@ export default can.Component.extend({
         model: descriptor.model,
         order: descriptor.order,
         uncountable: descriptor.uncountable,
+        forceRefetch: descriptor.forceRefetch,
       };
 
       return widget;
     },
-    route(path) {
+    /**
+     * Handles selecting tab
+     * @param {string} widgetId selected widget id
+     */
+    route(widgetId) {
+      let widget = this.findWidget(widgetId);
+      if (!widget && this.attr('widgetList').length) {
+        let widgetId = this.attr('widgetList')[0].id;
+        router.attr('widget', widgetId);
+        return;
+      }
 
+      if (widget) {
+        this.attr('activeWidget', widget);
+        this.dispatch({type: 'activeChanged', widget});
+      }
+    },
+    /**
+     * Searches widget by Id in widgetList collection
+     * @param {string} widgetId widget id
+     * @return {can.Map} widget
+     */
+    findWidget(widgetId) {
+      return _.find(this.attr('widgetList'),
+        (widget) => widget.id === widgetId);
     },
   },
   init() {
     this.viewModel.handleDescriptors();
+  },
+  events: {
+    inserted() {
+      router.bind('widget', (ev, newVal) => {
+        this.viewModel.route(newVal);
+      });
 
-    router.bind('widget', (ev, newVal) => {
-      this.viewModel.route(newVal);
-    });
+      this.viewModel.route(router.attr('widget'));
+    },
   },
 });

@@ -6,7 +6,7 @@
 <div class="tabs priority {{^if isAuditScope}}single-set{{/if}}">
   <ul class="internav {{lowercase instance.type}}">
     {{#widgetList}}
-      <li class="{{type}}">
+      <li class="{{type}} {{#if_equals activeWidget .}} active {{/if_equals}}">
         <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
           <i class="fa fa-{{ icon }} color"></i>
           {{title}}
