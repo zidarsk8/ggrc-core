@@ -3,13 +3,17 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 import Component from '../inner-nav';
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import {
+  getComponentVM,
+  makeFakeInstance,
+} from '../../../../js_specs/spec_helpers';
 import router, * as RouterUtils from '../../../router';
 import * as ObjectVersionsUtils
   from '../../../plugins/utils/object-versions-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import * as DashboardUtils from '../../../plugins/utils/dashboards-utils';
+import Cacheable from '../../../models/cacheable';
 
 describe('inner-nav component', () => {
   let viewModel;
@@ -113,6 +117,15 @@ describe('inner-nav component', () => {
     });
 
     describe('createWidget() method', () => {
+      beforeEach(() => {
+        let instance = makeFakeInstance({model: Cacheable, staticProps: {
+          obj_nav_options: {
+            force_show_list: ['force show widget title'],
+          },
+        }})();
+        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue(instance);
+      });
+
       it('should set id', () => {
         let result = viewModel.createWidget({widget_id: 'id', model: {}});
         expect(result.id).toBe('id');
@@ -220,6 +233,29 @@ describe('inner-nav component', () => {
         });
         expect(result.countsName).toBe('');
       });
+
+      it('should set default forceShow', () => {
+        let result = viewModel.createWidget({model: {}});
+        expect(result.forceShow).toBe(false);
+      });
+
+      it('should set inForceShowList TRUE '
+        + 'if widget is in instance force show list', () => {
+        let result = viewModel.createWidget({
+          widget_name: 'force show widget title',
+          model: {},
+        });
+        expect(result.inForceShowList).toBe(true);
+      });
+
+      it('should set inForceShowList FALSE '
+        + 'if widget is not in instance force show list', () => {
+        let result = viewModel.createWidget({
+          widget_name: 'not in force show list widget title',
+          model: {},
+        });
+        expect(result.inForceShowList).toBe(false);
+      });
     });
 
     describe('setTabsPriority() method', () => {
@@ -298,6 +334,7 @@ describe('inner-nav component', () => {
       });
 
       it('should set forceShow TRUE for widget', () => {
+        spyOn(viewModel, 'updateHiddenWidgets');
         let widget = new can.Map({id: '1', forceShow: false});
         spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
 
@@ -307,6 +344,7 @@ describe('inner-nav component', () => {
       });
 
       it('should set activeWidget if widget is in widgetList ', () => {
+        spyOn(viewModel, 'updateHiddenWidgets');
         let widget = new can.Map({id: '1'});
         spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
         viewModel.attr('activeWidget', null);
@@ -319,6 +357,7 @@ describe('inner-nav component', () => {
 
       it('should dispatch "activeChanged" event if widget is in widgetList',
         () => {
+          spyOn(viewModel, 'updateHiddenWidgets');
           spyOn(viewModel, 'dispatch');
           let widget = new can.Map({id: '1'});
           spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
@@ -386,6 +425,7 @@ describe('inner-nav component', () => {
       });
 
       it('should set count to widget', () => {
+        spyOn(viewModel, 'updateHiddenWidgets');
         let widget = new can.Map();
         spyOn(viewModel, 'findWidgetByCountsName').and.returnValue(widget);
 

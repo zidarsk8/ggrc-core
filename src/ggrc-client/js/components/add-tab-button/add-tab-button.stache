@@ -20,7 +20,7 @@
           <div class="inner-nav-item">
             {{#shouldCreateObject instance model.model_singular}}
               <a
-                href="{{urlPath}}{{internav_href}}"
+                href="{{urlPath}}{{href}}"
                 rel="tooltip"
                 data-placement="left"
                 data-original-title="Create {{model.title_singular}}"
@@ -44,8 +44,8 @@
                 }'
                 >
                 <div class="oneline">
-                  <i class="fa fa-fw fa-{{ internav_icon }} color"></i>
-                  {{internav_display}}
+                  <i class="fa fa-fw fa-{{ icon }} color"></i>
+                  {{title}}
                 </div>
               </a>
             {{else}}
@@ -54,15 +54,15 @@
                   class="external-link"
                   {instance}="instance"
                   {destination-model}="model">                  
-                    <i class="fa fa-fw fa-{{ internav_icon }} color"></i>
+                    <i class="fa fa-fw fa-{{ icon }} color"></i>
                     <span class="external-link__content">
-                      {{internav_display}}
+                      {{title}}
                       <i class="fa fa-external-link"></i>
                     </span>
                   </questionnaire-mapping-link>
                 </a>
               {{else}}
-                <a href="{{urlPath}}{{ internav_href }}"
+                <a href="{{urlPath}}{{ href }}"
                   {{#canMapObject model.model_singular}}
                     {{^if_equals model.model_singular 'Assessment'}}
                       data-clickable="true"
@@ -73,8 +73,8 @@
                     {{/if_equals}}
                   {{/canMapObject}}>
                   <div class="oneline">
-                    <i class="fa fa-fw fa-{{ internav_icon }} color"></i>
-                    {{internav_display}}
+                    <i class="fa fa-fw fa-{{ icon }} color"></i>
+                    {{title}}
                   </div>
                 </a>
               {{/isMappableExternally}}

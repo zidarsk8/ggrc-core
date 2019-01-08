@@ -20,10 +20,10 @@ describe('inner-nav-item component', () => {
         uncountable: false,
         title: 'widget',
         forceShow: false,
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('displayTab');
       expect(result).toBeTruthy();
@@ -36,10 +36,10 @@ describe('inner-nav-item component', () => {
         uncountable: true,
         title: 'widget',
         forceShow: false,
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('displayTab');
       expect(result).toBeTruthy();
@@ -52,10 +52,10 @@ describe('inner-nav-item component', () => {
         uncountable: false,
         title: 'widget',
         forceShow: true,
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('displayTab');
       expect(result).toBeTruthy();
@@ -68,10 +68,10 @@ describe('inner-nav-item component', () => {
         uncountable: false,
         title: 'widget',
         forceShow: false,
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', true);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('displayTab');
       expect(result).toBeTruthy();
@@ -84,10 +84,10 @@ describe('inner-nav-item component', () => {
         uncountable: false,
         title: 'widget',
         forceShow: false,
+        inForceShowList: true,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', ['widget']);
 
       let result = viewModel.attr('displayTab');
       expect(result).toBeTruthy();
@@ -100,10 +100,10 @@ describe('inner-nav-item component', () => {
         uncountable: false,
         title: 'widget',
         forceShow: false,
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('displayTab');
       expect(result).toBeFalsy();
@@ -116,10 +116,10 @@ describe('inner-nav-item component', () => {
         hasCount: false,
         count: 5,
         title: 'widget',
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('showCloseButton');
       expect(result).toBeFalsy();
@@ -130,10 +130,10 @@ describe('inner-nav-item component', () => {
         hasCount: true,
         count: 5,
         title: 'widget',
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('showCloseButton');
       expect(result).toBeFalsy();
@@ -144,10 +144,10 @@ describe('inner-nav-item component', () => {
         hasCount: true,
         count: 0,
         title: 'widget',
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', true);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('showCloseButton');
       expect(result).toBeFalsy();
@@ -158,10 +158,10 @@ describe('inner-nav-item component', () => {
         hasCount: true,
         count: 0,
         title: 'widget',
+        inForceShowList: true,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', ['widget']);
 
       let result = viewModel.attr('showCloseButton');
       expect(result).toBeFalsy();
@@ -172,10 +172,10 @@ describe('inner-nav-item component', () => {
         hasCount: true,
         count: 0,
         title: 'widget',
+        inForceShowList: false,
       };
       viewModel.attr('widget', widget);
       viewModel.attr('showAllTabs', false);
-      viewModel.attr('forceShowList', []);
 
       let result = viewModel.attr('showCloseButton');
       expect(result).toBeTruthy();

@@ -11,9 +11,17 @@
           {active-widget}="activeWidget"
           {show-title}="true" 
           {show-all-tabs}="instance.constructor.obj_nav_options.show_all_tabs"
-          {force-show-list}="instance.constructor.obj_nav_options.force_show_list"
           (close)="closeTab(%event)"></inner-nav-item>
       {{/priorityTabs}}
+    {{/if}}
+
+    {{^if isAuditScope}}
+      <add-tab-button
+        {instance}="instance"
+        {widget-list}="widgetList"
+        {add-tab-title}="'Add Tab'"
+        {has-hidden-widgets}="hasHiddenWidgets">
+      </add-tab-button>
     {{/if}}
   </ul>
 </div>
@@ -28,9 +36,15 @@
               {active-widget}="activeWidget" 
               {show-title}="false"
               {show-all-tabs}="instance.constructor.obj_nav_options.show_all_tabs"
-              {force-show-list}="instance.constructor.obj_nav_options.force_show_list"
               (close)="closeTab(%event)"></inner-nav-item>
           {{/notPriorityTabs}}
+
+          <add-tab-button
+            {instance}="instance"
+            {widget-list}="widgetList"
+            {add-tab-title}="'Add Scope'"
+            {has-hidden-widgets}="hasHiddenWidgets">
+          </add-tab-button>
         </ul>
       </inner-nav-collapse>
     </div>

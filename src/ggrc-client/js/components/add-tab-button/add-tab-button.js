@@ -43,7 +43,7 @@ const viewModel = can.Map.extend({
         let widgetList = this.attr('widgetList');
 
         return _.filter(widgetList, (widget) => {
-          return this.isNotObjectVersion(widget.internav_display) &&
+          return this.isNotObjectVersion(widget.attr('title')) &&
             !this.isNotProhibitedMap(widget.model.model_singular) &&
             widget.attr('placeInAddTab');
         });
@@ -77,8 +77,7 @@ const viewModel = can.Map.extend({
     return isMappable && canMap;
   },
   sortWidgets() {
-    this.attr('widgetList',
-      _.sortBy(this.attr('widgetList'), 'internav_display'));
+    this.attr('widgetList', _.sortBy(this.attr('widgetList'), 'title'));
   },
 });
 
@@ -88,6 +87,9 @@ export default can.Component.extend({
   leakScope: true,
   viewModel,
   events: {
+    inserted() {
+      this.viewModel.sortWidgets();
+    },
     // top nav dropdown position
     '.dropdown-toggle click'(el) {
       let $dropdown = this.element.find('.dropdown-menu');
@@ -124,8 +126,5 @@ export default can.Component.extend({
       }
       return options.inverse(options.contexts);
     },
-  },
-  init() {
-    this.viewModel.sortWidgets();
   },
 });

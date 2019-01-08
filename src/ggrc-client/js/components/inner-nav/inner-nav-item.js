@@ -12,14 +12,13 @@ export default can.Component.extend({
       displayTab: {
         get() {
           let widget = this.attr('widget');
-          let inForceShowList = this.attr('inForceShowList');
 
           return widget.attr('hasCount') &&
               widget.attr('count') ||
               widget.attr('uncountable') ||
               widget.attr('forceShow') ||
               this.attr('showAllTabs') ||
-              inForceShowList;
+              widget.attr('inForceShowList');
         },
       },
       showCloseButton: {
@@ -27,13 +26,7 @@ export default can.Component.extend({
           return this.attr('widget.hasCount')
             && !this.attr('widget.count')
             && !this.attr('showAllTabs')
-            && !this.attr('inForceShowList');
-        },
-      },
-      inForceShowList: {
-        get() {
-          return _.includes(this.attr('forceShowList'),
-            this.attr('widget.title'));
+            && !this.attr('widget.inForceShowList');
         },
       },
       isActive: {
@@ -46,7 +39,6 @@ export default can.Component.extend({
     showTitle: true,
     activeWidget: null,
     showAllTabs: false,
-    forceShowList: [],
     closeTab() {
       this.dispatch({
         type: 'close',

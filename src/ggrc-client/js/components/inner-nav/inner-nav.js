@@ -6,6 +6,7 @@
 import template from './inner-nav.stache';
 import './inner-nav-item';
 import './inner-nav-collapse';
+import '../add-tab-button/add-tab-button';
 import {
   getPageInstance,
   isAdmin,
@@ -48,6 +49,7 @@ export default can.Component.extend({
     widgetList: [],
     priorityTabs: [],
     notPriorityTabs: [],
+    hasHiddenWidgets: false,
     /**
      * Converts all descriptors to tabs view models
      */
@@ -74,6 +76,8 @@ export default can.Component.extend({
         (descriptor.content_controller_options &&
           descriptor.content_controller_options.countsName) ||
         descriptor.model.shortName;
+      let model = this.attr('instance').constructor;
+      let forceShowList = model.obj_nav_options.force_show_list || [];
 
       let widget = {
         id,
@@ -88,6 +92,9 @@ export default can.Component.extend({
         hasCount: false,
         count: 0,
         countsName: !descriptor.uncountable ? countsName : '',
+        forceShow: false,
+        inForceShowList: _.includes(forceShowList, title),
+        placeInAddTab: false,
       };
 
       return widget;
@@ -108,6 +115,26 @@ export default can.Component.extend({
       }
     },
     /**
+     * Configures widgets to display in Add Tab button dropdown
+     */
+    updateHiddenWidgets() {
+      let hasHiddenWidgets = false;
+      let model = this.attr('instance').constructor;
+      let showAllTabs = model.obj_nav_options.show_all_tabs;
+
+      // Update has hidden widget attr
+      this.attr('widgetList').forEach((widget) => {
+        widget.attr('placeInAddTab', false);
+
+        if (widget.hasCount && widget.count === 0 &&
+          !widget.forceShow && !widget.inForceShowList && !showAllTabs) {
+          widget.attr('placeInAddTab', true);
+          hasHiddenWidgets = true;
+        }
+      });
+      this.attr('hasHiddenWidgets', hasHiddenWidgets);
+    },
+    /**
      * Handles selecting tab
      * @param {string} widgetId selected widget id
      */
@@ -123,6 +150,7 @@ export default can.Component.extend({
         widget.attr('forceShow', true); // to show tabs with 0 count
         this.attr('activeWidget', widget);
         this.dispatch({type: 'activeChanged', widget});
+        this.updateHiddenWidgets();
       }
     },
     /**
@@ -155,6 +183,8 @@ export default can.Component.extend({
           count,
           hasCount: true,
         });
+
+        this.updateHiddenWidgets();
       }
     },
     /**

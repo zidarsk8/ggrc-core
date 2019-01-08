@@ -74,12 +74,12 @@ describe('add-tab-button component', function () {
       const list = ['Policies', 'Audits', 'Contracts', 'Risks'];
 
       viewModel.attr('widgetList',
-        list.map((name) => ({internav_display: name})));
+        list.map((name) => ({title: name})));
 
       viewModel.sortWidgets();
 
       const result = viewModel.attr('widgetList')
-        .map((widget) => widget.internav_display).serialize();
+        .map((widget) => widget.title).serialize();
 
       expect(result).toEqual(list.sort());
     });
