@@ -166,7 +166,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = all_models.Assessment.query.one()
     self._assert_integration_state(obj, value)
 
-  @ddt.data("yes", "no", "true", "false")
+  @ddt.data("on", "off")
   def test_enabled_state_assmt_tmpl_create_succeed(self, value):
     """Test Assessment Template integration state set correctly ."""
     audit = factories.AuditFactory()
@@ -177,7 +177,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Default Assignees*", "user@example.com"),
         ("Object Under Assessment", "Control"),
         ("Title", "Object Title"),
-        ("Integration Enabled", value),
+        ("Ticket Tracker Integration", value),
     ]))
 
     self._check_csv_response(response, {})
@@ -389,7 +389,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = all_models.Audit.query.one()
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
 
-  @ddt.data("yes", "no", "true", "false")
+  @ddt.data("on", "off")
   def test_enabled_state_audit_create_succeed(self, value):
     """Test Audit integration state set correctly during create via import."""
     program = factories.ProgramFactory()
@@ -400,7 +400,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
         ("Title", "Audit Title"),
         ("State", "Planned"),
         ("Audit Captains", "user@example.com"),
-        ("Integration Enabled", value),
+        ("Ticket Tracker Integration", value),
     ]))
 
     self._check_csv_response(response, {})

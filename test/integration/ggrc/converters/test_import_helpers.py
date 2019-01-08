@@ -392,7 +392,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Severity",
         "Priority",
         "Issue Type",
-        "Integration Enabled",
+        "Ticket Tracker Integration",
     }
     expected_fields = {
         "mandatory": {
@@ -432,7 +432,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Severity",
         "Priority",
         "Issue Type",
-        "Integration Enabled",
+        "Ticket Tracker Integration",
     }
     expected_fields = {
         "mandatory": {
