@@ -223,7 +223,7 @@ export default can.Model('can.Model.Cacheable', {
     let that = this;
 
     if (staticProps.mixins) {
-      can.each(staticProps.mixins, function (mixin) {
+      _.forEach(staticProps.mixins, function (mixin) {
         mixin.add_to(that);
       });
       delete this.mixins;

@@ -7,8 +7,8 @@
 //  promises, since every item passed to it will show up in
 //  the jasmine output.
 function failAll(done) {
-  return function () {
-    can.each(arguments, function (arg) {
+  return function (...args) {
+    args.forEach(function (arg) {
       fail(JSON.stringify(arg));
     });
     if (done) {

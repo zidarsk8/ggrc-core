@@ -28,7 +28,7 @@ function openMapperByElement(ev, disableMapper) {
   let btn = $(ev.currentTarget);
   let data = {};
 
-  can.each(btn.data(), function (val, key) {
+  _.forEach(btn.data(), function (val, key) {
     data[can.camelCaseToUnderscore(key)] = val;
   });
 

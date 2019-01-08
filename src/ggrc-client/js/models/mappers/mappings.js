@@ -258,9 +258,9 @@ export default can.Construct.extend({
   */
   get_mappings_for: function (object) {
     let mappings = {};
-    can.each(this.modules, function (mod, name) {
+    _.forEach(this.modules, function (mod, name) {
       if (mod[object]) {
-        can.each(mod[object], function (mapping, mappingName) {
+        _.forEach(mod[object], function (mapping, mappingName) {
           if (mappingName === '_canonical') {
             return;
           }
@@ -278,9 +278,9 @@ export default can.Construct.extend({
   */
   get_canonical_mappings_for: function (object) {
     let mappings = {};
-    can.each(this.modules, (mod, name) => {
+    _.forEach(this.modules, (mod, name) => {
       if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-        can.each(mod._canonical_mappings[object],
+        _.forEach(mod._canonical_mappings[object],
           (mappingName, model) => {
             mappings[model] = businessModels[model];
           });
@@ -369,9 +369,9 @@ export default can.Construct.extend({
   */
   get_related_mappings_for(object) {
     let mappings = {};
-    can.each(this.modules, (mod) => {
+    _.forEach(this.modules, (mod) => {
       if (mod._related_mappings && mod._related_mappings[object]) {
-        can.each(mod._related_mappings[object],
+        _.forEach(mod._related_mappings[object],
           (mappingName, model) => {
             mappings[model] = businessModels[model];
           });
@@ -391,14 +391,14 @@ export default can.Construct.extend({
     this._canonical_mappings = {};
     this._related_mappings = {};
     if (this.groups) {
-      can.each(this.groups, function (group, name) {
+      _.forEach(this.groups, function (group, name) {
         if (typeof group === 'function') {
           that.groups[name] = $.proxy(group, that.groups);
         }
       });
     }
     createdMappings = this.create_mappings(opts);
-    can.each(createdMappings, function (mappings, objectType) {
+    _.forEach(createdMappings, function (mappings, objectType) {
       if (mappings._canonical) {
         that._fillInMappings(objectType,
           mappings._canonical, that._canonical_mappings);
@@ -416,22 +416,21 @@ export default can.Construct.extend({
       mappings[objectType] = {};
     }
 
-    can.each(config || [],
-      (optionTypes, mappingName) => {
-        if (!can.isArray(optionTypes)) {
-          optionTypes = [optionTypes];
-        }
-        can.each(optionTypes, (optionType) => {
-          mappings[objectType][optionType] = mappingName;
-        });
+    _.forEach(config, (optionTypes, mappingName) => {
+      if (!can.isArray(optionTypes)) {
+        optionTypes = [optionTypes];
+      }
+      optionTypes.forEach((optionType) => {
+        mappings[objectType][optionType] = mappingName;
       });
+    });
   },
   // Recursively handle mixins -- this function should not be called directly.
   reify_mixins: function (definition, definitions) {
     let that = this;
     let finalDefinition = {};
     if (definition._mixins) {
-      can.each(definition._mixins, function (mixin) {
+      _.forEach(definition._mixins, function (mixin) {
         if (typeof (mixin) === 'string') {
           // If string, recursive lookup
           if (!definitions[mixin]) {
@@ -448,7 +447,7 @@ export default can.Construct.extend({
           if (finalDefinition._canonical && mixin._canonical) {
             mixin = Object.assign({}, mixin);
 
-            can.each(mixin._canonical, function (types, mapping) {
+            _.forEach(mixin._canonical, function (types, mapping) {
               if (finalDefinition._canonical[mapping]) {
                 if (!can.isArray(finalDefinition._canonical[mapping])) {
                   finalDefinition._canonical[mapping] =
@@ -478,12 +477,12 @@ export default can.Construct.extend({
   create_mappings: function (definitions) {
     let mappings = {};
 
-    can.each(definitions, function (definition, name) {
+    _.forEach(definitions, (definition, name) => {
       // Only output the mappings if it's a model, e.g., uppercase first letter
       if (name[0] === name[0].toUpperCase()) {
         mappings[name] = this.reify_mixins(definition, definitions);
       }
-    }, this);
+    });
     return mappings;
   },
 });

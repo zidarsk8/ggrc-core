@@ -45,7 +45,7 @@ describe('QueryParser', function () {
         '!~7531902 468',
       ];
 
-      can.each(textSearchQueries, function (queryStr) {
+      textSearchQueries.forEach(function (queryStr) {
         let text = queryStr.replace('!~', '').trim();
         expect(QueryParser.parse(queryStr)).toEqual({
           expression: {
@@ -71,7 +71,7 @@ describe('QueryParser', function () {
         '~7531902 468',
       ];
 
-      can.each(textSearchQueries, function (queryStr) {
+      textSearchQueries.forEach(function (queryStr) {
         let text = queryStr.replace('~', '').trim();
         expect(QueryParser.parse(queryStr)).toEqual({
           expression: {
@@ -94,7 +94,7 @@ describe('QueryParser', function () {
         '!~',
       ];
 
-      can.each(operators, (op) => {
+      operators.forEach((op) => {
         let simpleQueries = [
           `a${op}b`,
           ` with ${op} spaces`,
@@ -103,7 +103,7 @@ describe('QueryParser', function () {
           `"last updated"${op} "with spaces"  `,
         ];
 
-        can.each(simpleQueries, function (queryStr) {
+        simpleQueries.forEach(function (queryStr) {
           let query = queryStr.split(op);
           expect(QueryParser.parse(queryStr)).toEqual({
             expression: {
@@ -136,7 +136,7 @@ describe('QueryParser', function () {
         'n = "22"    or ("n" = 5) ',
       ];
 
-      can.each(queries, (query) => {
+      queries.forEach((query) => {
         expect(QueryParser.parse(query))
           .toEqual({
             expression: {
@@ -158,7 +158,7 @@ describe('QueryParser', function () {
         'n = "22"    and ("n" = 5) ',
       ];
 
-      can.each(queries, (query) => {
+      queries.forEach((query) => {
         expect(QueryParser.parse(query))
           .toEqual({
             expression: {
@@ -374,7 +374,7 @@ describe('QueryParser', function () {
           '~ bacon ipsum'],
       ];
 
-      can.each(sameQueries, function (queries) {
+      sameQueries.forEach(function (queries) {
         expect(
           JSON.stringify(QueryParser.parse(queries[0]))
         ).toEqual(
@@ -398,7 +398,7 @@ describe('QueryParser', function () {
           '  ~ bacon ipsum'],
       ];
 
-      can.each(sameQueries, function (queries) {
+      sameQueries.forEach(function (queries) {
         expect(
           JSON.stringify(QueryParser.parse(queries[0]))
         ).toEqual(

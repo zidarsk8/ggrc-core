@@ -475,7 +475,7 @@ export default can.Control({
     let $elements = $form
       .find(':input');
 
-    can.each($elements.toArray(), this.proxy('set_value_from_element'));
+    $elements.toArray().forEach(this.proxy('set_value_from_element'));
   },
   set_value_from_element: function (el) {
     let name;

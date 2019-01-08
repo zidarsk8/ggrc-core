@@ -61,7 +61,7 @@ function generateCycle(workflow) {
   }, (params, option) => {
     let data = {};
 
-    can.each(params, function (item) {
+    _.forEach(params, function (item) {
       data[item.name] = item.value;
     });
 

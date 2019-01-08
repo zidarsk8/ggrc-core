@@ -14,6 +14,10 @@ const CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
 const LHN_SIZE = 'lhn_size';
 const LHN_STATE = 'lhn_state';
 const pageToken = window.location.pathname.replace(/\./g, '/');
+const LHN_STATE_LIST = [
+  'open_category', 'panel_scroll', 'category_scroll',
+  'search_text', 'my_work', 'filter_params', 'is_open', 'is_pinned',
+];
 
 let preferences = null;
 /**
@@ -74,7 +78,7 @@ function saveObject() {
  */
 function createNestedProps(prefs, keyArgs) {
   let object = prefs;
-  can.each(keyArgs, function (arg) {
+  keyArgs.forEach(function (arg) {
     let value = _.get(object, arg);
     if (!value) {
       value = new can.Map();
@@ -220,15 +224,11 @@ function getLHNState() {
 
 function setLHNState(state) {
   let value = getObject(LHN_STATE);
-  can.each(
-    ['open_category', 'panel_scroll', 'category_scroll', 'search_text',
-      'my_work', 'filter_params', 'is_open', 'is_pinned'],
-    (token) => {
-      if (typeof state[token] !== 'undefined') {
-        value.attr(token, state[token]);
-      }
+  LHN_STATE_LIST.forEach((token) => {
+    if (typeof state[token] !== 'undefined') {
+      value.attr(token, state[token]);
     }
-  );
+  });
   saveObject(LHN_STATE, value);
 }
 

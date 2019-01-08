@@ -41,7 +41,7 @@ function _getCurrentUser() {
 const widgetModules = [];
 function initWidgets() {
   // Ensure each extension has had a chance to initialize widgets
-  can.each(widgetModules, function (module) {
+  widgetModules.forEach(function (module) {
     if (module.init_widgets) {
       module.init_widgets();
     }

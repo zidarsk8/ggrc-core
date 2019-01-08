@@ -50,12 +50,10 @@ import * as businessModels from '../models/business-models';
 
         dfd.then(function (objects) {
           this.last_stubs = objects;
-          can.each(
-            objects.slice(request.start, request.start + MAX_RESULTS),
+          objects.slice(request.start, request.start + MAX_RESULTS).forEach(
             function (object) {
               queue.enqueue(object);
-            }
-          );
+            });
           queue.trigger().then(function (objs) {
             objs = this.options.apply_filter(objs, request);
             if (objs.length || isNextPage) {
@@ -124,7 +122,7 @@ import * as businessModels from '../models/business-models';
           .then(function (searchResult) {
             let objects = [];
 
-            can.each(that.options.searchtypes, function (searchtype) {
+            _.forEach(that.options.searchtypes, function (searchtype) {
               objects.push(...searchResult.getResultsForType(searchtype));
             });
             return objects;
