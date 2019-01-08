@@ -37,18 +37,16 @@ class CalendarEventBuilder(object):
 
   def build_cycle_tasks(self):
     """Builds CalendarEvents based on CycleTaskGroupObjectTasks."""
-    with benchmark("Generating of events for cycle tasks."):
+    with benchmark("Pre-loading data."):
       self._preload_data()
+    with benchmark("Generating of events for cycle tasks."):
       self._generate_events()
+    with benchmark("Generating event descriptions"):
       self._generate_event_descriptions()
-      db.session.commit()
+    db.session.commit()
 
   def _preload_data(self):
     """Preload data for Calendar Event generation."""
-    self.task_mappings, self.event_mappings = utils.get_related_mapping(
-        left=all_models.CycleTaskGroupObjectTask,
-        right=all_models.CalendarEvent
-    )
     self.tasks = all_models.CycleTaskGroupObjectTask.query.options(
         orm.joinedload("cycle").load_only(
             "workflow_id",
@@ -88,6 +86,10 @@ class CalendarEventBuilder(object):
 
   def _generate_events(self):
     """Generates Calendar Events."""
+    self.task_mappings, _ = utils.get_related_mapping(
+        left=all_models.CycleTaskGroupObjectTask,
+        right=all_models.CalendarEvent
+    )
     for task in self.tasks:
       self._generate_events_for_task(task)
     db.session.flush()
@@ -142,42 +144,38 @@ class CalendarEventBuilder(object):
     if relationship:
       db.session.delete(relationship)
       self.task_mappings[task_id].discard(event_id)
-      self.event_mappings[event_id].discard(task_id)
 
   def _create_event_with_relationship(self, task, person_id):
     """Creates calendar event and relationship based on task and person id."""
-    db.session.add(all_models.CalendarEvent(
-        due_date=task.end_date,
-        attendee_id=person_id,
-        title=self.TASK_TITLE_TEMPLATE.format(prefix=self.title_prefix),
-        modified_by_id=person_id,
-    ))
-    db.session.flush()
-
-    event = all_models.CalendarEvent.query.filter(
-        all_models.CalendarEvent.due_date == task.end_date,
-        all_models.CalendarEvent.attendee_id == person_id,
-    ).first()
-    db.session.add(all_models.Relationship(
-        source=task,
-        destination=event,
-    ))
-    db.session.flush()
-
-    self.task_mappings[task.id].add(event.id)
-    self.event_mappings[event.id].add(task.id)
-    self.events.append(event)
+    with benchmark("Create Calendar event for task {}".format(task.id)):
+      event = all_models.CalendarEvent(
+          due_date=task.end_date,
+          attendee_id=person_id,
+          title=self.TASK_TITLE_TEMPLATE.format(prefix=self.title_prefix),
+          modified_by_id=person_id,
+      )
+      db.session.add(event)
+      db.session.add(all_models.Relationship(
+          source=task,
+          destination=event,
+      ))
+      self.events.append(event)
     return event
 
   def _create_event_relationship(self, task, event):
     """Creates event relationship is it is not exists."""
-    if task.id not in self.task_mappings:
+    relationship = utils.get_relationship(
+        left_id=event.id,
+        left_model_name="CalendarEvent",
+        right_id=task.id,
+        right_model_name="CycleTaskGroupObjectTask",
+    )
+    if not relationship:
       db.session.add(all_models.Relationship(
           source=task,
           destination=event,
       ))
       self.task_mappings[task.id].add(event.id)
-      self.event_mappings[event.id].add(task.id)
 
   @staticmethod
   def _should_create_event_for(task):
@@ -204,6 +202,10 @@ class CalendarEventBuilder(object):
 
   def _generate_event_descriptions(self):
     """Generates CalendarEvents descriptions."""
+    _, self.event_mappings = utils.get_related_mapping(
+        left=all_models.CycleTaskGroupObjectTask,
+        right=all_models.CalendarEvent
+    )
     events = db.session.query(all_models.CalendarEvent).options(
         load_only(
             all_models.CalendarEvent.id,
