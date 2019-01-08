@@ -1009,7 +1009,11 @@ class Resource(ModelView):
         self._gather_referenced_objects(value, accomulator)
     elif isinstance(data, dict):
       if "type" in data and data.get("id"):
-        accomulator[data["type"]].add(data["id"])
+        try:
+          accomulator[data["type"]].add(data["id"])
+        except TypeError:
+          raise BadRequest("Either type or id are specified "
+                           "incorrectly in the request payload.")
       for value in data.values():
         self._gather_referenced_objects(value, accomulator)
     return accomulator
