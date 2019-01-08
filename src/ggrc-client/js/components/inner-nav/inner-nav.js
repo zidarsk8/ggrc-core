@@ -11,6 +11,7 @@ import {
 import {getCounts} from '../../plugins/utils/widgets-utils';
 import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
+import {isDashboardEnabled} from '../../plugins/utils/dashboards-utils';
 
 export default can.Component.extend({
   tag: 'inner-nav',
@@ -43,6 +44,8 @@ export default can.Component.extend({
     activeWidget: null,
     widgetDescriptors: [],
     widgetList: [],
+    priorityTabs: [],
+    notPriorityTabs: [],
     /**
      * Converts all descriptors to tabs view models
      */
@@ -86,6 +89,21 @@ export default can.Component.extend({
       };
 
       return widget;
+    },
+    /**
+     * Splits tabs by priority for Audit
+     */
+    setTabsPriority() {
+      let widgets = this.attr('widgetList');
+      let instance = this.attr('instance');
+
+      if (this.attr('isAuditScope')) {
+        let priorityTabsNum = 5 + isDashboardEnabled(instance);
+        this.attr('priorityTabs', widgets.slice(0, priorityTabsNum));
+        this.attr('notPriorityTabs', widgets.slice(priorityTabsNum));
+      } else {
+        this.attr('priorityTabs', widgets);
+      }
     },
     /**
      * Handles selecting tab
@@ -139,6 +157,7 @@ export default can.Component.extend({
   },
   init() {
     this.viewModel.handleDescriptors();
+    this.viewModel.setTabsPriority();
   },
   events: {
     inserted() {

@@ -95,7 +95,7 @@ const DashboardControl = can.Control.extend({
   },
 
   init_inner_nav: function () {
-    let $innernav = this.element.find('.inner-nav');
+    let $innernav = this.element.find('#inner-nav');
     if ($innernav.length && this.options.innernav_view) {
       let options = {
         ...this.options,

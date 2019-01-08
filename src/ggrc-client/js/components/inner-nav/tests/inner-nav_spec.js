@@ -9,6 +9,7 @@ import * as ObjectVersionsUtils
   from '../../../plugins/utils/object-versions-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
+import * as DashboardUtils from '../../../plugins/utils/dashboards-utils';
 
 describe('inner-nav component', () => {
   let viewModel;
@@ -30,6 +31,13 @@ describe('inner-nav component', () => {
       init();
 
       expect(viewModel.handleDescriptors).toHaveBeenCalled();
+    });
+
+    it('should call setTabsPriority()', () => {
+      spyOn(viewModel, 'setTabsPriority');
+      init();
+
+      expect(viewModel.setTabsPriority).toHaveBeenCalled();
     });
   });
 
@@ -211,6 +219,62 @@ describe('inner-nav component', () => {
           },
         });
         expect(result.countsName).toBe('');
+      });
+    });
+
+    describe('setTabsPriority() method', () => {
+      describe('Audit object', () => {
+        it('should set first 5 widgets as priority if dashboard is not enabled',
+          () => {
+            spyOn(CurrentPageUtils, 'getPageInstance')
+              .and.returnValue(new can.Map({type: 'Audit'}));
+            spyOn(DashboardUtils, 'isDashboardEnabled').and.returnValue(false);
+            viewModel.attr('widgetList', [{id: 0}, {id: 1}, {id: 2},
+              {id: 3}, {id: 4}, {id: 5}, {id: 6}]);
+
+            viewModel.setTabsPriority();
+
+            expect(viewModel.attr('priorityTabs').length).toBe(5);
+            for (let i = 0; i < 5; i++) {
+              expect(viewModel.attr('priorityTabs')[i].id).toBe(i);
+            }
+
+            expect(viewModel.attr('notPriorityTabs').length).toBe(2);
+            for (let i = 0; i <2; i++) {
+              expect(viewModel.attr('notPriorityTabs')[i].id).toBe(i + 5);
+            }
+          });
+
+        it('should set first 6 widgets as priority if dashboard is enabled',
+          () => {
+            spyOn(CurrentPageUtils, 'getPageInstance')
+              .and.returnValue(new can.Map({type: 'Audit'}));
+            spyOn(DashboardUtils, 'isDashboardEnabled').and.returnValue(true);
+            viewModel.attr('widgetList', [{id: 0}, {id: 1}, {id: 2},
+              {id: 3}, {id: 4}, {id: 5}, {id: 6}]);
+
+            viewModel.setTabsPriority();
+
+            expect(viewModel.attr('priorityTabs').length).toBe(6);
+            for (let i = 0; i < 6; i++) {
+              expect(viewModel.attr('priorityTabs')[i].id).toBe(i);
+            }
+            expect(viewModel.attr('notPriorityTabs').length).toBe(1);
+            expect(viewModel.attr('notPriorityTabs')[0].id).toBe(6);
+          });
+      });
+
+      describe('all objects except Audit', () => {
+        it('sets all available widgets as priority', () => {
+          spyOn(CurrentPageUtils, 'getPageInstance')
+            .and.returnValue(new can.Map({type: 'type'}));
+          viewModel.attr('widgetList', [{}, {}, {}]);
+
+          viewModel.setTabsPriority();
+
+          expect(viewModel.attr('priorityTabs').length).toBe(3);
+          expect(viewModel.attr('notPriorityTabs').length).toBe(0);
+        });
       });
     });
 
