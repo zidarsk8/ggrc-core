@@ -41,6 +41,8 @@ export default can.Component.extend({
       let widgets = _.map(descriptors,
         (descriptor) => this.createWidget(descriptor));
 
+      widgets = _.sortBy(widgets, ['order', 'title']);
+
       this.attr('widgetList', widgets);
     },
     /**

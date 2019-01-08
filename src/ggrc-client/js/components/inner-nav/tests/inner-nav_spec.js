@@ -45,6 +45,29 @@ describe('inner-nav component', () => {
         expect(viewModel.createWidget).toHaveBeenCalledTimes(3);
         expect(viewModel.attr('widgetList').length).toBe(3);
       });
+
+      it('should sort widgets by order and title', () => {
+        let descriptors = [
+          {order: 3, widget_name: 'b'},
+          {order: 2, widget_name: 'a'},
+          {order: 3, widget_name: 'a'},
+          {order: 2, widget_name: 'b'},
+        ];
+        viewModel.attr('widgetDescriptors', descriptors);
+
+        viewModel.handleDescriptors();
+
+        let widgets = viewModel.attr('widgetList');
+
+        expect(widgets[0])
+          .toEqual(jasmine.objectContaining({order: 2, title: 'a'}));
+        expect(widgets[1])
+          .toEqual(jasmine.objectContaining({order: 2, title: 'b'}));
+        expect(widgets[2])
+          .toEqual(jasmine.objectContaining({order: 3, title: 'a'}));
+        expect(widgets[3])
+          .toEqual(jasmine.objectContaining({order: 3, title: 'b'}));
+      });
     });
 
     describe('createWidget() method', () => {
