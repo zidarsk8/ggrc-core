@@ -140,7 +140,20 @@ viewModel = can.Map.extend({
           pageSize: 10});
       },
     },
+    selectedItem: {
+      set(newValue) {
+        this.selectedItemHandler(newValue);
+        return newValue;
+      },
+    },
   },
+  /**
+   * This deferred describes operations which should be executed before
+   * the moment when info pane is loaded. Initial need of this deferred was
+   * for the case when Task Group's info pane is opened - without it
+   * mapped objects might be reloaded before instance.refresh() which is
+   * preformed in selectedItemHandler() method.
+   */
   infoPaneLoadDfd: $.Deferred(),
   /**
    *
@@ -571,6 +584,61 @@ viewModel = can.Map.extend({
 
     notifier('info', exportMessage, true);
   },
+  selectedItemHandler(itemIndex) {
+    let componentSelector = 'assessment-info-pane';
+    let pageInfo = this.attr('pageInfo');
+
+    let relativeIndex = this
+      .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
+    let pageLoadDfd = this
+      .getNextItemPage(itemIndex, pageInfo);
+    let pinControl = $('.pin-content').control();
+
+    if (!this.attr('canOpenInfoPin')) {
+      return;
+    }
+
+    pinControl.setLoadingIndicator(componentSelector, true);
+
+    const infoPaneLoadDfd = pageLoadDfd
+      .then(function () {
+        const items = this.attr('showedItems');
+        const newInstance = items[relativeIndex];
+
+        if (!newInstance) {
+          this.closeInfoPane();
+          this.showLastPage();
+
+          return $.Deferred().resolve();
+        }
+
+        return newInstance
+          .refresh();
+      }.bind(this))
+      .then(function (newInstance) {
+        if (!newInstance) {
+          return;
+        }
+
+        pinControl
+          .updateInstance(componentSelector, newInstance);
+        newInstance.dispatch('refreshRelatedDocuments');
+        newInstance.dispatch({
+          ...REFRESH_RELATED,
+          model: 'Assessment',
+        });
+
+        this.updateActiveItemIndicator(relativeIndex);
+      }.bind(this))
+      .fail(function () {
+        notifier('error', 'Failed to fetch an object.');
+      })
+      .always(function () {
+        pinControl.setLoadingIndicator(componentSelector, false);
+      });
+
+    this.attr('infoPaneLoadDfd', infoPaneLoadDfd);
+  },
 });
 
 /**
@@ -612,8 +680,7 @@ export default can.Component.extend({
       }
 
       if (!isSubTreeItem) {
-        const infoPaneLoadDfd = this.selectedItem(itemNumber);
-        infoPaneOptions.attr('options.infoPaneLoadDfd', infoPaneLoadDfd);
+        this.viewModel.attr('selectedItem', itemNumber);
       }
 
       this.viewModel.attr('canOpenInfoPin', false);
@@ -627,59 +694,6 @@ export default can.Component.extend({
       setInstanceDfd.then(function () {
         this.viewModel.attr('canOpenInfoPin', true);
       }.bind(this));
-    },
-    selectedItem(itemIndex) {
-      let componentSelector = 'assessment-info-pane';
-      let pageInfo = this.viewModel.attr('pageInfo');
-
-      let relativeIndex = this.viewModel
-        .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
-      let pageLoadDfd = this.viewModel
-        .getNextItemPage(itemIndex, pageInfo);
-      let pinControl = $('.pin-content').control();
-
-      if (!this.viewModel.attr('canOpenInfoPin')) {
-        return;
-      }
-
-      pinControl.setLoadingIndicator(componentSelector, true);
-
-      return pageLoadDfd
-        .then(function () {
-          const items = this.viewModel.attr('showedItems');
-          const newInstance = items[relativeIndex];
-
-          if (!newInstance) {
-            this.viewModel.closeInfoPane();
-            this.viewModel.showLastPage();
-
-            return $.Deferred().resolve();
-          }
-
-          return newInstance
-            .refresh();
-        }.bind(this))
-        .then(function (newInstance) {
-          if (!newInstance) {
-            return;
-          }
-
-          pinControl
-            .updateInstance(componentSelector, newInstance);
-          newInstance.dispatch('refreshRelatedDocuments');
-          newInstance.dispatch({
-            ...REFRESH_RELATED,
-            model: 'Assessment',
-          });
-
-          this.viewModel.updateActiveItemIndicator(relativeIndex);
-        }.bind(this))
-        .fail(function () {
-          notifier('error', 'Failed to fetch an object.');
-        })
-        .always(function () {
-          pinControl.setLoadingIndicator(componentSelector, false);
-        });
     },
     ' refreshTree'(el, ev) {
       ev.stopPropagation();
