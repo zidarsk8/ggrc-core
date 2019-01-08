@@ -41,7 +41,6 @@ const DashboardControl = can.Control.extend({
     this.hide_widget_area();
     this.init_default_widgets();
     this.init_inner_nav();
-    this.init_widget_area();
   },
 
   init_tree_view_settings: function () {
@@ -79,18 +78,6 @@ const DashboardControl = can.Control.extend({
 
     if (this.options.header_view && $pageHeader.length) {
       $pageHeader.html(can.view(this.options.header_view));
-    }
-  },
-
-  init_widget_area: function () {
-    if (!this.inner_nav_controller) {
-      //  If there is no inner-nav, then ensure widgets are shown
-      //  FIXME: This is a workaround because widgets and widget-areas are
-      //    hidden, assuming InnerNav controller will show() them
-      this.get_active_widget_containers()
-        .show()
-        .find('.widget').show()
-        .find('> section.content').show();
     }
   },
 
