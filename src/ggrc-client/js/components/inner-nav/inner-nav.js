@@ -4,7 +4,10 @@
  */
 
 import template from './inner-nav.stache';
-import {getPageInstance} from '../../plugins/utils/current-page-utils';
+import {
+  getPageInstance,
+  isAdmin,
+} from '../../plugins/utils/current-page-utils';
 import {getCounts} from '../../plugins/utils/widgets-utils';
 import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
@@ -27,6 +30,13 @@ export default can.Component.extend({
       isAuditScope: {
         get() {
           return this.attr('instance.type') === 'Audit';
+        },
+      },
+      showTabs: {
+        get() {
+          let counts = this.attr('counts');
+          let isEmptyCounts = can.isEmptyObject(counts.attr());
+          return !isEmptyCounts || isAdmin();
         },
       },
     },
@@ -55,6 +65,10 @@ export default can.Component.extend({
       let widgetName = descriptor.widget_name;
       let title = typeof widgetName === 'function'
         ? widgetName() : widgetName;
+      let countsName = descriptor.countsName ||
+        (descriptor.content_controller_options &&
+          descriptor.content_controller_options.countsName) ||
+        descriptor.model.shortName;
 
       let widget = {
         id,
@@ -66,6 +80,9 @@ export default can.Component.extend({
         order: descriptor.order,
         uncountable: descriptor.uncountable,
         forceRefetch: descriptor.forceRefetch,
+        hasCount: false,
+        count: 0,
+        countsName: !descriptor.uncountable ? countsName : '',
       };
 
       return widget;
@@ -75,7 +92,7 @@ export default can.Component.extend({
      * @param {string} widgetId selected widget id
      */
     route(widgetId) {
-      let widget = this.findWidget(widgetId);
+      let widget = this.findWidgetById(widgetId);
       if (!widget && this.attr('widgetList').length) {
         let widgetId = this.attr('widgetList')[0].id;
         router.attr('widget', widgetId);
@@ -92,9 +109,32 @@ export default can.Component.extend({
      * @param {string} widgetId widget id
      * @return {can.Map} widget
      */
-    findWidget(widgetId) {
+    findWidgetById(widgetId) {
       return _.find(this.attr('widgetList'),
         (widget) => widget.id === widgetId);
+    },
+    /**
+     * Searches widget by countName in widgetList collection
+     * @param {string} countsName counts name prop in widget
+     * @return {can.Map} widget
+     */
+    findWidgetByCountsName(countsName) {
+      return _.find(this.attr('widgetList'),
+        (widget) => widget.countsName === countsName);
+    },
+    /**
+     * Sets objects count for widget
+     * @param {string} name countsName prop in widget
+     * @param {*} count objects count
+     */
+    setWidgetCount(name, count) {
+      let widget = this.findWidgetByCountsName(name);
+      if (widget) {
+        widget.attr({
+          count,
+          hasCount: true,
+        });
+      }
     },
   },
   init() {
@@ -107,6 +147,9 @@ export default can.Component.extend({
       });
 
       this.viewModel.route(router.attr('widget'));
+    },
+    '{counts} change'(counts, event, name, action, count) {
+      this.viewModel.setWidgetCount(name, count);
     },
   },
 });

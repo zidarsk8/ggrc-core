@@ -5,14 +5,17 @@
 
 <div class="tabs priority {{^if isAuditScope}}single-set{{/if}}">
   <ul class="internav {{lowercase instance.type}}">
-    {{#widgetList}}
-      <li class="{{type}} {{#if_equals activeWidget .}} active {{/if_equals}}">
-        <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
-          <i class="fa fa-{{ icon }} color"></i>
-          {{title}}
-        </a>
-      </li>
-    {{/widgetList}}
+    {{#if showTabs}}
+      {{#widgetList}}
+        <li class="{{type}} {{#if_equals activeWidget .}} active {{/if_equals}}">
+          <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
+            <i class="fa fa-{{ icon }} color"></i>
+            {{title}}
+            {{#hasCount}}({{firstnonempty count 0}}){{/hasCount}}
+          </a>
+        </li>
+      {{/widgetList}}
+    {{/if}}
   </ul>
 </div>
 {{#if isAuditScope}}
