@@ -10,19 +10,6 @@
   background: $white;
 }
 
-.not-priority-hide {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  &.visible {
-    border-left: 1px dotted;
-    border-right: 1px dotted;
-  }
-  i {
-    margin: auto 5px;
-  }
-}
-
 div.nav {
   &.internav {
     display: flex;
@@ -207,5 +194,25 @@ ul.internav {
 
       }
     }
+  }
+}
+
+inner-nav-collapse {
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+
+  .header {
+    display: flex;
+    align-items: center;
+
+    .fa {
+      margin: auto 5px;
+    }
+  }
+
+  .expanded {
+    border-left: 1px dotted;
+    border-right: 1px dotted;
   }
 }

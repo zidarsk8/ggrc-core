@@ -4,7 +4,7 @@
 }}
 <div class="nav internav {{lowercase instance.type}}">
 <div class="tabs priority {{^if isAuditScope}}single-set{{/if}}">
-  <ul class="internav {{lowercase instance.type}}">
+  <ul class="internav">
     {{#if showTabs}}
       {{#priorityTabs}}
         <inner-nav-item {widget}="." 
@@ -21,16 +21,18 @@
 {{#if showTabs}}
   {{#if isAuditScope}}
     <div class="tabs not-priority">
-      <ul class="internav {{lowercase instance.type}}">
-        {{#notPriorityTabs}}
-          <inner-nav-item {widget}="."
-            {active-widget}="activeWidget"
-            {show-title}="false"
-            {show-all-tabs}="instance.constructor.obj_nav_options.show_all_tabs"
-            {force-show-list}="instance.constructor.obj_nav_options.force_show_list"
-            (close)="closeTab(%event)"></inner-nav-item>
-        {{/notPriorityTabs}}
-      </ul>
+      <inner-nav-collapse {title}="'Show Audit Scope'">
+        <ul class="internav">
+          {{#notPriorityTabs}}
+            <inner-nav-item {widget}="."
+              {active-widget}="activeWidget" 
+              {show-title}="false"
+              {show-all-tabs}="instance.constructor.obj_nav_options.show_all_tabs"
+              {force-show-list}="instance.constructor.obj_nav_options.force_show_list"
+              (close)="closeTab(%event)"></inner-nav-item>
+          {{/notPriorityTabs}}
+        </ul>
+      </inner-nav-collapse>
     </div>
   {{/if}}
 {{/if}}

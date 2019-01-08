@@ -5,6 +5,7 @@
 
 import template from './inner-nav.stache';
 import './inner-nav-item';
+import './inner-nav-collapse';
 import {
   getPageInstance,
   isAdmin,
