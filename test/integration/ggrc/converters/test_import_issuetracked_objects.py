@@ -50,19 +50,19 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("Issue", "Issue", "hotlist_id", "Hotlist ID", 321),
       ("Issue", "Issue", "issue_priority", "Priority", "P1"),
       ("Issue", "Issue", "issue_severity", "Severity", "S1"),
-      ("Issue", "Issue", "issue_type", "Issue Type", "BUG"),
+      ("Issue", "Issue", "issue_type", "Issue Type", "PROCESS"),
       ("Issue", "Issue", "title", "Issue Title", "iti_title"),
       ("Assessment", "Assessment", "component_id", "Component ID", 123),
       ("Assessment", "Assessment", "hotlist_id", "Hotlist ID", 321),
       ("Assessment", "Assessment", "issue_priority", "Priority", "P1"),
       ("Assessment", "Assessment", "issue_severity", "Severity", "S1"),
-      ("Assessment", "Assessment", "issue_type", "Issue Type", "BUG"),
+      ("Assessment", "Assessment", "issue_type", "Issue Type", "PROCESS"),
       ("Assessment", "Assessment", "title", "Issue Title", "iti_title"),
       ("Audit", "Audit", "component_id", "Component ID", 123),
       ("Audit", "Audit", "hotlist_id", "Hotlist ID", 321),
       ("Audit", "Audit", "issue_priority", "Priority", "P1"),
       ("Audit", "Audit", "issue_severity", "Severity", "S1"),
-      ("Audit", "Audit", "issue_type", "Issue Type", "BUG"),
+      ("Audit", "Audit", "issue_type", "Issue Type", "PROCESS"),
       ("AssessmentTemplate", "Assessment Template", "component_id",
        "Component ID", 123),
       ("AssessmentTemplate", "Assessment Template", "hotlist_id",
@@ -72,7 +72,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("AssessmentTemplate", "Assessment Template", "issue_severity",
        "Severity", "S1"),
       ("AssessmentTemplate", "Assessment Template", "issue_type",
-       "Issue Type", "BUG"),
+       "Issue Type", "PROCESS"),
   )
   @ddt.unpack
   def test_import_update_succeed(self, model, model_name, field, alias, value):
@@ -221,7 +221,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("hotlist_id", "Hotlist ID", 321),
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
-      ("issue_type", "Issue Type", "BUG"),
+      ("issue_type", "Issue Type", "PROCESS"),
       ("title", "Issue Title", "iti_title"),
   )
   @ddt.unpack
@@ -302,6 +302,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_severity", "Severity", "aa"),
       ("issue_type", "Issue Type", ""),
       ("issue_type", "Issue Type", "PARABOLA"),
+      ("issue_type", "Issue Type", "BUG"),
   )
   @ddt.unpack
   def test_default_value_set_correctly(self, missed_field, alias, value):
