@@ -4,6 +4,7 @@
 """ Tests for ggrc.models.Revision """
 from datetime import datetime
 
+from freezegun import freeze_time
 import ddt
 import mock
 
@@ -42,10 +43,14 @@ def _project_content(content):
 class TestRevisions(query_helper.WithQueryApi, TestCase):
   """ Tests for ggrc.models.Revision """
 
+  @classmethod
+  def setUpClass(cls):
+    """Sets up objects common to all tests."""
+    cls.gen = integration.ggrc.generator.ObjectGenerator()
+    cls.api_helper = api_helper.Api()
+
   def setUp(self):
     super(TestRevisions, self).setUp()
-    self.gen = integration.ggrc.generator.ObjectGenerator()
-    self.api_helper = api_helper.Api()
     self.api_helper.client.get("/login")
 
   def test_revisions(self):
@@ -415,3 +420,49 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
         all(values[i]["created_at"] >= values[i + 1]["created_at"]
             for i in range(count - 1))
     )
+
+  def test_created_at_filtering(self):
+    """Test revision could be filtered by created_at."""
+    with freeze_time("2019-01-08 12:00:00"):
+      control = factories.ControlFactory()
+      control_id = control.id
+      factories.RevisionFactory(obj=control)
+
+    expected_ids = set()
+    with freeze_time("2019-01-08 23:59:59"):
+      rev = factories.RevisionFactory(obj=control)
+      expected_ids.add(rev.id)
+
+    self.client.get("/login")
+    resp = self._get_first_result_set(
+        {
+            "object_name": "Revision",
+            "type": "ids",
+            "filters": {
+                "expression": {
+                    "op": {"name": "AND"},
+                    "left": {
+                        "op": {"name": "AND"},
+                        "left": {
+                            "op": {"name": "="},
+                            "left": "resource_type",
+                            "right": "Control"
+                        },
+                        "right": {
+                            "op": {"name": "="},
+                            "left": "resource_id",
+                            "right": control_id
+                        }
+                    },
+                    "right": {
+                        "op": {"name": ">"},
+                        "left": "created_at",
+                        "right": "2019-01-08 12:00:00"
+                    }
+                }
+            }
+        },
+        "Revision",
+        "ids"
+    )
+    self.assertItemsEqual(resp, expected_ids)
