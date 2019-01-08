@@ -4,6 +4,7 @@
  */
 
 import template from './inner-nav.stache';
+import './inner-nav-item';
 import {
   getPageInstance,
   isAdmin,
@@ -118,6 +119,7 @@ export default can.Component.extend({
       }
 
       if (widget) {
+        widget.attr('forceShow', true); // to show tabs with 0 count
         this.attr('activeWidget', widget);
         this.dispatch({type: 'activeChanged', widget});
       }
@@ -152,6 +154,19 @@ export default can.Component.extend({
           count,
           hasCount: true,
         });
+      }
+    },
+    /**
+     * Handles tab closing
+     * @param {Object} event contains closed widget
+     */
+    closeTab(event) {
+      let widget = event.widget;
+      widget.attr('forceShow', false);
+
+      let currentWidget = router.attr('widget');
+      if (currentWidget === widget.id) {
+        router.attr('widget', this.attr('widgetList.0.id')); // Switch to the first widget
       }
     },
   },

@@ -240,7 +240,7 @@ describe('inner-nav component', () => {
             }
 
             expect(viewModel.attr('notPriorityTabs').length).toBe(2);
-            for (let i = 0; i <2; i++) {
+            for (let i = 0; i < 2; i++) {
               expect(viewModel.attr('notPriorityTabs')[i].id).toBe(i + 5);
             }
           });
@@ -297,20 +297,30 @@ describe('inner-nav component', () => {
         expect(router.attr).toHaveBeenCalledWith('widget', '1');
       });
 
+      it('should set forceShow TRUE for widget', () => {
+        let widget = new can.Map({id: '1', forceShow: false});
+        spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
+
+        viewModel.route('1');
+
+        expect(widget.attr('forceShow')).toBe(true);
+      });
+
       it('should set activeWidget if widget is in widgetList ', () => {
-        let widget = {id: '1'};
+        let widget = new can.Map({id: '1'});
         spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
         viewModel.attr('activeWidget', null);
 
         viewModel.route('1');
 
-        expect(viewModel.attr('activeWidget').serialize()).toEqual(widget);
+        expect(viewModel.attr('activeWidget').serialize().id)
+          .toEqual(widget.id);
       });
 
       it('should dispatch "activeChanged" event if widget is in widgetList',
         () => {
           spyOn(viewModel, 'dispatch');
-          let widget = {id: '1'};
+          let widget = new can.Map({id: '1'});
           spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
 
           viewModel.route('1');
@@ -383,6 +393,36 @@ describe('inner-nav component', () => {
 
         expect(widget.count).toBe(5);
         expect(widget.hasCount).toBe(true);
+      });
+    });
+
+    describe('closeTab(event) method', () => {
+      it('shoule set forceShow FALSE for widget', () => {
+        let widget = new can.Map({id: '1', forceShow: true});
+
+        viewModel.closeTab({widget});
+
+        expect(widget.attr('forceShow')).toBe(false);
+      });
+
+      it('should not update router if closed tab is not currently selected',
+        () => {
+          router.attr('widget', 'selected');
+
+          viewModel.closeTab({widget: new can.Map({id: 'another widget'})});
+
+          expect(router.attr('widget')).toBe('selected');
+        });
+
+      it('should open first tab in widgetList '
+        + 'if closed tab is currently selected',
+      () => {
+        router.attr('widget', 'selected');
+        viewModel.attr('widgetList', [new can.Map({id: 'first tab'})]);
+
+        viewModel.closeTab({widget: new can.Map({id: 'selected'})});
+
+        expect(router.attr('widget')).toBe('first tab');
       });
     });
   });

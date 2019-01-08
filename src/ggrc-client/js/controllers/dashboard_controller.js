@@ -314,7 +314,7 @@ const PageObjectControl = DashboardControl.extend({}, {
     }
 
     this._super(event);
-  }
+  },
 });
 
 export {

@@ -1,0 +1,23 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#widget}}
+  <li class="{{icon}} {{type}} {{#isActive}} active {{/isActive}}">
+    <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
+      <i class="fa fa-{{ icon }} color"></i>
+      {{#showTitle}} {{title}} {{/showTitle}}
+      {{#hasCount}}
+        {{#if showTitle}}
+          ({{count}})
+        {{else}}
+          {{count}}
+        {{/if}}
+      {{/hasCount}}
+      {{#showCloseButton}}
+        <span class="closed" ($click)="closeTab()"><i class="fa fa-times"></i></span>
+      {{/showCloseButton}}
+    </a>
+  </li>
+{{/widget}}

@@ -7,13 +7,12 @@
   <ul class="internav {{lowercase instance.type}}">
     {{#if showTabs}}
       {{#priorityTabs}}
-        <li class="{{icon}} {{type}} {{#if_equals activeWidget .}} active {{/if_equals}}">
-          <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
-            <i class="fa fa-{{ icon }} color"></i>
-            {{title}}
-            {{#hasCount}}({{firstnonempty count 0}}){{/hasCount}}
-          </a>
-        </li>
+        <inner-nav-item {widget}="." 
+          {active-widget}="activeWidget"
+          {show-title}="true" 
+          {show-all-tabs}="instance.constructor.obj_nav_options.show_all_tabs"
+          {force-show-list}="instance.constructor.obj_nav_options.force_show_list"
+          (close)="closeTab(%event)"></inner-nav-item>
       {{/priorityTabs}}
     {{/if}}
   </ul>
@@ -24,12 +23,12 @@
     <div class="tabs not-priority">
       <ul class="internav {{lowercase instance.type}}">
         {{#notPriorityTabs}}
-          <li class="{{icon}} {{type}} {{#if_equals activeWidget .}} active {{/if_equals}}">
-            <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
-              <i class="fa fa-{{ icon }} color"></i>
-              {{#hasCount}}{{firstnonempty count 0}}{{/hasCount}}
-            </a>
-          </li>
+          <inner-nav-item {widget}="."
+            {active-widget}="activeWidget"
+            {show-title}="false"
+            {show-all-tabs}="instance.constructor.obj_nav_options.show_all_tabs"
+            {force-show-list}="instance.constructor.obj_nav_options.force_show_list"
+            (close)="closeTab(%event)"></inner-nav-item>
         {{/notPriorityTabs}}
       </ul>
     </div>
