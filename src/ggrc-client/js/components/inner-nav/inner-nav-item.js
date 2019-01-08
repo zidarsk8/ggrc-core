@@ -9,13 +9,31 @@ export default can.Component.extend({
   template,
   viewModel: {
     define: {
+      displayTab: {
+        get() {
+          let widget = this.attr('widget');
+          let inForceShowList = this.attr('inForceShowList');
+
+          return widget.attr('hasCount') &&
+              widget.attr('count') ||
+              widget.attr('uncountable') ||
+              widget.attr('forceShow') ||
+              this.attr('showAllTabs') ||
+              inForceShowList;
+        },
+      },
       showCloseButton: {
         get() {
           return this.attr('widget.hasCount')
             && !this.attr('widget.count')
             && !this.attr('showAllTabs')
-            && this.attr('forceShowList')
-              .indexOf(this.attr('widget.title')) === -1;
+            && !this.attr('inForceShowList');
+        },
+      },
+      inForceShowList: {
+        get() {
+          return _.includes(this.attr('forceShowList'),
+            this.attr('widget.title'));
         },
       },
       isActive: {

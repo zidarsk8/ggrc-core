@@ -12,6 +12,104 @@ describe('inner-nav-item component', () => {
     viewModel = getComponentVM(Component);
   });
 
+  describe('displayTab property', () => {
+    it('should return TRUE when widget has count', () => {
+      let widget = {
+        hasCount: true,
+        count: 5,
+        uncountable: false,
+        title: 'widget',
+        forceShow: false,
+      };
+      viewModel.attr('widget', widget);
+      viewModel.attr('showAllTabs', false);
+      viewModel.attr('forceShowList', []);
+
+      let result = viewModel.attr('displayTab');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return TRUE when widget is uncountable', () => {
+      let widget = {
+        hasCount: false,
+        count: 0,
+        uncountable: true,
+        title: 'widget',
+        forceShow: false,
+      };
+      viewModel.attr('widget', widget);
+      viewModel.attr('showAllTabs', false);
+      viewModel.attr('forceShowList', []);
+
+      let result = viewModel.attr('displayTab');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return TRUE when forceShow is true', () => {
+      let widget = {
+        hasCount: false,
+        count: 0,
+        uncountable: false,
+        title: 'widget',
+        forceShow: true,
+      };
+      viewModel.attr('widget', widget);
+      viewModel.attr('showAllTabs', false);
+      viewModel.attr('forceShowList', []);
+
+      let result = viewModel.attr('displayTab');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return TRUE when all tabs should be shown', () => {
+      let widget = {
+        hasCount: false,
+        count: 0,
+        uncountable: false,
+        title: 'widget',
+        forceShow: false,
+      };
+      viewModel.attr('widget', widget);
+      viewModel.attr('showAllTabs', true);
+      viewModel.attr('forceShowList', []);
+
+      let result = viewModel.attr('displayTab');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return TRUE when widget in forceShowList', () => {
+      let widget = {
+        hasCount: false,
+        count: 0,
+        uncountable: false,
+        title: 'widget',
+        forceShow: false,
+      };
+      viewModel.attr('widget', widget);
+      viewModel.attr('showAllTabs', false);
+      viewModel.attr('forceShowList', ['widget']);
+
+      let result = viewModel.attr('displayTab');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return FALSE when widget should not be displayed', () => {
+      let widget = {
+        hasCount: false,
+        count: 0,
+        uncountable: false,
+        title: 'widget',
+        forceShow: false,
+      };
+      viewModel.attr('widget', widget);
+      viewModel.attr('showAllTabs', false);
+      viewModel.attr('forceShowList', []);
+
+      let result = viewModel.attr('displayTab');
+      expect(result).toBeFalsy();
+    });
+  });
+
   describe('showCloseButton property', () => {
     it('should return FALSE when hasCount is false', () => {
       let widget = {
