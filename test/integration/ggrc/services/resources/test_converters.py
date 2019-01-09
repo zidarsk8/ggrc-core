@@ -20,6 +20,7 @@ import mock
 
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.notifications import import_export
 
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
@@ -194,6 +195,50 @@ class TestImportExports(TestImportExportBase):
     self.assertEqual(response.json["id"], ie1.id)
     self.assertEqual(response.json["status"], "Analysis")
 
+  def test_import_export_job(self):
+    """Check if proper ImportExport jobs and bg tasks returned."""
+    self.init_taskqueue()
+    factories.AuditFactory(slug="audit-1")
+    data = "Object type,,,\n" \
+           "Assessment,Code*,Audit*,Title*,State*,Assignees*,Creators*\n" \
+           ",,audit-1,Assessment title 1,,user@example.com,user@example.com"
+
+    user = all_models.Person.query.first()
+
+    imp_exp = factories.ImportExportFactory(
+        job_type="Import",
+        status="Not Started",
+        created_by=user,
+        created_at=datetime.now(),
+        content=data,
+    )
+
+    with mock.patch("ggrc.views.converters.check_for_previous_run"):
+      response = self.client.put(
+          "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+          headers=self.headers,
+      )
+      self.assert200(response)
+      with mock.patch("ggrc.models.background_task.BackgroundTask.finish"):
+        response = self.client.put(
+            "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+            headers=self.headers,
+        )
+        self.assert200(response)
+
+    imp_exp.status = "In Progress"
+    db.session.add(imp_exp)
+    db.session.commit()
+
+    tasks = import_export.get_import_export_tasks()
+    self.assertEqual(tasks.count(), 1)
+    _, bg_task = tasks.first()
+
+    expected_bg = all_models.BackgroundTask.query.order_by(
+        all_models.BackgroundTask.id.desc()
+    ).first()
+    self.assertEqual(expected_bg.name, bg_task.name)
+
   def test_imports_get_all(self):
     """Test imports get all items"""
     user = all_models.Person.query.first()
@@ -283,7 +328,7 @@ class TestImportExports(TestImportExportBase):
   def test_download_unicode_filename(self, filename):
     """Test import history download unicode filename"""
     user = all_models.Person.query.first()
-    import_export = factories.ImportExportFactory(
+    ie_job = factories.ImportExportFactory(
         job_type='Import',
         status='Finished',
         created_at=datetime.now(),
@@ -294,7 +339,7 @@ class TestImportExports(TestImportExportBase):
     response = self.client.get(
         "/api/people/{}/imports/{}/download?export_to=csv".format(
             user.id,
-            import_export.id),
+            ie_job.id),
         headers=self.headers)
     self.assert200(response)
     self.assertEqual(response.data, "Test content")

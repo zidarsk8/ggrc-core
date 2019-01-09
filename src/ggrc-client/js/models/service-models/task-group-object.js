@@ -3,18 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Join from './join';
-import TaskGroup from '../business-models/task-group';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Join('CMS.Models.TaskGroupObject', {
+export default Cacheable('CMS.Models.TaskGroupObject', {
   root_object: 'task_group_object',
   root_collection: 'task_group_objects',
-  join_keys: {
-    task_group: TaskGroup,
-    object: Cacheable,
-  },
   attributes: {
     context: Stub,
     modified_by: Stub,

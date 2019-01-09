@@ -31,9 +31,7 @@
 
               {{#case 'default'}}
                 <div class="owner attr-content">
-                  {{#instance}}
-                    {{> attrTemplate}}
-                  {{/instance}}
+                  <tree-item-attr {instance}="instance" {name}="attr_name"></tree-item-attr>
                 </div>
               {{/case}}
            {{/switch}}

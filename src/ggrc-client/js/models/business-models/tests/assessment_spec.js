@@ -9,6 +9,7 @@ import Audit from '../audit';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Context from '../../service-models/context';
+import * as modelsUtils from '../../../plugins/utils/models-utils';
 
 describe('Assessment model', function () {
   'use strict';
@@ -149,6 +150,10 @@ describe('Assessment model', function () {
   });
 
   describe('form_preload() method', function () {
+    beforeEach(() => {
+      spyOn(modelsUtils, 'getInstance').and.returnValue(GGRC.current_user);
+    });
+
     function checkAcRoles(model, roleId, peopleIds) {
       const res = can.makeArray(model.access_control_list).filter((acl) => {
         return acl.ac_role_id === roleId;

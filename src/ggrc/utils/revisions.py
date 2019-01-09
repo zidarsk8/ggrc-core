@@ -6,8 +6,8 @@
 from logging import getLogger
 
 from ggrc import db
-from ggrc.login import get_current_user_id
 from ggrc.models import all_models
+
 
 logger = getLogger(__name__)
 
@@ -15,7 +15,8 @@ logger = getLogger(__name__)
 def _get_new_objects():
   """Returns list of new objects"""
   result = db.session.execute("""
-      SELECT obj_id, obj_type, action FROM objects_without_revisions
+      SELECT obj_id, obj_type, action, modified_by_id
+      FROM objects_without_revisions
   """).fetchall()
   return result
 
@@ -32,7 +33,9 @@ def _get_chunks(objects, size):
     yield objects[i:i + size]
 
 
-def build_revision_body(obj_id, obj_type, obj_content, event_id, action):
+# pylint: disable-msg=too-many-arguments
+def build_revision_body(obj_id, obj_type, obj_content, event_id, action,
+                        modified_by_id):
   """Build revision body"""
   return {
       "resource_id": obj_id,
@@ -42,8 +45,7 @@ def build_revision_body(obj_id, obj_type, obj_content, event_id, action):
       "action": action,
       "content": obj_content,
       "context_id": obj_content.get("context_id"),
-      "modified_by_id": (obj_content.get("modified_by_id") or
-                         get_current_user_id()),
+      "modified_by_id": modified_by_id,
       "source_type": obj_content.get("source_type"),
       "source_id": obj_content.get("source_id"),
       "destination_type": obj_content.get("destination_type"),
@@ -52,7 +54,7 @@ def build_revision_body(obj_id, obj_type, obj_content, event_id, action):
 
 
 def do_missing_revisions():
-  """Crate 'created/modified' revisions.
+  """Create 'created/modified' revisions.
 
   Iterate thought objects in objects_without_revisions
   table and create revisions
@@ -63,12 +65,12 @@ def do_missing_revisions():
   revisions_table = all_models.Revision.__table__
   count = _get_new_objects_count()
   chunk_size = 100
-  logger.info("Crating revision content...")
+  logger.info("Creating revision content...")
   for index, chunk in enumerate(_get_chunks(_get_new_objects(),
                                             chunk_size), 1):
     logger.info("Processing chunk %s of %s", index, count / chunk_size + 1)
     revisions = []
-    for obj_id, obj_type, action in chunk:
+    for obj_id, obj_type, action, modified_by_id in chunk:
       model = getattr(all_models, obj_type, None)
       if not model:
         logger.warning("Failed to update revisions"
@@ -88,7 +90,7 @@ def do_missing_revisions():
                       obj_type, obj_id)
           continue
         revisions.append(build_revision_body(
-            obj_id, obj_type, obj_content, event.id, action
+            obj_id, obj_type, obj_content, event.id, action, modified_by_id
         ))
       elif not obj:
         logger.info("Object '%s' with id '%s' does't exists,"
@@ -97,7 +99,7 @@ def do_missing_revisions():
       else:
         obj_content = obj.log_json()
         revisions.append(build_revision_body(
-            obj_id, obj_type, obj_content, event.id, action
+            obj_id, obj_type, obj_content, event.id, action, modified_by_id
         ))
     db.session.execute(revisions_table.insert(), revisions)
     db.session.commit()

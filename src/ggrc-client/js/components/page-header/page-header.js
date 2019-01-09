@@ -8,6 +8,7 @@ import '../tasks-counter/tasks-counter';
 import '../tooltip-content/tooltip-content';
 import '../feedback-link/feedback-link';
 import '../release-notes-menu-item/release-notes-menu-item';
+import './notifications-menu-item';
 import logo from '../../../images/ggrc-logo.svg';
 import oneColorLogo from '../../../images/ggrc-one-color.svg';
 import {
@@ -122,6 +123,7 @@ let viewModel = can.Map.extend({
       value: GGRC.config.enable_release_notes,
     },
   },
+  menuInitialized: false,
   showHideTitles: function (element) {
     let elWidth = element.width();
     let $menu = element.find('.menu');
@@ -134,6 +136,9 @@ let viewModel = can.Map.extend({
     } else {
       this.attr('showTitles', true);
     }
+  },
+  handleMenuOpening() {
+    this.attr('menuInitialized', true);
   },
 });
 

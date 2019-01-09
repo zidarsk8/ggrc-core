@@ -1,0 +1,232 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#switch name}}
+
+  {{#case 'title'}}
+    {{#if_instance_of instance 'Document|Evidence'}}
+      <a class="link" href="{{normalizeLink instance.link}}" target="_blank">
+        {{instance.title}}
+      </a>
+    {{else}}
+      {{#if_instance_of instance 'Person'}}
+      <div class="email tree-title-area">
+        {{instance.name}}
+      </div>
+      {{else}}
+        {{instance.title}}
+      {{/if_instance_of}}
+    {{/if_instance_of}}
+  {{/case}}
+
+  {{#case 'network_zone'}}
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.network_zone" {type}="loadedModel"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'kind'}}
+    {{#if_instance_of instance 'Document|Evidence'}}
+      {{instance.kindTitle}}
+    {{else}}
+      <model-loader {path}="'service-models/option'">
+        <tree-field {source}="instance.kind" {type}="loadedModel" {show-tooltip}="false"/>
+      </model-loader>
+    {{/if_instance_of}}
+  {{/case}}
+
+  {{#case 'type'}}
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.kind" {type}="loadedModel"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'modified_by'}}
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'ra_manager'}}
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.ra_manager" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'ra_counsel'}}
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.ra_counsel" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'assignee'}}
+    <model-loader {path}="'business-models/person'">
+      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'means'}}
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.means" {type}="loadedModel" {show-tooltip}="false"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'frequency'}}
+    <model-loader {path}="'service-models/option'">
+      <tree-field {source}="instance.verify_frequency" {type}="loadedModel" {show-tooltip}="false"/>
+    </model-loader>
+  {{/case}}
+
+  {{#case 'assertions'}}
+    <sort-by {items}="instance.assertions" {is-snapshot}="instance.snapshot">
+      <model-loader {path}="'service-models/control-assertion'">
+        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
+      </model-loader>
+    </sort-by>
+  {{/case}}
+
+  {{#case 'categories'}}
+    <sort-by {items}="instance.categories" {is-snapshot}="instance.snapshot">
+      <model-loader {path}="'service-models/control-category'">
+        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
+      </model-loader>
+    </sort-by>
+  {{/case}}
+
+  {{#case 'status'}}
+    {{#using status=instance.status}}
+      <span class="state-value-dot {{addclass 'state' status}} {{#if instance.verified}}verified{{/if}}">
+        {{status}}
+      </span>
+    {{/using}}
+  {{/case}}
+
+  {{#case 'review_status'}}
+    <review-state {instance}="instance">
+      <span>{{reviewState}}</span>
+    </review-state>
+  {{/case}}
+
+  {{#case 'issue_url'}}
+    {{#if instance.issue_tracker.issue_url}}
+      <span class="reference-urls-list__item">
+        <a class="reference-urls-list__link link" href="{{instance.issue_tracker.issue_url}}" target="_blank">
+          Open Ticket
+        </a>
+      </span>
+    {{/if}}
+  {{/case}}
+
+  {{#case 'label'}}
+    <div class="labels">
+      {{#each labels}}
+        <span class="with-comma">{{name}}</span>
+      {{/each}}
+    </div>
+  {{/case}}
+
+  {{#case 'authorizations'}}
+    <div class="role tree-title-area">
+      <div class="item-data">
+        <div class="tree-title-area">
+          {{#user_roles instance parentInstance}}
+            <span class="role" rel="tooltip" data-original-title="{{rolesList}}">
+              {{rolesStr}}
+            </span>
+          {{/user_roles}}
+        </div>
+      </div>
+    </div>
+  {{/case}}
+
+  {{#case 'email'}}
+    <div class="email tree-title-area">
+      <span class="email">{{instance.email}}</span>
+      {{#if_equals system_wide_role 'No Access'}}
+        <span class="user-disabled">(Inactive user)</span>
+      {{/if_equals}}
+    </div>
+  {{/case}}
+  
+  {{#case 'workflow'}}
+    <div class="tree-title-area">
+      <span class="tiny-data" rel="tooltip" title="Workflow title">
+        {{instance.workflow_title}}
+      </span>
+    </div>
+  {{/case}}
+
+  {{#case 'repeat'}}
+    <repeat-on-summary class="repeat-cell" {unit}="instance.unit" 
+                       {repeat-every}="instance.repeat_every"
+                       {hide-repeat-off}="false" >
+    </repeat-on-summary>
+  {{/case}}
+
+  {{#case 'reference_url'}}
+    <related-documents {instance}="instance" {kind}="REFERENCE_URL">
+      <div class="reference-urls-list">
+        {{#each documents}}
+          <span class="reference-urls-list__item">
+            <a class="reference-urls-list__link link" href="{{link}}" target="_blank">{{title}}</a>
+          </span>
+        {{/each}}
+      </div>
+    </related-documents>
+  {{/case}}
+
+  {{#case 'questionnaire'}}
+    <questions-link {instance}="instance">Open</questions-link>
+  {{/case}}
+
+  {{#case 'last_comment'}}
+    <last-comment {instance}="instance"></last-comment>
+  {{/case}}
+
+  {{#case 'audit_firm'}}
+    {{#using firm=instance.audit_firm}}
+      {{{firstnonempty firm.title 'None'}}}
+    {{/using}}
+  {{/case}}
+
+  {{#case 'report_period'}}
+    {{#if instance.report_start_date}}
+      {{#if instance.report_end_date}}
+        {{localize_date instance.report_start_date}} - {{localize_date instance.report_end_date}}
+      {{else}}
+        Starts {{localize_date instance.report_start_date}}
+      {{/if}}
+    {{else}}
+      {{#if instance.report_end_date}}
+        Ends {{localize_date instance.report_end_date}}
+      {{/if}}
+    {{/if}}
+  {{/case}}
+
+  {{#case 'fraud_related'}}
+    {{#if_equals instance.fraud_related '0'}}No{{/if}}
+    {{#if_equals instance.fraud_related '1'}}Yes{{/if}}
+  {{/case}}
+
+  {{#case 'significance'}}
+    {{#if_equals instance.key_control '0'}}Non-Key{{/if}}
+    {{#if_equals instance.key_control '1'}}Key{{/if}}
+  {{/case}}
+  
+  {{#case 'is_verification_needed'}}
+    <span>
+      {{#if instance.is_verification_needed}}
+        Yes
+      {{else}}
+        No
+      {{/if}}
+    </span>
+  {{/case}}
+
+  {{#default}}
+    {{defaultValue}}
+  {{/default}}
+
+{{/switch}}

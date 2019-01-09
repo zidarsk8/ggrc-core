@@ -72,6 +72,7 @@ permissions = {
         "Role",
         "Context",
         "UserRole",
+        "NotificationConfig",
     ],
     "create": [
         "Audit",

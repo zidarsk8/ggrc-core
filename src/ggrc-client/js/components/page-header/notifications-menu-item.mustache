@@ -1,0 +1,16 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<span>
+  <i class="fa fa-clock-o"></i>
+  Notifications
+</span>
+<div class="inner-list">
+  <label>
+    <input type="checkbox" name="notifications" can-value="emailDigest"
+      {{#if isSaving}} disabled="disabled" {{/if}}>
+    Daily email digest
+  </label>
+</div>

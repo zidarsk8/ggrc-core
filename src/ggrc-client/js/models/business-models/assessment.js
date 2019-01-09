@@ -47,7 +47,6 @@ export default Cacheable('CMS.Models.Assessment', {
   statuses: ['Not Started', 'In Progress', 'In Review',
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/assessments/tree-item-attr.mustache',
     add_item_view: GGRC.mustache_path + '/assessments/tree_add_item.mustache',
     attr_list: [{
       attr_title: 'Title',
@@ -289,8 +288,7 @@ export default Cacheable('CMS.Models.Assessment', {
   },
   form_preload: function (newObjectForm) {
     let pageInstance = getPageInstance();
-    let currentUser = getInstance('Person',
-      GGRC.current_user.id, GGRC.current_user);
+    let currentUser = getInstance('Person', GGRC.current_user.id);
 
     if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
       if (pageInstance.type === 'Audit') {

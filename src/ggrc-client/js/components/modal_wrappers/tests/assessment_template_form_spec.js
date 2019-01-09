@@ -19,6 +19,7 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
     {value: 'Secondary Assignees', title: 'Secondary Assignees'},
     {value: 'Control Operators', title: 'Control Operators'},
     {value: 'Control Owners', title: 'Control Owners'},
+    {value: 'Other Contacts', title: 'Other Contacts'},
     {value: 'other', title: 'Others...'},
   ],
   defaults: [

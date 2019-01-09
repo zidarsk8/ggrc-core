@@ -51,7 +51,6 @@ export default Cacheable('CMS.Models.Evidence', {
     status: 'Active',
   },
   tree_view_options: {
-    attr_view: GGRC.mustache_path + '/evidence/tree-item-attr.mustache',
     display_attr_names: [
       'title',
       'status',

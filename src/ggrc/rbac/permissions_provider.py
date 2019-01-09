@@ -52,6 +52,8 @@ def resolve_permission_variable(value):
     if value.startswith('$'):
       if value == '$current_user':
         return current_user
+      if value == '$current_user.id':
+        return current_user.id
       raise Exception(
           'The permission condition variable {0} is not defined!'
           .format(value)
