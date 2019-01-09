@@ -54,9 +54,12 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       uselist=False,
   )
 
-  profile = db.relationship("PersonProfile", uselist=False,
-                            back_populates="person")
-
+  profile = db.relationship(
+      "PersonProfile",
+      foreign_keys='PersonProfile.person_id',
+      uselist=False,
+      backref="person",
+  )
   access_control_people = db.relationship(
       'AccessControlPerson',
       foreign_keys='AccessControlPerson.person_id',
@@ -166,6 +169,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     # modified_by relationship
     return super(Person, cls).eager_query().options(
         orm.joinedload('language'),
+        orm.joinedload('profile'),
         orm.subqueryload('object_people'),
     )
 

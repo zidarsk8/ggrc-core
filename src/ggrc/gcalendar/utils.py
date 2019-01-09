@@ -14,15 +14,6 @@ from ggrc.models import all_models
 from ggrc.utils import get_url_root
 
 
-def get_event_by_date_and_attendee(attendee_id, due_date):
-  """Get calendar events by attendee and due date."""
-  events = all_models.CalendarEvent.query.filter(
-      all_models.CalendarEvent.attendee_id == attendee_id,
-      all_models.CalendarEvent.due_date == due_date,
-  )
-  return events.first()
-
-
 def get_active_cycle_tasks_url(due_date):
   """Get CycleTask notification url."""
   base = urljoin(get_url_root(), u"dashboard#!task&query=")
@@ -72,10 +63,8 @@ def get_related_mapping(left, right):
   )
   mappings = destination_query.union(source_query).all()
 
-  left_mappings_dict = defaultdict(set)
-  right_mappings_dict = defaultdict(set)
+  mappings_dict = defaultdict(set)
   for left_id, right_id in mappings:
-    left_mappings_dict[left_id].add(right_id)
-    right_mappings_dict[right_id].add(left_id)
+    mappings_dict[left_id].add(right_id)
 
-  return left_mappings_dict, right_mappings_dict
+  return mappings_dict

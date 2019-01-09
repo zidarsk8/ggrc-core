@@ -3,10 +3,13 @@
 
 """Module for CalendarEvent model."""
 
+import datetime
+
 from ggrc import db
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
 
+from sqlalchemy.orm import validates
 from sqlalchemy.ext.declarative import declared_attr
 
 
@@ -18,7 +21,7 @@ class CalendarEvent(Relatable, Base, db.Model):
   title = db.Column(db.String)
   description = db.Column(db.String)
   due_date = db.Column(db.Date)
-  last_synced_at = db.Column(db.Date)
+  last_synced_at = db.Column(db.DateTime)
   attendee_id = db.Column(
       db.Integer(), db.ForeignKey('people.id'), nullable=False
   )
@@ -33,6 +36,12 @@ class CalendarEvent(Relatable, Base, db.Model):
         remote_side='Person.id',
         uselist=False,
     )
+
+  @validates("due_date")
+  def validate_due_date(self, _, value):
+    """Validator for due_date"""
+    # pylint: disable=no-self-use
+    return value.date() if isinstance(value, datetime.datetime) else value
 
   @property
   def is_synced(self):

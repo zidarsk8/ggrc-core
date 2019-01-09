@@ -27,7 +27,7 @@ def upgrade():
       sa.Column('title', sa.String(length=250), nullable=False),
       sa.Column('description', sa.String(length=2000), nullable=True),
       sa.Column('attendee_id', sa.Integer(), nullable=False),
-      sa.Column('due_date', sa.DateTime(), nullable=False),
+      sa.Column('due_date', sa.Date(), nullable=False),
       sa.Column('last_synced_at', sa.DateTime(), nullable=True),
       sa.Column('created_at', sa.DateTime(), nullable=False),
       sa.Column('updated_at', sa.DateTime(), nullable=False),

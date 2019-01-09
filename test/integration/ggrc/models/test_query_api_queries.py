@@ -39,7 +39,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Market': 14,
       'Objective': 15,
       'OrgGroup': 14,
-      'Person': 13,
+      'Person': 12,
       'Policy': 15,
       'Process': 14,
       'Program': 17,

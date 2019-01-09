@@ -40,5 +40,3 @@ class PersonProfile(base.ContextRBAC, base.Base, db.Model):
   last_seen_whats_new = db.Column(db.DateTime, default=default_last_seen_date)
 
   send_calendar_events = db.Column(db.Boolean, default=True)
-
-  person = db.relationship("Person", back_populates='profile')
