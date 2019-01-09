@@ -22,6 +22,10 @@
         {add-tab-title}="'Add Tab'">
       </add-tab-button>
     {{/if}}
+
+    {{#if_equals instance.type 'Workflow'}}
+      {{> '/static/templates/dashboard/object_nav_actions.stache'}}
+    {{/if_equals}}
   </ul>
 </div>
 
