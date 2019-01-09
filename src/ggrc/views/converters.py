@@ -651,8 +651,7 @@ def handle_export_stop(**kwargs):
       ie_job.status = "Stopped"
       # Stop tasks only on non local instance
       if getattr(settings, "APPENGINE_INSTANCE", "local") != "local":
-        task_names = get_ie_bg_task_name(ie_job)
-        task_queue.stop_bg_tasks(task_names, "ggrcImport")
+        stop_ie_bg_tasks(ie_job)
       db.session.commit()
       return make_import_export_response(ie_job.log_json())
   except Forbidden:
@@ -664,12 +663,19 @@ def handle_export_stop(**kwargs):
   raise BadRequest(app_errors.WRONG_STATUS)
 
 
-def get_ie_bg_task_name(ie_job):
-  """Get BackgroundTask name related to ImportExport job."""
-  task_names = db.session.query(all_models.BackgroundTask.name).join(
+def get_ie_bg_tasks(ie_job):
+  """Get BackgroundTasks related to ImportExport job."""
+  return all_models.BackgroundTask.query.join(
       all_models.BackgroundOperation
   ).filter(
       all_models.BackgroundOperation.object_type == ie_job.type,
       all_models.BackgroundOperation.object_id == ie_job.id,
   )
-  return [t.name for t in task_names]
+
+
+def stop_ie_bg_tasks(ie_job):
+  """Stop background tasks related to ImportExport job."""
+  bg_tasks = get_ie_bg_tasks(ie_job)
+  for task in bg_tasks:
+    task_queue.stop_bg_task(task.name, "ggrcImport")
+    task.status = all_models.BackgroundTask.STOPPED_STATUS

@@ -418,6 +418,13 @@ class TestImportExports(TestImportExportBase):
             instance_name, "us-central1", "ggrcImport", bg_task_name
         )
         delete_task.assert_called_once_with(task_name)
+        bg_task = all_models.BackgroundTask.query.filter_by(
+            name=bg_task_name
+        ).first()
+        self.assertEqual(
+            bg_task.status,
+            all_models.BackgroundTask.STOPPED_STATUS
+        )
 
   @ddt.data(("Not Started", True),
             ("Blocked", True),

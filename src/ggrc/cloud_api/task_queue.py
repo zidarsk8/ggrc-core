@@ -60,18 +60,17 @@ def delete_task(name):
   return request.execute()
 
 
-def stop_bg_tasks(task_names, queue_name):
-  """Stop background tasks."""
-  for task_name in task_names:
-    name = "projects/{}/locations/{}/queues/{}/tasks/{}".format(
-        settings.APPENGINE_INSTANCE,
-        settings.APPENGINE_LOCATION,
-        queue_name,
-        task_name
-    )
-    result = delete_task(name)
-    logger.info(
-        "Task '%s' was removed from queue with result '%s'.",
-        task_name,
-        result
-    )
+def stop_bg_task(task_name, queue_name):
+  """Stop background task."""
+  name = "projects/{}/locations/{}/queues/{}/tasks/{}".format(
+      settings.APPENGINE_INSTANCE,
+      settings.APPENGINE_LOCATION,
+      queue_name,
+      task_name
+  )
+  result = delete_task(name)
+  logger.info(
+      "Task '%s' was removed from queue with result '%s'.",
+      task_name,
+      result
+  )
