@@ -19,13 +19,15 @@ import urlparse
 import _pytest
 import requests
 
-from lib import environment, decorator, url as url_module, users
+from lib import decorator, environment, url as url_module, users
 from lib.service.rest_service import client
+from lib.utils import test_utils
 
 
 # add src to path so that we can do imports from our src
 PROJECT_ROOT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../"
 sys.path.append(PROJECT_ROOT_PATH + "src")
+OK_CODE = client.RestClient.STATUS_CODES["OK"]
 
 
 @decorator.track_time
@@ -36,8 +38,7 @@ def wait_for_server(url):
   print "Waiting on server: {}".format(url)
   for _ in xrange(environment.SERVER_WAIT_TIME):
     try:
-      if (requests.head(url).status_code ==
-              client.RestClient.STATUS_CODES["OK"]):
+      if requests.head(url).status_code == OK_CODE:
         return
     except IOError:
       pass
@@ -57,8 +58,11 @@ def add_user(url_origin):
   environment.app_url = url_origin
   environment.app_url = urlparse.urljoin(environment.app_url, "/")
   session = requests.Session()
-  session.get(url_module.Urls().gae_login(users.FAKE_SUPER_USER))
-  session.get(url_module.Urls().login)
+  test_utils.wait_for(
+      lambda: session.get(url_module.Urls().gae_login(
+          users.FAKE_SUPER_USER)).status_code == OK_CODE)
+  test_utils.wait_for(
+      lambda: session.get(url_module.Urls().login).status_code == OK_CODE)
 
 
 def prepare_dev_server(url_origin):

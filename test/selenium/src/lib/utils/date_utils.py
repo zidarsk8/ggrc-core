@@ -69,6 +69,13 @@ def iso8601_to_datetime(iso8601_str):
       tzinfo=tz.tzutc())
 
 
+def iso8601_to_local_datetime(iso8601_str):
+  """Converts ISO 8601 (yyyy-mm-ddThh:mm:ss) string to datetime.
+  Datetimes returned by API are in UTC.
+  """
+  return iso8601_to_datetime(iso8601_str).astimezone(tz.tzlocal())
+
+
 def assert_chronological_order(list_of_datetimes):
   """Assert that items sorted by datetime desc (newer items are first)."""
   for i in range(len(list_of_datetimes) - 1):

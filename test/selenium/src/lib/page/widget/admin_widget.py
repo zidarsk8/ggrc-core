@@ -5,7 +5,6 @@
 
 from lib import base, exception
 from lib.constants import locator, objects
-from lib.constants.element import AdminWidgetEvents
 from lib.entities.entities_factory import PeopleFactory
 from lib.page import dashboard
 from lib.page.widget import widget_base
@@ -29,46 +28,17 @@ class Events(dashboard.AdminDashboard):
         self._driver, self._locators.TREE_VIEW_ITEMS_W_PPL)
 
   @property
-  def events_raw(self):
-    """Returns list of strings that displayed in Tree View on Event widget."""
-    self._wait_to_be_init()
-    events = self._browser.elements(css=self._locators.TREE_VIEW_ITEMS)
-    return [event.text for event in events]
-
-  @property
   def events(self):
-    """Returns parsed list of dicts for event log records."""
-    return [self.parse_event(event_str) for event_str in self.events_raw]
+    """Returns list of EventTreeItems."""
+    self._wait_to_be_init()
+    return [
+        EventTreeItem(el).obj_dict
+        for el in self._browser.elements(css=self._locators.TREE_VIEW_ITEMS)]
 
-  @staticmethod
-  def parse_event(event_str, is_strict=False):
-    """Returns parsed event string row based on event regular expression as
-    dict of matched groups. If string doesn't match
-    regular expression tries to parse 2nd time w/o action in case
-    :parameter is_strict = False. Return None for unsuccessful parsing.
-    """
-    def parse_time(value):
-      """Parse string value for "time" to datetime."""
-      value["time"] = date_utils.ui_str_with_zone_to_datetime(value["time"])
-
-    parsed_value = string_utils.parse_str_by_reg_exp(
-        event_str, AdminWidgetEvents.TREE_VIEW_ROW_REGEXP, True)
-    # to workaround migration events and parse them w/o action
-    if not parsed_value and is_strict:
-      return parsed_value
-    if parsed_value:
-      parse_time(parsed_value)
-      return parsed_value
-    parsed_value = string_utils.parse_str_by_reg_exp(
-        event_str,
-        AdminWidgetEvents.TREE_VIEW_ROW_REGEXP_WO_ACTION, True)
-    parse_time(parsed_value)
-    return parsed_value
-
-  @property
-  def event_datetimes(self):
-    """Get list of datetimes for events on the page of Events widget."""
-    return [event["time"] for event in self.events]
+  def event_attrs(self, *attr_names):
+    """Get list of attributes for events on the page of Events widget."""
+    return self.events if not attr_names else string_utils.extract_items(
+        self.events, *attr_names)
 
   @property
   def paging_buttons(self):
@@ -197,3 +167,38 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
 
 class ModalCustomAttributes(widget_base.CustomAttributeModal):
   """Custom attributes modal."""
+
+
+class EventTreeItem(object):
+  """Event item row."""
+  def __init__(self, root_element):
+    self._root_element = root_element
+
+  @property
+  def time(self):
+    """Get event time as datetime."""
+    return date_utils.ui_str_with_zone_to_datetime(
+        self._root_element.element(
+            class_name="event-time").text.replace("on ", ""))
+
+  @property
+  def user_email(self):
+    """Get user email as string."""
+    return self._root_element.element(
+        class_name="event-owner").text.replace("by\n", "")
+
+  @property
+  def actions(self):
+    """Get actions as sorted list of strings."""
+    action_elements = self._root_element.elements(tag_name="strong")
+    return [] if not action_elements else (
+        sorted([action_el.text for action_el in action_elements]))
+
+  @property
+  def obj_dict(self):
+    """Return tree item as dict."""
+    return {
+        "time": self.time,
+        "user_email": self.user_email,
+        "actions": self.actions
+    }
