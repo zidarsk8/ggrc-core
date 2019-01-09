@@ -3,7 +3,6 @@
 
 """Module with CalendarEventBuilder class."""
 
-from collections import defaultdict
 from sqlalchemy.orm import load_only
 from sqlalchemy import orm
 
@@ -27,8 +26,6 @@ class CalendarEventBuilder(object):
 
   def __init__(self):
     """Initialize CalendarEventBuilder."""
-    self.task_mappings = defaultdict(set)
-    self.event_mappings = defaultdict(set)
     self.tasks = []
     self.events = []
     self.title_prefix = ""
@@ -86,20 +83,17 @@ class CalendarEventBuilder(object):
 
   def _generate_events(self):
     """Generates Calendar Events."""
-    self.task_mappings, _ = utils.get_related_mapping(
+    task_mappings = utils.get_related_mapping(
         left=all_models.CycleTaskGroupObjectTask,
         right=all_models.CalendarEvent
     )
     for task in self.tasks:
-      self._generate_events_for_task(task)
+      events = task_mappings[task.id] if task.id in task_mappings else set()
+      self._generate_events_for_task(task, events_ids=events)
     db.session.flush()
 
-  def _generate_events_for_task(self, task):
+  def _generate_events_for_task(self, task, events_ids):
     """Generates CalendarEvents for CycleTaskGroupObjectTask."""
-    events_ids = set()
-    if task.id in self.task_mappings:
-      events_ids = self.task_mappings[task.id].copy()
-
     if self._should_create_event_for(task):
       for person_id in self._get_task_persons_ids_to_notify(task):
         event = self._get_event_by_date_and_attendee(
@@ -107,7 +101,8 @@ class CalendarEventBuilder(object):
             end_date=task.end_date
         )
         if not event:
-          self._create_event_with_relationship(task, person_id)
+          event = self._create_event_with_relationship(task, person_id)
+          self.events.append(event)
         else:
           self._create_event_relationship(task, event)
           events_ids.discard(event.id)
@@ -133,7 +128,8 @@ class CalendarEventBuilder(object):
       person_ids.extend(task.get_person_ids_for_rolename(role))
     return set(person_ids)
 
-  def _delete_event_relationship(self, event_id, task_id):
+  @staticmethod
+  def _delete_event_relationship(event_id, task_id):
     """Deletes calendar event relationship to task."""
     relationship = utils.get_relationship(
         left_id=event_id,
@@ -143,7 +139,6 @@ class CalendarEventBuilder(object):
     )
     if relationship:
       db.session.delete(relationship)
-      self.task_mappings[task_id].discard(event_id)
 
   def _create_event_with_relationship(self, task, person_id):
     """Creates calendar event and relationship based on task and person id."""
@@ -159,11 +154,11 @@ class CalendarEventBuilder(object):
           source=task,
           destination=event,
       ))
-      self.events.append(event)
     return event
 
-  def _create_event_relationship(self, task, event):
-    """Creates event relationship is it is not exists."""
+  @staticmethod
+  def _create_event_relationship(task, event):
+    """Creates event relationship if there is no relationship."""
     relationship = utils.get_relationship(
         left_id=event.id,
         left_model_name="CalendarEvent",
@@ -175,7 +170,6 @@ class CalendarEventBuilder(object):
           source=task,
           destination=event,
       ))
-      self.task_mappings[task.id].add(event.id)
 
   @staticmethod
   def _should_create_event_for(task):
@@ -202,9 +196,9 @@ class CalendarEventBuilder(object):
 
   def _generate_event_descriptions(self):
     """Generates CalendarEvents descriptions."""
-    _, self.event_mappings = utils.get_related_mapping(
-        left=all_models.CycleTaskGroupObjectTask,
-        right=all_models.CalendarEvent
+    event_mappings = utils.get_related_mapping(
+        left=all_models.CalendarEvent,
+        right=all_models.CycleTaskGroupObjectTask
     )
     events = db.session.query(all_models.CalendarEvent).options(
         load_only(
@@ -213,10 +207,12 @@ class CalendarEventBuilder(object):
         )
     ).all()
     for event in events:
-      if event.id not in self.event_mappings:
+      if event.id not in event_mappings:
         continue
-      task_ids = self.event_mappings[event.id]
-      self._generate_description_for_event(event, task_ids)
+      self._generate_description_for_event(
+          event,
+          task_ids=event_mappings[event.id],
+      )
 
   def _generate_description_for_event(self, event, task_ids):
     """Generates CalendarEvent descriptions based on tasks."""

@@ -46,7 +46,7 @@ class CalendarEventsSync(object):
               all_models.CalendarEvent.last_synced_at,
           )
       ).all()
-      event_mappings, _ = utils.get_related_mapping(
+      event_mappings = utils.get_related_mapping(
           left=all_models.CalendarEvent,
           right=all_models.CycleTaskGroupObjectTask
       )

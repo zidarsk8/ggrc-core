@@ -63,10 +63,8 @@ def get_related_mapping(left, right):
   )
   mappings = destination_query.union(source_query).all()
 
-  left_mappings_dict = defaultdict(set)
-  right_mappings_dict = defaultdict(set)
+  mappings_dict = defaultdict(set)
   for left_id, right_id in mappings:
-    left_mappings_dict[left_id].add(right_id)
-    right_mappings_dict[right_id].add(left_id)
+    mappings_dict[left_id].add(right_id)
 
-  return left_mappings_dict, right_mappings_dict
+  return mappings_dict
