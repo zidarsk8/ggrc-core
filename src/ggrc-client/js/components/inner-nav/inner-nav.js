@@ -43,13 +43,20 @@ export default can.Component.extend({
           return !isEmptyCounts || isAdmin();
         },
       },
+      showAllTabs: {
+        get() {
+          let instance = this.attr('instance');
+          let model = instance.constructor;
+          return model.obj_nav_options.show_all_tabs;
+        },
+      },
     },
     activeWidget: null,
     widgetDescriptors: [],
     widgetList: [],
-    priorityTabs: [],
-    notPriorityTabs: [],
-    hasHiddenWidgets: false,
+    priorityTabs: null,
+    notPriorityTabs: null,
+    hiddenWidgets: null,
     /**
      * Converts all descriptors to tabs view models
      */
@@ -94,7 +101,6 @@ export default can.Component.extend({
         countsName: !descriptor.uncountable ? countsName : '',
         forceShow: false,
         inForceShowList: _.includes(forceShowList, title),
-        placeInAddTab: false,
       };
 
       return widget;
@@ -116,23 +122,50 @@ export default can.Component.extend({
     },
     /**
      * Configures widgets to display in Add Tab button dropdown
+     * @param {can.Map} widget widget object
      */
-    updateHiddenWidgets() {
-      let hasHiddenWidgets = false;
-      let model = this.attr('instance').constructor;
-      let showAllTabs = model.obj_nav_options.show_all_tabs;
+    updateHiddenWidgets(widget) {
+      if (this.attr('showAllTabs')
+        || widget.attr('inForceShowList')
+        || widget.attr('type') === 'version'
+        || widget.attr('uncountable')) {
+        // widget will never be in hiddenWidgets
+        return;
+      }
 
-      // Update has hidden widget attr
-      this.attr('widgetList').forEach((widget) => {
-        widget.attr('placeInAddTab', false);
+      if (widget.attr('hasCount') && widget.attr('count') === 0 &&
+          !widget.attr('forceShow')) {
+        // add to hidden widgets list
+        this.addToHiddenWidgets(widget);
+      } else {
+        this.removeFromHiddenWidgets(widget);
+      }
+    },
+    /**
+     * Adds widget to hiddenWidgets for Add tab button
+     * @param {can.Map} widget widget
+     */
+    addToHiddenWidgets(widget) {
+      let hiddenWidgets = this.attr('hiddenWidgets');
+      let hiddenWidget =
+        _.find(hiddenWidgets, (hidden) => hidden.id === widget.id);
 
-        if (widget.hasCount && widget.count === 0 &&
-          !widget.forceShow && !widget.inForceShowList && !showAllTabs) {
-          widget.attr('placeInAddTab', true);
-          hasHiddenWidgets = true;
-        }
-      });
-      this.attr('hasHiddenWidgets', hasHiddenWidgets);
+      if (!hiddenWidget) {
+        hiddenWidgets.push(widget);
+      }
+    },
+    /**
+     * Removes widgets from hiddenWidgets for Add tab button
+     * @param {can.Map} widget widget
+     */
+    removeFromHiddenWidgets(widget) {
+      let hiddenWidgets = this.attr('hiddenWidgets');
+      let index = _.findIndex(hiddenWidgets,
+        (hiddenWidget) => hiddenWidget.id === widget.id);
+
+      if (index > -1) {
+        hiddenWidgets.splice(index, 1);
+      }
     },
     /**
      * Handles selecting tab
@@ -150,7 +183,7 @@ export default can.Component.extend({
         widget.attr('forceShow', true); // to show tabs with 0 count
         this.attr('activeWidget', widget);
         this.dispatch({type: 'activeChanged', widget});
-        this.updateHiddenWidgets();
+        this.updateHiddenWidgets(widget);
       }
     },
     /**
@@ -184,7 +217,7 @@ export default can.Component.extend({
           hasCount: true,
         });
 
-        this.updateHiddenWidgets();
+        this.updateHiddenWidgets(widget);
       }
     },
     /**
@@ -199,11 +232,18 @@ export default can.Component.extend({
       if (currentWidget === widget.id) {
         router.attr('widget', this.attr('widgetList.0.id')); // Switch to the first widget
       }
+
+      this.updateHiddenWidgets(widget);
     },
   },
   init() {
     this.viewModel.handleDescriptors();
     this.viewModel.setTabsPriority();
+
+    // add default sorting for hidden widgets by title
+    let hiddenWidgets = new can.List();
+    hiddenWidgets.attr('comparator', 'title');
+    this.viewModel.attr('hiddenWidgets', hiddenWidgets);
   },
   events: {
     inserted() {

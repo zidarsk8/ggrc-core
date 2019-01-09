@@ -68,20 +68,4 @@ describe('add-tab-button component', function () {
       });
     });
   });
-
-  describe('sortWidgets() method', () => {
-    it('sorts widget names in alphabetical order', () => {
-      const list = ['Policies', 'Audits', 'Contracts', 'Risks'];
-
-      viewModel.attr('widgetList',
-        list.map((name) => ({title: name})));
-
-      viewModel.sortWidgets();
-
-      const result = viewModel.attr('widgetList')
-        .map((widget) => widget.title).serialize();
-
-      expect(result).toEqual(list.sort());
-    });
-  });
 });

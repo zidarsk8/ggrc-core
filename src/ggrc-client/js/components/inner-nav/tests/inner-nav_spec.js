@@ -71,6 +71,20 @@ describe('inner-nav component', () => {
       });
     });
 
+    describe('showAllTabs prop', () => {
+      it('should return show_all_tabs value from instance model', () => {
+        let instance = makeFakeInstance({model: Cacheable, staticProps: {
+          obj_nav_options: {
+            show_all_tabs: true,
+          },
+        }})();
+
+        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue(instance);
+
+        expect(viewModel.attr('showAllTabs')).toBe(true);
+      });
+    });
+
     describe('handleDescriptors() method', () => {
       it('should create widgets from descriptors', () => {
         spyOn(viewModel, 'createWidget').and.returnValue({});
@@ -259,7 +273,7 @@ describe('inner-nav component', () => {
     });
 
     describe('setTabsPriority() method', () => {
-      describe('Audit object', () => {
+      describe('for Audit object', () => {
         it('should set first 5 widgets as priority if dashboard is not enabled',
           () => {
             spyOn(CurrentPageUtils, 'getPageInstance')
@@ -300,7 +314,7 @@ describe('inner-nav component', () => {
           });
       });
 
-      describe('all objects except Audit', () => {
+      describe('for all objects except Audit', () => {
         it('sets all available widgets as priority', () => {
           spyOn(CurrentPageUtils, 'getPageInstance')
             .and.returnValue(new can.Map({type: 'type'}));
@@ -309,12 +323,185 @@ describe('inner-nav component', () => {
           viewModel.setTabsPriority();
 
           expect(viewModel.attr('priorityTabs').length).toBe(3);
-          expect(viewModel.attr('notPriorityTabs').length).toBe(0);
+          expect(viewModel.attr('notPriorityTabs')).toBeNull();
         });
       });
     });
 
+    describe('updateHiddenWidgets(widget) method', () => {
+      beforeEach(() => {
+        spyOn(viewModel, 'addToHiddenWidgets');
+        spyOn(viewModel, 'removeFromHiddenWidgets');
+      });
+
+      function showAllTabs(value) {
+        let instance = makeFakeInstance({model: Cacheable, staticProps: {
+          obj_nav_options: {
+            show_all_tabs: value,
+          },
+        }})();
+        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue(instance);
+      }
+
+      it('should do nothing if should be shown all widgets', () => {
+        showAllTabs(true);
+
+        viewModel.updateHiddenWidgets({});
+
+        expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
+        expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
+      });
+
+      it('should do nothing if widget is in forceShowList', () => {
+        showAllTabs(false);
+
+        let widget = new can.Map({
+          inForceShowList: true,
+        });
+
+        viewModel.updateHiddenWidgets(widget);
+
+        expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
+        expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
+      });
+
+      it('should do nothing if widget has version type', () => {
+        showAllTabs(false);
+
+        let widget = new can.Map({
+          type: 'version',
+        });
+
+        viewModel.updateHiddenWidgets(widget);
+
+        expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
+        expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
+      });
+
+      it('should do nothing if widget is uncountable', () => {
+        showAllTabs(false);
+
+        let widget = new can.Map({
+          uncountable: true,
+        });
+
+        viewModel.updateHiddenWidgets(widget);
+
+        expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
+        expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
+      });
+
+      it('should remove from hiddenWidgets when widget hasCount is false',
+        () => {
+          showAllTabs(false);
+
+          let widget = new can.Map({
+            hasCount: false,
+            count: 0,
+            forceShow: false,
+          });
+
+          viewModel.updateHiddenWidgets(widget);
+
+          expect(viewModel.removeFromHiddenWidgets)
+            .toHaveBeenCalledWith(widget);
+        });
+
+      it('should remove from hiddenWidgets when widget has count',
+        () => {
+          showAllTabs(false);
+
+          let widget = new can.Map({
+            hasCount: true,
+            count: 5,
+            forceShow: false,
+          });
+
+          viewModel.updateHiddenWidgets(widget);
+
+          expect(viewModel.removeFromHiddenWidgets)
+            .toHaveBeenCalledWith(widget);
+        });
+
+      it('should remove from hiddenWidgets when widget forceShow is true',
+        () => {
+          showAllTabs(false);
+
+          let widget = new can.Map({
+            hasCount: true,
+            count: 0,
+            forceShow: true,
+          });
+
+          viewModel.updateHiddenWidgets(widget);
+
+          expect(viewModel.removeFromHiddenWidgets)
+            .toHaveBeenCalledWith(widget);
+        });
+
+      it('should add to hiddenWidgets when widget has no count and '
+        + 'forseShow is false', () => {
+        showAllTabs(false);
+
+        let widget = new can.Map({
+          hasCount: true,
+          count: 0,
+          forceShow: false,
+        });
+
+        viewModel.updateHiddenWidgets(widget);
+
+        expect(viewModel.addToHiddenWidgets).toHaveBeenCalledWith(widget);
+      });
+    });
+
+    describe('addToHiddenWidgets(widget) method', () => {
+      it('should add widget if not in the list', () => {
+        viewModel.attr('hiddenWidgets', []);
+
+        let widget = new can.Map();
+        viewModel.addToHiddenWidgets(widget);
+
+        expect(viewModel.attr('hiddenWidgets').length).toBe(1);
+        expect(viewModel.attr('hiddenWidgets')[0]).toBe(widget);
+      });
+
+      it('should not add widget if already in the list', () => {
+        let widget = new can.Map({id: '1'});
+        viewModel.attr('hiddenWidgets', [widget]);
+
+        viewModel.addToHiddenWidgets(widget);
+
+        expect(viewModel.attr('hiddenWidgets').length).toBe(1);
+        expect(viewModel.attr('hiddenWidgets')[0]).toBe(widget);
+      });
+    });
+
+    describe('removeFromHiddenWidgets(widget) method', () => {
+      it('should remove widget if it is in the list', () => {
+        let widget = new can.Map({id: '1'});
+        viewModel.attr('hiddenWidgets', [widget]);
+
+        viewModel.removeFromHiddenWidgets(widget);
+
+        expect(viewModel.attr('hiddenWidgets').length).toBe(0);
+      });
+
+      it('should not remove widget if it is not in the list', () => {
+        let widget = new can.Map({id: '1'});
+        viewModel.attr('hiddenWidgets', [widget]);
+
+        viewModel.removeFromHiddenWidgets({id: '2'});
+
+        expect(viewModel.attr('hiddenWidgets').length).toBe(1);
+      });
+    });
+
     describe('route(widgetId) method', () => {
+      beforeEach(() => {
+        spyOn(viewModel, 'updateHiddenWidgets');
+      });
+
       it('should find widget in widgetList', () => {
         spyOn(viewModel, 'findWidgetById');
 
@@ -334,7 +521,6 @@ describe('inner-nav component', () => {
       });
 
       it('should set forceShow TRUE for widget', () => {
-        spyOn(viewModel, 'updateHiddenWidgets');
         let widget = new can.Map({id: '1', forceShow: false});
         spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
 
@@ -344,7 +530,6 @@ describe('inner-nav component', () => {
       });
 
       it('should set activeWidget if widget is in widgetList ', () => {
-        spyOn(viewModel, 'updateHiddenWidgets');
         let widget = new can.Map({id: '1'});
         spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
         viewModel.attr('activeWidget', null);
@@ -357,7 +542,6 @@ describe('inner-nav component', () => {
 
       it('should dispatch "activeChanged" event if widget is in widgetList',
         () => {
-          spyOn(viewModel, 'updateHiddenWidgets');
           spyOn(viewModel, 'dispatch');
           let widget = new can.Map({id: '1'});
           spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
@@ -369,6 +553,15 @@ describe('inner-nav component', () => {
             widget,
           });
         });
+
+      it('should update hiddenWidgets list', () => {
+        let widget = new can.Map({id: '1'});
+        spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
+
+        viewModel.route('1');
+
+        expect(viewModel.updateHiddenWidgets).toHaveBeenCalledWith(widget);
+      });
     });
 
     describe('findWidgetById(widgetId) method', () => {
@@ -434,9 +627,23 @@ describe('inner-nav component', () => {
         expect(widget.count).toBe(5);
         expect(widget.hasCount).toBe(true);
       });
+
+      it('should update hiddenWidgets list', () => {
+        spyOn(viewModel, 'updateHiddenWidgets');
+        let widget = new can.Map();
+        spyOn(viewModel, 'findWidgetByCountsName').and.returnValue(widget);
+
+        viewModel.setWidgetCount('name', 5);
+
+        expect(viewModel.updateHiddenWidgets).toHaveBeenCalledWith(widget);
+      });
     });
 
     describe('closeTab(event) method', () => {
+      beforeEach(() => {
+        spyOn(viewModel, 'updateHiddenWidgets');
+      });
+
       it('shoule set forceShow FALSE for widget', () => {
         let widget = new can.Map({id: '1', forceShow: true});
 
@@ -463,6 +670,14 @@ describe('inner-nav component', () => {
         viewModel.closeTab({widget: new can.Map({id: 'selected'})});
 
         expect(router.attr('widget')).toBe('first tab');
+      });
+
+      it('should update hiddenWidgets list', () => {
+        let widget = new can.Map({id: '1', forceShow: true});
+
+        viewModel.closeTab({widget});
+
+        expect(viewModel.updateHiddenWidgets).toHaveBeenCalledWith(widget);
       });
     });
   });

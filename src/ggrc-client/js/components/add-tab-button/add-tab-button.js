@@ -35,7 +35,7 @@ const viewModel = can.Map.extend({
           && !isMyWork()
           && !isAllObjects()
           && !['Person', 'Evidence'].includes(getPageType())
-          && this.attr('hasHiddenWidgets');
+          && this.attr('widgetList.length') > 0;
       },
     },
     filteredWidgets: {
@@ -43,21 +43,14 @@ const viewModel = can.Map.extend({
         let widgetList = this.attr('widgetList');
 
         return _.filter(widgetList, (widget) => {
-          return this.isNotObjectVersion(widget.attr('title')) &&
-            !this.isNotProhibitedMap(widget.model.model_singular) &&
-            widget.attr('placeInAddTab');
+          return !this.isNotProhibitedMap(widget.model.model_singular);
         });
       },
     },
   },
   instance: null,
   widgetList: null,
-  urlPath: '',
   addTabTitle: '',
-  hasHiddenWidgets: true,
-  isNotObjectVersion(internavDisplay) {
-    return internavDisplay.indexOf('Versions') === -1;
-  },
   isNotProhibitedMap(shortName) {
     const prohibitedMapList = {
       Issue: ['Assessment', 'Audit'],
@@ -76,9 +69,6 @@ const viewModel = can.Map.extend({
 
     return isMappable && canMap;
   },
-  sortWidgets() {
-    this.attr('widgetList', _.sortBy(this.attr('widgetList'), 'title'));
-  },
 });
 
 export default can.Component.extend({
@@ -87,9 +77,6 @@ export default can.Component.extend({
   leakScope: true,
   viewModel,
   events: {
-    inserted() {
-      this.viewModel.sortWidgets();
-    },
     // top nav dropdown position
     '.dropdown-toggle click'(el) {
       let $dropdown = this.element.find('.dropdown-menu');
