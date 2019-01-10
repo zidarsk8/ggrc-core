@@ -96,7 +96,6 @@ export default can.Component.extend({
         order: descriptor.order,
         uncountable: descriptor.uncountable,
         forceRefetch: descriptor.forceRefetch,
-        hasCount: false,
         count: 0,
         countsName: !descriptor.uncountable ? countsName : '',
         forceShow: false,
@@ -133,8 +132,7 @@ export default can.Component.extend({
         return;
       }
 
-      if (widget.attr('hasCount') && widget.attr('count') === 0 &&
-          !widget.attr('forceShow')) {
+      if (widget.attr('count') === 0 && !widget.attr('forceShow')) {
         // add to hidden widgets list
         this.addToHiddenWidgets(widget);
       } else {
@@ -214,7 +212,6 @@ export default can.Component.extend({
       if (widget) {
         widget.attr({
           count,
-          hasCount: true,
         });
 
         this.updateHiddenWidgets(widget);

@@ -13,8 +13,7 @@ export default can.Component.extend({
         get() {
           let widget = this.attr('widget');
 
-          return widget.attr('hasCount') &&
-              widget.attr('count') ||
+          return widget.attr('count') ||
               widget.attr('uncountable') ||
               widget.attr('forceShow') ||
               this.attr('showAllTabs') ||
@@ -23,8 +22,8 @@ export default can.Component.extend({
       },
       showCloseButton: {
         get() {
-          return this.attr('widget.hasCount')
-            && !this.attr('widget.count')
+          return !this.attr('widget.count')
+            && !this.attr('widget.uncountable')
             && !this.attr('showAllTabs')
             && !this.attr('widget.inForceShowList');
         },

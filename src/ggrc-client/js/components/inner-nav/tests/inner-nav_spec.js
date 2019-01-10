@@ -204,11 +204,6 @@ describe('inner-nav component', () => {
         expect(result.forceRefetch).toBe(true);
       });
 
-      it('should set default hasCount', () => {
-        let result = viewModel.createWidget({model: {}});
-        expect(result.hasCount).toBe(false);
-      });
-
       it('should set default count', () => {
         let result = viewModel.createWidget({model: {}});
         expect(result.count).toBe(0);
@@ -391,28 +386,11 @@ describe('inner-nav component', () => {
         expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
       });
 
-      it('should remove from hiddenWidgets when widget hasCount is false',
-        () => {
-          showAllTabs(false);
-
-          let widget = new can.Map({
-            hasCount: false,
-            count: 0,
-            forceShow: false,
-          });
-
-          viewModel.updateHiddenWidgets(widget);
-
-          expect(viewModel.removeFromHiddenWidgets)
-            .toHaveBeenCalledWith(widget);
-        });
-
       it('should remove from hiddenWidgets when widget has count',
         () => {
           showAllTabs(false);
 
           let widget = new can.Map({
-            hasCount: true,
             count: 5,
             forceShow: false,
           });
@@ -428,7 +406,6 @@ describe('inner-nav component', () => {
           showAllTabs(false);
 
           let widget = new can.Map({
-            hasCount: true,
             count: 0,
             forceShow: true,
           });
@@ -444,7 +421,6 @@ describe('inner-nav component', () => {
         showAllTabs(false);
 
         let widget = new can.Map({
-          hasCount: true,
           count: 0,
           forceShow: false,
         });
@@ -625,7 +601,6 @@ describe('inner-nav component', () => {
         viewModel.setWidgetCount('name', 5);
 
         expect(widget.count).toBe(5);
-        expect(widget.hasCount).toBe(true);
       });
 
       it('should update hiddenWidgets list', () => {

@@ -15,7 +15,6 @@ describe('inner-nav-item component', () => {
   describe('displayTab property', () => {
     it('should return TRUE when widget has count', () => {
       let widget = {
-        hasCount: true,
         count: 5,
         uncountable: false,
         title: 'widget',
@@ -31,7 +30,6 @@ describe('inner-nav-item component', () => {
 
     it('should return TRUE when widget is uncountable', () => {
       let widget = {
-        hasCount: false,
         count: 0,
         uncountable: true,
         title: 'widget',
@@ -47,7 +45,6 @@ describe('inner-nav-item component', () => {
 
     it('should return TRUE when forceShow is true', () => {
       let widget = {
-        hasCount: false,
         count: 0,
         uncountable: false,
         title: 'widget',
@@ -63,7 +60,6 @@ describe('inner-nav-item component', () => {
 
     it('should return TRUE when all tabs should be shown', () => {
       let widget = {
-        hasCount: false,
         count: 0,
         uncountable: false,
         title: 'widget',
@@ -79,7 +75,6 @@ describe('inner-nav-item component', () => {
 
     it('should return TRUE when widget in forceShowList', () => {
       let widget = {
-        hasCount: false,
         count: 0,
         uncountable: false,
         title: 'widget',
@@ -95,7 +90,6 @@ describe('inner-nav-item component', () => {
 
     it('should return FALSE when widget should not be displayed', () => {
       let widget = {
-        hasCount: false,
         count: 0,
         uncountable: false,
         title: 'widget',
@@ -111,10 +105,10 @@ describe('inner-nav-item component', () => {
   });
 
   describe('showCloseButton property', () => {
-    it('should return FALSE when hasCount is false', () => {
+    it('should return FALSE when widget count is not 0', () => {
       let widget = {
-        hasCount: false,
         count: 5,
+        uncountable: false,
         title: 'widget',
         inForceShowList: false,
       };
@@ -125,10 +119,10 @@ describe('inner-nav-item component', () => {
       expect(result).toBeFalsy();
     });
 
-    it('should return FALSE when widget count is not 0', () => {
+    it('should return FALSE when widget is uncountable', () => {
       let widget = {
-        hasCount: true,
-        count: 5,
+        count: 0,
+        uncountable: true,
         title: 'widget',
         inForceShowList: false,
       };
@@ -141,8 +135,8 @@ describe('inner-nav-item component', () => {
 
     it('should return FALSE when all tabs should be shown', () => {
       let widget = {
-        hasCount: true,
         count: 0,
+        uncountable: false,
         title: 'widget',
         inForceShowList: false,
       };
@@ -155,8 +149,8 @@ describe('inner-nav-item component', () => {
 
     it('should return FALSE when widget in forceShowList', () => {
       let widget = {
-        hasCount: true,
         count: 0,
+        uncountable: false,
         title: 'widget',
         inForceShowList: true,
       };
@@ -169,9 +163,9 @@ describe('inner-nav-item component', () => {
 
     it('should return TRUE when tab can be closed', () => {
       let widget = {
-        hasCount: true,
         count: 0,
         title: 'widget',
+        uncountable: false,
         inForceShowList: false,
       };
       viewModel.attr('widget', widget);
