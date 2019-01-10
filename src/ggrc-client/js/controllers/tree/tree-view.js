@@ -191,10 +191,12 @@ const TreeViewControl = TreeLoader.extend({
           if (self.element) {
             can.trigger(self.element, 'updateCount', [count(),
               self.options.update_count]);
+            getCounts().attr(countsName, count());
           }
           count.bind('change', self._ifNotRemoved(function () {
             can.trigger(self.element, 'updateCount', [count(),
               self.options.update_count]);
+            getCounts().attr(countsName, count());
           }));
         });
     }
