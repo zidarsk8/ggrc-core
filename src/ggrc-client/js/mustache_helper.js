@@ -540,23 +540,6 @@ Mustache.registerHelper('localize_date', function (date, allowNonISO, options) {
   return localizeDate(date, options, 'MM/DD/YYYY', allowNonISO);
 });
 
-/**
- *  Helper for rendering date or 'Today' string.
- *
- *  @param {Date} value - the date object; if it's falsey the current (local) date is used
- *  @return {String} - 'Today' or date string in the following format: MM/DD/YYYY
- */
-Mustache.registerHelper('localize_date_today', function (value) {
-  let date = resolveComputed(value);
-  let today = moment().startOf('day');
-  let startOfDate = moment(date).startOf('day');
-  // TODO: [Overdue] Move this logic to helper.
-  if (!value || (date && today.diff(startOfDate, 'days') === 0)) {
-    return 'Today';
-  }
-  return localizeDate(value, value, 'MM/DD/YYYY');
-});
-
 Mustache.registerHelper('normalizeLink', (value) => {
   let link = resolveComputed(value);
   if (link) {

@@ -10,7 +10,7 @@ import Requirement from '../../models/business-models/requirement';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 import CycleTaskGroup from '../../models/business-models/cycle-task-group';
 import Cycle from '../../models/business-models/cycle';
-
+import {formatDate} from '../../plugins/utils/date-utils';
 import template from './templates/tree-item-extra-info.mustache';
 
 let viewModel = can.Map.extend({
@@ -102,6 +102,18 @@ let viewModel = can.Map.extend({
           this.attr('instance.isOverdue');
 
         return isWorkflowOverdue || isCycleTasksOverdue;
+      },
+    },
+    endDate: {
+      type: String,
+      get() {
+        let date = this.attr('instance.end_date');
+        let today = moment().startOf('day');
+        let startOfDate = moment(date).startOf('day');
+        if (!date || today.diff(startOfDate, 'days') === 0) {
+          return 'Today';
+        }
+        return formatDate(date, true);
       },
     },
     cssClasses: {

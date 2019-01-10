@@ -56,9 +56,7 @@
             ></mapped-counter>
             <div class="date">
               <i class="fa fa-clock-o {{#if instance.isOverdue}}red{{else}}color{{/if}}"></i> Due On:
-              <span {{#if instance.isOverdue}}class="error"{{/if}}>
-                {{localize_date_today instance.end_date}}
-              </span>
+              <span {{#if instance.isOverdue}}class="error"{{/if}}>{{endDate}}</span>
             </div>
           </section>
         {{/if}}
