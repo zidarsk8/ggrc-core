@@ -48,6 +48,7 @@ def wait_for_server(url):
   sys.exit(3)
 
 
+@decorator.track_time
 def add_user(url_origin):
   """If two processes log in as a new user at the same time,
   the second login may fail because of a race condition in dev code
