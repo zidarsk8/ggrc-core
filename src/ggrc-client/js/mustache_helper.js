@@ -1018,45 +1018,6 @@ Mustache.registerHelper('has_role', function (role, instance, options) {
   }
 });
 
-Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
-  const allRoles = GGRC.access_control_roles;
-  let roles = {};
-  let allRoleNames = [];
-
-  if (!options) {
-    // if parent instance is not defined in helper use page instance
-    options = parentInstance;
-    parentInstance = Mustache.resolve(getPageInstance);
-  } else {
-    parentInstance = Mustache.resolve(parentInstance);
-  }
-
-  allRoles.forEach((role) => {
-    roles[role.id] = role;
-  });
-
-  person = Mustache.resolve(person);
-
-  if (parentInstance && parentInstance.access_control_list) {
-    allRoleNames = _.uniq(parentInstance.access_control_list.filter(
-      (acl) => {
-        return acl.person.id === person.id && acl.ac_role_id in roles;
-      }).map((acl) => {
-      return roles[acl.ac_role_id].name;
-    }));
-  } else {
-    let globalRole = person.system_wide_role === 'No Access'
-      ? 'No Role'
-      : person.system_wide_role;
-    allRoleNames = [globalRole];
-  }
-
-  return options.fn({
-    rolesStr: allRoleNames.join(', '),
-    rolesList: allRoleNames.join('\n'),
-  });
-});
-
 Mustache.registerHelper('isScopeModel', function (instance, options) {
   const modelName = Mustache.resolve(instance).type;
 
