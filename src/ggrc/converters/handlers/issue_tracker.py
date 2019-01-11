@@ -7,7 +7,7 @@ import re
 from ggrc.converters.handlers import handlers
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
-from ggrc.models import Assessment, AssessmentTemplate
+from ggrc.models import Assessment, AssessmentTemplate, Issue
 from ggrc.converters import errors
 from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
     default_values
@@ -114,11 +114,14 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
 
   Enabled flag stored as tinyint(1) in our DB.
   """
+
   _true = "on"
   _false = "off"
 
   TRUE_VALUES = {_true, }
   FALSE_VALUES = {_false, }
+
+  NOT_ALLOWED_STATUSES = {"Fixed", "Fixed and Verified", "Deprecated"}
 
   def set_obj_attr(self):
     if self.dry_run:
@@ -130,10 +133,36 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
       return self._true
     return self._false
 
+  def _needs_status_check(self):
+    """Check if we should check status befor turn integration On.
+
+    According to our business rules we shouldn't generate tickets for Issues
+    in some statuses. We can turn integration On for all already linked Issues.
+    """
+    if isinstance(self.row_converter.obj, Issue):
+      if not self.row_converter.obj.issue_tracker.get("issue_id"):
+        return True
+    return False
+
+  def _get_status(self):
+    """Get Issue Status.
+
+    First it would check if status was imported during current import.
+    Otherwise tries to get status from object.
+    """
+    imported_status = self.row_converter.attrs.get("status")
+    attrs_status_value = imported_status.value if imported_status else None
+    return attrs_status_value or self.row_converter.obj.status
+
   def parse_item(self):
     value = self.raw_value.strip().lower()
-
     if value in self.TRUE_VALUES:
+      if self._needs_status_check():
+        status = self._get_status()
+        if status in self.NOT_ALLOWED_STATUSES:
+          self.add_warning(errors.WRONG_TICKET_STATUS,
+                           column_name=self.display_name)
+          return False
       return True
     if value not in self.FALSE_VALUES:
       self.add_warning(errors.WRONG_VALUE_DEFAULT,
