@@ -202,3 +202,37 @@ class TestTaskqueueIndexing(TestCase):
                                      data=query_request_data,
                                      api_link="/query")
     self.assertEqual(response.json[0]["Assessment"]["count"], 1)
+
+  def test_audit_snapshots_reindex(self):
+    """Test if Snapshots created in Audit reindexed."""
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      control_title = control.title
+      program = factories.ProgramFactory()
+      factories.RelationshipFactory(source=control, destination=program)
+
+    response = self.api.post(all_models.Audit, [{
+        "audit": {
+            "title": "Some Audit",
+            "program": {"id": program.id},
+            "status": "Planned",
+            "context": None
+        }
+    }])
+    self.assertStatus(response, 200)
+
+    query_request_data = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": control_title,
+            },
+        },
+        "type": "ids",
+    }]
+    response = self.api.send_request(self.api.client.post,
+                                     data=query_request_data,
+                                     api_link="/query")
+    self.assertEqual(response.json[0]["Snapshot"]["count"], 1)

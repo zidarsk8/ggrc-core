@@ -328,14 +328,27 @@ class ObjectsInfoService(HelpRestService):
     """Get and return snapshoted object according to 'origin_obj' and
     'paren_obj'.
     """
+
+    def get_response():
+      """Get response from query."""
+      return self.client.create_object(
+          type=self.endpoint,
+          object_name=objects.get_obj_type(objects.SNAPSHOTS),
+          filters=query.Query.expression_get_snapshoted_obj(
+              obj_type=origin_obj.type, obj_id=origin_obj.id,
+              parent_type=paren_obj.type,
+              parent_id=paren_obj.id))
+
+    def get_response_values():
+      """Get values fom responese."""
+      return json.loads(
+          get_response().text, encoding="utf-8")[0]["Snapshot"]["values"]
+
+    test_utils.wait_for(
+        get_response_values,
+        constants.ux.MAX_USER_WAIT_SECONDS * 2)
     snapshoted_obj_dict = (
-        BaseRestService.get_items_from_resp(self.client.create_object(
-            type=self.endpoint,
-            object_name=objects.get_obj_type(objects.SNAPSHOTS),
-            filters=query.Query.expression_get_snapshoted_obj(
-                obj_type=origin_obj.type, obj_id=origin_obj.id,
-                parent_type=paren_obj.type,
-                parent_id=paren_obj.id))).get("values")[0])
+        BaseRestService.get_items_from_resp(get_response()).get("values")[0])
     return Representation.repr_dict_to_obj(snapshoted_obj_dict)
 
   def get_obj(self, obj):
