@@ -15,6 +15,7 @@ from StringIO import StringIO
 from datetime import datetime
 
 from apiclient.errors import HttpError
+from googleapiclient import errors
 
 import flask
 from flask import current_app
@@ -677,5 +678,14 @@ def stop_ie_bg_tasks(ie_job):
   """Stop background tasks related to ImportExport job."""
   bg_tasks = get_ie_bg_tasks(ie_job)
   for task in bg_tasks:
-    task_queue.stop_bg_task(task.name, "ggrcImport")
+    try:
+      task_queue.stop_bg_task(task.name, "ggrcImport")
+    except errors.HttpError as err:
+      if err.resp.status == 404:
+        logger.warning(
+            "Task '%s' wasn't found in queue. It will be stopped.",
+            task.name
+        )
+      else:
+        raise err
     task.status = all_models.BackgroundTask.STOPPED_STATUS
