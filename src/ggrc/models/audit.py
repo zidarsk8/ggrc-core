@@ -4,7 +4,7 @@
 """Audit model."""
 
 from sqlalchemy import orm
-from werkzeug.exceptions import Forbidden
+from werkzeug import exceptions as wzg_exceptions
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
@@ -22,6 +22,7 @@ from ggrc.models.mixins import base
 from ggrc.models.mixins import clonable
 from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
+from ggrc.models.mixins import rest_handable as rest_handable_mixins
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
 from ggrc.models.evidence import Evidence
@@ -43,6 +44,7 @@ class Audit(Snapshotable,
             base.ContextRBAC,
             mixins.BusinessObject,
             mixins.Folderable,
+            rest_handable_mixins.WithDeleteHandable,
             Indexed,
             db.Model):
   """Audit model."""
@@ -204,7 +206,7 @@ class Audit(Snapshotable,
        not any(acl for person, acl in list(self.program.access_control_list)
                if acl.ac_role.name == "Program Managers" and
                person.id == user.id):
-      raise Forbidden()
+      raise wzg_exceptions.Forbidden()
     return value
 
   @classmethod
@@ -297,6 +299,20 @@ class Audit(Snapshotable,
     return db.session.query(Evidence).filter(
         Evidence.id.in_(evidence_ids)
     )
+
+  def _check_no_assessments(self):
+    """Check that audit has no assessments before delete."""
+    if self.assessments:
+      db.session.rollback()
+      raise wzg_exceptions.Conflict(
+          "The audit cannot be deleted due to mapped assessment(s) to this "
+          "audit. Please delete assessment(s) mapped to this audit first "
+          "before deleting the audit.",
+      )
+
+  def handle_delete(self):
+    """Handle model_deleted signals."""
+    self._check_no_assessments()
 
 
 def build_audit_stub(obj):
