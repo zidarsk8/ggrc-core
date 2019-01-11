@@ -971,48 +971,6 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   return toLowerCase ? value.toLowerCase() : value;
 });
 
-/**
-   * Check if property's value did not pass validation, and render the
-   * corresponding block in the template. The error messages, if any, are
-   * available in the "error" variable within the "truthy" block.
-   *
-   * Example usage:
-   *
-   *   {{#validation_error validationErrors propertyName}}
-   *     Invalid value for the property {{propertyName}}: {{errors.0}}
-   *   {{else}}
-   *     Hooray, no errors, a correct value is set!
-   *   {{/validation_error}}
-   *
-   * @param {Object} validationErrors - an object containing validation results
-   *   of a can.Model instance
-   * @param {Number} propertyName - Name of the property to check for
-   *   validation errors
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper(
-  'validation_error',
-  function (validationErrors, propertyName, options) {
-    let errors;
-    let property;
-    let contextStack;
-
-    validationErrors = Mustache.resolve(validationErrors) || {};
-    if (_.isFunction(validationErrors)) {
-      validationErrors = Mustache.resolve(validationErrors) || {};
-    }
-
-    property = Mustache.resolve(propertyName);
-    errors = validationErrors[property] || [];
-
-    if (errors.length > 0) {
-      contextStack = options.contexts.add({errors: errors});
-      return options.fn(contextStack);
-    }
-    return options.inverse(options.contexts);
-  }
-);
-
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
   modelName = _.isFunction(modelName) ? modelName() : modelName;

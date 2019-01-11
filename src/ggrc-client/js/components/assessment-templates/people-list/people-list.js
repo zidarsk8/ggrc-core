@@ -38,6 +38,14 @@ export default can.Component.extend({
           return newValue;
         },
       },
+      validationError: {
+        type: String,
+        get() {
+          let errors = this.instance.computed_errors();
+          let attr = this.attr('peopleListAttr');
+          return errors && errors[attr] ? errors[attr] : '';
+        },
+      },
     },
     /**
    * Event handler when a person is picked in an autocomplete form field.
