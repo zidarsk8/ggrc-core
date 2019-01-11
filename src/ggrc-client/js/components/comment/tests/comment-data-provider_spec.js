@@ -53,12 +53,12 @@ describe('comment-data-provider component', () => {
     let queryDeferred;
     let resultDeferred;
     beforeEach(() => {
-      queryDeferred = can.Deferred();
+      queryDeferred = $.Deferred();
       spyOn(QueryAPI, 'batchRequests')
         .and.returnValue(queryDeferred);
 
       resultDeferred = jasmine.createSpyObj(['promise', 'resolve']);
-      spyOn(can, 'Deferred')
+      spyOn($, 'Deferred')
         .and.returnValue(resultDeferred);
     });
 
@@ -122,7 +122,7 @@ describe('comment-data-provider component', () => {
   describe('processComment() method', () => {
     let mapDfd;
     beforeEach(() => {
-      mapDfd = can.Deferred();
+      mapDfd = $.Deferred();
       spyOn(viewModel, 'mapToInstance').and.returnValue(mapDfd.promise());
       viewModel.attr('instance', {
         refresh: jasmine.createSpy(),

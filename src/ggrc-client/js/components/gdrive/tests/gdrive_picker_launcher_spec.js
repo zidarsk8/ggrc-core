@@ -31,7 +31,7 @@ describe('gdrive-picker-launcher', function () {
     });
 
     it('pass callbackResult to can.when()', function () {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       let thenSpy = jasmine.createSpy('then');
       spyOn(viewModel, 'confirmationCallback').and.returnValue(dfd);
       spyOn(can, 'when').and.returnValue({
@@ -94,7 +94,7 @@ describe('gdrive-picker-launcher', function () {
 
     beforeEach(function () {
       el = jasmine.createSpyObj(['data', 'trigger']);
-      uploadFilesDfd = can.Deferred();
+      uploadFilesDfd = $.Deferred();
       spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
     });
 
@@ -108,7 +108,7 @@ describe('gdrive-picker-launcher', function () {
 
     describe('sets "isUploading" flag to false', function () {
       beforeEach(function () {
-        createModelDfd = can.Deferred();
+        createModelDfd = $.Deferred();
         viewModel.attr('isUploading', true);
         spyOn(viewModel, 'createDocumentModel').and.returnValue(createModelDfd);
       });
@@ -150,8 +150,8 @@ describe('gdrive-picker-launcher', function () {
     beforeEach(function () {
       el = jasmine.createSpyObj(['data', 'trigger']);
       parentFolderStub = {id: 'id'};
-      parentFolderDfd = can.Deferred();
-      uploadFilesDfd = can.Deferred();
+      parentFolderDfd = $.Deferred();
+      uploadFilesDfd = $.Deferred();
 
       spyOn(pickerUtils, 'findGDriveItemById').and.returnValue(parentFolderDfd);
       spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
@@ -173,7 +173,7 @@ describe('gdrive-picker-launcher', function () {
 
       it('after uploadFiles() success', function () {
         spyOn(viewModel, 'createDocumentModel')
-          .and.returnValue(can.Deferred().resolve());
+          .and.returnValue($.Deferred().resolve());
         parentFolderDfd.resolve(parentFolderStub);
         uploadFilesDfd.resolve();
 

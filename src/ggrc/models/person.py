@@ -5,7 +5,6 @@
 
 import re
 from sqlalchemy.orm import validates
-from sqlalchemy.orm import relationship
 
 from ggrc import builder
 from ggrc import db
@@ -54,12 +53,13 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'Option.role == "person_language")',
       uselist=False,
   )
-  profile = relationship(
-      "PersonProfile",
-      uselist=False,
-      back_populates="person",
-  )
 
+  profile = db.relationship(
+      "PersonProfile",
+      foreign_keys='PersonProfile.person_id',
+      uselist=False,
+      backref="person",
+  )
   access_control_people = db.relationship(
       'AccessControlPerson',
       foreign_keys='AccessControlPerson.person_id',
@@ -83,6 +83,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'email',
       'language',
       'name',
+      reflection.Attribute('profile', create=False, update=False),
       reflection.Attribute('object_people', create=False, update=False),
       reflection.Attribute('system_wide_role', create=False, update=False),
   )
@@ -168,6 +169,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     # modified_by relationship
     return super(Person, cls).eager_query().options(
         orm.joinedload('language'),
+        orm.joinedload('profile'),
         orm.subqueryload('object_people'),
     )
 

@@ -30,7 +30,7 @@ describe('<assessment-modal/> component', () => {
       let model = makeFakeInstance({model: Assessment})();
 
       spyOn(model, 'getRelatedObjects').and
-        .returnValue(can.Deferred().resolve({
+        .returnValue($.Deferred().resolve({
           Snapshot: [{}, {}, {}],
         }));
 

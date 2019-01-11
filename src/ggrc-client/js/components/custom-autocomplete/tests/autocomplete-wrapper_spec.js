@@ -30,7 +30,7 @@ describe('autocomplete-wrapper viewModel', () => {
 
     beforeEach(() => {
       response = {};
-      deferred = new can.Deferred();
+      deferred = new $.Deferred();
       stubs = [];
       filterResult = [];
       fullObjects = [];
@@ -206,7 +206,7 @@ describe('autocomplete-wrapper viewModel', () => {
 
     it('should call "trigger" method from RefreshQueue object', () => {
       spyOn(RefreshQueue.prototype, 'trigger')
-        .and.returnValue(new can.Deferred());
+        .and.returnValue(new $.Deferred());
 
       viewModel.getFullObjects(result);
 
@@ -216,7 +216,7 @@ describe('autocomplete-wrapper viewModel', () => {
     it('should resolve returned deferred after "trigger" is done', (done) => {
       const data = [{a: 1}, {b: 2}];
       spyOn(RefreshQueue.prototype, 'trigger')
-        .and.returnValue(new can.Deferred().resolve(data));
+        .and.returnValue(new $.Deferred().resolve(data));
 
       viewModel.getFullObjects(result).done((objs) => {
         expect(objs).toEqual(data);

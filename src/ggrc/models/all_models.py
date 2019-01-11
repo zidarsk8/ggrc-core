@@ -24,6 +24,7 @@ from ggrc.models.automapping import Automapping
 from ggrc.models.background_operation_type import BackgroundOperationType
 from ggrc.models.background_task import BackgroundTask
 from ggrc.models.background_operation import BackgroundOperation
+from ggrc.models.calendar_event import CalendarEvent
 from ggrc.models.categorization import Categorization
 from ggrc.models.category import CategoryBase
 from ggrc.models.comment import Comment
@@ -103,6 +104,7 @@ all_models = [  # pylint: disable=invalid-name
     BackgroundTask,
     BackgroundOperation,
     BackgroundOperationType,
+    CalendarEvent,
     Categorization,
     CategoryBase,
     Comment,

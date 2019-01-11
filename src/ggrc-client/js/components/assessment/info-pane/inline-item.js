@@ -21,7 +21,7 @@ export default can.Component.extend({
     dropdownNoValue: false,
     withReadMore: false,
     isEditIconDenied: false,
-    onStateChangeDfd: can.Deferred().resolve(),
+    onStateChangeDfd: $.Deferred().resolve(),
     mandatory: false,
     isConfirmationNeeded: true,
   },

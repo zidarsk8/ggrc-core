@@ -36,7 +36,7 @@ let batchTimeout = null;
  * @return {Promise} Promise on Query API request.
  */
 function batchRequests(params) {
-  let dfd = can.Deferred();
+  let dfd = $.Deferred();
   batchQueue.push({dfd: dfd, params: params});
 
   if (_.isNumber(batchTimeout)) {
@@ -47,26 +47,6 @@ function batchRequests(params) {
     _resolveBatch(batchQueue.splice(0, batchQueue.length));
   }, BATCH_TIMEOUT);
   return dfd;
-}
-
-/**
- * Build params for request on Query API.
- *
- * @param {String} objName - Name of requested object
- * @param {Object} page - Information about page state.
- * @param {Number} page.current - Current page
- * @param {Number} page.pageSize - Page size
- * @param {Array} page.sort - Array of sorting criteria
- * @param {String} page.filter - Filter string
- * @param {Object} relevant - Information about relevant object
- * @param {Object} relevant.type - Type of relevant object
- * @param {Object} relevant.id - Id of relevant object
- * @param {Object} relevant.operation - Type of operation.
- * @param {Object} additionalFilter - An additional filter to be applied
- * @return {Array} Array of QueryAPIRequest
- */
-function buildParams(objName, page, relevant, additionalFilter) {
-  return [buildParam(objName, page, relevant, undefined, additionalFilter)];
 }
 
 /**
@@ -262,7 +242,6 @@ function _resolveBatch(queue) {
 
 export {
   buildParam,
-  buildParams,
   buildRelevantIdsQuery,
   batchRequests,
   buildCountParams,

@@ -144,7 +144,7 @@ export default can.Component.extend({
       return buildParam(type, {}, relevantFilters, [], []);
     },
     requestQuery: function (query) {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       this.attr('isLoading', true);
 
       batchRequests(query)
@@ -173,7 +173,7 @@ export default can.Component.extend({
       return this.requestQuery(query);
     },
     load: function () {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       let binding = this.getBinding();
 
       if (!binding) {

@@ -41,7 +41,7 @@ describe('sub-tree-wrapper component', function () {
     it('returns empty list', function (done) {
       vm.attr('childModels', ['a', 'b', 'c']);
       spyOn(TreeViewUtils, 'loadItemsForSubTier').and
-        .returnValue(can.Deferred().resolve({
+        .returnValue($.Deferred().resolve({
           directlyItems: [],
           notDirectlyItems: [],
           showMore: false,
@@ -62,7 +62,7 @@ describe('sub-tree-wrapper component', function () {
     it('returns valid data from server-side', function (done) {
       vm.attr('childModels', ['a', 'b', 'c']);
       spyOn(TreeViewUtils, 'loadItemsForSubTier').and
-        .returnValue(can.Deferred().resolve({
+        .returnValue($.Deferred().resolve({
           directlyItems: [{id: 1}, {id: 2}, {id: 3}],
           notDirectlyItems: [{id: 4}, {id: 5}, {id: 6}, {id: 7}],
           showMore: false,

@@ -107,6 +107,7 @@ class PageHeader(object):
   BUTTON_HELP = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' #page-help')
   BUTTON_LOGOUT = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' [href="/logout"]')
   NOTIFICATIONS = (By.CSS_SELECTOR, USER_MENU + ' .notify-wrap')
+  EMAIL = (By.CSS_SELECTOR, USER_MENU + ' .user-email')
   BUTTON_ADMIN_DASHBOARD = (
       By.CSS_SELECTOR,
       Common.DROPDOWN_MENU + ' [href="/admin#!people_list"]')
@@ -187,7 +188,7 @@ class LhnMenu(object):
   # user input elements
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
-  EXTENDED_INFO = (By.CSS_SELECTOR, ".extended-info.in .info .fa")
+  EXTENDED_INFO = (By.CSS_SELECTOR, ".extended-info.in")
   HOLDER = (By.CSS_SELECTOR, '.lhs-holder')
   FILTER = (By.CSS_SELECTOR, ".lhs-search")
   FILTER_TEXT_BOX = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch")
@@ -199,7 +200,7 @@ class LhnMenu(object):
   MY_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="my_objects_6fa95ae1"]')
   PIN = (By.CSS_SELECTOR, ".lhn-pin")
   # LHN items
-  DIRECTIVES = (By.CSS_SELECTOR, '[data-test-id="directives_66116337"]')
+  TOGGLE_DIRECTIVES = (By.CSS_SELECTOR, '[data-test-id="directives_66116337"]')
   TOGGLE_CONTROLS_OR_OBJECTIVES = (
       By.CSS_SELECTOR, '[data-test-id="controls/objectives_66116337"]')
   TOGGLE_PEOPLE_OR_GROUPS = (
@@ -215,6 +216,7 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Draft"]')
   BUTTON_WORKFLOWS_INACTIVE = (
       By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Inactive"]')
+  BUTTON_CREATE_NEW_NO = (By.CSS_SELECTOR, '.sub-actions.in')
 
 
 class ExportItem(object):
@@ -947,15 +949,13 @@ class WidgetAdminRoles(object):
 class WidgetAdminEvents(object):
   """Locators for Events widget on Admin Dashboard."""
   _BASE_CSS_SELECTOR = 'section#events_list:not([class~="hidden"])'
-  _TREE_ITEMS_SELECTOR = ".tree-item[data-model]"
-  TREE_VIEW_ITEMS = (
-      By.CSS_SELECTOR,
-      "{0} {1}".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_ITEMS = "{0} .tree-item[data-model]".format(_BASE_CSS_SELECTOR)
   TREE_VIEW_HEADER = (
       By.CSS_SELECTOR, "{} header".format(_BASE_CSS_SELECTOR))
-  FIRST_TREE_VIEW_ITEM = (
-      By.CSS_SELECTOR,
-      "{0} {1}:first-child".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_ITEMS_W_PPL = (
+      By.XPATH,
+      "//section[@id='events_list']" +
+      "//*[@class='person-name' and contains(text(), '@')]")
 
 
 class WidgetAdminPeople(object):

@@ -5,10 +5,9 @@
 
 from datetime import datetime, timedelta
 
-from sqlalchemy.orm import relationship
-
 from ggrc import db
 from ggrc.models.mixins import base
+from ggrc.models import reflection
 
 # Offset for default last seen what's new date in days
 DEFAULT_LAST_SEEN_OFFSET = 60
@@ -29,10 +28,15 @@ class PersonProfile(base.ContextRBAC, base.Base, db.Model):
 
   __tablename__ = 'people_profiles'
 
+  _api_attrs = reflection.ApiAttributes(
+      'send_calendar_events',
+      'last_seen_whats_new',
+  )
+
   person_id = db.Column(db.Integer,
                         db.ForeignKey('people.id', ondelete='CASCADE'),
                         unique=True)
 
   last_seen_whats_new = db.Column(db.DateTime, default=default_last_seen_date)
 
-  person = relationship("Person", back_populates='profile')
+  send_calendar_events = db.Column(db.Boolean, default=True)

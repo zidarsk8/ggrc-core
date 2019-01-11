@@ -118,7 +118,7 @@ export default can.Control({
       userFetch = currentUser.refresh();
     } else {
       // nothing to wait for
-      userFetch = new can.Deferred().resolve(currentUser);
+      userFetch = new $.Deferred().resolve(currentUser);
     }
 
     userFetch
@@ -361,7 +361,7 @@ export default can.Control({
         });
       }
     }
-    return preloadDfd || can.Deferred().resolve();
+    return preloadDfd || $.Deferred().resolve();
   },
 
   fetch_all: function () {
@@ -530,7 +530,15 @@ export default can.Control({
     model = $elem.attr('model');
 
     if (model) {
-      value = getInstance(model, item.value);
+      if (item.value instanceof Array) {
+        value = can.map(item.value, function (id) {
+          return getInstance(model, id);
+        });
+      } else if (item.value instanceof Object) {
+        value = getInstance(model, item.value.id);
+      } else {
+        value = getInstance(model, item.value);
+      }
     } else if ($elem.is('[type=checkbox]')) {
       value = $elem.is(':checked');
     } else {
@@ -951,7 +959,7 @@ export default can.Control({
     let ajd;
 
     if (this.wasDestroyed()) {
-      return can.Deferred().reject();
+      return $.Deferred().reject();
     }
 
     if (instance.errors()) {

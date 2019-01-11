@@ -103,7 +103,7 @@ describe('csv-import component', () => {
   describe('analyseSelectedFile() method', () => {
     it('should reset state to "Select" for empty files', (done) => {
       spyOn(backendGdriveClient, 'withAuth')
-        .and.returnValue(can.Deferred().resolve({
+        .and.returnValue($.Deferred().resolve({
           objects: {
             Foo: 0,
             Bar: 0,
@@ -131,7 +131,7 @@ describe('csv-import component', () => {
 
     it('should reset state to "Select" after error on GDrive side', (done) => {
       spyOn(backendGdriveClient, 'withAuth')
-        .and.returnValue(can.Deferred().reject({
+        .and.returnValue($.Deferred().reject({
           responseJSON: {
             message: 'GDrive error message',
           },
@@ -156,7 +156,7 @@ describe('csv-import component', () => {
 
     it('should set the correct status about import job', (done) => {
       spyOn(backendGdriveClient, 'withAuth')
-        .and.returnValue(can.Deferred().resolve({
+        .and.returnValue($.Deferred().resolve({
           objects: {
             Control: 15,
             Assessment: 5,
@@ -185,7 +185,7 @@ describe('csv-import component', () => {
     it(`should set number of imported objects in "importedObjectsCount" field
       when there are imported objects`, (done) => {
       spyOn(backendGdriveClient, 'withAuth')
-        .and.returnValue(can.Deferred().resolve({
+        .and.returnValue($.Deferred().resolve({
           objects: {
             Control: 15,
             Assessment: 5,
@@ -209,7 +209,7 @@ describe('csv-import component', () => {
     it(`should not set "importedObjectsCount" field
     when there are not imported objects`, (done) => {
       spyOn(backendGdriveClient, 'withAuth')
-        .and.returnValue(can.Deferred().resolve({
+        .and.returnValue($.Deferred().resolve({
           objects: {
             Control: 0,
             Assessment: 0,
@@ -234,7 +234,7 @@ describe('csv-import component', () => {
   describe('startImport() method', () => {
     beforeEach(() => {
       spyOn(ieUtils, 'startImport')
-        .and.returnValue(can.Deferred().resolve({id: 1}));
+        .and.returnValue($.Deferred().resolve({id: 1}));
 
       spyOn(vm, 'trackStatusOfImport');
     });
@@ -268,7 +268,7 @@ describe('csv-import component', () => {
       statuses.forEach((status) => {
         it(`for the ${status} status`, (done) => {
           spyOn(ieUtils, 'getImportJobInfo')
-            .and.returnValue(can.Deferred().resolve({status}));
+            .and.returnValue($.Deferred().resolve({status}));
 
           vm.trackStatusOfImport(1, 0);
 
@@ -292,7 +292,7 @@ describe('csv-import component', () => {
     describe('with empty history', () => {
       beforeEach(() => {
         spyOn(ieUtils, 'getImportHistory')
-          .and.returnValue(can.Deferred().resolve([]));
+          .and.returnValue($.Deferred().resolve([]));
 
         spyOn(ieUtils, 'isInProgressJob');
       });
@@ -313,7 +313,7 @@ describe('csv-import component', () => {
       describe('and last job with "In Progress" state', () => {
         beforeEach(() => {
           spyOn(ieUtils, 'getImportHistory')
-            .and.returnValue(can.Deferred().resolve([
+            .and.returnValue($.Deferred().resolve([
               {
                 id: 1,
                 status: jobStatuses.FINISHED,
@@ -356,7 +356,7 @@ describe('csv-import component', () => {
       describe('and last job is completed', () => {
         beforeEach(() => {
           spyOn(ieUtils, 'getImportHistory')
-            .and.returnValue(can.Deferred().resolve([
+            .and.returnValue($.Deferred().resolve([
               {
                 id: 1,
                 status: jobStatuses.FAILED,

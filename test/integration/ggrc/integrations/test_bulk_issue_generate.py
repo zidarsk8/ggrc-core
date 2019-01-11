@@ -424,7 +424,8 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       updater.send_notification(filename, "user@example.com", failed=True)
 
     self.assertEqual(send_mock.call_count, 1)
-    (email, _, body), _ = send_mock.call_args_list[0]
+    (email, title, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(title, updater.ISSUETRACKER_SYNC_TITLE)
     self.assertEqual(email, "user@example.com")
     self.assertIn(updater.ERROR_TITLE.format(filename=filename), body)
     self.assertIn(updater.EXCEPTION_TEXT, body)
@@ -438,7 +439,8 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       creator.send_notification(filename, recipient)
 
     self.assertEqual(send_mock.call_count, 1)
-    (email, _, body), _ = send_mock.call_args_list[0]
+    (email, title, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(title, creator.ISSUETRACKER_SYNC_TITLE)
     self.assertEqual(email, recipient)
     self.assertIn(creator.SUCCESS_TITLE.format(filename=filename), body)
     self.assertIn(creator.SUCCESS_TEXT, body)
@@ -454,7 +456,8 @@ class TestBulkIssuesGenerate(TestBulkIssuesSync):
       creator.send_notification(filename, recipient, errors=[(assmt, "")])
 
     self.assertEqual(send_mock.call_count, 1)
-    (email, _, body), _ = send_mock.call_args_list[0]
+    (email, title, body), _ = send_mock.call_args_list[0]
+    self.assertEqual(title, creator.ISSUETRACKER_SYNC_TITLE)
     self.assertEqual(email, recipient)
     self.assertIn(creator.ERROR_TITLE.format(filename=filename), body)
     self.assertIn(assmt.slug, body)
@@ -746,8 +749,9 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     self.assertEqual(send_mock.call_count, 1)
     (email, title, body), _ = send_mock.call_args_list[0]
     cur_user = all_models.Person.query.get(side_user.id)
+    child_creator = issuetracker_bulk_sync.IssueTrackerBulkChildCreator
     self.assertEqual(email, cur_user.email)
-    self.assertEqual(title, issuetracker_bulk_sync.ISSUETRACKER_SYNC_TITLE)
+    self.assertEqual(title, child_creator.ISSUETRACKER_SYNC_TITLE)
     self.assertIn("There were some errors in generating tickets", body)
 
   def test_child_notification(self):
@@ -760,8 +764,9 @@ class TestBulkIssuesChildGenerate(TestBulkIssuesSync):
     self.assert200(response)
     self.assertEqual(send_mock.call_count, 1)
     (email, title, body), _ = send_mock.call_args_list[0]
+    child_creator = issuetracker_bulk_sync.IssueTrackerBulkChildCreator
     self.assertEqual(email, "user@example.com")
-    self.assertEqual(title, issuetracker_bulk_sync.ISSUETRACKER_SYNC_TITLE)
+    self.assertEqual(title, child_creator.ISSUETRACKER_SYNC_TITLE)
     title = all_models.Audit.query.get(audit_id).title
     self.assertIn(
         "Tickets generation for audit \"{}\" was completed".format(title),

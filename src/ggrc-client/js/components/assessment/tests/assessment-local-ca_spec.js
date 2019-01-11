@@ -802,7 +802,7 @@ describe('assessment-local-ca component', () => {
     beforeEach(function () {
       attributeChanged = viewModel.attributeChanged.bind(viewModel);
       validateFormSpy = spyOn(viewModel, 'validateForm');
-      saveDfd = can.Deferred();
+      saveDfd = $.Deferred();
       saveSpy = spyOn(viewModel, 'save').and.returnValue(saveDfd);
 
       inputField = new can.Map({

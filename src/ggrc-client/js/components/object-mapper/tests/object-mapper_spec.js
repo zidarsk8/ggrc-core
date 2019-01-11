@@ -434,7 +434,7 @@ describe('object-mapper component', function () {
       spyOn(RefreshQueue.prototype, 'enqueue')
         .and.returnValue({
           trigger: jasmine.createSpy()
-            .and.returnValue(can.Deferred().resolve()),
+            .and.returnValue($.Deferred().resolve()),
         });
       spyOn($.prototype, 'trigger');
     });

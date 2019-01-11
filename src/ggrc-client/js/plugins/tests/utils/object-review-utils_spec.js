@@ -17,8 +17,8 @@ describe('object-review-utils', () => {
 
   describe('saveReview() method', () => {
     beforeEach(() => {
-      const saveDfd = new can.Deferred();
-      const refreshDfd = new can.Deferred();
+      const saveDfd = new $.Deferred();
+      const refreshDfd = new $.Deferred();
 
       spyOn(review, 'save').and.returnValue(saveDfd.resolve(review));
       spyOn(review, 'refresh').and.returnValue(refreshDfd.resolve(review));

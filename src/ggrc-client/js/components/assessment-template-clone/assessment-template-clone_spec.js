@@ -120,7 +120,7 @@ describe('assessment-template-clone component', () => {
       beforeEach(() => {
         vm = new can.Map();
         spyOn(vm, 'dispatch');
-        dfd = new can.Deferred();
+        dfd = new $.Deferred();
         that = {
           viewModel: vm,
           closeModal: jasmine.createSpy(),

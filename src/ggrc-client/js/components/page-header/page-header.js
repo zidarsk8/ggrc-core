@@ -124,6 +124,7 @@ let viewModel = can.Map.extend({
     },
   },
   menuInitialized: false,
+  lhnInitialized: false,
   showHideTitles: function (element) {
     let elWidth = element.width();
     let $menu = element.find('.menu');
@@ -139,6 +140,15 @@ let viewModel = can.Map.extend({
   },
   handleMenuOpening() {
     this.attr('menuInitialized', true);
+  },
+  handleLHNOpening() {
+    if (!this.attr('lhnInitialized')) {
+      import(/* webpackChunkName: "lhn" */'../../controllers/lhn_controllers')
+        .then(() => {
+          $('#lhn').cms_controllers_lhn();
+          this.attr('lhnInitialized', true);
+        });
+    }
   },
 });
 

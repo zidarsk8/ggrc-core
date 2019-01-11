@@ -3,6 +3,7 @@
 """LHN elements."""
 # pylint: disable=not-callable
 # pylint: disable=not-an-iterable
+# pylint: disable=duplicate-code
 
 from selenium.common import exceptions as selenium_exception
 
@@ -116,8 +117,8 @@ class AccordionGroup(base.DropdownDynamic):
     Args: member_title (basestring): (unique) title of member
     """
     try:
-      el = self._get_visible_member_by_title(member_title)
-      selenium_utils.hover_over_element(self._driver, el)
+      elem = self._get_visible_member_by_title(member_title)
+      selenium_utils.hover_over_element(self._driver, elem)
       selenium_utils.get_when_visible(
           self._driver, locator.LhnMenu.EXTENDED_INFO)
       return extended_info.ExtendedInfo(self._driver)

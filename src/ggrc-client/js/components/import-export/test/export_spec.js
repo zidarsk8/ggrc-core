@@ -225,7 +225,7 @@ describe('export component', () => {
       beforeEach(() => {
         event = Component.prototype.events['inserted'].bind({viewModel});
 
-        exportsDfd = can.Deferred();
+        exportsDfd = $.Deferred();
         spyOn(viewModel, 'getExports').and.returnValue(exportsDfd);
       });
 

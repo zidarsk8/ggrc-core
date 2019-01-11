@@ -56,3 +56,8 @@ class Tab(object):
   def select(self):
     """Selects tab."""
     self._root.click()
+
+  @property
+  def tab_icon(self):
+    """Return tab icon"""
+    return self._root.element(class_name='fa')

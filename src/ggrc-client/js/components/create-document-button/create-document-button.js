@@ -58,7 +58,7 @@ const viewModel = can.Map.extend({
     });
   },
   useExistingDocuments(documents) {
-    let dfd = can.Deferred();
+    let dfd = $.Deferred();
 
     if (!documents.length) {
       return dfd.resolve([]);
@@ -77,7 +77,7 @@ const viewModel = can.Map.extend({
   },
   createDocuments(files) {
     if (!files.length) {
-      return can.Deferred().resolve([]);
+      return $.Deferred().resolve([]);
     }
 
     this.attr('parentInstance').dispatch(BEFORE_DOCUMENT_CREATE);
@@ -105,7 +105,7 @@ const viewModel = can.Map.extend({
         this.attr('element').trigger('modal:dismiss');
       }
 
-      return can.Deferred().resolve();
+      return $.Deferred().resolve();
     }
 
     return Permission.refresh()
@@ -118,7 +118,7 @@ const viewModel = can.Map.extend({
       }.bind(this));
   },
   showConfirm(documents) {
-    let confirmation = can.Deferred();
+    let confirmation = $.Deferred();
     let parentInstance = this.attr('parentInstance');
     let docsCount = documents.length;
     confirm({

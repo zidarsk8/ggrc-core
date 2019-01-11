@@ -5,7 +5,7 @@
 
 import Component from './release-notes-menu-item';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
-import * as UserUtils from '../../plugins/utils/user-utils';
+import PersonProfile from '../../models/service-models/person-profile';
 import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
 describe('"release-notes-menu-item" component', () => {
@@ -36,46 +36,74 @@ describe('"release-notes-menu-item" component', () => {
     describe('"inserted" handler', () => {
       const releaseDateObj = new Date(RELEASE_NOTES_DATE);
       let profileDfd;
+      let originalCurrentUser;
+
+      beforeAll(() => {
+        originalCurrentUser = GGRC.current_user;
+      });
+
+      afterAll(() => {
+        GGRC.current_user = originalCurrentUser;
+      });
 
       beforeEach(() => {
         handler = events.inserted.bind({viewModel: vm});
         spyOn(vm, 'open');
 
-        profileDfd = can.Deferred();
-        spyOn(UserUtils, 'loadUserProfile')
-          .and.returnValue(profileDfd);
-        spyOn(UserUtils, 'updateUserProfile')
-          .and.returnValue(profileDfd);
+        GGRC.current_user = {
+          profile: {
+            id: 12345,
+          },
+        };
+        profileDfd = $.Deferred();
+        spyOn(PersonProfile, 'findOne').and.returnValue(profileDfd);
       });
 
       describe('if RELEASE_NOTES_DATE not equal to saved date', () => {
         let dayBefore;
         let profile;
+        let saveDfd;
 
         beforeEach(() => {
           dayBefore = new Date(releaseDateObj)
             .setDate(releaseDateObj.getDate() - 1);
-          profile = {
+          profile = new can.Map({
             last_seen_whats_new: new Date(dayBefore).toISOString(),
-          };
+          });
+          saveDfd = $.Deferred();
+          profile.save = jasmine.createSpy('save').and.returnValue(saveDfd);
           profileDfd.resolve(profile);
         });
 
-        it('calls updateUserProfile with RELEASE_NOTES_DATE', async (done) => {
-          let updatedProfile = {
-            last_seen_whats_new: getFormattedUtcDate(releaseDateObj),
-          };
+
+        it('sets current user\'s last_seen_whats_new to RELEASE_NOTES_DATE',
+          async (done) => {
+            const expected = getFormattedUtcDate(RELEASE_NOTES_DATE);
+
+            await handler();
+
+            expect(profile.attr('last_seen_whats_new')).toBe(expected);
+            done();
+          });
+
+        it('saves current user\'s profile', async (done) => {
           await handler();
 
-          expect(UserUtils.updateUserProfile)
-            .toHaveBeenCalledWith(updatedProfile);
+          expect(profile.save)
+            .toHaveBeenCalled();
           done();
         });
 
-        it('calls open() method', async (done) => {
-          await handler();
-          expect(vm.open).toHaveBeenCalled();
-          done();
+        describe('and current user\'s profile was saved', () => {
+          beforeEach(() => {
+            saveDfd.resolve();
+          });
+
+          it('calls open() method', async (done) => {
+            await handler();
+            expect(vm.open).toHaveBeenCalled();
+            done();
+          });
         });
       });
 
@@ -83,17 +111,18 @@ describe('"release-notes-menu-item" component', () => {
         let profile;
 
         beforeEach(() => {
-          profile = {
+          profile = new can.Map({
             last_seen_whats_new: new Date(releaseDateObj).toISOString(),
-          };
+          });
           profileDfd.resolve(profile);
         });
 
-        it('updateUserProfile() should not been called', async (done) => {
+        it('profile shouldn\'t be saved', async (done) => {
+          profile.save = jasmine.createSpy('save');
+
           await handler();
 
-          expect(UserUtils.updateUserProfile)
-            .not.toHaveBeenCalled();
+          expect(profile.save).not.toHaveBeenCalled();
           done();
         });
 

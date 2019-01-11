@@ -823,3 +823,12 @@ class ProposalEmailUI(Representation):
     super(ProposalEmailUI, self).__init__()
     self.set_attrs(
         "recipient_email", "author", "obj_type", "changes", "comment", **attrs)
+
+
+class DailyEmailUI(Representation):
+  """Daily notification email."""
+  def __init__(self, **attrs):
+    super(DailyEmailUI, self).__init__()
+    self.set_attrs(
+        "email_recipient", "assigned_tasks", "due_soon_tasks", "new_wf_cycles",
+        **attrs)

@@ -105,6 +105,8 @@ Settings from ``settings.sh``
 +------------------------------------+---------------------------------------------------------------------------+
 | ASSESSMENT_SHORT_URL_PREFIX        | Assessment short link prefix                                              |
 +------------------------------------+---------------------------------------------------------------------------+
+| NOTIFICATION_PREFIX                | Title prefix for events and emails notifications                          |
++------------------------------------+---------------------------------------------------------------------------+
 | CUSTOM_URL_ROOT                    | Equal to the URL where the app is supposed to be deployed too; used to    |
 |                                    | generate links to internal objects in email notifications                 |
 +------------------------------------+---------------------------------------------------------------------------+

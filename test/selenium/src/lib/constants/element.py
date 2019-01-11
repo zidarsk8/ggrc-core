@@ -25,25 +25,41 @@ class Lhn(object):
           cls.CONTROLS,
           cls.OBJECTIVES)
       cls.PEOPLE_OR_GROUPS_MEMBERS = (
-          cls.PEOPLE,
-          cls.VENDORS,
-          cls.ACCESS_GROUPS)
+          cls.PEOPLE,)
       cls.SCOPE_MEMBERS = (
+          cls.ACCESS_GROUPS,
           cls.ORG_GROUPS,
           cls.SYSTEMS,
           cls.PROCESSES,
           cls.DATA_ASSETS,
           cls.PRODUCTS,
+          cls.PRODUCT_GROUPS,
           cls.PROJECTS,
           cls.FACILITIES,
-          cls.MARKETS)
+          cls.MARKETS,
+          cls.METRICS,
+          cls.TECHNOLOGY_ENVIRONMENTS,
+          cls.VENDORS,)
       cls.RISKS_OR_THREATS_MEMBERS = (
           cls.RISKS,
           cls.THREATS)
+      cls.BASE_OBJS = (
+          cls.PROGRAMS,
+          cls.WORKFLOWS,
+          cls.AUDITS,
+          cls.ASSESSMENTS,
+          cls.ISSUES)
+  DIRECTIVES = "directives"
   CONTROLS_OR_OBJECTIVES = "controls_or_objectives"
   PEOPLE_OR_GROUPS = "people_or_groups"
   SCOPE = "scope"
   RISKS_OR_THREATS = "risks_or_threats"
+  SUB_OBJS = (
+      DIRECTIVES,
+      CONTROLS_OR_OBJECTIVES,
+      PEOPLE_OR_GROUPS,
+      SCOPE,
+      RISKS_OR_THREATS)
   MY_OBJS = "My objects"
   ALL_OBJS = "All objects"
 
@@ -89,8 +105,10 @@ class AdminWidgetEvents(object):
   at Admin Dashboard.
   """
   WIDGET_HEADER = "Events"
-  TREE_VIEW_ROW_REGEXP = r"^.+\s(by\s.+)\son\s" + \
-      r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
+  TREE_VIEW_ROW_REGEXP_WO_ACTION = r"by\s(?P<user>.+)\son\s" + \
+      r"(?P<time>\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M\s" + \
+      r"[\+,-]\d{2}:\d{2})"
+  TREE_VIEW_ROW_REGEXP = r"^(?P<action>.+)\s" + TREE_VIEW_ROW_REGEXP_WO_ACTION
 
 
 class AdminWidgetCustomAttributes(object):

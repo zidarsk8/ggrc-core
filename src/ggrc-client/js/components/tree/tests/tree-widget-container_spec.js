@@ -104,7 +104,7 @@ describe('tree-widget-container component', function () {
 
     it('', function (done) {
       spyOn(TreeViewUtils, 'loadFirstTierItems')
-        .and.returnValue(can.Deferred().resolve({
+        .and.returnValue($.Deferred().resolve({
           total: 100,
           values: [],
         }));

@@ -15,10 +15,6 @@ import template from './templates/tree-item-extra-info.mustache';
 
 let viewModel = can.Map.extend({
   define: {
-    isSubTreeItem: {
-      type: 'htmlbool',
-      value: false,
-    },
     isActive: {
       type: 'boolean',
       get: function () {
@@ -132,6 +128,7 @@ let viewModel = can.Map.extend({
     },
   },
   onEnter: function () {
+    this.processPendingContent();
     this.attr('active', true);
     if (!this.attr('triggered')) {
       this.attr('triggered', true);
@@ -140,22 +137,31 @@ let viewModel = can.Map.extend({
   onLeave: function () {
     this.attr('active', false);
   },
-  addContent: function (dataPromise) {
+  processPendingContent() {
+    const extractedPendingContent = this.attr('pendingContent').splice(0);
+    const resolvedContent = extractedPendingContent.map((pending) => pending());
+
+    this.addContent(...resolvedContent);
+  },
+  addDeferredContent({deferredCallback}) {
+    this.attr('pendingContent').push(deferredCallback);
+  },
+  addContent(...dataPromises) {
     let dfds = this.attr('contentPromises');
     let dfdReady = this.attr('dfdReady');
 
-    if (dfdReady.state() === 'pending') {
-      this.attr('spin', true);
-      dfds.push(dataPromise);
-      dfdReady = $.when(...dfds).then(function () {
-        this.attr('spin', false);
-      }.bind(this));
+    this.attr('spin', true);
+    dfds.push(...dataPromises);
 
-      this.attr('dfdReady', dfdReady);
-    }
+    dfdReady = $.when(...dfds).then(() => {
+      this.attr('spin', false);
+    });
+
+    this.attr('dfdReady', dfdReady);
   },
+  pendingContent: [],
   contentPromises: [],
-  dfdReady: can.Deferred(),
+  dfdReady: $.Deferred(),
   classes: [],
   instance: null,
 });

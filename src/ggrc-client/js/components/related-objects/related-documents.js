@@ -158,7 +158,7 @@ export default can.Component.extend({
         document, this.instance);
       if (!relationship.id) {
         console.warn('Unable to find relationship');
-        return can.Deferred().reject({
+        return $.Deferred().reject({
           error: 'Unable to find relationship',
         });
       }

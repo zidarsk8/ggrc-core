@@ -237,6 +237,7 @@ class ImportRowConverter(RowConverter):
         self.add_error(errors.VALIDATION_ERROR,
                        column_name=role,
                        message=msg)
+    self._check_secondary_objects()
     if self.block_converter.converter.dry_run:
       return
     try:
@@ -277,6 +278,20 @@ class ImportRowConverter(RowConverter):
         row_converter: Row converter for the row we want to check.
     """
     checker = pre_commit_checks.CHECKS.get(type(self.obj).__name__)
+    if checker and callable(checker):
+      checker(self)
+
+  def _check_secondary_objects(self):
+    """Check object if it has any pre commit checks
+    after setup of secondary objects.
+
+    The check functions can mutate the row_converter object and mark it
+    to be ignored if there are any errors detected.
+
+    Args:
+        row_converter: Row converter for the row we want to check.
+    """
+    checker = pre_commit_checks.SECONDARY_CHECKS.get(type(self.obj).__name__)
     if checker and callable(checker):
       checker(self)
 

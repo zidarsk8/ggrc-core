@@ -4,6 +4,7 @@
 (split done as `info_widget` module is too large.
 """
 from lib.page.modal import update_object
+from lib.constants import locator
 
 
 class InfoPanel(object):
@@ -12,6 +13,36 @@ class InfoPanel(object):
 
   def __init__(self, root):
     self._root = root
+    self._locators = locator.WidgetInfoPanel
+
+  @property
+  def title(self):
+    """Return panel title"""
+    return self._root.element(class_name='pane-header__title-details').\
+        h3().text
+
+  @property
+  def is_minimized(self):
+    return self._root.parent(class_name='pin-content--minimized').exists
+
+  @property
+  def is_maximized(self):
+    return self._root.parent(class_name='pin-content--maximized').exists
+
+  @property
+  def button_minimize(self):
+    """Return minimize button"""
+    return self._root.element(class_name='fa-compress')
+
+  @property
+  def button_maximize(self):
+    """Return maximize button"""
+    return self._root.element(class_name='fa-expand')
+
+  @property
+  def button_close(self):
+    """Return close button"""
+    return self._root.element(class_name='close-pane')
 
 
 class SnapshotInfoPanel(InfoPanel):

@@ -13,10 +13,7 @@ class TreeWidget(object):
   def __init__(self, container, table_row_cls=None):
     super(TreeWidget, self).__init__()
     self._root = container
-    if table_row_cls:
-      self._table_row_cls = table_row_cls
-    else:
-      self._table_row_cls = TreeItem
+    self._table_row_cls = table_row_cls if table_row_cls else TreeItem
     self._table = table_with_headers.TableWithHeaders(
         self._root,
         header_elements=self._tree_header_elements,

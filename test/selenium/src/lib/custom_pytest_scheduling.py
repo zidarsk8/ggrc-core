@@ -39,7 +39,7 @@ class CustomPytestScheduling(LoadScheduling):
 
   def _idxs_of_destructive_tests(self):
     """Destructive tests to send."""
-    return self._idxs_to_send_for(self._is_destructive_test)
+    return self._idxs_to_send_for(self.is_destructive_test)
 
   def _idxs_of_proposal_tests(self):
     """Proposal tests to send."""
@@ -65,8 +65,17 @@ class CustomPytestScheduling(LoadScheduling):
     node.send_runtest_some(idxs_to_send)
 
   @staticmethod
-  def _is_destructive_test(test_id):
-    return test_runner.DESTRUCTIVE_TEST_METHOD_PREFIX in test_id
+  def is_destructive_test(*args):
+    """Verify if test destructive based on prefix and suffix and list of
+    input items.
+    """
+    prefix = test_runner.DESTRUCTIVE_TEST_METHOD_PREFIX
+    suffix = test_runner.DESTRUCTIVE_TEST_CLASS_SUFFIX
+    return any(
+        str_part in item
+        for str_part in (prefix, suffix)
+        for item in args
+    )
 
   @staticmethod
   def _is_check_proposals_test(test_id):

@@ -124,7 +124,7 @@ class TestTicketTrackerExport(TestCase):
     self.assertIn("P4", response.data)
     self.assertIn("Severity", response.data)
     self.assertIn("S4", response.data)
-    self.assertIn("true", response.data)
+    self.assertIn("on", response.data)
 
   @ddt.data("Issue", "Assessment")
   def test_issue_title_export(self, model_name):
