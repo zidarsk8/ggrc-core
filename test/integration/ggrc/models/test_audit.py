@@ -86,7 +86,7 @@ class TestAudit(TestCase):
     self.assert500(response)
     self.assertEqual(response.json, errors.MISSING_REVISION)
 
-  def test_delete_audit(self):
+  def test_delete_audit_asmnt_tmpl(self):
     """Check inability to delete audit in relation with assessment template."""
     with factories.single_commit():
       audit = factories.AuditFactory()
@@ -100,6 +100,24 @@ class TestAudit(TestCase):
     self.assertEqual(response.json["message"],
                      "This request will break a mandatory relationship from "
                      "assessment_templates to audits.")
+
+  def test_delete_audit_asmnt(self):
+    """Check inability to delete audit in relation with assessment."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(
+          source=audit,
+          destination=assessment,
+      )
+    response = self.api.delete(audit)
+    self.assertStatus(response, 409)
+    self.assertEqual(
+        response.json["message"],
+        "The audit cannot be deleted due to mapped assessment(s) to this "
+        "audit. Please delete assessment(s) mapped to this audit first "
+        "before deleting the audit.",
+    )
 
   def test_delete_audit_proper(self):
     """Check delete audit with assessment template. Remove template first"""
