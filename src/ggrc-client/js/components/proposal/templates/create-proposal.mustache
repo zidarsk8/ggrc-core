@@ -19,12 +19,8 @@
 
   <div class="proposal__save-button">
     <spinner class="proposal__spinner" toggle="loading"></spinner>
-    <a class="btn
-      btn-small
-      btn-green
-      {{disable_if_errors instance}}
-      {{#if isDisabledButton}}disabled{{/if}}"
-      ($click)="create(%element, %event)">
+    <a class="btn btn-small btn-green {{#if isDisabled}}disabled{{/isDisabled}}"
+       ($click)="create(%element, %event)">
         Propose
     </a>
   </div>

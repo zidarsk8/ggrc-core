@@ -893,18 +893,6 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   };
 });
 
-Mustache.registerHelper('disable_if_errors', function (instance) {
-  let ins;
-  let res;
-  ins = Mustache.resolve(instance);
-  res = ins.computed_unsuppressed_errors();
-  if (res === null || res === undefined) {
-    return '';
-  } else {
-    return 'disabled';
-  }
-});
-
 Mustache.registerHelper('debugger', function () {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Dev tools need to be open for this

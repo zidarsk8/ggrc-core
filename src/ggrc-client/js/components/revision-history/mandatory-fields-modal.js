@@ -18,6 +18,13 @@ export default can.Component.extend({
           return this.attr('caFields').length;
         },
       },
+      isDisabled: {
+        type: Boolean,
+        get() {
+          let hasErrors = this.instance.computed_unsuppressed_errors();
+          return hasErrors || this.attr('loading');
+        },
+      },
     },
     instance: null,
     state: {
