@@ -36,8 +36,8 @@ export default can.Construct.extend({
     let widgets = {};
     let descriptors = {};
 
-    can.each(this.modules, function (module) {
-      can.each(module[pageType], function (descriptor, id) {
+    _.forEach(this.modules, function (module) {
+      _.forEach(module[pageType], function (descriptor, id) {
         if (!widgets[id]) {
           widgets[id] = descriptor;
         } else {
@@ -46,7 +46,7 @@ export default can.Construct.extend({
       });
     });
 
-    can.each(widgets, function (widget, widgetId) {
+    _.forEach(widgets, function (widget, widgetId) {
       let ctrl = widget.content_controller;
       let options = widget.content_controller_options;
 
@@ -83,7 +83,7 @@ export default can.Construct.extend({
       }
     });
 
-    can.each(descriptors, function (descriptor, id) {
+    _.forEach(descriptors, function (descriptor, id) {
       if (!descriptor || descriptor.suppressed) {
         delete descriptors[id];
       }

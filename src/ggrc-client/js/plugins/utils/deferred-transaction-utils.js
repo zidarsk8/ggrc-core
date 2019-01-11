@@ -18,20 +18,20 @@ export default function (completeTransaction, timeout) {
   };
 
   function runBatch(batch) {
-    can.each(batch, function (actionItem) {
+    _.forEach(batch, function (actionItem) {
       actionItem.action();
     });
   }
 
   function resolveBatch(batch, batchDfd, ...result) {
-    can.each(batch, function (actionItem) {
+    _.forEach(batch, function (actionItem) {
       actionItem.deferred.resolve(...result);
     });
     batchDfd.resolve();
   }
 
   function rejectBatch(batch, batchDfd, ...result) {
-    can.each(batch, function (actionItem) {
+    _.forEach(batch, function (actionItem) {
       actionItem.deferred.reject(...result);
     });
     batchDfd.resolve();

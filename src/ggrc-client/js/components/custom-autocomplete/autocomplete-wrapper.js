@@ -65,7 +65,7 @@ export default can.Map.extend({
     let defer = new $.Deferred();
     let queue = new RefreshQueue();
 
-    can.each(result, (object) => {
+    _.forEach(result, (object) => {
       queue.enqueue(object);
     });
 

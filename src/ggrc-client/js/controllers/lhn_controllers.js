@@ -657,13 +657,11 @@ can.Control.extend({
 
     this._show_more_pending = true;
     refreshQueue = new RefreshQueue();
-    newVisibleList =
-
-    resultsList.slice(visibleList.length,
+    newVisibleList = resultsList.slice(visibleList.length,
       visibleList.length + this.options.limit
     );
 
-    can.each(newVisibleList, function (item) {
+    newVisibleList.forEach(function (item) {
       refreshQueue.enqueue(item);
     });
     refreshQueue.trigger().then(function (newItems) {
@@ -683,7 +681,7 @@ can.Control.extend({
       this.options.visible_lists = {};
     }
 
-    can.each(this.get_lists(), function ($list) {
+    this.get_lists().forEach(function ($list) {
       let modelName;
       $list = $($list);
       modelName = self.get_list_model($list);
@@ -695,7 +693,7 @@ can.Control.extend({
   init_list_views: function () {
     let self = this;
 
-    can.each(this.get_lists(), function ($list) {
+    this.get_lists().forEach(function ($list) {
       let modelName;
       $list = $($list);
       modelName = self.get_list_model($list);
@@ -767,7 +765,7 @@ can.Control.extend({
     // Set the new counts
     self.options.counts.attr(searchResult.counts);
 
-    can.each(this.get_lists(), function ($list) {
+    this.get_lists().forEach(function ($list) {
       let modelName;
       let count;
       $list = $($list);
@@ -789,7 +787,7 @@ can.Control.extend({
     let lists = this.get_visible_lists();
     let dfds = [];
 
-    can.each(lists, function (list) {
+    lists.forEach(function (list) {
       let dfd;
       let $list = $(list);
       let modelName = self.get_list_model($list);
@@ -802,7 +800,7 @@ can.Control.extend({
       initialVisibleList =
           self.options.results_lists[modelName].slice(0, self.options.limit);
 
-      can.each(initialVisibleList, function (obj) {
+      initialVisibleList.forEach(function (obj) {
         refreshQueue.enqueue(obj);
       });
 
@@ -868,7 +866,7 @@ can.Control.extend({
 
     if (models.length > 0) {
       // Register that the lists are loaded
-      can.each(models, function (modelName) {
+      models.forEach(function (modelName) {
         self.options.loaded_lists.push(modelName);
       });
 
@@ -894,10 +892,10 @@ can.Control.extend({
 
     if (term !== this.current_term || extraParams !== this.current_params) {
       // Clear current result lists
-      can.each(this.options.results_lists, function (list) {
+      _.forEach(this.options.results_lists, function (list) {
         list.replace([]);
       });
-      can.each(this.options.visible_lists, function (list) {
+      _.forEach(this.options.visible_lists, function (list) {
         list.replace([]);
         list.attr('is_loading', true);
       });
