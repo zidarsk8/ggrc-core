@@ -17,10 +17,10 @@ from ggrc.utils import benchmark
 class CalendarEventBuilder(object):
   """Class with builder methods for CalendarEvent model."""
 
-  TASK_DESCRIPTION_HEADER = u"You have due tasks for today.\n"
+  TASK_DESCRIPTION_HEADER = u"You have following tasks due today:\n"
   TASK_DESCRIPTION_SUMMARY = (
       u"Please click on the link below to review "
-      u"and take action on your task(s) due today.\n"
+      u"and take action on your task(s) due today:\n"
       u"<a href='{link}'>Link</a>")
   TASK_TITLE_TEMPLATE = u"{prefix}Your tasks are due today"
 
