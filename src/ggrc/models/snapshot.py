@@ -14,11 +14,12 @@ from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
+from werkzeug.exceptions import InternalServerError
 
 from ggrc import builder
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, errors
 from ggrc.login import get_current_user_id
 from ggrc.models import mixins
 from ggrc.models import reflection
@@ -335,6 +336,8 @@ def _set_latest_revisions(objects):
   id_map = {(r_type, r_id): id_ for id_, r_type, r_id in query}
   for o in objects:
     o.revision_id = id_map.get((o.child_type, o.child_id))
+    if o.revision_id is None:
+      raise InternalServerError(errors.MISSING_REVISION)
 
 
 event.listen(Session, 'before_flush', handle_post_flush)
