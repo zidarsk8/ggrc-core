@@ -249,34 +249,52 @@ def generate_fields(fields, proposed_content, current_data):
   return diff
 
 
+def _construct_diff(meta, current_content, new_content):
+  return {
+      "fields": generate_fields(
+          meta.fields,
+          new_content,
+          current_content,
+      ),
+      "access_control_list": generate_acl_diff(
+          meta.acrs,
+          new_content.get("access_control_list", []),
+          current_content.get("access_control_list", []),
+      ),
+      "custom_attribute_values": generate_cav_diff(
+          meta.cads,
+          new_content.get("custom_attribute_values", []),
+          current_content.get("custom_attribute_values", []),
+      ),
+      "mapping_fields": generate_single_mappings(
+          meta.mapping_fields,
+          new_content,
+          current_content,
+      ),
+      "mapping_list_fields": generate_list_mappings(
+          meta.mapping_list_fields,
+          new_content,
+          current_content
+      ),
+  }
+
+
 def prepare(instance, content):
   """Prepare content diff for instance and sent content."""
   instance_meta_info = meta_info.MetaInfo(instance)
   current_data = get_latest_revision_content(instance)
-  return {
-      "fields": generate_fields(
-          instance_meta_info.fields,
-          content,
-          current_data,
-      ),
-      "access_control_list": generate_acl_diff(
-          instance_meta_info.acrs,
-          content.get("access_control_list"),
-          current_data.get("access_control_list") or [],
-      ),
-      "custom_attribute_values": generate_cav_diff(
-          instance_meta_info.cads,
-          content.get("custom_attribute_values"),
-          current_data.get("custom_attribute_values") or [],
-      ),
-      "mapping_fields": generate_single_mappings(
-          instance_meta_info.mapping_fields,
-          content,
-          current_data,
-      ),
-      "mapping_list_fields": generate_list_mappings(
-          instance_meta_info.mapping_list_fields,
-          content,
-          current_data
-      ),
-  }
+  return _construct_diff(
+      meta=instance_meta_info,
+      current_content=current_data,
+      new_content=content
+  )
+
+
+def differ(instance_cls, new_content, current_content):
+  """Get diff between two contents of specified type."""
+  instance_meta_info = meta_info.MetaInfo(instance_cls())
+  return _construct_diff(
+      meta=instance_meta_info,
+      current_content=current_content,
+      new_content=new_content
+  )
