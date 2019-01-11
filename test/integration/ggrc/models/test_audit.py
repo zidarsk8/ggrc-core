@@ -5,6 +5,7 @@
 """Tests for Audit model."""
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.utils import errors
 from integration.ggrc import generator
 from integration.ggrc import TestCase, Api
 from integration.ggrc.models import factories
@@ -12,7 +13,7 @@ from integration.ggrc.models import factories
 
 class TestAudit(TestCase):
   """ Test Audit class. """
-
+  # pylint: disable=invalid-name
   def setUp(self):
     super(TestAudit, self).setUp()
     self.api = Api()
@@ -71,6 +72,19 @@ class TestAudit(TestCase):
     self.assertIsNotNone(audit)
     self.assertIsNotNone(program)
     self.assertIsNotNone(relationships)
+
+  def test_control_mapping_missing_revision(self):
+    """Test mapping control with missing revision to audit"""
+    audit = factories.AuditFactory()
+    control = factories.ControlFactory()
+    all_models.Revision.query.filter_by(
+        resource_id=control.id,
+        resource_type=control.type
+    ).delete()
+    db.session.commit()
+    response, _ = self.gen.generate_relationship(audit, control)
+    self.assert500(response)
+    self.assertEqual(response.json, errors.MISSING_REVISION)
 
   def test_delete_audit(self):
     """Check inability to delete audit in relation with assessment template."""

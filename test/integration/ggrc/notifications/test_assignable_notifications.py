@@ -8,9 +8,10 @@
 """Tests for notifications for models with assignable mixin."""
 
 import unittest
-
 from collections import OrderedDict
 from datetime import datetime
+
+import ddt
 from freezegun import freeze_time
 from mock import patch
 from sqlalchemy import and_
@@ -23,6 +24,8 @@ from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Revision
 from ggrc.models import Relationship
+from ggrc.models import all_models
+from ggrc.utils import errors
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper, generator
 from integration.ggrc.models import factories
@@ -736,6 +739,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
       self.assertIn(u"Reopened assessments", content)
 
 
+@ddt.ddt
 class TestAssignableNotificationUsingAPI(TestAssignableNotification):
   """Tests for notifications when interacting with objects through an API."""
 
@@ -1309,3 +1313,97 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
 
     reopened_notifs = self._get_notifications(notif_type="assessment_reopened")
     self.assertEqual(reopened_notifs.count(), 1)
+
+  @ddt.data("/_notifications/send_daily_digest", "nightly_cron_endpoint")
+  @patch("ggrc.notifications.common.send_email")
+  def test_notifications_missing_revision(self, url, send_email):
+    """Test notifications with missing revision"""
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
+    self.import_file("assessment_with_templates.csv")
+
+    asmt = Assessment.query.filter_by(slug="A 1").first()
+    self.api_helper.put(asmt, {"title": "New title"})
+    Revision.query.filter_by(
+        resource_id=asmt.id,
+        resource_type=asmt.type
+    ).delete()
+    db.session.commit()
+    self.client.get(url)
+    _, _, content = send_email.call_args[0]
+    self.assertIn(u"Assessments have been updated", content)
+
+  def test_evidence_notifications_missing_revision(self):
+    """Test evidence notification after adding to assessment
+    with missing revision"""
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
+    self.import_file("assessment_with_templates.csv")
+
+    slug = "A 2"
+    asmt = Assessment.query.filter_by(slug=slug).first()
+    Revision.query.filter_by(
+        resource_id=asmt.id,
+        resource_type=asmt.type
+    ).delete()
+    db.session.commit()
+    expected_evidence_url = u"www.foo-url.bar"
+    evidence_data = dict(
+        title=expected_evidence_url,
+        kind="URL",
+        link=expected_evidence_url,
+    )
+    _, evidence = self.objgen.generate_object(
+        all_models.Evidence,
+        evidence_data
+    )
+    asmt = Assessment.query.filter_by(slug=slug).first()
+    response = self.api_helper.put(asmt, {
+        "actions": {
+            "add_related": [{"id": evidence.id, "type": "Evidence"}]
+        }
+    })
+    self.assert500(response)
+    self.assertEqual(response.json["message"], errors.MISSING_REVISION)
+    url = "/api/assessments/{}/related_objects".format(asmt.id)
+    response = self.client.get(url)
+    self.assert200(response)
+    content = response.json
+    evidence_urls = content["Evidence:URL"]
+    self.assertEqual(len(evidence_urls), 0)
+
+  def test_comment_notifications_missing_revision(self):
+    """Test comment notification after adding to assessment
+    with missing revision"""
+    self.import_file("assessment_template_no_warnings.csv", safe=False)
+    self.import_file("assessment_with_templates.csv")
+
+    slug = "A 1"
+    asmt = Assessment.query.filter_by(slug=slug).first()
+    Revision.query.filter_by(
+        resource_id=asmt.id,
+        resource_type=asmt.type
+    ).delete()
+    db.session.commit()
+    expected_comment = "some comment"
+    asmt = Assessment.query.filter_by(slug=slug).first()
+    request_data = [{
+        "comment": {
+            "description": expected_comment,
+            "send_notification": True,
+            "context": None
+        }
+    }]
+    response = self.api_helper.post(all_models.Comment, request_data)
+    self.assert200(response)
+    comment = all_models.Comment.query.first()
+    response = self.api_helper.put(asmt, {
+        "actions": {
+            "add_related": [{"id": comment.id, "type": "Comment"}]
+        }
+    })
+    self.assert500(response)
+    self.assertEqual(response.json["message"], errors.MISSING_REVISION)
+    url = "/api/assessments/{}/related_objects".format(asmt.id)
+    response = self.client.get(url)
+    self.assert200(response)
+    comments = response.json["Comment"]
+    self.assertEqual(len(comments), 0)
