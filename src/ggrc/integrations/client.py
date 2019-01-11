@@ -13,6 +13,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import urlfetch_errors
 
 from ggrc import settings
+from ggrc.integrations import constants
 from ggrc.integrations import integrations_errors
 
 
@@ -51,17 +52,16 @@ def value_for_http_error(func=None, predicates=None):
 
   @functools.wraps(func)
   def wrapper(*args, **kwargs):
+    """Wrapper for external func."""
     try:
       return func(*args, **kwargs)
-    except integrations_errors.HttpError as e:
-      if e.status not in predicates:
+    except integrations_errors.HttpError as exc:
+      if exc.status not in predicates:
         raise
-      value = predicates[e.status]
+      value = predicates[exc.status]
       if hasattr(value, '__call__'):
         return value()
-      else:
-        return value
-      raise
+      return value
   return wrapper
 
 
@@ -103,7 +103,7 @@ class BaseClient(object):
           payload=payload,
           headers=headers,
           follow_redirects=False,
-          deadline=30,
+          deadline=constants.REQUEST_DEADLINE,
       )
 
       if response.status_code != 200:

@@ -4,9 +4,12 @@
 """Unit tests for client module."""
 # pylint: disable=protected-access
 
+import datetime
 import unittest
 
 import mock
+
+from ggrc.models.hooks.issue_tracker import assessment_integration
 
 from ggrc.integrations.synchronization_jobs import assessment_sync_job
 from ggrc.integrations import integrations_errors, constants
@@ -26,7 +29,9 @@ class BaseClientTest(unittest.TestCase):
         issue_type='bug1',
         issue_priority='P1',
         issue_severity='S1',
-        due_date=None
+        due_date=None,
+        reporter='reporter@example.com',
+        assignee='assignee@example.com'
     )
     issue2_mock = mock.MagicMock(
         issue_tracked_obj=None,
@@ -50,13 +55,16 @@ class BaseClientTest(unittest.TestCase):
       self.assertEquals(actual, {
           't1': {
               'object_id': 1,
-              'component_id': '1',
+              'object': assessment1_mock,
               'state': {
+                  'component_id': '1',
                   'status': 'In Review',
                   'type': 'bug1',
                   'priority': 'P1',
                   'severity': 'S1',
                   'due_date': None,
+                  'reporter': 'reporter@example.com',
+                  'assignee': 'assignee@example.com'
               },
           }
       })
@@ -74,6 +82,9 @@ class BaseClientTest(unittest.TestCase):
                         'type': 'bug1',
                         'priority': 'P1',
                         'severity': 'S1',
+                        'verifier': 'verifier@example.com',
+                        'assignee': 'assignee@example.com',
+                        'reporter': 'reporter@example.com',
                         'custom_fields': [{
                             'name': 'Due Date',
                             'value': '2018-09-13',
@@ -105,6 +116,9 @@ class BaseClientTest(unittest.TestCase):
                   'type': 'bug1',
                   'priority': 'P1',
                   'severity': 'S1',
+                  'verifier': 'verifier@example.com',
+                  'assignee': 'assignee@example.com',
+                  'reporter': 'reporter@example.com',
                   'custom_fields': [{
                       'name': 'Due Date',
                       'value': '2018-09-13',
@@ -118,6 +132,9 @@ class BaseClientTest(unittest.TestCase):
                   'type': 'bug2',
                   'priority': 'P2',
                   'severity': 'S2',
+                  'verifier': None,
+                  'assignee': None,
+                  'reporter': None,
                   'custom_fields': [],
                   'ccs': []
               },
@@ -151,24 +168,18 @@ class BaseClientTest(unittest.TestCase):
     cli_mock.update_issue.side_effect = iter([
         exception,
         exception,
-        exception,
-        exception,
         None,
     ])
     with mock.patch.object(sync_utils.time, 'sleep') as sleep_mock:
-      sync_utils.update_issue(cli_mock, 1, 'params')
+      sync_utils.update_issue(cli_mock, 5, 'params')
       self.assertEqual(cli_mock.update_issue.call_args_list, [
-          mock.call(1, 'params'),
-          mock.call(1, 'params'),
-          mock.call(1, 'params'),
-          mock.call(1, 'params'),
-          mock.call(1, 'params'),
+          mock.call(5, 'params'),
+          mock.call(5, 'params'),
+          mock.call(5, 'params'),
       ])
       self.assertEqual(sleep_mock.call_args_list, [
-          mock.call(1),
-          mock.call(1),
-          mock.call(1),
-          mock.call(1),
+          mock.call(5),
+          mock.call(5),
       ])
 
   def test_update_issue_with_raise(self):
@@ -200,54 +211,104 @@ class BaseClientTest(unittest.TestCase):
             mock.call(1),
         ])
 
-  def test_sync_issue_tracker_statuses(self):  # pylint: disable=invalid-name
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      "_get_reporter_on_sync",
+      lambda obj, audit_id, reporter_db: "reporter@example.com"
+  )
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      "_get_assignee_on_sync",
+      lambda obj, assessment_id, assignee_db: "assignee@example.com"
+  )
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      "_get_ccs",
+      lambda obj, reporter, assignee, assessment: []
+  )
+  @mock.patch.object(
+      assessment_integration.AssessmentTrackerHandler,
+      '_is_tracker_enabled',
+      lambda obj, audit: True
+  )
+  def test_sync_issue_statuses(self):  # pylint: disable=invalid-name
     """Tests issue synchronization flow."""
+    assessment_in_review = mock.MagicMock(
+        id=1,
+        status='In Review',
+        start_date=datetime.datetime.utcnow()
+    )
+    assessment_not_started = mock.MagicMock(
+        id=2,
+        status='Not Started',
+        start_date=datetime.datetime.utcnow()
+    )
     assessment_issues = {
         '1': {
             'object_id': 1,
+            'object': assessment_in_review,
             'state': {
+                'component_id': '1111',
                 'status': 'In Review',
                 'type': 'BUG1',
                 'priority': 'P1',
                 'severity': 'S1',
                 'due_date': None,
+                'reporter': 'reporter@example.com',
+                'assignee': 'assignee@example.com'
             },
         },
         '2': {
             'object_id': 2,
+            'object': assessment_not_started,
             'state': {
+                'component_id': '1111',
                 'status': 'Not Started',
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
                 'due_date': None,
+                'reporter': 'reporter@example.com',
+                'assignee': 'assignee@example.com'
             },
         },
     }
     batches = [
         {
             1: {
+                'component_id': '1111',
                 'status': 'FIXED',
                 'type': 'BUG1',
                 'priority': 'P1',
                 'severity': 'S1',
                 'custom_fields': [],
+                'reporter': 'reporter@example.com',
+                'assignee': 'assignee@example.com',
+                'ccs': []
             },
         },
         {
             2: {
+                'component_id': '1111',
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
                 'custom_fields': [],
+                'reporter': 'reporter@example.com',
+                'assignee': 'assignee@example.com',
+                'ccs': []
             },
             3: {
+                'component_id': '1111',
                 'status': 'FIXED',
                 'type': 'BUG2',
                 'priority': 'P2',
                 'severity': 'S2',
                 'custom_fields': [],
+                'reporter': 'reporter@example.com',
+                'assignee': 'assignee@example.com',
+                'ccs': []
             },
         },
     ]
@@ -269,28 +330,31 @@ class BaseClientTest(unittest.TestCase):
         iter_calls = sync_utils.iter_issue_batches.call_args_list
         self.assertEqual(len(iter_calls), 1)
         self.assertItemsEqual(iter_calls[0][0][0], ['1', '2'])
-        sync_utils.update_issue.assert_called_once_with(cli_mock, '2', {
+        sync_utils.update_issue.assert_called_with(cli_mock, '2', {
             'status': 'ASSIGNED',
             'type': 'BUG2',
             'priority': 'P2',
             'severity': 'S2',
             'ccs': [],
-            'component_id': None
+            'component_id': 1111,
+            'reporter': 'reporter@example.com',
+            'assignee': 'assignee@example.com',
+            'verifier': 'assignee@example.com'
         })
 
   def test_due_date_equals(self):
     """Due date current and issue tracker equals."""
     custom_fields_payload = [
         {
-            "name": constants.CUSTOM_FIELDS_DUE_DATE,
+            "name": constants.CustomFields.DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
+            "display_string": constants.CustomFields.DUE_DATE
         }
     ]
     custom_fields_issuetracker = [
         {
-            constants.CUSTOM_FIELDS_DUE_DATE: "2018-10-10"
+            constants.CustomFields.DUE_DATE: "2018-10-10"
         },
         {
             "field1": "value1"
@@ -311,15 +375,15 @@ class BaseClientTest(unittest.TestCase):
     """Due date current and issue tracker not equals."""
     custom_fields_payload = [
         {
-            "name": constants.CUSTOM_FIELDS_DUE_DATE,
+            "name": constants.CustomFields.DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
+            "display_string": constants.CustomFields.DUE_DATE
         }
     ]
     custom_fields_issuetracker = [
         {
-            constants.CUSTOM_FIELDS_DUE_DATE: "2018-11-10"
+            constants.CustomFields.DUE_DATE: "2018-11-10"
         },
         {
             "field1": "value1"
@@ -340,10 +404,10 @@ class BaseClientTest(unittest.TestCase):
     """Due date is empty for issue tracker."""
     custom_fields_payload = [
         {
-            "name": constants.CUSTOM_FIELDS_DUE_DATE,
+            "name": constants.CustomFields.DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
+            "display_string": constants.CustomFields.DUE_DATE
         }
     ]
     custom_fields_issuetracker = [
@@ -366,10 +430,10 @@ class BaseClientTest(unittest.TestCase):
     """Custom fields for issue tracker is empty."""
     custom_fields_payload = [
         {
-            "name": constants.CUSTOM_FIELDS_DUE_DATE,
+            "name": constants.CustomFields.DUE_DATE,
             "value": "2018-10-10",
             "type": "DATE",
-            "display_string": constants.CUSTOM_FIELDS_DUE_DATE
+            "display_string": constants.CustomFields.DUE_DATE
         }
     ]
     custom_fields_issuetracker = []
