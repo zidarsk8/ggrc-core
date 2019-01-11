@@ -50,14 +50,10 @@ class TestExportTasks(TestCase):
           task_group_task = factories.TaskGroupTaskFactory(
               task_group=task_group)
           for r_name in role_names:
-            role = all_models.AccessControlRole.query.filter(
-                all_models.AccessControlRole.name == r_name,
-                all_models.AccessControlRole.object_type ==
-                task_group_task.type,
-            ).one()
-            ggrc_factories.AccessControlListFactory(ac_role=role,
-                                                    object=task_group_task,
-                                                    person=person)
+            ggrc_factories.AccessControlPersonFactory(
+                person=person,
+                ac_list=task_group_task.acr_name_acl_map[r_name],
+            )
           cycle_task_group = factories.CycleTaskGroupFactory(
               cycle=cycle, contact=person)
 
@@ -67,13 +63,10 @@ class TestExportTasks(TestCase):
               task_group_task=task_group_task
           )
           for r_name in role_names:
-            role = all_models.AccessControlRole.query.filter(
-                all_models.AccessControlRole.name == r_name,
-                all_models.AccessControlRole.object_type == task.type,
-            ).one()
-            ggrc_factories.AccessControlListFactory(ac_role=role,
-                                                    object=task,
-                                                    person=person)
+            ggrc_factories.AccessControlPersonFactory(
+                person=person,
+                ac_list=task.acr_name_acl_map[r_name],
+            )
           results[task.id] = cycle.slug
     return results
 

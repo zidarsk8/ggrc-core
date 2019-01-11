@@ -47,10 +47,9 @@ class TestExportTasks(TestCase):
           task_group_task = factories.TaskGroupTaskFactory(
               task_group=task_group)
           for r_name in role_names:
-            ggrc_factories.AccessControlListFactory(
-                object=task_group_task,
+            ggrc_factories.AccessControlPersonFactory(
                 person=person,
-                ac_role_id=self.get_role_id_for_obj(task_group_task, r_name)
+                ac_list=task_group_task.acr_name_acl_map[r_name],
             )
           task = factories.CycleTaskGroupObjectTaskFactory(
               cycle=cycle,
@@ -58,10 +57,9 @@ class TestExportTasks(TestCase):
               task_group_task=task_group_task
           )
           for r_name in role_names:
-            ggrc_factories.AccessControlListFactory(
-                object=task,
+            ggrc_factories.AccessControlPersonFactory(
                 person=person,
-                ac_role_id=self.get_role_id_for_obj(task, r_name)
+                ac_list=task.acr_name_acl_map[r_name],
             )
           results[task.id] = cycle_task_group.slug
     return results
