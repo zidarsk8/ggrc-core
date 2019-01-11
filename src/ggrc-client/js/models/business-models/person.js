@@ -7,6 +7,7 @@ import Cacheable from '../cacheable';
 import tracker from '../../tracker';
 import caUpdate from '../mixins/ca-update';
 import Stub from '../stub';
+import {loadPersonProfile} from '../../plugins/utils/user-utils';
 
 export default Cacheable('CMS.Models.Person', {
   root_object: 'person',
@@ -131,5 +132,12 @@ export default Cacheable('CMS.Models.Person', {
         stopFn(true);
         console.warn(`Request on '${url}' failed!`);
       });
+  },
+  form_preload(newObjectForm) {
+    if (newObjectForm) {
+      return $.Deferred().resolve();
+    }
+
+    return loadPersonProfile(this);
   },
 });

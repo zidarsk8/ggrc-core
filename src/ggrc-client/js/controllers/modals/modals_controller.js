@@ -38,6 +38,7 @@ import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
+import '../../components/person-modal/person-modal';
 import {
   bindXHRToButton,
   BUTTON_VIEW_DONE,
