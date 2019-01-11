@@ -6,41 +6,44 @@
 
 from collections import defaultdict
 
-from ddt import data, unpack, ddt
+from ddt import data
+from ddt import ddt
+from ddt import unpack
 
-from integration.ggrc_workflows.models import factories
-from integration.ggrc.models import factories as ggrc_factories
-from integration.ggrc.models.factories import PersonFactory, single_commit
+from ggrc.models import all_models
 from integration.ggrc import TestCase
-
-from ggrc.models.all_models import CycleTaskGroupObjectTask, CycleTaskGroup
+from integration.ggrc.models import factories as ggrc_factories
+from integration.ggrc_workflows.models import factories
 
 
 @ddt
 class TestExportTasks(TestCase):
   """Test imports for basic workflow objects."""
 
-  model = CycleTaskGroup
+  model = all_models.CycleTaskGroup
 
   def setUp(self):
     super(TestExportTasks, self).setUp()
     self.client.get("/login")
     self.headers = {
-        'Content-Type': 'application/json',
         "X-Requested-By": "GGRC",
+        'Content-Type': 'application/json',
         "X-export-view": "blocks",
     }
 
-  def generate_tasks_for_cycle(self, group_count, task_count):
+  @staticmethod
+  def generate_tasks_for_cycle(group_count, task_count):
     """generate number of task groups and task for current task group"""
     role_names = ("Task Assignees", "Task Secondary Assignees")
     results = {}
-    with single_commit():
+    with ggrc_factories.single_commit():
       workflow = factories.WorkflowFactory()
       cycle = factories.CycleFactory(workflow=workflow)
       task_group = factories.TaskGroupFactory(workflow=workflow)
       for idx in range(group_count):
-        person = PersonFactory(name="user for group {}".format(idx))
+        person = ggrc_factories.PersonFactory(
+            name="user for group {}".format(idx)
+        )
         cycle_task_group = factories.CycleTaskGroupFactory(cycle=cycle,
                                                            contact=person)
         for _ in range(task_count):
@@ -48,8 +51,8 @@ class TestExportTasks(TestCase):
               task_group=task_group)
           for r_name in role_names:
             ggrc_factories.AccessControlPersonFactory(
-                person=person,
                 ac_list=task_group_task.acr_name_acl_map[r_name],
+                person=person,
             )
           task = factories.CycleTaskGroupObjectTaskFactory(
               cycle=cycle,
@@ -69,7 +72,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -78,8 +80,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       self.assert_slugs("task title", task.title, [slug])
 
@@ -87,7 +89,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
@@ -97,8 +98,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       self.assert_slugs("group title", task.cycle_task_group.title, [slug])
 
@@ -106,7 +107,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
@@ -117,8 +117,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       due_date_dict[str(task.end_date)].add(slug)
 
@@ -130,7 +130,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -140,8 +139,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       due_date_dict[str(task.cycle_task_group.next_due_date)].add(slug)
 
@@ -153,7 +152,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -162,8 +160,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       self.assert_slugs(
           "group assignee", task.cycle_task_group.contact.email, [slug])
@@ -175,7 +173,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -184,8 +181,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       assignees = list(self.get_persons_for_role_name(task, "Task Assignees"))
       self.assertEqual(1, len(assignees))
@@ -197,7 +194,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack  # pylint: disable=invalid-name
@@ -206,8 +202,8 @@ class TestExportTasks(TestCase):
     generated = self.generate_tasks_for_cycle(group_count, task_count)
     self.assertEqual(bool(group_count), bool(generated))
     for task_id, slug in generated.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       s_assignees = list(
           self.get_persons_for_role_name(task, "Task Secondary Assignees"))
@@ -224,16 +220,16 @@ class TestExportTasks(TestCase):
   @unpack
   def test_filter_by_task_comment(self, cycle_count, task_count):
     """Test filter groups by task comments."""
-    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
     filter_params = {}
+    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
     for task_id, slug in task_cycle_filter.iteritems():
-      task = CycleTaskGroupObjectTask.query.filter(
-          CycleTaskGroupObjectTask.id == task_id
+      task = all_models.CycleTaskGroupObjectTask.query.filter(
+          all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
       comment = "comment for task # {}".format(task_id)
       factories.CycleTaskEntryFactory(
-          cycle_task_group_object_task=task,
           description=comment,
+          cycle_task_group_object_task=task,
       )
       filter_params[comment] = slug
 

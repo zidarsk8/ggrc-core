@@ -232,10 +232,10 @@ class Cycle(roleable.Roleable,
     return super(Cycle, cls).indexed_query().options(
         orm.Load(cls).load_only("next_due_date"),
         orm.Load(cls).subqueryload("cycle_task_group_object_tasks").load_only(
-            "id",
-            "title",
             "end_date",
+            "id",
             "status",
+            "title",
         ),
         orm.Load(cls).subqueryload("cycle_task_groups").load_only(
             "id",
@@ -243,35 +243,33 @@ class Cycle(roleable.Roleable,
             "end_date",
             "next_due_date",
         ),
-        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").subqueryload(
-            "_access_control_list"
-        ).load_only(
+        orm.Load(cls).subqueryload(
+            "cycle_task_group_object_tasks",
+        ).subqueryload("_access_control_list").load_only(
             "ac_role_id",
-        ).subqueryload(
-            "access_control_people"
-        ).load_only(
+        ).subqueryload("access_control_people").load_only(
             "person_id",
         ),
         orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
             "cycle_task_entries"
         ).load_only(
             "description",
-            "id"
+            "id",
         ),
         orm.Load(cls).subqueryload("cycle_task_groups").joinedload(
             "contact"
         ).load_only(
-            "email",
             "name",
-            "id"
+            "email",
+            "id",
         ),
         orm.Load(cls).joinedload("contact").load_only(
-            "email",
             "name",
-            "id"
+            "email",
+            "id",
         ),
         orm.Load(cls).joinedload("workflow").undefer_group(
-            "Workflow_complete"
+            "Workflow_complete",
         ),
     )
 

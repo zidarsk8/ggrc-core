@@ -94,7 +94,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -113,7 +112,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -131,7 +129,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
@@ -155,7 +152,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -178,7 +174,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -199,7 +194,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
@@ -222,7 +216,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
@@ -247,7 +240,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
@@ -274,7 +266,6 @@ class TestExportTasks(TestCase):
       (0, 0),
       (1, 1),
       (2, 1),
-      (2, 1),
       (2, 2),
   )
   @unpack
@@ -298,7 +289,6 @@ class TestExportTasks(TestCase):
       #  (Cycle count, tasks in cycle)
       (0, 0),
       (1, 1),
-      (2, 1),
       (2, 1),
       (2, 2),
   )
