@@ -209,13 +209,7 @@ git clean -df
 Start re-provisioning:
 ```sh
 docker-compose build --pull --no-cache
-```
-
-Because Docker provisioning is done with Dockerfile which can not modify content of a shared volume, you need to enter the container and run one more step to finish the provisioning
-
-```
-docker-compose up -d --force-recreate
-docker exec -it $(docker container ls -f name=ggrccore_cleandev_1 -q -a) su vagrant
+./bin/containers setup
 ```
 
 
