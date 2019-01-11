@@ -295,15 +295,16 @@ class PersonResource(common.ExtendedResource):
         sa.and_(
             all_models.Workflow.is_verification_needed ==
             sa.true(),
-            all_models.CycleTaskGroupObjectTask.status.in_(
-                ['Verified', 'Deprecated']
-            )),
+            all_models.CycleTaskGroupObjectTask.status ==
+            'Verified'
+        ),
         sa.and_(
             all_models.Workflow.is_verification_needed ==
             sa.false(),
-            all_models.CycleTaskGroupObjectTask.status.in_(
-                ['Finished', 'Deprecated']
-    )))
+            all_models.CycleTaskGroupObjectTask.status ==
+            'Finished'
+        )
+    )
 
     tasks_query = base_query.join(
         all_models.Cycle,

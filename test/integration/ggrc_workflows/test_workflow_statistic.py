@@ -187,7 +187,7 @@ class TestPersonResource(TestCase, WithQueryApi):
           'owners': [user_email],
           'task_stat': {
               'counts': {
-                  'completed': 3,
+                  'completed': 2,
                   'overdue': 1,
                   'total': 4
               },
@@ -200,7 +200,7 @@ class TestPersonResource(TestCase, WithQueryApi):
           'owners': workflow1_owners,
           'task_stat': {
               'counts': {
-                  'completed': 2,
+                  'completed': 1,
                   'total': 4,
                   'overdue': 1,
               },
