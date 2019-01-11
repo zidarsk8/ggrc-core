@@ -72,11 +72,11 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
         u') and "Task Due Date"=01/10/2015'
     )
     expected_description = (
-        u"You have due tasks for today.\n"
+        u"You have following tasks due today:\n"
         u"- First task\n"
         u"- Second task\n"
         u"Please click on the link below to review and take action "
-        u"on your task(s) due today.\n"
+        u"on your task(s) due today:\n"
         u"<a href='http://localhost/dashboard#!task&query={link}'>Link</a>"
     ).format(link=urllib.quote(link_not_encoded.encode('utf-8')))
     self.assertEquals(event.description, expected_description)
@@ -194,11 +194,11 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
         u') and "Task Due Date"=01/05/2015'
     )
     expected_description = (
-        u"You have due tasks for today.\n"
+        u"You have following tasks due today:\n"
         u"- First task\n"
         u"- Second task\n"
         u"Please click on the link below to review and take action "
-        u"on your task(s) due today.\n"
+        u"on your task(s) due today:\n"
         u"<a href='http://localhost/dashboard#!task&query={link}'>Link</a>"
     ).format(link=urllib.quote(link_not_encoded.encode('utf-8')))
     self.assertEquals(event.description, expected_description)
