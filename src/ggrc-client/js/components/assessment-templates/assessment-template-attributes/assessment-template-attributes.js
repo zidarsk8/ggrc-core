@@ -47,8 +47,6 @@ export default can.Component.extend({
      *
      * @param {CustomAttributeDefinition} field -
      *   the definition that was removed
-     * @param {jQuery.Element} $el - the source of the event `ev`
-     * @param {jQuery.Event} ev - the onRemove event object
      */
     fieldRemoved: function (field) {
       let idx = _.findIndex(this.fields, {title: field.title});
