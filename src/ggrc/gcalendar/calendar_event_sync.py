@@ -55,7 +55,8 @@ class CalendarEventsSync(object):
           continue
         try:
           if event.id not in event_mappings or not event_mappings[event.id]:
-            self._delete_event(event)
+            if event.is_synced:
+              self._delete_event(event)
             db.session.delete(event)
             continue
           if not event.is_synced:
