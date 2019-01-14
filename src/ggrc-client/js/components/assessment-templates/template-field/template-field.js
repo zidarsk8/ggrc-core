@@ -20,7 +20,6 @@ export default can.Component.extend({
   viewModel: {
     types: [],
     field: null,
-    _EV_FIELD_REMOVED: 'on-remove',
     /*
      * Removes `field` from `fields`
      */
