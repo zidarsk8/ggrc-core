@@ -10,8 +10,6 @@
   let $doc = $(doc);
   let $body = $(body);
 
-  $.migrateMute = true; // turn off console warnings for jQuery-migrate
-
   root.calculate_spinner_z_index = function () {
     let zindex = 0;
     $(this).parents().each(function () {
