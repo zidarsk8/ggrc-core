@@ -259,6 +259,7 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(len(notifs), 1)
 
   def assert_asmnt_notifications(self):
+    """Check if Assessment reopen notifications are sent."""
     notifs, _ = common.get_daily_notifications()
     self.assertEqual(len(notifs), 2)
 
@@ -328,6 +329,7 @@ class TestAssessmentNotification(TestCase):
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
       control = factories.ControlFactory()
+    # pylint: disable=expression-not-assigned
     self._create_snapshots(assessment.audit, [control])[0]
     assessment.add_person_with_role_name(user, "Verifiers")
     assessment.status = status
