@@ -36,7 +36,8 @@ export default can.Component.extend({
       });
     },
     menu() {
-      const workflowRelatedTypes = ['TaskGroup', 'Workflow'];
+      const workflowRelatedTypes = ['Cycle', 'CycleTaskGroup',
+        'CycleTaskGroupObjectTask', 'TaskGroup', 'Workflow'];
       const baseWidgetsTypes = can.Map.keys(
         TreeViewConfig.attr('base_widgets_by_type')
       );
