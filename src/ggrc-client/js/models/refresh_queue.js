@@ -3,15 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {reify} from '../plugins/utils/reify-utils';
 import * as businessModels from './business-models';
 import * as serviceModels from './service-models';
 import * as mappingModels from './mapping-models';
 
-const allModels = Object.assign({},
-  businessModels,
-  serviceModels,
-  mappingModels
-);
+const allModels = {
+  ...businessModels,
+  ...serviceModels,
+  ...mappingModels,
+};
 
 /*  RefreshQueue
  *
@@ -244,7 +245,7 @@ const RefreshQueue = can.Construct({
     if (deferreds.length) {
       $.when(...deferreds).then(function () {
         self.deferred.resolve(can.map(self.objects, function (obj) {
-          return obj.reify();
+          return reify(obj);
         }));
       }, function () {
         self.deferred.reject(...arguments);
