@@ -4,8 +4,8 @@
 }}
 
 <div class="hideable-holder">
+{{#instance}}
 <person-modal {instance}="instance" {is-new-instance}="new_object_form">
-  {{#instance}}
   <form action="javascript://">
     {{> /static/mustache/base_objects/form_restore.mustache}}
 
@@ -61,6 +61,6 @@
       </div>
     </div>
   </form>
-  {{/instance}}
 </person-modal>
+{{/instance}}
 </div>
