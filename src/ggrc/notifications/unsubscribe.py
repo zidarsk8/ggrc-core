@@ -1,24 +1,19 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module with functions related to unsubscribing from notifications."""
 
-from cgi import escape as html_escape
 from logging import getLogger
 
 import urllib
-from urlparse import urljoin
+import urlparse
 
-from flask import current_app
+from flask import render_template
 
 from ggrc import db
 from ggrc.models import NotificationConfig
 from ggrc.login import get_current_user
 from ggrc.utils import get_url_root
-from sqlalchemy.exc import SQLAlchemyError  # the base SqlAlchemy exception
-
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -36,26 +31,33 @@ def unsubscribe_from_notifications(email):
   Returns:
     HTTP response indicating the outcome of the action requested.
   """
-
   current_user = get_current_user()
-  if not current_user:
-    # TODO: redirect to login page?
-    return current_app.make_response((u"Not authorized", 401))
+
+  def render_unsubscribe_template(result, msg, status_code=200):
+    return render_template(
+        "unsubscribe/index.haml",
+        result=result.upper(),
+        unsubscribe_message=msg,
+        is_error=status_code == 500
+    ), status_code
 
   if current_user.email != email:
     msg = u"User %s tried to unsubscribe a user other than self (%s)"
     logger.warning(msg, current_user.email, email)
-    return current_app.make_response(
-        (u"Cannot unsubscribe other people", 403))
+    return render_unsubscribe_template(
+        "Not unsubscribed",
+        "Cannot unsubscribe other people",
+        403
+    )
+
+  instance = db.session.query(
+      NotificationConfig
+  ).filter(
+      NotificationConfig.person_id == current_user.id,
+      NotificationConfig.notif_type == "Email_Digest"
+  ).first()
 
   try:
-    instance = db.session.query(
-        NotificationConfig
-    ).filter(
-        (NotificationConfig.person_id == current_user.id) &
-        (NotificationConfig.notif_type == "Email_Digest")
-    ).first()
-
     if instance:
       instance.enable_flag = False
     else:
@@ -66,16 +68,11 @@ def unsubscribe_from_notifications(email):
           modified_by_id=current_user.id,
       )
       db.session.add(instance)
-
     db.session.commit()
-  except SQLAlchemyError:
-    return current_app.make_response(
-        (u"Database error, unsubcribing failed", 500))
-
-  email = html_escape(email)
-  response = current_app.make_response(
-      u"<b>unsubscribed:</b> {}".format(email))
-  return response
+  except Exception as e:  # pylint: disable=broad-except
+    logger.exception(e.message)
+    return render_unsubscribe_template("Unsubscribed Failed", email, 500)
+  return render_unsubscribe_template("You have been unsubscribed", email)
 
 
 def unsubscribe_url(email):
@@ -85,13 +82,13 @@ def unsubscribe_url(email):
     email (basestring): user's email address
 
   Returns:
-    string: generated URL
+    url (string): unsubscribe URL
   """
   if isinstance(email, unicode):
     email = email.encode("utf-8")
 
-  url = urljoin(
+  url = urlparse.urljoin(
       get_url_root(),
-      "unsubscribe/" + urllib.quote_plus(email)
+      "_notifications/unsubscribe/{}".format(urllib.quote_plus(email))
   )
   return url

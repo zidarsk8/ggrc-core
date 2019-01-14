@@ -1,0 +1,42 @@
+-#
+-# Copyright (C) 2019 Google Inc.
+-# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+-#
+!!!
+
+%html{ lang:"en", "class": "no-js" }
+  %head
+    %meta{ content:"text/html; charset=utf-8", 'http-equiv':"Content-Type" }
+    %meta{ charset:"utf-8" }
+    %meta{ content: "width=device-width, initial-scale=1.0", name: "viewport" }
+    -#FIXME: (?) META tags for author, description
+
+    %title
+      -block title
+        Governance, Risk and Compliance
+
+    %link{ rel:'stylesheet', type:'text/css', href:'{{config.get("STYLES_CSS_PATH")}}' }
+    %link{ rel:'stylesheet', type:'text/css', href:'{{config.get("VENDOR_CSS_PATH")}}' }
+
+    %link{ 'href': '={ url_for("static", filename="favicon.ico") }', 'rel':'icon', 'type':'image/x-icon' }
+
+    -if config.get("GOOGLE_ANALYTICS_ID")
+      %script{ type:'text/javascript', async:'async', src:"//www.google-analytics.com/analytics.js" }
+
+  %body
+    .container-fluid.welcome
+        .row-fluid
+          .span12
+            %h1.centered
+              %img{ src:'={ url_for("static", filename="images/ggrc-logo.svg") }', width: '200px' }
+            %h2
+              -if is_error
+                %span{ style: 'color: #b94a48 !important;' }
+                    %i{ class:'fa fa-exclamation-triangle', aria-hidden: 'true' }
+                    {{result}}
+              -else
+                %span
+                    {{result}}
+            %p.centered
+                %span
+                  {{unsubscribe_message}}

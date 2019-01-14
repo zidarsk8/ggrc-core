@@ -1,49 +1,41 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for the daily digest unsubscribe API endpoint."""
 
 from ggrc import db
-from ggrc.models import NotificationConfig, Person
+from ggrc.models import all_models
 from ggrc.notifications.unsubscribe import unsubscribe_url
 
 from integration.ggrc import TestCase
-from integration.ggrc import generator
 from integration.ggrc.api_helper import Api
 
 
+# pylint: disable=invalid-name
 class TestUnsubscribeFromNotifications(TestCase):
   """Tests unsubscribing from notifications."""
-  # pylint: disable=invalid-name
 
   def setUp(self):
     super(TestUnsubscribeFromNotifications, self).setUp()
     self.api = Api()
-    self.obj_generator = generator.ObjectGenerator()
-
-    _, self.admin = self.obj_generator.generate_person(
-        user_role="Administrator")
+    self.client.get("/login")
 
   def test_unsubscribing_not_publicly_allowed(self):
     """Anonymous users should not be allowed to unsubscribe anyone."""
-    admin = Person.query.filter_by(id=self.admin.id).one()
-
-    url = unsubscribe_url(admin.email)
+    self.client.get("/logout")
+    person = all_models.Person.query.first()
+    url = unsubscribe_url(person.email)
     response = self.client.get(url)
-    self.assertEqual(response.status_code, 401)  # HTTP Unauthorized
-    # TODO: should this be a redirect instead?
+    self.assertEqual(response.status_code, 302)
 
   def test_does_not_allow_unsubscribing_other_users(self):
     """Unsubscribing users other than self should results in HTTP 403."""
-    admin = Person.query.filter_by(id=self.admin.id).one()
+    person = all_models.Person.query.first()
 
-    self.api.set_user(admin)
-    url = unsubscribe_url("not-my-" + admin.email)
+    url = unsubscribe_url("not-my-" + person.email)
     response = self.client.get(url)
 
-    self.assertEqual(response.status_code, 403)  # HTTP forbidden
+    self.assertEqual(response.status_code, 403)
 
   def test_unsubscribing_when_explicitly_subscribed(self):
     """Test that users can unsubscribe themselves.
@@ -51,21 +43,23 @@ class TestUnsubscribeFromNotifications(TestCase):
     NOTE: Explicitly subscribed means that there exists a relevant notification
     config entry in database.
     """
-    admin = Person.query.filter_by(id=self.admin.id).one()
+    person = all_models.Person.query.first()
 
-    config = NotificationConfig(
-        person_id=admin.id, notif_type="Email_Digest", enable_flag=True)
+    config = all_models.NotificationConfig(
+        person_id=person.id,
+        notif_type="Email_Digest",
+        enable_flag=True
+    )
     db.session.add(config)
-    db.session.commit()
+    db.session.flush()
 
-    response = self.api.set_user(admin)
-
-    url = unsubscribe_url(admin.email)
+    url = unsubscribe_url(person.email)
     response = self.client.get(url)
-    self.assertEqual(response.status_code, 200)  # HTTP OK
+    self.assert200(response)
 
-    config = NotificationConfig.query.filter_by(
-        person_id=admin.id, notif_type="Email_Digest").first()
+    config = all_models.NotificationConfig.query.filter_by(
+        person_id=person.id, notif_type="Email_Digest"
+    ).first()
     self.assertIsNotNone(config)
     self.assertFalse(config.enable_flag)
 
@@ -76,35 +70,34 @@ class TestUnsubscribeFromNotifications(TestCase):
     notification config entry in database, but unsubscribing such users must
     work, too.
     """
-    admin = Person.query.filter_by(id=self.admin.id).one()
-
-    response = self.api.set_user(admin)
-
-    url = unsubscribe_url(admin.email)
+    person = all_models.Person.query.first()
+    url = unsubscribe_url(person.email)
     response = self.client.get(url)
-    self.assertEqual(response.status_code, 200)  # HTTP OK
+    self.assert200(response)
 
-    config = NotificationConfig.query.filter_by(
-        person_id=admin.id, notif_type="Email_Digest").first()
+    person = all_models.Person.query.first()
+    config = all_models.NotificationConfig.query.filter_by(
+        person_id=person.id, notif_type="Email_Digest"
+    ).first()
     self.assertIsNotNone(config)
     self.assertFalse(config.enable_flag)
 
   def test_unsubscribing_when_already_unsubscribed(self):
     """Test that unsubscribing oneself when unsubscribed yields no error."""
-    admin = Person.query.filter_by(id=self.admin.id).one()
-
-    config = NotificationConfig(
-        person_id=admin.id, notif_type="Email_Digest", enable_flag=False)
+    person = all_models.Person.query.first()
+    config = all_models.NotificationConfig(
+        person_id=person.id,
+        notif_type="Email_Digest",
+        enable_flag=False
+    )
     db.session.add(config)
-    db.session.commit()
-
-    self.api.set_user(admin)
-
-    url = unsubscribe_url(admin.email)
+    db.session.flush()
+    url = unsubscribe_url(person.email)
     response = self.client.get(url)
-    self.assertEqual(response.status_code, 200)  # HTTP OK
+    self.assert200(response)
 
-    config = NotificationConfig.query.filter_by(
-        person_id=admin.id, notif_type="Email_Digest").first()
+    config = all_models.NotificationConfig.query.filter_by(
+        person_id=person.id, notif_type="Email_Digest"
+    ).first()
     self.assertIsNotNone(config)
     self.assertFalse(config.enable_flag)
