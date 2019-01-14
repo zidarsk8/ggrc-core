@@ -9,7 +9,6 @@ import {bindXHRToButton} from '../../plugins/utils/modals';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default ModalsController({
-  pluginName: 'ggrc_controllers_delete',
   defaults: {
     skip_refresh: true,
   },
