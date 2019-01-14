@@ -126,7 +126,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @property
   def title(self):
-    return self.name
+    return self.name or self.email
 
   def is_active(self):
     # pylint: disable=no-self-use
