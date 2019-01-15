@@ -214,6 +214,8 @@ export default can.Component.extend({
     onStateChangeDfd: {},
     formState: {},
     noItemsText: '',
+    currentState: '',
+    previousStatus: undefined,
     initialState: 'Not Started',
     deprecatedState: 'Deprecated',
     assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
@@ -489,27 +491,25 @@ export default can.Component.extend({
       }
 
       this.attr('onStateChangeDfd', $.Deferred());
-
-      if (isUndo) {
-        instance.attr('previousStatus', undefined);
-      } else {
-        instance.attr('previousStatus', instance.attr('status'));
-      }
       this.attr('isUpdatingState', true);
 
       return this.attr('deferredSave').execute(() => {
         if (isUndo) {
-          instance.attr('status', previousStatus);
+          instance.attr('status', this.attr('previousStatus'));
+          this.attr('previousStatus', undefined);
         } else {
+          this.attr('previousStatus', instance.attr('status'));
           instance.attr('status', newStatus);
         }
+      }).then((resp) => {
+        this.attr('isUndoButtonVisible', !isUndo);
+        this.attr('currentState', resp.status);
 
-        if (instance.attr('status') === 'In Review' && !isUndo) {
-          $(document.body).trigger('ajax:flash',
-            {hint: 'The assessment is complete. ' +
-            'The verifier may revert it if further input is needed.'});
+        if (resp.status === 'In Review' && !isUndo) {
+          notifier('info', 'The assessment is complete. ' +
+          'The verifier may revert it if further input is needed.');
         }
-      }).then(() => {
+
         this.attr('onStateChangeDfd').resolve();
         pubsub.dispatch({
           type: 'refetchOnce',
@@ -587,7 +587,6 @@ export default can.Component.extend({
     this.viewModel.initGlobalAttributes();
     this.viewModel.updateRelatedItems();
     this.viewModel.initializeDeferredSave();
-
     this.viewModel.setVerifierRoleId();
   },
   events: {
