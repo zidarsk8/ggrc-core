@@ -84,8 +84,7 @@ export default can.Component.extend({
     getAllRevisions() {
       const instance = this.attr('instance');
       const filter = QueryParser.parse(
-        `resource_type = ${instance.type} AND
-         resource_id = ${instance.id} OR
+        `${instance.type} not_empty_revisions_for ${instance.id} OR
          source_type = ${instance.type} AND
          source_id = ${instance.id} OR
          destination_type = ${instance.type} AND

@@ -312,6 +312,20 @@ describe('QueryParser', function () {
       });
     });
 
+    it('parses not_empty_revisions_for queries', () => {
+      let query = 'Control not_empty_revisions_for 1';
+
+      let result = QueryParser.parse(query);
+
+      expect(result).toEqual({
+        expression: {
+          op: {name: 'not_empty_revisions'},
+          resource_type: 'Control',
+          resource_id: '1',
+        },
+      });
+    });
+
     it('correctly handles escaped symbols inside quotes', function () {
       let queries = [
         'title ~ "test\\\\"',
