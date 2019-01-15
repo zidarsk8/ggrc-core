@@ -3,40 +3,27 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../template-field';
+import Component from './template-field';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('template-field component', function () {
-  'use strict';
-
   let viewModel;
   let pads = new can.Map({
     COMMENT: 0,
     ATTACHMENT: 1,
   });
-  let parentScope;
 
-  beforeAll(function () {
-    parentScope = new can.Map({
-      attr: function () {
-        return {};
-      },
-    });
+  beforeEach(function () {
+    viewModel = getComponentVM(Component);
   });
 
-  describe('denormalize_mandatory() method', function () {
-    let denormalizeMandatory;
-
-    beforeAll(function () {
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      denormalizeMandatory = viewModel.denormalize_mandatory;
-    });
-
+  describe('denormalizeMandatory() method', function () {
     it('returns correct denormalized field', function () {
       let field = new can.Map({
         multi_choice_options: 'foo,bar,baz,bam',
         multi_choice_mandatory: '0,1,2,3',
       });
-      let result = denormalizeMandatory(field, pads);
+      let result = viewModel.denormalizeMandatory(field, pads);
 
       expect(result.length).toEqual(4);
       expect(result[0].attachment).toEqual(false);
@@ -55,7 +42,7 @@ describe('template-field component', function () {
           multi_choice_options: 'one,two,three,four,five',
           multi_choice_mandatory: '0,1,2',
         });
-        let result = denormalizeMandatory(field, pads);
+        let result = viewModel.denormalizeMandatory(field, pads);
 
         expect(result.length).toEqual(5);
         expect(result[0].attachment).toEqual(false);
@@ -76,7 +63,7 @@ describe('template-field component', function () {
         multi_choice_options: 'one,two,three',
         multi_choice_mandatory: '0,1,2,2,0',
       });
-      let result = denormalizeMandatory(field, pads);
+      let result = viewModel.denormalizeMandatory(field, pads);
 
       expect(result.length).toEqual(3);
       expect(result[0].attachment).toEqual(false);
@@ -88,14 +75,7 @@ describe('template-field component', function () {
     });
   });
 
-  describe('normalize_mandatory() method', function () {
-    let normalizeMandatory;
-
-    beforeAll(function () {
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      normalizeMandatory = viewModel.normalize_mandatory;
-    });
-
+  describe('normalizeMandatory() method', function () {
     it('returns correct normalized attrs', function () {
       let attrs = new can.List([
         {attachment: false, comment: false},
@@ -103,7 +83,7 @@ describe('template-field component', function () {
         {attachment: false, comment: true},
         {attachment: true, comment: true},
       ]);
-      let result = normalizeMandatory(attrs, pads);
+      let result = viewModel.normalizeMandatory(attrs, pads);
 
       expect(result).toEqual('0,2,1,3');
     });
@@ -124,9 +104,10 @@ describe('template-field component', function () {
         onRemoveCallback = jasmine.createSpy('onRemoveCallback');
 
         htmlSnippet = [
-          '<template-field ',
-          '  field="fieldDefinition"',
-          '  can-on-remove="callMeOnRemove">',
+          '<template-field',
+          '  {field}="fieldDefinition"',
+          '  {types}="types"',
+          '  (remove)="fieldRemoved">',
           '</template-field>',
         ].join('');
 
@@ -141,10 +122,10 @@ describe('template-field component', function () {
           fieldDefinition: {
             attribute_type: 'Text',
           },
-          callMeOnRemove: onRemoveCallback,
+          fieldRemoved: onRemoveCallback,
         });
 
-        renderer = can.view.mustache(htmlSnippet);
+        renderer = can.mustache(htmlSnippet);
         docFragment = renderer(templateContext);
         $body.append(docFragment);
 

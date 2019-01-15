@@ -3,28 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component, * as Validations from '../add-template-field';
+import Component, * as Validations from './add-template-field';
+import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('add-template-field component', () => {
   describe('addField() method', () => {
-    let addField; // the method under test
-    let $el;
-    let ev;
     let viewModel;
-    let parentScope;
 
     beforeEach(() => {
-      parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      addField = viewModel.addField.bind(viewModel);
-
-      $el = $('<div></div>');
-      ev = {
-        preventDefault: jasmine.createSpy(),
-      };
+      viewModel = getComponentVM(Component);
 
       spyOn(viewModel, 'getValidators').and.returnValue([]);
     });
@@ -37,7 +24,7 @@ describe('add-template-field component', () => {
           values: '',
         });
         viewModel.attr('selected', selectedObj);
-        addField(viewModel, $el, ev);
+        viewModel.addField();
         expect(viewModel.fields.length).toEqual(1);
       }
     );
@@ -48,7 +35,7 @@ describe('add-template-field component', () => {
         values: 'value0 value1',
       });
       viewModel.attr('selected', selectedObj);
-      addField.call(viewModel, viewModel, $el, ev);
+      viewModel.addField();
       expect(viewModel.fields.length).toEqual(1);
     });
     it('requires the "values" field to add a field of type Dropdown', () => {
@@ -58,7 +45,7 @@ describe('add-template-field component', () => {
         values: '',
       });
       viewModel.attr('selected', selectedObj);
-      addField(viewModel, $el, ev);
+      viewModel.addField();
       expect(viewModel.fields.length).toEqual(0);
     });
     it('requires the "values" field to add a field of type Text', () => {
@@ -68,7 +55,7 @@ describe('add-template-field component', () => {
         values: '',
       });
       viewModel.attr('selected', selectedObj);
-      addField(viewModel, $el, ev);
+      viewModel.addField();
       expect(viewModel.fields.length).toEqual(1);
     });
   });
@@ -188,45 +175,33 @@ describe('add-template-field component', () => {
   });
 
   describe('validateValues() method', () => {
-    let validateValues; // the method under test
     let viewModel;
 
     beforeEach(() => {
-      const parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      validateValues = viewModel.validateValues;
+      viewModel = getComponentVM(Component);
     });
 
     it('has to not allow to input type "Dropdown" with not set values', () => {
-      validateValues(viewModel, 'Dropdown', '');
+      viewModel.validateValues('Dropdown', '');
       expect(viewModel.attr('selected.invalidValues')).toBeTruthy();
     });
 
     it('has to allow to input type "Dropdown" with set values', () => {
-      validateValues(viewModel, 'DropDown', 'some values');
+      viewModel.validateValues('DropDown', 'some values');
       expect(viewModel.attr('selected.invalidValues')).toBeFalsy();
     });
 
     it('has to allow to input type "Text" with not set values', () => {
-      validateValues(viewModel, 'Text', '');
+      viewModel.validateValues('Text', '');
       expect(viewModel.attr('selected.invalidValues')).toBeFalsy();
     });
   });
 
   describe('validateTitle() method', () => {
     let viewModel;
-    let validateTitle;
 
     beforeAll(() => {
-      const parentScope = new can.Map({
-        attr: {},
-        fields: [],
-      });
-      viewModel = Component.prototype.viewModel({}, parentScope);
-      validateTitle = viewModel.validateTitle.bind(viewModel);
+      viewModel = getComponentVM(Component);
     });
 
     beforeEach(() => {
@@ -268,7 +243,7 @@ describe('add-template-field component', () => {
       setupSpies('', '');
 
       let validators = viewModel.getValidators('my title', []);
-      validateTitle(validators);
+      viewModel.validateTitle(validators);
 
       expect(getTitleError()).toEqual('');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
@@ -281,7 +256,7 @@ describe('add-template-field component', () => {
       setupSpies('', '');
 
       let validators = viewModel.getValidators('', []);
-      validateTitle(validators);
+      viewModel.validateTitle(validators);
 
       expect(getTitleError()).toEqual('empty val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
@@ -294,7 +269,7 @@ describe('add-template-field component', () => {
       setupSpies('', '');
 
       let validators = viewModel.getValidators('my title', ['my title']);
-      validateTitle(validators);
+      viewModel.validateTitle(validators);
 
       expect(getTitleError()).toEqual('duplicates val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
@@ -308,7 +283,7 @@ describe('add-template-field component', () => {
       setupSpies(expectedMessage, '');
 
       let validators = viewModel.getValidators('new_checkbox', []);
-      validateTitle(validators);
+      viewModel.validateTitle(validators);
 
       expect(getTitleError()).toEqual(expectedMessage);
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
@@ -322,7 +297,7 @@ describe('add-template-field component', () => {
       setupSpies('', expectedMessage);
 
       let validators = viewModel.getValidators('code', []);
-      validateTitle(validators);
+      viewModel.validateTitle(validators);
 
       expect(getTitleError()).toEqual(expectedMessage);
       expect(Validations.isEmptyTitle).toHaveBeenCalled();

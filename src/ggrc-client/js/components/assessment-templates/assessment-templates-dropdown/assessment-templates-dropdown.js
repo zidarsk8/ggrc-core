@@ -3,16 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../dropdown/dropdown';
+import '../../dropdown/dropdown';
 import {
   buildParam,
   batchRequests,
-} from '../../plugins/utils/query-api-utils';
-import template from './assessment_templates.mustache';
-import tracker from '../../tracker';
+} from '../../../plugins/utils/query-api-utils';
+import template from './assessment-templates-dropdown.mustache';
+import tracker from '../../../tracker';
 
 export default can.Component.extend({
-  tag: 'assessment-templates',
+  tag: 'assessment-templates-dropdown',
   template,
   viewModel: {
     responses: [],

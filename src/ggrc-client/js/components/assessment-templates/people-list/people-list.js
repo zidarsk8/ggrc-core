@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/people-list.mustache';
+import template from './people-list.mustache';
 
 export default can.Component.extend({
   tag: 'people-list',
