@@ -39,7 +39,7 @@ export default can.Component.extend({
       }
     });
 
-    binding = Mappings.get_binding(
+    binding = Mappings.getBinding(
       this.viewModel.mapping,
       this.viewModel.parentInstance);
 

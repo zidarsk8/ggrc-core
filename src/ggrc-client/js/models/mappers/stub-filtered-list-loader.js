@@ -19,7 +19,7 @@ import Mappings from './mappings';
         let matchingResults;
 
         if (typeof this.source === 'string') {
-          binding.source_binding = Mappings.get_binding(
+          binding.source_binding = Mappings.getBinding(
             this.source,
             binding.instance);
         } else {

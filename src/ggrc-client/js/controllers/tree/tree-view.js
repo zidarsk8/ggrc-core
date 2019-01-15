@@ -212,9 +212,10 @@ export default TreeLoader({
         // TODO investigate why is this method sometimes called twice
         return undefined; // not ready, will try again
       }
-      this.find_all_deferred = Mappings.get_list_loader(
+      let binding = Mappings.getBinding(
         this.options.mapping,
         this.options.parent_instance);
+      this.find_all_deferred = binding.refresh_list();
     } else if (this.options.list_loader) {
       this.find_all_deferred =
         this.options.list_loader(this.options.parent_instance);

@@ -53,7 +53,7 @@ import Mappings from './mappings';
         }
 
         if (typeof this.source === 'string') {
-          binding.source_binding = Mappings.get_binding(
+          binding.source_binding = Mappings.getBinding(
             this.source,
             binding.instance);
         } else {

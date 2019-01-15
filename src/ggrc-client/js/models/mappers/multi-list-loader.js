@@ -20,7 +20,7 @@ import Mappings from './mappings';
       }
 
       _.forEach(this.sources, function (source) {
-        let sourceBinding = Mappings.get_binding(source, binding.instance);
+        let sourceBinding = Mappings.getBinding(source, binding.instance);
         if (source) {
           binding.source_bindings.push(sourceBinding);
           self.init_source_listeners(binding, sourceBinding);

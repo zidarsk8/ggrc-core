@@ -248,9 +248,9 @@ export default can.Construct.extend({
     object - a string representing the object type's shortName
 
     return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by mapping name
-    Example: Mappings.get_mappings_for('Program')
+    Example: Mappings.getMappingsFor('Program')
   */
-  get_mappings_for: function (object) {
+  getMappingsFor: function (object) {
     let mappings = {};
     if (this.config[object]) {
       _.forEach(this.config[object], function (mapping, mappingName) {
@@ -282,25 +282,25 @@ export default can.Construct.extend({
     }
     return mappings;
   },
-  get_mapper: function (mappingName, type) {
+  getMapper: function (mappingName, type) {
     let mapper;
-    let mappers = this.get_mappings_for(type);
+    let mappers = this.getMappingsFor(type);
     if (mappers) {
       mapper = mappers[mappingName];
       return mapper;
     }
   },
-  _get_binding_attr: function (mapper) {
+  _getBindingAttr: function (mapper) {
     if (typeof (mapper) === 'string') {
       return '_' + mapper + '_binding';
     }
   },
   // checks if binding exists without throwing debug statements
-  // modeled after what get_binding is doing
-  has_binding: function (mapper, model) {
+  // modeled after what getBinding is doing
+  hasBinding: function (mapper, model) {
     let binding;
     let mapping;
-    let bindingAttr = this._get_binding_attr(mapper);
+    let bindingAttr = this._getBindingAttr(mapper);
 
     if (bindingAttr) {
       binding = model[bindingAttr];
@@ -308,7 +308,7 @@ export default can.Construct.extend({
 
     if (!binding) {
       if (typeof (mapper) === 'string') {
-        mapping = this.get_mapper(mapper, model.constructor.shortName);
+        mapping = this.getMapper(mapper, model.constructor.shortName);
         if (!mapping) {
           return false;
         }
@@ -319,10 +319,10 @@ export default can.Construct.extend({
 
     return true;
   },
-  get_binding: function (mapper, model) {
+  getBinding: function (mapper, model) {
     let mapping;
     let binding;
-    let bindingAttr = this._get_binding_attr(mapper);
+    let bindingAttr = this._getBindingAttr(mapper);
 
     if (bindingAttr) {
       binding = model[bindingAttr];
@@ -331,7 +331,7 @@ export default can.Construct.extend({
     if (!binding) {
       if (typeof (mapper) === 'string') {
       // Lookup and attach named mapper
-        mapping = this.get_mapper(mapper, model.constructor.shortName);
+        mapping = this.getMapper(mapper, model.constructor.shortName);
         if (!mapping) {
           console.warn(
             `No such mapper: ${model.constructor.shortName}.${mapper}`);
@@ -350,10 +350,6 @@ export default can.Construct.extend({
       }
     }
     return binding;
-  },
-  get_list_loader: function (name, model) {
-    let binding = this.get_binding(name, model);
-    return binding.refresh_list();
   },
   /*
     return all possible indirectly mapped models for an object type.

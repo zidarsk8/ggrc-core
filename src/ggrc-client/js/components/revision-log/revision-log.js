@@ -770,7 +770,7 @@ export default can.Component.extend({
       currentAssignees = _.groupBy(
         _.flattenDeep(_.map(assigneeList, function (assignableType) {
           return _.map(
-            Mappings.get_binding(assignableType.mapping, instance).list,
+            Mappings.getBinding(assignableType.mapping, instance).list,
             function (person) {
               return {
                 id: person.instance.id,

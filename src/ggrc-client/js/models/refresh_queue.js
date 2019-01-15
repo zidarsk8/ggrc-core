@@ -161,8 +161,8 @@ const RefreshQueue = can.Construct({
         refreshQueue.enqueue(next, force);
         deferred = refreshQueue.trigger();
       } else if (instance.get_binding) {
-        next = Mappings.get_binding(prop, instance);
-        hasBinding = Mappings.has_binding(prop, instance);
+        next = Mappings.getBinding(prop, instance);
+        hasBinding = Mappings.hasBinding(prop, instance);
 
         if (!hasBinding) {
           dfd.reject({

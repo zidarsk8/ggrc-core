@@ -36,7 +36,7 @@ import Mappings from './mappings';
       if (this.source_binding) {
         binding.source_binding = this.source_binding;
       } else {
-        binding.source_binding = Mappings.get_binding(
+        binding.source_binding = Mappings.getBinding(
           this.source,
           binding.instance);
       }
