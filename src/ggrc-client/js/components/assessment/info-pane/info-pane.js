@@ -62,7 +62,7 @@ import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubsub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
-import {notifier} from '../../../plugins/utils/notifiers-utils';
+import {notifier, notifierXHR} from '../../../plugins/utils/notifiers-utils';
 import Evidence from '../../../models/business-models/evidence';
 import * as businessModels from '../../../models/business-models';
 
@@ -475,6 +475,7 @@ export default can.Component.extend({
       let isUndo = event.undo;
       let newStatus = event.state;
       let instance = this.attr('instance');
+      let status = instance.attr('status');
       let initialState = this.attr('initialState');
       let deprecatedState = this.attr('deprecatedState');
       let isArchived = instance.attr('archived');
@@ -482,11 +483,6 @@ export default can.Component.extend({
       let stopFn = tracker.start(instance.type,
         tracker.USER_JOURNEY_KEYS.INFO_PANE,
         tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
-      const resetStatusOnConflict = (object, xhr) => {
-        if (xhr && xhr.status === 409 && xhr.remoteObject) {
-          instance.attr('status', xhr.remoteObject.status);
-        }
-      };
 
       if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
         return $.Deferred().resolve();
@@ -520,7 +516,14 @@ export default can.Component.extend({
           modelNames: relatedAssessmentsTypes,
         });
         stopFn();
-      }).fail(resetStatusOnConflict).always(() => {
+      }).fail((object, xhr) => {
+        if (xhr && xhr.status === 409 && xhr.remoteObject) {
+          instance.attr('status', xhr.remoteObject.status);
+        } else {
+          instance.attr('status', status);
+          notifierXHR('error')(xhr);
+        }
+      }).always(() => {
         this.attr('isUpdatingState', false);
       });
     },
