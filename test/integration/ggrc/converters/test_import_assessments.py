@@ -219,7 +219,7 @@ class TestAssessmentImport(TestCase):
         "user 2": {"Assignees", "Creators"}
     }
     self._test_assessment_users(asmt_1, users)
-    self.assertEqual(asmt_1.status, all_models.Assessment.START_STATE)
+    self.assertEqual(asmt_1.status, all_models.Assessment.PROGRESS_STATE)
 
     # Test second Assessment line in the CSV file
     asmt_2 = all_models.Assessment.query.filter_by(slug="Assessment 2").first()
