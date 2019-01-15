@@ -19,6 +19,8 @@ class TestFullInstanceContentFased(unittest.TestCase):
   @ddt.data(({}, {}),
             ({'mapping_list_fields': {}}, {'mapping_list_fields': {}}),
             ({'mapping_list_fields': {'object_people': {}}},
+             {'mapping_list_fields': {}}),
+            ({'mapping_list_fields': {'task_group_objects': {}}},
              {'mapping_list_fields': {}}))
   @ddt.unpack
   @mock.patch('flask.g')
