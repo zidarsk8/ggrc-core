@@ -362,26 +362,69 @@ class TestImportExports(TestImportExportBase):
           headers=self.headers)
       self.assert400(response)
 
-  @ddt.data(("Import", "Analysis"),
-            ("Export", "In Progress"))
-  @ddt.unpack
-  def test_import_stop(self, job_type, status):
-    """Test import/export stop"""
+  def test_import_stop(self):
+    """Test import stop"""
     user = all_models.Person.query.first()
     ie1 = factories.ImportExportFactory(
-        job_type=job_type,
-        status=status,
+        job_type="Import",
+        status="Analysis",
         created_at=datetime.now(),
         created_by=user,
         title="test.csv",
-        content="test content")
+        content="test content",
+    )
     response = self.client.put(
-        "/api/people/{}/{}s/{}/stop".format(user.id,
-                                            job_type.lower(),
-                                            ie1.id),
-        headers=self.headers)
+        "/api/people/{}/imports/{}/stop".format(user.id, ie1.id),
+        headers=self.headers
+    )
     self.assert200(response)
     self.assertEqual(json.loads(response.data)["status"], "Stopped")
+
+  def test_export_stop(self):
+    """Test export stop"""
+    user = all_models.Person.query.first()
+    bg_task_name = "test export"
+    instance_name = "test instance"
+    export_op_type = all_models.BackgroundOperationType.query.filter_by(
+        name="export"
+    ).first()
+
+    with factories.single_commit():
+      ie_job = factories.ImportExportFactory(
+          job_type="Export",
+          status="In Progress",
+          created_at=datetime.now(),
+          created_by=user,
+          title="test.csv",
+          content="test content",
+      )
+      bg_task = factories.BackgroundTaskFactory(name=bg_task_name)
+      factories.BackgroundOperationFactory(
+          object_type=ie_job.type,
+          object_id=ie_job.id,
+          bg_task_id=bg_task.id,
+          bg_operation_type=export_op_type,
+      )
+
+    with mock.patch("ggrc.settings.APPENGINE_INSTANCE", new=instance_name):
+      with mock.patch("ggrc.cloud_api.task_queue.delete_task") as delete_task:
+        response = self.client.put(
+            "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+            headers=self.headers
+        )
+        self.assert200(response)
+        self.assertEqual(json.loads(response.data)["status"], "Stopped")
+        task_name = "projects/{}/locations/{}/queues/{}/tasks/{}".format(
+            instance_name, "us-central1", "ggrcImport", bg_task_name
+        )
+        delete_task.assert_called_once_with(task_name)
+        bg_task = all_models.BackgroundTask.query.filter_by(
+            name=bg_task_name
+        ).first()
+        self.assertEqual(
+            bg_task.status,
+            all_models.BackgroundTask.STOPPED_STATUS
+        )
 
   @ddt.data(("Not Started", True),
             ("Blocked", True),

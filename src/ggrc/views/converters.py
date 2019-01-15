@@ -15,6 +15,7 @@ from StringIO import StringIO
 from datetime import datetime
 
 from apiclient.errors import HttpError
+from googleapiclient import errors
 
 import flask
 from flask import current_app
@@ -27,12 +28,13 @@ from werkzeug.exceptions import (
 
 from ggrc import db, utils
 from ggrc.app import app
+from ggrc.cloud_api import task_queue
 from ggrc.converters import get_exportables
 from ggrc.converters.base import ImportConverter, ExportConverter
 from ggrc.converters.import_helper import count_objects, \
     read_csv_file, get_export_filename, get_object_column_definitions
 from ggrc.gdrive import file_actions as fa
-from ggrc.models import import_export, background_task
+from ggrc.models import import_export, background_task, all_models
 from ggrc.notifications import job_emails
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.builder import QueryHelper
@@ -167,7 +169,7 @@ def make_export(objects, exportable_objects=None):
   ids_by_type = query_helper.get_ids()
   converter = ExportConverter(
       ids_by_type=ids_by_type,
-      exportable_queries=exportable_objects
+      exportable_queries=exportable_objects,
   )
   csv_data = converter.export_csv_data()
   object_names = "_".join(converter.get_object_names())
@@ -259,6 +261,7 @@ def run_export(task):
 
     job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email,
                           ie.title, ie_id)
+
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Export failed: %s", e.message)
     ie = import_export.get(ie_id)
@@ -419,7 +422,6 @@ def handle_start(ie_job):
 
 def run_background_import(ie_job_id):
   """Run import job in background task."""
-  from ggrc.models import all_models
   background_task.create_task(
       name="import",
       url=flask.url_for(run_import_phases.__name__),
@@ -588,7 +590,6 @@ def handle_export_post(**kwargs):
 
 def run_background_export(ie_job_id, objects, exportable_objects):
   """Run export job in background task."""
-  from ggrc.models import all_models
   background_task.create_task(
       name="export",
       url=flask.url_for(run_export.__name__),
@@ -650,6 +651,9 @@ def handle_export_stop(**kwargs):
     ie_job = import_export.get(kwargs["id2"])
     if ie_job.status == "In Progress":
       ie_job.status = "Stopped"
+      # Stop tasks only on non local instance
+      if getattr(settings, "APPENGINE_INSTANCE", "local") != "local":
+        stop_ie_bg_tasks(ie_job)
       db.session.commit()
       return make_import_export_response(ie_job.log_json())
   except Forbidden:
@@ -659,3 +663,30 @@ def handle_export_stop(**kwargs):
     raise BadRequest(
         app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
   raise BadRequest(app_errors.WRONG_STATUS)
+
+
+def get_ie_bg_tasks(ie_job):
+  """Get BackgroundTasks related to ImportExport job."""
+  return all_models.BackgroundTask.query.join(
+      all_models.BackgroundOperation
+  ).filter(
+      all_models.BackgroundOperation.object_type == ie_job.type,
+      all_models.BackgroundOperation.object_id == ie_job.id,
+  )
+
+
+def stop_ie_bg_tasks(ie_job):
+  """Stop background tasks related to ImportExport job."""
+  bg_tasks = get_ie_bg_tasks(ie_job)
+  for task in bg_tasks:
+    try:
+      task_queue.stop_bg_task(task.name, "ggrcImport")
+    except errors.HttpError as err:
+      if err.resp.status == 404:
+        logger.warning(
+            "Task '%s' wasn't found in queue. It will be stopped.",
+            task.name
+        )
+      else:
+        raise err
+    task.status = all_models.BackgroundTask.STOPPED_STATUS
