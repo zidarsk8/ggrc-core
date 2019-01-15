@@ -114,7 +114,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("AssessmentTemplate", "Assessment Template", "off"),
   )
   @ddt.unpack
-  def test_import_enabled_update_succeed(self, model, model_name, value):
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_import_enabled_update_succeed(self, model, model_name, value, _):
     """Test {0} integration state {1} set correctly when updated via import."""
     with factories.single_commit():
       factory = factories.get_model_factory(model)
@@ -134,7 +135,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self._assert_integration_state(obj, value)
 
   @ddt.data("on", "off")
-  def test_enabled_state_issue_create_succeed(self, value):
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  def test_enabled_state_issue_create_succeed(self, value, _):
     """Test Issue integration state set correctly during create via import."""
     response = self.import_data(OrderedDict([
         ("object_type", "Issue"),
@@ -149,7 +151,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self._assert_integration_state(obj, value)
 
   @ddt.data("on", "off")
-  def test_enabled_state_assmt_create_succeed(self, value):
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  def test_enabled_state_assmt_create_succeed(self, value, _):
     """Test Assessment integration state set correctly during create."""
     audit = factories.AuditFactory()
     response = self.import_data(OrderedDict([
