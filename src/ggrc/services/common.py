@@ -585,6 +585,7 @@ class Resource(ModelView):
 
   @utils.validate_mimetype("application/json")
   def put(self, id):  # pylint: disable=redefined-builtin
+    """PUT operation handler."""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -680,6 +681,7 @@ class Resource(ModelView):
       flask.g.referenced_object_stubs = {obj.type: {obj.id}}
 
   def delete(self, id):  # pylint: disable=redefined-builtin
+    """DELETE operation handler."""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
