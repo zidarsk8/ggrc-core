@@ -19,6 +19,7 @@ export default can.Component.extend({
       <i class="fa fa-trash"></i>
       Delete
     </span>`,
+  leakScope: true,
   viewModel: {
     define: {
       instance: {
