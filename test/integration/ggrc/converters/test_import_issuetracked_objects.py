@@ -748,3 +748,31 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = all_models.Issue.query.one()
     self.assertTrue(obj.issue_tracker["enabled"])
     create_mock.assert_called_once()
+
+  @ddt.data(*all_models.Assessment.VALID_STATES)
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_generation_allowed_for_assmts(self, status, create_mock):
+    """Test ticket generation allowed for Assessment in {} status"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assmt = factories.AssessmentFactory(status=status, audit=audit)
+      person = factories.PersonFactory()
+      factories.AccessControlPersonFactory(
+          ac_list=assmt.acr_name_acl_map["Verifiers"],
+          person=person,
+      )
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=assmt,
+          enabled=False,
+          issue_id=None,
+      )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assmt.slug),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, {})
+    assmt = all_models.Assessment.query.one()
+    self.assertTrue(assmt.issue_tracker["enabled"])
+    create_mock.assert_called_once()
