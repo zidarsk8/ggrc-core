@@ -9,6 +9,7 @@ from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper
 from integration.ggrc.access_control import acl_helper
+from integration.ggrc.models import factories
 
 
 @ddt.ddt
@@ -24,6 +25,84 @@ class TestAutomappings(TestCase):
         name="Admin",
         object_type="Issue",
     ).one()
+
+  def _login_as(self, user_email):
+    """Helper function to send all further requests as given user."""
+    user = all_models.Person.query.filter(
+        all_models.Person.email == user_email,
+    ).one()
+    self.api.set_user(user)
+    return user
+
+  def _create_audit(self, program, extra_data=None):
+    """Helper function to create audit for given program."""
+    audit_data = {
+        "title": "Some title",
+        "program": {
+            "id": program.id,
+            "type": program.type,
+        },
+        "status": "Planned",
+        "context": None,
+    }
+    if extra_data is not None:
+      audit_data.update(extra_data)
+    response = self.api.post(
+        all_models.Audit, {"audit": audit_data}
+    )
+    self.assertStatus(response, 201)
+    return all_models.Audit.query.get(
+        response.json["audit"]["id"],
+    )
+
+  def _autogenerate_assessment(self, audit, snapshot, extra_data=None):
+    """Helper function to autogenerate assessment on audit from snapshot."""
+    assessment_data = {
+        "_generated": True,
+        "audit": {
+            "id": audit.id,
+            "type": audit.type,
+        },
+        "object": {
+            "id": snapshot.id,
+            "type": snapshot.type,
+        },
+        "context": {
+            "id": audit.context.id,
+            "type": audit.context.type,
+        },
+        "title": "Some title",
+    }
+    if extra_data is not None:
+      assessment_data.update(extra_data)
+    response = self.api.post(
+        all_models.Assessment, {"assessment": assessment_data}
+    )
+    self.assertStatus(response, 201)
+    return all_models.Assessment.query.get(
+        response.json["assessment"]["id"],
+    )
+
+  def _raise_issue(self, assessment, extra_data=None):
+    """Helper function to raise an issue on assessment."""
+    issue_data = {
+        "status": "Draft",
+        "assessment": {
+            "type": assessment.type,
+            "id": assessment.id,
+        },
+        "title": "aa",
+        "context": None,
+    }
+    if extra_data is not None:
+      issue_data.update(extra_data)
+    response = self.api.post(
+        all_models.Issue, {"issue": issue_data}
+    )
+    self.assertStatus(response, 201)
+    return all_models.Issue.query.get(
+        response.json["issue"]["id"],
+    )
 
   @ddt.data(
       "user@example.com",
@@ -67,7 +146,6 @@ class TestAutomappings(TestCase):
     self.assert200(response)
     issue = all_models.Issue.query.first()
     audit = all_models.Audit.query.first()
-    self.assertIsNotNone(issue)
     relationship = all_models.Relationship.find_related(issue, audit)
     self.assertIsNotNone(relationship)
     self.assertEqual(audit.context_id, issue.context_id)
