@@ -53,9 +53,10 @@ owner_read = owner_base + [
     "UserRole",
     "Context",
     "Person",
+    "PersonProfile",
 ]
 
-owner_update = owner_base + [
+owner_delete = owner_base + [
     {
         "type": "Relationship",
         "terms": {
@@ -80,6 +81,10 @@ owner_update = owner_base + [
             "action": "update",
         }
     },
+]
+
+owner_update = owner_delete + [
+    "PersonProfile",
 ]
 
 permissions = {
@@ -192,5 +197,5 @@ permissions = {
         "Review"
     ],
     "update": owner_update,
-    "delete": owner_update,
+    "delete": owner_delete,
 }
