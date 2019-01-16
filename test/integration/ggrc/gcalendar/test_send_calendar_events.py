@@ -6,12 +6,14 @@
 from datetime import date, datetime
 import mock
 from freezegun import freeze_time
+from werkzeug.exceptions import Forbidden
 
 from ggrc.models import all_models
 from ggrc.notifications import common
 from integration.ggrc.gcalendar import BaseCalendarEventTest
 
 
+# pylint: disable=unused-argument
 class TestSendCalendarEvents(BaseCalendarEventTest):
   """Test calendar events builder class."""
 
@@ -22,7 +24,8 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
 
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.calendar_auth")
-  def test_rebuild_existing_event(self, _):
+  @mock.patch("ggrc.rbac.permissions.is_admin", return_value=True)
+  def test_rebuild_existing_event(self, auth_mock, admin_mock):
     """Test rebuild of existing synced Calendar Event."""
     person, task, event = self.setup_person_task_event(date(2015, 1, 5))
     event.last_synced_at = datetime(2015, 1, 5, 12, 0, 0)
@@ -34,7 +37,8 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
 
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.calendar_auth")
-  def test_event_change_date(self, _):
+  @mock.patch("ggrc.rbac.permissions.is_admin", return_value=True)
+  def test_event_change_date(self, auth_mock, admin_mock):
     """Test rebuild calendar event with changed date."""
     person, task, event = self.setup_person_task_event(date(2015, 1, 5))
     event.last_synced_at = datetime(2015, 1, 5, 12, 0, 0)
@@ -49,7 +53,8 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
 
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.calendar_auth")
-  def test_create_event_without_send(self, _):
+  @mock.patch("ggrc.rbac.permissions.is_admin", return_value=True)
+  def test_create_event_without_send(self, auth_mock, admin_mock):
     """Test creation of event."""
     person, task, event = self.setup_person_task_event(date(2015, 1, 5))
     person.profile.send_calendar_events = False
@@ -58,3 +63,11 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
     self.assertEquals(event.needs_sync, False)
     event = self.get_event(person.id, task.end_date)
     self.assertIsNone(event.last_synced_at)
+
+  @mock.patch("ggrc.gcalendar.calendar_api_service"
+              ".CalendarApiService.calendar_auth")
+  @mock.patch("ggrc.rbac.permissions.is_admin", return_value=False)
+  def test_send_events_for_not_admin(self, auth_mock, admin_mock):
+    """Test creation of event."""
+    with self.assertRaises(Forbidden):
+      common.send_calendar_events()
