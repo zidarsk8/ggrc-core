@@ -13,10 +13,11 @@ import json
 import sqlalchemy as sa
 from alembic import op
 
+from ggrc.migrations import utils
 
 # revision identifiers, used by Alembic.
 revision = '077caaf74f6b'
-down_revision = 'dd2a3a987de5'
+down_revision = '26d983e69d78'
 
 
 def upgrade():
@@ -26,9 +27,13 @@ def upgrade():
       sa.text("""
           SELECT id, content
           FROM proposals
-          WHERE instance_type='Control';
+          WHERE instance_type='Control'
+          AND content LIKE '%key_control%'
+          OR content LIKE'%fraud_related%';
           """)).fetchall()
+  ids = []
   for proposal in proposals_to_update:
+    ids.append(proposal.id)
     content = json.loads(proposal.content)
     # modify values for `key_control`
     if 'key_control' in content['fields']:
@@ -47,6 +52,10 @@ def upgrade():
     connection.execute("""
        UPDATE proposals SET content='{}' WHERE id={};
      """.format(json.dumps(content), proposal.id))
+
+  utils.add_to_objects_without_revisions_bulk(
+      connection, ids, "Proposal", action="modified",
+  )
 
 
 def downgrade():
