@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -53,16 +54,21 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
           attendee_id=person.id,
       )
       first_task = wf_factories.CycleTaskGroupObjectTaskFactory(
-          title=u"First task",
+          title=u"unicode ascii title",
           end_date=date(2015, 1, 10),
       )
       second_task = wf_factories.CycleTaskGroupObjectTaskFactory(
-          title=u"Second task",
+          title=u"Â тест",
+          end_date=date(2015, 1, 10),
+      )
+      third_task = wf_factories.CycleTaskGroupObjectTaskFactory(
+          title="some ordinary title",
           end_date=date(2015, 1, 10),
       )
       factories.RelationshipFactory(source=first_task, destination=event)
       factories.RelationshipFactory(source=event, destination=second_task)
-      task_ids = [first_task.id, second_task.id]
+      factories.RelationshipFactory(source=event, destination=third_task)
+      task_ids = [first_task.id, second_task.id, third_task.id]
     self.builder._preload_data()
     self.builder._generate_description_for_event(event, task_ids)
     link_not_encoded = (
@@ -73,8 +79,9 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
     )
     expected_description = (
         u"You have following tasks due today:\n"
-        u"- First task\n"
-        u"- Second task\n"
+        u"- unicode ascii title\n"
+        u"- Â тест\n"
+        u"- some ordinary title\n"
         u"Please click on the link below to review and take action "
         u"on your task(s) due today:\n"
         u"<a href='http://localhost/dashboard#!task&query={link}'>Link</a>"

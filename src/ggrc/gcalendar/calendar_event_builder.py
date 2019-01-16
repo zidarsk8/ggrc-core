@@ -216,11 +216,12 @@ class CalendarEventBuilder(object):
 
   def _generate_description_for_event(self, event, task_ids):
     """Generates CalendarEvent descriptions based on tasks."""
-    titles = ["- {}".format(task.title) for task in self.tasks
+    titles = [u"- {}".format(unicode(task.title)) for task in self.tasks
               if task.id in task_ids]
     event.description = (
         self.TASK_DESCRIPTION_HEADER +
-        "\n".join(titles) + "\n" + self.TASK_DESCRIPTION_SUMMARY.format(
+        u"\n".join(titles) + u"\n" +
+        self.TASK_DESCRIPTION_SUMMARY.format(
             link=utils.get_active_cycle_tasks_url(
                 due_date=event.due_date.strftime('%m/%d/%Y')
             )
