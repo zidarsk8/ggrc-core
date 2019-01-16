@@ -102,6 +102,21 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       "folder",
   ]
 
+  # The app should not pass to the json representation of
+  # relationships to the internal models
+  IGNORED_RELATED_TYPES = ["CalendarEvent"]
+
+  _custom_publish = {
+      "related_sources": lambda obj: [
+          rel.log_json() for rel in obj.related_sources
+          if rel.source_type not in obj.IGNORED_RELATED_TYPES
+      ],
+      "related_destinations": lambda obj: [
+          rel.log_json() for rel in obj.related_destinations
+          if rel.destination_type not in obj.IGNORED_RELATED_TYPES
+      ]
+  }
+
   AUTO_REINDEX_RULES = [
       ft_mixin.ReindexRule("CycleTaskEntry",
                            lambda x: x.cycle_task_group_object_task),
