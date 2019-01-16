@@ -412,6 +412,8 @@ def show_daily_digest_notifications():
 
 def send_calendar_events():
   """Sends calendar events."""
+  if not permissions.is_admin():
+    raise Forbidden()
   error_msg = None
   try:
     with benchmark("Send calendar events"):
