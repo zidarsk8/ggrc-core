@@ -46,6 +46,7 @@ class TestCalendarApiService(unittest.TestCase):
             "timeZone": "UTC",
         },
         "attendees": [{"email": "someuser@example.com"}],
+        "locked": True,
         "sendNotifications": False,
         "guestsCanModify": False,
         "guestsCanInviteOthers": False,
@@ -78,6 +79,10 @@ class TestCalendarApiService(unittest.TestCase):
             "timeZone": "UTC",
         },
         "attendees": [{"email": "someuser@example.com"}],
+        "locked": True,
+        "sendNotifications": False,
+        "guestsCanModify": False,
+        "guestsCanInviteOthers": False,
     }
     self.events_mock.update.assert_called_with(
         calendarId="primary",
