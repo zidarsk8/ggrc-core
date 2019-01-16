@@ -37,7 +37,10 @@ def upgrade():
         UPDATE proposals SET content='{}' WHERE id={};
     """.format(json.dumps(content), proposal.id))
   if ids:
-    utils.add_to_objects_without_revisions_bulk(connection, ids, "Proposal")
+    utils.add_to_objects_without_revisions_bulk(connection,
+                                                ids,
+                                                "Proposal",
+                                                action="modified")
 
 
 def downgrade():
