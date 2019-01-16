@@ -124,7 +124,7 @@ export default can.Component.extend({
         return Revision.findAll(query);
       }.bind(this);
 
-      return can.when(
+      return $.when(
         findAll('resource'), findAll('source'), findAll('destination')
       ).then(function (objRevisions, mappingsSrc, mappingsDest) {
         // manually include people for modified_by since using __include would

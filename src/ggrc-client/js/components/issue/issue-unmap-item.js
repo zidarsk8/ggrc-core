@@ -75,7 +75,7 @@ export default can.Component.extend({
       const auditsQuery = this.buildQuery('Audit');
 
       this.attr('isLoading', true);
-      return can.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
+      return $.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
         .done((snapshotsResponse, auditsResponse) => {
           const snapshots = snapshotsResponse.Snapshot;
           const audits = auditsResponse.Audit;

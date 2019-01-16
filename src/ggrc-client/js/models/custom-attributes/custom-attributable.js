@@ -19,7 +19,7 @@ export default Cacheable('CMS.Models.CustomAttributable', {
     let types = _.orderBy(getCustomAttributableModels(),
       'category', false);
 
-    return can.when(can.map(types, (type, i) => {
+    return $.when(can.map(types, (type, i) => {
       return new this(Object.assign({}, type, {
         id: i,
       }));

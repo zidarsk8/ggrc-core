@@ -104,7 +104,7 @@ const viewModel = {
     let params = this.getParams(id);
 
     this.attr('isLoading', true);
-    can.when(...params.map((param) => {
+    $.when(...params.map((param) => {
       return batchRequests(param.request).then((response) => {
         let objects = response.Snapshot.values.map((item) => toObject(item));
         this.attr(param.type, objects);

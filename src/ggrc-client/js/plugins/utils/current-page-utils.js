@@ -68,7 +68,7 @@ function initMappedInstances() {
     reqParams.push(batchRequests(query));
   });
 
-  return can.when(...reqParams)
+  return $.when(...reqParams)
     .then(function () {
       let response = can.makeArray(arguments);
 
