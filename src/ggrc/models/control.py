@@ -140,12 +140,14 @@ class AssertionCategorized(Categorizable):
     Args:
         values: List of dicts representing `ControlAssertion` objects.
     """
-    new_assertions = [v.get(u'id', False) for v in values]
-    if not all(new_assertions):
+    new_assertions_ids = [v.get(u'id', False) for v in values]
+    if not (new_assertions_ids and all(new_assertions_ids)):
+      # Not all items in `values` contain `id` field.
       raise ValueError("Invalid values for attribute: assertions")
     new_assertions = ControlAssertion.eager_query().filter(
-        ControlAssertion.id.in_(new_assertions)).all()
-    if not new_assertions:
+        ControlAssertion.id.in_(new_assertions_ids)).all()
+    if len(new_assertions) != len(new_assertions_ids):
+      # Not all passed assertion ids are valid.
       raise ValueError("Invalid values for attribute: assertions")
     return new_assertions
 
