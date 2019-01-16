@@ -13,6 +13,7 @@ import json
 import sqlalchemy as sa
 from alembic import op
 
+from ggrc.migrations import utils
 # revision identifiers, used by Alembic.
 revision = 'b295575c706c'
 down_revision = 'dd2a3a987de5'
@@ -27,12 +28,16 @@ def upgrade():
               FROM proposals
               WHERE content LIKE :proposal_content;
               """), proposal_content='%task_group_objects%').fetchall()
+  ids = []
   for proposal in proposals_to_cleanup:
+    ids.append(proposal.id)
     content = json.loads(proposal.content)
     content['mapping_list_fields'].pop('task_group_objects', None)
     connection.execute("""
         UPDATE proposals SET content='{}' WHERE id={};
     """.format(json.dumps(content), proposal.id))
+  if ids:
+    utils.add_to_objects_without_revisions_bulk(connection, ids, "Proposal")
 
 
 def downgrade():
