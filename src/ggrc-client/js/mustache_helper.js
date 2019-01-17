@@ -23,7 +23,6 @@ import {
   buildCountParams,
   batchRequests,
 } from './plugins/utils/query-api-utils';
-import Option from './models/service-models/option';
 import Search from './models/service-models/search';
 import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
@@ -408,38 +407,6 @@ Mustache.registerHelper('with_current_user_as', function (name, options) {
     return options.inverse(options.contexts);
   }
 });
-
-Mustache.registerHelper('option_select',
-  function (object, attrName, role, options) {
-    let selectedOption = object.attr(attrName);
-    let selectedId = selectedOption ? selectedOption.id : null;
-    let optionsDfd = Option.for_role(role);
-    let tabindex = options.hash && options.hash.tabindex;
-    let tagPrefix = 'select class="span12"';
-
-    function getSelectHtml(options) {
-      return [
-        '<select class="span12" model="Option" name="' + attrName + '"',
-        tabindex ? ' tabindex=' + tabindex : '',
-        '>',
-        '<option value=""',
-        !selectedId ? ' selected=selected' : '',
-        '>---</option>',
-        can.map(options, function (option) {
-          return [
-            '<option value="', option.id, '"',
-            selectedId === option.id ? ' selected=selected' : '',
-            '>',
-            option.title,
-            '</option>',
-          ].join('');
-        }).join('\n'),
-        '</select>',
-      ].join('');
-    }
-
-    return deferRender(tagPrefix, getSelectHtml, optionsDfd);
-  });
 
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
