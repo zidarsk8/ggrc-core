@@ -344,11 +344,11 @@ export default Cacheable('CMS.Models.Assessment', {
     let that = this;
 
     if (!href) {
-      return can.Deferred().reject();
+      return $.Deferred().reject();
     }
     if (!this._pending_refresh) {
       this._pending_refresh = {
-        dfd: can.Deferred(),
+        dfd: $.Deferred(),
         fn: _.throttle(function () {
           let dfd = that._pending_refresh.dfd;
           can.ajax({

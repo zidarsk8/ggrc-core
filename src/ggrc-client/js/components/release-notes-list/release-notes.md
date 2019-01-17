@@ -1,8 +1,12 @@
-[//]: <> (updated 12/20/2018)
+[//]: <> (updated 01/17/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.d9jpeh222p9)
+[Calendar events added for tasks (v.1.38.0, 01/17/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.vxhz1afc8gty)
+
+[Added a checkbox in Audit ‘Create screen’ to map snapshots manually (v.1.38.0, 01/17/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.1k1frii91vko)
+
+[Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fyunlkl3iivr)
 
 [You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ypafmrujihtr)
 
@@ -69,6 +73,14 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### Calendar events added for tasks (v.1.38.0, 01/17/2019)
+
+GGRC Workflow Tasks are now integrated with Google Calendar. In order to improve the notification capability of the tool we introduce a Google Calendar integration feature. It provides an ability to track upcoming tasks based on their due dates as google calendar events. Google calendar events are created for all tasks that are due in future and not finished. User will have ability to have an associate calendar event for every workcycle cycle task. The calendar event associated with the task contains the description of task due on that day as well as the “My Task” link.
+
+### Added a checkbox in Audit ‘Create screen’ to map snapshots manually (v.1.38.0, 01/17/2019)
+
+Now it is possible to create an audit without snapshots mapped. For this purpose on ‘Audit Create screen’ should be used a checkbox ‘Manually map snapshots’. This option is available and visible only on Audit ‘Create screen’.
 
 ### Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)
 

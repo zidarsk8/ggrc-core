@@ -116,7 +116,7 @@ describe('SummaryWidgetController', function () {
         },
         setState: jasmine.createSpy(),
         getStatuses: jasmine.createSpy().and
-          .returnValue(new can.Deferred().resolve(raw)),
+          .returnValue(new $.Deferred().resolve(raw)),
         parseStatuses: jasmine.createSpy(),
         drawChart: jasmine.createSpy(),
         prepareLegend: jasmine.createSpy(),

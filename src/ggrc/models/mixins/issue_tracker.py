@@ -91,7 +91,11 @@ class IssueTrackedWithUrl(IssueTracked):
       "issue_severity": "Severity",
       "issue_title": "Issue Title",
       "issue_type": "Issue Type",
-      "enabled": "Integration Enabled",
+      "enabled": {
+          "display_name": "Ticket Tracker Integration",
+          "description": "Turn on integration with Ticket tracker, "
+                         "On / Off options are possible",
+      }
   }
 
 

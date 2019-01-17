@@ -301,7 +301,7 @@ import * as businessModels from '../models/business-models';
         let queryField = this.element.attr('data-query-field') || 'title';
         let queryRelevantType = this.element.attr('data-query-relevant-type');
         let queryRelevantId = this.element.attr('data-query-relevant-id');
-        let dfd = can.Deferred();
+        let dfd = $.Deferred();
         let objName = this.options.searchtypes[0];
         let relevant;
         let filter = {expression: {

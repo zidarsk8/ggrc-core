@@ -6,6 +6,7 @@ from selenium.common import exceptions
 
 from lib import base, decorator
 from lib.constants import locator
+from lib.element import tab_element
 from lib.page import widget_bar, lhn
 from lib.utils import selenium_utils
 
@@ -28,6 +29,8 @@ class UserList(base.Component):
         self._driver, self.locators.BUTTON_HELP)
     self.button_data_export = base.Button(
         self._driver, self.locators.BUTTON_DATA_EXPORT)
+    self.email = base.Label(
+        self._driver, self.locators.EMAIL)
 
   @decorator.wait_for_redirect
   def select_logout(self):
@@ -47,6 +50,11 @@ class UserList(base.Component):
     """
     self.button_admin_dashboard.click()
     return AdminDashboard(self._driver)
+
+  def get_button_icon(self, btn_name):
+    return getattr(self, 'button_' + btn_name). \
+        element.find_element_by_xpath('..'). \
+        find_element_by_class_name('fa').get_attribute('class')
 
 
 class GenericHeader(base.Component):
@@ -121,6 +129,11 @@ class GenericHeader(base.Component):
     self.button_dashboard.click()
     return Dashboard(self._driver)
 
+  def select_all_objects(self):
+    """Clicks "All Objects" button."""
+    self._browser.element(id="allObjectView").click()
+    return AllObjectsDashboard(self._driver)
+
 
 class Header(GenericHeader):
   """Header of page dashboard with navigation to admin panel."""
@@ -134,18 +147,35 @@ class Dashboard(widget_bar.Dashboard, Header):
   """Main dashboard page."""
   # pylint: disable=abstract-method
 
-  def __init__(self, driver=None):
-    super(Dashboard, self).__init__(driver)
-
   def start_workflow(self):
     """Clicks "Start new Workflow" button."""
     self._browser.element(class_name="get-started__list__item",
                           text="Start new Workflow").click()
+
+  @property
+  def is_add_tab_present(self):
+    """Checks presence of Add Tab"""
+    return selenium_utils.is_element_exist(self._driver,
+                                           locator.WidgetBar.BUTTON_ADD)
+
+  def wait_to_be_init(self):
+    """Waits for page object to be initialized."""
+    # Element with class `nav-tabs` appears in DOM at start of panel rendering.
+    # But a class "tab-container_hidden-tabs" that makes it "display: none"
+    #   is removed only at end.
+    self._browser.element(class_name="internav").\
+        wait_until(lambda e: e.present)
 
 
 class AdminDashboard(widget_bar.AdminDashboard, GenericHeader):
   """Admin Dashboard page model."""
   # pylint: disable=abstract-method
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(AdminDashboard, self).__init__(driver)
+    self.tabs = tab_element.Tabs(self._browser, tab_element.Tabs.TOP)
+
+
+class AllObjectsDashboard(widget_bar.AllObjectsDashboard, GenericHeader):
+  """All Objects Dashboard"""
+  # pylint: disable=abstract-method

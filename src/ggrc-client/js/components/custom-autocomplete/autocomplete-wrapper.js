@@ -59,10 +59,10 @@ export default can.Map.extend({
       return getInstance(modelConstructor.shortName, id);
     });
 
-    return new can.Deferred().resolve(res);
+    return new $.Deferred().resolve(res);
   },
   getFullObjects: function (result) {
-    let defer = new can.Deferred();
+    let defer = new $.Deferred();
     let queue = new RefreshQueue();
 
     can.each(result, (object) => {

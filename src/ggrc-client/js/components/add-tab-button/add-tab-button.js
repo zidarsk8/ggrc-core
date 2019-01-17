@@ -36,6 +36,17 @@ const viewModel = can.Map.extend({
           && this.attr('hasHiddenWidgets');
       },
     },
+    filteredWidgets: {
+      get() {
+        let widgetList = this.attr('widgetList');
+
+        return _.filter(widgetList, (widget) => {
+          return this.isNotObjectVersion(widget.internav_display) &&
+            !this.isNotProhibitedMap(widget.model.shortName) &&
+            widget.attr('placeInAddTab');
+        });
+      },
+    },
   },
   instance: null,
   widgetList: null,
@@ -66,16 +77,21 @@ export default can.Component.extend({
   tag: 'add-tab-button',
   template,
   viewModel,
-  helpers: {
-    filterWidgets(widget, options) {
-      if (this.isNotObjectVersion(widget.internav_display) &&
-      !this.isNotProhibitedMap(widget.model.shortName) &&
-      widget.attr('placeInAddTab')) {
-        return options.fn(options.contexts);
-      }
+  events: {
+    // top nav dropdown position
+    '.dropdown-toggle click'(el) {
+      let $dropdown = this.element.find('.dropdown-menu');
+      let leftPos = el.offset().left;
+      let winWidth = $(window).width();
 
-      return options.inverse(options.contexts);
+      if (winWidth - leftPos < 400) {
+        $dropdown.addClass('right-pos');
+      } else {
+        $dropdown.removeClass('right-pos');
+      }
     },
+  },
+  helpers: {
     shouldCreateObject(instance, modelShortName, options) {
       if (modelShortName() === 'Audit' &&
         instance().type === 'Program') {

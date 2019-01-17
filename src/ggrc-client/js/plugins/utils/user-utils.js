@@ -11,41 +11,8 @@ function cacheCurrentUser() {
   Person.model(GGRC.current_user);
 }
 
-let profilePromise;
-
-function loadUserProfile() {
-  if (typeof profilePromise === 'undefined') {
-    profilePromise = can.ajax({
-      type: 'GET',
-      headers: $.extend({
-        'Content-Type': 'application/json',
-      }, {}),
-      url: '/api/people/' + GGRC.current_user.id + '/profile',
-    });
-  }
-
-  return profilePromise;
-}
-
-function updateUserProfile(profile) {
-  let result = can.ajax({
-    type: 'PUT',
-    headers: $.extend({
-      'Content-Type': 'application/json',
-    }, {}),
-    url: '/api/people/' + GGRC.current_user.id + '/profile',
-    data: profile,
-  });
-
-  result.then(() => {
-    profilePromise = undefined;
-  });
-
-  return result;
-}
-
 function getPersonInfo(person) {
-  const dfd = can.Deferred();
+  const dfd = $.Deferred();
   let actualPerson;
 
   if (!person || !person.id) {
@@ -77,7 +44,5 @@ function getPersonInfo(person) {
 
 export {
   cacheCurrentUser,
-  loadUserProfile,
-  updateUserProfile,
   getPersonInfo,
 };

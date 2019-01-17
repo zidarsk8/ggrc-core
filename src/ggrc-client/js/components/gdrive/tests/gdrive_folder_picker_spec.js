@@ -103,7 +103,7 @@ describe('gdrive-folder-picker component', function () {
 
         spyOn(viewModel, 'unsetCurrent');
         spyOn(viewModel, 'unlinkFolder')
-          .and.returnValue(can.Deferred().resolve());
+          .and.returnValue($.Deferred().resolve());
 
         method();
         expect(viewModel.unlinkFolder).toHaveBeenCalled();
@@ -200,7 +200,7 @@ describe('gdrive-folder-picker component', function () {
         viewModel.attr('deferred', false);
 
         spyOn(viewModel, 'setCurrent');
-        spyOn(viewModel, 'linkFolder').and.returnValue(can.Deferred());
+        spyOn(viewModel, 'linkFolder').and.returnValue($.Deferred());
 
         method(element, jasmine.any(Object), pickedFolders);
         expect(viewModel.setCurrent).toHaveBeenCalledWith(folderId);

@@ -196,7 +196,7 @@ export default TreeLoader({
 
   insert_items: function (items) {
     this.options.list.push(...items);
-    return can.Deferred().resolve();
+    return $.Deferred().resolve();
   },
 
   '{list} change': 'update_count',

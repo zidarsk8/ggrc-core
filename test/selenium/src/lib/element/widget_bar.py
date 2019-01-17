@@ -14,21 +14,19 @@ class Tab(base.Tab):
   # pylint: disable=too-few-public-methods
   def __init__(self, driver, _locator_or_element):
     """
+    member_count store count during init
     Args: driver (base.CustomDriver
     """
     super(Tab, self).__init__(driver, _locator_or_element)
-    self.member_count = None
-    self._set_member_count()
+    self.member_count = self.count
 
-  def _set_member_count(self):
-    "Select member count."
+  @property
+  def count(self):
+    """Get current count that displayed in tab."""
     widget_title = selenium_utils.get_when_visible(
         self._driver, self.locator_or_element).text
-    if "(" not in widget_title:
-      self.member_count = int(widget_title)
-    else:
-      self.member_count = int(
-          re.match(regex.WIDGET_TITLE_AND_COUNT, widget_title).group(2))
+    return int(widget_title) if "(" not in widget_title else int(re.match(
+        regex.WIDGET_TITLE_AND_COUNT, widget_title).group(2))
 
 
 class AddWidget(base.Component):

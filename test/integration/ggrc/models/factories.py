@@ -548,6 +548,12 @@ class ProductGroupFactory(TitledFactory):
     model = all_models.ProductGroup
 
 
+class CalendarEventFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.CalendarEvent
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -558,6 +564,7 @@ def get_model_factory(model_name):
       "Assessment": AssessmentFactory,
       "AssessmentTemplate": AssessmentTemplateFactory,
       "Audit": AuditFactory,
+      "CalendarEvent": CalendarEventFactory,
       "Contract": ContractFactory,
       "Control": ControlFactory,
       "Cycle": wf_factories.CycleFactory,

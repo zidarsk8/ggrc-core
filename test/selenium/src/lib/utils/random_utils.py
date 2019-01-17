@@ -1,6 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Generate random stuff."""
+import copy
 import datetime
 import random
 import string
@@ -22,9 +23,10 @@ def get_email(domain=users.DEFAULT_EMAIL_DOMAIN):
   return "{}@{}".format(email_local_part, domain)
 
 
-STANDARD_CHARS = string.ascii_letters + string.punctuation + string.digits
+# STANDARD_CHARS = string.ascii_letters + string.punctuation + string.digits
+STANDARD_CHARS = string.punctuation
 # Part of string after `<` is removed (GGRC-6037)
-STANDARD_CHARS = STANDARD_CHARS.replace("<", "")
+STANDARD_CHARS = STANDARD_CHARS.replace("<", "").replace("'", "")
 
 
 def _current_time():
@@ -37,4 +39,10 @@ def _current_time():
 def get_string(size=15, chars=STANDARD_CHARS):
   """Returns string of size `size` that consists of characters `chars`.
   """
-  return "".join(random.choice(chars) for _ in range(size))
+  chars_copy = copy.deepcopy(chars)
+  array = []
+  for _ in range(size):
+    rand_char = random.choice(chars_copy)
+    chars_copy = chars_copy.replace(rand_char, "")
+    array.append(rand_char)
+  return ''.join(array)

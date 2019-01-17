@@ -52,6 +52,7 @@
             <mapped-counter {instance}="instance"
                             type="Comment"
                             {add-content}="@addContent"
+                            (deferred-update-counter)="addDeferredContent(%event)"
             ></mapped-counter>
             <div class="date">
               <i class="fa fa-clock-o {{#if instance.isOverdue}}red{{else}}color{{/if}}"></i> Due On:

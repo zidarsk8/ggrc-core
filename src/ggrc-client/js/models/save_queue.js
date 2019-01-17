@@ -93,7 +93,7 @@ export default can.Construct({
       let cb = function (single) {
         return function () {
           this.created(single[1][bucket.type]);
-          return can.Deferred().resolve(this);
+          return $.Deferred().resolve(this);
         };
       };
       can.each(objs, function (obj, idx) {

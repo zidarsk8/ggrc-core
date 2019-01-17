@@ -199,28 +199,36 @@ label) require additional checks to be performed on top of all the
 others regular checks, namely the following:
 
 -  The migration works from a clean database,
--  Downgrading and upgrading work on a clean database,
+-  Upgrading works on a clean database,
 -  Migrations work from the current database state on the main
    ``dev`` branch,
 -  Migrations work on a populated database (using the data from the
    ``ggrc-qa`` or ``ggrc-test`` instance).
--  Database state after downgrade is the same as before the upgrade.
-   Before applying a migration do a mysqldump
 
-   .. code-block:: bash
+**(Optional) Database downgrade**
 
-       mysqldump db_name > backup-file.sql
+Downgrade can be complicated so it is not mandatory. If you decide to
+implement it you should be sure that downgrade works correctly after
+db data is changed. Usually it is easier to use backup functionality during
+deploy rather than write downgrade.
 
-   Afterwards do the upgrade and downgrade to the previous state
-   and do autogenerate again:
+Database state after downgrade should be the same as before the upgrade.
+Before applying a migration do a mysqldump
 
-   .. code-block:: bash
+.. code-block:: bash
 
-       alembic <module_name> upgrade <new_revision>
-       alembic <module_name> downgrade <old_revision>
-       mysqldump db_name > backup-file1.sql
+   mysqldump db_name > backup-file.sql
 
-   Compare the two generated backup files, they should be identical.
+Afterwards do the upgrade and downgrade to the previous state
+and do autogenerate again:
+
+.. code-block:: bash
+
+   alembic <module_name> upgrade <new_revision>
+   alembic <module_name> downgrade <old_revision>
+   mysqldump db_name > backup-file1.sql
+
+Compare the two generated backup files, they should be identical.
 
 .. _acceptance-criteria:
 

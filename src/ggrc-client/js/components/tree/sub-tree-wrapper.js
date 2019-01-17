@@ -153,7 +153,7 @@ const viewModel = can.Map.extend({
     if (!models.length) {
       this.attr('directlyItems', []);
       this.attr('notDirectlyItems', []);
-      return can.Deferred().resolve();
+      return $.Deferred().resolve();
     }
 
     const stopFn = tracker.start(parentType,

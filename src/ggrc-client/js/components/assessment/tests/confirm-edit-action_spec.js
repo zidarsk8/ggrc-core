@@ -23,7 +23,7 @@ describe('confirm-edit-action component', function () {
   describe('openEditMode() method', function () {
     describe('if onStateChangeDfd is resolved then ', function () {
       beforeEach(function () {
-        viewModel.attr('onStateChangeDfd', new can.Deferred().resolve());
+        viewModel.attr('onStateChangeDfd', new $.Deferred().resolve());
       });
 
       it('dispatches setEditMode event if instance is in editable state',
@@ -63,19 +63,21 @@ describe('confirm-edit-action component', function () {
     let dfd;
 
     beforeEach(function () {
-      dfd = new can.Deferred();
+      dfd = new $.Deferred();
+
       spyOn(ModalsUtils, 'confirm');
-      spyOn(can, 'Deferred').and.returnValue(dfd);
+      spyOn($, 'Deferred').and.returnValue(dfd);
       spyOn(viewModel, 'dispatch');
       spyOn(viewModel, 'openEditMode');
     });
 
     it('returns promise', function (done) {
       dfd.resolve();
-
-      viewModel.showConfirm().then(function () {
+      spyOn(dfd, 'then').and.callFake(function () {
         done();
       });
+
+      viewModel.showConfirm();
     });
 
     it('initializes confirmation modal with correct options', function () {
@@ -96,6 +98,10 @@ describe('confirm-edit-action component', function () {
       dfd.resolve();
       viewModel.attr('instance.status', 'In Review');
 
+      spyOn(dfd, 'then').and.callFake(function (func) {
+        func();
+      });
+
       viewModel.showConfirm();
 
       expect(viewModel.dispatch).toHaveBeenCalledWith('setInProgress');
@@ -104,6 +110,10 @@ describe('confirm-edit-action component', function () {
     it('opens edit mode if modal has been confirmed', function () {
       dfd.resolve();
       viewModel.attr('instance.status', 'In Review');
+
+      spyOn(dfd, 'then').and.callFake(function (func) {
+        func();
+      });
 
       viewModel.showConfirm();
 

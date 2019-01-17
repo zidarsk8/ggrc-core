@@ -22,7 +22,7 @@ class Assignable(Roleable):
     """Returns assignees.
 
     Returns:
-        A set of assignees.
+        A dict of assignees and their roles.
     """
     assignees = defaultdict(list)
     for person, acl in self.access_control_list:
@@ -30,3 +30,13 @@ class Assignable(Roleable):
         assignees[person].append(acl.ac_role.name)
 
     return assignees
+
+  @property
+  def verifiers(self):
+    """Returns verifiers.
+
+    Returns:
+        A list of Verifiers.
+    """
+    return [person for person, acl in self.access_control_list
+            if acl.ac_role.name == "Verifiers"]

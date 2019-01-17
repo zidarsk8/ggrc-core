@@ -193,10 +193,22 @@ const MAP_OBJECTS = {
  * @event deferredMapObjects
  * @type {object}
  * @property {string} type - Event name.
- * @property {Object[]} objects - Mapped objects.
+ * @property {Stub[]|can.Model.Cacheable[]} objects - Mapped objects (always
+ * contain "id" and "type" fields).
  */
 const DEFERRED_MAP_OBJECTS = {
   type: 'deferredMapObjects',
+};
+
+/**
+ * Refreshes counter of mapped objects.
+ * @event refreshMappedCounter
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} modelType - Type of model.
+ */
+const REFRESH_MAPPED_COUNTER = {
+  type: 'refreshMappedCounter',
 };
 
 export {
@@ -219,4 +231,5 @@ export {
   DOCUMENT_CREATE_FAILED,
   MAP_OBJECTS,
   DEFERRED_MAP_OBJECTS,
+  REFRESH_MAPPED_COUNTER,
 };

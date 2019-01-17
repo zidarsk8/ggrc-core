@@ -35,7 +35,7 @@ describe('repeat-on-button-wrapper component', function () {
 
     beforeEach(function () {
       instance = viewModel.attr('instance');
-      saveDfd = can.Deferred();
+      saveDfd = $.Deferred();
       instance.save = jasmine.createSpy('save')
         .and
         .returnValue(saveDfd);
@@ -70,7 +70,7 @@ describe('repeat-on-button-wrapper component', function () {
     let instance;
     beforeEach(function () {
       instance = viewModel.attr('instance');
-      saveDfd = can.Deferred();
+      saveDfd = $.Deferred();
       instance.save = jasmine.createSpy('save')
         .and
         .returnValue(saveDfd);

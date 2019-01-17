@@ -33,6 +33,7 @@ exports = [
     "CREATE_ISSUE_URL",
     "CREATE_ISSUE_BUTTON_NAME",
     "ASSESSMENT_SHORT_URL_PREFIX",
+    "NOTIFICATION_PREFIX",
     "CHANGE_REQUEST_URL",
 ]  # pylint: disable=invalid-name
 
@@ -55,7 +56,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.37.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.38.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -221,6 +222,10 @@ RISK_ASSESSMENT_URL = os.environ.get(
 )
 ASSESSMENT_SHORT_URL_PREFIX = os.environ.get(
     'GGRC_ASSESSMENT_SHORT_URL_PREFIX',
+    ''
+)
+NOTIFICATION_PREFIX = os.environ.get(
+    'GGRC_NOTIFICATION_PREFIX',
     ''
 )
 

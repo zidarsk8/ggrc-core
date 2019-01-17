@@ -45,7 +45,7 @@ describe('RelatedRevisions component', () => {
 
     beforeEach(() => {
       viewModel.attr('instance', {id: 1, type: 'Risk'});
-      requestDeferred = can.Deferred();
+      requestDeferred = $.Deferred();
       spyOn(viewModel, 'buildRevisionRequest').and.returnValue(requestDeferred);
       spyOn(viewModel, 'setVisibleRevisions');
     });

@@ -6,15 +6,12 @@
 from lib import base, exception
 from lib.constants import locator, objects
 from lib.entities.entities_factory import PeopleFactory
+from lib.page import dashboard
 from lib.page.widget import widget_base
-from lib.utils import selenium_utils
+from lib.utils import date_utils, selenium_utils, string_utils
 
 
-class Widget(base.Widget):
-  """Base class for Admin widgets."""
-
-
-class Events(Widget):
+class Events(dashboard.AdminDashboard):
   """Event widget on Admin Dashboard."""
   _locators = locator.WidgetAdminEvents
 
@@ -22,16 +19,55 @@ class Events(Widget):
     super(Events, self).__init__(driver)
     self.widget_header = base.Label(driver, self._locators.TREE_VIEW_HEADER)
 
-  def get_events(self):
-    """Get list of elements that displayed in Tree View on Event widget."""
-    selenium_utils.get_when_clickable(
-        self._driver, self._locators.FIRST_TREE_VIEW_ITEM)
-    self._browser.elements(class_name="event-owner")[0].element(
-        class_name="person-name").wait_until(lambda e: "@" in e.text)
-    return self._driver.find_elements(*self._locators.TREE_VIEW_ITEMS)
+  def _wait_to_be_init(self):
+    """Wait when all rows will be visible and ppl emails will be loaded into
+    last row.
+    """
+    selenium_utils.wait_for_js_to_load(self._driver)
+    selenium_utils.get_when_all_visible(
+        self._driver, self._locators.TREE_VIEW_ITEMS_W_PPL)
+
+  @property
+  def events(self):
+    """Returns list of EventTreeItems."""
+    self._wait_to_be_init()
+    return [
+        EventTreeItem(el).obj_dict
+        for el in self._browser.elements(css=self._locators.TREE_VIEW_ITEMS)]
+
+  def event_attrs(self, *attr_names):
+    """Get list of attributes for events on the page of Events widget."""
+    return self.events if not attr_names else string_utils.extract_items(
+        self.events, *attr_names)
+
+  @property
+  def paging_buttons(self):
+    """Get navigation buttons on the tab."""
+    self._wait_to_be_init()
+    return self._browser.element(id="events_list").elements(
+        class_name="view-more-paging")
+
+  def _get_btn_by_name(self, btn_name):
+    """Returns buttons by provided name, otherwise None."""
+    return next(btn for btn in self.paging_buttons if btn.text == btn_name)
+
+  def _go_to_page(self, btn_name):
+    """Find navigation button by name on click if such button exists
+    otherwise raise an AttributeError exception.
+    """
+    self._get_btn_by_name(btn_name).click()
+    return self
+
+  def go_to_next_page(self):
+    """Go to next page."""
+    return self._go_to_page("NEXT PAGE")
+
+  def go_to_prev_page(self):
+    """Go to previous page."""
+    return self._go_to_page("PREVIOUS PAGE")
 
 
-class People(Widget):
+class People(dashboard.AdminDashboard):
   """People widget on Admin Dashboard."""
   _locators = locator.WidgetAdminPeople
 
@@ -63,7 +99,7 @@ class People(Widget):
     selenium_utils.wait_for_js_to_load(self._driver)
 
 
-class Roles(Widget):
+class Roles(dashboard.AdminDashboard):
   """Admin roles widget on Admin Dashboard."""
 
   def __init__(self, driver):
@@ -77,7 +113,7 @@ class Roles(Widget):
     return dict([item.text.splitlines() for item in tree_view_items])
 
 
-class CustomRoles(Widget):
+class CustomRoles(dashboard.AdminDashboard):
   """Admin custom roles widget on Admin Dashboard."""
 
   def __init__(self, driver):
@@ -131,3 +167,38 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
 
 class ModalCustomAttributes(widget_base.CustomAttributeModal):
   """Custom attributes modal."""
+
+
+class EventTreeItem(object):
+  """Event item row."""
+  def __init__(self, root_element):
+    self._root_element = root_element
+
+  @property
+  def time(self):
+    """Get event time as datetime."""
+    return date_utils.ui_str_with_zone_to_datetime(
+        self._root_element.element(
+            class_name="event-time").text.replace("on ", ""))
+
+  @property
+  def user_email(self):
+    """Get user email as string."""
+    return self._root_element.element(
+        class_name="event-owner").text.replace("by\n", "")
+
+  @property
+  def actions(self):
+    """Get actions as sorted list of strings."""
+    action_elements = self._root_element.elements(tag_name="strong")
+    return [] if not action_elements else (
+        sorted([action_el.text for action_el in action_elements]))
+
+  @property
+  def obj_dict(self):
+    """Return tree item as dict."""
+    return {
+        "time": self.time,
+        "user_email": self.user_email,
+        "actions": self.actions
+    }

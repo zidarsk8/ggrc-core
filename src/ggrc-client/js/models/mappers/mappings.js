@@ -361,14 +361,6 @@ export default can.Construct.extend({
     let binding = this.get_binding(name, model);
     return binding.refresh_list();
   },
-  get_mapping: function (name, model) {
-    let binding = this.get_binding(name, model);
-    if (binding) {
-      binding.refresh_list();
-      return binding.list;
-    }
-    return [];
-  },
   /*
     return all related mappings from all modules for an object type.
     object - a string representing the object type's shortName

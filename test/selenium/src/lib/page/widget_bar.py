@@ -8,14 +8,17 @@ what is mappable to it.
 from lib import base, factory
 from lib.base import Button
 from lib.constants import locator, element
-from lib.element import widget_bar
-from lib.page.widget import admin_widget
+from lib.element import widget_bar, tab_element
 from lib.utils import selenium_utils
 
 
 class _WidgetBar(base.Component):
   """All widget bars."""
   # pylint: disable=too-few-public-methods
+
+  def __init__(self, driver=None):
+    super(_WidgetBar, self).__init__(driver)
+    self.tabs = tab_element.Tabs(self._browser, tab_element.Tabs.TOP)
 
   def get_active_widget_name(self):
     """In general multiple tabs are open. Get name of active one.
@@ -24,13 +27,18 @@ class _WidgetBar(base.Component):
     active_widget = base.Button(self._driver, locator.WidgetBar.TAB_WIDGET)
     return active_widget.text
 
+  @property
+  def get_visible_tabs(self):
+    """Returns list of all visible tabs"""
+    return [tab for tab in self.tabs.tabs if tab.name != '']
+
 
 class _ObjectWidgetBar(_WidgetBar):
   """Model for Generic object widget bar
  (e.g. each Info Widget is object specific).
  """
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(_ObjectWidgetBar, self).__init__(driver)
     self.tab_info = base.Tab(self._driver, locator.WidgetBar.INFO)
 
@@ -147,40 +155,50 @@ class AdminDashboard(_WidgetBar):
     self.tab_custom_roles = widget_bar.Tab(
         self._driver, locator.WidgetBar.ADMIN_CUSTOM_ROLES)
 
+  @property
+  def _admin_widget_cls(self):
+    """Get imported locally admin_widget to avoid circular import error."""
+    from lib.page.widget import admin_widget
+    return admin_widget
+
   def select_people(self):
     """
     Return: lib.page.widget.admin_widget.People
     """
     self.tab_people.click()
-    return admin_widget.People(self._driver)
+    return self._admin_widget_cls.People(self._driver)
 
   def select_roles(self):
     """
     Return: lib.page.widget.admin_widget.Roles
     """
     self.tab_roles.click()
-    return admin_widget.Roles(self._driver)
+    return self._admin_widget_cls.Roles(self._driver)
 
   def select_events(self):
     """
     Return: lib.page.widget.admin_widget.Events
     """
     self.tab_events.click()
-    return admin_widget.Events(self._driver)
+    return self._admin_widget_cls.Events(self._driver)
 
   def select_custom_attributes(self):
     """
     Return: lib.page.widget.admin_widget.CustomAttributes
     """
     self.tab_custom_attributes.click()
-    return admin_widget.CustomAttributes(self._driver)
+    return self._admin_widget_cls.CustomAttributes(self._driver)
 
   def select_custom_roles(self):
     """
     Return: lib.page.widget.admin_widget.CustomRoles
     """
     self.tab_custom_roles.click()
-    return admin_widget.CustomRoles(self._driver)
+    return self._admin_widget_cls.CustomRoles(self._driver)
+
+
+class AllObjectsDashboard(_WidgetBar):
+  """Widget bar on Admin Dashboard."""
 
 
 class Dashboard(_ObjectWidgetBar):

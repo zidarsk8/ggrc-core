@@ -21,12 +21,12 @@ class PeopleAdminWebUiService(AdminWebUiService):
 
   def __init__(self, driver):
     super(PeopleAdminWebUiService, self).__init__(driver)
-    self.people_tab = self._open_admin_people_tab()
+    self.people_widget = self._open_admin_people_tab()
 
   def create_new_person(self, person):
     """Create new person on Admin People widget
       - Return: lib.entities.entity.PersonEntity"""
-    self.people_tab.click_create_button()
+    self.people_widget.click_create_button()
     self._create_new_person_on_modal(person)
     # refresh page to make newly created person appear on Admin People Widget
     self._driver.refresh()
@@ -50,5 +50,11 @@ class PeopleAdminWebUiService(AdminWebUiService):
   def find_filtered_person(self, person):
     """Find person by email in the list on Admin People widget
       - Return: list of PersonEntities"""
-    self.people_tab.filter_by_name_email_company(person.email)
-    return self.people_tab.get_people()[0]
+    self.people_widget.filter_by_name_email_company(person.email)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return self.people_widget.get_people()[0]
+
+  @property
+  def ppl_count(self):
+    """Get ppl count from tab."""
+    return self.people_widget.tab_people.count

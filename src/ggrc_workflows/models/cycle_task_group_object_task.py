@@ -97,9 +97,25 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
                                                     ["description"]),
       ft_attributes.BooleanFullTextAttr("needs verification",
                                         "is_verification_needed",
-                                        with_template=False),
+                                        with_template=False,
+                                        true_value="Yes", false_value="No"),
       "folder",
   ]
+
+  # The app should not pass to the json representation of
+  # relationships to the internal models
+  IGNORED_RELATED_TYPES = ["CalendarEvent"]
+
+  _custom_publish = {
+      "related_sources": lambda obj: [
+          rel.log_json() for rel in obj.related_sources
+          if rel.source_type not in obj.IGNORED_RELATED_TYPES
+      ],
+      "related_destinations": lambda obj: [
+          rel.log_json() for rel in obj.related_destinations
+          if rel.destination_type not in obj.IGNORED_RELATED_TYPES
+      ]
+  }
 
   AUTO_REINDEX_RULES = [
       ft_mixin.ReindexRule("CycleTaskEntry",
@@ -182,23 +198,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     Returns:
       List of tuples with (related_object_type, related_object_id)
     """
-    rsp = relationship.Relationship
-    related_objs = db.session.query(
-        rsp.destination_type,
-        rsp.destination_id
-    ).filter(
-        rsp.source_id == self.id,
-        rsp.source_type == 'CycleTaskGroupObjectTask'
-    ).union(
-        db.session.query(
-            rsp.source_type,
-            rsp.source_id
-        ).filter(
-            rsp.destination_id == self.id,
-            rsp.destination_type == 'CycleTaskGroupObjectTask'
-        )
-    ).all()
-    return related_objs
+    return [(object_.__class__.__name__, object_.id) for object_ in
+            self.related_objects()]
 
   _api_attrs = reflection.ApiAttributes(
       'cycle',

@@ -45,7 +45,8 @@ EXPORTABLES_MAP = {exportable.__name__: exportable for exportable
                    in get_exportables().values()}
 
 IGNORE_FIELD_IN_TEMPLATE = {
-    "Assessment": {"evidences_file"},
+    "Assessment": {"evidences_file",
+                   "end_date"},
     "Audit": {"evidences_file"},
 }
 
@@ -360,7 +361,7 @@ def init_converter_views():
   @login_required
   def handle_export_csv_template():
     """Calls export csv template handler"""
-    with benchmark("handle export csv templae"):
+    with benchmark("handle export csv template"):
       return handle_export_csv_template_request()
 
   @app.route("/_service/import_csv", methods=["POST"])

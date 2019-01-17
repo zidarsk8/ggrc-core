@@ -71,7 +71,7 @@ describe('issue-unmap-item component', () => {
   describe('processRelatedSnapshots() method', () => {
     beforeEach(() => {
       spyOn(viewModel, 'loadRelatedObjects')
-        .and.returnValue(can.Deferred().resolve());
+        .and.returnValue($.Deferred().resolve());
       spyOn(viewModel, 'showModal');
       spyOn(viewModel, 'unmap');
     });
@@ -113,7 +113,7 @@ describe('issue-unmap-item component', () => {
           total: 1,
         },
       };
-      reqDeferred = can.Deferred();
+      reqDeferred = $.Deferred();
       spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
       spyOn(QueryAPI, 'batchRequests');
       spyOn(can, 'when').and.returnValue(reqDeferred);

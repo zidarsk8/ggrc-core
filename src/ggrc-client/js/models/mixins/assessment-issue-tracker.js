@@ -41,14 +41,14 @@ export default Mixin(
     },
     initIssueTracker() {
       if (!GGRC.ISSUE_TRACKER_ENABLED) {
-        return can.Deferred().reject();
+        return $.Deferred().reject();
       }
 
       if (!this.attr('issue_tracker')) {
         this.attr('issue_tracker', new can.Map({}));
       }
 
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
 
       this.ensureParentAudit().then((audit) => {
         if (audit) {
@@ -63,7 +63,7 @@ export default Mixin(
     },
     ensureParentAudit() {
       const pageInstance = getPageInstance();
-      const dfd = new can.Deferred();
+      const dfd = new $.Deferred();
       if (this.audit) {
         return dfd.resolve(this.audit);
       }

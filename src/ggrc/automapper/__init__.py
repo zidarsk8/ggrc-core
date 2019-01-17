@@ -65,43 +65,43 @@ class AutomapperGenerator(object):
     """Generate Automappings for a given relationship"""
     # pylint: disable=protected-access
     self.auto_mappings = set()
-    with benchmark("Automapping generate_automappings"):
-      # initial relationship is special since it is already created and
-      # processing it would abort the loop so we manually enqueue the
-      # neighborhood
-      src = Stub.from_source(relationship)
-      dst = Stub.from_destination(relationship)
+
+    # initial relationship is special since it is already created and
+    # processing it would abort the loop so we manually enqueue the
+    # neighborhood
+    src = Stub.from_source(relationship)
+    dst = Stub.from_destination(relationship)
+    self._step(src, dst)
+    self._step(dst, src)
+    while self.queue:
+      if len(self.auto_mappings) > self.COUNT_LIMIT:
+        break
+      src, dst = entry = self.queue.pop()
+
+      if {src.type, dst.type} != {"Audit", "Issue"}:
+        # Auditor doesn't have edit (+map) permission on the Audit,
+        # but the Auditor should be allowed to Raise an Issue.
+        # Since Issue-Assessment-Audit is the only rule that
+        # triggers Issue to Audit mapping, we should skip the
+        # permission check for it
+        if not (permissions.is_allowed_update(src.type, src.id, None) and
+                permissions.is_allowed_update(dst.type, dst.id, None)):
+          continue
+
+      created = self._ensure_relationship(src, dst)
+      self.processed.add(entry)
+      if not created:
+        # If the edge already exists it means that auto mappings for it have
+        # already been processed and it is safe to cut here.
+        continue
       self._step(src, dst)
       self._step(dst, src)
-      while self.queue:
-        if len(self.auto_mappings) > self.COUNT_LIMIT:
-          break
-        src, dst = entry = self.queue.pop()
 
-        if {src.type, dst.type} != {"Audit", "Issue"}:
-          # Auditor doesn't have edit (+map) permission on the Audit,
-          # but the Auditor should be allowed to Raise an Issue.
-          # Since Issue-Assessment-Audit is the only rule that
-          # triggers Issue to Audit mapping, we should skip the
-          # permission check for it
-          if not (permissions.is_allowed_update(src.type, src.id, None) and
-                  permissions.is_allowed_update(dst.type, dst.id, None)):
-            continue
-
-        created = self._ensure_relationship(src, dst)
-        self.processed.add(entry)
-        if not created:
-          # If the edge already exists it means that auto mappings for it have
-          # already been processed and it is safe to cut here.
-          continue
-        self._step(src, dst)
-        self._step(dst, src)
-
-      if len(self.auto_mappings) <= self.COUNT_LIMIT:
-        self._flush(relationship)
-      else:
-        logger.error("Automapping limit exceeded: limit=%s, count=%s",
-                     self.COUNT_LIMIT, len(self.auto_mappings))
+    if len(self.auto_mappings) <= self.COUNT_LIMIT:
+      self._flush(relationship)
+    else:
+      logger.error("Automapping limit exceeded: limit=%s, count=%s",
+                   self.COUNT_LIMIT, len(self.auto_mappings))
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
@@ -262,8 +262,9 @@ def register_automapping_listeners():
         del flask.g.referenced_object_stubs
       if hasattr(flask.g, "_request_permissions"):
         del flask.g._request_permissions
-      for obj in relationships:
-        automapper.generate_automappings(obj)
+      with benchmark("Automapping generate_automappings"):
+        for obj in relationships:
+          automapper.generate_automappings(obj)
       automapper.propagate_acl()
       if referenced_objects:
         flask.g.referenced_object_stubs = referenced_objects

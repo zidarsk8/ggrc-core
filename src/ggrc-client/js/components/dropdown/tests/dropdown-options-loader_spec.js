@@ -37,7 +37,7 @@ describe('dropdown-options-loader component', function () {
       },
     ];
 
-    findDfd = can.Deferred();
+    findDfd = $.Deferred();
     TestType = can.Map.extend({
       findAll: jasmine.createSpy('findAll').and.returnValue(findDfd),
       findInCacheById: jasmine.createSpy('findInCacheById')

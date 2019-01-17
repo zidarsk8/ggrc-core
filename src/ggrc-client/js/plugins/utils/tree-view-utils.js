@@ -608,7 +608,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
     models.forEach(function (model) {
       countMap[model] = false;
     });
-    result = can.Deferred().resolve({
+    result = $.Deferred().resolve({
       countsMap: countMap,
       showMore: false,
     });

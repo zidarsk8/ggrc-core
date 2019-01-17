@@ -441,42 +441,6 @@ Mustache.registerHelper('option_select',
     return deferRender(tagPrefix, getSelectHtml, optionsDfd);
   });
 
-Mustache.registerHelper('show_long', function () {
-  return [
-    '<a href="javascript://" class="show-long"',
-    can.view.hook(function (el, parent) {
-      el = $(el);
-
-      let content = el.prevAll('.short');
-      if (content.length) {
-        return !function hide() {
-          // Trigger the "more" toggle if the height is the same as the scrollable area
-          if (el[0].offsetHeight) {
-            if (content[0].offsetHeight === content[0].scrollHeight) {
-              el.trigger('click');
-            }
-          } else {
-            // If there is an open/close toggle, wait until "that" is triggered
-            let root = el.closest('.tree-item');
-            let toggle;
-            if (root.length && !root.hasClass('item-open') &&
-              (toggle = root.find('.openclose')) && toggle.length) {
-              // Listen for the toggle instead of timeouts
-              toggle.one('click', function () {
-                // Delay to ensure all event handlers have fired
-                setTimeout(hide, 0);
-              });
-            } else { // Otherwise just detect visibility
-              setTimeout(hide, 100);
-            }
-          }
-        }();
-      }
-    }),
-    '>...more</a>',
-  ].join('');
-});
-
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
   let frame = new can.Map();
@@ -506,35 +470,6 @@ Mustache.registerHelper('using', function (options) {
   }
 
   return deferRender('span', finish, refreshQueue.trigger());
-});
-
-Mustache.registerHelper('with_mapping', function (binding, options) {
-  let context = arguments.length > 2 ? resolveComputed(options) : this;
-  let frame = new can.Map();
-  let loader;
-
-  if (!context) { // can't find an object to map to.  Do nothing;
-    return;
-  }
-  binding = Mustache.resolve(binding);
-  loader = Mappings.get_binding(binding, context);
-  if (!loader) {
-    return;
-  }
-  frame.attr(binding, loader.list);
-
-  options = arguments[2] || options;
-
-  function finish(list) {
-    return options
-      .fn(options.contexts.add(_.assign({}, frame, {results: list})));
-  }
-  function fail(error) {
-    return options.inverse(options.contexts.add({error: error}));
-  }
-
-  return deferRender('span', {done: finish, fail: fail},
-    loader.refresh_instances());
 });
 
 Mustache.registerHelper('person_roles', function (person, scope, options) {

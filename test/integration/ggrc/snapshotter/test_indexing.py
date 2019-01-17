@@ -15,6 +15,7 @@ from ggrc.snapshotter.indexer import delete_records
 
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 from integration.ggrc.models import factories
+from integration.ggrc_workflows.models import factories as wf_factories
 
 
 def get_records(_audit, _snapshots):
@@ -498,6 +499,27 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     self.client.post("/admin/full_reindex")
     snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
+
+  @ddt.data(
+      (True, "Yes"),
+      (False, "No"),
+      ("1", "Yes"),
+      ("0", "No"),
+      (1, "Yes"),
+      (0, "No"),
+  )
+  @ddt.unpack
+  def test_filter_by_needs_verification(self, value, search_value):
+    """Test index by needs verification {0} value and search_value {1}."""
+    workflow = wf_factories.WorkflowFactory(is_verification_needed=value)
+    cycle = wf_factories.CycleFactory(workflow=workflow,
+                                      is_verification_needed=value)
+    task = wf_factories.CycleTaskGroupObjectTaskFactory(
+        cycle=cycle,
+        title="test_index_{0}_{1}".format(value, search_value)
+    )
+    self.assert_indexed_fields(task, "needs verification",
+                               {"": search_value})
 
   def test_index_deleted_acr(self):
     """Test index by removed ACR."""

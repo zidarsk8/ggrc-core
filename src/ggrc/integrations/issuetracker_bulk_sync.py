@@ -30,9 +30,6 @@ logger = logging.getLogger(__name__)
 WRONG_COMPONENT_ERR = "Component {} does not exist"
 WRONG_HOTLIST_ERR = "No Hotlist with id: {}"
 
-# Email title
-ISSUETRACKER_SYNC_TITLE = "Tickets generation status"
-
 
 class IssueTrackerBulkCreator(object):
   """Class with methods for bulk tickets creation in issuetracker."""
@@ -63,6 +60,8 @@ class IssueTrackerBulkCreator(object):
       'assessments or issues that were not updated.'
   )
   EXCEPTION_TEXT = "Something went wrong, we are looking into it."
+
+  ISSUETRACKER_SYNC_TITLE = "Ticket generation status"
 
   def __init__(self):
     self.break_on_errs = False
@@ -464,7 +463,7 @@ class IssueTrackerBulkCreator(object):
       data["email_text"] = self.SUCCESS_TEXT.format(filename=filename)
       body = settings.EMAIL_BULK_SYNC_SUCCEEDED.render(sync_data=data)
 
-    common.send_email(recipient, ISSUETRACKER_SYNC_TITLE, body)
+    common.send_email(recipient, self.ISSUETRACKER_SYNC_TITLE, body)
 
 
 class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
@@ -488,6 +487,7 @@ class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
       'sufficient access to generate/update the tickets. Here is the list '
       'of assessments or issues that were not updated.'
   )
+  ISSUETRACKER_SYNC_TITLE = "Ticket update status"
 
   @staticmethod
   def get_issuetracked_objects(obj_type, obj_ids):
@@ -630,8 +630,11 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     )
     return allow_func(obj)
 
-  @staticmethod
-  def send_notification(parent_type, parent_id, errors=None, failed=False):
+  def send_notification(self,
+                        parent_type,
+                        parent_id,
+                        errors=None,
+                        failed=False):
     """Send mail notification with information about errors."""
     parent_model = models.get_model(parent_type)
     parent = parent_model.query.get(parent_id)
@@ -652,7 +655,7 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
       body = settings.EMAIL_BULK_CHILD_SYNC_SUCCEEDED.render(sync_data=data)
 
     receiver = login.get_current_user()
-    common.send_email(receiver.email, ISSUETRACKER_SYNC_TITLE, body)
+    common.send_email(receiver.email, self.ISSUETRACKER_SYNC_TITLE, body)
 
 
 class IssuetrackedObjInfo(collections.namedtuple(

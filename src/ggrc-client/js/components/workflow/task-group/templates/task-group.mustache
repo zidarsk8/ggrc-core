@@ -51,20 +51,13 @@
 
       <div class="pane-content">
         {{> /static/mustache/task_groups/tier2_content.mustache}}
-        {{#options}}
         <div class="info-pane__section">
-            {{#with_mapping 'objects' instance}}
-            <div class="info-pane__section-title info-pane__section-title--underlined">
-                Objects (<span>{{objects.length}}</span>)
-                <span class="inline-explanation">Choose objects that tasks will apply to</span>
-            </div>
-            <ul class="tree-structure new-tree">
-                {{#each objects}}
-                    {{>'/static/mustache/base_objects/task_group_subtree.mustache'}}
-                {{/each}}
-                {{>'/static/mustache/base_objects/task_group_subtree_footer.mustache'}}
-            </ul>
-            {{/with_mapping}}
+        {{#if readyToRenderTaskGroupObjects}}
+          <task-group-objects
+            {task-group}="instance"
+            {can-edit}="canEdit"
+          ></task-group-objects>
+        {{/if}}
         </div>
         <div class="info-pane__section">
           <h5 class="info-pane__section-title">
@@ -75,7 +68,6 @@
             {workflow}="workflow"
           ></task-list>
         </div>
-        {{/options}}
       </div>
     </div>
   </div>

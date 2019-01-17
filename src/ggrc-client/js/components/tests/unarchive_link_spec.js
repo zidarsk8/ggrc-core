@@ -17,7 +17,7 @@ describe('unarchive-link component', function () {
     let event;
 
     beforeEach(function () {
-      pendingSave = new can.Deferred();
+      pendingSave = new $.Deferred();
 
       instance = new can.Map({
         save: jasmine.createSpy('save')

@@ -108,6 +108,10 @@
     "no-new": 0,
     "no-console": ["error", {
       "allow": ["warn", "error"]
+    }],
+    "no-restricted-properties": [2, {
+      "object": "can",
+      "property": "Deferred"
     }]
   }
 }

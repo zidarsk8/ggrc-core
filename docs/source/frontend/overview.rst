@@ -441,8 +441,7 @@ Program Flow
 ~~~~~~~~~~~~
 
 Legacy part of client-side logic is implemented in Controls. Much of this logic is
-implemented using asynchronous callbacks via
-`can.Deferred <http://canjs.com/docs/can.Deferred.html>`_.
+implemented using asynchronous callbacks via `$.Deferred`.
 All new features are written in component-based approach.
 
 Error Handling

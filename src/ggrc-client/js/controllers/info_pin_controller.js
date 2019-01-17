@@ -112,7 +112,7 @@ export default can.Control({
   },
   setInstance: function (opts, el, maximizedState) {
     let instance = opts.attr('instance');
-    let infoPaneOpenDfd = can.Deferred();
+    let infoPaneOpenDfd = $.Deferred();
     let isSubtreeItem = opts.attr('options.isSubTreeItem');
 
     opts.attr('options.isDirectlyRelated',
@@ -147,9 +147,6 @@ export default can.Control({
     let vm = this.element.find(selector).viewModel();
 
     vm.attr('instance', instance);
-    vm.attr('instance').dispatch({
-      type: 'update',
-    });
   },
   setLoadingIndicator: function (selector, isLoading) {
     this.element.toggleClass('loading');

@@ -27,11 +27,12 @@ class TestExportImportCoreObjectTemplate(TestCase):
       ('Policy', ('map:standard', 'map:requirement', 'map:contract',
                   'map:regulation'), ('map:policy',)),
       ('Contract', ('map:standard', 'map:requirement', 'map:policy',
-                    'map:regulation'), ('map:contract',))
+                    'map:regulation'), ('map:contract',)),
+      ('Assessment', [], ('Last Deprecated Date',))
   )
   @ddt.unpack
   def test_columns(self, obj_type, expected, not_expected):
-    """Test generation of csv template for object Standard"""
+    """Test generation of csv template for object - {obj_type}"""
     objects = [{"object_name": obj_type}]
 
     response = self.export_csv_template(objects)

@@ -116,7 +116,7 @@ export default can.Component.extend({
       if (refreshQueue.objects.length) {
         return refreshQueue.trigger();
       }
-      return can.Deferred().resolve();
+      return $.Deferred().resolve();
     },
     getRevisions: function (currentRevisionID, newRevisionID) {
       let notCached = [];

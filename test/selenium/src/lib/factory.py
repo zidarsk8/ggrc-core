@@ -74,7 +74,8 @@ def get_cls_widget(object_name, is_info=False, is_admin=False):
   info_widget.'obj_name', if is_admin is True then class
   admin_widget.'tab_element', else class generic_widget.'obj_name'.
   """
-  from lib.page.widget import admin_widget, generic_widget, info_widget
+  from lib.page import dashboard
+  from lib.page.widget import generic_widget, info_widget
   base_cls = None
   if is_info:
     if object_name not in objects.ALL_SNAPSHOTABLE_OBJS:
@@ -84,7 +85,7 @@ def get_cls_widget(object_name, is_info=False, is_admin=False):
     elif object_name == objects.PEOPLE:
       base_cls = info_widget.base.Widget
   elif is_admin:
-    base_cls = admin_widget.Widget
+    base_cls = dashboard.AdminDashboard
   else:
     base_cls = generic_widget.Widget
   return _factory(cls_name=object_name, parent_cls=base_cls)

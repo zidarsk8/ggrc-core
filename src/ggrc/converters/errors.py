@@ -193,3 +193,7 @@ MULTIPLE_ASSIGNEES = (u"Line {line}: Only one assignee (column "
 NO_VALID_USERS_ERROR = (u"Line {line}: Required field '{column_name}' "
                         u"contains not valid users. Only registered users "
                         u"can be assigned to Task Groups.")
+
+NO_VERIFIER_WARNING = (u"Line {line}: Assessment without verifier cannot "
+                       u"be moved to {status} state. "
+                       u"The value will be ignored.")

@@ -171,7 +171,7 @@ describe('object-review component', () => {
     let refeshReviewDfd;
 
     beforeEach(() => {
-      refeshReviewDfd = can.Deferred();
+      refeshReviewDfd = $.Deferred();
       spyOn(Review.prototype, 'refresh').and.returnValue(refeshReviewDfd);
     });
 
@@ -249,7 +249,7 @@ describe('object-review component', () => {
       review = new Review();
       viewModel.attr('review', review);
 
-      changeReviewDfd = can.Deferred();
+      changeReviewDfd = $.Deferred();
       viewModel.changeReviewState = () => changeReviewDfd;
       review.attr('status', 'Unreviewed');
 
@@ -292,7 +292,7 @@ describe('object-review component', () => {
       review = new Review();
       viewModel.attr('review', review);
 
-      changeReviewDfd = can.Deferred();
+      changeReviewDfd = $.Deferred();
       viewModel.changeReviewState = () => changeReviewDfd;
       review.attr('status', 'Reviewed');
 
@@ -334,7 +334,7 @@ describe('object-review component', () => {
       review = new Review();
       viewModel.attr('review', review);
 
-      updateReviewDfd = can.Deferred();
+      updateReviewDfd = $.Deferred();
       viewModel.updateReview = () => updateReviewDfd;
 
       spyOn(viewModel, 'showNotification');
@@ -380,7 +380,7 @@ describe('object-review component', () => {
     let reviewAfterSave;
 
     beforeEach(() => {
-      const saveDfd = new can.Deferred();
+      const saveDfd = new $.Deferred();
 
       currentReview = new Review();
       reviewAfterSave = new Review({status: 'Reviewed'});

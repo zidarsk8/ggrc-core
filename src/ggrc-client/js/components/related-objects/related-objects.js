@@ -89,7 +89,7 @@ export default can.Component.extend({
       return params;
     },
     loadRelatedItems: function () {
-      let dfd = can.Deferred();
+      let dfd = $.Deferred();
       let params = this.getParams();
       this.attr('isLoading', true);
 

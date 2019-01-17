@@ -19,10 +19,10 @@
 </div>
 <div class="selector-list people-selector">
   <ul>
-    {{#options}}
+    {{#rolesList}}
     <li {{ data 'option' }} data-id="{{ id }}">
       <label>
-        {{#if_equals selected_id id}}
+        {{#if_equals selectedOption id}}
           <input type="radio" checked="checked" name="map" rel="tooltip" title="map">
         {{else}}
           <input type="radio" name="map" rel="tooltip" title="map">
@@ -40,6 +40,6 @@
         {{#scope}}<p><strong>Role Scope:</strong> {{role_scope scope}}</p>{{/scope}}
       </div>
     </li>
-    {{/options}}
+    {{/rolesList}}
   </ul>
 </div>

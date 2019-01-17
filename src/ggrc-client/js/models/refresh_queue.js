@@ -6,8 +6,13 @@
 import Mappings from './mappers/mappings';
 import * as businessModels from './business-models';
 import * as serviceModels from './service-models';
+import * as mappingModels from './mapping-models';
 
-const allModels = Object.assign({}, businessModels, serviceModels);
+const allModels = Object.assign({},
+  businessModels,
+  serviceModels,
+  mappingModels
+);
 
 /*  RefreshQueue
  *
@@ -137,7 +142,7 @@ const RefreshQueueManager = can.Construct({}, {
 const RefreshQueue = can.Construct({
   refresh_queue_manager: new RefreshQueueManager(),
   refresh_all: function (instance, props, force) {
-    let dfd = new can.Deferred();
+    let dfd = new $.Deferred();
 
     refreshAll(instance, props, dfd);
     return dfd;
@@ -172,7 +177,7 @@ const RefreshQueue = can.Construct({
         deferred.then(function (refreshedItems) {
           if (nextProps.length) {
             can.each(refreshedItems, function (item) {
-              let df = new can.Deferred();
+              let df = new $.Deferred();
               refreshAll(item, nextProps, df);
               dfds.push(df);
             });

@@ -62,7 +62,7 @@ describe('bulk-update-button component', function () {
         name_singular: 'Some Model',
       });
       resMessage = 'items updated';
-      updateDfd = can.Deferred();
+      updateDfd = $.Deferred();
 
       spyOn(can, 'trigger');
       spyOn(NotifiersUtils, 'notifier');

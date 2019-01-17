@@ -52,11 +52,11 @@ const getRelatedAssessmentsIds = async (filters = relevantToAuditFilter,
   return response[0].Assessment.ids;
 };
 const updateAssessments = (assessments) => {
-  let result = can.Deferred().resolve([]);
+  let result = $.Deferred().resolve([]);
 
   return Array.from(assessments).reduce((dfd, assessment) => {
     return dfd.then((updated) => {
-      let deferred = new can.Deferred();
+      let deferred = new $.Deferred();
 
       assessment.save().then((assessment) => {
         logger.add({

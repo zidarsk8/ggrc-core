@@ -73,6 +73,7 @@ permissions = {
         "Context",
         "UserRole",
         "NotificationConfig",
+        "PersonProfile",
     ],
     "create": [
         "Audit",
@@ -193,6 +194,7 @@ permissions = {
         "UserRole",
         "Context",
         "Review",
+        "PersonProfile",
     ],
     "delete": [
         {
