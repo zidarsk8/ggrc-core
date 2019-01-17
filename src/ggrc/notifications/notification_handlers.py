@@ -21,11 +21,13 @@ from enum import Enum
 
 from sqlalchemy import inspect
 from sqlalchemy.sql.expression import true
+from werkzeug.exceptions import InternalServerError
 
 from ggrc import db
 from ggrc import notifications
 from ggrc.services import signals
 from ggrc import models
+from ggrc.utils import errors
 from ggrc.models.mixins.statusable import Statusable
 
 
@@ -257,18 +259,21 @@ def _ca_values_changed(obj):
   Returns:
     (bool) True if there is a change to any of the CA values, False otherwise.
   """
-  rev = db.session.query(models.Revision) \
-                  .filter_by(resource_id=obj.id, resource_type=obj.type) \
-                  .order_by(models.Revision.id.desc()) \
-                  .first()
-
+  revision = db.session.query(
+      models.Revision
+  ).filter_by(
+      resource_id=obj.id,
+      resource_type=obj.type
+  ).order_by(models.Revision.id.desc()).first()
+  if not revision:
+    raise InternalServerError(errors.MISSING_REVISION)
   new_attrs = {
       "custom_attribute_values":
       [value.log_json() for value in obj.custom_attribute_values],
       "custom_attribute_definitions":
       [defn.log_json() for defn in obj.custom_attribute_definitions]
   }
-  return any(notifications.get_updated_cavs(new_attrs, rev.content))
+  return any(notifications.get_updated_cavs(new_attrs, revision.content))
 
 
 def _align_by_ids(items, items2):

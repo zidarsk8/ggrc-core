@@ -30,3 +30,6 @@ MANDATORY_HEADER = u"{} should be set, contains {!r} instead."
 
 WRONG_PERSON_HEADER_FORMAT = u"{} should have JSON object like" \
                              u" {{'email': str}}, contains {!r} instead."
+
+MISSING_REVISION = u"The object you are trying to update/map is broken. " \
+                   u"Please contact administrator for help."

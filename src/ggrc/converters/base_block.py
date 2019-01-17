@@ -430,9 +430,11 @@ class ImportBlockConverter(BlockConverter):
         try:
           row.process_row()
         except ReservedNameError:
+          db.session.rollback()
           row.add_error(errors.DUPLICATE_CAD_NAME)
           logger.exception(errors.DUPLICATE_CAD_NAME)
         except Exception:  # pylint: disable=broad-except
+          db.session.rollback()
           row.add_error(errors.UNKNOWN_ERROR)
           logger.exception("Unexpected error on import")
         self._update_info(row)
