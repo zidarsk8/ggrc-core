@@ -15,15 +15,32 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
   """Test for correctness of `not_empty_revisions` operator."""
 
   @classmethod
-  def setUpClass(cls):
+  def setUpClass(cls):  # pylint: disable=missing-docstring
+    super(TestNotEmptyRevisions, cls).setUpClass()
     cls.api = api_helper.Api()
 
   def setUp(self):
     super(TestNotEmptyRevisions, self).setUp()
     self.client.get("/login")
 
+  def _turn_on_bg_indexing(self):
+    """Helper method to turn on bg indexing."""
+    from ggrc.fulltext import listeners
+    from ggrc.models import background_task
+
+    listeners.reindex_on_commit = background_task.reindex_on_commit
+    self.init_taskqueue()
+
+  def _turn_off_bg_indexing(self):
+    """Helper method to turn off bg indexing."""
+    from ggrc.fulltext import listeners
+
+    listeners.reindex_on_commit = lambda: True
+    self.del_taskueue()
+
   def test_not_empty_revisions(self):
     """Test `not_empty_revisions` returns revisions with changes."""
+    self._turn_on_bg_indexing()
     with factories.single_commit():
       control = factories.ControlFactory()
 
@@ -33,8 +50,8 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
       self.assert200(response)
 
     all_revisions_count = all_models.Revision.query.filter(
-        all_models.Revision.resource_type == "Control",
-        all_models.Revision.resource_id == control.id
+        all_models.Revision.resource_type == control.type,
+        all_models.Revision.resource_id == control.id,
     ).count()
     # Revision also is created when creating an object
     self.assertEqual(all_revisions_count, edits_count + 1)
@@ -46,12 +63,13 @@ class TestNotEmptyRevisions(test_ggrc.TestCase, query_helper.WithQueryApi):
             "filters": {
                 "expression": {
                     "op": {"name": "not_empty_revisions"},
-                    "resource_type": "Control",
-                    "resource_id": control.id
-                }
-            }
+                    "resource_type": control.type,
+                    "resource_id": control.id,
+                },
+            },
         },
         "Revision",
-        "ids"
+        "ids",
     )
     self.assertEqual(len(not_empty_revisions), 1)
+    self._turn_off_bg_indexing()
