@@ -206,13 +206,13 @@
   {{/case}}
 
   {{#case 'fraud_related'}}
-    {{#if_equals instance.fraud_related '0'}}No{{/if}}
-    {{#if_equals instance.fraud_related '1'}}Yes{{/if}}
+    {{#if_equals instance.fraud_related false}}No{{/if}}
+    {{#if_equals instance.fraud_related true}}Yes{{/if}}
   {{/case}}
 
   {{#case 'significance'}}
-    {{#if_equals instance.key_control '0'}}Non-Key{{/if}}
-    {{#if_equals instance.key_control '1'}}Key{{/if}}
+    {{#if_equals instance.key_control false}}Non-Key{{/if}}
+    {{#if_equals instance.key_control true}}Key{{/if}}
   {{/case}}
   
   {{#case 'is_verification_needed'}}

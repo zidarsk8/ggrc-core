@@ -67,16 +67,14 @@
                     <div class="span4">
                       <h6>Fraud Related</h6>
                       <p>
-                        {{#if_equals fraud_related "0"}}
-                          No
-                        {{/if}}
-                        {{#if_equals fraud_related "1"}}
-                          Yes
-                        {{/if}}
-                        {{^if_equals fraud_related "0" }}
-                          {{^if_equals fraud_related "1" }}
-                            <span class="empty-message">None</span>
-                          {{/if}}
+                        {{#if_null fraud_related}}
+                          <span class="empty-message">None</span>
+                        {{else}}
+                          {{#if fraud_related}}
+                            Yes
+                          {{else}}
+                            No
+                          {{/if}}  
                         {{/if}}
                       </p>
                     </div>
@@ -85,15 +83,13 @@
                     <div class="span8">
                       <h6>Significance</h6>
                       <p>
-                        {{#if_equals key_control "1"}}
-                          Key
-                        {{/if}}
-                        {{#if_equals key_control "0"}}
-                          Non-Key
-                        {{/if}}
-                        {{^if_equals key_control "0" }}
-                          {{^if_equals key_control "1" }}
-                            <span class="empty-message">None</span>
+                        {{#if_null key_control}}
+                          <span class="empty-message">None</span>
+                        {{else}}
+                          {{#if key_control}}
+                            Key
+                          {{else}}
+                            Non-Key
                           {{/if}}
                         {{/if}}
                       </p>
