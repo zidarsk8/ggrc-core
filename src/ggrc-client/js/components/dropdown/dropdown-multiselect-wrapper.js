@@ -4,7 +4,7 @@
 */
 
 export default can.Component.extend({
-  tag: 'dropdown-options-loader',
+  tag: 'dropdown-multiselect-wrapper',
   viewModel: {
     placeholder: '',
     selected: [],
@@ -12,7 +12,7 @@ export default can.Component.extend({
     preparedOptions: [],
     define: {
       /*
-        dropdown-options-loader wrapper when data should be fetched first
+        dropdown-multiselect-wrapper when data should be fetched first
         {modelConstructor}: Model definition to fetch
         {(selected)}: Two-way binding parent`s target attribute
       */

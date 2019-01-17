@@ -4,9 +4,9 @@
 */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../dropdown-options-loader';
+import Component from '../dropdown-multiselect-wrapper';
 
-describe('dropdown-options-loader component', function () {
+describe('dropdown-multiselect-wrapper component', function () {
   let viewModel;
   let response;
   let findDfd;

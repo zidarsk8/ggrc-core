@@ -201,7 +201,7 @@
         </label>
           <div data-id="assertions_dd" tabindex="12" class="no-outline">
             <model-loader {path}="'service-models/control-assertion'">
-              <dropdown-options-loader
+              <dropdown-multiselect-wrapper
                 {model-constructor}="loadedModel"
                 {(selected)}="instance.assertions"
                 {placeholder}="'Select Assertions'">
@@ -211,7 +211,7 @@
                   (selected-changed)="selectedChanged(%event)"
                   {placeholder}="placeholder">
                 </multiselect-dropdown>
-              </dropdown-options-loader>
+              </dropdown-multiselect-wrapper>
             </model-loader>
           </div>
           {{#instance.computed_errors.assertions}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.assertions}}
@@ -224,7 +224,7 @@
         </label>
           <div data-id="categories_dd" tabindex="13" class="no-outline">
             <model-loader {path}="'service-models/control-category'">
-              <dropdown-options-loader
+              <dropdown-multiselect-wrapper
                 {model-constructor}="loadedModel"
                 {(selected)}="instance.categories"
                 {placeholder}="'Select Categories'">
@@ -234,7 +234,7 @@
                   (selected-changed)="selectedChanged(%event)"
                   {placeholder}="placeholder">
                 </multiselect-dropdown>
-              </dropdown-options-loader>
+              </dropdown-multiselect-wrapper>
             </model-loader>
           </div>
       </div>
