@@ -4,8 +4,8 @@
  */
 
 import '../tree_pagination/tree_pagination';
-import '../paginate/paginate';
 import './revision-page';
+
 import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-log.stache';
 import tracker from '../../tracker';
