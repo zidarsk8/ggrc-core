@@ -478,7 +478,6 @@ def handle_get(id2, command, job_type):
       BadRequest("Unknown command")
     return handle_file_download(id2)
   try:
-    import_export.clear_overtimed_tasks()
     if id2:
       res = import_export.get(id2).log_json()
     else:
