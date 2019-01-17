@@ -4,6 +4,7 @@
  */
 
 import Person from '../../models/business-models/person';
+import PersonProfile from '../../models/service-models/person-profile';
 import RefreshQueue from '../../models/refresh_queue';
 import {notifier} from './notifiers-utils';
 
@@ -42,7 +43,14 @@ function getPersonInfo(person) {
   return dfd;
 }
 
+function loadPersonProfile(person) {
+  return PersonProfile.findOne({
+    id: person.attr('profile.id'),
+  });
+}
+
 export {
   cacheCurrentUser,
   getPersonInfo,
+  loadPersonProfile,
 };
