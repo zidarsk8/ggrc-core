@@ -212,3 +212,14 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
     for task in tasks:
       relationship = self.get_relationship(task.id, event.id)
       self.assertIsNotNone(relationship)
+
+  @mock.patch("ggrc.gcalendar.calendar_event_builder.CalendarEventBuilder."
+              "_should_create_event_for", side_effect=Exception("test"))
+  def test_fail_to_build_event(self, should_create_mock):
+    """Test that sync job tried to sync the second event after a failure."""
+    self.setup_person_task_event(date(2015, 1, 5))
+    self.setup_person_task_event(date(2015, 1, 6))
+    with freeze_time("2015-01-1 12:00:00"):
+      self.builder._preload_data()
+      self.builder._generate_events()
+    self.assertEqual(should_create_mock.call_count, 2)
