@@ -16,7 +16,7 @@ from alembic import op
 from ggrc.migrations import utils
 # revision identifiers, used by Alembic.
 revision = 'b295575c706c'
-down_revision = '26d983e69d78'
+down_revision = '44f601715634'
 
 
 def upgrade():
