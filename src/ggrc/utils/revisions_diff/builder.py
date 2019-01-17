@@ -177,7 +177,7 @@ def generate_cav_diff(cads, proposed, revisioned):
       revisioned_value = revisioned_cavs[cad.id]
     if proposed_val != revisioned_value:
       value, person_id = proposed_val
-      person = person_obj_by_id(person_id) if person_id else None
+      person = person_obj_by_id(int(person_id)) if person_id else None
       diff[cad.id] = {
           "attribute_value": value,
           "attribute_object": person,
