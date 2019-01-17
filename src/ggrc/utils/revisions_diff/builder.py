@@ -274,7 +274,7 @@ def _construct_diff(meta, current_content, new_content):
       "mapping_list_fields": generate_list_mappings(
           meta.mapping_list_fields,
           new_content,
-          current_content
+          current_content,
       ),
   }
 
@@ -286,15 +286,5 @@ def prepare(instance, content):
   return _construct_diff(
       meta=instance_meta_info,
       current_content=current_data,
-      new_content=content
-  )
-
-
-def differ(instance_cls, new_content, current_content):
-  """Get diff between two contents of specified type."""
-  instance_meta_info = meta_info.MetaInfo(instance_cls())
-  return _construct_diff(
-      meta=instance_meta_info,
-      current_content=current_content,
-      new_content=new_content
+      new_content=content,
   )

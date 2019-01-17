@@ -490,24 +490,34 @@ def not_empty_revisions(exp, object_class, target_class, query):
     raise BadQueryException("'not_empty_revisions' operator works with "
                             "Revision only")
 
-  query = db.session.query(
-      all_models.Revision
-  ).filter(
-      all_models.Revision.resource_type == exp["resource_type"],
-      all_models.Revision.resource_id == exp["resource_id"]
+  resource_type = exp["resource_type"]
+  resource_id = exp["resource_id"]
+
+  resource_cls = getattr(all_models, resource_type, None)
+  if resource_cls is None:
+    raise BadQueryException("'{}' resource type does not exist"
+                            .format(resource_type))
+
+  query = all_models.Revision.query.filter(
+      all_models.Revision.resource_type == resource_type,
+      all_models.Revision.resource_id == resource_id,
   ).order_by(
-      all_models.Revision.created_at
+      all_models.Revision.created_at,
   )
 
+  current_instance = resource_cls.query.get(resource_id)
+
+  prev_diff = None
   revision_with_changes = []
-  prev_content = {}
-  resource_type = getattr(all_models, exp["resource_type"])
   for revision in query:
-    diff = revdiff_builder.differ(resource_type, revision.content,
-                                  prev_content)
-    if any(diff.values()):
+    diff = revdiff_builder.prepare(current_instance, revision.content)
+    if diff != prev_diff:
       revision_with_changes.append(revision.id)
-      prev_content = revision.content
+      prev_diff = diff
+
+  if not revision_with_changes:
+    return sqlalchemy.sql.false()
+
   return all_models.Revision.id.in_(revision_with_changes)
 
 
