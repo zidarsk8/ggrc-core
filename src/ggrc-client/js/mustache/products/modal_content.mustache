@@ -97,7 +97,16 @@
           <a data-id="hide_kind_type_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="kind_type_dd" tabindex="8">
-          {{{option_select this "kind" "product_type"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.kind" 
+                              {role}="'product_type'">
+              <dropdown {options-list}="options"
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
     </div>

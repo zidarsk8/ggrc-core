@@ -123,7 +123,16 @@
           <a data-id="hide_kind_nature_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="kind_nature_dd" tabindex="7">
-          {{{option_select this "kind" "control_kind"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.kind" 
+                              {role}="'control_kind'">
+              <dropdown {options-list}="options"
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
 
@@ -170,7 +179,16 @@
           <a data-id="hide_type_means_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="type_means_dd" tabindex="10">
-          {{{option_select this "means" "control_means"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.means"
+                              {role}="'control_means'">
+              <dropdown {options-list}="options" 
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
     </div>
@@ -188,7 +206,16 @@
           <a data-id="hide_frequency_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="frequency_dd" tabindex="11">
-          {{{option_select this "verify_frequency" "verify_frequency"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.verify_frequency"
+                              {role}="'verify_frequency'">
+              <dropdown {options-list}="options"
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
       <div data-test-id="control_assertions_5d8b7f7a"
@@ -244,12 +271,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-
-          <dropdown options-list="model.statuses"
-                    name="instance.status"
-                    tab-index="14">
-          </dropdown>
-
+        <dropdown {options-list}="model.statuses"
+                  name="instance.status"
+                  tab-index="14">
+        </dropdown>
       </div>
     </div>
   </div>
