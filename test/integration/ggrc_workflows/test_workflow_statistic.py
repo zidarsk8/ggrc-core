@@ -14,31 +14,28 @@ from ggrc.utils import create_stub
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
-from integration.ggrc.query_helper import WithQueryApi
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 
 
 @ddt.ddt
-class TestPersonResource(TestCase, WithQueryApi):
-  """Tests endpoint for getting workflow statistics."""
-
+class TestWorkflowStatistic(TestCase):
+  """Tests endpoint for getting workflow statistic."""
   def setUp(self):
-    super(TestPersonResource, self).setUp()
+    super(TestWorkflowStatistic, self).setUp()
     self.client.get("/login")
     self.api = Api()
     self.generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
+    self.first_wf_admin_id = None  # id of first workflow admin and logged user
 
-  def test_workflow_statistic(self):
-    """Tests endpoint for getting workflow statistics."""
-    # pylint: disable=too-many-locals
-    user = all_models.Person.query.first()
-    _, user1 = self.object_generator.generate_person(
+  def _setup_data(self):
+    first_wf_admin = all_models.Person.query.first()
+    _, second_wf_admin = self.object_generator.generate_person(
         user_role="Administrator")
-    user_id = user.id
-    user1_id = user1.id
+    self.first_wf_admin_id = first_wf_admin.id
+    second_wf_admin_id = second_wf_admin.id
     role = all_models.AccessControlRole.query.filter(
         all_models.AccessControlRole.name == "Task Assignees",
         all_models.AccessControlRole.object_type == "TaskGroupTask",
@@ -49,25 +46,25 @@ class TestPersonResource(TestCase, WithQueryApi):
         "is_verification_needed": True,
         "task_groups": [{
             "title": "task group 1",
-            "contact": create_stub(user),
+            "contact": create_stub(first_wf_admin),
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "task 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 16),
             }, {"title": "task 3",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17),
                 }
@@ -75,12 +72,12 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_objects": []
         }, {
             "title": "task group 2",
-            "contact": create_stub(user),
+            "contact": create_stub(first_wf_admin),
             "task_group_tasks": [{
                 "title": "task 4",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17),
             }],
@@ -92,33 +89,33 @@ class TestPersonResource(TestCase, WithQueryApi):
         "is_verification_needed": False,
         "task_groups": [{
             "title": "task group 1",
-            "contact": create_stub(user),
+            "contact": create_stub(first_wf_admin),
             "task_group_tasks": [{
                 "title": "task 5",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17),
             }, {
                 "title": "task 6",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15)
             }, {
                 "title": "task 7",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17)
             }, {
                 "title": "task 8",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user_id)],
+                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 14)
             }],
@@ -138,18 +135,25 @@ class TestPersonResource(TestCase, WithQueryApi):
     workflow1 = all_models.Workflow.query.get(workflow1.id)
     workflow1_id = workflow1.id
     workflow2_id = workflow2.id
+
+    # first workflow has 2 workflow admins, second has 1
+    # workflow admin now
     factories.AccessControlPersonFactory(
         ac_list=workflow1.acr_name_acl_map["Admin"],
-        person=user1
+        person=second_wf_admin
     )
+
     with freeze_time("2017-8-16"):
-      self.client.get("/login")
       workflow1 = all_models.Workflow.query.get(workflow1_id)
       wf1_title = workflow1.title
       workflow2 = all_models.Workflow.query.get(workflow2_id)
       wf2_title = workflow2.title
-      user_email = all_models.Person.query.get(user_id).email
-      user1_email = all_models.Person.query.get(user1_id).email
+      first_wf_admin_email = all_models.Person.query.get(
+          self.first_wf_admin_id
+      ).email
+      second_wf_admin_email = all_models.Person.query.get(
+          second_wf_admin_id
+      ).email
 
       cycle1 = all_models.Cycle.query.get(cycle1_id)
       cycle2 = all_models.Cycle.query.get(cycle2_id)
@@ -177,14 +181,14 @@ class TestPersonResource(TestCase, WithQueryApi):
       self.api.put(task8, {
           "status": "Finished"
       })
-      workflow1_owners = [user_email, user1_email]
-      response = self.client.get("/api/people/{}/my_workflows".format(user_id))
-      expected_result = {'workflows': [{
+      workflow1_owners = [first_wf_admin_email, second_wf_admin_email]
+
+      self.expected_result = {'workflows': [{
           'workflow': {
               'id': workflow2.id,
               'title': wf2_title
           },
-          'owners': [user_email],
+          'owners': [first_wf_admin_email],
           'task_stat': {
               'counts': {
                   'completed': 2,
@@ -207,4 +211,13 @@ class TestPersonResource(TestCase, WithQueryApi):
               'due_in_date': '2017-08-15'
           }},
       ]}
-      self.assertEqual(response.json, expected_result)
+
+  def test_workflow_statistic(self):
+    """Tests endpoint for getting workflow statistics."""
+    with freeze_time("2017-8-16"):
+      self.client.get('/login')
+      self._setup_data()
+      response = self.client.get(
+          "/api/people/{}/my_workflows".format(self.first_wf_admin_id)
+      )
+      self.assertEqual(response.json, self.expected_result)
