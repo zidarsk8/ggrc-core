@@ -7,10 +7,12 @@ import {notifier} from './notifiers-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import * as businessModels from '../../models/business-models';
 import * as serviceModels from '../../models/service-models';
+import * as mappingModels from '../../models/mapping-models';
 
 const allModels = Object.assign({},
   businessModels,
-  serviceModels);
+  serviceModels,
+  mappingModels);
 
 const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
 

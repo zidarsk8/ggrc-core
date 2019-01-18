@@ -48,6 +48,7 @@ class FullInstanceContentFased(utils.FasadeProperty):
     # pop out unused object_people field out of mapping_list_fields
     if 'mapping_list_fields' in content:
       content['mapping_list_fields'].pop('object_people', None)
+      content['mapping_list_fields'].pop('task_group_objects', None)
     return content
 
 
