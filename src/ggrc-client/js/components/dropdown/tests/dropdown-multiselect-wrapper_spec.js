@@ -62,7 +62,7 @@ describe('dropdown-multiselect-wrapper component', function () {
       viewModel.attr('modelConstructor', TestType);
       findDfd.resolve(response);
 
-      findDfd.then((result) => {
+      findDfd.then(() => {
         expect(viewModel.prepareOptions).toHaveBeenCalledWith(response);
 
         done();
@@ -71,7 +71,7 @@ describe('dropdown-multiselect-wrapper component', function () {
 
     describe('prepareOptions() method', () => {
       beforeEach(function () {
-        viewModel.attr('selected', [
+        viewModel.attr('value', [
           {
             id: 2,
             name: '2 item',
@@ -85,12 +85,12 @@ describe('dropdown-multiselect-wrapper component', function () {
         ]);
       });
 
-      it('sets preparedOptions', (done) => {
+      it('sets options', (done) => {
         viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
-        findDfd.then((result) => {
-          expect(viewModel.preparedOptions.length).toEqual(response.length);
+        findDfd.then(() => {
+          expect(viewModel.options.length).toEqual(response.length);
 
           done();
         });
@@ -100,37 +100,37 @@ describe('dropdown-multiselect-wrapper component', function () {
         viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
-        findDfd.then((result) => {
-          expect(viewModel.preparedOptions[0].value).toEqual('1 item');
-          expect(viewModel.preparedOptions[0].id).toEqual(1);
-          expect(viewModel.preparedOptions[0].checked).toBeFalsy();
-          expect(viewModel.preparedOptions[0].extra).toBeUndefined();
+        findDfd.then(() => {
+          expect(viewModel.options[0].value).toEqual('1 item');
+          expect(viewModel.options[0].id).toEqual(1);
+          expect(viewModel.options[0].checked).toBeFalsy();
+          expect(viewModel.options[0].extra).toBeUndefined();
 
           done();
         });
       });
 
-      it('sets selectedInternal', (done) => {
+      it('sets selected', (done) => {
         viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
-        findDfd.then((result) => {
-          expect(viewModel.selectedInternal.length)
+        findDfd.then(() => {
+          expect(viewModel.selected.length)
             .toEqual(viewModel.selected.length);
 
           done();
         });
       });
 
-      it('selectedInternal has correct format', (done) => {
+      it('selected has correct format', (done) => {
         viewModel.attr('modelConstructor', TestType);
         findDfd.resolve(response);
 
-        findDfd.then((result) => {
-          expect(viewModel.selectedInternal[0].value).toEqual('2 item');
-          expect(viewModel.selectedInternal[0].id).toEqual(2);
-          expect(viewModel.selectedInternal[0].checked).toBeTruthy();
-          expect(viewModel.selectedInternal[0].extra).toBeUndefined();
+        findDfd.then(() => {
+          expect(viewModel.selected[0].value).toEqual('2 item');
+          expect(viewModel.selected[0].id).toEqual(2);
+          expect(viewModel.selected[0].checked).toBeTruthy();
+          expect(viewModel.selected[0].extra).toBeUndefined();
 
           done();
         });
@@ -143,7 +143,7 @@ describe('dropdown-multiselect-wrapper component', function () {
 
     beforeEach(function () {
       viewModel.attr('modelConstructor', TestType);
-      viewModel.attr('selected', [
+      viewModel.attr('value', [
         {
           id: 2,
           name: '2 item',
@@ -168,10 +168,10 @@ describe('dropdown-multiselect-wrapper component', function () {
     it('should get model from cache', () => {
       viewModel.selectedChanged({selected: newSelected});
 
-      expect(viewModel.selected.length).toEqual(newSelected.length);
-      expect(viewModel.selected[0].id).toEqual('testId');
-      expect(viewModel.selected[0].name).toEqual('testName');
-      expect(viewModel.selected[0].extra).toEqual('extra');
+      expect(viewModel.value.length).toEqual(newSelected.length);
+      expect(viewModel.value[0].id).toEqual('testId');
+      expect(viewModel.value[0].name).toEqual('testName');
+      expect(viewModel.value[0].extra).toEqual('extra');
     });
   });
 });
