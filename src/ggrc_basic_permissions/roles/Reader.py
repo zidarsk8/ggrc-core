@@ -6,7 +6,7 @@
 # pylint: disable=invalid-name
 
 
-from ggrc_basic_permissions.roles.Creator import owner_update
+from ggrc_basic_permissions.roles.Creator import owner_delete, owner_update
 
 
 scope = "System"
@@ -85,6 +85,7 @@ permissions = {
         "CycleTaskGroupObjectTask",
         "CycleTaskEntry",
         "NotificationConfig",
+        "PersonProfile",
     ],
     "create": [
         {
@@ -191,5 +192,5 @@ permissions = {
         "Review"
     ],
     "update": owner_update,
-    "delete": owner_update,
+    "delete": owner_delete,
 }
