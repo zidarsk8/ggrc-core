@@ -6,7 +6,6 @@
 export default can.Component.extend({
   tag: 'dropdown-multiselect-wrapper',
   viewModel: {
-    placeholder: '',
     value: [],
     selected: [],
     options: [],
