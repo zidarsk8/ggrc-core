@@ -1292,6 +1292,35 @@ describe('assessment-info-pane component', () => {
     });
   });
 
+  describe('beforeStatusSave() method', () => {
+    const defaultAssessmentStatus = 'DefaultStatus';
+    beforeEach(() => {
+      vm.attr('instance', {
+        status: defaultAssessmentStatus,
+      });
+
+      vm.attr('previousStatus', undefined);
+    });
+
+    it('should set new status', () => {
+      const newStatus = 'NewAssessmnetStatus';
+      vm.beforeStatusSave.call(vm, newStatus, false);
+
+      expect(vm.attr('instance.status')).toEqual(newStatus);
+      expect(vm.attr('previousStatus')).toEqual(defaultAssessmentStatus);
+    });
+
+    it('should set previous status. Undo is TRUE', () => {
+      const newStatus = 'NewAssessmnetStatus';
+      vm.attr('previousStatus', defaultAssessmentStatus);
+
+      vm.beforeStatusSave.call(vm, newStatus, true);
+
+      expect(vm.attr('instance.status')).toEqual(defaultAssessmentStatus);
+      expect(vm.attr('previousStatus')).toBe(undefined);
+    });
+  });
+
   describe('onStateChange() method', () => {
     let method;
     let instanceSave;
@@ -1336,15 +1365,24 @@ describe('assessment-info-pane component', () => {
       });
     });
 
-    it('returns status back on undo action', (done) => {
-      vm.attr('instance.previousStatus', 'FooBar');
+    it('should set status from response', (done) => {
+      const newStatus = 'new status';
+      const newStatusFromResponse = 'status from response';
+      const currentStatus = 'current status';
+
+      vm.attr('currentState', currentStatus);
       instanceSave.resolve();
 
+      spyOn(vm.attr('deferredSave'), 'execute').and.
+        returnValue($.Deferred().resolve(
+          {status: newStatusFromResponse}
+        ));
+
       method({
-        undo: true,
-        status: 'newStatus',
+        undo: false,
+        status: newStatus,
       }).then(() => {
-        expect(vm.attr('instance.status')).toBe('FooBar');
+        expect(vm.attr('currentState')).toBe(newStatusFromResponse);
         done();
       });
     });

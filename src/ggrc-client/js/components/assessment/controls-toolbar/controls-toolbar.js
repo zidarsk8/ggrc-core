@@ -14,6 +14,7 @@ export default can.Component.extend({
     instance: null,
     verifiers: [],
     isInfoPaneSaving: false,
+    currentState: '',
     onStateChange: function (event) {
       this.dispatch({
         type: 'onStateChange',

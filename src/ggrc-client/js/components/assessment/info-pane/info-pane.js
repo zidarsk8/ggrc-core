@@ -473,16 +473,31 @@ export default can.Component.extend({
           this.attr('instance').save().done(resolve).fail(reject);
         }.bind(this), 1000));
     },
+    beforeStatusSave(newStatus, isUndo) {
+      const instance = this.attr('instance');
+
+      if (isUndo) {
+        instance.attr('status', this.attr('previousStatus'));
+        this.attr('previousStatus', undefined);
+      } else {
+        this.attr('previousStatus', instance.attr('status'));
+        instance.attr('status', newStatus);
+      }
+    },
+    afterStatusSave(savedStatus) {
+      this.attr('instance.status', savedStatus);
+      this.attr('currentState', savedStatus);
+    },
     onStateChange: function (event) {
-      let isUndo = event.undo;
-      let newStatus = event.state;
-      let instance = this.attr('instance');
-      let status = instance.attr('status');
-      let initialState = this.attr('initialState');
-      let deprecatedState = this.attr('deprecatedState');
-      let isArchived = instance.attr('archived');
-      let previousStatus = instance.attr('previousStatus');
-      let stopFn = tracker.start(instance.type,
+      const isUndo = event.undo;
+      const newStatus = event.state;
+      const instance = this.attr('instance');
+      const status = instance.attr('status');
+      const initialState = this.attr('initialState');
+      const deprecatedState = this.attr('deprecatedState');
+      const isArchived = instance.attr('archived');
+      const previousStatus = this.attr('previousStatus');
+      const stopFn = tracker.start(instance.type,
         tracker.USER_JOURNEY_KEYS.INFO_PANE,
         tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
 
@@ -493,19 +508,15 @@ export default can.Component.extend({
       this.attr('onStateChangeDfd', $.Deferred());
       this.attr('isUpdatingState', true);
 
-      return this.attr('deferredSave').execute(() => {
-        if (isUndo) {
-          instance.attr('status', this.attr('previousStatus'));
-          this.attr('previousStatus', undefined);
-        } else {
-          this.attr('previousStatus', instance.attr('status'));
-          instance.attr('status', newStatus);
-        }
-      }).then((resp) => {
-        this.attr('isUndoButtonVisible', !isUndo);
-        this.attr('currentState', resp.status);
+      return this.attr('deferredSave').execute(
+        this.beforeStatusSave.bind(this, newStatus, isUndo)
+      ).then((resp) => {
+        const newStatus = resp.status;
+        this.afterStatusSave(newStatus);
 
-        if (resp.status === 'In Review' && !isUndo) {
+        this.attr('isUndoButtonVisible', !isUndo);
+
+        if (newStatus === 'In Review' && !isUndo) {
           notifier('info', 'The assessment is complete. ' +
           'The verifier may revert it if further input is needed.');
         }
@@ -520,8 +531,8 @@ export default can.Component.extend({
         if (xhr && xhr.status === 409 && xhr.remoteObject) {
           instance.attr('status', xhr.remoteObject.status);
         } else {
-          instance.attr('status', status);
-          instance.attr('previousStatus', previousStatus);
+          this.afterStatusSave(status);
+          this.attr('previousStatus', previousStatus);
           notifierXHR('error')(xhr);
         }
       }).always(() => {
@@ -581,6 +592,12 @@ export default can.Component.extend({
         this.refreshCounts([countKey]);
       }
     },
+    resetCurrentState() {
+      const instanceStatus = this.attr('instance.status');
+      this.attr('currentState', instanceStatus);
+      this.attr('previousStatus', undefined);
+      this.attr('isUndoButtonVisible', false);
+    },
   },
   init: function () {
     this.viewModel.initializeFormFields();
@@ -590,6 +607,9 @@ export default can.Component.extend({
     this.viewModel.setVerifierRoleId();
   },
   events: {
+    inserted() {
+      this.viewModel.resetCurrentState();
+    },
     [`{viewModel.instance} ${REFRESH_MAPPING.type}`](scope, event) {
       const viewModel = this.viewModel;
       viewModel.attr('mappedSnapshots')
@@ -629,6 +649,8 @@ export default can.Component.extend({
       this.viewModel.initializeFormFields();
       this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
+
+      this.viewModel.resetCurrentState();
     },
     '{pubsub} objectDeleted'(pubsub, event) {
       let instance = event.instance;
