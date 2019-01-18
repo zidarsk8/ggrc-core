@@ -479,7 +479,7 @@ export default can.Component.extend({
       let initialState = this.attr('initialState');
       let deprecatedState = this.attr('deprecatedState');
       let isArchived = instance.attr('archived');
-      let previousStatus = instance.attr('previousStatus') || 'In Progress';
+      let previousStatus = instance.attr('previousStatus');
       let stopFn = tracker.start(instance.type,
         tracker.USER_JOURNEY_KEYS.INFO_PANE,
         tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
@@ -521,6 +521,7 @@ export default can.Component.extend({
           instance.attr('status', xhr.remoteObject.status);
         } else {
           instance.attr('status', status);
+          instance.attr('previousStatus', previousStatus);
           notifierXHR('error')(xhr);
         }
       }).always(() => {
