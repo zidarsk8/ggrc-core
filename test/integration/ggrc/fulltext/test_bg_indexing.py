@@ -11,6 +11,7 @@ from ggrc import settings
 from ggrc.models import all_models
 from integration.ggrc import TestCase, api_helper
 from integration.ggrc.models import factories
+from integration.ggrc import generator
 
 
 class TestTaskqueueIndexing(TestCase):
@@ -25,6 +26,7 @@ class TestTaskqueueIndexing(TestCase):
     listeners.reindex_on_commit = reindex_on_commit
     self.api = api_helper.Api()
     self.init_taskqueue()
+    self.object_generator = generator.ObjectGenerator()
     self._bg_tasks = {}
 
   def run_bg_tasks(self):
@@ -46,12 +48,15 @@ class TestTaskqueueIndexing(TestCase):
   @mock.patch.object(settings, "APP_ENGINE", True, create=True)
   def test_general_bg_indexing(self):
     """Test indexing in background task"""
-    response = self.api.post(all_models.Control, {
-        "control": {
-            "title": "testCONTROL_title",
-            "context": None,
-        },
-    })
+    response, _ = self.object_generator.generate_object(
+        all_models.Control,
+        data={
+            "control": {
+                "title": "testCONTROL_title",
+                "context": None,
+            },
+        }
+    )
     self.assertStatus(response, 201)
     control_id = response.json["control"]["id"]
     modified_by = response.json["control"]["modified_by"]["id"]
@@ -95,12 +100,16 @@ class TestTaskqueueIndexing(TestCase):
   @mock.patch.object(settings, "APP_ENGINE", True, create=True)
   def test_indexing_header(self):
     """Test response headers contain indexing task.id"""
-    response = self.api.post(all_models.Control, {
-        "control": {
-            "title": "CONTROL_title",
-            "context": None,
-        },
-    })
+    response, _ = self.object_generator.generate_object(
+        all_models.Control,
+        data={
+            "control": {
+                "title": "CONTROL_title",
+                "context": None,
+            },
+        }
+    )
+
     self.assertStatus(response, 201)
     indexing_task_id = response.headers.get("X-GGRC-Indexing-Task-Id")
 

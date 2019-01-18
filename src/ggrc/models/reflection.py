@@ -52,6 +52,18 @@ class Attribute(object):
     self.read = read
 
 
+class HybridAttribute(Attribute):
+  """Class for attributes which are hybrid_properties on models."""
+
+  __slots__ = ["hybrid"]
+
+  def __init__(self, attr, create=True, update=True, read=True):
+    super(HybridAttribute, self).__init__(
+        attr, create=create, update=update, read=read
+    )
+    self.hybrid = True
+
+
 class ApiAttributes(dict):
   """Class to collect all required api attributes."""
 
@@ -189,6 +201,15 @@ class AttributeInfo(object):
     self._update_raw = AttributeInfo.gather_update_raw(tgt_class)
     self._aliases = AttributeInfo.gather_aliases(tgt_class)
     self._visible_aliases = AttributeInfo.gather_visible_aliases(tgt_class)
+
+  @classmethod
+  def get_attr(cls, tgt_class, src_attr, attr):
+    """Get the particular attribute from `tgt_class` or it's base classes."""
+    for base in tgt_class.__mro__:
+      attrs = getattr(base, src_attr, None) or {}
+      if attr in attrs:
+        return attrs[attr]
+    return None
 
   @classmethod
   def gather_attr_dicts(cls, tgt_class, src_attr):

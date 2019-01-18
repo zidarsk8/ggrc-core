@@ -4,6 +4,7 @@
 """This module contains object generation utilities."""
 
 import datetime
+import functools
 import random
 
 import names
@@ -33,14 +34,31 @@ class Generator(object):
     return start + datetime.timedelta(
         seconds=random.randint(0, int((end - start).total_seconds())))
 
-  def generate(self, obj_class, obj_name=None, data=None):
+  @staticmethod
+  def get_header():
+    return {
+        "Content-Type": "application/json",
+        "X-Requested-By": "GGRC",
+        "X-export-view": "blocks",
+    }
+
+  def generate(self, obj_class, obj_name=None, data=None,
+               with_background_tasks=False):
     """Generate `obj_class` instance with fields populated from `data`."""
-    # pylint: disable=protected-access
     if obj_name is None:
+      # pylint: disable=protected-access
       obj_name = obj_class._inflector.table_plural
+      # pylint: enable=protected-access
     if data is None:
       data = {}
-    response = self.api.post(obj_class, data)
+
+    headers = {}
+    if with_background_tasks:
+      headers.update({"X-GGRC-BackgroundTask": "true"})
+    response = self.api.send_request(
+        self.api.client.post, obj=obj_class, data=data, headers=headers,
+    )
+
     response_obj = None
     if response.status_code == 201 and response.json:
       try:
@@ -53,14 +71,6 @@ class Generator(object):
           ))
         response_obj = None
     return response, response_obj
-
-  @staticmethod
-  def get_header():
-    return {
-        "Content-Type": "application/json",
-        "X-Requested-By": "GGRC",
-        "X-export-view": "blocks",
-    }
 
   def modify(self, obj, obj_name, data):
     """Make a PUT request to modify `obj` with new fields in `data`."""
@@ -84,6 +94,32 @@ class ObjectGenerator(Generator):
   such as model_posted, model_put and model_deleted.
   """
 
+  def _singledispatchmethod(func):  # pylint: disable=no-self-argument
+    """Call specific method based on second (1st is self) attr's type."""
+    registry = {}
+
+    def dispatch(cls):
+      """Get specific method based on type."""
+      return registry.get(cls, func)
+
+    def register(cls, func=None):
+      """Register method as handler for specific type."""
+      if func is None:
+        return lambda f: register(cls, f)
+      registry[cls] = func
+      return func
+
+    def wrapper(*args, **kwargs):
+      """Call method based on second argument type."""
+      return dispatch(args[1])(*args, **kwargs)
+
+    registry[object] = func
+    wrapper.register = register
+    wrapper.dispatch = dispatch
+    wrapper.registry = registry
+    functools.update_wrapper(wrapper, func)
+    return wrapper
+
   @staticmethod
   def create_stub(obj):
     # pylint: disable=protected-access
@@ -93,7 +129,9 @@ class ObjectGenerator(Generator):
         "type": obj.type,
     }
 
-  def generate_object(self, obj_class, data=None, add_fields=True):
+  @_singledispatchmethod
+  def generate_object(self, obj_class, data=None, add_fields=True,
+                      with_background_tasks=False):
     """Generate an object of `obj_class` with fields from `data`.
 
     This generator is used for creating objects with data. By default it will
@@ -105,14 +143,17 @@ class ObjectGenerator(Generator):
       add_fields: Flag for adding owners and title default field values. If
         these are present in the data, default values will be overridden.
       data: Dict containing generation data for the object.
+      with_background_tasks: Flag for executing background tasks on object
+        creation.
 
     Returns:
       Tuple containing server response and the generated object.
     """
-    # pylint: disable=protected-access
     if data is None:
       data = {}
+    # pylint: disable=protected-access
     obj_name = obj_class._inflector.table_singular
+    # pylint: enable=protected-access
     obj = obj_class()
     obj_dict = self.obj_to_dict(obj, obj_name)
     if add_fields:
@@ -120,8 +161,36 @@ class ObjectGenerator(Generator):
           "owners": [self.create_stub(models.Person.query.first())],
           "title": factories.random_str(),
       })
-    obj_dict[obj_name].update(data)
-    return self.generate(obj_class, obj_name, obj_dict)
+    obj_dict[obj_name].update(data[obj_name] if obj_name in data else data)
+    return self.generate(obj_class, obj_name=obj_name, data=obj_dict,
+                         with_background_tasks=with_background_tasks)
+
+  @generate_object.register(models.Control)
+  def _(self, obj_class, data=None, add_fields=True,
+        with_background_tasks=False):
+    """Handle generation of `Control` objects."""
+    data = data if data is not None else {}
+    # pylint: disable=protected-access
+    obj_name = models.Control._inflector.table_singular
+    # pylint: enable=protected-access
+    obj_dict = self.obj_to_dict(models.Control(), obj_name)
+
+    defaults = {
+        obj_name: {
+            "title": factories.random_str(),
+            "context": None,
+            "recipients": "Admin,Control Operators,Control Owners",
+            "send_by_default": 0,
+            "assertions": [{
+                "id": factories.ControlAssertionFactory().id
+            }]
+        }
+    }
+
+    obj_dict[obj_name].update(defaults[obj_name])
+    obj_dict[obj_name].update(data[obj_name] if obj_name in data else data)
+    return self.generate(models.Control, obj_name=obj_name, data=obj_dict,
+                         with_background_tasks=with_background_tasks)
 
   def generate_relationship(self, source, destination, context=None, **kwargs):
     """Create relationship between two objects.

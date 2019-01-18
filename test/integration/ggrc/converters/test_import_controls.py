@@ -38,6 +38,26 @@ class TestControlsImport(TestCase):
     self.assertEqual(control.documents_reference_url[0].link,
                      "https://img_123.jpg")
 
+  def test_import_controls_no_assertions(self):
+    """Test controls can not be imported without Assertions."""
+    response = self.import_file("controls_no_assertions.csv", safe=False)
+    expected_errors = {
+        "Control": {
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(
+                    line=7,
+                    column_name="Assertions"
+                ),
+                errors.MISSING_VALUE_ERROR.format(
+                    line=8,
+                    column_name="Assertions"
+                )
+            },
+        },
+    }
+    self._check_csv_response(response, expected_errors)
+    self.assertEqual(all_models.Control.query.count(), 0)
+
   def test_add_admin_to_document(self):
     """Test evidence should have current user as admin"""
     control = factories.ControlFactory()

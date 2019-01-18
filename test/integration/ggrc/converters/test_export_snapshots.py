@@ -249,7 +249,7 @@ class TestExportSnapshots(TestCase):
             "person": u"",
 
             # Fields that are not included in snapshots - Known bugs.
-            "Assertions": u"",
+            "Assertions": u",".join(a.name for a in control.assertions),
             "Categories": u"",
             "Document File": u"",
             "Admin": u"",
@@ -449,7 +449,7 @@ class TestExportSnapshots(TestCase):
           "Title": control.title,
           "Type/Means": u"",
           "Audit": audit.slug,
-          "Assertions": u"",
+          "Assertions": u",".join(a.name for a in control.assertions),
           "Categories": u"",
           "Document File": u"",
           'Created Date': control.created_at.strftime(DATE_FORMAT_US),
