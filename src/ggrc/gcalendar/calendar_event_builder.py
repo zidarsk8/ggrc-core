@@ -113,8 +113,9 @@ class CalendarEventBuilder(object):
             self._create_event_relationship(task, event)
             events_ids.discard(event.id)
 
-      for event_id in events_ids:
-        self._delete_event_relationship(event_id, task.id)
+      if self._should_delete_event_for(task):
+        for event_id in events_ids:
+          self._delete_event_relationship(event_id, task.id)
     except Exception as exp:   # pylint: disable=broad-except
       logger.exception("Generating of event for task %d has failed with the "
                        "following error %s.", task.id, exp.message)
@@ -201,6 +202,15 @@ class CalendarEventBuilder(object):
         task.workflow.workflow_archived,
     ]
     return not any(conditions)
+
+  @staticmethod
+  def _should_delete_event_for(task):
+    """Determines should we delete a Calendar Event for the task or not.
+
+    Calendar events should NOT be deleted for:
+    - overdue cycle tasks.
+    """
+    return not task.is_overdue
 
   def _generate_event_descriptions(self):
     """Generates CalendarEvents descriptions."""

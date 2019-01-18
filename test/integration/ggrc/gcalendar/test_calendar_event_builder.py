@@ -149,19 +149,10 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
     relationship = self.get_relationship(task.id, event.id)
     self.assertIsNotNone(relationship)
 
-  def test_generate_events_for_task_with_event(self):
-    """Test remove relationship to event for overdue task."""
-    with factories.single_commit():
-      person = factories.PersonFactory()
-      task = wf_factories.CycleTaskGroupObjectTaskFactory(
-          end_date=date(2015, 1, 1),
-      )
-      task.add_person_with_role_name(person, u"Task Assignees")
-      event = factories.CalendarEventFactory(
-          due_date=date(2015, 1, 1),
-          attendee_id=person.id,
-      )
-      factories.RelationshipFactory(source=task, destination=event)
+  def test_remove_event_for_tasks(self):
+    """Test remove relationship to event."""
+    person, task, event = self.setup_person_task_event(date(2015, 1, 10))
+    task.status = task.DEPRECATED
     with freeze_time("2015-01-5 12:00:00"):
       self.builder._preload_data()
       self.builder._generate_events()
@@ -223,3 +214,11 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
       self.builder._preload_data()
       self.builder._generate_events()
     self.assertEqual(should_create_mock.call_count, 2)
+
+  def test_event_delete_for_overdue_tasks(self):
+      """Test that event is not deleted for overdue tasks."""
+    _, task, event = self.setup_person_task_event(date(2015, 1, 1))
+    with freeze_time("2015-01-05 12:00:00"):
+      self.builder.build_cycle_tasks()
+    relationship = self.get_relationship(task.id, event.id)
+    self.assertIsNotNone(relationship)
