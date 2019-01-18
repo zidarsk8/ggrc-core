@@ -6,9 +6,8 @@
 import * as aclUtils from '../utils/acl-utils';
 import {
   getAssigneeType,
+  getTruncatedList,
 } from '../ggrc_utils';
-
-'use strict';
 
 describe('getAssigneeType() method', function () {
   let instance;
@@ -106,5 +105,46 @@ describe('getAssigneeType() method', function () {
 
     userType = getAssigneeType(instance);
     expect(userType).toEqual(expectedString);
+  });
+});
+
+describe('getTruncatedList() util', () => {
+  it('returns string which includes 5 lines without last line with count of ' +
+  'remaining items if count of items less then 6', () => {
+    const items = [
+      'email2@something.com',
+      'email1@something.com',
+      'email3@something.com',
+      'email4@something.com',
+    ];
+    const expected = items.join('\n');
+
+    const result = getTruncatedList(items);
+
+    expect(result).toBe(expected);
+  });
+
+  it('returns first 5 items with last line with count of remaining items ' +
+  'if count of items less then 6', () => {
+    const items = [
+      'email2@something.com',
+      'email1@something.com',
+      'email3@something.com',
+      'email4@something.com',
+      'email12@something.com',
+    ];
+    const overflowedItems = [
+      ...items,
+      'email11@something.com',
+      'email13@something.com',
+      'email14@something.com',
+    ];
+    const itemsLimit = 5;
+    const expected = items.join('\n') +
+      `\n and ${overflowedItems.length - itemsLimit} more`;
+
+    const result = getTruncatedList(overflowedItems);
+
+    expect(result).toBe(expected);
   });
 });
