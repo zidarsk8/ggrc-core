@@ -203,11 +203,11 @@
             <model-loader {path}="'service-models/control-assertion'">
               <dropdown-multiselect-wrapper
                 {model-constructor}="loadedModel"
-                {(selected)}="instance.assertions"
+                {(value)}="instance.assertions"
                 {placeholder}="'Select Assertions'">
                 <multiselect-dropdown
-                  {options}="preparedOptions"
-                  {selected}="selectedInternal"
+                  {options}="options"
+                  {selected}="selected"
                   (selected-changed)="selectedChanged(%event)"
                   {placeholder}="placeholder">
                 </multiselect-dropdown>
@@ -226,11 +226,11 @@
             <model-loader {path}="'service-models/control-category'">
               <dropdown-multiselect-wrapper
                 {model-constructor}="loadedModel"
-                {(selected)}="instance.categories"
+                {(value)}="instance.categories"
                 {placeholder}="'Select Categories'">
                 <multiselect-dropdown
-                  {options}="preparedOptions"
-                  {selected}="selectedInternal"
+                  {options}="options"
+                  {selected}="selected"
                   (selected-changed)="selectedChanged(%event)"
                   {placeholder}="placeholder">
                 </multiselect-dropdown>
