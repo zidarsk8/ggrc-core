@@ -296,6 +296,7 @@ class TestACLImportExport(TestCase):
       "Control": {"role name": set(_random_emails[:3])},
       "Market": {"role name": set(_random_emails[2:])},
       "System": {"role name": set(_random_emails)},
+      "KeyReport": {"role name": set(_random_emails)},
       "Objective": {"role name": set()},
       "Product": {"role name": set(_random_emails[:1])},
       "Policy": {"other role name": set(_random_emails[:1])},

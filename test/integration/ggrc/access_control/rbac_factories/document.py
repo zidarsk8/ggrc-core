@@ -11,7 +11,8 @@ from integration.ggrc.models import factories
 FACTORIES_MAPPING = {
     "Control": factories.ControlFactory,
     "Standard": factories.StandardFactory,
-    "Program": factories.ProgramFactory
+    "Program": factories.ProgramFactory,
+    "KeyReport": factories.KeyReportFactory,
 }
 
 

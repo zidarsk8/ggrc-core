@@ -72,12 +72,12 @@ class TestListOfDefencePropagation(base.TestACLPropagation):
         Initialized RBACFactory object.
     """
     self.setup_people()
-    list_of_defence = all_models.AccessControlRole.query.filter_by(
+    list_of_defense = all_models.AccessControlRole.query.filter_by(
         name="Line of Defense One Contacts",
         object_type=parent,
     ).first()
     rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
-    return rbac_factory(self.people[role].id, list_of_defence, parent)
+    return rbac_factory(self.people[role].id, list_of_defense, parent)
 
   @helpers.unwrap(PERMISSIONS)
   def test_access(self, role, model, action_name, expected_result):

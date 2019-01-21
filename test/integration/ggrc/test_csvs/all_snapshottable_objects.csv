@@ -118,3 +118,8 @@ Object type,,,,,,,,,,,,,,,,,,,,,,
 ProductGroup,Code*,Title*,Description,Notes,verifier,assignee,,Admin*,Effective Date,Launch Status,Reference URL,,,,,,,,,,,Delete
 ,ProductGroup code,ProductGroup title,ProductGroup description,ProductGroup notes,user@example.com,user@example.com,,"user@example.com
 user1@example.com",20/2/2020,Draft,http://url.example.zzz,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,
+Object type,,,,,,,,,,,,,,,,,,,,,,
+KeyReport,Code*,Title*,Description,Notes,Admin*,verifier,assignee,Effective Date,Launch Status,Reference URL,Network Zone,,,,,,,,,,,
+,KeyReport code,KeyReport title,KeyReport description,KeyReport notes,"user@example.com
+user1@example.com",user@example.com,user@example.com,20/2/2020,Draft,http://url.example.zzz,core,,,,,,,,,,,
