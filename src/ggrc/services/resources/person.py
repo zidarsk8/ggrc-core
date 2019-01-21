@@ -365,7 +365,7 @@ class PersonResource(common.ExtendedResource):
               "id": row.workflow_id,
               "title": row.workflow_title
           },
-          "owners": owners_result[row.workflow_id].split(","),
+          "owners": sorted(owners_result[row.workflow_id].split(",")),
           "task_stat": {
               "counts": {
                   "total": int(row.total),

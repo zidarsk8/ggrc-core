@@ -5,7 +5,6 @@
 
 from datetime import date
 
-import ddt
 from freezegun import freeze_time
 
 from ggrc.models import all_models
@@ -19,7 +18,6 @@ from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 
 
-@ddt.ddt
 class TestWorkflowStatistic(TestCase):
   """Tests endpoint for getting workflow statistic."""
   def setUp(self):
@@ -28,14 +26,16 @@ class TestWorkflowStatistic(TestCase):
     self.api = Api()
     self.generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
-    self.first_wf_admin_id = None  # id of first workflow admin and logged user
 
   def _setup_data(self):
+    """Help method to setup workflows configuration."""
+    # pylint: disable=too-many-locals
+    # pylint: disable=attribute-defined-outside-init
     first_wf_admin = all_models.Person.query.first()
     _, second_wf_admin = self.object_generator.generate_person(
-        user_role="Administrator")
-    self.first_wf_admin_id = first_wf_admin.id
-    second_wf_admin_id = second_wf_admin.id
+        user_role="Administrator",
+        data={"email": "test@example.com"})
+    first_wf_admin_id = first_wf_admin.id
     role = all_models.AccessControlRole.query.filter(
         all_models.AccessControlRole.name == "Task Assignees",
         all_models.AccessControlRole.object_type == "TaskGroupTask",
@@ -51,20 +51,20 @@ class TestWorkflowStatistic(TestCase):
                 "title": "task 1",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "task 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 16),
             }, {"title": "task 3",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17),
                 }
@@ -77,7 +77,7 @@ class TestWorkflowStatistic(TestCase):
                 "title": "task 4",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17),
             }],
@@ -94,28 +94,28 @@ class TestWorkflowStatistic(TestCase):
                 "title": "task 5",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17),
             }, {
                 "title": "task 6",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15)
             }, {
                 "title": "task 7",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 17)
             }, {
                 "title": "task 8",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.first_wf_admin_id)],
+                    acl_helper.get_acl_json(role_id, first_wf_admin_id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 14)
             }],
@@ -133,8 +133,8 @@ class TestWorkflowStatistic(TestCase):
       cycle2_id = cycle2.id
 
     workflow1 = all_models.Workflow.query.get(workflow1.id)
-    workflow1_id = workflow1.id
-    workflow2_id = workflow2.id
+    self.workflow1_id = workflow1.id
+    self.workflow2_id = workflow2.id
 
     # first workflow has 2 workflow admins, second has 1
     # workflow admin now
@@ -144,17 +144,6 @@ class TestWorkflowStatistic(TestCase):
     )
 
     with freeze_time("2017-8-16"):
-      workflow1 = all_models.Workflow.query.get(workflow1_id)
-      wf1_title = workflow1.title
-      workflow2 = all_models.Workflow.query.get(workflow2_id)
-      wf2_title = workflow2.title
-      first_wf_admin_email = all_models.Person.query.get(
-          self.first_wf_admin_id
-      ).email
-      second_wf_admin_email = all_models.Person.query.get(
-          second_wf_admin_id
-      ).email
-
       cycle1 = all_models.Cycle.query.get(cycle1_id)
       cycle2 = all_models.Cycle.query.get(cycle2_id)
       task2 = cycle1.cycle_task_group_object_tasks[1]
@@ -181,43 +170,54 @@ class TestWorkflowStatistic(TestCase):
       self.api.put(task8, {
           "status": "Finished"
       })
-      workflow1_owners = [first_wf_admin_email, second_wf_admin_email]
 
-      self.expected_result = {'workflows': [{
-          'workflow': {
-              'id': workflow2.id,
-              'title': wf2_title
-          },
-          'owners': [first_wf_admin_email],
-          'task_stat': {
-              'counts': {
-                  'completed': 2,
-                  'overdue': 1,
-                  'total': 4
-              },
-              'due_in_date': '2017-08-14'
-          }}, {
-          'workflow': {
-              'id': workflow1.id,
-              'title': wf1_title
-          },
-          'owners': workflow1_owners,
-          'task_stat': {
-              'counts': {
-                  'completed': 1,
-                  'total': 4,
-                  'overdue': 1,
-              },
-              'due_in_date': '2017-08-15'
-          }},
-      ]}
+  def _get_expected_result(self):
+    """Help method to provide expected statistic."""
+    first_wf_admin_email = "user@example.com"
+    second_wf_admin_email = "test@example.com"
+    workflow1_owners = sorted([first_wf_admin_email,
+                               second_wf_admin_email])
+    workflow1 = all_models.Workflow.query.get(self.workflow1_id)
+    workflow2 = all_models.Workflow.query.get(self.workflow2_id)
+    expected_result = {'workflows': [{
+        'workflow': {
+            'id': workflow2.id,
+            'title': workflow2.title
+        },
+        'owners': [first_wf_admin_email],
+        'task_stat': {
+            'counts': {
+                'completed': 2,
+                'overdue': 1,
+                'total': 4
+            },
+            'due_in_date': '2017-08-14'
+        }}, {
+        'workflow': {
+            'id': workflow1.id,
+            'title': workflow1.title
+        },
+        'owners': workflow1_owners,
+        'task_stat': {
+            'counts': {
+                'completed': 1,
+                'total': 4,
+                'overdue': 1,
+            },
+            'due_in_date': '2017-08-15'
+        }},
+    ]}
+    return expected_result
 
   def test_workflow_statistic(self):
     """Tests endpoint for getting workflow statistics."""
     with freeze_time("2017-8-16"):
       self.client.get('/login')
       self._setup_data()
+      # first wf admin (logged user)
+      first_wf_admin = all_models.Person.query.first()
       response = self.client.get(
-          "/api/people/{}/my_workflows".format(self.first_wf_admin_id)
+          "/api/people/{}/my_workflows".format(first_wf_admin.id)
       )
-      self.assertEqual(response.json, self.expected_result)
+      expected_result = self._get_expected_result()
+      self.assertEqual(response.json, expected_result)
