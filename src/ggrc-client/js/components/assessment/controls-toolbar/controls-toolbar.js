@@ -13,6 +13,7 @@ export default can.Component.extend({
   viewModel: {
     instance: null,
     verifiers: [],
+    isInfoPaneSaving: false,
     onStateChange: function (event) {
       this.dispatch({
         type: 'onStateChange',
