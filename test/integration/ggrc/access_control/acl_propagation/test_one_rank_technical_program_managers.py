@@ -1,7 +1,7 @@
-# Copyright (C) 2019 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Test Access Control roles Compliance Contacts propagation"""
+"""Test Access Control roles Technical / Program Managers propagation"""
 
 import ddt
 
@@ -12,21 +12,17 @@ from integration.ggrc.utils import helpers
 
 
 @ddt.ddt
-class TestComplianceContactsPropagation(base.TestACLPropagation):
-  """Test Compliance Contacts role permissions propagation"""
+class TestTechnicalManagersPropagation(base.TestACLPropagation):
+  """Test Technical / Program Managers role permissions propagation
+
+  This tests are different from other ACR test in acr_propagation package
+  because we map document to parent directly (one rank)
+  e.g Control -> with document.Reference URL and check that
+  Control's Admin can read/create etc document and its comments.
+  """
 
   PERMISSIONS = {
       "Creator": {
-          "Universal Market": {
-              "create_and_map_document": True,
-              "read_document": True,
-              "update_document": True,
-              "delete_document": False,
-              "create_and_map_comment": True,
-              "read_comment": True,
-              "create_and_map_document_comment": True,
-              "read_document_comment": True,
-          },
           "Universal KeyReport": {
               "create_and_map_document": True,
               "read_document": True,
@@ -39,16 +35,6 @@ class TestComplianceContactsPropagation(base.TestACLPropagation):
           },
       },
       "Reader": {
-          "Universal Metric": {
-              "create_and_map_document": True,
-              "read_document": True,
-              "update_document": True,
-              "delete_document": False,
-              "create_and_map_comment": True,
-              "read_comment": True,
-              "create_and_map_document_comment": True,
-              "read_document_comment": True,
-          },
           "Universal KeyReport": {
               "create_and_map_document": True,
               "read_document": True,
@@ -61,16 +47,6 @@ class TestComplianceContactsPropagation(base.TestACLPropagation):
           },
       },
       "Editor": {
-          "Universal OrgGroup": {
-              "create_and_map_document": True,
-              "read_document": True,
-              "update_document": True,
-              "delete_document": False,
-              "create_and_map_comment": True,
-              "read_comment": True,
-              "create_and_map_document_comment": True,
-              "read_document_comment": True,
-          },
           "Universal KeyReport": {
               "create_and_map_document": True,
               "read_document": True,
@@ -81,11 +57,11 @@ class TestComplianceContactsPropagation(base.TestACLPropagation):
               "create_and_map_document_comment": True,
               "read_document_comment": True,
           },
-      }
+      },
   }
 
   def init_factory(self, role, model, parent):
-    """Initialize RBAC factory with propagated Verifier role.
+    """Initialize RBAC factory with propagated Technical/Program Managers role.
 
     Args:
         role: Global Custom role that user have (Creator/Reader/Editor).
@@ -96,14 +72,14 @@ class TestComplianceContactsPropagation(base.TestACLPropagation):
         Initialized RBACFactory object.
     """
     self.setup_people()
-    primary_contacts = all_models.AccessControlRole.query.filter_by(
-        name="Compliance Contacts",
+    technical_managers = all_models.AccessControlRole.query.filter_by(
+        name="Technical / Program Managers",
         object_type=parent,
     ).first()
     rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]
-    return rbac_factory(self.people[role].id, primary_contacts, parent)
+    return rbac_factory(self.people[role].id, technical_managers, parent)
 
   @helpers.unwrap(PERMISSIONS)
   def test_access(self, role, model, action_name, expected_result):
-    """Primary Contacts {0:<7}: On {1:<20} test {2:<20} - Expected {3:<2} """
+    """Technical Managers {0:<7}: On {1:<20} test {2:<20} - Expected {3:<2} """
     self.runtest(role, model, action_name, expected_result)

@@ -41,6 +41,14 @@ class TestPrimaryContactsDocumentPropagation(base.TestACLPropagation):
               "read_comments": True,
               "add_comment": True
           },
+          "Document KeyReport": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
       },
       "Reader": {
           "Document Program": {
@@ -52,6 +60,14 @@ class TestPrimaryContactsDocumentPropagation(base.TestACLPropagation):
               "add_comment": False
           },
           "Document Standard": {
+              "read": True,
+              "create_and_map": True,
+              "update": True,
+              "delete": False,
+              "read_comments": True,
+              "add_comment": True
+          },
+          "Document KeyReport": {
               "read": True,
               "create_and_map": True,
               "update": True,
