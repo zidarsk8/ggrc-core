@@ -245,6 +245,7 @@ export default can.Component.extend({
         prevRevision = revisionsForCompare[0];
       }
 
+      revisions = _.reverse(revisions);
       let diffList = _.map(revisions, function (revision, i) {
         // default to empty revision
         let prev = revisions[i - 1] || prevRevision;
