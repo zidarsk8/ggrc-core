@@ -2,17 +2,33 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
 
+import logging
+
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import select
+from sqlalchemy.sql.expression import select, union_all
 from sqlalchemy import event
 
 from ggrc import db
 from ggrc.fulltext.sql import SqlIndexer
-from ggrc.models import all_models
+from ggrc.fulltext.mixin import Indexed
+from ggrc.models import all_models, get_model
 from ggrc.query import my_objects
 from ggrc.rbac import permissions
+
+
+logger = logging.getLogger(__name__)
+
+
+ATTRIBUTE_ALIASES_TO_SEARCH_IN = (
+    'title',
+    'name',
+    'email',
+    'notes',
+    'description',
+    'slug'
+)
 
 
 # pylint: disable=too-few-public-methods
@@ -41,10 +57,31 @@ class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
   @staticmethod
-  def _get_filter_query(terms):
+  def _get_attr_names_to_search_in(model):
+    """Get list of indexed attribute names"""
+
+    attrs = model.get_fulltext_attrs()
+
+    aliases = dict((attr.alias, attr) for attr in attrs)
+
+    ret = []
+    # Get list of attribute names by alias name
+    for name in ATTRIBUTE_ALIASES_TO_SEARCH_IN:
+      if name in aliases:
+        ret.append(model.get_fulltext_attr_name(aliases[name]))
+
+    return ret
+
+  @classmethod
+  def _get_filter_query(cls, terms, model=None):
     """Get the whitelist of fields to filter in full text table."""
-    whitelist = MysqlRecordProperty.property.in_(
-        ['title', 'name', 'email', 'notes', 'description', 'slug'])
+
+    if not model or not issubclass(model, Indexed):
+      # Only indexed models are supported
+      return sa.false()
+
+    attr_names = cls._get_attr_names_to_search_in(model)
+    whitelist = MysqlRecordProperty.property.in_(attr_names)
 
     if not terms:
       return whitelist
@@ -124,26 +161,69 @@ class MysqlIndexer(SqlIndexer):
 
   @staticmethod
   def _get_grouped_types(types=None, extra_params=None):
-    """Return list of model names from all model names
-
-    if they in sended types and extra_params"""
-    model_names = []
+    """Return dict(type -> model) for all types if it's not in extra_params"""
+    model_names = dict()
     for model_klass in all_models.all_models:
       model_name = model_klass.__name__
       if types and model_name not in types:
         continue
       if extra_params and model_name in extra_params:
         continue
-      model_names.append(model_name)
+      model_names[model_name] = model_klass
     return model_names
+
+  @staticmethod
+  def _get_model(model_name, extra_params=None):
+    """Return model by its name if it is not in `extra_params`, else None"""
+
+    if extra_params and model_name in extra_params:
+      return None
+
+
+    return get_model(model_name)
 
   # pylint: disable=too-many-arguments
   def search(self, terms, types=None, permission_type='read',
              contact_id=None, extra_params=None):
     """Prepare the search query and return the results set based on the
     full text table."""
+
+    if not types:
+      # return empty result in case if type is not specified
+      return []
+
+    queries = []
+
+    for type_ in types:
+      queries.append(self._get_search_for_single_model(
+          terms=terms,
+          types=[type_],
+          permission_type=permission_type,
+          contact_id=contact_id,
+          extra_params=extra_params
+      ))
+
+    if len(queries) > 1:
+      query = union_all(*queries)
+    else:
+      query = queries[0]
+
+    return db.session.execute(query)
+
+  # pylint: disable=too-many-arguments,too-many-locals
+  def _get_search_for_single_model(self, terms, types,
+                                   permission_type='read',
+                                   contact_id=None, extra_params=None):
+    """Prepare the search query and return the results set based on the
+    full text table.
+
+    `types` must contain 1 item at most
+    """
+
     extra_params = extra_params or {}
     model_names = self._get_grouped_types(types, extra_params)
+    any_model = model_names.values()[0] if model_names else None
+
     columns = (
         self.record_type.key.label('key'),
         self.record_type.type.label('type'),
@@ -155,11 +235,12 @@ class MysqlIndexer(SqlIndexer):
 
     query = db.session.query(*columns)
     query = query.filter(self.get_permissions_query(
-        model_names, permission_type))
-    query = query.filter(self._get_filter_query(terms))
+        model_names.keys(), permission_type))
+    query = query.filter(self._get_filter_query(terms, any_model))
     query = self.search_get_owner_query(query, types, contact_id)
 
     model_names = self._get_grouped_types(types)
+    any_model = model_names.values()[0] if model_names else None
 
     unions = [query]
     # Add extra_params and extra_colums:
@@ -169,36 +250,69 @@ class MysqlIndexer(SqlIndexer):
       extra_q = db.session.query(*columns)
       extra_q = extra_q.filter(
           self.get_permissions_query([key], permission_type))
-      extra_q = extra_q.filter(self._get_filter_query(terms))
+      extra_q = extra_q.filter(self._get_filter_query(terms, any_model))
       extra_q = self.search_get_owner_query(extra_q, [key], contact_id)
       extra_q = self._add_extra_params_query(extra_q, key, value)
       unions.append(extra_q)
     all_queries = sa.union(*unions)
     all_queries = aliased(all_queries.order_by(
         all_queries.c.sort_key, all_queries.c.content))
-    return db.session.execute(
-        select([all_queries.c.key, all_queries.c.type]).distinct())
+
+    return select([all_queries.c.key, all_queries.c.type]).distinct()
 
   # pylint: disable=too-many-arguments
-  def counts(self, terms, types=None, contact_id=None,
-             extra_params=None, extra_columns=None):
-    """Prepare the search query, but return only count for each of
-     the requested objects."""
+  def counts(self, terms, types=None, contact_id=None, extra_params=None,
+             extra_columns=None):
+    """Prepare the search query and return the results set based on the
+    full text table."""
+
+    queries = []
+
+    if not types:
+      # return empty result in case if type is not specified
+      return []
+
+    for type_ in types:
+      queries.append(self._get_counts_for_single_model(
+          terms=terms,
+          types=[type_],
+          contact_id=contact_id,
+          extra_params=extra_params,
+          extra_columns=extra_columns
+      ))
+
+    if len(queries) > 1:
+      query = union_all(*queries)
+    else:
+      query = queries[0]
+
+    return db.session.execute(query)
+
+  # pylint: disable=too-many-arguments
+  def _get_counts_for_single_model(self, terms, types=None,
+                                   contact_id=None, extra_params=None,
+                                   extra_columns=None):
+    """Prepare the search query, but return only count for the requested object.
+
+    `types` must contain 1 item at most
+    """
     extra_params = extra_params or {}
     extra_columns = extra_columns or {}
     model_names = self._get_grouped_types(types, extra_params)
+    any_model = model_names.values()[0] if model_names else None
+
     query = db.session.query(
         self.record_type.type, sa.func.count(sa.distinct(
             self.record_type.key)), sa.literal(""))
-    query = query.filter(self.get_permissions_query(model_names))
-    query = query.filter(self._get_filter_query(terms))
+    query = query.filter(self.get_permissions_query(model_names.keys()))
+    query = query.filter(self._get_filter_query(terms, any_model))
     query = self.search_get_owner_query(query, types, contact_id)
     query = query.group_by(self.record_type.type)
     all_extra_columns = dict(extra_columns.items() +
                              [(p, p) for p in extra_params
                               if p not in extra_columns])
     if not all_extra_columns:
-      return query.all()
+      return query
 
     # Add extra_params and extra_colums:
     for key, value in all_extra_columns.iteritems():
@@ -208,14 +322,14 @@ class MysqlIndexer(SqlIndexer):
           sa.literal(key)
       )
       extra_q = extra_q.filter(self.get_permissions_query([value]))
-      extra_q = extra_q.filter(self._get_filter_query(terms))
+      extra_q = extra_q.filter(self._get_filter_query(terms, any_model))
       extra_q = self.search_get_owner_query(extra_q, [value], contact_id)
       extra_q = self._add_extra_params_query(extra_q,
                                              value,
                                              extra_params.get(key, None))
       extra_q = extra_q.group_by(self.record_type.type)
       query = query.union(extra_q)
-    return query.all()
+    return query
 
 
 Indexer = MysqlIndexer

@@ -264,8 +264,10 @@ class ModelView(View):
       types = self._get_matching_types(self.model)
       indexer = get_indexer()
       models = indexer._get_grouped_types(types)
-      search_query = indexer.get_permissions_query(models, 'read')
-      search_query = sa.and_(search_query, indexer._get_filter_query(terms))
+      any_model = models.values()[0] if models else None
+      search_query = indexer.get_permissions_query(models.keys(), 'read')
+      search_query = sa.and_(search_query,
+                             indexer._get_filter_query(terms, any_model))
       search_query = db.session.query(indexer.record_type.key).filter(
           search_query)
       if '__mywork' in request.args:

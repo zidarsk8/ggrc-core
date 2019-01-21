@@ -161,7 +161,7 @@ all_models = [  # pylint: disable=invalid-name
     Vendor,
 ]
 
-__all__ = [m.__name__ for m in all_models]
+__all__ = list(m.__name__ for m in all_models)
 
 
 def register_model(model):
