@@ -119,15 +119,14 @@ export default can.Component.extend({
       const reviewDate = moment(this.attr('review.last_reviewed_at'))
         .format('YYYY-MM-DD HH:mm:ss');
       const filter = QueryParser.parse(
-        `resource_type = ${instance.type} AND
-         resource_id = ${instance.id} AND
-         created_at >= ${reviewDate} OR
+        `${instance.type} not_empty_revisions_for ${instance.id} AND
+         created_at >= "${reviewDate}" OR
          source_type = ${instance.type} AND
          source_id = ${instance.id} AND
-         created_at >= ${reviewDate} OR
+         created_at >= "${reviewDate}" OR
          destination_type = ${instance.type} AND
          destination_id = ${instance.id} AND
-         created_at >= ${reviewDate}`);
+         created_at >= "${reviewDate}"`);
       let pageInfo = this.attr('pageInfo');
       const page = {
         current: pageInfo.current,
