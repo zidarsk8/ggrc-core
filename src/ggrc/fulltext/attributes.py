@@ -50,12 +50,8 @@ class FullTextAttr(object):
     If template exists for the property, it's being applied
     """
     if isinstance(instance, Indexed):
-      property_tmpl = instance.PROPERTY_TEMPLATE
-    else:
-      property_tmpl = u"{}"
+      return instance.get_fulltext_attr_name(self)
 
-    if self.with_template:
-      return property_tmpl.format(self.alias)
     return self.alias
 
   def get_value_for(self, instance):
