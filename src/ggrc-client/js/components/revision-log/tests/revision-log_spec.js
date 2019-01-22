@@ -6,10 +6,37 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-log';
 
-import RefreshQueue from '../../../models/refresh_queue';
 import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
+import RefreshQueue from '../../../models/refresh_queue';
+import Revision from '../../../models/service-models/revision';
+import Stub from '../../../models/stub';
+import * as ReifyUtils from '../../../plugins/utils/reify-utils';
 
 describe('revision-log component', function () {
+  describe('init() method', () => {
+    let init;
+
+    beforeEach(() => {
+      init = Component.prototype.init.bind({
+        viewModel: viewModel,
+      });
+      spyOn(viewModel, 'initObjectReview');
+      spyOn(viewModel, 'fetchItems');
+    });
+
+    it('calls initObjectReview', () => {
+      init();
+
+      expect(viewModel.initObjectReview).toHaveBeenCalled();
+    });
+
+    it('calls fetchItems', () => {
+      init();
+
+      expect(viewModel.fetchItems).toHaveBeenCalled();
+    });
+  });
+
   let viewModel;
 
   beforeEach(function () {
@@ -27,13 +54,17 @@ describe('revision-log component', function () {
   });
 
   describe('fetchItems() method', function () {
-    let dfdFetchData;
+    let fetchDfd;
 
     beforeEach(function () {
-      dfdFetchData = new $.Deferred();
-      spyOn(viewModel, '_fetchRevisionsData')
-        .and.returnValue(dfdFetchData);
+      fetchDfd = new $.Deferred();
+      spyOn(viewModel, 'fetchRevisions')
+        .and.returnValue(fetchDfd);
       spyOn(NotifierUtils, 'notifier');
+      spyOn(viewModel, 'fetchAdditionalInfoForRevisions')
+        .and.callFake(() => 'additionalFetched');
+      spyOn(viewModel, 'composeRevisionsData')
+        .and.callFake(() => 'composedRevisions');
     });
 
     it('assigns true to isLoading', () => {
@@ -48,9 +79,28 @@ describe('revision-log component', function () {
       expect(viewModel.attr('revisions')).toBeNull();
     });
 
+    it('calls fetchAdditionalInfoForRevisions with fetched revisions', () => {
+      viewModel.fetchItems();
+
+      fetchDfd.resolve('revisions');
+
+      expect(viewModel.fetchAdditionalInfoForRevisions)
+        .toHaveBeenCalledWith('revisions');
+    });
+
+    it('calls composeRevisionsData with fetched revisions ' +
+    'after additional info fetched', () => {
+      viewModel.fetchItems();
+
+      fetchDfd.resolve('revisions');
+
+      expect(viewModel.composeRevisionsData)
+        .toHaveBeenCalledWith('additionalFetched');
+    });
+
     it('displays specified error if fetching the data fails', function () {
       viewModel.fetchItems();
-      dfdFetchData.reject('Server error');
+      fetchDfd.reject('Server error');
 
       expect(NotifierUtils.notifier).toHaveBeenCalledWith(
         'error',
@@ -58,65 +108,299 @@ describe('revision-log component', function () {
       );
     });
 
-    it('assigns fetched revisionsData to revisions attr', () => {
-      const revisionsData = [1, 2, 3];
-
+    it('assigns result of composeRevisionsData to revisions attr', () => {
       viewModel.fetchItems();
-      dfdFetchData.resolve(revisionsData);
+      fetchDfd.resolve('revisions');
 
-      expect(viewModel.attr('revisions').serialize())
-        .toEqual(revisionsData);
+      expect(viewModel.attr('revisions')).toEqual('composedRevisions');
+    });
+
+    it('assigns false to "isLoading" after data fetching ' +
+    'in case of success', (done) => {
+      fetchDfd.resolve();
+
+      viewModel.fetchItems().done(() => {
+        expect(viewModel.attr('isLoading')).toBe(false);
+        done();
+      });
+    });
+
+    it('assigns false to "isLoading" after data fetching ' +
+    'in case of fail', (done) => {
+      fetchDfd.reject();
+
+      viewModel.fetchItems().fail(() => {
+        expect(viewModel.attr('isLoading')).toBe(false);
+        done();
+      });
     });
   });
 
-  describe('_fetchRevisionsData() method', function () {
-    let triggerDfd;
-    let compareDfd;
+  describe('makeRevisionModels(data) method', () => {
+    it('returns models of Revision from data.values', () => {
+      const values = [{id: 1}, {id: 2}];
 
-    beforeEach(function () {
-      triggerDfd = $.Deferred();
-      spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(triggerDfd);
-      spyOn(viewModel, '_fetchAdditionalInfoForRevisions');
-      compareDfd = $.Deferred();
-      spyOn(viewModel, 'getRevisionForCompare').and.returnValue(compareDfd);
+      const result = viewModel.makeRevisionModels({values});
+
+      result.forEach((revision, index) => {
+        expect(revision instanceof Revision).toBe(true);
+        expect(revision).toEqual(jasmine.objectContaining(values[index]));
+      });
     });
+  });
 
-    describe('if options.showLastReviewUpdates is false', () => {
-      let revisionsDfd;
+  describe('fetchAdditionalInfoForRevisions(revisions) method',
+    () => {
+      let revisions;
+      let enqueueSpy;
+      let triggerDfd;
 
       beforeEach(() => {
-        viewModel.attr('options.showLastReviewUpdates', false);
-        revisionsDfd = $.Deferred();
-        spyOn(viewModel, 'getAllRevisions').and.returnValue(revisionsDfd);
+        enqueueSpy = spyOn(RefreshQueue.prototype, 'enqueue');
+        triggerDfd = $.Deferred();
+        spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(triggerDfd);
+
+        revisions = [{
+          modified_by: 'mock1',
+        }, {
+          destination_type: 'mock2',
+          destination_id: 'mock3',
+        }, {
+          source_type: 'mock4',
+          source_id: 'mock5',
+        }];
       });
 
-      it('fetches all revisions', () => {
-        viewModel._fetchRevisionsData();
+      it('calls enqueue for all users which modified object', () => {
+        viewModel.fetchAdditionalInfoForRevisions(revisions);
 
-        expect(viewModel.getAllRevisions).toHaveBeenCalled();
+        const modifiers = revisions
+          .filter((revision) => revision.modified_by)
+          .map((revision) => revision.modified_by);
+        expect(modifiers.length).not.toBe(0);
+
+        modifiers.forEach((modifier) => {
+          expect(enqueueSpy).toHaveBeenCalledWith(modifier);
+        });
       });
 
-      describe('when revisions fetched', () => {
-        it('fetches additional info for revisions', () => {
-          const revisions = [];
-          viewModel._fetchRevisionsData();
+      it('adds to revisions attribute "destination" ' +
+      'if "destination_type" and "destination_id" are defined', () => {
+        viewModel.fetchAdditionalInfoForRevisions(revisions);
 
-          revisionsDfd.resolve(revisions);
+        const destinations = revisions
+          .filter((revision) => revision.destination_id &&
+            revision.destination_type)
+          .map((revision) => revision.destination);
+        expect(destinations.length).not.toBe(0);
+        revisions.forEach((revision) => {
+          if (revision.destination_id && revision.destination_type) {
+            expect(revision.destination instanceof Stub);
+            expect(revision.destination).toEqual(jasmine.objectContaining({
+              id: revision.destination_id,
+              type: revision.destination_type,
+            }));
+          }
+        });
+      });
 
-          expect(viewModel._fetchAdditionalInfoForRevisions).
-            toHaveBeenCalledWith(jasmine.any(RefreshQueue), revisions);
+      it('calls enqueue for each created "destination" in revision', () => {
+        viewModel.fetchAdditionalInfoForRevisions(revisions);
+
+        const destinations = revisions
+          .filter((revision) => revision.destination_id &&
+            revision.destination_type)
+          .map((revision) => revision.destination);
+        expect(destinations.length).not.toBe(0);
+        destinations.forEach((destination) => {
+          expect(enqueueSpy).toHaveBeenCalledWith(destination);
+        });
+      });
+
+      it('adds to revisions attribute "source" ' +
+      'if "source_type" and "source_id" are defined', () => {
+        viewModel.fetchAdditionalInfoForRevisions(revisions);
+
+        const sources = revisions
+          .filter((revision) => revision.source_id &&
+            revision.source_type)
+          .map((revision) => revision.source);
+        expect(sources.length).not.toBe(0);
+        revisions.forEach((revision) => {
+          if (revision.source_id && revision.source_type) {
+            expect(revision.source instanceof Stub);
+            expect(revision.source).toEqual(jasmine.objectContaining({
+              id: revision.source_id,
+              type: revision.source_type,
+            }));
+          }
+        });
+      });
+
+      it('calls enqueue for each created "source" in revision', () => {
+        viewModel.fetchAdditionalInfoForRevisions(revisions);
+
+        const sources = revisions
+          .filter((revision) => revision.source_id &&
+            revision.source_type)
+          .map((revision) => revision.source);
+        expect(sources.length).not.toBe(0);
+        sources.forEach((source) => {
+          expect(enqueueSpy).toHaveBeenCalledWith(source);
+        });
+      });
+
+      it('returns deferred with revisions', (done) => {
+        viewModel.fetchAdditionalInfoForRevisions(revisions)
+          .then((result) => {
+            expect(result).toBe(revisions);
+            done();
+          });
+        triggerDfd.resolve();
+      });
+    });
+
+  describe('composeRevisionsData(revisions) method',
+    () => {
+      let revisions;
+      let revisionsForCompare;
+
+      beforeEach(() => {
+        revisions = [{
+          destination: 'destination',
+        }, {
+          source: 'source',
+        }, {
+          modified_by: 'modified_by',
+        }];
+
+        revisionsForCompare = {mock: 'mock'};
+        revisions.push(revisionsForCompare);
+
+        spyOn(viewModel, 'reifyRevision').and.callFake(
+          (revision) => {
+            revision.isReified = true;
+            return revision;
+          });
+      });
+
+      it('returns specified object composed from revisions ' +
+      'with not empty revisionsForCompare ' +
+      'if there is more revisions then pageSize', () => {
+        const expected = {
+          object: [jasmine.objectContaining(revisions[2])],
+          mappings: [revisions[0], revisions[1]].map((revision) =>
+            jasmine.objectContaining(revision)),
+          revisionsForCompare: [jasmine.objectContaining(revisionsForCompare)],
+        };
+        viewModel.attr('pageInfo.pageSize', 3);
+
+        const result =
+          viewModel.composeRevisionsData(revisions);
+
+        expect(result).toEqual(expected);
+      });
+
+      it('returns specified object composed from revisions' +
+      'with empty revisionsForCompare ' +
+      'if there is not more revisions then pageSize', () => {
+        const expected = {
+          object: [jasmine.objectContaining(revisions[2])],
+          mappings: [revisions[0], revisions[1]].map((revision) =>
+            jasmine.objectContaining(revision)),
+          revisionsForCompare: [],
+        };
+        revisions.splice(-1);
+        viewModel.attr('pageInfo.pageSize', 10);
+
+        const result =
+          viewModel.composeRevisionsData(revisions);
+
+        expect(result).toEqual(expected);
+      });
+
+      it('reifies all revisions in returned object', () => {
+        viewModel.attr('pageInfo.pageSize', 3);
+
+        const result =
+          viewModel.composeRevisionsData(revisions, revisionsForCompare);
+
+        result.object.forEach((revision) => {
+          expect(revision.isReified).toBe(true);
+        });
+        result.mappings.forEach((revision) => {
+          expect(revision.isReified).toBe(true);
+        });
+        result.revisionsForCompare.forEach((revision) => {
+          expect(revision.isReified).toBe(true);
         });
       });
     });
 
-    it('fetches after review revisions ' +
-    'if options.showLastReviewUpdates is true', () => {
-      viewModel.attr('options.showLastReviewUpdates', true);
-      spyOn(viewModel, 'getAfterReviewRevisions').and.returnValue($.Deferred());
+  describe('reifyRevision(revision) method', () => {
+    let revision;
+    let isReifiableSpy;
+    let reifySpy;
 
-      viewModel._fetchRevisionsData();
+    beforeEach(() => {
+      revision = {
+        attr: jasmine.createSpy('attr').and.callFake(function (prop) {
+          return this.prop;
+        }),
+      };
+      isReifiableSpy = spyOn(ReifyUtils, 'isReifiable');
+      reifySpy = spyOn(ReifyUtils, 'reify');
+    });
 
-      expect(viewModel.getAfterReviewRevisions).toHaveBeenCalled();
+    it('reifies "modified_by" field if it is reifiable', () => {
+      revision = Object.assign(revision, {modified_by: {}});
+      isReifiableSpy.and.returnValue(true);
+
+      viewModel.reifyRevision(revision);
+
+      expect(reifySpy).toHaveBeenCalled();
+    });
+
+    it('works without errors ' +
+    'if "modified_by" field does not have reify method', () => {
+      revision = Object.assign(revision, {modified_by: {}});
+      isReifiableSpy.and.returnValue(false);
+
+      expect(viewModel.reifyRevision.bind(null, revision)).not.toThrowError();
+    });
+
+    it('reifies "source" field if it has reify method', () => {
+      revision = Object.assign(revision, {source: {}});
+      isReifiableSpy.and.returnValue(true);
+
+      viewModel.reifyRevision(revision);
+
+      expect(reifySpy).toHaveBeenCalled();
+    });
+
+    it('works without errors ' +
+    'if "destination" field does not have reify method', () => {
+      revision = Object.assign(revision, {source: {}});
+      isReifiableSpy.and.returnValue(false);
+
+      expect(viewModel.reifyRevision.bind(null, revision)).not.toThrowError();
+    });
+
+    it('reifies "destination" field if it has reify method', () => {
+      revision = Object.assign(revision, {destination: {}});
+      isReifiableSpy.and.returnValue(true);
+
+      viewModel.reifyRevision(revision);
+
+      expect(reifySpy).toHaveBeenCalled();
+    });
+
+    it('works without errors ' +
+    'if "destination" field does not have reify method', () => {
+      revision = Object.assign(revision, {destination: {}});
+      isReifiableSpy.and.returnValue(false);
+
+      expect(viewModel.reifyRevision.bind(null, revision)).not.toThrowError();
     });
   });
 
@@ -146,29 +430,96 @@ describe('revision-log component', function () {
       expect(viewModel.attr('pageInfo.current'))
         .toBe(1);
     });
-  });
-
-  describe('init() method', () => {
-    let init;
-
-    beforeEach(() => {
-      init = Component.prototype.init.bind({
-        viewModel: viewModel,
-      });
-      spyOn(viewModel, 'initObjectReview');
-      spyOn(viewModel, 'fetchItems');
-    });
-
-    it('calls initObjectReview', () => {
-      init();
-
-      expect(viewModel.initObjectReview).toHaveBeenCalled();
-    });
 
     it('calls fetchItems', () => {
-      init();
+      viewModel.changeLastUpdatesFilter({});
 
       expect(viewModel.fetchItems).toHaveBeenCalled();
+    });
+  });
+
+  describe('initObjectReview() method', () => {
+    it('assigns reified review in "review" attr ' +
+    'if review present in instance', () => {
+      const review = new can.Map();
+      spyOn(ReifyUtils, 'reify').and.returnValue('reifiedReview');
+      viewModel.attr('review', 'previousReview');
+      viewModel.attr('instance', {review});
+
+      viewModel.initObjectReview();
+
+      expect(viewModel.attr('review')).toBe('reifiedReview');
+    });
+
+    it('does not assigns "review" attr if it is not present in instance',
+      () => {
+        viewModel.attr('instance', {});
+        viewModel.attr('review', 'previousReview');
+
+        viewModel.initObjectReview();
+
+        expect(viewModel.attr('review')).toBe('previousReview');
+      });
+  });
+
+  describe('events', () => {
+    const events = Component.prototype.events;
+    let handler;
+
+    describe('"{viewModel.instance} refreshInstance" handler', () => {
+      beforeEach(() => {
+        handler = events['{viewModel.instance} refreshInstance']
+          .bind({viewModel});
+        spyOn(viewModel, 'fetchItems');
+      });
+
+      it('calls fetchItems of viewModel', () => {
+        handler();
+
+        expect(viewModel.fetchItems).toHaveBeenCalled();
+      });
+    });
+
+    describe('"{viewModel.pageInfo} current" handler', () => {
+      beforeEach(() => {
+        handler = events['{viewModel.pageInfo} current']
+          .bind({viewModel});
+        spyOn(viewModel, 'fetchItems');
+      });
+
+      it('calls fetchItems of viewModel', () => {
+        handler();
+
+        expect(viewModel.fetchItems).toHaveBeenCalled();
+      });
+    });
+
+    describe('"{viewModel.pageInfo} pageSize" handler', () => {
+      beforeEach(() => {
+        handler = events['{viewModel.pageInfo} pageSize']
+          .bind({viewModel});
+        spyOn(viewModel, 'fetchItems');
+      });
+
+      it('calls fetchItems of viewModel', () => {
+        handler();
+
+        expect(viewModel.fetchItems).toHaveBeenCalled();
+      });
+    });
+
+    describe('removed handler', () => {
+      beforeEach(() => {
+        handler = events.removed.bind({viewModel});
+      });
+
+      it('assigns false to options.showLastReviewUpdates of viewModel', () => {
+        viewModel.attr('options', {showLastReviewUpdates: true});
+        handler();
+
+        expect(viewModel.attr('options.showLastReviewUpdates'))
+          .toBe(false);
+      });
     });
   });
 });
