@@ -4,15 +4,7 @@
  */
 
 import {reify} from '../plugins/utils/reify-utils';
-import * as businessModels from './business-models';
-import * as serviceModels from './service-models';
-import * as mappingModels from './mapping-models';
-
-const allModels = {
-  ...businessModels,
-  ...serviceModels,
-  ...mappingModels,
-};
+import allModels from './all-models';
 
 /*  RefreshQueue
  *

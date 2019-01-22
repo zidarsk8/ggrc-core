@@ -3,13 +3,7 @@ Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as businessModels from '../../models/business-models';
-import * as serviceModels from '../../models/service-models';
-
-const allModels = {
-  ...businessModels,
-  ...serviceModels,
-};
+import allModels from '../../models/all-models';
 
 function reify(obj) {
   if (obj instanceof can.List) {
