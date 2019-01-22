@@ -252,11 +252,9 @@ export default can.Construct.extend({
   */
   getMappingsFor: function (object) {
     let mappings = {};
-    if (this.config[object]) {
-      _.forEach(this.config[object], function (mapping, mappingName) {
-        if (mappingName === 'map') {
-          return;
-        }
+    let objectConfig = this.config[object];
+    if (objectConfig && objectConfig.mappers) {
+      _.forEach(objectConfig.mappers, function (mapping, mappingName) {
         mappings[mappingName] = mapping;
       });
     }

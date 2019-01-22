@@ -212,51 +212,56 @@ new Mappings({
     // collection. The result of the operation is the total list.
     map: [...coreObjects, 'Audit', 'Program'],
     indirectMappings: ['Person'],
-    // Needed for related_objects mapper
-    related_objects_as_source: Proxy(
-      null,
-      'destination', 'Relationship',
-      'source', 'related_destinations'
-    ),
-    // Needed for related_objects mapper
-    related_objects_as_destination: Proxy(
-      null,
-      'source', 'Relationship',
-      'destination', 'related_sources'
-    ),
-    // Needed to show mapped objects for CycleTaskGroupObjectTask
-    related_objects: Multi(
-      ['related_objects_as_source', 'related_objects_as_destination']
-    ),
-    /**
+
+    mappers: {
+      // Needed for related_objects mapper
+      related_objects_as_source: Proxy(
+        null,
+        'destination', 'Relationship',
+        'source', 'related_destinations'
+      ),
+      // Needed for related_objects mapper
+      related_objects_as_destination: Proxy(
+        null,
+        'source', 'Relationship',
+        'destination', 'related_sources'
+      ),
+      // Needed to show mapped objects for CycleTaskGroupObjectTask
+      related_objects: Multi(
+        ['related_objects_as_source', 'related_objects_as_destination']
+      ),
+      /**
        * "cycle" mapper is needed for mapped objects under
        * CycleTaskGroupObjectTask into mapping-tree-view component.
        */
-    cycle: Direct(
-      'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-    /**
+      cycle: Direct(
+        'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
+      /**
        * This mapping name is needed for objects mapped to CTGOT.
        * It helps to filter results of objects mapped to CTGOT.
        * We can just remove some objects from results.
        */
-    info_related_objects: CustomFilter(
-      'related_objects',
-      function (relatedObjects) {
-        return !_.includes([
-          'CycleTaskGroup',
-          'Comment',
-          'Document',
-          'Person',
-        ],
-        relatedObjects.instance.type);
-      }
-    ),
+      info_related_objects: CustomFilter(
+        'related_objects',
+        function (relatedObjects) {
+          return !_.includes([
+            'CycleTaskGroup',
+            'Comment',
+            'Document',
+            'Person',
+          ],
+          relatedObjects.instance.type);
+        }
+      ),
+    },
   },
 
   // Other
   UserRole: {
-    person: Direct('Person', 'user_roles', 'person'),
-    role: Direct('Role', 'user_roles', 'role'),
+    mappers: {
+      person: Direct('Person', 'user_roles', 'person'),
+      role: Direct('Role', 'user_roles', 'role'),
+    },
   },
   MultitypeSearch: {
     map: [
@@ -272,20 +277,24 @@ new Mappings({
   },
   // Used by Custom Attributes widget
   CustomAttributable: {
-    custom_attribute_definitions: Search(function (binding) {
-      return CustomAttributeDefinition.findAll({
-        definition_type: binding.instance.root_object,
-        definition_id: null,
-      });
-    }, 'CustomAttributeDefinition'),
+    mappers: {
+      custom_attribute_definitions: Search(function (binding) {
+        return CustomAttributeDefinition.findAll({
+          definition_type: binding.instance.root_object,
+          definition_id: null,
+        });
+      }, 'CustomAttributeDefinition'),
+    },
   },
   // used by the Custom Roles admin panel tab
   Roleable: {
-    access_control_roles: Search(function (binding) {
-      return AccessControlRole.findAll({
-        object_type: binding.instance.model_singular,
-        internal: false,
-      });
-    }, 'AccessControlRole'),
+    mappers: {
+      access_control_roles: Search(function (binding) {
+        return AccessControlRole.findAll({
+          object_type: binding.instance.model_singular,
+          internal: false,
+        });
+      }, 'AccessControlRole'),
+    },
   },
 });
