@@ -13,7 +13,6 @@ import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import autoStatusChangeable from '../mixins/auto-status-changeable';
 import timeboxed from '../mixins/timeboxed';
-import inScopeObjects from '../mixins/in-scope-objects';
 import accessControlList from '../mixins/access-control-list';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
@@ -32,7 +31,7 @@ export default Cacheable.extend({
   mixins: [
     uniqueTitle, caUpdate,
     autoStatusChangeable, timeboxed,
-    inScopeObjects, accessControlList, refetchHash,
+    accessControlList, refetchHash,
     assessmentIssueTracker, relatedAssessmentsLoader,
   ],
   is_custom_attributable: true,

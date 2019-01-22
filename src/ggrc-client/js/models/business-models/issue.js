@@ -6,8 +6,6 @@
 import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
-import inScopeObjects from '../mixins/in-scope-objects';
-import inScopeObjectsPreload from '../mixins/in-scope-objects-preload';
 import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/base-notifications';
 import issueTracker from '../mixins/issue-tracker';
@@ -25,8 +23,6 @@ export default Cacheable.extend({
   mixins: [
     caUpdate,
     timeboxed,
-    inScopeObjects,
-    inScopeObjectsPreload,
     accessControlList,
     baseNotifications,
     issueTracker,

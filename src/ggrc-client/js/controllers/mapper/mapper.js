@@ -119,31 +119,29 @@ const ObjectMapper = can.Control.extend({
       let model = businessModels[data.join_object_type];
       let inScopeObject =
         model.findInCacheById(data.join_object_id);
-      inScopeObject.updateScopeObject().then(function () {
-        let scopeObject = inScopeObject.attr('audit');
+      let scopeObject = inScopeObject.attr('audit');
 
-        if (!scopeObject.id) {
-          notifier('error', DATA_CORRUPTION_MESSAGE);
-          setTimeout(function () {
-            changeUrl('/dashboard');
-          }, 3000);
-          return;
-        }
+      if (!scopeObject.id) {
+        notifier('error', DATA_CORRUPTION_MESSAGE);
+        setTimeout(function () {
+          changeUrl('/dashboard');
+        }, 3000);
+        return;
+      }
 
-        _.assign(config.general, {
-          object: data.join_object_type,
-          'join-object-id': data.join_object_id,
-          type: data.join_option_type,
-          relevantTo: [{
-            readOnly: true,
-            type: scopeObject.type,
-            id: scopeObject.id,
-            title: scopeObject.title,
-          }],
-        });
-        self.launch(btn, Object.assign(config, data));
-      })
-        .always(() => self.isLoading = false);
+      _.assign(config.general, {
+        object: data.join_object_type,
+        'join-object-id': data.join_object_id,
+        type: data.join_option_type,
+        relevantTo: [{
+          readOnly: true,
+          type: scopeObject.type,
+          id: scopeObject.id,
+          title: scopeObject.title,
+        }],
+      });
+      self.launch(btn, Object.assign(config, data));
+      self.isLoading = false;
     }
 
     function openForCommonObjects(data, isSearch) {
