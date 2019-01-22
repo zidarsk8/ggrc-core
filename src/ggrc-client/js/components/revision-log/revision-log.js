@@ -24,6 +24,17 @@ export default can.Component.extend({
   tag: 'revision-log',
   template,
   leakScope: true,
+  /**
+   * The component's entry point. Invoked when a new component instance has
+   * been created.
+   */
+  init: function () {
+    const viewModel = this.viewModel;
+
+    viewModel.initObjectReview();
+
+    viewModel.fetchItems();
+  },
   viewModel: {
     define: {
       showFilter: {
@@ -46,40 +57,54 @@ export default can.Component.extend({
     review: null,
     isLoading: false,
     revisions: null,
-    // for last revision where properties of objects was changed,
-    // we need fetch additional revision for calculating diff
-    getRevisionForCompare(lastRevision) {
-      const instance = this.attr('instance');
-      const createdAt = moment(lastRevision.created_at)
-        .format('YYYY-MM-DD HH:mm:ss');
-      const filter = QueryParser.parse(
-        `resource_type = ${instance.type} AND
-         resource_id = ${instance.id} AND
-         created_at < "${createdAt}"`);
-      const page = {
-        current: 1,
-        pageSize: 1,
-        sort: [{
-          direction: 'desc',
-          key: 'created_at',
-        }],
-      };
-      let params = buildParam(
-        'Revision',
-        page,
-        null,
-        null,
-        filter
-      );
+    fetchItems: function () {
+      this.attr('isLoading', true);
+      this.attr('revisions', null);
 
-      return batchRequests(params).then((data) => {
-        return this.makeRevisionModels(data.Revision);
-      }).then((revisions) => {
-        let rq = new RefreshQueue();
-        this._fetchAdditionalInfoForRevisions(rq, revisions);
+      const stopFn = tracker.start(
+        this.attr('instance.type'),
+        tracker.USER_JOURNEY_KEYS.LOADING,
+        tracker.USER_ACTIONS.CHANGE_LOG);
 
-        return rq.trigger().then(() => revisions);
-      });
+      return this._fetchRevisionsData()
+        .done((revisionsData) => {
+          this.attr('revisions', revisionsData);
+          stopFn();
+        })
+        .fail(function () {
+          stopFn(true);
+          $('body').trigger(
+            'ajax:flash',
+            {error: 'Failed to fetch revision history data.'});
+        })
+        .always(function () {
+          this.attr('isLoading', false);
+        }.bind(this));
+    },
+    _fetchRevisionsData() {
+      let fetchRevisions = this.attr('options.showLastReviewUpdates') ?
+        this.getAfterReviewRevisions.bind(this) :
+        this.getAllRevisions.bind(this);
+
+      return fetchRevisions().then(
+        (revisions) => {
+          let rq = new RefreshQueue();
+          this._fetchAdditionalInfoForRevisions(rq, revisions);
+
+          let dfdForCompare = $.Deferred().resolve([]);
+          // find last revision with modified content by excluding revisions with mappings
+          const lastModifiedRevision = _.findLast(revisions,
+            (revision) => !revision.source && !revision.destination);
+
+          if (lastModifiedRevision) {
+            dfdForCompare = this.getRevisionForCompare(lastModifiedRevision);
+          }
+
+          return $.when(dfdForCompare, rq.trigger())
+            .then((revisionsForCompare) => {
+              return this.composeRevisionsData(revisions, revisionsForCompare);
+            });
+        });
     },
     getAllRevisions() {
       const instance = this.attr('instance');
@@ -152,6 +177,41 @@ export default can.Component.extend({
         return this.makeRevisionModels(data);
       });
     },
+    // for last revision where properties of objects was changed,
+    // we need fetch additional revision for calculating diff
+    getRevisionForCompare(lastRevision) {
+      const instance = this.attr('instance');
+      const createdAt = moment(lastRevision.created_at)
+        .format('YYYY-MM-DD HH:mm:ss');
+      const filter = QueryParser.parse(
+        `resource_type = ${instance.type} AND
+         resource_id = ${instance.id} AND
+         created_at < "${createdAt}"`);
+      const page = {
+        current: 1,
+        pageSize: 1,
+        sort: [{
+          direction: 'desc',
+          key: 'created_at',
+        }],
+      };
+      let params = buildParam(
+        'Revision',
+        page,
+        null,
+        null,
+        filter
+      );
+
+      return batchRequests(params).then((data) => {
+        return this.makeRevisionModels(data.Revision);
+      }).then((revisions) => {
+        let rq = new RefreshQueue();
+        this._fetchAdditionalInfoForRevisions(rq, revisions);
+
+        return rq.trigger().then(() => revisions);
+      });
+    },
     makeRevisionModels(data) {
       let revisions = data.values;
       revisions = revisions.map(function (source) {
@@ -159,31 +219,6 @@ export default can.Component.extend({
       });
 
       return revisions;
-    },
-
-    fetchItems: function () {
-      this.attr('isLoading', true);
-      this.attr('revisions', null);
-
-      const stopFn = tracker.start(
-        this.attr('instance.type'),
-        tracker.USER_JOURNEY_KEYS.LOADING,
-        tracker.USER_ACTIONS.CHANGE_LOG);
-
-      return this._fetchRevisionsData()
-        .done((revisionsData) => {
-          this.attr('revisions', revisionsData);
-          stopFn();
-        })
-        .fail(function () {
-          stopFn(true);
-          $('body').trigger(
-            'ajax:flash',
-            {error: 'Failed to fetch revision history data.'});
-        })
-        .always(function () {
-          this.attr('isLoading', false);
-        }.bind(this));
     },
     _fetchAdditionalInfoForRevisions(refreshQueue, revisions) {
       _.forEach(revisions, (revision) => {
@@ -206,40 +241,6 @@ export default can.Component.extend({
         }
       });
     },
-    _reifyRevision(revision) {
-      _.forEach(['modified_by', 'source', 'destination'],
-        function (field) {
-          if (revision[field] && isReifiable(revision[field])) {
-            revision.attr(field, reifyUtil(revision[field]));
-          }
-        });
-      return revision;
-    },
-    _fetchRevisionsData() {
-      let fetchRevisions = this.attr('options.showLastReviewUpdates') ?
-        this.getAfterReviewRevisions.bind(this) :
-        this.getAllRevisions.bind(this);
-
-      return fetchRevisions().then(
-        (revisions) => {
-          let rq = new RefreshQueue();
-          this._fetchAdditionalInfoForRevisions(rq, revisions);
-
-          let dfdForCompare = $.Deferred().resolve([]);
-          // find last revision with modified content by excluding revisions with mappings
-          const lastModifiedRevision = _.findLast(revisions,
-            (revision) => !revision.source && !revision.destination);
-
-          if (lastModifiedRevision) {
-            dfdForCompare = this.getRevisionForCompare(lastModifiedRevision);
-          }
-
-          return $.when(dfdForCompare, rq.trigger())
-            .then((revisionsForCompare) => {
-              return this.composeRevisionsData(revisions, revisionsForCompare);
-            });
-        });
-    },
     composeRevisionsData(revisions, revisionsForCompare = []) {
       let objRevisions = [];
       let mappings = [];
@@ -257,6 +258,15 @@ export default can.Component.extend({
         revisionsForCompare: _.map(revisionsForCompare, this._reifyRevision),
       };
     },
+    _reifyRevision(revision) {
+      _.forEach(['modified_by', 'source', 'destination'],
+        function (field) {
+          if (revision[field] && isReifiable(revision[field])) {
+            revision.attr(field, reifyUtil(revision[field]));
+          }
+        });
+      return revision;
+    },
     changeLastUpdatesFilter(element) {
       const isChecked = element.checked;
       this.attr('options.showLastReviewUpdates', isChecked);
@@ -271,17 +281,6 @@ export default can.Component.extend({
         this.attr('review', reifyUtil(review));
       }
     },
-  },
-  /**
-   * The component's entry point. Invoked when a new component instance has
-   * been created.
-   */
-  init: function () {
-    const viewModel = this.viewModel;
-
-    viewModel.initObjectReview();
-
-    viewModel.fetchItems();
   },
   events: {
     '{viewModel.instance} refreshInstance': function () {
