@@ -17,8 +17,7 @@ describe('ObjectMapper', function () {
     let method;
     let fakeCtrlInst;
     let fakeData;
-    let updateScopeObject;
-    let scopeObject;
+    let audit;
     let cacheBackup;
 
     beforeAll(function () {
@@ -31,21 +30,16 @@ describe('ObjectMapper', function () {
     });
 
     beforeEach(function () {
-      updateScopeObject = $.Deferred();
-      scopeObject = new can.Map({
+      audit = new can.Map({
         id: 1,
       });
 
       Assessment.cache = [
         new can.Map({
-          updateScopeObject: jasmine.createSpy('updateScopeObject')
-            .and
-            .returnValue(updateScopeObject),
-          audit: scopeObject,
+          audit: audit,
         }),
       ];
       fakeCtrlInst = {
-        isLoading: false,
         launch: jasmine.createSpy('launch'),
       };
       fakeData = {
@@ -64,13 +58,6 @@ describe('ObjectMapper', function () {
       expect(fakeCtrlInst.launch).not.toHaveBeenCalled();
     });
 
-    it('interrupts own work if isLoading prop is true', function () {
-      fakeCtrlInst.isLoading = true;
-      method(fakeData, false);
-
-      expect(fakeCtrlInst.launch).not.toHaveBeenCalled();
-    });
-
     it('throws Error with message if data.join_object_type does not exist',
       function () {
         let closure = function () {
@@ -81,27 +68,21 @@ describe('ObjectMapper', function () {
       });
 
     describe('shows mapper for snapshots', function () {
-      it('calls launch method with params',
-        function (done) {
-          let btn = {};
-          method(fakeData, false, btn);
+      it('calls launch method with params', function () {
+        let btn = {};
+        method(fakeData, false, btn);
 
-          updateScopeObject.resolve().then(function () {
-            expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
-              btn,
-              jasmine.objectContaining({
-                general: jasmine.any(Object),
-                special: jasmine.any(Array),
-              })
-            );
-
-            done();
-          });
-        });
+        expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
+          btn,
+          jasmine.objectContaining({
+            general: jasmine.any(Object),
+            special: jasmine.any(Array),
+          })
+        );
+      });
 
       it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
-      'if data has is_new`,
-      function (done) {
+      'if data has is_new`, function () {
         let args;
         method(_.assign(fakeData, {
           is_new: true,
@@ -109,21 +90,17 @@ describe('ObjectMapper', function () {
 
         args = fakeCtrlInst.launch.calls.argsFor(0);
 
-        // so hard:(
-        updateScopeObject.resolve().then(function () {
-          expect(args[1]).toEqual(
-            jasmine.objectContaining({
-              general: jasmine.objectContaining({
-                object: fakeData.join_object_type,
-                type: fakeData.join_option_type,
-                isNew: true,
-                relevantTo: jasmine.any(Array),
-              }),
-            })
-          );
-          expect(args[1].general['join-object-id']).toBeNull();
-          done();
-        });
+        expect(args[1]).toEqual(
+          jasmine.objectContaining({
+            general: jasmine.objectContaining({
+              object: fakeData.join_object_type,
+              type: fakeData.join_option_type,
+              isNew: true,
+              relevantTo: jasmine.any(Array),
+            }),
+          })
+        );
+        expect(args[1].general['join-object-id']).toBeNull();
       });
 
       it('throws Error with message if data.join_object_id does not exist',
@@ -133,19 +110,6 @@ describe('ObjectMapper', function () {
           };
 
           expect(closure).toThrowError();
-        });
-
-      it('updates "isLoading" flag before and after updating scope object',
-        (done) => {
-          fakeCtrlInst.isLoading = false;
-
-          method(fakeData, false);
-          expect(fakeCtrlInst.isLoading).toBe(true);
-
-          updateScopeObject.resolve().then(() => {
-            expect(fakeCtrlInst.isLoading).toBe(false);
-            done();
-          });
         });
     });
 
@@ -160,7 +124,7 @@ describe('ObjectMapper', function () {
       });
 
       it('sets config without relevantTo section if data.join_object_type ' +
-      'is not in scope model', function () {
+      'is not audit scope model', function () {
         let args;
         method(fakeDataForCommon, false, {});
         args = ObjectSearch.launch.calls.argsFor(0);
@@ -182,19 +146,15 @@ describe('ObjectMapper', function () {
       });
 
       it('calls launch for ObjectMapper with passed btn and config if ' +
-      'data.toggle contains "unified-search" string', function (done) {
+      'data.toggle contains "unified-search" string', function () {
         let btn = {};
         fakeDataForCommon.toggle = '';
         method(fakeDataForCommon, false, btn);
 
-        updateScopeObject.resolve().then(() => {
-          expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
-            btn,
-            jasmine.any(Object)
-          );
-
-          done();
-        });
+        expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
+          btn,
+          jasmine.any(Object)
+        );
       });
     });
   });
