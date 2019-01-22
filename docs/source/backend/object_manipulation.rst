@@ -303,7 +303,6 @@ Examples
               "custom_attribute_values": [],
               "people": [],
               "verified_date": null,
-              "task_group_objects": [],
               "design": "Ineffective",
               "secondary_contact": {
                   "href": "/api/people/1",
@@ -479,7 +478,6 @@ Examples
               "custom_attribute_values": [],
               "people": [],
               "updated_at": "2016-05-19T12:09:15",
-              "task_group_objects": [],
               "audits": [],
               "id": 10,
               "description": "Some description",
@@ -619,7 +617,6 @@ Examples
               "custom_attribute_values": [],
               "people": [],
               "updated_at": "2016-05-20T10:14:42",
-              "task_group_objects": [],
               "id": 1,
               "related_sources": [
                   {
@@ -887,8 +884,6 @@ Examples
                    "id": 2
                },
                "updated_at": "2016-05-19T14:37:23",
-               "task_group_objects": [],
-               "objects": [],
                "modified_by": {
                    "href": "/api/people/1",
                    "type": "Person",
