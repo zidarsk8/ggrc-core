@@ -35,7 +35,7 @@ function reifyMap(obj) {
 }
 
 function reifyList(obj) {
-  return new can.List(can.map(obj, function (item) {
+  return new can.List(_.map(obj, function (item) {
     return reifyMap(item);
   }));
 }
