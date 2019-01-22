@@ -13,26 +13,14 @@ import {
 import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
 import AccessControlRole from '../custom-roles/access-control-role';
-import {getRoleableModels} from '../../plugins/utils/models-utils';
 
-const businessObjects = [
-  'Assessment', 'AccessGroup', 'Audit', 'Contract', 'Control', 'DataAsset',
-  'Document', 'Facility', 'Issue', 'Market', 'Metric', 'Objective', 'OrgGroup',
-  'Policy', 'Process', 'Product', 'ProductGroup', 'Program', 'Project',
-  'Regulation', 'Requirement', 'Risk', 'Standard', 'System',
-  'TechnologyEnvironment', 'Threat', 'Vendor',
-];
-
-const coreObjects = _.difference(businessObjects,
-  ['Assessment', 'Audit', 'Document', 'Program']);
-
-const scopingObjects = [
-  'AccessGroup', 'DataAsset', 'Facility', 'Market', 'Metric', 'OrgGroup',
-  'Process', 'Product', 'ProductGroup', 'Project', 'System',
-  'TechnologyEnvironment', 'Vendor',
-];
-
-const snapshotableObjects = GGRC.config.snapshotable_objects;
+import {
+  businessObjects,
+  coreObjects,
+  scopingObjects,
+  snapshotableObjects,
+  roleableObjects,
+} from '../../plugins/models-types-collections';
 
 /*
   To configure a new mapping, use the following format :
@@ -59,7 +47,7 @@ const snapshotableObjects = GGRC.config.snapshotable_objects;
 new Mappings({
   Person: {
     indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
-      ...getRoleableModels().map((model) => model.model_singular)],
+      ...roleableObjects],
   },
 
   Program: {
