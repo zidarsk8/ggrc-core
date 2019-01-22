@@ -34,6 +34,28 @@ const scopingObjects = [
 
 const snapshotableObjects = GGRC.config.snapshotable_objects;
 
+/*
+  To configure a new mapping, use the following format :
+  { <source object type> : {
+      map : [ <object name>, ...]
+      indirectMappings: [ <object name>, ...]
+      mappers : {
+        <mapping name> : Proxy(...) | Direct(...)
+                      | Multi(...)
+                      | CustomFilter(...),
+      ...
+      }
+    }
+  }
+
+  <map> - models that can be mapped to source object directly
+    using object mapper
+  <indirectMappings> - models which cannot be directly mapped to object
+    through Relationship but linked by another way. Currently used for Mapping
+    Filter in Object mapper and Global Search
+  <mappers> - custom mappings
+*/
+
 new Mappings({
   Person: {
     indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
@@ -205,11 +227,6 @@ new Mappings({
     indirectMappings: ['Person', 'TaskGroup', 'TaskGroupTask'],
   },
   CycleTaskGroupObjectTask: {
-    // It is needed for an object list generation. This object list
-    // describes which objects can be mapped to CycleTaskGroupObjectTask.
-    // Types placed within this collection will be intersected
-    // with TreeViewConfig.base_widgets_by_type["CycleTaskGroupObjectTask"]
-    // collection. The result of the operation is the total list.
     map: [...coreObjects, 'Audit', 'Program'],
     indirectMappings: ['Person'],
 

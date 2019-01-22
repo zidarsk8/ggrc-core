@@ -14,16 +14,6 @@ import Permission from '../../permission';
   a Mappings instance contains the set of known mappings.
   The set of all Mappings instances is used throughout the
   system to build widgets, map and unmap objects, etc.
-
-  To configure a new Mappings instance, use the following format :
-  { <source object type> : {
-      map : [ <object name>, ...]
-      <mapping name> : Proxy(...) | Direct(...)
-                      | Multi(...)
-                      | CustomFilter(...),
-      ...
-    }
-  }
 */
 export default can.Construct.extend({
   config: null,
