@@ -59,12 +59,11 @@ const ObjectMapper = can.Control.extend({
 
     return $target;
   },
-  isLoading: false,
   openMapper: function (data, disableMapper, btn) {
     let self = this;
     let isSearch = /unified-search/ig.test(data.toggle);
 
-    if (disableMapper || this.isLoading) {
+    if (disableMapper) {
       return;
     }
 
@@ -114,8 +113,6 @@ const ObjectMapper = can.Control.extend({
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
 
-      self.isLoading = true;
-
       let model = businessModels[data.join_object_type];
       let inScopeObject =
         model.findInCacheById(data.join_object_id);
@@ -141,7 +138,6 @@ const ObjectMapper = can.Control.extend({
         }],
       });
       self.launch(btn, Object.assign(config, data));
-      self.isLoading = false;
     }
 
     function openForCommonObjects(data, isSearch) {
