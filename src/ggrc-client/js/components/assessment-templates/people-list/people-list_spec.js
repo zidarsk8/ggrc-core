@@ -7,7 +7,7 @@ import {
   getComponentVM,
   makeFakeInstance,
 } from '../../../../js_specs/spec_helpers';
-import Component from '../people-list';
+import Component from './people-list';
 import AssessmentTemplate from '../../../models/business-models/assessment-template';
 
 describe('people-list component', function () {

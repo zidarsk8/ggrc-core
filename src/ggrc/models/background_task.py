@@ -52,12 +52,14 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
   RUNNING_STATUS = "Running"
   SUCCESS_STATUS = "Success"
   FAILURE_STATUS = "Failure"
+  STOPPED_STATUS = "Stopped"
 
   VALID_STATES = [
       PENDING_STATUS,
       RUNNING_STATUS,
       SUCCESS_STATUS,
       FAILURE_STATUS,
+      STOPPED_STATUS,
   ]
   name = db.Column(db.String, nullable=False, unique=True)
   parameters = deferred(db.Column(CompressedType), 'BackgroundTask')

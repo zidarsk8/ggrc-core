@@ -84,7 +84,7 @@ import RefreshQueue from '../refresh_queue';
       let newInstanceResults = [];
       let instancesToRefresh = [];
 
-      can.each(results, function (newResult) {
+      _.forEach(results, function (newResult) {
         let foundResult = null;
         let mappingAttr;
 
@@ -109,7 +109,7 @@ import RefreshQueue from '../refresh_queue';
           // Since we're adding the result as its own mapping, use
           // new_result as the mapping instead of new_result.mappings?
 
-          can.each(newResult.mappings, function (mapping) {
+          _.forEach(newResult.mappings, function (mapping) {
             // TODO: Examine when this will be false -- is it a sign of
             //   duplicate work?
             if (mappingAttr.indexOf && mappingAttr.indexOf(mapping) === -1) {
@@ -165,7 +165,7 @@ import RefreshQueue from '../refresh_queue';
         mappings = [mappings];
       }
 
-      can.each(binding.list, function (data, instanceIndex) {
+      _.forEach(binding.list, function (data, instanceIndex) {
         let mappingAttr = binding.list[instanceIndex].mappings;
 
         if (data.instance.id === instance.id &&
@@ -174,7 +174,7 @@ import RefreshQueue from '../refresh_queue';
           if (mappingAttr.length === 0) {
             indexesToRemove.push(instanceIndex);
           } else {
-            can.each(mappings, function (mapping) {
+            mappings.forEach(function (mapping) {
               let wasRemoved = data.remove_mapping(mapping);
               if (wasRemoved) {
                 if (mappingAttr.length === 0) {
@@ -185,7 +185,7 @@ import RefreshQueue from '../refresh_queue';
           }
         }
       });
-      can.each(indexesToRemove.sort(), function (indexToRemove, count) {
+      indexesToRemove.sort().forEach(function (indexToRemove, count) {
         binding.list.splice(indexToRemove - count, 1);
       });
     },
@@ -222,7 +222,7 @@ import RefreshQueue from '../refresh_queue';
       return this.refresh_stubs(binding)
         .then(function () {
           let refreshQueue = new RefreshQueue();
-          can.each(binding.list, function (result) {
+          _.forEach(binding.list, function (result) {
             refreshQueue.enqueue(result.instance, force);
           });
           return refreshQueue.trigger();

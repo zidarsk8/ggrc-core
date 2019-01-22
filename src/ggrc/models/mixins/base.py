@@ -210,6 +210,10 @@ class ChangeTracked(object):
           "modified_by", "modified_by", ["email", "name"]
       ),
   ]
+  _filterable_attrs = [
+      "created_at",
+      "updated_at"
+  ]
 
   _aliases = {
       "updated_at": {

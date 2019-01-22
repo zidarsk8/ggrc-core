@@ -10,6 +10,7 @@ from mock import patch
 from ggrc import db
 from ggrc import models
 from ggrc import settings
+from ggrc.models.hooks.issue_tracker import assessment_integration
 
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper
@@ -29,8 +30,11 @@ class TestTicketTrackerExport(TestCase):
   @patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_assessment_export(self, _):
     """Test export Assessment Ticket Tracker attribute(link to issue)."""
-    with patch.object(models.hooks.issue_tracker.assessment_integration,
-                      '_is_issue_tracker_enabled', return_value=True):
+    with patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
       iti = factories.IssueTrackerIssueFactory()
       asmt = iti.issue_tracked_obj
       asmt_id = asmt.id
@@ -40,6 +44,9 @@ class TestTicketTrackerExport(TestCase):
               "enabled": True,
               "component_id": "11111",
               "hotlist_id": "222222",
+              "issue_type": "PROCESS",
+              "issue_priority": "P2",
+              "issue_severity": "S2"
           },
       })
       asmt = db.session.query(models.Assessment).get(asmt_id)
@@ -48,6 +55,9 @@ class TestTicketTrackerExport(TestCase):
               "enabled": True,
               "component_id": "11111",
               "hotlist_id": "222222",
+              "issue_type": "PROCESS",
+              "issue_priority": "P2",
+              "issue_severity": "S2"
           },
       })
       asmt = db.session.query(models.Assessment).get(asmt_id)
@@ -56,6 +66,10 @@ class TestTicketTrackerExport(TestCase):
               "enabled": True,
               "component_id": "11111",
               "hotlist_id": "222222",
+              "issue_type": "PROCESS",
+              "issue_priority": "P2",
+              "issue_severity": "S2",
+              "title": "Title Here",
               "issue_id": iti.issue_id,
               "issue_url": "http://issue/333333"
           },

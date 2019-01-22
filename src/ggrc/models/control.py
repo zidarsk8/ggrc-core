@@ -5,9 +5,11 @@
 
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc import login
 from ggrc.models.comment import Commentable
 from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
@@ -105,8 +107,73 @@ class AssertionCategorized(Categorizable):
   @declared_attr
   def categorized_assertions(cls):  # pylint: disable=no-self-argument
     return cls.declare_categorizable(
-        "ControlAssertion", "assertion", "assertions",
+        "ControlAssertion", "assertion", "_assertions",
         "categorized_assertions")
+
+  @hybrid_property
+  def assertions(self):
+    return self._assertions
+
+  @assertions.setter
+  def assertions(self, values):
+    """Setter function for control's assertions.
+
+    This setter function accepts two kind of values:
+      - List of assertion objects. This is used to set assertions in back-end.
+      - List of dicts containing json representation of assertion values. This
+        is used when setting assertions through the API and json builder.
+
+    Args:
+      values: List of assertions or dicts containing json representation
+        of assertion values.
+    """
+    if not values:
+      raise ValueError("Missing mandatory attribute: assertions")
+    if isinstance(values[0], dict):
+      values = self._get_assertions(values)
+    self._set_assertions(values)
+
+  @staticmethod
+  def _get_assertions(values):
+    """Get assertion objects from serialized values.
+
+    Args:
+        values: List of dicts representing `ControlAssertion` objects.
+    """
+    new_assertions_ids = [v.get(u'id', False) for v in values]
+    if not (new_assertions_ids and all(new_assertions_ids)):
+      # Not all items in `values` contain `id` field.
+      raise ValueError("Invalid values for attribute: assertions")
+    new_assertions = ControlAssertion.eager_query().filter(
+        ControlAssertion.id.in_(new_assertions_ids)).all()
+    if len(new_assertions) != len(new_assertions_ids):
+      # Not all passed assertion ids are valid.
+      raise ValueError("Invalid values for attribute: assertions")
+    return new_assertions
+
+  def _set_assertions(self, values):
+    """Set control assertions.
+
+    Args:
+        values: List of `ControlAssertion` objects.
+    """
+    # pylint: disable=not-an-iterable
+    proxied_set_map = dict([
+        (a.category, a) for a in self.categorized_assertions
+    ])
+    # pylint: enable=not-an-iterable
+    old_set, new_set = set(self.assertions), set(values)
+    current_user_id = login.get_current_user_id()
+
+    for assertion in new_set - old_set:
+      new_assertion = self.assertions.creator(assertion)
+      new_assertion.modified_by_id = current_user_id
+      self.categorized_assertions.append(new_assertion)
+
+    for assertion in old_set - new_set:
+      self.categorized_assertions.remove(proxied_set_map[assertion])
+
+  _update_raw = ["assertions", ]
 
   _fulltext_attrs = [
       attributes.MultipleSubpropertyFullTextAttr(
@@ -116,12 +183,13 @@ class AssertionCategorized(Categorizable):
       ),
   ]
   _api_attrs = reflection.ApiAttributes(
-      'assertions',
+      reflection.HybridAttribute('assertions'),
       reflection.Attribute('categorized_assertions',
                            create=False,
                            update=False),
   )
   _include_links = []
+
   _aliases = {
       "assertions": {
           "display_name": "Assertions",

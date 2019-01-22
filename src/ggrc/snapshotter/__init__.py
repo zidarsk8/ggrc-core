@@ -29,7 +29,7 @@ from ggrc.snapshotter.helpers import create_snapshot_dict
 from ggrc.snapshotter.helpers import create_snapshot_revision_dict
 from ggrc.snapshotter.helpers import get_revisions
 from ggrc.snapshotter.helpers import get_snapshots
-from ggrc.snapshotter.indexer import reindex_pairs
+from ggrc.snapshotter import indexer
 
 from ggrc.snapshotter.rules import get_rules
 
@@ -145,7 +145,7 @@ class SnapshotGenerator(object):
                           revisions=revisions, _filter=_filter)
     updated = result.response
     if not self.dry_run:
-      reindex_pairs(updated)
+      indexer.reindex_pairs_bg(updated)
       self._copy_snapshot_relationships()
       self._create_audit_relationships()
     return result
@@ -307,7 +307,7 @@ class SnapshotGenerator(object):
 
     to_reindex = updated | created
     if not self.dry_run:
-      reindex_pairs(to_reindex)
+      indexer.reindex_pairs_bg(to_reindex)
       self._remove_lost_snapshot_mappings()
       self._copy_snapshot_relationships()
       self._create_audit_relationships()
@@ -338,7 +338,7 @@ class SnapshotGenerator(object):
         revisions=revisions, _filter=_filter)
     created = result.response
     if not self.dry_run:
-      reindex_pairs(created)
+      indexer.reindex_pairs_bg(created)
       self._copy_snapshot_relationships()
       self._create_audit_relationships()
     return result

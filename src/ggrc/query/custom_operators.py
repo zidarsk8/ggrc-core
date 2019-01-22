@@ -21,6 +21,7 @@ from ggrc.query import autocast
 from ggrc.query import my_objects
 from ggrc.query.exceptions import BadQueryException
 from ggrc.snapshotter import rules
+from ggrc.utils.revisions_diff import builder as revdiff_builder
 
 
 GETATTR_WHITELIST = {
@@ -482,6 +483,44 @@ def cascade_unmappable(exp, object_class, target_class, query):
   return object_class.id.in_([row[0] for row in result])
 
 
+@validate("resource_type", "resource_id")
+def not_empty_revisions(exp, object_class, target_class, query):
+  """Filter revisions containing object state changes."""
+  if object_class is not all_models.Revision:
+    raise BadQueryException("'not_empty_revisions' operator works with "
+                            "Revision only")
+
+  resource_type = exp["resource_type"]
+  resource_id = exp["resource_id"]
+
+  resource_cls = getattr(all_models, resource_type, None)
+  if resource_cls is None:
+    raise BadQueryException("'{}' resource type does not exist"
+                            .format(resource_type))
+
+  query = all_models.Revision.query.filter(
+      all_models.Revision.resource_type == resource_type,
+      all_models.Revision.resource_id == resource_id,
+  ).order_by(
+      all_models.Revision.created_at,
+  )
+
+  current_instance = resource_cls.query.get(resource_id)
+
+  prev_diff = None
+  revision_with_changes = []
+  for revision in query:
+    diff = revdiff_builder.prepare(current_instance, revision.content)
+    if diff != prev_diff:
+      revision_with_changes.append(revision.id)
+      prev_diff = diff
+
+  if not revision_with_changes:
+    return sqlalchemy.sql.false()
+
+  return all_models.Revision.id.in_(revision_with_changes)
+
+
 EQ_OPERATOR = validate("left", "right")(build_op_shortcut(operator.eq))
 LT_OPERATOR = validate("left", "right")(build_op_shortcut(operator.lt))
 GT_OPERATOR = validate("left", "right")(build_op_shortcut(operator.gt))
@@ -508,4 +547,5 @@ OPS = {
     "text_search": text_search,
     "is": is_filter,
     "cascade_unmappable": cascade_unmappable,
+    "not_empty_revisions": not_empty_revisions,
 }

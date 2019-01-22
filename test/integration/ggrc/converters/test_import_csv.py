@@ -5,6 +5,7 @@
 from collections import OrderedDict
 
 import ddt
+import mock
 
 from ggrc import models
 from ggrc.converters import errors
@@ -477,3 +478,15 @@ class TestBasicCsvImport(TestCase):
       )
     self.assertIn(u"Line 16", results["Program"]["row_warnings"][0])
     self.assertIn(u"Line 21", results["Audit"]["row_warnings"][0])
+
+  def test_import_hook_error(self):
+    """Test errors in import"""
+    with mock.patch(
+        "ggrc.converters.base_block."
+        "ImportBlockConverter.send_collection_post_signals",
+        side_effect=Exception("Test Error")
+    ):
+      self._import_file("assessment_template_no_warnings.csv")
+      self._import_file("assessment_with_templates.csv")
+    self.assertEqual(models.all_models.Assessment.query.count(), 0)
+    self.assertEqual(models.all_models.Revision.query.count(), 0)

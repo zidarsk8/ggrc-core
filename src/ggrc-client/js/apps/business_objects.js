@@ -83,7 +83,7 @@ _.assign(CoreExtension, {
     modelNames = can.Map.keys(baseWidgetsByType);
     modelNames.sort();
     possibleModelType = modelNames.slice();
-    can.each(modelNames, function (name) {
+    modelNames.forEach(function (name) {
       let wList;
       let childModelList = [];
       let widgetConfig = getWidgetConfig(name);
@@ -96,7 +96,7 @@ _.assign(CoreExtension, {
       // Initialize child_model_list, and child_display_list each model_type
       wList = baseWidgetsByType[name];
 
-      can.each(wList, function (item) {
+      _.forEach(wList, function (item) {
         let childConfig;
         if (possibleModelType.indexOf(item) !== -1) {
           childConfig = getWidgetConfig(name);
@@ -179,7 +179,7 @@ _.assign(CoreExtension, {
       },
     };
 
-    can.each(farModels, function (modelName) {
+    _.forEach(farModels, function (modelName) {
       let widgetConfig = getWidgetConfig(modelName);
       modelName = widgetConfig.name;
 

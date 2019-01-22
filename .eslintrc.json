@@ -112,6 +112,9 @@
     "no-restricted-properties": [2, {
       "object": "can",
       "property": "Deferred"
+    }, {
+      "object": "can",
+      "property": "when"
     }]
   }
 }

@@ -8,12 +8,14 @@ from collections import defaultdict
 from functools import partial
 import itertools
 
+import flask
 from sqlalchemy.sql.expression import tuple_
 from sqlalchemy import orm
 
 from ggrc import db
 from ggrc import models
-from ggrc.models import all_models
+from ggrc.app import app
+from ggrc.models import all_models, background_task
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.fulltext import get_indexer
 from ggrc.models.reflection import AttributeInfo
@@ -415,3 +417,28 @@ def reindex_pairs(pairs):
       )
   delete_records(snapshots.keys())
   insert_records(search_payload)
+
+
+def reindex_pairs_bg(pairs):
+  """Reindex selected snapshots in background.
+
+  Args:
+      pairs: A list of parent-child pairs that uniquely represent snapshot
+        object whose properties should be reindexed.
+  """
+  background_task.create_task(
+      name="reindex_pairs_bg",
+      url=flask.url_for(run_reindex_pairs_bg.__name__),
+      parameters={"pairs": pairs},
+      queued_callback=run_reindex_pairs_bg,
+  )
+  db.session.commit()
+
+
+@app.route("/_background_tasks/reindex_pairs_bg", methods=["POST"])
+@background_task.queued_task
+def run_reindex_pairs_bg(task):
+  """Run reindexation of snapshots specified in pairs."""
+  pairs = task.parameters.get("pairs")
+  reindex_pairs(pairs)
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))

@@ -633,7 +633,7 @@ describe('mapper-results component', function () {
       spyOn(viewModel, 'setDisabledItems');
       dfdRequest = $.Deferred();
       spyOn(QueryAPI, 'batchRequests');
-      spyOn(can, 'when')
+      spyOn($, 'when')
         .and.returnValue(dfdRequest.promise());
     });
 
@@ -714,7 +714,7 @@ describe('mapper-results component', function () {
       viewModel.attr({});
       dfdRequest = $.Deferred();
       spyOn(QueryAPI, 'batchRequests');
-      spyOn(can, 'when')
+      spyOn($, 'when')
         .and.returnValue(dfdRequest.promise());
 
       spyOn(viewModel, 'getQuery')

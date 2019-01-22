@@ -9,27 +9,7 @@ from ggrc import db
 from ggrc import settings
 from ggrc.models import exceptions
 from ggrc.models import all_models
-from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
-    default_values, ISSUE_TRACKED_MODELS as issuetracked_models
-from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
-    ASSESSMENT_STATUSES_MAPPING
-
-
-def validate_issue_tracker_info(info):
-  """Validates that component ID and hotlist ID are integers."""
-  component_id = info.get('component_id')
-  if component_id:
-    try:
-      int(component_id)
-    except (TypeError, ValueError):
-      raise exceptions.ValidationError('Component ID must be a number.')
-
-  hotlist_id = info.get('hotlist_id')
-  if hotlist_id:
-    try:
-      int(hotlist_id)
-    except (TypeError, ValueError):
-      raise exceptions.ValidationError('Hotlist ID must be a number.')
+from ggrc.integrations import constants
 
 
 def is_already_linked(ticket_id):
@@ -69,6 +49,7 @@ def set_values_for_missed_fields(assmt, issue_tracker_info):
     due date.
   """
   audit_info = assmt.audit.issue_tracker or {}
+  default_values = constants.DEFAULT_ISSUETRACKER_VALUES
   if not issue_tracker_info.get("component_id"):
     issue_tracker_info["component_id"] = audit_info.get("component_id") or\
         default_values["component_id"]
@@ -93,7 +74,7 @@ def set_values_for_missed_fields(assmt, issue_tracker_info):
     issue_tracker_info["title"] = assmt.title
 
   if not issue_tracker_info.get("status"):
-    issue_tracker_info["status"] = ASSESSMENT_STATUSES_MAPPING.get(
+    issue_tracker_info["status"] = constants.STATUSES_MAPPING.get(
         assmt.status
     )
 
@@ -198,7 +179,7 @@ def _collect_created_objects(revision_ids):
           revisions.resource_id == iti.object_id
       )
   ).filter(
-      revisions.resource_type.in_(issuetracked_models),
+      revisions.resource_type.in_(constants.ISSUE_TRACKED_MODELS),
       revisions.id.in_(revision_ids),
       iti.issue_id.is_(None),
       iti.enabled != 0,
@@ -213,7 +194,7 @@ def _collect_created_objects(revision_ids):
   ).filter(
       revisions.resource_type == "IssuetrackerIssue",
       revisions.id.in_(revision_ids),
-      iti.object_type.in_(issuetracked_models),
+      iti.object_type.in_(constants.ISSUE_TRACKED_MODELS),
       iti.issue_id.is_(None),
       iti.enabled != 0,
   )
@@ -243,7 +224,7 @@ def _collect_update_objects(revision_ids):
           revisions.resource_id == iti.object_id
       )
   ).filter(
-      revisions.resource_type.in_(issuetracked_models),
+      revisions.resource_type.in_(constants.ISSUE_TRACKED_MODELS),
       revisions.id.in_(revision_ids),
       iti.issue_id.isnot(None),
       iti.enabled != 0,
@@ -258,7 +239,7 @@ def _collect_update_objects(revision_ids):
   ).filter(
       revisions.resource_type == "IssuetrackerIssue",
       revisions.id.in_(revision_ids),
-      iti.object_type.in_(issuetracked_models),
+      iti.object_type.in_(constants.ISSUE_TRACKED_MODELS),
       iti.issue_id.isnot(None),
       iti.enabled != 0,
   )
@@ -288,7 +269,7 @@ def _collect_comments(revision_ids):
       revisions.resource_type == "Relationship",
       revisions.source_type == "Comment",
       revisions.id.in_(revision_ids),
-      revisions.destination_type.in_(issuetracked_models)
+      revisions.destination_type.in_(constants.ISSUE_TRACKED_MODELS)
   )
 
   imported_comments_dst = db.session.query(
@@ -302,6 +283,6 @@ def _collect_comments(revision_ids):
       revisions.resource_type == "Relationship",
       revisions.destination_type == "Comment",
       revisions.id.in_(revision_ids),
-      revisions.source_type.in_(issuetracked_models)
+      revisions.source_type.in_(constants.ISSUE_TRACKED_MODELS)
   )
   return imported_comments_dst.union(imported_comments_src).all()

@@ -138,7 +138,7 @@ describe('external-data-provider component', () => {
         request2.resolve(response2);
         request1.resolve(response1);
 
-        can.when(request1, request2).then(() => {
+        $.when(request1, request2).then(() => {
           expect(viewModel.attr('values').serialize()).toEqual(response2);
           done();
         });

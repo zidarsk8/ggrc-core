@@ -102,11 +102,12 @@ def init_hook():
     # Flush roles objects for generated assessments.
     db.session.flush()
 
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
     for assessment, src in itertools.izip(objects, sources):
       # Handling IssueTracker info here rather than in hooks/issue_tracker
       # would avoid querying same data (such as snapshots, audits and
       # templates) twice.
-      assessment_integration.handle_assessment_create(assessment, src)
+      tracker_handler.handle_assessment_create(assessment, src)
 
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Assessment)

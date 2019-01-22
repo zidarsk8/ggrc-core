@@ -25,7 +25,7 @@ export default Cacheable('CMS.Models.Roleable', {
       return new this(withId);
     });
 
-    return can.when(instances);
+    return $.when(instances);
   },
 }, {
   // Cacheable checks if selfLink is set when the findAll deferred is done

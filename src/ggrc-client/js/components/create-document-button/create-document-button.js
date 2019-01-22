@@ -35,7 +35,7 @@ const viewModel = can.Map.extend({
           }
         });
 
-        return can.when(
+        return $.when(
           this.useExistingDocuments(existingDocuments),
           this.createDocuments(newFiles)
         ).then((existingDocs, newDocs) => {
@@ -92,7 +92,7 @@ const viewModel = can.Map.extend({
       return instance.save();
     });
 
-    return can.when(...dfdDocs)
+    return $.when(...dfdDocs)
       .fail(() => {
         this.attr('parentInstance').dispatch(DOCUMENT_CREATE_FAILED);
       });

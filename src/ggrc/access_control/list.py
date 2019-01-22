@@ -43,7 +43,7 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
   parent_id_nn = db.Column(
       db.Integer,
       nullable=False,
-      default="0",
+      default=0,
   )
 
   # Parent id field is just to keep the information about the entire chain of

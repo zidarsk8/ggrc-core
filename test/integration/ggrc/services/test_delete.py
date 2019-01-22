@@ -48,11 +48,11 @@ class TestDelete(TestCase, WithQueryApi):
     """Deletion returns HTTP400 if BadRequest is raised."""
     with factories.single_commit():
       audit = factories.AuditFactory()
-      factories.AssessmentFactory(audit=audit)
+      factories.AssessmentTemplateFactory(audit=audit)
 
     result = self.api.delete(audit)
 
     self.assert400(result)
     self.assertEqual(result.json["message"],
                      "This request will break a mandatory relationship from "
-                     "assessments to audits.")
+                     "assessment_templates to audits.")

@@ -65,7 +65,7 @@ const viewModel = can.Map.extend({
     const rq = new RefreshQueue();
     const Type = this.attr('type');
 
-    can.each(items, function (item) {
+    _.forEach(items, function (item) {
       rq.enqueue(Type.model(item));
     });
 

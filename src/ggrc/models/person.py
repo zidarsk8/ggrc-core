@@ -125,6 +125,10 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   def user_name(self):
     return self.email.split("@")[0]
 
+  @property
+  def title(self):
+    return self.name or self.email
+
   def is_active(self):
     # pylint: disable=no-self-use
     return True  # self.active

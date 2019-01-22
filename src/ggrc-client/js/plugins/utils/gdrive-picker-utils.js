@@ -87,7 +87,7 @@ export function uploadFiles(opts = {}) {
       // RefreshQueue converts picker file objects into GDrive file objects
       let pickedFilesById = _.keyBy(pickedFiles, 'id');
       let refreshDfds = pickedFiles.map((file) => findGDriveItemById(file.id));
-      can.when(...refreshDfds).then((...files) => {
+      $.when(...refreshDfds).then((...files) => {
         // adding a newUpload flag so we can later distinguish newly
         // uploaded files from the picked ones.
         files.forEach((file) => {

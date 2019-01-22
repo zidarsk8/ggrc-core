@@ -8,10 +8,10 @@ import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access_control_list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
-import '../../components/assessment_templates/assessment-template-attributes';
-import '../../components/assessment_templates/people-list';
-import '../../components/assessment_templates/template-field';
-import '../../components/assessment_templates/add-template-field';
+import '../../components/assessment-templates/assessment-template-attributes/assessment-template-attributes';
+import '../../components/assessment-templates/people-list/people-list';
+import '../../components/assessment-templates/template-field/template-field';
+import '../../components/assessment-templates/add-template-field/add-template-field';
 import '../../components/textarea-array/textarea-array';
 import '../../components/object-list-item/object-list-item-updater';
 import '../../components/related-objects/related-documents';
@@ -22,6 +22,7 @@ import '../../components/object-list-item/document-object-list-item';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/effective-dates/effective-dates';
 import '../../components/dropdown/dropdown';
+import '../../components/dropdown/boolean-dropdown-wrapper';
 import '../../components/modal_wrappers/assessment_template_form';
 import '../../components/autocomplete/autocomplete';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
@@ -38,6 +39,7 @@ import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
+import '../../components/person-modal/person-modal';
 import {
   bindXHRToButton,
   BUTTON_VIEW_DONE,
@@ -475,7 +477,7 @@ export default can.Control({
     let $elements = $form
       .find(':input');
 
-    can.each($elements.toArray(), this.proxy('set_value_from_element'));
+    $elements.toArray().forEach(this.proxy('set_value_from_element'));
   },
   set_value_from_element: function (el) {
     let name;

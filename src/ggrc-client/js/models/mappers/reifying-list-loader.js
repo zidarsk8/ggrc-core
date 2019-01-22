@@ -22,7 +22,7 @@ import Mappings from './mappings';
       let refreshQueue = new RefreshQueue();
       let newResults = [];
 
-      can.each(results, function (result) {
+      _.forEach(results, function (result) {
         refreshQueue.enqueue(result.instance);
         newResults.push(self.make_result(result.instance, [result], binding));
       });
@@ -48,7 +48,7 @@ import Mappings from './mappings';
       });
 
       binding.source_binding.list.bind('remove', function (ev, results, index) {
-        can.each(results, function (result) {
+        _.forEach(results, function (result) {
           self.remove_instance(binding, result.instance, result);
         });
       });

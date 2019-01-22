@@ -11,6 +11,7 @@ from ggrc import settings
 from ggrc.models import all_models
 from integration.ggrc import TestCase, api_helper
 from integration.ggrc.models import factories
+from integration.ggrc import generator
 
 
 class TestTaskqueueIndexing(TestCase):
@@ -25,6 +26,7 @@ class TestTaskqueueIndexing(TestCase):
     listeners.reindex_on_commit = reindex_on_commit
     self.api = api_helper.Api()
     self.init_taskqueue()
+    self.object_generator = generator.ObjectGenerator()
     self._bg_tasks = {}
 
   def run_bg_tasks(self):
@@ -46,12 +48,15 @@ class TestTaskqueueIndexing(TestCase):
   @mock.patch.object(settings, "APP_ENGINE", True, create=True)
   def test_general_bg_indexing(self):
     """Test indexing in background task"""
-    response = self.api.post(all_models.Control, {
-        "control": {
-            "title": "testCONTROL_title",
-            "context": None,
-        },
-    })
+    response, _ = self.object_generator.generate_object(
+        all_models.Control,
+        data={
+            "control": {
+                "title": "testCONTROL_title",
+                "context": None,
+            },
+        }
+    )
     self.assertStatus(response, 201)
     control_id = response.json["control"]["id"]
     modified_by = response.json["control"]["modified_by"]["id"]
@@ -95,12 +100,16 @@ class TestTaskqueueIndexing(TestCase):
   @mock.patch.object(settings, "APP_ENGINE", True, create=True)
   def test_indexing_header(self):
     """Test response headers contain indexing task.id"""
-    response = self.api.post(all_models.Control, {
-        "control": {
-            "title": "CONTROL_title",
-            "context": None,
-        },
-    })
+    response, _ = self.object_generator.generate_object(
+        all_models.Control,
+        data={
+            "control": {
+                "title": "CONTROL_title",
+                "context": None,
+            },
+        }
+    )
+
     self.assertStatus(response, 201)
     indexing_task_id = response.headers.get("X-GGRC-Indexing-Task-Id")
 
@@ -202,3 +211,37 @@ class TestTaskqueueIndexing(TestCase):
                                      data=query_request_data,
                                      api_link="/query")
     self.assertEqual(response.json[0]["Assessment"]["count"], 1)
+
+  def test_audit_snapshots_reindex(self):
+    """Test if Snapshots created in Audit reindexed."""
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      control_title = control.title
+      program = factories.ProgramFactory()
+      factories.RelationshipFactory(source=control, destination=program)
+
+    response = self.api.post(all_models.Audit, [{
+        "audit": {
+            "title": "Some Audit",
+            "program": {"id": program.id},
+            "status": "Planned",
+            "context": None
+        }
+    }])
+    self.assertStatus(response, 200)
+
+    query_request_data = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": control_title,
+            },
+        },
+        "type": "ids",
+    }]
+    response = self.api.send_request(self.api.client.post,
+                                     data=query_request_data,
+                                     api_link="/query")
+    self.assertEqual(response.json[0]["Snapshot"]["count"], 1)

@@ -19,6 +19,7 @@ from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models import all_models, inflector
 from ggrc.models import exceptions as ggrc_exceptions
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc import utils
 from ggrc.notifications import common
 from ggrc.notifications.data_handlers import get_object_url
@@ -36,7 +37,7 @@ class IssueTrackerBulkCreator(object):
 
   # IssueTracker integration modules with handlers for specific models
   INTEGRATION_HANDLERS = {
-      "Assessment": models.hooks.issue_tracker.assessment_integration,
+      "Assessment": assessment_integration.AssessmentTrackerHandler,
       "Issue": models.hooks.issue_tracker.issue_integration,
   }
 
@@ -228,6 +229,8 @@ class IssueTrackerBulkCreator(object):
 
     if not issue_json.get("assignee") and result:
       issue_json["assignee"] = result.get("issueState", {}).get("assignee")
+    if not issue_json.get("reporter") and result:
+      issue_json["reporter"] = result.get("issueState", {}).get("reporter")
 
   @staticmethod
   def _add_error(error_list, object_, error):
@@ -240,9 +243,7 @@ class IssueTrackerBulkCreator(object):
     del issue_id
     return sync_utils.create_issue(
         self.client,
-        issue_json,
-        max_attempts=10,
-        interval=10
+        issue_json
     )
 
   @staticmethod
@@ -321,6 +322,7 @@ class IssueTrackerBulkCreator(object):
         "issue_priority": expr.bindparam("issue_priority"),
         "issue_severity": expr.bindparam("issue_severity"),
         "assignee": expr.bindparam("assignee"),
+        "reporter": expr.bindparam("reporter"),
         "issue_id": expr.bindparam("issue_id"),
         "issue_url": expr.bindparam("issue_url"),
     })
@@ -358,6 +360,7 @@ class IssueTrackerBulkCreator(object):
         "issue_priority": info["priority"],
         "issue_severity": info["severity"],
         "assignee": info["assignee"],
+        "reporter": info["reporter"],
         "issue_id": info["issue_id"],
         "issue_url": info["issue_url"],
     } for (obj_type, obj_id), info in issue_info.items()]
@@ -514,9 +517,7 @@ class IssueTrackerBulkUpdater(IssueTrackerBulkCreator):
     return sync_utils.update_issue(
         self.client,
         issue_id,
-        issue_json,
-        max_attempts=10,
-        interval=10
+        issue_json
     )
 
   def update_db_issues(self, issues_info, errors):

@@ -60,7 +60,7 @@
 
     watch_observe_trigger: function () {
       this.observe_trigger().attr('change_count');
-      can.each(this.mappings, function (mapping) {
+      this.mappings.forEach(function (mapping) {
         if (mapping.watch_observe_trigger) {
           mapping.watch_observe_trigger();
         }
