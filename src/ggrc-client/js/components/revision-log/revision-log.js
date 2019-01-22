@@ -85,24 +85,24 @@ export default can.Component.extend({
         this.getAfterReviewRevisions.bind(this) :
         this.getAllRevisions.bind(this);
 
-      return fetchRevisions().then(
-        (revisions) => {
-          let rq = new RefreshQueue();
-          this._fetchAdditionalInfoForRevisions(rq, revisions);
+      return fetchRevisions().then(this.whenRevisionsFetched.bind(this));
+    },
+    whenRevisionsFetched(revisions) {
+      const rq = new RefreshQueue();
+      this._fetchAdditionalInfoForRevisions(rq, revisions);
 
-          let dfdForCompare = $.Deferred().resolve([]);
-          // find last revision with modified content by excluding revisions with mappings
-          const lastModifiedRevision = _.findLast(revisions,
-            (revision) => !revision.source && !revision.destination);
+      let dfdForCompare = $.Deferred().resolve([]);
+      // find last revision with modified content by excluding revisions with mappings
+      const lastModifiedRevision = _.findLast(revisions,
+        (revision) => !revision.source && !revision.destination);
 
-          if (lastModifiedRevision) {
-            dfdForCompare = this.getRevisionForCompare(lastModifiedRevision);
-          }
+      if (lastModifiedRevision) {
+        dfdForCompare = this.getRevisionForCompare(lastModifiedRevision);
+      }
 
-          return $.when(dfdForCompare, rq.trigger())
-            .then((revisionsForCompare) => {
-              return this.composeRevisionsData(revisions, revisionsForCompare);
-            });
+      return $.when(dfdForCompare, rq.trigger())
+        .then((revisionsForCompare) => {
+          return this.composeRevisionsData(revisions, revisionsForCompare);
         });
     },
     getAllRevisions() {
