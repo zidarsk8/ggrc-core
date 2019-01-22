@@ -264,10 +264,6 @@ export default can.Component.extend({
       this.attr('pageInfo.current', 1);
       this.fetchItems();
     },
-    getLastUpdatesFlag() {
-      return this.attr('showFilter') &&
-        this.attr('options.showLastReviewUpdates');
-    },
     initObjectReview() {
       const review = this.attr('instance.review');
 
