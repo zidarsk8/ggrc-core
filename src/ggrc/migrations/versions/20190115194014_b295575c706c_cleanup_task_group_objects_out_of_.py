@@ -33,14 +33,12 @@ def upgrade():
     ids.append(proposal.id)
     content = json.loads(proposal.content)
     content['mapping_list_fields'].pop('task_group_objects', None)
-    connection.execute("""
-        UPDATE proposals SET content='{}' WHERE id={};
-    """.format(json.dumps(content), proposal.id))
+    connection.execute(
+        sa.text("""UPDATE proposals SET content=:content WHERE id=:id;"""),
+        content=json.dumps(content), id=proposal.id)
   if ids:
-    utils.add_to_objects_without_revisions_bulk(connection,
-                                                ids,
-                                                "Proposal",
-                                                action="modified")
+    utils.add_to_objects_without_revisions_bulk(
+        connection, ids, "Proposal", action="modified")
 
 
 def downgrade():
