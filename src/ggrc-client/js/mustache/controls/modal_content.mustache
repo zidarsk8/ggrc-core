@@ -47,7 +47,7 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Provide an assessment procedure for this {{model.model_singular}}."></i>
         <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <div class="rich-text data-test-id="control_test_plan-text_d8b5a2f4"">
+      <div class="rich-text">
           <rich-text
             tabindex="2"
             {hidden-toolbar}="true"
@@ -123,7 +123,16 @@
           <a data-id="hide_kind_nature_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="kind_nature_dd" tabindex="7">
-          {{{option_select this "kind" "control_kind"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.kind" 
+                              {role}="'control_kind'">
+              <dropdown {options-list}="options"
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
 
@@ -170,7 +179,16 @@
           <a data-id="hide_type_means_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="type_means_dd" tabindex="10">
-          {{{option_select this "means" "control_means"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.means"
+                              {role}="'control_means'">
+              <dropdown {options-list}="options" 
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
     </div>
@@ -188,7 +206,16 @@
           <a data-id="hide_frequency_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
         <div data-id="frequency_dd" tabindex="11">
-          {{{option_select this "verify_frequency" "verify_frequency"}}}
+          <model-loader {path}="'service-models/option'">
+            <dropdown-wrapper {model-constructor}="loadedModel"
+                              {(value)}="instance.verify_frequency"
+                              {role}="'verify_frequency'">
+              <dropdown {options-list}="options"
+                        ($change)="selectedChanged" name="selected"
+                        {no-value}="true" {no-value-label}="'---'">
+              </dropdown>
+            </dropdown-wrapper>
+          </model-loader>
         </div>
       </div>
       <div data-test-id="control_assertions_5d8b7f7a"
@@ -201,17 +228,16 @@
         </label>
           <div data-id="assertions_dd" tabindex="12" class="no-outline">
             <model-loader {path}="'service-models/control-assertion'">
-              <dropdown-options-loader
+              <dropdown-multiselect-wrapper
                 {model-constructor}="loadedModel"
-                {(selected)}="instance.assertions"
-                {placeholder}="'Select Assertions'">
+                {(value)}="instance.assertions">
                 <multiselect-dropdown
-                  {options}="preparedOptions"
-                  {selected}="selectedInternal"
+                  {options}="options"
+                  {selected}="selected"
                   (selected-changed)="selectedChanged(%event)"
-                  {placeholder}="placeholder">
+                  {placeholder}="'Select Assertions'">
                 </multiselect-dropdown>
-              </dropdown-options-loader>
+              </dropdown-multiselect-wrapper>
             </model-loader>
           </div>
           {{#instance.computed_errors.assertions}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.assertions}}
@@ -224,17 +250,16 @@
         </label>
           <div data-id="categories_dd" tabindex="13" class="no-outline">
             <model-loader {path}="'service-models/control-category'">
-              <dropdown-options-loader
+              <dropdown-multiselect-wrapper
                 {model-constructor}="loadedModel"
-                {(selected)}="instance.categories"
-                {placeholder}="'Select Categories'">
+                {(value)}="instance.categories">
                 <multiselect-dropdown
-                  {options}="preparedOptions"
-                  {selected}="selectedInternal"
+                  {options}="options"
+                  {selected}="selected"
                   (selected-changed)="selectedChanged(%event)"
-                  {placeholder}="placeholder">
+                  {placeholder}="'Select Categories'">
                 </multiselect-dropdown>
-              </dropdown-options-loader>
+              </dropdown-multiselect-wrapper>
             </model-loader>
           </div>
       </div>
@@ -246,12 +271,10 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
           <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-
-          <dropdown options-list="model.statuses"
-                    name="instance.status"
-                    tab-index="14">
-          </dropdown>
-
+        <dropdown {options-list}="model.statuses"
+                  name="instance.status"
+                  tab-index="14">
+        </dropdown>
       </div>
     </div>
   </div>

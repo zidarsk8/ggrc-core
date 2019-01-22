@@ -4,17 +4,16 @@
 */
 
 export default can.Component.extend({
-  tag: 'dropdown-options-loader',
+  tag: 'dropdown-multiselect-wrapper',
   viewModel: {
-    placeholder: '',
+    value: [],
     selected: [],
-    selectedInternal: [],
-    preparedOptions: [],
+    options: [],
     define: {
       /*
-        dropdown-options-loader wrapper when data should be fetched first
+        dropdown-multiselect-wrapper when data should be fetched first
         {modelConstructor}: Model definition to fetch
-        {(selected)}: Two-way binding parent`s target attribute
+        {(value)}: Two-way binding parent`s target attribute
       */
       modelConstructor: {
         set(newModelConstructor) {
@@ -28,34 +27,32 @@ export default can.Component.extend({
       },
     },
     prepareOptions: function (items) {
-      let selected = this.attr('selected');
-      let preparedOptions = [];
-      let selectedInternal = [];
+      let options = [];
+      let selected = [];
 
       items.forEach((item) => {
-        let isSelected = _.find(selected, (selectedItem) => {
+        let isSelected = !!_.find(this.attr('value'), (selectedItem) => {
           return selectedItem.id === item.id;
         });
 
         let option = {
           value: item.name,
           id: item.id,
-          checked: isSelected ? true : false,
+          checked: isSelected,
         };
 
-        preparedOptions.push(option);
+        options.push(option);
 
         if (isSelected) {
-          selectedInternal.push(option);
+          selected.push(option);
         }
       });
 
-      // preparedOptions sent down to multiselect-dropdown
-      this.attr('preparedOptions', preparedOptions);
+      // options sent down to multiselect-dropdown
+      this.attr('options', options);
 
-      // selectedInternal is input models
-      // converted into multiselect-dropdown format
-      this.attr('selectedInternal', selectedInternal);
+      // selected is input models converted into multiselect-dropdown format
+      this.attr('selected', selected);
     },
     selectedChanged(event) {
       let newSelected = event.selected;
@@ -67,7 +64,7 @@ export default can.Component.extend({
         selected.push(model.findInCacheById(item.id));
       });
 
-      this.attr('selected', selected);
+      this.attr('value', selected);
     },
   },
 });

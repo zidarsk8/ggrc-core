@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './multiselect_dropdown.mustache';
+import template from './multiselect-dropdown.mustache';
 
 export default can.Component.extend({
   tag: 'multiselect-dropdown',
