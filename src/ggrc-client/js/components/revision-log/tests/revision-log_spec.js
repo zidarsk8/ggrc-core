@@ -7,6 +7,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-log';
 
 import RefreshQueue from '../../../models/refresh_queue';
+import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
 
 describe('revision-log component', function () {
   let viewModel;
@@ -32,6 +33,7 @@ describe('revision-log component', function () {
       dfdFetchData = new $.Deferred();
       spyOn(viewModel, '_fetchRevisionsData')
         .and.returnValue(dfdFetchData);
+      spyOn(NotifierUtils, 'notifier');
     });
 
     it('assigns true to isLoading', () => {
@@ -46,15 +48,13 @@ describe('revision-log component', function () {
       expect(viewModel.attr('revisions')).toBeNull();
     });
 
-    it('displays a toaster error if fetching the data fails', function () {
-      let trigger = spyOn($.prototype, 'trigger');
-
+    it('displays specified error if fetching the data fails', function () {
       viewModel.fetchItems();
       dfdFetchData.reject('Server error');
 
-      expect(trigger).toHaveBeenCalledWith(
-        'ajax:flash',
-        {error: 'Failed to fetch revision history data.'}
+      expect(NotifierUtils.notifier).toHaveBeenCalledWith(
+        'error',
+        'Failed to fetch revision history data.'
       );
     });
 

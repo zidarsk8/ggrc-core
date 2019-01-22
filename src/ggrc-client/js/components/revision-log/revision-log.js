@@ -19,6 +19,7 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Pagination from '../base-objects/pagination';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'revision-log',
@@ -73,9 +74,7 @@ export default can.Component.extend({
         })
         .fail(function () {
           stopFn(true);
-          $('body').trigger(
-            'ajax:flash',
-            {error: 'Failed to fetch revision history data.'});
+          notifier('error', 'Failed to fetch revision history data.');
         })
         .always(function () {
           this.attr('isLoading', false);
