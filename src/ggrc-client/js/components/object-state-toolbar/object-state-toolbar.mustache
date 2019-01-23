@@ -26,7 +26,8 @@
   {{/if}}
   {{#unless isInProgress}}
       {{#if isUndoButtonVisible}}
-        <button class="btn btn-small btn-link object-state-toolbar__item"
+        <button type="button"
+                class="btn btn-small btn-link object-state-toolbar__item"
                 {{#if disabled}}disabled{{/if}}
                 ($click)="changeState('In Progress', true)">Undo
         </button>
