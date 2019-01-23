@@ -99,7 +99,7 @@ Create a CMS.Models.Cacheable object
 3. Add ``new_object`` to ``mappings-ggrc.js``
 
    Add the object to the list of mappings:
-   ``Mappings("ggrc_core", {base:{}, NewObject: {...}}``.
+   ``Mappings({NewObject: {...}}``.
 
 Extending
 ~~~~~~~~~
@@ -118,13 +118,6 @@ Create a ModuleExtension object:
       },
     }
     widgetModules.push(ModuleExtension);
-
-    // Add mappings:
-
-    var mappings = {
-      // your mappings
-    }
-    new Mappings("ggrc_new_module", mappings);
 
 Add NewObject to the LHN
 ~~~~~~~~~~~~~~~~~~~~~~~~
