@@ -283,30 +283,6 @@ export default can.Construct.extend({
       return '_' + mapper + '_binding';
     }
   },
-  // checks if binding exists without throwing debug statements
-  // modeled after what getBinding is doing
-  hasBinding: function (mapper, model) {
-    let binding;
-    let mapping;
-    let bindingAttr = this._getBindingAttr(mapper);
-
-    if (bindingAttr) {
-      binding = model[bindingAttr];
-    }
-
-    if (!binding) {
-      if (typeof (mapper) === 'string') {
-        mapping = this.getMapper(mapper, model.constructor.shortName);
-        if (!mapping) {
-          return false;
-        }
-      } else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
-        return false;
-      }
-    }
-
-    return true;
-  },
   getBinding: function (mapper, model) {
     let mapping;
     let binding;
