@@ -24,7 +24,6 @@ export default can.Component.extend({
     instance: {},
     items: [],
     allowHide: false,
-    suppressErrors: false,
     validateControls: function () {
       const items = this.attr('items');
       let valid;
@@ -54,11 +53,6 @@ export default can.Component.extend({
     },
   },
   helpers: {
-    showError(item, options) {
-      return item.validationState.hasGCAErrors && !this.attr('suppressErrors')
-        ? options.fn()
-        : options.inverse();
-    },
     errorMessage(type) {
       type = Mustache.resolve(type);
       return errorMessages[type] || errorMessages.any;
