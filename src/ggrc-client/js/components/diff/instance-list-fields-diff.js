@@ -49,12 +49,12 @@ const viewModel = DiffBaseVM.extend({
   },
   buildDisplayNames(diffData) {
     const currentDisplayNames = this.getDisplayValue(diffData.currentVal);
-    const modifiedDiplayNames = this.getDisplayValue(diffData.modifiedVal);
+    const modifiedDisplayNames = this.getDisplayValue(diffData.modifiedVal);
     const attrName = this.getAttrDisplayName(diffData.attrName);
     const diff = {
       attrName,
       currentVal: currentDisplayNames,
-      modifiedVal: modifiedDiplayNames,
+      modifiedVal: modifiedDisplayNames,
     };
 
     return diff;
