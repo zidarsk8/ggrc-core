@@ -191,14 +191,40 @@ describe('assessment-info-pane component', () => {
       });
 
       describe('if instance is not archived', () => {
-        it('returns true if instance status is editable otherwise false',
-          function () {
-            allStatuses.forEach((status) => {
-              vm.attr('instance.status', status);
-              expect(vm.attr('editMode'))
-                .toBe(editableStatuses.includes(status));
-            });
+        it('returns true if instance status and currentState' +
+        'have equal editable otherwise false',
+        function () {
+          allStatuses.forEach((status) => {
+            vm.attr('instance.status', status);
+            vm.attr('currentState', status);
+            expect(vm.attr('editMode'))
+              .toBe(editableStatuses.includes(status));
           });
+        });
+
+        it('returns false if instance status is editable and currentState' +
+        'is NOT editable',
+        () => {
+          vm.attr('instance.status', editableStatuses[0]);
+          vm.attr('currentState', nonEditableStates[0]);
+          expect(vm.attr('editMode')).toBeFalsy();
+        });
+
+        it('returns false if instance status is NOT editable and currentState' +
+        'is editable',
+        () => {
+          vm.attr('instance.status', nonEditableStates[0]);
+          vm.attr('currentState', editableStatuses[0]);
+          expect(vm.attr('editMode')).toBeFalsy();
+        });
+
+        it('returns false if instance status and currentState' +
+        'have different EDITABLE statuses',
+        () => {
+          vm.attr('instance.status', editableStatuses[1]);
+          vm.attr('currentState', editableStatuses[0]);
+          expect(vm.attr('editMode')).toBeFalsy();
+        });
       });
     });
 

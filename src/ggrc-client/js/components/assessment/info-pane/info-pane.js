@@ -163,10 +163,22 @@ export default can.Component.extend({
       editMode: {
         type: 'boolean',
         get: function () {
-          let status = this.attr('instance.status');
+          if (this.attr('instance.archived')) {
+            return false;
+          }
 
-          return !this.attr('instance.archived') &&
-            editableStatuses.includes(status);
+          // instance's state is changed before sending a request to server
+          const instanceStatus = this.attr('instance.status');
+
+          // current state is changed after receiving a server's response
+          const currentState = this.attr('currentState');
+
+          // the state when a request was sent, but a response wasn't received
+          if (currentState !== instanceStatus) {
+            return false;
+          }
+
+          return editableStatuses.includes(instanceStatus);
         },
         set: function () {
           this.onStateChange({state: 'In Progress', undo: false});
