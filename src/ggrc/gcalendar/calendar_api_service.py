@@ -57,6 +57,7 @@ class CalendarApiService(object):
             'timeZone': kwargs.get('timezone', 'UTC'),
         },
         'attendees': [{'email': x} for x in attendees],
+        'locked': kwargs.get('locked', True),
         'sendNotifications': kwargs.get('send_notifications', False),
         'guestsCanModify': kwargs.get('guests_can_modify', False),
         'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
@@ -91,6 +92,10 @@ class CalendarApiService(object):
             'timeZone': kwargs.get('timezone', 'UTC'),
         },
         'attendees': [{'email': x} for x in attendees],
+        'locked': kwargs.get('locked', True),
+        'sendNotifications': kwargs.get('send_notifications', False),
+        'guestsCanModify': kwargs.get('guests_can_modify', False),
+        'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
     }
     return self.calendar_service.events().update(
         calendarId=calendar_id, body=event, eventId=event_id).execute()
