@@ -20,38 +20,38 @@ export default can.Component.extend({
     baseInstance: {},
     define: {
       showIcon: {
-        type: 'boolean',
+        type: Boolean,
         value: false,
       },
       iconCls: {
-        get: function () {
+        get() {
           return this.attr('showIcon') ?
             'fa-' + this.attr('itemData.title').toLowerCase() :
             '';
         },
       },
       itemData: {
-        get: function () {
+        get() {
           return this.attr('instance');
         },
       },
       commentText: {
-        get: function () {
+        get() {
           return this.attr('itemData.description');
         },
       },
       commentCreationDate: {
-        get: function () {
+        get() {
           return this.attr('itemData.created_at');
         },
       },
       commentAuthor: {
-        get: function () {
+        get() {
           return this.attr('itemData.modified_by') || false;
         },
       },
       commentAuthorType: {
-        get: function () {
+        get() {
           function capitalizeFirst(type) {
             return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
           }
@@ -65,17 +65,17 @@ export default can.Component.extend({
         },
       },
       hasRevision: {
-        get: function () {
+        get() {
           return this.attr('commentRevision') || false;
         },
       },
       commentRevision: {
-        get: function () {
+        get() {
           return this.attr('itemData.custom_attribute_revision');
         },
       },
       customAttributeData: {
-        get: function () {
+        get() {
           return this.attr('commentRevision.custom_attribute.title') +
          ':' + this.attr('commentRevision.custom_attribute_stored_value');
         },
