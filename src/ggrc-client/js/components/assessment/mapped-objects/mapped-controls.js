@@ -39,8 +39,8 @@ const viewModel = {
       type: '*',
       value: [
         {
-          type: 'objectives',
-          objName: 'Objective',
+          type: 'requirements',
+          objName: 'Requirement',
           fields: ['child_id', 'child_type', 'revision', 'parent'],
         },
         {
