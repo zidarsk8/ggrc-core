@@ -14,12 +14,12 @@
                 <div class="tree-title-area">
                   <ul>
                     {{#revisions}}
-                    {{^if_match resource_type 'Context|RoleImplication'}}
-                    <li>
-                      <strong>
-                        {{firstnonempty description display_name}}
-                      </strong>
-                    </li>
+                    {{^if_equals resource_type 'Context'}}
+                      <li>
+                        <strong>
+                          {{firstnonempty description display_name}}
+                        </strong>
+                      </li>
                     {{/if_equals}}
                     {{/revisions}}
                     <li>

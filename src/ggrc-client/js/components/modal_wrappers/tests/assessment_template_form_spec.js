@@ -34,6 +34,17 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
   ],
 });
 
+const PEOPLE_LABELS_OPTIONS = Object.freeze({
+  assignees: {
+    assignee_1: 'Assignee Label 1',
+    assignee_2: 'Assignee Label 2',
+  },
+  verifiers: {
+    verifier_1: 'Verifier Label 1',
+    verifier_2: 'Verifier Label 2',
+  },
+});
+
 describe('wrapper-assessment-template component', function () {
   let viewModel;
 
@@ -79,5 +90,39 @@ describe('wrapper-assessment-template component', function () {
         expect(peopleValues)
           .toEqual(PEOPLE_VALUES_OPTIONS.defaults);
       });
+  });
+
+  describe('defaultAssigneeLabel property', () => {
+    beforeEach(() => {
+      viewModel.attr('instance', {
+        DEFAULT_PEOPLE_LABELS: PEOPLE_LABELS_OPTIONS.assignees,
+      });
+    });
+
+    it('returns correct values when template_object_type is Control', () => {
+      viewModel.attr('instance.default_people', {
+        assignees: 'assignee_1',
+      });
+
+      let result = viewModel.attr('defaultAssigneeLabel');
+      expect(result).toEqual(PEOPLE_LABELS_OPTIONS.assignees.assignee_1);
+    });
+  });
+
+  describe('defaultVerifierLabel property', () => {
+    beforeEach(() => {
+      viewModel.attr('instance', {
+        DEFAULT_PEOPLE_LABELS: PEOPLE_LABELS_OPTIONS.verifiers,
+      });
+    });
+
+    it('returns correct values when template_object_type is Control', () => {
+      viewModel.attr('instance.default_people', {
+        verifiers: 'verifier_2',
+      });
+
+      let result = viewModel.attr('defaultVerifierLabel');
+      expect(result).toEqual(PEOPLE_LABELS_OPTIONS.verifiers.verifier_2);
+    });
   });
 });

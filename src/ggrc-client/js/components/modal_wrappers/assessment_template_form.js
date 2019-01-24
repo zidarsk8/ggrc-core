@@ -38,7 +38,7 @@ export default can.Component.extend({
     instance: {},
     define: {
       showCaptainAlert: {
-        type: 'boolean',
+        type: Boolean,
         value: false,
         get() {
           return peopleTitlesList
@@ -46,11 +46,27 @@ export default can.Component.extend({
         },
       },
       peopleValues: {
-        get: function () {
+        get() {
           let options = PEOPLE_VALUES_OPTIONS[
             this.attr('instance.template_object_type')
           ];
           return options ? options : PEOPLE_VALUES_OPTIONS['defaults'];
+        },
+      },
+      defaultAssigneeLabel: {
+        type: String,
+        get() {
+          let labels = this.attr('instance.DEFAULT_PEOPLE_LABELS');
+          let assignee = this.attr('instance.default_people.assignees');
+          return labels[assignee];
+        },
+      },
+      defaultVerifierLabel: {
+        type: String,
+        get() {
+          let labels = this.attr('instance.DEFAULT_PEOPLE_LABELS');
+          let verifiers = this.attr('instance.default_people.verifiers');
+          return labels[verifiers];
         },
       },
     },

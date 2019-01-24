@@ -143,108 +143,12 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
   return exec();
 });
 
-Mustache.registerHelper('if_match', function (val1, val2, options) {
-  let _val1 = resolveComputed(val1);
-  let _val2 = resolveComputed(val2);
-  function exec() {
-    let re = new RegExp(_val2);
-    if (re.test(_val1)) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-  return exec();
-});
-
 Mustache.registerHelper('in_array', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack);
 
   return options[_.includes(haystack, needle) ?
     'fn' : 'inverse'](options.contexts);
-});
-
-Mustache.registerHelper('if_null', function (val1, options) {
-  let that = this;
-  let _val1;
-  function exec() {
-    if (_val1 === null || _val1 === undefined) return options.fn(that);
-    else return options.inverse(that);
-  }
-  if (typeof val1 === 'function') {
-    if (val1.isComputed) {
-      val1.bind('change', function (ev, newVal) {
-        _val1 = newVal;
-        return exec();
-      });
-    }
-    _val1 = val1.call(this);
-  } else {
-    _val1 = val1;
-  }
-  return exec();
-});
-
-/**
-   * Check if the given argument is a string and render the corresponding
-   * block in the template.
-   *
-   * Example usage:
-   *
-   *   {{#if_string someValue}}
-   *      {{someValue}} is a string
-   *   {{else}}
-   *     {{someValue}} is NOT a string
-   *   {{/if_string}}
-   *
-   * @param {*} thing - the argument to check
-   * @param {Object} options - a CanJS options argument passed to every helper
-   *
-   */
-Mustache.registerHelper('if_string', function (thing, options) {
-  let resolved;
-
-  if (arguments.length !== 2) {
-    throw new Error(
-      'Invalid number of arguments (' +
-        (arguments.length - 1) + // do not count the auto-provided options arg
-        '), expected 1.');
-  }
-
-  resolved = Mustache.resolve(thing);
-
-  if (_.isString(resolved)) {
-    return options.fn(options.context);
-  }
-
-  return options.inverse(options.context);
-});
-
-/**
-   * Return the value of the given object's property.
-   *
-   * If the first argument is not an object, an error is raised.
-   *
-   * @param {Object | Function} object - the object itself
-   * @param {String | Function} key - the name of the property to retrieve
-   * @param {Object} options - the Mustache options object
-   *
-   * @return {*} - the value of the property object[key]
-   */
-Mustache.registerHelper('get_item', function (object, key, options) {
-  if (arguments.length !== 3) {
-    throw new Error(
-      'Invalid number of arguments (' +
-        (arguments.length - 1) + // do not count the auto-provided options arg
-        '), expected 2.');
-  }
-
-  object = Mustache.resolve(object);
-
-  if (!_.isObject(object)) {
-    throw new Error('First argument must be an object.');
-  }
-
-  key = Mustache.resolve(key);
-  return object[key];
 });
 
 // Resolve and return the first computed value from a list
@@ -739,31 +643,9 @@ Mustache.registerHelper('normalizeLink', (value) => {
   return link;
 });
 
-Mustache.registerHelper('capitalize', function (value, options) {
-  value = resolveComputed(value) || '';
-  return can.capitalize(value);
-});
-
 Mustache.registerHelper('lowercase', function (value, options) {
   value = resolveComputed(value) || '';
   return value.toLowerCase();
-});
-
-Mustache.registerHelper('assignee_types', function (value, options) {
-  function capitalizeFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-  value = resolveComputed(value) || '';
-  value = _.head(_.map(value.split(','), function (type) {
-    let lowercaseType = _.trim(type).toLowerCase();
-
-    if (lowercaseType === 'assessor') {
-      lowercaseType = 'assignee';
-    }
-
-    return lowercaseType;
-  }));
-  return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
 });
 
 Mustache.registerHelper('is_dashboard', function (options) {
@@ -864,8 +746,8 @@ Mustache.registerHelper('urlPath', function () {
 
   Example:
     {{#if_helpers '\
-      #if_match' page_object.constructor.shortName 'Project' '\
-      and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
+      #if_equals' instance.status 'Assigned' '\
+      and ^if_equals' instance.type 'Audit|Program|Person' '\
     ' _1_hash_arg_for_second_statement=something}}
       matched all conditions
     {{else}}
@@ -1087,14 +969,6 @@ Mustache.registerHelper('with_mapping_count',
     dfd);
   });
 
-Mustache.registerHelper('log', function () {
-  let args = can.makeArray(arguments).slice(0, arguments.length - 1);
-  console.warn(
-    ...['Mustache log'].concat(_.map(args, function (arg) {
-      return resolveComputed(arg);
-    })));
-});
-
 Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   let options = arguments[arguments.length - 1];
   let _disableCreate = Mustache.resolve(disableCreate);
@@ -1134,83 +1008,6 @@ Mustache.registerHelper('disable_if_errors', function (instance) {
   } else {
     return 'disabled';
   }
-});
-
-/**
- * Helper method for determining the file type of a Document object from its
- * file name extension.
- *
- * @param {Object} instance - an instance of a model object of type "Document"
- * @return {String} - determined file type or "default" for unknown/missing
- *   file name extensions.
- *
- * @throws {String} If the type of the `instance` is not "Document" or if its
- *   "title" attribute is empty.
- */
-Mustache.registerHelper('file_type', function (instance) {
-  let extension;
-  let filename;
-  let parts;
-  let DEFAULT_VALUE = 'default';
-  let FILE_EXTENSION_TYPES;
-  let FILE_TYPES;
-
-  FILE_TYPES = Object.freeze({
-    PLAIN_TXT: 'txt',
-    IMAGE: 'img',
-    PDF: 'pdf',
-    OFFICE_DOC: 'doc',
-    OFFICE_SHEET: 'xls',
-    ARCHIVE: 'zip',
-  });
-
-  FILE_EXTENSION_TYPES = Object.freeze({
-    // plain text files
-    txt: FILE_TYPES.PLAIN_TXT,
-
-    // image files
-    jpg: FILE_TYPES.IMAGE,
-    jpeg: FILE_TYPES.IMAGE,
-    png: FILE_TYPES.IMAGE,
-    gif: FILE_TYPES.IMAGE,
-    bmp: FILE_TYPES.IMAGE,
-    tiff: FILE_TYPES.IMAGE,
-
-    // PDF documents
-    pdf: FILE_TYPES.PDF,
-
-    // Office-like text documents
-    doc: FILE_TYPES.OFFICE_DOC,
-    docx: FILE_TYPES.OFFICE_DOC,
-    odt: FILE_TYPES.OFFICE_DOC,
-
-    // Office-like spreadsheet documents
-    xls: FILE_TYPES.OFFICE_SHEET,
-    xlsx: FILE_TYPES.OFFICE_SHEET,
-    ods: FILE_TYPES.OFFICE_SHEET,
-
-    // archive files
-    zip: FILE_TYPES.ARCHIVE,
-    rar: FILE_TYPES.ARCHIVE,
-    '7z': FILE_TYPES.ARCHIVE,
-    gz: FILE_TYPES.ARCHIVE,
-    tar: FILE_TYPES.ARCHIVE,
-  });
-
-  if (instance.type !== 'Document') {
-    throw new Error('Cannot determine file type for a non-document object');
-  }
-
-  filename = instance.title || '';
-  if (!filename) {
-    throw new Error("Cannot determine the object's file name");
-  }
-
-  parts = filename.split('.');
-  extension = (parts.length === 1) ? '' : parts[parts.length - 1];
-  extension = extension.toLowerCase();
-
-  return FILE_EXTENSION_TYPES[extension] || DEFAULT_VALUE;
 });
 
 Mustache.registerHelper('debugger', function () {

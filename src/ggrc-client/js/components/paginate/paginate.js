@@ -9,6 +9,20 @@ export default can.Component.extend({
   tag: 'paginate',
   template,
   viewModel: {
+    define: {
+      hasPrevPage: {
+        type: Boolean,
+        get() {
+          return this.attr('currentPage') !== 1;
+        },
+      },
+      hasNextPage: {
+        type: Boolean,
+        get() {
+          return this.attr('currentPage') !== this.attr('totalPages');
+        },
+      },
+    },
     list: null,
     current: 0,
     /**
