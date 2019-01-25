@@ -28,6 +28,7 @@ describe('TreeViewNode Controller', function () {
         add_child_lists_to_child: jasmine.createSpy(),
         _ifNotRemoved: jasmine.createSpy().and.returnValue(ifNotRemovedResult),
         replace_element: jasmine.createSpy(),
+        add_control: jasmine.createSpy(),
       };
 
       method = Ctrl.prototype.draw_node.bind(ctrlInst);

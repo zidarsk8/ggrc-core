@@ -19,7 +19,7 @@ import Roleable from '../../models/custom-roles/roleable';
 import Person from '../../models/business-models/person';
 import WidgetList from '../../modules/widget_list';
 import ListView from '../../controllers/tree/list_view_controller';
-import TreeView from '../../controllers/tree/tree-view';
+import TreeViewControl from '../../controllers/tree/tree-view';
 import {DashboardControl} from '../../controllers/dashboard_controller';
 
 const path = GGRC.mustache_path || '/static/mustache';
@@ -167,12 +167,12 @@ new WidgetList('ggrc_admin', {
       widget_id: 'custom_attribute',
       widget_name: 'Custom Attributes',
       widget_icon: 'workflow',
-      content_controller: TreeView,
+      content_controller: TreeViewControl,
       content_controller_selector: 'ul',
       model: CustomAttributable,
       widget_initial_content:
       '<ul' +
-      '  class="tree-structure new-tree colored-list"' +
+      '  class="tree-structure new-tree colored-list tree-view-control"' +
       '  data-no-pin="true"' +
       '></ul>',
       content_controller_options: adminListDescriptors.custom_attributes,
@@ -181,13 +181,13 @@ new WidgetList('ggrc_admin', {
       widget_id: 'custom_roles',
       widget_name: 'Custom Roles',
       widget_icon: 'unlock',
-      content_controller: TreeView,
+      content_controller: TreeViewControl,
       content_controller_selector: 'ul',
       content_controller_options: adminListDescriptors.custom_roles,
       model: Roleable,
       widget_initial_content: [
         '<ul',
-        '  class="tree-structure new-tree colored-list"',
+        '  class="tree-structure new-tree colored-list tree-view-control"',
         '  data-no-pin="true"',
         '></ul>',
       ].join('\n'),

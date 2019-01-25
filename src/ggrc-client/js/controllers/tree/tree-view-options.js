@@ -7,6 +7,5 @@ export default can.Map.extend({
   defaults: {
     instance: undefined,
     parent: null,
-    children_drawn: false,
   },
 }, {});
