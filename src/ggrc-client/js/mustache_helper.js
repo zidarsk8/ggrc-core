@@ -496,17 +496,6 @@ Mustache.registerHelper('attach_spinner', function (spinOpts, styles) {
   };
 });
 
-Mustache.registerHelper('json_escape', function (obj, options) {
-  let str = JSON.stringify(String(resolveComputed(obj) || ''));
-  return str.substr(1, str.length - 2);
-});
-
-Mustache.registerHelper('json_stringify', function (obj, options) {
-  let fields = (options.hash && options.hash.fields || '').split(',');
-  obj = Mustache.resolve(obj);
-  return JSON.stringify(_.pick(obj.serialize(), fields));
-});
-
 function localizeDate(date, options, tmpl, allowNonISO) {
   let formats = [
     'YYYY-MM-DD',
@@ -770,14 +759,6 @@ Mustache.registerHelper('if_helpers', function (...args) {
   }
 });
 
-Mustache.registerHelper('with_model_as',
-  function (varName, modelName, options) {
-    let frame = {};
-    modelName = resolveComputed(Mustache.resolve(modelName));
-    frame[varName] = modalModels[modelName];
-    return options.fn(options.contexts.add(frame));
-  });
-
 Mustache.registerHelper('if_in', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack).split(',');
@@ -893,18 +874,6 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   };
 });
 
-Mustache.registerHelper('disable_if_errors', function (instance) {
-  let ins;
-  let res;
-  ins = Mustache.resolve(instance);
-  res = ins.computed_unsuppressed_errors();
-  if (res === null || res === undefined) {
-    return '';
-  } else {
-    return 'disabled';
-  }
-});
-
 Mustache.registerHelper('debugger', function () {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Dev tools need to be open for this
@@ -970,48 +939,6 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   value = value.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
   return toLowerCase ? value.toLowerCase() : value;
 });
-
-/**
-   * Check if property's value did not pass validation, and render the
-   * corresponding block in the template. The error messages, if any, are
-   * available in the "error" variable within the "truthy" block.
-   *
-   * Example usage:
-   *
-   *   {{#validation_error validationErrors propertyName}}
-   *     Invalid value for the property {{propertyName}}: {{errors.0}}
-   *   {{else}}
-   *     Hooray, no errors, a correct value is set!
-   *   {{/validation_error}}
-   *
-   * @param {Object} validationErrors - an object containing validation results
-   *   of a can.Model instance
-   * @param {Number} propertyName - Name of the property to check for
-   *   validation errors
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper(
-  'validation_error',
-  function (validationErrors, propertyName, options) {
-    let errors;
-    let property;
-    let contextStack;
-
-    validationErrors = Mustache.resolve(validationErrors) || {};
-    if (_.isFunction(validationErrors)) {
-      validationErrors = Mustache.resolve(validationErrors) || {};
-    }
-
-    property = Mustache.resolve(propertyName);
-    errors = validationErrors[property] || [];
-
-    if (errors.length > 0) {
-      contextStack = options.contexts.add({errors: errors});
-      return options.fn(contextStack);
-    }
-    return options.inverse(options.contexts);
-  }
-);
 
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
@@ -1089,45 +1016,6 @@ Mustache.registerHelper('has_role', function (role, instance, options) {
   } else {
     return options.inverse(options.contexts);
   }
-});
-
-Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
-  const allRoles = GGRC.access_control_roles;
-  let roles = {};
-  let allRoleNames = [];
-
-  if (!options) {
-    // if parent instance is not defined in helper use page instance
-    options = parentInstance;
-    parentInstance = Mustache.resolve(getPageInstance);
-  } else {
-    parentInstance = Mustache.resolve(parentInstance);
-  }
-
-  allRoles.forEach((role) => {
-    roles[role.id] = role;
-  });
-
-  person = Mustache.resolve(person);
-
-  if (parentInstance && parentInstance.access_control_list) {
-    allRoleNames = _.uniq(parentInstance.access_control_list.filter(
-      (acl) => {
-        return acl.person.id === person.id && acl.ac_role_id in roles;
-      }).map((acl) => {
-      return roles[acl.ac_role_id].name;
-    }));
-  } else {
-    let globalRole = person.system_wide_role === 'No Access'
-      ? 'No Role'
-      : person.system_wide_role;
-    allRoleNames = [globalRole];
-  }
-
-  return options.fn({
-    rolesStr: allRoleNames.join(', '),
-    rolesList: allRoleNames.join('\n'),
-  });
 });
 
 Mustache.registerHelper('isScopeModel', function (instance, options) {

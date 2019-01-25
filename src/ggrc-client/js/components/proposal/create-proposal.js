@@ -17,9 +17,11 @@ export default can.Component.extend({
   template,
   viewModel: {
     define: {
-      isDisabledButton: {
+      isDisabled: {
+        type: Boolean,
         get() {
-          return !this.hasChanges() || this.attr('loading');
+          let hasErrors = this.instance.computed_unsuppressed_errors();
+          return hasErrors || !this.hasChanges() || this.attr('loading');
         },
       },
     },

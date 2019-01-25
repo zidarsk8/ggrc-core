@@ -70,9 +70,11 @@
               <div class="span12">
                 <h6>Authorizations</h6>
                 <span>
-                  {{#user_roles instance}}
-                    {{rolesStr}}
-                  {{/user_roles}}
+                  {{#if_equals instance.system_wide_role 'No Access'}}
+                    No Role
+                  {{else}}
+                    {{instance.system_wide_role}}
+                  {{/if_equals}}
                 </span>
               </div>
             </div>
