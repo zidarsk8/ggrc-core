@@ -15,6 +15,14 @@ let viewModel = can.Map.extend({
   isRefreshed: false,
   isSaving: false,
   isAttributesDisabled: false,
+  define: {
+    isNoRole: {
+      type: Boolean,
+      get() {
+        return this.attr('instance.system_wide_role') === 'No Access';
+      },
+    },
+  },
   async onSendCalendarEventsChange({checked}) {
     const profile = this.attr('profile');
 

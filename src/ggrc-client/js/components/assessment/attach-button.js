@@ -5,7 +5,10 @@
 
 import Permission from '../../permission';
 import template from './attach-button.mustache';
-import {findGDriveItemById} from '../../plugins/utils/gdrive-picker-utils';
+import {
+  getGDriveItemId,
+  findGDriveItemById,
+} from '../../plugins/utils/gdrive-picker-utils';
 
 const tag = 'attach-button';
 
@@ -26,6 +29,12 @@ export default can.Component.extend({
           } else {
             setValue(false);
           }
+        },
+      },
+      folderId: {
+        type: String,
+        get() {
+          return getGDriveItemId(this.attr('error.message'));
         },
       },
     },

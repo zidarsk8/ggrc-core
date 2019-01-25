@@ -6,6 +6,7 @@
 import '../action-toolbar/action-toolbar';
 import {
   uploadFiles,
+  getGDriveItemId,
   findGDriveItemById,
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils';
@@ -29,6 +30,12 @@ export default can.Component.extend({
         get() {
           return !this.attr('readonly') &&
             !this.attr('_folder_change_pending');
+        },
+      },
+      folderId: {
+        type: String,
+        get() {
+          return getGDriveItemId(this.attr('folder_error.message'));
         },
       },
     },

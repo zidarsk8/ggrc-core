@@ -24,7 +24,6 @@ import {
   batchRequests,
 } from './plugins/utils/query-api-utils';
 import Search from './models/service-models/search';
-import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import Mappings from './models/mappers/mappings';
@@ -294,24 +293,6 @@ function deferRender(tagPrefix, funcs, deferred) {
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 }
 
-Mustache.registerHelper('with_current_user_as', function (name, options) {
-  if (!options) {
-    options = name;
-    name = 'current_user';
-  }
-  let pageObject = Person.findInCacheById(GGRC.current_user.id) ||
-    Person.model(GGRC.current_user);
-
-  if (pageObject) {
-    let po = {};
-    po[name] = pageObject;
-    options.contexts = options.contexts.add(po);
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
   let frame = new can.Map();
@@ -341,64 +322,6 @@ Mustache.registerHelper('using', function (options) {
   }
 
   return deferRender('span', finish, refreshQueue.trigger());
-});
-
-Mustache.registerHelper('person_roles', function (person, scope, options) {
-  let rolesDeferred = new $.Deferred();
-  let refreshQueue = new RefreshQueue();
-
-  if (!options) {
-    options = scope;
-    scope = null;
-  }
-
-  person = Mustache.resolve(person);
-  person = person.reify();
-  refreshQueue.enqueue(person);
-  // Force monitoring of changes to `person.user_roles`
-  person.attr('user_roles');
-  refreshQueue.trigger().then(function () {
-    let userRoles = person.user_roles.reify();
-    let userRolesRefreshQueue = new RefreshQueue();
-
-    userRolesRefreshQueue.enqueue(userRoles);
-    userRolesRefreshQueue.trigger().then(function () {
-      let roles = can.map(
-        can.makeArray(userRoles),
-        function (userRole) {
-          if (userRole.role) {
-            return userRole.role.reify();
-          }
-        });
-      let rolesRefreshQueue = new RefreshQueue();
-      rolesRefreshQueue.enqueue(roles.splice());
-      rolesRefreshQueue.trigger().then(function () {
-        roles = can.map(can.makeArray(roles), function (role) {
-          if (!scope || new RegExp(scope).test(role.scope)) {
-            return role;
-          }
-        });
-
-        //  "Superuser" roles are determined from config
-        //  FIXME: Abstraction violation
-        if ((!scope || new RegExp(scope).test('System'))
-            && GGRC.config.BOOTSTRAP_ADMIN_USERS
-            && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
-          roles.unshift({
-            permission_summary: 'Superuser',
-            name: 'Superuser',
-          });
-        }
-        rolesDeferred.resolve(roles);
-      });
-    });
-  });
-
-  function finish(roles) {
-    return options.fn({roles: roles});
-  }
-
-  return deferRender('span', finish, rolesDeferred);
 });
 
 /**
@@ -615,23 +538,6 @@ Mustache.registerHelper('localize_date', function (date, allowNonISO, options) {
     allowNonISO = false;
   }
   return localizeDate(date, options, 'MM/DD/YYYY', allowNonISO);
-});
-
-/**
- *  Helper for rendering date or 'Today' string.
- *
- *  @param {Date} value - the date object; if it's falsey the current (local) date is used
- *  @return {String} - 'Today' or date string in the following format: MM/DD/YYYY
- */
-Mustache.registerHelper('localize_date_today', function (value) {
-  let date = resolveComputed(value);
-  let today = moment().startOf('day');
-  let startOfDate = moment(date).startOf('day');
-  // TODO: [Overdue] Move this logic to helper.
-  if (!value || (date && today.diff(startOfDate, 'days') === 0)) {
-    return 'Today';
-  }
-  return localizeDate(value, value, 'MM/DD/YYYY');
 });
 
 Mustache.registerHelper('normalizeLink', (value) => {
@@ -987,17 +893,6 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   };
 });
 
-Mustache.registerHelper('grdive_msg_to_id', function (message) {
-  let msg = Mustache.resolve(message);
-
-  if (!msg) {
-    return;
-  }
-
-  msg = msg.split(' ');
-  return msg[msg.length-1];
-});
-
 Mustache.registerHelper('disable_if_errors', function (instance) {
   let ins;
   let res;
@@ -1075,24 +970,6 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   value = value.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
   return toLowerCase ? value.toLowerCase() : value;
 });
-
-/**
-   * Checks if two object types are mappable
-   *
-   * @param {String} source - Source type
-   * @param {String} target - Target type
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper('is_mappable_type',
-  function (source, target, options) {
-    target = Mustache.resolve(target);
-    source = Mustache.resolve(source);
-    if (Mappings.isMappableType(source, target)) {
-      return options.fn(options.contexts);
-    }
-    return options.inverse(options.contexts);
-  }
-);
 
 /**
    * Check if property's value did not pass validation, and render the
