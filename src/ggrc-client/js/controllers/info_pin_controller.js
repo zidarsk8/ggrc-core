@@ -46,15 +46,7 @@ export default can.Control.extend({
     return !this.element.hasClass(pinContentHiddenClass);
   },
   findOptions: function (el) {
-    let options;
-    let treeNode = el.closest('.cms_controllers_tree_view_node');
-
-    if (treeNode.length) {
-      options = treeNode.control().options;
-    } else {
-      options = el.closest('.tree-item-element').viewModel();
-    }
-    return options;
+    return el.closest('.tree-item-element').viewModel();
   },
   hideInstance: function () {
     this.unsetInstance();
