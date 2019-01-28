@@ -64,13 +64,11 @@
               {{else}}
                 <a href="{{urlPath}}{{ href }}"
                   {{#canMapObject model.model_singular}}
-                    {{^if_equals model.model_singular 'Assessment'}}
-                      data-clickable="true"
-                      data-toggle="unified-mapper"
-                      data-join-option-type="{{model.model_singular}}"
-                      data-join-object-id="{{instance.id}}"
-                      data-join-object-type="{{instance.class.model_singular}}"
-                    {{/if_equals}}
+                    data-clickable="true"
+                    data-toggle="unified-mapper"
+                    data-join-option-type="{{model.shortName}}"
+                    data-join-object-id="{{instance.id}}"
+                    data-join-object-type="{{instance.class.shortName}}"
                   {{/canMapObject}}>
                   <div class="oneline">
                     <i class="fa fa-fw fa-{{ icon }} color"></i>
