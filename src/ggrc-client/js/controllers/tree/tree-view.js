@@ -91,11 +91,6 @@ const TreeViewControl = TreeLoader.extend({
     this.options.attr('is_subtree',
       this.element && this.element.closest('.inner-tree').length > 0);
 
-    this.options.update_count =
-      _.isBoolean(this.element.data('update-count')) ?
-        this.element.data('update-count') :
-        true;
-
     if (!this.options.scroll_element) {
       this.options.attr('scroll_element', $('.object-area'));
     }
@@ -165,22 +160,9 @@ const TreeViewControl = TreeLoader.extend({
   init_count: function () {
     let self = this;
     let options = this.options;
-    let counts;
     let countsName = options.countsName || options.model.model_singular;
 
-    if (this.options.parent_instance && this.options.mapping) {
-      counts = getCounts();
-
-      if (self.element) {
-        can.trigger(self.element, 'updateCount',
-          [counts.attr(countsName), self.options.update_count]);
-      }
-
-      counts.on(countsName, function (ev, newVal, oldVal) {
-        can.trigger(self.element, 'updateCount',
-          [newVal, self.options.update_count]);
-      });
-    } else if (this.options.list_loader) {
+    if (this.options.list_loader) {
       this.options.list_loader(this.options.parent_instance)
         .then(function (list) {
           return can.compute(function () {
@@ -189,13 +171,9 @@ const TreeViewControl = TreeLoader.extend({
         })
         .then(function (count) {
           if (self.element) {
-            can.trigger(self.element, 'updateCount', [count(),
-              self.options.update_count]);
             getCounts().attr(countsName, count());
           }
           count.bind('change', self._ifNotRemoved(function () {
-            can.trigger(self.element, 'updateCount', [count(),
-              self.options.update_count]);
             getCounts().attr(countsName, count());
           }));
         });

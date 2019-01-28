@@ -179,13 +179,9 @@ export default TreeLoader({
   },
 
   update_count: function () {
-    if (this.element) {
-      if (this.options.pager) {
-        this.element.trigger('updateCount', this.options.pager.total);
-        getCounts()
-          .attr(this.options.model.shortName, this.options.pager.total);
-      }
-      this.element.trigger('widget_updated');
+    if (this.element && this.options.pager) {
+      getCounts()
+        .attr(this.options.model.shortName, this.options.pager.total);
     }
   },
 

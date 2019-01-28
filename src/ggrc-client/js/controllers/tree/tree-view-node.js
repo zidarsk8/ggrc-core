@@ -89,10 +89,6 @@ export default can.Control.extend({
         this.draw_node();
       }
     },
-  ' updateCount'(el, ev, count, updateCount) {
-    // prevents updating counts for widget after openning tree-view-node
-    ev.stopPropagation();
-  },
 
   markNotRelatedItem: function () {
     let instance = this.options.instance;
