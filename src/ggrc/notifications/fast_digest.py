@@ -25,9 +25,6 @@ def build_subject():
   """Build notification subject."""
   user_datetime = data_handlers.as_user_time(
       datetime.utcnow(),
-      datetime_format="%m/%d/%Y %I:%M:%S %p %z",
-      # Replacing (+|-)HHMM timezone representation with (+|-)HH:MM.
-      formatter=lambda s: "{}:{}".format(s[:-2], s[-2:]),
   )
   return DIGEST_TITLE_TMPL.format(user_datetime)
 

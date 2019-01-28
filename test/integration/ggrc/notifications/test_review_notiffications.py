@@ -386,7 +386,7 @@ class TestReviewNotification(TestCase):
   def test_notification_subject(self, send_mail_mock):
     """Test that emails are sent with proper subject."""
     expected_subject = "GGRC Change requests review digest " \
-                       "for 01/15/2019 04:00:00 AM -08:00"
+                       "for 01/15/2019 04:00:00 PST"
 
     reviewer = factories.PersonFactory()
     reviewer_role_id = all_models.AccessControlRole.query.filter_by(
