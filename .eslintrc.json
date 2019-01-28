@@ -31,7 +31,11 @@
     // Webpack variables
     "GOOGLE_ANALYTICS_ID": false,
     "RELEASE_NOTES_DATE": false,
-    "BUILD_DATE": false
+    "BUILD_DATE": false,
+    // "env.jasmine: true" includes rules only for 1.3 and 2.0 versions. Because
+    // of this reason need to allow to use features which are included for
+    // newer versions of Jasmine
+    "expectAsync": false
   },
 
   "rules": {
