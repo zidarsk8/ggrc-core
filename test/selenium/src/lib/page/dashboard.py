@@ -1,6 +1,7 @@
 # Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """List dashboard."""
+# pylint: disable=too-many-instance-attributes
 
 from selenium.common import exceptions
 
@@ -31,6 +32,9 @@ class UserList(base.Component):
         self._driver, self.locators.BUTTON_DATA_EXPORT)
     self.email = base.Label(
         self._driver, self.locators.EMAIL)
+    self.user_menu_items = (self.button_logout, self.button_data_export,
+                            self.button_admin_dashboard, self.button_help,
+                            self.notifications)
 
   @decorator.wait_for_redirect
   def select_logout(self):
@@ -50,11 +54,6 @@ class UserList(base.Component):
     """
     self.button_admin_dashboard.click()
     return AdminDashboard(self._driver)
-
-  def get_button_icon(self, btn_name):
-    return getattr(self, 'button_' + btn_name). \
-        element.find_element_by_xpath('..'). \
-        find_element_by_class_name('fa').get_attribute('class')
 
 
 class GenericHeader(base.Component):
