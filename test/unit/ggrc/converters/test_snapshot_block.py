@@ -27,7 +27,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   @staticmethod
   def _mock_snapshot_factory(content_list):
-    return [mock.MagicMock(snapshot=None) for _ in content_list]
+    return mock.MagicMock(return_value=content_list)
 
   @staticmethod
   def _mock_get_snapshot_content(content_list):
@@ -77,9 +77,6 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         "options": [{"type": "option", "id": 4}],
     }]
     self.block.snapshots = self._mock_snapshot_factory(content_list)
-    self.block.get_snapshot_content = self._mock_get_snapshot_content(
-        content_list
-    )
     stubs = self.block._gather_stubs()
     self.assertEqual(
         stubs,
@@ -96,9 +93,6 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     self.block.snapshots = self._mock_snapshot_factory(
         self._dummy_cad_snapshots()
     )
-    self.block.get_snapshot_content = self._mock_get_snapshot_content(
-        self._dummy_cad_snapshots()
-    )
     self.assertEqual(
         self.block._cad_map.items(),
         [
@@ -112,9 +106,6 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def test_cad_name_map(self):
     """Test gathering name map for all custom attribute definitions."""
     self.block.snapshots = self._mock_snapshot_factory(
-        self._dummy_cad_snapshots()
-    )
-    self.block.get_snapshot_content = self._mock_get_snapshot_content(
         self._dummy_cad_snapshots()
     )
     self.assertEqual(
@@ -245,6 +236,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_invalid_cav_dict(self):
     """Test getting ca value from invalid cav representation."""
+    self.block.snapshots = self._mock_snapshot_factory([])
     with self.assertRaises(TypeError):
       self.block.get_cav_value_string("XX")
     with self.assertRaises(KeyError):
@@ -381,8 +373,5 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def test_body_list(self, snapshots, block_list):
     """Test basic CSV body format."""
     self.block._content_line_list = lambda x: []
-    self.block.snapshots = snapshots
-    self.block.get_snapshot_content = self._mock_get_snapshot_content(
-        snapshots
-    )
+    self.block.snapshots = self._mock_snapshot_factory(snapshots)
     self.assertEqual(self.block._body_list, block_list)

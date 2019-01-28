@@ -10,11 +10,12 @@ from collections import OrderedDict
 
 import copy
 from cached_property import cached_property
+from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
 from ggrc import utils
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, list_chunks
 from ggrc.models.reflection import AttributeInfo
 
 logger = logging.getLogger(__name__)
@@ -59,6 +60,8 @@ class SnapshotBlockConverter(object):
       "0": "no",
       "": "no",
   }
+
+  ROW_CHUNK_SIZE = 500
 
   def __init__(self, converter, ids, fields=None):
     self.converter = converter
@@ -120,36 +123,46 @@ class SnapshotBlockConverter(object):
       self._generate_mapping_content(snapshot, content)
     return content
 
-  @cached_property
   def snapshots(self):
     """List of all snapshots in the current block.
 
     The content of the given snapshots also contains the mapped audit field.
     """
-    with benchmark("Gather selected snapshots"):
-      if not self.ids:
-        return []
+    snapshots = models.Snapshot.query.filter(
+        models.Snapshot.id.in_(self.ids)
+    ).count()
+    if not snapshots:
+      yield {}
+    for ids_pool in list_chunks(self.ids, self.ROW_CHUNK_SIZE):
+      # sqlalchemy caches all queries and it takes a lot of memory.
+      # This line clears query cache
+      _app_ctx_stack.top.sqlalchemy_queries = []
       snapshots = models.Snapshot.eager_query().filter(
-          models.Snapshot.id.in_(self.ids)
+          models.Snapshot.id.in_(ids_pool)
       ).all()
-      return snapshots
+      for snapshot in snapshots:
+        yield self.get_snapshot_content(snapshot)
 
   @cached_property
   def child_type(self):
     """Name of snapshot object types."""
-    child_types = {snapshot.child_type for snapshot in self.snapshots}
+    child_types = db.session.query(models.Snapshot.child_type).filter(
+        models.Snapshot.id.in_(self.ids)
+    ).distinct().all()
+
     assert len(child_types) <= 1
-    return child_types.pop() if child_types else ""
+    return unicode(child_types.pop()[0]) if child_types else ""
 
   @cached_property
   def _cad_map(self):
     """Get id to cad mapping for all cad ordered by title."""
     cad_map = {}
-    for snap in self.snapshots:
-      for cad in self.get_snapshot_content(snap).get(
+    for snap in self.snapshots():
+      for cad in snap.get(
           "custom_attribute_definitions", []
       ):
         cad_map[cad["id"]] = cad
+
     return OrderedDict(
         sorted(cad_map.iteritems(), key=lambda x: x[1]["title"])
     )
@@ -198,8 +211,8 @@ class SnapshotBlockConverter(object):
           stubs[value["type"]].add(value["id"])
         for val in value.values():
           walk(val, stubs)
-    for snapshot in self.snapshots:
-      walk(self.get_snapshot_content(snapshot), stubs)
+    for snapshot in self.snapshots():
+      walk(snapshot, stubs)
     return stubs
 
   @cached_property
@@ -228,32 +241,27 @@ class SnapshotBlockConverter(object):
         cache[model_name] = dict(query)
     return cache
 
-  @cached_property
-  def _access_control_map(self):
+  def _access_control_map(self, content):
     """Get AC role name to person emails mapping."""
-    with benchmark("Generate access control map"):
-      acr = self._stub_cache.get("AccessControlRole", {})
-      people = self._stub_cache.get("Person", {})
-      _access_control_map = {}
-      for snapshot in self.snapshots:
-        content = self.get_snapshot_content(snapshot)
-        _access_control_map[int(content["id"])] = defaultdict(list)
-        for acl in content.get("access_control_list", []):
-          if acl["ac_role_id"] not in acr:
-            # This is a bug in our snapshot handling where we still refer to
-            # live data in our database. The proper thing would be to have all
-            # snapshot related data stored in the revision content
-            # and so deleted roles would not affect older snapshots
-            continue
-          role_name = acr[acl["ac_role_id"]]
-          email = people.get(acl["person_id"], "")
-          _access_control_map[content["id"]][role_name].append(email)
+    acr = self._stub_cache.get("AccessControlRole", {})
+    people = self._stub_cache.get("Person", {})
+    _access_control_map = defaultdict(list)
+    for acl in content.get("access_control_list", []):
+      if acl["ac_role_id"] not in acr:
+        # This is a bug in our snapshot handling where we still refer to
+        # live data in our database. The proper thing would be to have all
+        # snapshot related data stored in the revision content
+        # and so deleted roles would not affect older snapshots
+        continue
+      role_name = acr[acl["ac_role_id"]]
+      email = people.get(acl["person_id"], "")
+      _access_control_map[role_name].append(email)
 
-        # Emails should be sorted in asc order
-        _access_control_map[content["id"]] = {
-            role: sorted(emails)
-            for role, emails in _access_control_map[content["id"]].items()
-        }
+    # Emails should be sorted in asc order
+    _access_control_map = {
+        role: sorted(emails)
+        for role, emails in _access_control_map.items()
+    }
     return _access_control_map
 
   def get_value_string(self, value):
@@ -294,7 +302,7 @@ class SnapshotBlockConverter(object):
     elif AttributeInfo.ALIASES_PREFIX in name:
       _, role_name = name.split(":")
       return "\n".join(
-          self._access_control_map[content["id"]].get(role_name, [])
+          self._access_control_map(content).get(role_name, [])
       )
     return self.get_value_string(content.get(name))
 
@@ -347,8 +355,8 @@ class SnapshotBlockConverter(object):
   def _body_list(self):
     """Get 2D representation of CSV content."""
     return [
-        self._content_line_list(self.get_snapshot_content(snapshot))
-        for snapshot in self.snapshots
+        self._content_line_list(snapshot)
+        for snapshot in self.snapshots()
     ] or [[]]
 
   def generate_csv_header(self):
@@ -358,8 +366,8 @@ class SnapshotBlockConverter(object):
     """Get 2D list representing the CSV file."""
     if not self.snapshots:
       yield []
-    for snapshot in self.snapshots:
-      yield self._content_line_list(self.get_snapshot_content(snapshot))
+    for snapshot in self.snapshots():
+      yield self._content_line_list(snapshot)
 
   @property
   def block_width(self):
