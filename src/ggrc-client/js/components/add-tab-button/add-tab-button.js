@@ -64,10 +64,7 @@ const viewModel = can.Map.extend({
   },
   isAllowedToMap(target) {
     let source = this.attr('instance');
-    let isMappable = Mappings.isMappableType(source.attr('type'), target);
-    let canMap = Mappings.allowedToMap(source, target);
-
-    return isMappable && canMap;
+    return Mappings.allowedToMap(source, target);
   },
 });
 
