@@ -68,7 +68,6 @@ class TestSnapshotResourceDelete(services.TestCase):
       factories.RelationshipFactory(source=snapshot_c, destination=assessment)
       factories.RelationshipFactory(source=issue, destination=audit)
       factories.RelationshipFactory(source=issue, destination=assessment)
-      factories.RelationshipFactory(source=issue, destination=snapshot_c)
 
     # Check related_objects endpoint
     related_objects = self._get_related_objects(snapshot_c_id)
