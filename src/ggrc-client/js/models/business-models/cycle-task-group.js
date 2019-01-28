@@ -4,7 +4,6 @@
 */
 
 import Cacheable from '../cacheable';
-import Person from './person';
 import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 
@@ -28,22 +27,5 @@ export default Cacheable('CMS.Models.CycleTaskGroup', {
 
   init: function () {
     this._super(...arguments);
-    this.validateNonBlank('contact');
-    this.validateContact(['_transient.contact', 'contact']);
-  },
-  validateContact: function (attrNames, options) {
-    this.validate(attrNames, options, function (newVal) {
-      let reifiedContact = newVal && newVal instanceof can.Map ?
-        Person.findInCacheById(newVal.id) : false;
-      let hasEmail = reifiedContact ? reifiedContact.email : false;
-      options = options || {};
-
-      // This check will not work until the bug introduced with commit 8a5f600c65b7b45fd34bf8a7631961a6d5a19638
-      // is resolved.
-      if (!hasEmail) {
-        return options.message ||
-          'No valid contact selected for assignee';
-      }
-    });
   },
 }, {});

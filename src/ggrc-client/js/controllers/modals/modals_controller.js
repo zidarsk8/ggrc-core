@@ -62,7 +62,6 @@ import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
 import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
-import {reify} from '../../plugins/utils/reify-utils';
 
 export default can.Control.extend({
   defaults: {
@@ -89,7 +88,6 @@ export default can.Control.extend({
   },
 }, {
   init: function () {
-    let currentUser;
     let userFetch;
 
     if (!(this.options instanceof can.Map)) {
@@ -105,11 +103,7 @@ export default can.Control.extend({
     // loaded before rendering the form, otherwise initial validation can
     // incorrectly fail for form fields whose values rely on current user's
     // attributes.
-    currentUser = Person.findInCacheById(GGRC.current_user.id);
-
-    if (currentUser) {
-      currentUser = reify(currentUser);
-    }
+    const currentUser = Person.findInCacheById(GGRC.current_user.id);
 
     if (!currentUser) {
       userFetch = Person.findOne({id: GGRC.current_user.id});
