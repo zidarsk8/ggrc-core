@@ -16,6 +16,11 @@ import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
 import {isDashboardEnabled} from '../../plugins/utils/dashboards-utils';
 
+const prohibitedMapList = Object.freeze({
+  Issue: ['Assessment', 'Audit'],
+  Assessment: ['Evidence'],
+});
+
 export default can.Component.extend({
   tag: 'inner-nav',
   template,
@@ -127,7 +132,8 @@ export default can.Component.extend({
       if (this.attr('showAllTabs')
         || widget.attr('inForceShowList')
         || widget.attr('type') === 'version'
-        || widget.attr('uncountable')) {
+        || widget.attr('uncountable')
+        || this.isInProhibitedMap(widget)) {
         // widget will never be in hiddenWidgets
         return;
       }
@@ -138,6 +144,18 @@ export default can.Component.extend({
       } else {
         this.removeFromHiddenWidgets(widget);
       }
+    },
+    /**
+     * Checks additional rules for hidden widgets
+     * @param {can.Map} widget widget object
+     * @return {boolean} whether widget is in prohibited list
+     */
+    isInProhibitedMap(widget) {
+      const instanceType = this.attr('instance.type');
+      const shortName = widget.model.shortName;
+
+      return prohibitedMapList[instanceType] &&
+        prohibitedMapList[instanceType].includes(shortName);
     },
     /**
      * Adds widget to hiddenWidgets for Add tab button

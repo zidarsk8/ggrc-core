@@ -324,9 +324,12 @@ describe('inner-nav component', () => {
     });
 
     describe('updateHiddenWidgets(widget) method', () => {
+      let isInProhibitedMapSpy;
+
       beforeEach(() => {
         spyOn(viewModel, 'addToHiddenWidgets');
         spyOn(viewModel, 'removeFromHiddenWidgets');
+        isInProhibitedMapSpy = spyOn(viewModel, 'isInProhibitedMap');
       });
 
       function showAllTabs(value) {
@@ -378,6 +381,23 @@ describe('inner-nav component', () => {
 
         let widget = new can.Map({
           uncountable: true,
+        });
+
+        viewModel.updateHiddenWidgets(widget);
+
+        expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
+        expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
+      });
+
+      it('should do nothing if widget is in prohibited map list', () => {
+        showAllTabs(false);
+
+        isInProhibitedMapSpy.and.returnValue(true);
+
+        let widget = new can.Map({
+          uncountable: false,
+          type: '',
+          inForceShowList: false,
         });
 
         viewModel.updateHiddenWidgets(widget);

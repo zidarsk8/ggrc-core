@@ -38,30 +38,10 @@ const viewModel = can.Map.extend({
           && this.attr('widgetList.length') > 0;
       },
     },
-    filteredWidgets: {
-      get() {
-        let widgetList = this.attr('widgetList');
-
-        return _.filter(widgetList, (widget) => {
-          return !this.isNotProhibitedMap(widget.model.model_singular);
-        });
-      },
-    },
   },
   instance: null,
   widgetList: null,
   addTabTitle: '',
-  isNotProhibitedMap(shortName) {
-    const prohibitedMapList = {
-      Issue: ['Assessment', 'Audit'],
-      Assessment: ['Evidence'],
-    };
-
-    const instanceType = this.attr('instance.type');
-
-    return prohibitedMapList[instanceType] &&
-      prohibitedMapList[instanceType].includes(shortName);
-  },
   isAllowedToMap(target) {
     let source = this.attr('instance');
     return Mappings.allowedToMap(source, target);
