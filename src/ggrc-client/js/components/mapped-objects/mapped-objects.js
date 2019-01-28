@@ -89,7 +89,7 @@ export default can.Component.extend({
         this.attr('filter').attr(), getTypeFromInstance);
     },
     getBinding: function () {
-      return Mappings.get_binding(
+      return Mappings.getBinding(
         this.attr('mapping'),
         this.attr('parentInstance'));
     },

@@ -6,7 +6,7 @@
 import Mappings from '../mappings';
 
 describe('Mappings', () => {
-  const types = Mappings.get_canonical_mappings_for('MultitypeSearch');
+  const types = Mappings.getAllowedToMapModels('MultitypeSearch');
 
   let modules = {
     core: [
@@ -48,12 +48,13 @@ describe('Mappings', () => {
 
   const coreObjectsRules = _.concat(modules.core, modules.workflow,
     ['Assessment', 'Audit', 'Document', 'Person', 'Program']);
+  const snapshotableObjects = _.difference(modules.core, ['Project']);
 
   const mappingRules = {
     AccessGroup: _.difference(coreObjectsRules, ['AccessGroup']),
-    Assessment: [...modules.core, 'Evidence', 'Audit', 'Person'],
+    Assessment: [...snapshotableObjects, 'Evidence', 'Audit', 'Person'],
     AssessmentTemplate: ['Audit'],
-    Audit: [...modules.core, 'Evidence', 'Assessment',
+    Audit: [...snapshotableObjects, 'Evidence', 'Assessment',
       'AssessmentTemplate', 'Person', 'Program'],
     Contract: _.difference(coreObjectsRules, ['Contract']),
     Control: coreObjectsRules,

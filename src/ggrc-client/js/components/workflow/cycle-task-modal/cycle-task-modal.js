@@ -33,7 +33,7 @@ const viewModel = can.Map.extend({
   },
   async loadMappedObjects() {
     const mappedObjectsBindings = await Mappings
-      .get_binding('info_related_objects', this.attr('instance'))
+      .getBinding('info_related_objects', this.attr('instance'))
       .refresh_instances();
     return mappedObjectsBindings.map((binding) =>
       binding.instance ||

@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Mappings from './mappers/mappings';
 import * as businessModels from './business-models';
 import * as serviceModels from './service-models';
 import * as mappingModels from './mapping-models';
@@ -155,24 +154,12 @@ const RefreshQueue = can.Construct({
       let refreshQueue = new RefreshQueue();
       let dfds = [];
       let deferred;
-      let hasBinding;
 
       if (next) {
         refreshQueue.enqueue(next, force);
         deferred = refreshQueue.trigger();
-      } else if (instance.get_binding) {
-        next = Mappings.get_binding(prop, instance);
-        hasBinding = Mappings.has_binding(prop, instance);
-
-        if (!hasBinding) {
-          dfd.reject({
-            message: prop + ' binding not found',
-          });
-        }
-        if (hasBinding && next) {
-          deferred = next.refresh_instances(force);
-        }
       }
+
       if (deferred) {
         deferred.then(function (refreshedItems) {
           if (nextProps.length) {

@@ -926,7 +926,7 @@ describe('revision-log component', function () {
           }],
         },
       });
-      spyOn(Mappings, 'get_binding').and.callFake((mappingName) => {
+      spyOn(Mappings, 'getBinding').and.callFake((mappingName) => {
         let bindingData = {
           related_requesters: {
             list: [

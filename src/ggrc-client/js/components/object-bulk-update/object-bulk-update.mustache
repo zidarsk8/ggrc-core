@@ -14,8 +14,8 @@
 <div class="modal-filter modal-body">
   <collapsible-panel {soft-mode}="true" {title-text}="'filter'" {(expanded)}="showSearch">
     <advanced-search-wrapper
-      {model-name}="model.singular"
-      {model-display-name}="model.name"
+      {model-name}="model.model_singular"
+      {model-display-name}="model.title_plural"
       {^filter-items}="*filterItems"
       {^status-item}="*statusItem"
       ($enter)="onSubmit()">
@@ -78,7 +78,7 @@
     <bulk-update-target-state
       {target-states}="targetStates"
       {(target-state)}="targetState"
-      {model-name}="model.singular"
+      {model-name}="model.model_singular"
       {enabled}="selected.length"
       class="target-state">
     </bulk-update-target-state>

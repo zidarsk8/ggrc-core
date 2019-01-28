@@ -11,7 +11,7 @@
     Map {{get_object}} to {{get_title}}
   </h2>
   {{#if allowedToCreate}}
-    {{#is_allowed 'create' model.singular context='any'}}
+    {{#is_allowed 'create' model.model_singular context='any'}}
         {{#if_equals type 'Document'}}
           <span class="create-new-object">
             Do you want to search for an existing document or
@@ -28,8 +28,8 @@
                   href="javascript://"
                   data-toggle="modal-ajax-form"
                   data-modal-class="modal-wide"
-                  data-object-singular="{{model.singular}}"
-                  data-object-plural="{{model.plural}}"
+                  data-object-singular="{{model.model_singular}}"
+                  data-object-plural="{{model.table_plural}}"
                   data-unique-id="{{join_object_id}}"
                   data-join-object-id="{{join_object_id}}">
                   Create and map new object
@@ -51,8 +51,8 @@
 
   <collapsible-panel {soft-mode}="true" {title-text}="'filter'" {(expanded)}="showSearch">
     <advanced-search-wrapper
-      {model-name}="model.singular"
-      {model-display-name}="model.name"
+      {model-name}="model.model_singular"
+      {model-display-name}="model.title_plural"
       {^mapping-items}="*mappingItems"
       {^filter-items}="*filterItems"
       {^status-item}="*statusItem"

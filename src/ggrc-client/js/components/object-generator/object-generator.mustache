@@ -8,14 +8,14 @@
     <i class="fa fa-times black"></i>
   </a>
   <h2>
-    Select {{un_camel_case model.singular true}} to generate assessments
+    Select {{un_camel_case model.model_singular true}} to generate assessments
   </h2>
 </div>
 <div class="modal-filter modal-body">
   <collapsible-panel {soft-mode}="true" {title-text}="'filter'" {(expanded)}="showSearch">
     <advanced-search-wrapper
-      {model-name}="model.singular"
-      {model-display-name}="model.name"
+      {model-name}="model.model_singular"
+      {model-display-name}="model.title_plural"
       {^mapping-items}="*mappingItems"
       {^filter-items}="*filterItems"
       {^status-item}="*statusItem"
