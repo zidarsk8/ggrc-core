@@ -4,7 +4,6 @@
 */
 
 import DashboardWidgets from './dashboard_widgets_controller';
-import InnerNav from './inner-nav-controller';
 import InfoPin from './info_pin_controller';
 import {
   isAdmin,
@@ -91,14 +90,6 @@ const DashboardControl = can.Control.extend({
       $innernav.html(can.view(this.options.innernav_view, options));
       return;
     }
-
-    let $internav = this.element.find('.internav');
-    if ($internav.length) {
-      this.inner_nav_controller = new InnerNav(
-        this.element.find('.internav'), {
-          dashboard_controller: this,
-        });
-    }
   },
 
   showWidgetArea(event) {
@@ -163,25 +154,6 @@ const DashboardControl = can.Control.extend({
   show_widget_area: function () {
     this.get_active_widget_containers().removeClass('hidden');
   },
-  ' widgets_updated': 'update_inner_nav',
-  ' updateCount': function (el, ev, count, updateCount) {
-    if (_.isBoolean(updateCount) && !updateCount) {
-      return;
-    }
-    if (this.inner_nav_controller) {
-      this.inner_nav_controller
-        .update_widget_count($(ev.target), count, updateCount);
-    }
-  },
-  update_inner_nav: function (el, ev, data) {
-    if (this.inner_nav_controller) {
-      if (data) {
-        this.inner_nav_controller
-          .update_widget(data.widget || data, data.index);
-      }
-      this.inner_nav_controller.sortWidgets();
-    }
-  },
 
   get_active_widget_containers: function () {
     return this.element.find('.widget-area');
@@ -235,9 +207,6 @@ const DashboardControl = can.Control.extend({
     } else {
       $container.append($element);
     }
-
-    $element
-      .trigger('widgets_updated', $element);
 
     this.options.innerNavDescriptors.push(control.options);
 
