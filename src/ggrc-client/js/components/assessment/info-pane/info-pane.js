@@ -485,6 +485,11 @@ export default can.Component.extend({
           this.attr('instance').save().done(resolve).fail(reject);
         }.bind(this), 1000));
     },
+    refreshAssessment() {
+      this.attr('instance').refresh().then((response) => {
+        this.setCurrentState(response.status);
+      });
+    },
     beforeStatusSave(newStatus, isUndo) {
       const instance = this.attr('instance');
 
@@ -498,7 +503,10 @@ export default can.Component.extend({
     },
     afterStatusSave(savedStatus) {
       this.attr('instance.status', savedStatus);
-      this.attr('currentState', savedStatus);
+      this.setCurrentState(savedStatus);
+    },
+    setCurrentState(state) {
+      this.attr('currentState', state);
     },
     onStateChange: function (event) {
       const isUndo = event.undo;
@@ -605,8 +613,7 @@ export default can.Component.extend({
       }
     },
     resetCurrentState() {
-      const instanceStatus = this.attr('instance.status');
-      this.attr('currentState', instanceStatus);
+      this.setCurrentState(this.attr('instance.status'));
       this.attr('previousStatus', undefined);
       this.attr('isUndoButtonVisible', false);
     },
@@ -646,6 +653,7 @@ export default can.Component.extend({
     },
     '{viewModel.instance} modelAfterSave': function () {
       this.viewModel.attr('isAssessmentSaving', false);
+      this.viewModel.setCurrentState(this.viewModel.attr('instance.status'));
     },
     '{viewModel.instance} assessment_type'() {
       const onSave = () => {

@@ -104,7 +104,7 @@ export default can.Component.extend({
         this.attr('selectedEvidences').replace([]);
         this.attr('isSaving', false);
         this.dispatch('afterObjectReused');
-        this.attr('instance').dispatch('refreshInstance');
+        this.dispatch('refreshAssessment');
       });
     },
     loadRelatedAssessments() {
