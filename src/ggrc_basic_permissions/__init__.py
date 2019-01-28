@@ -45,7 +45,6 @@ blueprint = flask.Blueprint(
 )
 
 PERMISSION_CACHE_TIMEOUT = 3600  # 60 minutes
-PERMISSION_NAMESPACE = "permissions"
 
 
 def get_public_config(_):
@@ -165,7 +164,7 @@ def query_memcache(key):
     cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
     return cache, None
 
-  return cache, memcache.blob_get(cache, key, namespace=PERMISSION_NAMESPACE)
+  return cache, memcache.blob_get(cache, key)
 
 
 def load_default_permissions(permissions):
@@ -406,7 +405,6 @@ def store_results_into_memcache(permissions, cache, key):
          key,
          permissions,
          exp_time=PERMISSION_CACHE_TIMEOUT,
-         namespace=PERMISSION_NAMESPACE,
      ):
     logger.error("Failed to set permissions data into memcache")
 

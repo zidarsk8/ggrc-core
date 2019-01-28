@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Memcache implements the remote AppEngine Memcache mechanism."""
 
+import logging
+
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -9,6 +11,9 @@ from google.appengine.api import memcache
 
 from ggrc.cache import cache
 from ggrc import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class MemCache(cache.Cache):
