@@ -8,7 +8,7 @@ import RefreshQueue from '../refresh_queue';
 (function (GGRC, can) {
   /*  GGRC.ListLoaders.ListBinding
    */
-  can.Construct('GGRC.ListLoaders.ListBinding', {}, {
+  GGRC.ListLoaders.ListBinding = can.Construct.extend({}, {
     init: function (instance, loader) {
       this.instance = instance;
       this.loader = loader;
