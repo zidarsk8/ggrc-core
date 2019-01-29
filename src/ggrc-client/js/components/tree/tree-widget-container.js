@@ -55,6 +55,7 @@ import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
 import exportMessage from './templates/export-message.mustache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
 let viewModel;
 
@@ -394,12 +395,16 @@ viewModel = can.Map.extend({
     }
 
     function onDestroyed(ev, instance) {
-      let current;
+      const activeTabType = businessModels[activeTabModel].model_singular;
+      const isSnapshotTab =
+        isSnapshotType(instance) &&
+        instance.child_type === activeTabType;
 
       if (_verifyRelationship(instance, activeTabModel) ||
-        instance instanceof businessModels[activeTabModel]) {
+        instance instanceof businessModels[activeTabModel] ||
+        isSnapshotTab) {
         if (self.attr('showedItems').length === 1) {
-          current = self.attr('pageInfo.current');
+          const current = self.attr('pageInfo.current');
           self.attr('pageInfo.current',
             current > 1 ? current - 1 : 1);
         }
