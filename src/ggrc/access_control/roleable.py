@@ -122,16 +122,26 @@ class Roleable(object):
     if values is None:
       return
 
-    new_acl_people_map = defaultdict(set)
+    from ggrc.models import person
+
+    for value in values:
+      referenced_objects.mark_to_cache(person.Person, value["person"]["id"])
+    referenced_objects.rewarm_cache(
+        rewarm_type=person.Person,
+        skip_cad=True,
+        undefer=True,
+    )
+
+    persons_by_acl = defaultdict(set)
     for value in values:
       if value["ac_role_id"] not in self.acr_id_acl_map:
         raise BadRequest(errors.BAD_PARAMS)
       person = referenced_objects.get("Person", value["person"]["id"])
       acl = self.acr_id_acl_map[value["ac_role_id"]]
-      new_acl_people_map[acl].add(person)
+      persons_by_acl[acl].add(person)
 
     for acl in self._access_control_list:
-      acl.update_people(new_acl_people_map[acl])
+      acl.update_people(persons_by_acl[acl])
 
   @classmethod
   def eager_query(cls):
