@@ -9,8 +9,8 @@ import flask
 
 from ggrc import cache
 import ggrc.models
-from ggrc import settings
 from ggrc.utils.memcache import blob_get_chunk_keys
+from ggrc.cache.memcache import has_memcache
 
 
 logger = logging.getLogger(__name__)
@@ -22,10 +22,6 @@ def get_cache_manager():
   cache_manager = cache.CacheManager()
   cache_manager.initialize(cache.MemCache())
   return cache_manager
-
-
-def has_memcache():
-  return getattr(settings, 'MEMCACHE_MECHANISM', False)
 
 
 def get_cache_key(obj, type_=None, id_=None):
@@ -119,7 +115,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
     None
 
   """
-  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+  if not has_memcache():
     return
 
   context.cache_manager = get_cache_manager()
@@ -160,7 +156,7 @@ def update_memcache_after_commit(context):
     None
 
   """
-  if getattr(settings, 'MEMCACHE_MECHANISM', False) is False:
+  if not has_memcache():
     return
 
   if context.cache_manager is None:
@@ -216,7 +212,7 @@ def build_cache_status(data, key, expiry_timeout, status):
 
 def clear_permission_cache():
   """Drop cached permissions for all users."""
-  if not getattr(settings, 'MEMCACHE_MECHANISM', False):
+  if not has_memcache():
     return
 
   client = get_cache_manager().cache_object.memcache_client
@@ -233,7 +229,7 @@ def clear_permission_cache():
 
 def clear_users_permission_cache(user_ids):
   """ Drop cached permissions for a list of users. """
-  if not getattr(settings, 'MEMCACHE_MECHANISM', False) or not user_ids:
+  if not has_memcache() or not user_ids:
     return
 
   client = get_cache_manager().cache_object.memcache_client
@@ -249,3 +245,12 @@ def clear_users_permission_cache(user_ids):
 
   client.set('permissions:list', cached_keys_set)
   client.delete_multi(keys_to_delete)
+
+
+def clear_memcache():
+  """Flush memcahce if available"""
+
+  if not has_memcache():
+    return
+
+  get_cache_manager().clean()

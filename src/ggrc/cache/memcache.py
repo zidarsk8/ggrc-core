@@ -15,6 +15,11 @@ from ggrc import settings
 logger = logging.getLogger(__name__)
 
 
+def has_memcache():
+  # type: () -> bool
+  return getattr(settings, 'MEMCACHE_MECHANISM', False)
+
+
 class MemCache(cache.Cache):
   """MemCache class."""
 
@@ -272,7 +277,8 @@ class _Decorated(object):
 
   @property
   def active(self):
-    return settings.MEMCACHE_MECHANISM
+    # type: () -> bool
+    return has_memcache()
 
   def get_key(self, *args, **kwargs):
     """Return key name for sent args and kwargs"""

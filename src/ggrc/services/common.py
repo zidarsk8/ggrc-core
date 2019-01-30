@@ -725,7 +725,7 @@ class Resource(ModelView):
 
   @staticmethod
   def has_cache():
-    return getattr(settings, 'MEMCACHE_MECHANISM', False)
+    return cache_utils.has_memcache()
 
   def apply_paging(self, matches_query):
     page_size = min(
