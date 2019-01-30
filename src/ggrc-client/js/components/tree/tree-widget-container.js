@@ -42,7 +42,6 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import {
   getCounts,
-  initCounts,
 } from '../../plugins/utils/widgets-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
@@ -210,10 +209,6 @@ viewModel = can.Map.extend({
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
-
-    if (this._getFilterByName('status')) {
-      initCounts([countsName], parent.type, parent.id);
-    }
 
     let loadSnapshots = this.attr('options.objectVersion');
     return TreeViewUtils
