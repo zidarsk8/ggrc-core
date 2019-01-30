@@ -2,9 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Facade for Web UI services"""
 import copy
+import re
 
 from lib import users, base
-from lib.constants import objects
+from lib.constants import objects, element
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
 from lib.utils import selenium_utils, ui_utils
@@ -103,3 +104,48 @@ def _assert_title_editable(obj, selenium, info_page):
   new_ui_obj = _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
   base.Test.general_equal_assert(
       obj.repr_ui(), new_ui_obj, "audit", "custom_attributes")
+
+
+def check_base_objects_have_numbers(lhn_menu):
+  """Check LHN list of the upper objects have numbers in brackets."""
+  for item in element.Lhn.BASE_OBJS:
+    lhn_item = getattr(lhn_menu, 'toggle_' + item)
+    assert re.match(item.upper() + r' \((\d*)\)',
+                    lhn_item.text) is not None
+
+
+def check_objects_have_numbers(lhn_menu):
+  """Check LHN list of the middle objects have numbers in brackets."""
+  for item in element.Lhn.SUB_OBJS:
+    assert getattr(lhn_menu, 'toggle_' + item).text == item.replace(
+        '_or_', '/').upper()
+    lhn_item = getattr(lhn_menu, 'select_' + item)()
+    lhn_item.update_members()
+    for item_sub in getattr(element.Lhn, item.upper() + '_MEMBERS'):
+      lhn_item_sub = getattr(lhn_item, 'toggle_' + item_sub)
+      assert re.match(item_sub.replace('_', ' ').title() + r' \((\d*)\)',
+                      lhn_item_sub.text) is not None
+
+
+def can_base_objects_expand(lhn_menu):
+  """Check LHN list of the upper objects can expand."""
+  for item in element.Lhn.BASE_OBJS:
+    getattr(lhn_menu, 'select_' + item)()
+    assert getattr(lhn_menu, 'toggle_' + item).is_activated is True
+
+
+def can_objects_expand(lhn_menu):
+  """Check LHN list of the middle objects can expand."""
+  for item in element.Lhn.SUB_OBJS:
+    lhn_item = getattr(lhn_menu, 'select_' + item)()
+    for item_sub in getattr(element.Lhn, item.upper() + '_MEMBERS'):
+      getattr(lhn_item, 'select_' + item_sub)()
+      assert getattr(lhn_item, 'toggle_' + item_sub).is_activated is True
+
+
+def check_user_menu_has_icons(user_menu):
+  """Check user menu list has icons."""
+  for item in user_menu.user_menu_items:
+    assert item.element.find_element_by_class_name(
+        'fa').get_attribute('class') != ''
+  assert user_menu.email.text == users.current_user().name

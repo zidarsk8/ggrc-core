@@ -302,10 +302,10 @@ class Toggle(Element):
     Args: on_el (bool)
     """
     if on_el and not self.is_activated:
-      self.element.click()
+      self.click_via_js()
       self.is_activated = True
     elif not on_el and self.is_activated:
-      self.element.click()
+      self.click_via_js()
       self.is_activated = False
 
 
