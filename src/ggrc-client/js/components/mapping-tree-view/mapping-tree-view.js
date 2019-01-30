@@ -11,20 +11,14 @@ export default can.Component.extend({
   template,
   leakScope: true,
   viewModel: {
-    treeViewClass: '@',
     parentInstance: null,
     mappedObjects: [],
+    itemTemplate: GGRC.mustache_path + '/base_templates/subtree.stache',
   },
   init(element) {
-    _.forEach(['mapping', 'itemTemplate'], (prop) => {
-      this.viewModel.attr(prop,
-        $(element).attr(can.camelCaseToDashCase(prop))
-      );
-    });
-
     const binding = Mappings
       .getBinding(
-        this.viewModel.mapping,
+        'info_related_objects',
         this.viewModel.parentInstance
       );
 
