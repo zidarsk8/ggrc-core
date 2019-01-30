@@ -13,7 +13,6 @@ export default can.Component.extend({
   viewModel: {
     parentInstance: null,
     mappedObjects: [],
-    itemTemplate: GGRC.mustache_path + '/base_templates/subtree.stache',
   },
   init(element) {
     const binding = Mappings
