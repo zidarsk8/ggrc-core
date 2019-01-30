@@ -20,6 +20,7 @@ ACR_TABLE = sa.sql.table(
     sa.sql.column('update', sa.Boolean),
     sa.sql.column('delete', sa.Boolean),
     sa.sql.column('my_work', sa.Boolean),
+    sa.sql.column('default_to_current_user', sa.Boolean),
     sa.sql.column('created_at', sa.DateTime),
     sa.sql.column('modified_by_id', sa.Integer),
     sa.sql.column('updated_at', sa.DateTime),

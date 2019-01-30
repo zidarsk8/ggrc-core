@@ -105,6 +105,9 @@ def create_acrs():
         internal=False,
         non_editable=True,
         mandatory=mandatory,
+        # Mandatory roles are default to user
+        default_to_current_user=mandatory,
+        my_work=1,
         read=read,
         update=update,
         delete=delete,
