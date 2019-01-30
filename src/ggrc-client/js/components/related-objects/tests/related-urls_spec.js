@@ -1,20 +1,19 @@
 /*
- Copyright (C) 2019 Google Inc.
- Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import Component from '../related-urls';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
+import * as UrlUtils from '../../../plugins/utils/url-utils';
 
-describe('related-urls component', function () {
-  'use strict';
-
+describe('related-urls component', () => {
   let viewModel;
   let instance;
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
     instance = {
       isNew: jasmine.createSpy('isNew'),
@@ -127,16 +126,16 @@ describe('related-urls component', function () {
     });
   });
 
-  describe('createUrl() method', function () {
+  describe('createUrl() method', () => {
     let method;
     let url;
 
-    beforeEach(function () {
+    beforeEach(() => {
       method = viewModel.createUrl.bind(viewModel);
       url = 'test.url';
     });
 
-    it('should dispatch createUrl event', function () {
+    it('should dispatch createUrl event', () => {
       spyOn(viewModel, 'dispatch');
       method(url);
       expect(viewModel.dispatch)
@@ -147,17 +146,17 @@ describe('related-urls component', function () {
     });
   });
 
-  describe('removeUrl() method', function () {
+  describe('removeUrl() method', () => {
     let method;
     let url;
 
-    beforeEach(function () {
+    beforeEach(() => {
       method = viewModel.removeUrl.bind(viewModel);
       url = 'test.url';
       spyOn(viewModel, 'dispatch');
     });
 
-    it('should dispatch removeUrl event', function () {
+    it('should dispatch removeUrl event', () => {
       method(url);
       expect(viewModel.dispatch)
         .toHaveBeenCalledWith({
@@ -167,130 +166,114 @@ describe('related-urls component', function () {
     });
   });
 
-  describe('toggleFormVisibility() method', function () {
+  describe('toggleFormVisibility() method', () => {
     let method;
 
-    beforeEach(function () {
+    beforeEach(() => {
       method = viewModel.toggleFormVisibility.bind(viewModel);
       spyOn(viewModel, 'moveFocusToInput');
     });
 
-    it('should set new value for form visibility', function () {
+    it('should set new value for form visibility', () => {
       viewModel.attr('isFormVisible', true);
       method(false);
       expect(viewModel.attr('isFormVisible')).toEqual(false);
     });
 
-    it('should clear create url form input by default', function () {
+    it('should clear create url form input by default', () => {
       viewModel.attr('value', 'foobar');
       method(true);
       expect(viewModel.attr('value')).toEqual('');
     });
 
-    it('does not clear input field value if instructed to do so', function () {
+    it('does not clear input field value if instructed to do so', () => {
       viewModel.attr('value', 'foobar');
       method(true, true);
       expect(viewModel.attr('value')).toEqual('foobar');
     });
 
-    it('should set focus to form input field if visible', function () {
+    it('should set focus to form input field if visible', () => {
       viewModel.attr('isFormVisible', false);
       method(true);
       expect(viewModel.moveFocusToInput).toHaveBeenCalled();
     });
   });
 
-  describe('submitCreateUrlForm() method', function () {
+  describe('submitCreateUrlForm() method', () => {
     let method;
 
-    beforeEach(function () {
+    beforeEach(() => {
       method = viewModel.submitCreateUrlForm.bind(viewModel);
       spyOn(viewModel, 'createUrl');
       spyOn(viewModel, 'toggleFormVisibility');
       spyOn(NotifiersUtils, 'notifier');
     });
 
-    describe('in case of non-empty input', function () {
-      let url;
+    describe('in case of non-empty input', () => {
+      let url = 'www.test.url';
 
-      beforeEach(function () {
-        spyOn(viewModel, 'validateUserInput').and.returnValue(true);
-        url = 'test.url';
+      beforeEach(() => {
+        viewModel.attr('urls', []);
+        spyOn(UrlUtils, 'sanitizer').and.returnValue({
+          isValid: true, value: url,
+        });
       });
 
-      it('should validate user input', function () {
-        method(url);
-        expect(viewModel.validateUserInput)
-          .toHaveBeenCalledWith(url);
-      });
-
-      it('prevents adding duplicate URLs', function () {
-        let matches;
-
+      it('prevents adding duplicate URLs', () => {
         viewModel.attr('urls', [
           new can.Map({link: 'www.xyz.com', title: 'www.xyz.com'}),
-          new can.Map({link: 'www.bar.com', title: 'www.bar.com'}),
-          new can.Map({link: 'www.baz.org', title: 'www.baz.org'}),
+          new can.Map({link: 'www.test.url', title: 'www.test.url'}),
         ]);
 
-        url = 'www.bar.com';
         method(url);
-
-        matches = _.filter(viewModel.attr('urls'), {link: url});
-        expect(matches.length).toEqual(1); // still only 1
         expect(viewModel.createUrl).not.toHaveBeenCalled();
       });
 
-      it('issues error notification when adding duplicate URLs', function () {
+      it('issues error notification when adding duplicate URLs', () => {
         viewModel.attr('urls', [
           new can.Map({link: 'www.xyz.com', title: 'www.xyz.com'}),
-          new can.Map({link: 'www.bar.com', title: 'www.bar.com'}),
-          new can.Map({link: 'www.baz.org', title: 'www.baz.org'}),
+          new can.Map({link: 'www.test.url', title: 'www.test.url'}),
         ]);
 
-        method('www.bar.com');
-
+        method(url);
         expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
           'error', 'URL already exists.');
       });
 
-      it('should create url', function () {
+      it('should create url', () => {
         method(url);
-        expect(viewModel.createUrl)
-          .toHaveBeenCalledWith(url);
+        expect(viewModel.createUrl).toHaveBeenCalledWith(url);
       });
 
-      it('should hide create url form', function () {
+      it('should hide create url form', () => {
         method(url);
-        expect(viewModel.toggleFormVisibility)
-          .toHaveBeenCalledWith(false);
+        expect(viewModel.toggleFormVisibility).toHaveBeenCalledWith(false);
       });
     });
 
-    describe('in case of empty input', function () {
-      let url;
+    describe('should not hide create url form', () => {
+      it('in case of empty input', () => {
+        spyOn(UrlUtils, 'sanitizer').and.returnValue({
+          isValid: false, value: '',
+        });
 
-      beforeEach(function () {
-        spyOn(viewModel, 'validateUserInput').and.returnValue(false);
-        url = '   ';
+        method(' ');
+        expect(viewModel.toggleFormVisibility).not.toHaveBeenCalled();
       });
 
-      it('should validate user input', function () {
-        method(url);
-        expect(viewModel.validateUserInput)
-          .toHaveBeenCalledWith('');
-      });
+      it('in case of duplicate url', () => {
+        let url = 'www.test.url';
+        viewModel.attr('urls', [
+          new can.Map({link: 'www.xyz.com', title: 'www.xyz.com'}),
+          new can.Map({link: 'www.test.url', title: 'www.test.url'}),
+        ]);
 
-      it('should show create url form', function () {
-        method(url);
-        expect(viewModel.toggleFormVisibility)
-          .toHaveBeenCalledWith(true);
-      });
+        spyOn(UrlUtils, 'sanitizer').and.returnValue({
+          isValid: false, value: url,
+        });
 
-      it('should show notification with error message', function () {
         method(url);
-        expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
-          'error', 'Please enter a URL.');
+        expect(viewModel.toggleFormVisibility).not.toHaveBeenCalled();
       });
     });
   });
