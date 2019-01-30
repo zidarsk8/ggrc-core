@@ -237,8 +237,8 @@ class TestManualAudit(TestCase):
     snapshot_count = all_models.Snapshot.query.count()
     self.assertEqual(snapshot_count, count)
 
-  def assertRelatedObjectives(self, snapshot_id, count):
-    """Assert related objectives count for control snapshot"""
+  def count_related_objectives(self, snapshot_id):
+    """Returns related objectives count for control snapshot"""
     query_data = [{
         "object_name": "Snapshot",
         "filters": {
@@ -277,7 +277,7 @@ class TestManualAudit(TestCase):
         api_link="/query"
     )
     self.assert200(response)
-    self.assertEqual(count, response.json[0]["Snapshot"]["count"])
+    return response.json[0]["Snapshot"]["count"]
 
   def test_audit_upsert(self):
     """Test upsert audit with manual mapping
@@ -336,14 +336,14 @@ class TestManualAudit(TestCase):
     self.gen.generate_relationship(audit, control)
     control_snapshot_id = all_models.Snapshot.query.filter_by(
         child_id=control_id, child_type="Control").first().id
-    self.assertRelatedObjectives(control_snapshot_id, 0)
+    self.assertEqual(self.count_related_objectives(control_snapshot_id), 0)
 
     self.gen.generate_relationship(audit, objective)
-    self.assertRelatedObjectives(control_snapshot_id, 1)
+    self.assertEqual(self.count_related_objectives(control_snapshot_id), 1)
 
     self.gen.generate_relationship(audit, control2)
     control2_snapshot_id = all_models.Snapshot.query.filter_by(
         child_id=control2_id, child_type="Control").first().id
-    self.assertRelatedObjectives(control2_snapshot_id, 0)
+    self.assertEqual(self.count_related_objectives(control2_snapshot_id), 0)
 
     self.assertSnapshotCount(3)

@@ -47,7 +47,7 @@ class SnapshotGenerator(object):
     self.snapshots = dict()
     self.context_cache = dict()
     self.dry_run = dry_run
-    self.manual_snapshots = dict()
+    self.manual_snapshots = set()
 
   def add_parent(self, obj):
     """Add parent object and automatically scan neighborhood for snapshottable
@@ -61,7 +61,8 @@ class SnapshotGenerator(object):
           self.context_cache[key] = obj.context_id
           self.children = self.children | objs
           self.snapshots[key] = objs
-          self.manual_snapshots[key] = getattr(obj, "manual_snapshots", False)
+          if getattr(obj, "manual_snapshots", False):
+            self.manual_snapshots.add(key)
       return self.parents
 
   def add_family(self, parent, children):
@@ -272,7 +273,7 @@ class SnapshotGenerator(object):
 
     full_scope = set()
     for parent, children in self.snapshots.items():
-      if not self.manual_snapshots.get(parent, False):
+      if parent not in self.manual_snapshots:
         for child in children:
           full_scope.add(Pair(parent, child))
 
