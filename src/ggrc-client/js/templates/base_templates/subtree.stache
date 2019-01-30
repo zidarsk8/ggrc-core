@@ -11,9 +11,7 @@
     <div class="item-wrap">
       <div class="openclose">
         <span class="status-label status-draft"></span>
-        {{#if isExpandable}}
         <i class="fa fa-caret-right"></i>
-        {{/if}}
       </div>
       <div class="select">
         <div class="item-data">
@@ -32,8 +30,6 @@
       </div>
     </div>
   </div>
-
-  {{#if isExpandable}}
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       <lazy-openclose>
@@ -47,6 +43,4 @@
       </lazy-openclose>
     </div>
   </div>
-  {{/if}}
-
 </li>
