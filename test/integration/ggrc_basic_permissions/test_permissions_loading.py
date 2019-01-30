@@ -105,7 +105,7 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
 
     # emulate work of worker #1 - get permissions for our user
     # the first step - check permissions in memcache
-    ggrc_basic_permissions.query_memcache("permissions:11")
+    ggrc_basic_permissions.query_memcache(client, "permissions:11")
     # step 2 - load permissions from DB and save then into memcahe
     # this step is omitted
 

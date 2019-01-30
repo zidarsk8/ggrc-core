@@ -18,9 +18,14 @@ logger = logging.getLogger(__name__)
 
 def get_cache_manager():
   """Returns an instance of CacheManager."""
+
   cache_manager = cache.CacheManager()
   cache_manager.initialize(cache.MemCache())
   return cache_manager
+
+
+def has_memcache():
+  return getattr(settings, 'MEMCACHE_MECHANISM', False)
 
 
 def get_cache_key(obj, type_=None, id_=None):
