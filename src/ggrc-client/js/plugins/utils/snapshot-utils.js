@@ -275,8 +275,10 @@ function getSnapshotsCounts(widgets, instance) {
           return widgetObj.name === name;
         });
 
-        let countsName = widget.countsName || widget.name;
-        countsMap[countsName] = counts[name];
+        if (widget) {
+          let countsName = widget.countsName || widget.name;
+          countsMap[countsName] = counts[name];
+        }
       });
 
       return countsMap;
