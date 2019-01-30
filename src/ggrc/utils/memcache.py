@@ -43,7 +43,7 @@ def blob_set(cache, key, value, exp_time=0, key_prefix="", namespace=None):
   # in order to conserve available memcache space.
   blob_delete(cache, key, namespace=namespace)
 
-  compressed_value = zlib.compress(cPickle.dumps(value))
+  compressed_value = _encode_data(value)
   chunk_map = create_chunk_map(compressed_value, MEMCACHE_MAX_ITEM_SIZE, key)
 
   unset_ids = cache.set_multi(
@@ -94,7 +94,7 @@ def blob_get(cache, key, key_prefix="", namespace=None):
   compressed_value = ''.join(chunk_values)
 
   try:
-    return cPickle.loads(zlib.decompress(compressed_value))
+    return _decode_data(compressed_value)
   except Exception:  # pylint: disable=broad-except
     logger.error("Failed to uncompress object from memcache")
     return None
@@ -108,3 +108,13 @@ def create_chunk_map(value, chunk_size, key_prefix):
     chunk_key = "%s:%d" % (key_prefix, pos)
     chunk_map[chunk_key] = chunk
   return chunk_map
+
+
+def _encode_data(data):
+  # type: (Any) -> str
+  return zlib.compress(cPickle.dumps(data))
+
+
+def _decode_data(data):
+  # type: (str) -> Any
+  return cPickle.loads(zlib.decompress(data))
