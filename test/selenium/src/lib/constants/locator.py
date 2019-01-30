@@ -60,7 +60,7 @@ class Common(object):
   CONTENT = ".content"
   OPTION = "option"
   # panel locator
-  PANEL_CSS = (By.CSS_SELECTOR, ".pin-content.cms_controllers_info_pin")
+  PANEL_CSS = (By.CSS_SELECTOR, ".pin-content.pin-content")
   OBJECT_AREA_CSS = (By.CSS_SELECTOR, ".object-area")
   # widgets
   WDG_NOT_HIDDEN = ".widget:not(.hidden) "
@@ -1159,11 +1159,11 @@ class AdminCustomAttributes(object):
 class CustomAttributesItemContent(AdminCustomAttributes):
   """Locators for expanded view of custom attribute group
   in admin dashboard."""
-  _TREE_ITEM = ".tree-item.cms_controllers_tree_view_node"
+  _TREE_ITEM = ".tree-item.tree-view-node"
   TREE_ITEM_EL_OPENED_CSS = (By.CSS_SELECTOR, _TREE_ITEM + ".item-open")
   CONTENT_OPEN = ".content-open .tier-2-info-content"
   TREE_STRUCTURE = (
-      CONTENT_OPEN + " .tree-structure .cms_controllers_tree_view_node")
+      CONTENT_OPEN + " .tree-structure .tree-view-node")
   TITLES_ROW_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + " thead tr")
   ROW_CSS = (By.CSS_SELECTOR, TREE_STRUCTURE)
   CELL_IN_ROW_CSS = (By.CSS_SELECTOR, "td")
