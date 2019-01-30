@@ -54,6 +54,7 @@ const events = {
 
 export default can.Component.extend({
   tag: 'person-modal',
+  leakScope: true,
   viewModel,
   events,
 });

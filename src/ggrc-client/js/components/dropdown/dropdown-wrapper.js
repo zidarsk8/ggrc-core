@@ -5,6 +5,7 @@
 
 export default can.Component.extend({
   tag: 'dropdown-wrapper',
+  leakScope: true,
   viewModel: {
     value: null,
     selected: '',
