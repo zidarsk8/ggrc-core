@@ -26,7 +26,6 @@ class KeyReport(mixins.CustomAttributable,
                 mixins.base.ContextRBAC,
                 mixins.ScopeObject,
                 mixins.Folderable,
-                mixins.WithNetworkZone,
                 fulltext_mixin.Indexed,
                 db.Model,
                 ):
