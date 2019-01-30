@@ -6,21 +6,21 @@
 import logging
 from collections import defaultdict
 from collections import namedtuple
+
 from sqlalchemy import orm
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from cached_property import cached_property
 from werkzeug.exceptions import BadRequest
 
-
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
-from ggrc import utils
 from ggrc.utils import errors
 from ggrc.utils import referenced_objects
+
 
 logger = logging.getLogger(__name__)
 
@@ -197,17 +197,12 @@ class Roleable(object):
     revision logs.
     """
     acl_json = []
-    for person, acl in self.access_control_list:
-      person_entry = acl.log_json()
-      person_entry["person"] = utils.create_stub(person)
-      person_entry["person_email"] = person.email
-      person_entry["person_id"] = person.id
-      person_entry["person_name"] = person.name
-      acl_json.append(person_entry)
+    for acl in self._access_control_list:
+      acl_json.extend(acl.people_json)
     return acl_json
 
   def log_json(self):
-    """Log custom attribute values."""
+    """Log access control lists values."""
     # pylint: disable=not-an-iterable
     res = super(Roleable, self).log_json()
     res["access_control_list"] = self.acl_json
