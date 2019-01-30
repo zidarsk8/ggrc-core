@@ -411,31 +411,10 @@ def store_results_into_memcache(permissions, cache, key):
     logger.error("Failed to set permissions data into memcache")
 
 
-def load_permissions_for(user):
-  """Permissions is dictionary that can be exported to json to share with
-  clients. Structure is:
-  ..
+def _load_permissions_from_database(user):
+  """Calculate permissions based on DB queries"""
 
-    permissions[action][resource_type][contexts]
-                                      [conditions][context][context_conditions]
-
-  'action' is one of 'create', 'read', 'update', 'delete'.
-  'resource_type' is the name of a valid GGRC resource type.
-  'contexts' is a list of context_id where the action is allowed.
-  'conditions' is a dictionary of 'context_conditions' indexed by 'context'
-    where 'context' is a context_id.
-  'context_conditions' is a list of dictionaries with 'condition' and 'terms'
-    keys.
-  'condition' is the string name of a conditional operator, such as 'contains'.
-  'terms' are the arguments to the 'condition'.
-  """
   permissions = {}
-  key = 'permissions:{}'.format(user.id)
-
-  with benchmark("load_permissions > query memcache"):
-    cache, result = query_memcache(key)
-    if result:
-      return result
 
   with benchmark("load_permissions > load default permissions"):
     load_default_permissions(permissions)
@@ -455,6 +434,39 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load access control list"):
     load_access_control_list(user, permissions)
 
+  return permissions
+
+
+def load_permissions_for(user):
+  """Permissions is dictionary that can be exported to json to share with
+  clients. Structure is:
+  ..
+
+    permissions[action][resource_type][contexts]
+                                      [conditions][context][context_conditions]
+
+  'action' is one of 'create', 'read', 'update', 'delete'.
+  'resource_type' is the name of a valid GGRC resource type.
+  'contexts' is a list of context_id where the action is allowed.
+  'conditions' is a dictionary of 'context_conditions' indexed by 'context'
+    where 'context' is a context_id.
+  'context_conditions' is a list of dictionaries with 'condition' and 'terms'
+    keys.
+  'condition' is the string name of a conditional operator, such as 'contains'.
+  'terms' are the arguments to the 'condition'.
+  """
+  key = 'permissions:{}'.format(user.id)
+
+  # try to get cached permissions from memcahe
+  with benchmark("load_permissions > query memcache"):
+    cache, result = query_memcache(key)
+    if result:
+      return result
+
+  # no permissions were stored in memcache for this user. Use DB to get perms
+  permissions = _load_permissions_from_database(user)
+
+  # store calculated permissions into memcahe
   if not hasattr(flask.g, "referenced_object_stubs"):
     # In some cases for optimization we only load a small chunk of permissions
     # and in that case we can not cache the value because it might not contain
