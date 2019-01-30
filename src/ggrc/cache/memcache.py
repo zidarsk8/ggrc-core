@@ -3,7 +3,6 @@
 """Memcache implements the remote AppEngine Memcache mechanism."""
 
 import logging
-
 from collections import OrderedDict
 from copy import deepcopy
 

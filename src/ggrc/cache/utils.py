@@ -10,6 +10,7 @@ import flask
 from ggrc import cache
 import ggrc.models
 from ggrc import settings
+from ggrc.utils.memcache import blob_get_chunk_keys
 
 
 logger = logging.getLogger(__name__)
@@ -212,22 +213,34 @@ def clear_permission_cache():
   """Drop cached permissions for all users."""
   if not getattr(settings, 'MEMCACHE_MECHANISM', False):
     return
+
   client = get_cache_manager().cache_object.memcache_client
-  cached_keys_set = client.get('permissions:list') or set()
-  cached_keys_set.add('permissions:list')
+
   # We delete all the cached user permissions as well as
   # the permissions:list value itself
-  client.delete_multi(cached_keys_set)
+  keys_to_delete = list('permissions:list')
+  for user_key in client.get('permissions:list') or set():
+    keys_to_delete.append(user_key)
+    keys_to_delete.extend(blob_get_chunk_keys(client, user_key))
+
+  client.delete_multi(keys_to_delete)
 
 
 def clear_users_permission_cache(user_ids):
   """ Drop cached permissions for a list of users. """
   if not getattr(settings, 'MEMCACHE_MECHANISM', False) or not user_ids:
     return
+
   client = get_cache_manager().cache_object.memcache_client
+
+  keys_to_delete = list()
   cached_keys_set = client.get('permissions:list') or set()
   for user_id in user_ids:
     key = 'permissions:{}'.format(user_id)
     if key in cached_keys_set:
       cached_keys_set.remove(key)
+      keys_to_delete.append(key)
+      keys_to_delete.extend(blob_get_chunk_keys(client, key))
+
   client.set('permissions:list', cached_keys_set)
+  client.delete_multi(keys_to_delete)

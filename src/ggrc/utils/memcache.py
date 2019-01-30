@@ -14,14 +14,19 @@ logger = logging.getLogger(__name__)
 MEMCACHE_MAX_ITEM_SIZE = 10 ** 6 - 1
 
 
-def blob_delete(cache, key):
-  """Delete stored values from memcache."""
-  chunk_keys = cache.get(key)
-  if chunk_keys is None:
+def blob_delete(cache, key, namespace):
+  # type: (Any, str, Optional[str]) -> bool
+  """Delete stored values from memcache"""
+
+  chunk_keys = blob_get_chunk_keys(cache, key, namespace=namespace)
+  if not chunk_keys:
     # Keys are not set, no need to remove them.
     return True
-  chunk_keys.append(key)
-  return cache.delete_multi(chunk_keys)
+
+  keys_to_delete = list(chunk_keys)
+  keys_to_delete.append(key)
+
+  return cache.delete_multi(keys_to_delete, namespace=namespace)
 
 
 # pylint: disable=too-many-arguments
@@ -36,10 +41,11 @@ def blob_set(cache, key, value, exp_time=0, key_prefix="", namespace=None):
   """
   # delete previous entity with the given key
   # in order to conserve available memcache space.
-  blob_delete(cache, key)
+  blob_delete(cache, key, namespace=namespace)
 
   compressed_value = zlib.compress(cPickle.dumps(value))
   chunk_map = create_chunk_map(compressed_value, MEMCACHE_MAX_ITEM_SIZE, key)
+
   unset_ids = cache.set_multi(
       mapping=chunk_map,
       time=exp_time,
@@ -49,12 +55,22 @@ def blob_set(cache, key, value, exp_time=0, key_prefix="", namespace=None):
 
   if unset_ids:
     return False
-  return cache.set(
+
+  ret = cache.set(
       key,
       chunk_map.keys(),
       time=exp_time,
       namespace=namespace,
   )
+  return ret
+
+
+def blob_get_chunk_keys(cache, key, namespace=None):
+  # type: (Any, str, str) -> List[str]
+  """Get list of chunk keys which store value
+  """
+
+  return cache.get(key, namespace=namespace) or list()
 
 
 def blob_get(cache, key, key_prefix="", namespace=None):
@@ -62,8 +78,8 @@ def blob_get(cache, key, key_prefix="", namespace=None):
 
   Object should be compressed and can be stored in divided state.
   """
-  chunk_keys = cache.get(key, namespace=namespace)
-  if chunk_keys is None:
+  chunk_keys = blob_get_chunk_keys(cache, key, namespace)
+  if not chunk_keys:
     return None
 
   chunk_map = cache.get_multi(
