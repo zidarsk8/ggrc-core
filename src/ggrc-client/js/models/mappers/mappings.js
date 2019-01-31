@@ -254,7 +254,7 @@ export default can.Construct.extend({
     return all allowed mappings (suitable for joining) for an object type.
     object - a string representing the object type's shortName
 
-    return: a keyed object of all mappings (instances of CMS.Models)
+    return: a keyed object of all mappings (instances of Cacheable)
   */
   getAllowedToMapModels: function (object) {
     return this._getModelsFromConfig(object, 'map');
@@ -319,7 +319,7 @@ export default can.Construct.extend({
     return all possible indirectly mapped models for an object type.
     object - a string representing the object type's shortName
 
-    return: a keyed object of all related mappings (instances of CMS.Models)
+    return: a keyed object of all related mappings (instances of Cacheable)
   */
   getIndirectlyMappedModels(object) {
     return this._getModelsFromConfig(object, 'indirectMappings');

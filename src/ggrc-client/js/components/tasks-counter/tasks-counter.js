@@ -17,6 +17,7 @@ export default can.Component.extend({
   template: '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>',
   leakScope: true,
   viewModel: {
+    CycleTaskGroupObjectTask,
     define: {
       tasksAmount: {
         type: 'number',
@@ -67,8 +68,8 @@ export default can.Component.extend({
         this.viewModel.loadTasks();
       }
     },
-    '{CMS.Models.CycleTaskGroupObjectTask} updated': 'onModelChange',
-    '{CMS.Models.CycleTaskGroupObjectTask} destroyed': 'onModelChange',
-    '{CMS.Models.CycleTaskGroupObjectTask} created': 'onModelChange',
+    '{CycleTaskGroupObjectTask} updated': 'onModelChange',
+    '{CycleTaskGroupObjectTask} destroyed': 'onModelChange',
+    '{CycleTaskGroupObjectTask} created': 'onModelChange',
   },
 });

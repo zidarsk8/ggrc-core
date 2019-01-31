@@ -10,6 +10,7 @@ import {REFRESH_RELATED} from '../../../events/eventTypes';
 import TaskGroupTask from '../../../models/business-models/task-group-task';
 
 const viewModel = can.Map.extend({
+  TaskGroupTask,
   define: {
     paging: {
       value() {
@@ -67,12 +68,12 @@ const viewModel = can.Map.extend({
 });
 
 const events = {
-  '{CMS.Models.TaskGroupTask} destroyed'(model, event, instance) {
+  '{TaskGroupTask} destroyed'(model, event, instance) {
     if (instance instanceof TaskGroupTask) {
       this.viewModel.updatePagingAfterDestroy();
     }
   },
-  '{CMS.Models.TaskGroupTask} created'(model, event, instance) {
+  '{TaskGroupTask} created'(model, event, instance) {
     if (instance instanceof TaskGroupTask) {
       this.viewModel.updatePagingAfterCreate();
     }

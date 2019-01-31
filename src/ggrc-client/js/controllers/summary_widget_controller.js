@@ -20,6 +20,8 @@ import Assessment from '../models/business-models/assessment';
 
 export default can.Control({
   defaults: {
+    Assessment,
+    Relationship,
     model: getPageModel(),
     instance: getPageInstance(),
     widget_view: GGRC.templates_path + '/base_objects/summary.stache',
@@ -82,9 +84,9 @@ export default can.Control({
       this.options.forceRefresh = true;
     }
   },
-  '{CMS.Models.Relationship} destroyed': 'onRelationshipChange',
-  '{CMS.Models.Relationship} created': 'onRelationshipChange',
-  '{CMS.Models.Assessment} updated': function (model, ev, instance) {
+  '{Relationship} destroyed': 'onRelationshipChange',
+  '{Relationship} created': 'onRelationshipChange',
+  '{Assessment} updated': function (model, ev, instance) {
     if (instance instanceof Assessment) {
       this.options.forceRefresh = true;
     }

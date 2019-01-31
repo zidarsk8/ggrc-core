@@ -42,7 +42,7 @@ export default Cacheable('CMS.Models.System', {
     status: 'Draft',
   },
   tree_view_options: {
-    attr_list: can.Model.Cacheable.attr_list.concat([
+    attr_list: Cacheable.attr_list.concat([
       {
         attr_title: 'Network Zone',
         attr_name: 'network_zone',
