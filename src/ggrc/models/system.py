@@ -28,9 +28,9 @@ class SystemOrProcess(ScopedCommentable,
                       mixins.TestPlanned,
                       mixins.LastDeprecatedTimeboxed,
                       mixins.base.ContextRBAC,
+                      mixins.WithNetworkZone,
                       mixins.ScopeObject,
                       mixins.Folderable,
-                      mixins.WithNetworkZone,
                       db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'

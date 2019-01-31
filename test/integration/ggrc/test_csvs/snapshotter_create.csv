@@ -351,13 +351,8 @@ Launched
 Not Launched
 In Scope
 Not in Scope
-Deprecated",,,,,,,,MM/DD/YYYY,"Options are:
-Prod
-Corp
-Service
-Core
-3rd Party",
-KeyReport,code*,title*,description,admin,Launch Status,notes,compliance contacts,primary contacts,secondary contacts,assignee,verifier,reference url,effective date,network zone,map:program
-,keyreport-1,keyreport-1,test,user@example.com,Draft,this is a note,user@example.com,user@example.com,user@example.com,user@example.com,user@example.com,google.com,7/1/2015,prod,Prog-13211
-,keyreport-2,keyreport-2,test,user@example.com,Active,this is a note,user@example.com,user@example.com,user@example.com,user@example.com,user@example.com,google.com,7/1/2015,corp,Prog-13211
-,keyreport-3,keyreport-3,test,user@example.com,Active,this is a note,user@example.com,user@example.com,user@example.com,user@example.com,user@example.com,google.com,7/1/2015,service,Prog-13211
+Deprecated",,,,,,,,MM/DD/YYYY,,
+KeyReport,code*,title*,description,admin,Launch Status,notes,compliance contacts,primary contacts,secondary contacts,assignee,verifier,reference url,effective date,map:program,
+,keyreport-1,keyreport-1,test,user@example.com,Draft,this is a note,user@example.com,user@example.com,user@example.com,user@example.com,user@example.com,google.com,7/1/2015,Prog-13211,
+,keyreport-2,keyreport-2,test,user@example.com,Active,this is a note,user@example.com,user@example.com,user@example.com,user@example.com,user@example.com,google.com,7/1/2015,Prog-13211,
+,keyreport-3,keyreport-3,test,user@example.com,Active,this is a note,user@example.com,user@example.com,user@example.com,user@example.com,user@example.com,google.com,7/1/2015,Prog-13211,
