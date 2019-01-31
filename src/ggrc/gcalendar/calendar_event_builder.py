@@ -208,9 +208,22 @@ class CalendarEventBuilder(object):
     """Determines should we delete a Calendar Event for the task or not.
 
     Calendar events should NOT be deleted for:
-    - overdue cycle tasks.
+    - overdue cycle tasks that does not satisfy any of these conditions:
+        - cycle task is deprecated.
+        - cycle task is verified (in case it has Verification flow).
+        - cycle task is finished (in case it has no Verification flow).
+        - cycle task is 'in progress' within a cycle that was ended
+          (tasks are stored at 'History' tab).
+        - cycle task is in archived workflow.
     """
-    return not task.is_overdue
+    conditions = [
+        task.status in [task.DEPRECATED, task.VERIFIED],
+        task.status == task.FINISHED and not task.is_verification_needed,
+        task.is_in_history,
+        task.workflow.workflow_archived,
+    ]
+    should_not_be_deleted = task.is_overdue and not any(conditions)
+    return not should_not_be_deleted
 
   def _generate_event_descriptions(self):
     """Generates CalendarEvents descriptions."""
