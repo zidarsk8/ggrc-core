@@ -400,6 +400,31 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
 
+  def test_incorrect_id_in_payload(self):
+    """Test that 400 is raised for payload
+     which contains the following structure:
+      ..."workflow":{
+        "id":{
+          "id":1
+        },
+        "type":"Workflow"}
+    """
+    wf_data = self.get_workflow_dict()
+    wf_response = self.api.post(all_models.Workflow, wf_data)
+    data = {
+        "workflow": {
+            "id": {
+                "id": wf_response.json["workflow"]["id"]
+            },
+            "type": "Workflow"
+        }
+    }
+    tg_response = self.api.post(all_models.TaskGroup, data)
+    self.assertEqual(tg_response.status_code, 400)
+    self.assertEqual(tg_response.json["message"],
+                     ("Either type or id are specified "
+                      "incorrectly in the request payload."))
+
   @staticmethod
   def get_workflow_dict():
     return {
