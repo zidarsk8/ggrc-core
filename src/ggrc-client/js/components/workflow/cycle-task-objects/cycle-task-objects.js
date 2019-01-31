@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './mapping-tree-view.stache';
-import Mappings from '../../models/mappers/mappings';
+import template from './cycle-task-objects.stache';
+import Mappings from '../../../models/mappers/mappings';
 
 const viewModel = can.Map.extend({
   parentInstance: null,
@@ -30,7 +30,7 @@ const init = function (element) {
 };
 
 export default can.Component.extend({
-  tag: 'mapping-tree-view',
+  tag: 'cycle-task-objects',
   template,
   leakScope: true,
   viewModel,

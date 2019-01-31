@@ -5,8 +5,8 @@
 
 <h6>Mapped objects</h6>
 
-<mapping-tree-view {parent-instance}="instance">
-</mapping-tree-view>
+<cycle-task-objects {parent-instance}="instance">
+</cycle-task-objects>
 
 {{#if_equals instance.type 'CycleTaskGroupObjectTask'}}
   {{^if_in instance.status "Finished,Verified"}}

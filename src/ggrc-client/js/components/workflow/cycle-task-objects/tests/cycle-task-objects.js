@@ -3,9 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Component from '../mapping-tree-view';
+import Component from '../cycle-task-objects';
 
-describe('mapping-tree-view component', function () {
+describe('cycle-task-objects component', function () {
   'use strict';
 
   let unsortedArray = [

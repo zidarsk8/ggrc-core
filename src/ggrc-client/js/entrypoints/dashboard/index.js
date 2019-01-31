@@ -20,7 +20,7 @@ import '../../components/autocomplete/autocomplete';
 import '../../components/person/person-data';
 import '../../components/clipboard-link/permalink';
 import '../../components/clipboard-link/shortlink';
-import '../../components/mapping-tree-view/mapping-tree-view';
+import '../../components/workflow/cycle-task-objects/cycle-task-objects';
 import '../../components/tabs/tab-container';
 import '../../components/lazy_open_close';
 import '../../components/revision-log/revision-log';

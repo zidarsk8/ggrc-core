@@ -243,7 +243,7 @@ new Mappings({
       ),
       /**
        * "cycle" mapper is needed for mapped objects under
-       * CycleTaskGroupObjectTask into mapping-tree-view component.
+       * CycleTaskGroupObjectTask into cycle-task-objects component.
        */
       cycle: Direct(
         'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
