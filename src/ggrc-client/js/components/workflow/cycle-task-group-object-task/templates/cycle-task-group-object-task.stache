@@ -152,7 +152,40 @@
 
           <div class="row-fluid wrap-row">
             <div class="span12">
-              {{> /static/templates/base_templates/mapped_objects.stache}}
+              <h6>Mapped objects</h6>
+
+              <cycle-task-objects {parent-instance}="instance">
+              </cycle-task-objects>
+
+              {{#if_equals instance.type 'CycleTaskGroupObjectTask'}}
+                {{^if_in instance.status "Finished,Verified"}}
+                  {{#is_allowed 'update' instance context='for'}}
+                    <a
+                      class="btn btn-white btn-small"
+                      href="javascript://"
+                      data-placement="right"
+                      data-toggle="unified-mapper"
+                      data-join-object-id="{{instance.id}}"
+                      data-join-object-type="{{instance.class.model_singular}}">
+                      Map Objects
+                    </a>
+                  {{/is_allowed}}
+                {{/if_in}}
+              {{else}}
+                {{#is_allowed 'update' instance context='for'}}
+                <a
+                  class="btn btn-white btn-small"
+                  href="javascript://"
+                  data-type="Program"
+                  data-placement="right"
+                  data-toggle="unified-mapper"
+                  data-join-option-type="{{model.model_singular}}"
+                  data-join-object-id="{{instance.id}}"
+                  data-join-object-type="{{instance.class.model_singular}}">
+                  Map Objects
+                </a>
+                {{/is_allowed}}
+              {{/if_equals}}
             </div>
           </div>
 
@@ -229,7 +262,7 @@
                 {notifications-info}="'Notify Task Assignees and Task Secondary Assignees'">
               </comment-add-form>
             {{/unless}}
-            <mapped-comments {base-instance}="instance" 
+            <mapped-comments {base-instance}="instance"
               {mapped-items}="comments"
               {is-loading}="isLoading"
               {show-no-items-text}="isEditDenied"></mapped-comments>
