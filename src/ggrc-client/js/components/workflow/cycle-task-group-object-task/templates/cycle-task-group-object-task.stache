@@ -157,35 +157,19 @@
               <cycle-task-objects {parent-instance}="instance">
               </cycle-task-objects>
 
-              {{#if_equals instance.type 'CycleTaskGroupObjectTask'}}
-                {{^if_in instance.status "Finished,Verified"}}
-                  {{#is_allowed 'update' instance context='for'}}
-                    <a
-                      class="btn btn-white btn-small"
-                      href="javascript://"
-                      data-placement="right"
-                      data-toggle="unified-mapper"
-                      data-join-object-id="{{instance.id}}"
-                      data-join-object-type="{{instance.class.model_singular}}">
-                      Map Objects
-                    </a>
-                  {{/is_allowed}}
-                {{/if_in}}
-              {{else}}
+              {{^if_in instance.status "Finished,Verified"}}
                 {{#is_allowed 'update' instance context='for'}}
-                <a
-                  class="btn btn-white btn-small"
-                  href="javascript://"
-                  data-type="Program"
-                  data-placement="right"
-                  data-toggle="unified-mapper"
-                  data-join-option-type="{{model.model_singular}}"
-                  data-join-object-id="{{instance.id}}"
-                  data-join-object-type="{{instance.class.model_singular}}">
-                  Map Objects
-                </a>
+                  <a
+                    class="btn btn-white btn-small"
+                    href="javascript://"
+                    data-placement="right"
+                    data-toggle="unified-mapper"
+                    data-join-object-id="{{instance.id}}"
+                    data-join-object-type="{{instance.class.model_singular}}">
+                    Map Objects
+                  </a>
                 {{/is_allowed}}
-              {{/if_equals}}
+              {{/if_in}}
             </div>
           </div>
 
