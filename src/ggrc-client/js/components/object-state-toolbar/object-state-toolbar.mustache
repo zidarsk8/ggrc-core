@@ -25,12 +25,12 @@
     {{/if}}
   {{/if}}
   {{#unless isInProgress}}
-    {{#if hasPreviousState}}
-      <button type="button"
-              class="btn btn-small btn-link object-state-toolbar__item"
-              {{#if disabled}}disabled{{/if}}
-              ($click)="changeState('In Progress', true)">Undo
-      </button>
-    {{/if}}
+      {{#if isUndoButtonVisible}}
+        <button type="button"
+                class="btn btn-small btn-link object-state-toolbar__item"
+                {{#if disabled}}disabled{{/if}}
+                ($click)="changeState('In Progress', true)">Undo
+        </button>
+      {{/if}}
   {{/unless}}
 </div>

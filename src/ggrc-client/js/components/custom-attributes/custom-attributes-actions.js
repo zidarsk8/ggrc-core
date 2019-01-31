@@ -12,6 +12,7 @@ export default can.Component.extend({
   viewModel: {
     instance: null,
     formEditMode: false,
+    disabled: false,
     edit: function () {
       this.attr('formEditMode', true);
     },

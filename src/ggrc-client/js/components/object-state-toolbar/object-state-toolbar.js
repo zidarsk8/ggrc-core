@@ -36,20 +36,19 @@ export default can.Component.extend({
         },
       },
     },
+    instanceState: '',
     disabled: false,
+    isUndoButtonVisible: false,
     verifiers: [],
     instance: {},
     isActiveState: function () {
-      return activeStates.includes(this.attr('instance.status'));
+      return activeStates.includes(this.attr('instanceState'));
     },
     isInProgress: function () {
-      return this.attr('instance.status') === 'In Progress';
+      return this.attr('instanceState') === 'In Progress';
     },
     isInReview: function () {
-      return this.attr('instance.status') === 'In Review';
-    },
-    hasPreviousState: function () {
-      return !!this.attr('instance.previousStatus');
+      return this.attr('instanceState') === 'In Review';
     },
     changeState: function (newState, isUndo) {
       if (this.attr('instance._hasValidationErrors')) {
