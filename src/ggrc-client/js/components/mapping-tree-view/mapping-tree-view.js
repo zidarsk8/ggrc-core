@@ -6,29 +6,33 @@
 import template from './mapping-tree-view.stache';
 import Mappings from '../../models/mappers/mappings';
 
+const viewModel = can.Map.extend({
+  parentInstance: null,
+  mappedObjects: [],
+});
+
+const init = function (element) {
+  const binding = Mappings
+    .getBinding(
+      'info_related_objects',
+      this.viewModel.parentInstance
+    );
+
+  binding.refresh_instances()
+    .then((mappedObjects) => {
+      this.viewModel.attr('mappedObjects').replace(mappedObjects);
+    });
+
+  // We are tracking binding changes, so mapped items update accordingly
+  binding.list.on('change', () => {
+    this.viewModel.attr('mappedObjects').replace(binding.list);
+  });
+};
+
 export default can.Component.extend({
   tag: 'mapping-tree-view',
   template,
   leakScope: true,
-  viewModel: {
-    parentInstance: null,
-    mappedObjects: [],
-  },
-  init(element) {
-    const binding = Mappings
-      .getBinding(
-        'info_related_objects',
-        this.viewModel.parentInstance
-      );
-
-    binding.refresh_instances()
-      .then((mappedObjects) => {
-        this.viewModel.attr('mappedObjects').replace(mappedObjects);
-      });
-
-    // We are tracking binding changes, so mapped items update accordingly
-    binding.list.on('change', () => {
-      this.viewModel.attr('mappedObjects').replace(binding.list);
-    });
-  },
+  viewModel,
+  init,
 });
