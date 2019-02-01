@@ -6,8 +6,6 @@
 import '../dropdown/dropdown';
 import '../numberbox/numberbox';
 import template from './templates/modal-issue-tracker-fields.stache';
-import {showTrackerNotification} from
-  './temporary-issue-tracker-notification';
 
 const tag = 'modal-issue-tracker-fields';
 
@@ -21,12 +19,5 @@ export default can.Component.extend({
     linkingNote: '',
     setIssueTitle: false,
     allowToChangeId: false,
-  },
-  events: {
-    '{viewModel.instance.issue_tracker} hotlist_id'() {
-      if (this.viewModel.instance.attr('type') === 'Assessment') {
-        showTrackerNotification();
-      }
-    },
   },
 });
