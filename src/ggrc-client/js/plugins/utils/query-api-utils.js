@@ -79,6 +79,7 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @param {Number} page.current - Current page
  * @param {Number} page.pageSize - Page size
  * @param {Array} page.sort - Array of sorting criteria
+ * @param {Number} page.buffer - Size of additional items
  * @param {Object|Object[]} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
  * @param {Object} relevant.id - Id of relevant object
@@ -102,6 +103,9 @@ function buildParam(objName, page, relevant, fields, filters) {
   if (page.current && page.pageSize) {
     first = (page.current - 1) * page.pageSize;
     last = page.current * page.pageSize;
+    if (page.buffer) {
+      last += page.buffer;
+    }
     params.limit = [first, last];
   }
 
