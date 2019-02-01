@@ -222,14 +222,73 @@ class TestAudit(TestCase):
     expected_slug = "SLUG"
     self.assertEqual(current_slug, expected_slug)
 
-  def test_audit_manual_snapshots(self):
-    """Test creation audit without snapshot and adding manual snapshot"""
-    program = factories.ProgramFactory()
-    control = factories.ControlFactory()
-    factories.RelationshipFactory(
-        source=program,
-        destination=control,
+
+class TestManualAudit(TestCase):
+  """ Test Audit with manual snapshot mapping"""
+
+  # pylint: disable=invalid-name
+  def setUp(self):
+    super(TestManualAudit, self).setUp()
+    self.api = Api()
+    self.gen = generator.ObjectGenerator()
+
+  def assertSnapshotCount(self, count):
+    """Assert snapshots count"""
+    snapshot_count = all_models.Snapshot.query.count()
+    self.assertEqual(snapshot_count, count)
+
+  def count_related_objectives(self, snapshot_id):
+    """Returns related objectives count for control snapshot"""
+    query_data = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": {
+                    "left": "child_type",
+                    "op": {
+                        "name": "="
+                    },
+                    "right": "Objective"
+                },
+                "op": {
+                    "name": "AND"
+                },
+                "right": {
+                    "object_name": "Snapshot",
+                    "op": {
+                        "name": "relevant"
+                    },
+                    "ids": [
+                        str(snapshot_id)
+                    ]
+                }
+            }
+        },
+        "fields": [
+            "child_id",
+            "child_type",
+            "revision",
+            "parent"
+        ]
+    }]
+    response = self.api.send_request(
+        self.api.client.post,
+        data=query_data,
+        api_link="/query"
     )
+    self.assert200(response)
+    return response.json[0]["Snapshot"]["count"]
+
+  def test_audit_upsert(self):
+    """Test upsert audit with manual mapping
+
+    Audit with manual mapping should not add new snapshots
+    after calling "Update objects to latest version"
+    """
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      control = factories.ControlFactory()
+      factories.RelationshipFactory(source=program, destination=control)
     self.api.post(all_models.Audit, [{
         "audit": {
             "title": "New Audit",
@@ -239,16 +298,52 @@ class TestAudit(TestCase):
             "manual_snapshots": True,
         }
     }])
-    audit = all_models.Audit.query.first()
-    self.assertIsNotNone(audit)
-    snapshot_count = all_models.Snapshot.query.count()
-    self.assertEqual(snapshot_count, 0)
+    self.assertSnapshotCount(0)
 
-    control = all_models.Control.query.first()
-    self.gen.generate_relationship(audit.program, control)
     audit = all_models.Audit.query.first()
-    self.api.put(audit, data={
-        "snapshots": {"operation": "upsert"}
-    })
-    snapshot_count = all_models.Snapshot.query.count()
-    self.assertEqual(snapshot_count, 1)
+    self.api.put(audit, data={"snapshots": {"operation": "upsert"}})
+    self.assertSnapshotCount(0)
+
+  def test_audit_manual_snapshots(self):
+    """Test audit with manual snapshot mapping"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      control = factories.ControlFactory()
+      control_id = control.id
+      control2 = factories.ControlFactory()  # wouldn't be mapped to objective
+      control2_id = control2.id
+      objective = factories.ObjectiveFactory()
+      factories.RelationshipFactory(source=program, destination=control)
+      factories.RelationshipFactory(source=program, destination=control2)
+      factories.RelationshipFactory(source=program, destination=objective)
+      factories.RelationshipFactory(source=control, destination=objective)
+    self.api.post(all_models.Audit, [{
+        "audit": {
+            "title": "New Audit",
+            "program": {"id": program.id, "type": program.type},
+            "status": "Planned",
+            "context": None,
+            "manual_snapshots": True,
+        }
+    }])
+    self.assertSnapshotCount(0)
+
+    audit = all_models.Audit.query.first()
+    control = all_models.Control.query.get(control_id)
+    control2 = all_models.Control.query.get(control2_id)
+    objective = all_models.Objective.query.first()
+
+    self.gen.generate_relationship(audit, control)
+    control_snapshot_id = all_models.Snapshot.query.filter_by(
+        child_id=control_id, child_type="Control").first().id
+    self.assertEqual(self.count_related_objectives(control_snapshot_id), 0)
+
+    self.gen.generate_relationship(audit, objective)
+    self.assertEqual(self.count_related_objectives(control_snapshot_id), 1)
+
+    self.gen.generate_relationship(audit, control2)
+    control2_snapshot_id = all_models.Snapshot.query.filter_by(
+        child_id=control2_id, child_type="Control").first().id
+    self.assertEqual(self.count_related_objectives(control2_snapshot_id), 0)
+
+    self.assertSnapshotCount(3)
