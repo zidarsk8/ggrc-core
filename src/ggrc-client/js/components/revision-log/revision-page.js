@@ -417,7 +417,12 @@ export default can.Component.extend({
         let rev2people = this._getPeopleForRole(role, rev2content);
         let roleDiff;
 
-        if (!this._isEqualArrays(rev1people, rev2people, 'id')) {
+        // if arrays are not equal by person id
+        let idsDiff = _.xor(
+          _.map(rev1people, (person) => person.id),
+          _.map(rev2people, (person) => person.id)
+        );
+        if (idsDiff.length) {
           roleDiff = new can.Map({
             fieldName: role.name,
             origVal: [],
@@ -606,34 +611,6 @@ export default can.Component.extend({
       return revisionContent.access_control_list
         .filter((item) => item.ac_role_id === role.id)
         .map((item) => item.person);
-    },
-    /**
-     * Compare 2 arrays by property name
-     *
-     * @param {Array} arr1 - access_control_list
-     *
-     * @param {Array} arr2 - access_control_list
-     *
-     * @param {string} propName - property name for compare
-     *
-     * @return {Boolean} - arrays is equal.
-     */
-    _isEqualArrays: function (arr1, arr2, propName) {
-      let diffArray;
-      if (arr1.length === 0 && arr2.length === 0) {
-        return true;
-      }
-
-      if (arr1.length !== arr2.length) {
-        return false;
-      }
-
-      diffArray = arr1.filter((item1) =>
-        _.findIndex(arr2, (item2) =>
-          item1[propName] === item2[propName]) === -1
-      );
-
-      return !diffArray.length;
     },
     /**
      * Build list of users emails

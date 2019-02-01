@@ -844,47 +844,6 @@ describe('revision-page component', function () {
     });
   });
 
-  describe('"_isEqualArrays" method', () => {
-    let viewModel;
-
-    beforeEach(() => {
-      viewModel = getComponentVM(Component);
-    });
-
-    it('should return TRUE. empty arrays', () => {
-      let result = viewModel._isEqualArrays([], [], 'id');
-      expect(result).toBeTruthy();
-    });
-
-    it('should return TRUE. equals arrays', () => {
-      let arr1 = [{id: 1}, {id: 3}, {id: 5}];
-      let arr2 = [{id: 3}, {id: 5}, {id: 1}];
-      let result = viewModel._isEqualArrays(arr1, arr2, 'id');
-      expect(result).toBeTruthy();
-    });
-
-    it('should return FALSE. different length', () => {
-      let arr1 = [{id: 1}, {id: 3}, {id: 5}];
-      let arr2 = [{id: 3}, {id: 5}, {id: 1}, {id: 6}];
-      let result = viewModel._isEqualArrays(arr1, arr2, 'id');
-      expect(result).toBeFalsy();
-    });
-
-    it('should return FALSE. one empty array', () => {
-      let arr1 = [{id: 1}, {id: 3}, {id: 5}];
-      let arr2 = [];
-      let result = viewModel._isEqualArrays(arr1, arr2, 'id');
-      expect(result).toBeFalsy();
-    });
-
-    it('should return FALSE. different data', () => {
-      let arr1 = [{id: 1}, {id: 3}, {id: 5}];
-      let arr2 = [{id: 1}, {id: 3}, {id: 55}];
-      let result = viewModel._isEqualArrays(arr1, arr2, 'id');
-      expect(result).toBeFalsy();
-    });
-  });
-
   describe('"_buildPeopleEmails" method', () => {
     let viewModel;
 
