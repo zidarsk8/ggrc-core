@@ -12,7 +12,7 @@ describe('TreeView Controller', function () {
     let ctrlInst; // fake controller instance
     let method;
     let removeEventHandler;
-    let tvClass = 'cms_controllers_tree_view_node';
+    let tvClass = 'tree-view-node';
 
     function genFilteredList(num) {
       let items = [];
@@ -62,7 +62,7 @@ describe('TreeView Controller', function () {
       function () {
         let removedItems = [new can.Map({id: 1})];
         let callArgs;
-        let rowSelector = '.cms_controllers_tree_view_node[data-object-id="1"]';
+        let rowSelector = '.tree-view-node[data-object-id="1"]';
         expect(ctrlInst.element.find(rowSelector).length).toEqual(1);
 
         removeEventHandler(null, {type: 'remove'}, removedItems, 0);

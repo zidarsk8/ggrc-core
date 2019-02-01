@@ -225,7 +225,7 @@ export default can.Component.extend({
     '{viewModel.instance} showInvalidField': function (ev) {
       let pageType = getPageInstance().type;
       let $container = (pageType === 'Assessment') ?
-        $('.object-area') : $('.cms_controllers_info_pin');
+        $('.object-area') : $('.pin-content');
       let $body = (pageType === 'Assessment') ?
         $('.inner-content.widget-area') : $('.info-pane__body');
       let field;

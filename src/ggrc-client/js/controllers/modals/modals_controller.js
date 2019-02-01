@@ -63,8 +63,7 @@ import Stub from '../../models/stub';
 import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 
-export default can.Control({
-  pluginName: 'ggrc_controllers_modals',
+export default can.Control.extend({
   defaults: {
     preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',
     header_view: GGRC.mustache_path + '/modals/modal_header.mustache',
@@ -1053,7 +1052,7 @@ export default can.Control({
       return false;
     }
     return $trigger.data('updateHash') ||
-      !$trigger.closest('.modal, .cms_controllers_info_pin').length;
+      !$trigger.closest('.modal, .pin-content').length;
   },
 
   update_hash_fragment: function () {

@@ -144,8 +144,8 @@ let viewModel = can.Map.extend({
   handleLHNOpening() {
     if (!this.attr('lhnInitialized')) {
       import(/* webpackChunkName: "lhn" */'../../controllers/lhn_controllers')
-        .then(() => {
-          $('#lhn').cms_controllers_lhn();
+        .then((module) => {
+          new module.LhnControl('#lhn');
           this.attr('lhnInitialized', true);
         });
     }

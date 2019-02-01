@@ -20,6 +20,9 @@ import {
 } from '../plugins/utils/current-page-utils';
 import modalModels from '../models/modal-models';
 import {changeUrl} from '../router';
+import ModalsController from '../controllers/modals/modals_controller';
+import ArchiveModalControl from '../controllers/modals/archive_modal_controller';
+import DeleteModalControl from '../controllers/modals/delete_modal_controller';
 
 let originalModalShow = $.fn.modal.Constructor.prototype.show;
 let originalModalHide = $.fn.modal.Constructor.prototype.hide;
@@ -65,13 +68,14 @@ let handlers = {
       );
     }
 
+    $target.modal_form(option, $trigger);
+
     warning(
       modalSettings,
       _.constant({}),
       _.constant({}), {
-        controller: $target
-          .modal_form(option, $trigger)
-          .ggrc_controllers_delete.bind($target),
+        controller: DeleteModalControl,
+        target: $target,
       });
 
     $target.on('modal:success', function (e, data) {
@@ -131,28 +135,29 @@ let handlers = {
       '/modal_content.mustache';
 
     $target
-      .modal_form(option, $trigger)
-      .ggrc_controllers_modals({
-        new_object_form: !$trigger.attr('data-object-id'),
-        object_params: objectParams,
-        extendNewInstance,
-        button_view: isProposal ?
-          BUTTON_CREATE_PROPOSAL :
-          BUTTON_VIEW_SAVE_CANCEL_DELETE,
-        model: model,
-        oldData: {
-          status: instance && instance.status, // status before changing
-        },
-        applyPreconditions:
-          shouldApplyPreconditions(instance),
-        current_user: GGRC.current_user,
-        instance: instance,
-        skip_refresh: !needToRefresh,
-        modal_title: objectParams.modal_title || modalTitle,
-        content_view: contentView,
-        isProposal: isProposal,
-        $trigger: $trigger,
-      });
+      .modal_form(option, $trigger);
+
+    new ModalsController($target, {
+      new_object_form: !$trigger.attr('data-object-id'),
+      object_params: objectParams,
+      extendNewInstance,
+      button_view: isProposal ?
+        BUTTON_CREATE_PROPOSAL :
+        BUTTON_VIEW_SAVE_CANCEL_DELETE,
+      model: model,
+      oldData: {
+        status: instance && instance.status, // status before changing
+      },
+      applyPreconditions:
+        shouldApplyPreconditions(instance),
+      current_user: GGRC.current_user,
+      instance: instance,
+      skip_refresh: !needToRefresh,
+      modal_title: objectParams.modal_title || modalTitle,
+      content_view: contentView,
+      isProposal: isProposal,
+      $trigger: $trigger,
+    });
 
     $target.on('modal:success', function (e, data, xhr) {
       let WARN_MSG = [
@@ -238,18 +243,19 @@ let handlers = {
     }
 
     $target
-      .modal_form(option, $trigger)
-      .ggrc_controllers_toggle_archive({
-        $trigger: $trigger,
-        new_object_form: false,
-        button_view: GGRC.mustache_path +
-        '/modals/archive_cancel_buttons.mustache',
-        model: model,
-        instance: instance,
-        modal_title: 'Archive ' + $trigger.attr('data-object-singular'),
-        content_view: GGRC.mustache_path +
-        '/base_objects/confirm_archive.mustache',
-      });
+      .modal_form(option, $trigger);
+
+    new ArchiveModalControl($target, {
+      $trigger: $trigger,
+      new_object_form: false,
+      button_view: GGRC.mustache_path +
+      '/modals/archive_cancel_buttons.mustache',
+      model: model,
+      instance: instance,
+      modal_title: 'Archive ' + $trigger.attr('data-object-singular'),
+      content_view: GGRC.mustache_path +
+      '/base_objects/confirm_archive.mustache',
+    });
 
     $target.on('modal:success', function (e, data) {
       $trigger.trigger('modal:success', data);

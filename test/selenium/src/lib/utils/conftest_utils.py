@@ -20,12 +20,6 @@ def get_lhn_accordion(driver, object_name):
   return getattr(lhn_menu, constants.method.SELECT_PREFIX + object_name)()
 
 
-def delete_obj_via_info_widget(driver, object_name):
-  """Delete object via Info Widget."""
-  (factory.get_cls_widget(object_name, is_info=True)(driver)
-   .open_3bbs().select_delete().confirm_delete())
-
-
 class DevLogRetriever(object):
   """A class to retrieve logs from the dev server.
   Only logs added between class initialization and retrieval are returned."""

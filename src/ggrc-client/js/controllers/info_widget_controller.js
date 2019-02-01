@@ -15,8 +15,7 @@ import {
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models';
 
-export default can.Control({
-  pluginName: 'ggrc_controllers_info_widget',
+export default can.Control.extend({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),

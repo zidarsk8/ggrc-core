@@ -417,8 +417,8 @@ viewModel = can.Map.extend({
 
         // TODO: This is a workaround.We need to update communication between
         //       info-pin and tree views through Observer
-        if (!self.attr('$el').closest('.cms_controllers_info_pin').length) {
-          $('.cms_controllers_info_pin').control().unsetInstance();
+        if (!self.attr('$el').closest('.pin-content').length) {
+          $('.pin-content').control().unsetInstance();
         }
       } else {
         // reinit mapped instances (subTree uses mapped instances)

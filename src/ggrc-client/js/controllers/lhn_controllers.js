@@ -17,11 +17,9 @@ import {
 import * as businessModels from '../models/business-models';
 import Relationship from '../models/service-models/relationship';
 import '../components/recently-viewed/recently-viewed';
+import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 
-can.Control.extend({
-  pluginName: 'cms_controllers_lhn',
-  defaults: {},
-}, {
+const LhnControl = can.Control.extend({}, {
   init: function () {
     this.obs = new can.Map();
 
@@ -156,14 +154,12 @@ can.Control.extend({
     }
     this.obs.attr('my_work', myWorkTab);
 
-    $lhs
-      .cms_controllers_lhn_search({
-        observer: this.obs,
-      })
-      .control('cms_controllers_lhn_search')
-      .display();
+    let searchControl = new LhnSearchControl($lhs, {
+      observer: this.obs,
+    });
+    searchControl.display();
 
-    $lhs.cms_controllers_lhn_tooltips();
+    new LhnTooltipsControl($lhs);
 
     let checked = this.obs.attr('my_work');
     let value = checked ? 'my_work' : 'all';
@@ -224,14 +220,13 @@ can.Control.extend({
   hide_lhn: function () {
     // UI-revamp
     // Here we should hide the button ||| also
-    let $area = $('.area');
     let $lhsHolder = $('.lhs-holder');
     let $bar = $('.bar-v');
     let $lhnTrigger = $('.lhn-trigger');
 
     this.element.hide();
     $lhsHolder.css('width', 0);
-    $area.css('margin-left', 0);
+    $('.page-content').css('margin-left', 0);
     $bar.hide();
     $lhnTrigger.hide();
     $lhnTrigger.addClass('hide');
@@ -354,8 +349,7 @@ can.Control.extend({
   },
 });
 
-can.Control.extend({
-  pluginName: 'cms_controllers_lhn_search',
+const LhnSearchControl = can.Control.extend({
   defaults: {
     list_view: GGRC.mustache_path + '/base_objects/search_result.mustache',
     actions_view: GGRC.mustache_path + '/base_objects/search_actions.mustache',
@@ -388,11 +382,12 @@ can.Control.extend({
 
     this.element.html(frag);
     this.post_init();
-    this.element.find('.sub-level')
-      .cms_controllers_infinite_scroll()
-      .on('scroll', _.debounce(function () {
-        setLHNState({category_scroll: this.scrollTop});
-      }, 250));
+
+    let subLevelElements = this.element.find('.sub-level');
+    new InfiniteScrollControl(subLevelElements);
+    subLevelElements.on('scroll', _.debounce(function () {
+      setLHNState({category_scroll: this.scrollTop});
+    }, 250));
 
     let initialTerm = lhnPrefs.search_text || '';
     if (this.options.observer.my_work) {
@@ -969,3 +964,7 @@ can.Control.extend({
     this.run_search(term, param);
   },
 });
+
+export {
+  LhnControl,
+};

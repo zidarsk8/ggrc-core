@@ -61,7 +61,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
   def _root(self):
     """Returns root element (including title, 3bbs)."""
     if self.is_info_page:
-      return self._browser.element(class_name="ggrc_controllers_info_widget")
+      return self._browser.element(class_name="widget", id="info")
     return self._browser.element(class_name="sticky-info-panel")
 
   @property
@@ -794,7 +794,7 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
   def _root(self):
     """Returns root element (including title, 3bbs)."""
     if self.is_info_page:
-      return self._browser.element(class_name="ggrc_controllers_info_widget")
+      return self._browser.element(class_name="widget", id="info")
     if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
       return self.root_element
     return self._browser.element(class_name="sticky-info-panel")

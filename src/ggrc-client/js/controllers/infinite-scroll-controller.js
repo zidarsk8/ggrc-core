@@ -3,10 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-can.Control.extend({
-  pluginName: 'cms_controllers_infinite_scroll',
-  defaults: {},
-}, {
+const InfiniteScrollControl = can.Control.extend({}, {
   init: function () {},
   ' DOMMouseScroll': 'prevent_overscroll',
   ' mousewheel': 'prevent_overscroll',
@@ -61,8 +58,7 @@ can.Control.extend({
   },
 });
 
-can.Control.extend({
-  pluginName: 'cms_controllers_lhn_tooltips',
+const LhnTooltipsControl = can.Control.extend({
   defaults: {
     tooltip_view: GGRC.mustache_path + '/base_objects/extended_info.mustache',
     trigger_selector: '.show-extended',
@@ -198,3 +194,8 @@ can.Control.extend({
     this.on_mouseleave();
   },
 });
+
+export {
+  InfiniteScrollControl,
+  LhnTooltipsControl,
+};

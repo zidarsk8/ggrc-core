@@ -6,7 +6,6 @@
 import ModalsController from './modals_controller';
 
 export default ModalsController({
-  pluginName: 'ggrc_controllers_gapi_modal',
   defaults: {
     skip_refresh: true,
     content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache',
@@ -19,6 +18,7 @@ export default ModalsController({
   init: function () {
     this._super();
     this.element.trigger('shown');
+    this.element.addClass('gapi-modal-control');
   },
   '{scopes} change': function () {
     this.element.trigger('shown');

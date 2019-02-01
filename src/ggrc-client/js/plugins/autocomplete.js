@@ -12,6 +12,7 @@ import Search from '../models/service-models/search';
 import {bindXHRToButton} from '../plugins/utils/modals';
 import {getInstance} from '../plugins/utils/models-utils';
 import * as businessModels from '../models/business-models';
+import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 
 (function ($) {
   'use strict';
@@ -283,8 +284,8 @@ import * as businessModels from '../models/business-models';
         can.view.render(GGRC.mustache_path + template,
           context, function (frag) {
             $ul.html(frag);
-            $ul.cms_controllers_lhn_tooltips()
-              .cms_controllers_infinite_scroll();
+            new LhnTooltipsControl($ul);
+            new InfiniteScrollControl($ul);
             can.view.hookup(ul);
           });
       });

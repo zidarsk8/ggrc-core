@@ -34,8 +34,7 @@ export const pinContentHiddenClass = 'pin-content--hidden';
 export const pinContentMaximizedClass = 'pin-content--maximized';
 export const pinContentMinimizedClass = 'pin-content--minimized';
 
-export default can.Control({
-  pluginName: 'cms_controllers_info_pin',
+export default can.Control.extend({
   defaults: {
     view: GGRC.mustache_path + '/base_objects/info.mustache',
   },
@@ -47,15 +46,7 @@ export default can.Control({
     return !this.element.hasClass(pinContentHiddenClass);
   },
   findOptions: function (el) {
-    let options;
-    let treeNode = el.closest('.cms_controllers_tree_view_node');
-
-    if (treeNode.length) {
-      options = treeNode.control().options;
-    } else {
-      options = el.closest('.tree-item-element').viewModel();
-    }
-    return options;
+    return el.closest('.tree-item-element').viewModel();
   },
   hideInstance: function () {
     this.unsetInstance();

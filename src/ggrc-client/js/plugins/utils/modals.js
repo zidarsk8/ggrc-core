@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import ModalsController from '../../controllers/modals/modals_controller';
+
 /**
  * Utils methods for showing standart modals
  */
@@ -74,13 +76,16 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
  */
 function warning(options, success, fail, extra) {
   let confirmOptions = _.assign({}, warning.settings, options);
-  let confirmController;
   let confirmResult;
 
   extra = extra || {};
 
-  confirmController = extra.controller || confirm;
-  confirmResult = confirmController(confirmOptions, success, fail);
+  if (extra.controller) {
+    new extra.controller(extra.target, confirmOptions, success, fail);
+    confirmResult = extra.target;
+  } else {
+    confirmResult = confirm(confirmOptions, success, fail);
+  }
 
   _setupWarning(confirmResult, confirmOptions);
   return confirmResult;
@@ -94,23 +99,25 @@ function confirm(options, success, dismiss) {
   import(/* webpackChunkName: "modalsCtrls" */'../../controllers/modals')
     .then(() => {
       $target
-        .modal({backdrop: 'static'})
-        .ggrc_controllers_modals(Object.assign({
-          new_object_form: false,
-          button_view: BUTTON_VIEW_CONFIRM_CANCEL,
-          modal_confirm: 'Confirm',
-          modal_description: 'description',
-          modal_title: 'Confirm',
-          content_view: CONTENT_VIEW_CONFIRM,
-        }, options))
-        .on('click', 'a.btn[data-toggle=confirm]', function (e) {
-          let params = $(e.target).closest('.modal').find('form')
-            .serializeArray();
-          $target.modal('hide').remove();
-          if (success) {
-            success(params, $(e.target).data('option'));
-          }
-        })
+        .modal({backdrop: 'static'});
+
+      new ModalsController($target, Object.assign({
+        new_object_form: false,
+        button_view: BUTTON_VIEW_CONFIRM_CANCEL,
+        modal_confirm: 'Confirm',
+        modal_description: 'description',
+        modal_title: 'Confirm',
+        content_view: CONTENT_VIEW_CONFIRM,
+      }, options));
+
+      $target.on('click', 'a.btn[data-toggle=confirm]', function (e) {
+        let params = $(e.target).closest('.modal').find('form')
+          .serializeArray();
+        $target.modal('hide').remove();
+        if (success) {
+          success(params, $(e.target).data('option'));
+        }
+      })
         .on('click.modal-form.close', '[data-dismiss="modal"]', function () {
           $target.modal('hide').remove();
           if (dismiss) {
