@@ -67,7 +67,8 @@ export default can.Component.extend({
         tracker.USER_JOURNEY_KEYS.LOADING,
         tracker.USER_ACTIONS.CHANGE_LOG);
 
-      return this._fetchRevisionsData()
+      return this.fetchRevisions()
+        .then(this.whenRevisionsFetched.bind(this))
         .done((revisionsData) => {
           this.attr('revisions', revisionsData);
           stopFn();
@@ -80,12 +81,57 @@ export default can.Component.extend({
           this.attr('isLoading', false);
         }.bind(this));
     },
-    _fetchRevisionsData() {
-      let fetchRevisions = this.attr('options.showLastReviewUpdates') ?
-        this.getAfterReviewRevisions.bind(this) :
-        this.getAllRevisions.bind(this);
+    fetchRevisions() {
+      const filter = this.getQueryFilter();
+      const pageInfo = this.attr('pageInfo');
+      const page = {
+        current: pageInfo.current,
+        pageSize: pageInfo.pageSize,
+        sort: [{
+          direction: 'desc',
+          key: 'created_at',
+        }],
+      };
+      let params = buildParam(
+        'Revision',
+        page,
+        null,
+        null,
+        filter
+      );
 
-      return fetchRevisions().then(this.whenRevisionsFetched.bind(this));
+      return batchRequests(params).then((data) => {
+        data = data.Revision;
+        const total = data.total;
+        this.attr('pageInfo.total', total);
+
+        return this.makeRevisionModels(data);
+      });
+    },
+    getQueryFilter() {
+      const instance = this.attr('instance');
+
+      if (!this.attr('options.showLastReviewUpdates')) {
+        return QueryParser.parse(
+          `${instance.type} not_empty_revisions_for ${instance.id} OR
+          source_type = ${instance.type} AND
+          source_id = ${instance.id} OR
+          destination_type = ${instance.type} AND
+          destination_id = ${instance.id}`);
+      } else {
+        const reviewDate = moment(this.attr('review.last_reviewed_at'))
+          .format('YYYY-MM-DD HH:mm:ss');
+
+        return QueryParser.parse(
+          `${instance.type} not_empty_revisions_for ${instance.id} AND
+          created_at >= "${reviewDate}" OR
+          source_type = ${instance.type} AND
+          source_id = ${instance.id} AND
+          created_at >= "${reviewDate}" OR
+          destination_type = ${instance.type} AND
+          destination_id = ${instance.id} AND
+          created_at >= "${reviewDate}"`);
+      }
     },
     whenRevisionsFetched(revisions) {
       const rq = new RefreshQueue();
@@ -104,77 +150,6 @@ export default can.Component.extend({
         .then((revisionsForCompare) => {
           return this.composeRevisionsData(revisions, revisionsForCompare);
         });
-    },
-    getAllRevisions() {
-      const instance = this.attr('instance');
-      const filter = QueryParser.parse(
-        `${instance.type} not_empty_revisions_for ${instance.id} OR
-         source_type = ${instance.type} AND
-         source_id = ${instance.id} OR
-         destination_type = ${instance.type} AND
-         destination_id = ${instance.id}`);
-      let pageInfo = this.attr('pageInfo');
-      const page = {
-        current: pageInfo.current,
-        pageSize: pageInfo.pageSize,
-        sort: [{
-          direction: 'desc',
-          key: 'created_at',
-        }],
-      };
-      let params = buildParam(
-        'Revision',
-        page,
-        null,
-        null,
-        filter
-      );
-
-      return batchRequests(params).then((data) => {
-        data = data.Revision;
-        const total = data.total;
-        this.attr('pageInfo.total', total);
-
-        return this.makeRevisionModels(data);
-      });
-    },
-    getAfterReviewRevisions() {
-      const instance = this.attr('instance');
-      const reviewDate = moment(this.attr('review.last_reviewed_at'))
-        .format('YYYY-MM-DD HH:mm:ss');
-      const filter = QueryParser.parse(
-        `${instance.type} not_empty_revisions_for ${instance.id} AND
-         created_at >= "${reviewDate}" OR
-         source_type = ${instance.type} AND
-         source_id = ${instance.id} AND
-         created_at >= "${reviewDate}" OR
-         destination_type = ${instance.type} AND
-         destination_id = ${instance.id} AND
-         created_at >= "${reviewDate}"`);
-      let pageInfo = this.attr('pageInfo');
-      const page = {
-        current: pageInfo.current,
-        pageSize: pageInfo.pageSize,
-        sort: [{
-          direction: 'desc',
-          key: 'created_at',
-        }],
-      };
-      let params = buildParam(
-        'Revision',
-        page,
-        null,
-        null,
-        filter
-      );
-
-      return batchRequests(params).then((data) => {
-        data = data.Revision;
-        const total = data.total;
-        this.attr('pageInfo.total', total);
-
-        return this.makeRevisionModels(data);
-      });
     },
     // for last revision where properties of objects was changed,
     // we need fetch additional revision for calculating diff
