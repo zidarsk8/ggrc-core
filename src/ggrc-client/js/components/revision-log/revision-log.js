@@ -185,12 +185,12 @@ export default can.Component.extend({
       });
 
       return {
-        object: _.map(objRevisions, this._reifyRevision),
-        mappings: _.map(mappings, this._reifyRevision),
-        revisionsForCompare: _.map(revisionsForCompare, this._reifyRevision),
+        object: _.map(objRevisions, this.reifyRevision),
+        mappings: _.map(mappings, this.reifyRevision),
+        revisionsForCompare: _.map(revisionsForCompare, this.reifyRevision),
       };
     },
-    _reifyRevision(revision) {
+    reifyRevision(revision) {
       _.forEach(['modified_by', 'source', 'destination'],
         function (field) {
           if (revision[field] && isReifiable(revision[field])) {
