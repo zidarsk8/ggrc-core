@@ -76,7 +76,7 @@ export default can.Component.extend({
     },
     /**
      * Creates tab's view model
-     * @param {Objbect} descriptor widget descriptor
+     * @param {Object} descriptor widget descriptor
      * @return {Object} view model
      */
     createWidget(descriptor) {

@@ -25,20 +25,21 @@ describe('inner-nav component', () => {
   describe('init() method', () => {
     let init;
     beforeEach(() => {
+      spyOn(viewModel, 'handleDescriptors');
+      spyOn(viewModel, 'setTabsPriority');
+
       init = Component.prototype.init.bind({
         viewModel,
       });
     });
 
     it('should call handleDescriptors()', () => {
-      spyOn(viewModel, 'handleDescriptors');
       init();
 
       expect(viewModel.handleDescriptors).toHaveBeenCalled();
     });
 
     it('should call setTabsPriority()', () => {
-      spyOn(viewModel, 'setTabsPriority');
       init();
 
       expect(viewModel.setTabsPriority).toHaveBeenCalled();
@@ -47,23 +48,31 @@ describe('inner-nav component', () => {
 
   describe('viewModel', () => {
     describe('showTabs prop', () => {
+      let isAdminSpy;
+      let getCountsSpy;
+
+      beforeEach(() => {
+        isAdminSpy = spyOn(CurrentPageUtils, 'isAdmin');
+        getCountsSpy = spyOn(WidgetsUtils, 'getCounts');
+      });
+
       it('returns TRUE when on Admin page', () => {
-        spyOn(CurrentPageUtils, 'isAdmin').and.returnValue(true);
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(new can.Map());
+        isAdminSpy.and.returnValue(true);
+        getCountsSpy.and.returnValue(new can.Map());
 
         expect(viewModel.attr('showTabs')).toBe(true);
       });
 
       it('returns FALSE when counts is empty and not Admin page', () => {
-        spyOn(CurrentPageUtils, 'isAdmin').and.returnValue(false);
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(new can.Map());
+        isAdminSpy.and.returnValue(false);
+        getCountsSpy.and.returnValue(new can.Map());
 
         expect(viewModel.attr('showTabs')).toBe(false);
       });
 
       it('returns TRUE when counts is not empty and not Admin page', () => {
-        spyOn(CurrentPageUtils, 'isAdmin').and.returnValue(false);
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(new can.Map({
+        isAdminSpy.and.returnValue(false);
+        getCountsSpy.and.returnValue(new can.Map({
           Assessment: 10,
         }));
 
@@ -87,7 +96,8 @@ describe('inner-nav component', () => {
 
     describe('handleDescriptors() method', () => {
       it('should create widgets from descriptors', () => {
-        spyOn(viewModel, 'createWidget').and.returnValue({});
+        spyOn(viewModel, 'createWidget')
+          .and.returnValues({id: 0}, {id: 1}, {id: 2});
         viewModel.attr('widgetList', null);
 
         let descriptors = [{}, {}, {}];
@@ -95,8 +105,12 @@ describe('inner-nav component', () => {
 
         viewModel.handleDescriptors();
 
+        let widgetList = viewModel.attr('widgetList');
         expect(viewModel.createWidget).toHaveBeenCalledTimes(3);
-        expect(viewModel.attr('widgetList').length).toBe(3);
+        widgetList.forEach((widget, i) => {
+          expect(widget.serialize()).toEqual({id: i});
+        });
+        expect(widgetList.length).toBe(3);
       });
 
       it('should sort widgets by order and title', () => {
@@ -167,7 +181,7 @@ describe('inner-nav component', () => {
         expect(result.type).toBe('');
       });
 
-      it('shoult set version type for object versions widgets', () => {
+      it('should set version type for object versions widgets', () => {
         spyOn(ObjectVersionsUtils, 'isObjectVersion').and.returnValue(true);
         let result = viewModel.createWidget({widget_id: 'id', model: {}});
         expect(result.type).toBe('version');
@@ -209,13 +223,13 @@ describe('inner-nav component', () => {
         expect(result.count).toBe(0);
       });
 
-      it('should set counsName from descriptor if exists', () => {
+      it('should set countsName from descriptor if exists', () => {
         let result = viewModel.createWidget({countsName: 'name'});
         expect(result.countsName).toBe('name');
       });
 
-      it('should set counsName from descriptor\'s content_controller_options '
-      + 'if exists', () => {
+      it('should set countsName from descriptor\'s content_controller_options' +
+        ' if exists', () => {
         let result = viewModel.createWidget({
           content_controller_options: {
             countsName: 'name',
@@ -248,8 +262,8 @@ describe('inner-nav component', () => {
         expect(result.forceShow).toBe(false);
       });
 
-      it('should set inForceShowList TRUE '
-        + 'if widget is in instance force show list', () => {
+      it('should set inForceShowList TRUE ' +
+        'if widget is in instance force show list', () => {
         let result = viewModel.createWidget({
           widget_name: 'force show widget title',
           model: {},
@@ -257,8 +271,8 @@ describe('inner-nav component', () => {
         expect(result.inForceShowList).toBe(true);
       });
 
-      it('should set inForceShowList FALSE '
-        + 'if widget is not in instance force show list', () => {
+      it('should set inForceShowList FALSE ' +
+        'if widget is not in instance force show list', () => {
         let result = viewModel.createWidget({
           widget_name: 'not in force show list widget title',
           model: {},
@@ -436,8 +450,8 @@ describe('inner-nav component', () => {
             .toHaveBeenCalledWith(widget);
         });
 
-      it('should add to hiddenWidgets when widget has no count and '
-        + 'forseShow is false', () => {
+      it('should add to hiddenWidgets when widget has no count and ' +
+        'forceShow is false', () => {
         showAllTabs(false);
 
         let widget = new can.Map({
@@ -494,21 +508,16 @@ describe('inner-nav component', () => {
     });
 
     describe('route(widgetId) method', () => {
+      let findWidgetByIdSpy;
+
       beforeEach(() => {
         spyOn(viewModel, 'updateHiddenWidgets');
+        findWidgetByIdSpy = spyOn(viewModel, 'findWidgetById');
       });
 
-      it('should find widget in widgetList', () => {
-        spyOn(viewModel, 'findWidgetById');
-
-        viewModel.route('widget id');
-
-        expect(viewModel.findWidgetById).toHaveBeenCalledWith('widget id');
-      });
-
-      it('should select first widget from widgetList '
-        + 'if selected widget is not in the list', () => {
-        spyOn(viewModel, 'findWidgetById').and.returnValue(null);
+      it('should select first widget from widgetList ' +
+        'if selected widget is not in the list', () => {
+        findWidgetByIdSpy.and.returnValue(null);
         viewModel.attr('widgetList', [{id: '1'}, {id: '2'}]);
         spyOn(router, 'attr');
 
@@ -518,7 +527,7 @@ describe('inner-nav component', () => {
 
       it('should set forceShow TRUE for widget', () => {
         let widget = new can.Map({id: '1', forceShow: false});
-        spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
+        findWidgetByIdSpy.and.returnValue(widget);
 
         viewModel.route('1');
 
@@ -527,7 +536,7 @@ describe('inner-nav component', () => {
 
       it('should set activeWidget if widget is in widgetList ', () => {
         let widget = new can.Map({id: '1'});
-        spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
+        findWidgetByIdSpy.and.returnValue(widget);
         viewModel.attr('activeWidget', null);
 
         viewModel.route('1');
@@ -540,7 +549,7 @@ describe('inner-nav component', () => {
         () => {
           spyOn(viewModel, 'dispatch');
           let widget = new can.Map({id: '1'});
-          spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
+          findWidgetByIdSpy.and.returnValue(widget);
 
           viewModel.route('1');
 
@@ -552,7 +561,7 @@ describe('inner-nav component', () => {
 
       it('should update hiddenWidgets list', () => {
         let widget = new can.Map({id: '1'});
-        spyOn(viewModel, 'findWidgetById').and.returnValue(widget);
+        findWidgetByIdSpy.and.returnValue(widget);
 
         viewModel.route('1');
 
@@ -571,7 +580,7 @@ describe('inner-nav component', () => {
         expect(result.serialize()).toEqual(widget2);
       });
 
-      it('retuns undefined when widget is not found', () => {
+      it('returns undefined when widget is not found', () => {
         let widget1 = {id: '1'};
         let widget2 = {id: '2'};
         viewModel.attr('widgetList', [widget1, widget2]);
@@ -593,7 +602,7 @@ describe('inner-nav component', () => {
         expect(result.serialize()).toEqual(widget2);
       });
 
-      it('retuns undefined when widget is not found', () => {
+      it('returns undefined when widget is not found', () => {
         let widget1 = {id: '1', countsName: 'name1'};
         let widget2 = {id: '2', countsName: 'name2'};
         viewModel.attr('widgetList', [widget1, widget2]);
@@ -605,14 +614,6 @@ describe('inner-nav component', () => {
     });
 
     describe('setWidgetCount(name, count) method', () => {
-      it('should find widget in widgetList', () => {
-        spyOn(viewModel, 'findWidgetByCountsName');
-
-        viewModel.setWidgetCount('name', 5);
-
-        expect(viewModel.findWidgetByCountsName).toHaveBeenCalledWith('name');
-      });
-
       it('should set count to widget', () => {
         spyOn(viewModel, 'updateHiddenWidgets');
         let widget = new can.Map();
@@ -639,7 +640,7 @@ describe('inner-nav component', () => {
         spyOn(viewModel, 'updateHiddenWidgets');
       });
 
-      it('shoule set forceShow FALSE for widget', () => {
+      it('should set forceShow FALSE for widget', () => {
         let widget = new can.Map({id: '1', forceShow: true});
 
         viewModel.closeTab({widget});
@@ -656,8 +657,8 @@ describe('inner-nav component', () => {
           expect(router.attr('widget')).toBe('selected');
         });
 
-      it('should open first tab in widgetList '
-        + 'if closed tab is currently selected',
+      it('should open first tab in widgetList ' +
+        'if closed tab is currently selected',
       () => {
         router.attr('widget', 'selected');
         viewModel.attr('widgetList', [new can.Map({id: 'first tab'})]);
