@@ -84,9 +84,11 @@ const DashboardControl = can.Control.extend({
   init_inner_nav: function () {
     let $innernav = this.element.find('#inner-nav');
     if ($innernav.length && this.options.innernav_view) {
+      let pageInstance = getPageInstance();
       let options = {
         ...this.options,
-        instance: getPageInstance(),
+        isAuditScope: pageInstance.attr('type') === 'Audit',
+        instance: pageInstance,
         showWidgetArea: this.showWidgetArea.bind(this),
       };
       $innernav.html(can.view(this.options.innernav_view, options));

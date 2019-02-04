@@ -32,6 +32,7 @@ import '../../components/tree/tree-widget-container';
 import '../../components/snapshotter/scope-update';
 import '../../components/page-header/page-header';
 import '../../components/inner-nav/inner-nav';
+import '../../components/inner-nav/audit-inner-nav';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/unmap-button/unmap-button';
 import '../../components/delete-button/delete-button';

@@ -2,54 +2,28 @@
   Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<div class="nav internav {{lowercase instance.type}}">
-<div class="tabs priority {{^if isAuditScope}}single-set{{/if}}">
+<div class="nav internav">
+<div class="tabs priority single-set">
   <ul class="internav">
     {{#if showTabs}}
-      {{#priorityTabs}}
+      {{#widgetList}}
         <inner-nav-item {widget}="." 
           {active-widget}="activeWidget"
           {show-title}="true" 
           {show-all-tabs}="showAllTabs"
           (close)="closeTab(%event)"></inner-nav-item>
-      {{/priorityTabs}}
+      {{/widgetList}}
     {{/if}}
 
-    {{^if isAuditScope}}
-      <add-tab-button
-        {instance}="instance"
-        {widget-list}="hiddenWidgets"
-        {add-tab-title}="'Add Tab'">
-      </add-tab-button>
-    {{/if}}
+    <add-tab-button
+      {instance}="instance"
+      {widget-list}="hiddenWidgets"
+      {add-tab-title}="'Add Tab'">
+    </add-tab-button>
 
     {{#if_equals instance.type 'Workflow'}}
       {{> '/static/templates/dashboard/object_nav_actions.stache'}}
     {{/if_equals}}
   </ul>
 </div>
-
-{{#if showTabs}}
-  {{#if isAuditScope}}
-    <div class="tabs not-priority">
-      <inner-nav-collapse {title}="'Show Audit Scope'">
-        <ul class="internav">
-          {{#notPriorityTabs}}
-            <inner-nav-item {widget}="."
-              {active-widget}="activeWidget" 
-              {show-title}="false"
-              {show-all-tabs}="showAllTabs"
-              (close)="closeTab(%event)"></inner-nav-item>
-          {{/notPriorityTabs}}
-
-          <add-tab-button
-            {instance}="instance"
-            {widget-list}="hiddenWidgets"
-            {add-tab-title}="'Add Scope'">
-          </add-tab-button>
-        </ul>
-      </inner-nav-collapse>
-    </div>
-  {{/if}}
-{{/if}}
 </div>

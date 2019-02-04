@@ -1,0 +1,41 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<div class="nav internav audit">
+<div class="tabs priority">
+  <ul class="internav">
+    {{#if showTabs}}
+      {{#priorityTabs}}
+        <inner-nav-item {widget}="." 
+          {active-widget}="activeWidget"
+          {show-title}="true" 
+          {show-all-tabs}="showAllTabs"
+          (close)="closeTab(%event)"></inner-nav-item>
+      {{/priorityTabs}}
+    {{/if}}
+  </ul>
+</div>
+
+{{#if showTabs}}
+  <div class="tabs not-priority">
+    <inner-nav-collapse {title}="'Show Audit Scope'">
+      <ul class="internav">
+        {{#notPriorityTabs}}
+          <inner-nav-item {widget}="."
+            {active-widget}="activeWidget" 
+            {show-title}="false"
+            {show-all-tabs}="showAllTabs"
+            (close)="closeTab(%event)"></inner-nav-item>
+        {{/notPriorityTabs}}
+
+        <add-tab-button
+          {instance}="instance"
+          {widget-list}="hiddenWidgets"
+          {add-tab-title}="'Add Scope'">
+        </add-tab-button>
+      </ul>
+    </inner-nav-collapse>
+  </div>
+{{/if}}
+</div>
