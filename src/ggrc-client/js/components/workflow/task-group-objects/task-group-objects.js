@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/task-group-objects.mustache';
+import template from './templates/task-group-objects.stache';
 import TaskGroupObject from '../../../models/service-models/task-group-object';
 import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
 import {mapObjects} from '../../../plugins/utils/mapper-utils';

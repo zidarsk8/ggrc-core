@@ -113,7 +113,7 @@
         </div>
       </div>
       {{#using instance isAttributesDisabled}}
-          {{> /static/templates/custom_attributes/info.mustache}}
+        {{> /static/templates/custom_attributes/info.stache}}
       {{/using}}
     </div>
   </div>

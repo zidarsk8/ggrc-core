@@ -112,7 +112,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   /**
    * There is situation when user switch type from one two another.
    * After it current config is changed immediately. It leads to the fact
-   * that all things in the mustache templates are rerendered.
+   * that all things in the templates are rerendered.
    * But several controls must not be rerenderd till submit action will not be
    * occurred (for example it's a results in unified mapper - when we switch
    * object type the results should not be painted in another color (if

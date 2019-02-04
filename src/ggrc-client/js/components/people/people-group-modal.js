@@ -4,7 +4,7 @@
  */
 
 import '../person/person-data';
-import template from './templates/people-group-modal.mustache';
+import template from './templates/people-group-modal.stache';
 
 export default can.Component.extend({
   tag: 'people-group-modal',

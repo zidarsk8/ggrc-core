@@ -5,24 +5,24 @@
 
 <div class="menu-button-container">
   {{#if instance.snapshot}}
-    {{> /static/templates/snapshots/dropdown_menu.mustache}}
+    {{> /static/templates/snapshots/dropdown_menu.stache}}
   {{else}}
     {{#if_equals instance.type "Person"}}
-      {{> /static/templates/people/dropdown_menu.mustache}}
+      {{> /static/templates/people/dropdown_menu.stache}}
     {{else}}
         {{#if_equals instance.type 'Audit'}}
-            {{> /static/templates/audits/dropdown_menu.mustache}}
+            {{> /static/templates/audits/dropdown_menu.stache}}
         {{else}}
-            {{> /static/templates/base_objects/dropdown_menu.mustache}}
+            {{> /static/templates/base_objects/dropdown_menu.stache}}
         {{/if_equals}}
     {{/if_equals}}
   {{/if}}
 </div>
 <div class="flex-box">
   {{#if_equals instance.type "Person"}}
-    {{> /static/templates/people/mapper-item-description.mustache}}
+    {{> /static/templates/people/mapper-item-description.stache}}
   {{else}}
-    {{> /static/templates/base_objects/mapper-item-description.mustache}}
+    {{> /static/templates/base_objects/mapper-item-description.stache}}
   {{/if_equals}}
 </div>
 <div class="open-link-container">

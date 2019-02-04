@@ -4,7 +4,7 @@
  */
 
 import Proposal from '../../models/service-models/proposal';
-import template from './templates/create-proposal.mustache';
+import template from './templates/create-proposal.stache';
 import {hasPending as hasPendingUtil} from '../../plugins/ggrc_utils';
 import {
   REFRESH_TAB_CONTENT,

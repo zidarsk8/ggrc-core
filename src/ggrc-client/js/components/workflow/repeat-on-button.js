@@ -4,7 +4,7 @@
  */
 
 import '../dropdown/dropdown';
-import template from './templates/repeat-on-button.mustache';
+import template from './templates/repeat-on-button.stache';
 import * as config from '../../apps/workflow-config';
 
 export default can.Component.extend({

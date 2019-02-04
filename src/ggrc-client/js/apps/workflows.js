@@ -64,7 +64,7 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
       info: {
         content_controller: InfoWidget,
         content_controller_options: {
-          widget_view: GGRC.templates_path + '/workflows/info.mustache',
+          widget_view: GGRC.templates_path + '/workflows/info.stache',
         },
       },
       task_group: {
@@ -117,7 +117,7 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
       additional_filter: currentWidgetFilter,
       add_item_view:
         GGRC.templates_path +
-        '/cycle_task_group_object_tasks/tree_add_item.mustache',
+        '/cycle_task_group_object_tasks/tree_add_item.stache',
     },
   };
 

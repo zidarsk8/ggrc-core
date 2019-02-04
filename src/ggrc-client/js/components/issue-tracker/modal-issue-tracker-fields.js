@@ -5,7 +5,7 @@
 
 import '../dropdown/dropdown';
 import '../numberbox/numberbox';
-import template from './templates/modal-issue-tracker-fields.mustache';
+import template from './templates/modal-issue-tracker-fields.stache';
 import {showTrackerNotification} from
   './temporary-issue-tracker-notification';
 

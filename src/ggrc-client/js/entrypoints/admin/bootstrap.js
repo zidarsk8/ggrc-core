@@ -54,11 +54,11 @@ const adminListDescriptors = {
         });
     },
     object_display: 'People',
-    tooltip_view: '/static/templates/people/object_tooltip.mustache',
+    tooltip_view: '/static/templates/people/object_tooltip.stache',
     header_view:
     // includes only the filter, not the column headers
-      '/static/templates/people/filters.mustache',
-    list_view: '/static/templates/people/object_list.mustache',
+      '/static/templates/people/filters.stache',
+    list_view: '/static/templates/people/object_list.stache',
     fetch_post_process: sortByNameEmail,
   },
   roles: {
@@ -66,23 +66,23 @@ const adminListDescriptors = {
     extra_params: {scope__in: 'System,Admin,Private Program,Workflow'},
     object_category: 'governance',
     object_display: 'Roles',
-    list_view: '/static/templates/roles/object_list.mustache',
+    list_view: '/static/templates/roles/object_list.stache',
     fetch_post_process: sortByNameEmail,
   },
   events: {
     model: Event,
     object_category: 'governance',
     object_display: 'Events',
-    list_view: '/static/templates/events/object_list.mustache',
+    list_view: '/static/templates/events/object_list.stache',
   },
   custom_attributes: {
     parent_instance: CustomAttributable,
     model: CustomAttributable,
     header_view:
     GGRC.templates_path +
-    '/custom_attribute_definitions/tree_header.mustache',
+    '/custom_attribute_definitions/tree_header.stache',
     show_view:
-    GGRC.templates_path + '/custom_attribute_definitions/tree.mustache',
+    GGRC.templates_path + '/custom_attribute_definitions/tree.stache',
     sortable: false,
     list_loader: function () {
       return CustomAttributable.findAll();
@@ -92,7 +92,7 @@ const adminListDescriptors = {
       mapping: 'custom_attribute_definitions',
       show_view:
       GGRC.templates_path +
-      '/custom_attribute_definitions/subtree.mustache',
+      '/custom_attribute_definitions/subtree.stache',
       add_item_view: null,
     }],
   },
@@ -100,9 +100,9 @@ const adminListDescriptors = {
     parent_instance: Roleable,
     model: Roleable,
     header_view:
-    GGRC.templates_path + '/access_control_roles/tree_header.mustache',
+    GGRC.templates_path + '/access_control_roles/tree_header.stache',
     show_view:
-    GGRC.templates_path + '/access_control_roles/tree.mustache',
+    GGRC.templates_path + '/access_control_roles/tree.stache',
     sortable: false,
     list_loader: function () {
       return Roleable.findAll();
@@ -111,7 +111,7 @@ const adminListDescriptors = {
       model: AccessControlRole,
       mapping: 'access_control_roles',
       show_view:
-      GGRC.templates_path + '/access_control_roles/subtree.mustache',
+      GGRC.templates_path + '/access_control_roles/subtree.stache',
       add_item_view: null,
     }],
   },
@@ -195,7 +195,7 @@ new WidgetList('ggrc_admin', {
 new DashboardControl('#pageContent', {
   widget_descriptors: WidgetList.get_widget_list_for('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
-  header_view: `${GGRC.templates_path}/base_objects/page_header.mustache`,
+  header_view: `${GGRC.templates_path}/base_objects/page_header.stache`,
   default_widgets: [
     'people', 'roles', 'events', 'custom_attributes', 'custom_roles',
   ],

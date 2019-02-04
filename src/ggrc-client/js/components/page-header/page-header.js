@@ -19,7 +19,7 @@ import {
   isObjectContextPage,
   isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
-import template from './page-header.mustache';
+import template from './page-header.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 let colorsMap = {

@@ -235,9 +235,9 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
           model &&
           GGRC.Templates[model.table_plural + '/autocomplete_result']
         ) {
-          template = '/' + model.table_plural + '/autocomplete_result.mustache';
+          template = '/' + model.table_plural + '/autocomplete_result.stache';
         } else {
-          template = '/base_objects/autocomplete_result.mustache';
+          template = '/base_objects/autocomplete_result.stache';
         }
       }
 

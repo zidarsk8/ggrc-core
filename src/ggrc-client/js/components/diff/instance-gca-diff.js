@@ -5,7 +5,7 @@
 
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
-import template from './templates/instance-diff-items.mustache';
+import template from './templates/instance-diff-items.stache';
 import {getPersonInfo} from '../../../js/plugins/utils/user-utils';
 import {formatDate} from '../../../js/plugins/utils/date-utils';
 const tag = 'instance-gca-diff';

@@ -47,7 +47,7 @@ export default Cacheable('CMS.Models.RiskAssessment', {
         attr_sort_field: 'ra_counsel',
       },
     ],
-    add_item_view: path + '/tree_add_item.mustache',
+    add_item_view: path + '/tree_add_item.stache',
   },
   sub_tree_view_options: {
     default_filter: ['Program'],

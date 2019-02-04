@@ -5,7 +5,7 @@
 
 import './related-objects';
 import '../add-issue-button/add-issue-button';
-import template from './related-issues.mustache';
+import template from './related-issues.stache';
 
 export default can.Component.extend({
   tag: 'related-issues',

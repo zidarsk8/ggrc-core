@@ -7,7 +7,7 @@
 <div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
-  {{> /static/templates/base_objects/form_restore.mustache}}
+  {{> /static/templates/base_objects/form_restore.stache}}
 
   <div class="row-fluid">
     <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
@@ -25,7 +25,7 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Policy / Regulation / Standard / Contract containing this Requirement"></i>
           <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <input tabindex="2" class="input-block-level" name="_directive.title" data-lookup="Policy,Regulation,Standard,Contract" data-permission-type="update" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Policy / Regulation / Standard / Contract" type="text" />
+        <input tabindex="2" class="input-block-level" name="_directive.title" data-lookup="Policy,Regulation,Standard,Contract" data-permission-type="update" data-template="/directives/autocomplete_result.stache" placeholder="Choose Policy / Regulation / Standard / Contract" type="text" />
       {{/if_helpers}}
     </div>
   </div>
@@ -48,7 +48,7 @@
     </div>
   </div>
 
-  {{> /static/templates/partials/modal-ajax-test-plan.mustache}}
+  {{> /static/templates/partials/modal-ajax-test-plan.stache}}
 
   <div class="row">
     <div class="span12 hide-wrap hidable">
@@ -77,7 +77,7 @@
     </div>
     <div class="span6 hide-wrap hidable">
       <div class="row-fluid inner-hide">
-        {{> /static/templates/base_objects/modal-content-reference-urls.mustache}}
+        {{> /static/templates/base_objects/modal-content-reference-urls.stache}}
       </div>
     </div>
   </div>

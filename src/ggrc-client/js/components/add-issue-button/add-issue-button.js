@@ -4,7 +4,7 @@
  */
 
 import {REFRESH_RELATED} from '../../events/eventTypes';
-import template from './add-issue-button.mustache';
+import template from './add-issue-button.stache';
 import {
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';

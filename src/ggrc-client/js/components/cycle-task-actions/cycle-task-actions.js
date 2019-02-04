@@ -8,7 +8,7 @@ import '../spinner/spinner';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
-import template from './cycle-task-actions.mustache';
+import template from './cycle-task-actions.stache';
 import {updateStatus} from '../../plugins/utils/workflow-utils';
 import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';

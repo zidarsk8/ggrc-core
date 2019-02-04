@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './add-tab-button.mustache';
+import template from './add-tab-button.stache';
 import {
   getPageType,
   isMyWork,

@@ -39,9 +39,9 @@
       <lazy-openclose>
         {{#show}}
           <div class="tier-content">
-            {{> /static/templates/base_objects/title.mustache}}
-            {{> /static/templates/base_objects/description.mustache}}
-            {{> /static/templates/base_objects/notes.mustache}}
+            {{> /static/templates/base_objects/title.stache}}
+            {{> /static/templates/base_objects/description.stache}}
+            {{> /static/templates/base_objects/notes.stache}}
           </div>
         {{/show}}
       </lazy-openclose>

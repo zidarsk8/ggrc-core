@@ -10,7 +10,7 @@ import {
 } from '../../plugins/utils/object-history-utils';
 import Revision from '../../models/service-models/revision';
 
-import template from './templates/review-proposal.mustache';
+import template from './templates/review-proposal.stache';
 const tag = 'review-proposal';
 
 export default can.Component.extend({
@@ -21,7 +21,7 @@ export default can.Component.extend({
     define: {
       buttonView: {
         get() {
-          return `${GGRC.templates_path}/modals/review_proposal.mustache`;
+          return `${GGRC.templates_path}/modals/review_proposal.stache`;
         },
       },
       canReview: {

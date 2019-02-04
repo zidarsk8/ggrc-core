@@ -11,7 +11,7 @@ import '../../components/unified-mapper/mapper-results';
 import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/mapping-controls/mapping-type-selector';
 
-import template from './object-mapper.mustache';
+import template from './object-mapper.stache';
 
 import tracker from '../../tracker';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';

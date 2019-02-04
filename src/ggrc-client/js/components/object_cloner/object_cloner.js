@@ -29,10 +29,10 @@ export default can.Component.extend({
         modal_title: scope.attr('modalTitle'),
         modal_description: scope.attr('modalDescription'),
         content_view: GGRC.templates_path + '/' +
-          instance.class.root_collection + '/object_cloner.mustache',
+          instance.class.root_collection + '/object_cloner.stache',
         modal_confirm: 'Clone',
         skip_refresh: true,
-        button_view: GGRC.templates_path + '/modals/prompt_buttons.mustache',
+        button_view: GGRC.templates_path + '/modals/prompt_buttons.stache',
       }, function () {
         let clonedInstance = instance.clone({
           cloneOptions: {

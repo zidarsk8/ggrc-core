@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './current-exports.mustache';
+import template from './current-exports.stache';
 import {jobStatuses} from '../../../plugins/utils/import-export-utils';
 
 export default can.Component.extend({

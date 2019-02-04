@@ -110,7 +110,7 @@
      *      defined DELAY after which will should show tooltip.
      * 2) User clicks the button ->
      *    Actions:
-     *      Click handler switches mustache template to new button(maximize/minimize, for example).
+     *      Click handler switches template to new button(maximize/minimize, for example).
      *      P.S. Old button is destroyed.
      * 3) After DELAY in (1) Bootstrap uses data for the tooltip which was destroyed in (2).
      */

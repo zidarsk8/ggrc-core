@@ -58,7 +58,7 @@ import {
   getPageInstance,
 } from '../../../plugins/utils/current-page-utils';
 import {initCounts} from '../../../plugins/utils/widgets-utils';
-import template from './info-pane.mustache';
+import template from './info-pane.stache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubsub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';

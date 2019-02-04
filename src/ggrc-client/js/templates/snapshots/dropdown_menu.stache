@@ -50,7 +50,7 @@
         {{#if_helpers '\n #if_instance_of' page_instance 'Issue' '\n or ^if' instance.snapshot.archived '\n and #if_instance_of' page_instance 'Assessment'}}
             {{#is_allowed_to_map page_instance instance.snapshot}}
             {{#using instance=instance.snapshot}}
-                {{> /static/templates/base_objects/unmap.mustache}}
+              {{> /static/templates/base_objects/unmap.stache}}
             {{/using}}
             {{/is_allowed_to_map}}
         {{/if_helpers}}

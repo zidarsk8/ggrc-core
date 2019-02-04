@@ -19,8 +19,8 @@ const messages = {
 /**
  * Shows flash notification
  * @param  {String} type    type of notification. error|warning
- * @param  {String} message Plain text message or mustache template if data is passed
- * @param  {Object} [data] data to populate mustache template
+ * @param  {String} message Plain text message or template if data is passed
+ * @param  {Object} [data] data to populate template
  */
 function notifier(type, message, data) {
   let props = {};

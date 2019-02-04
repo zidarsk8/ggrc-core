@@ -11,7 +11,7 @@ import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-gr
 import CycleTaskGroup from '../../models/business-models/cycle-task-group';
 import Cycle from '../../models/business-models/cycle';
 import {formatDate} from '../../plugins/utils/date-utils';
-import template from './templates/tree-item-extra-info.mustache';
+import template from './templates/tree-item-extra-info.stache';
 
 let viewModel = can.Map.extend({
   define: {

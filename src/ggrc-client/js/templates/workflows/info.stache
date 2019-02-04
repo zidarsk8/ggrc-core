@@ -128,7 +128,7 @@
           </div>
         </div>
 
-        {{> /static/templates/controls/contacts.mustache}}
+        {{> /static/templates/controls/contacts.stache}}
 
         <div class="row-fluid wrap-row">
           <div class="span6">
@@ -168,7 +168,7 @@
         </div>
         <div class="row-fluid">
           <div class="span12">
-            {{> /static/templates/custom_attributes/info.mustache}}
+            {{> /static/templates/custom_attributes/info.stache}}
           </div>
         </div>
       </tab-panel>

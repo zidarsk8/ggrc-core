@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/request-review-modal.mustache';
+import template from './templates/request-review-modal.stache';
 import {createReviewInstance, saveReview} from '../../plugins/utils/object-review-utils';
 
 const tag = 'request-review-modal';

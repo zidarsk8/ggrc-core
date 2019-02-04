@@ -22,7 +22,7 @@ export default can.Control({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),
-    widget_view: GGRC.templates_path + '/base_objects/summary.mustache',
+    widget_view: GGRC.templates_path + '/base_objects/summary.stache',
     isLoading: true,
     isShown: false,
     forceRefresh: false,

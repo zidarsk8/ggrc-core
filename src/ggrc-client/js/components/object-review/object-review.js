@@ -4,8 +4,8 @@
  */
 
 import './request-review-modal';
-import template from './templates/object-review.mustache';
-import notificationTemplate from './templates/complete-review-notification.mustache';
+import template from './templates/object-review.stache';
+import notificationTemplate from './templates/complete-review-notification.stache';
 import Review from '../../models/service-models/review';
 import Permission from '../../permission';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';

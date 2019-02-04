@@ -4,7 +4,7 @@
  */
 
 import '../../numberbox/numberbox';
-import template from './templates/numberbox-form-field.mustache';
+import template from './templates/numberbox-form-field.stache';
 import {TEXT_FORM_FIELD_VM} from './text-form-field';
 
 const tag = 'numberbox-form-field';

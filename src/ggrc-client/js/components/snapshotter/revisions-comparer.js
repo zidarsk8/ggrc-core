@@ -44,7 +44,7 @@ export default can.Component.extend({
         modal_title: this.attr('modalTitle'),
         modal_description: 'Loading...',
         header_view: GGRC.templates_path +
-                      '/modals/modal_compare_header.mustache',
+                      '/modals/modal_compare_header.stache',
         modal_confirm: this.attr('modalConfirm'),
         skip_refresh: true,
         extraCssClass: 'compare-modal',

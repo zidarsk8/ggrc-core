@@ -345,10 +345,10 @@ export default class CustomAttributeObject {
 
     this._validator = validator;
     /*
-     * We use this property due to mustache is rerender
+     * We use this property due to template is rerender
      * itself when we use in code attr method. In this case,
      * after each validation, if this property is changed with help
-     * attr method then mustache will update itself.
+     * attr method then template will update itself.
      */
     this._validationState = new can.Map(validator.validationState);
   }

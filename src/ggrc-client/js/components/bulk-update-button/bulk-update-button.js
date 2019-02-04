@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './bulk-update-button.mustache';
+import template from './bulk-update-button.stache';
 import updateService from '../../plugins/utils/bulk-update-service';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 

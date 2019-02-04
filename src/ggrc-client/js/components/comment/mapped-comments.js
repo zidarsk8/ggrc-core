@@ -5,7 +5,7 @@
 
 import '../object-list-item/comment-list-item';
 import '../object-list/object-list';
-import template from './mapped-comments.mustache';
+import template from './mapped-comments.stache';
 
 /**
  * Assessment specific mapped controls view component

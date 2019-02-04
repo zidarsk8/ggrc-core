@@ -23,7 +23,7 @@
                 </li>
               {{/if}}
               {{^if instance.archived}}
-                {{> /static/templates/base_objects/edit_object_link.mustache}}
+                {{> /static/templates/base_objects/edit_object_link.stache}}
               {{/if}}
 
               {{#if instance.class.is_clonable}}
@@ -84,7 +84,7 @@
                 {options}="options">
                   {{#is_allowed_to_map page_instance instance}}
                     {{#isNotInScopeModel instance.type}}
-                      {{> /static/templates/base_objects/unmap.mustache}}
+                      {{> /static/templates/base_objects/unmap.stache}}
                     {{/isNotInScopeModel}}
                   {{/is_allowed_to_map}}
               </issue-unmap-dropdown-item>

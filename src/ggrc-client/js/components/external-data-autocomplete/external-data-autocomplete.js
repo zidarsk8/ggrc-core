@@ -7,7 +7,7 @@ import './external-data-provider';
 import './autocomplete-results';
 import '../spinner/spinner';
 import * as businessModels from '../../models/business-models';
-import template from './external-data-autocomplete.mustache';
+import template from './external-data-autocomplete.stache';
 
 /**
  * The autocomplete component used to load data from external sources.

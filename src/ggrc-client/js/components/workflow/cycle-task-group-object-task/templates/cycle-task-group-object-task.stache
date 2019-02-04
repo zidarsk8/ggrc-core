@@ -152,7 +152,7 @@
 
           <div class="row-fluid wrap-row">
             <div class="span12">
-              {{> /static/templates/base_templates/mapped_objects.mustache}}
+              {{> /static/templates/base_templates/mapped_objects.stache}}
             </div>
           </div>
 

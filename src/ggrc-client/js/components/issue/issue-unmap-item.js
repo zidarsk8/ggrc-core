@@ -4,7 +4,7 @@
 */
 
 import '../object-list-item/business-object-list-item';
-import template from './issue-unmap-item.mustache';
+import template from './issue-unmap-item.stache';
 import Pagination from '../base-objects/pagination';
 import {
   buildParam,

@@ -16,7 +16,7 @@ import pubSub from '../pub-sub';
 
 export default can.Control.extend({
   defaults: {
-    internav_view: '/static/templates/dashboard/internav_list.mustache',
+    internav_view: '/static/templates/dashboard/internav_list.stache',
     pin_view: '.pin-content',
     widget_list: null,
     priorityTabs: null,

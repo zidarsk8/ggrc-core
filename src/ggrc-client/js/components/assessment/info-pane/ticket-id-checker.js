@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/ticket-id-checker.mustache';
+import template from './templates/ticket-id-checker.stache';
 
 export default can.Component.extend({
   tag: 'ticket-id-checker',

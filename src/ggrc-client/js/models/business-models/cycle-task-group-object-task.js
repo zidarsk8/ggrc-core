@@ -93,12 +93,12 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
   info_pane_options: {
     mapped_objects: {
       mapping: 'info_related_objects',
-      show_view: GGRC.templates_path + '/base_templates/subtree.mustache',
+      show_view: GGRC.templates_path + '/base_templates/subtree.stache',
     },
   },
   tree_view_options: {
     add_item_view: GGRC.templates_path +
-      '/cycle_task_group_object_tasks/tree_add_item.mustache',
+      '/cycle_task_group_object_tasks/tree_add_item.stache',
     attr_list: [
       {
         attr_title: 'Task Title',

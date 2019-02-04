@@ -4,7 +4,7 @@
  */
 
 import '../lazy-render/lazy-render';
-import template from './tab-panel.mustache';
+import template from './tab-panel.stache';
 import {REFRESH_TAB_CONTENT} from '../../events/eventTypes';
 
 const PRE_RENDER_DELAY = 3000;

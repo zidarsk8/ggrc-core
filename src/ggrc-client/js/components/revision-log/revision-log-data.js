@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './revision-log-data.mustache';
+import template from './revision-log-data.stache';
 
 let viewModel = can.Map.extend({
   data: null,

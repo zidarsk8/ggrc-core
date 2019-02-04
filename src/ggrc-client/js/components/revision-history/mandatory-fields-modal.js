@@ -5,7 +5,7 @@
 
 import '../simple-modal/simple-modal';
 import '../gca-controls/gca-controls';
-import template from './templates/mandatory-fields-modal.mustache';
+import template from './templates/mandatory-fields-modal.stache';
 
 export default can.Component.extend({
   template,

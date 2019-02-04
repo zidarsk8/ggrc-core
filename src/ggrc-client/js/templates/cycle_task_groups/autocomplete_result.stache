@@ -6,7 +6,7 @@
 {{#each items}}
 <li class="ui-menu-item" {{data 'ui-autocomplete-item'}}>
   <a href="javascript://" class='show-extended' {{data 'model'}}
-    data-tooltip-view="/cycle_task_groups/extended_info.mustache">
+    data-tooltip-view="/cycle_task_groups/extended_info.stache">
     {{title}}
   </a>
 </li>

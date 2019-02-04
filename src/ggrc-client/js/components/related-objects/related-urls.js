@@ -5,7 +5,7 @@
 
 
 import Permission from '../../permission';
-import template from './templates/related-urls.mustache';
+import template from './templates/related-urls.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({

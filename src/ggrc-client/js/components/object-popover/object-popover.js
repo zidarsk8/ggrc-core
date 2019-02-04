@@ -4,7 +4,7 @@
  */
 
 import '../show-more/show-more';
-import template from './object-popover.mustache';
+import template from './object-popover.stache';
 
 const tag = 'object-popover';
 const defaultMaxInnerHeight = 400;

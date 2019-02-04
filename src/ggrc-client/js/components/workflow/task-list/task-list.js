@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/task-list.mustache';
+import template from './templates/task-list.stache';
 import Pagination from '../../base-objects/pagination';
 import Permission from '../../../permission';
 import {REFRESH_RELATED} from '../../../events/eventTypes';

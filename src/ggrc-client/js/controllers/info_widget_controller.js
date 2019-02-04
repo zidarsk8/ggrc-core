@@ -19,7 +19,7 @@ export default can.Control.extend({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),
-    widget_view: GGRC.templates_path + '/base_objects/info.mustache',
+    widget_view: GGRC.templates_path + '/base_objects/info.stache',
   },
 }, {
   init: function () {

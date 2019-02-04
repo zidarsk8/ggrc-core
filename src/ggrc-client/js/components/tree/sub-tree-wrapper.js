@@ -7,7 +7,7 @@ import {
   DESTINATION_UNMAPPED,
   REFRESH_SUB_TREE,
 } from '../../events/eventTypes';
-import template from './templates/sub-tree-wrapper.mustache';
+import template from './templates/sub-tree-wrapper.stache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   isObjectContextPage,

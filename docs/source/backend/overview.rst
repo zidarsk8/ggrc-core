@@ -138,7 +138,7 @@ Templates are HAML files which define the structural HTML which is
 basically the scaffolding around which the functionality and features of
 GGRC are built. Templates don’t define JavaScript logic, client-side
 models, or “how to render an Audit”. Those types of view logic are
-defined in ``.js`` and ``.mustache`` files.
+defined in ``.js`` and ``.stache`` files.
 
 Views
 ^^^^^

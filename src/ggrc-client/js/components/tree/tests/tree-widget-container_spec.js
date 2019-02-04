@@ -12,7 +12,7 @@ import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
-import exportMessage from '../templates/export-message.mustache';
+import exportMessage from '../templates/export-message.stache';
 import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 describe('tree-widget-container component', function () {

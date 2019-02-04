@@ -6,7 +6,7 @@
 {{#instance}}
   <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
     <div class="tier-content">
-      {{> /static/templates/base_objects/general-page-header.mustache}}
+      {{> /static/templates/base_objects/general-page-header.stache}}
 
       <tab-container>
         <tab-panel {(panels)}="panels" title-text="Attributes">
@@ -22,9 +22,9 @@
                 </div>
               {{/if}}
 
-              {{> /static/templates/base_objects/description.mustache}}
-              {{> /static/templates/issues/remediation_plan.mustache}}
-              {{> /static/templates/base_objects/notes.mustache}}
+              {{> /static/templates/base_objects/description.stache}}
+              {{> /static/templates/issues/remediation_plan.stache}}
+              {{> /static/templates/base_objects/notes.stache}}
 
               <div class="row-fluid wrap-row">
                 <div data-test-id="title_manager_7a906d2e">
@@ -34,7 +34,7 @@
                 </div>
               </div>
 
-              {{> /static/templates/base_objects/reference-urls.mustache}}
+              {{> /static/templates/base_objects/reference-urls.stache}}
 
               <div class="row-fluid wrap-row">
                 <folder-attachments-list {title}="'Attachment'"
@@ -112,7 +112,7 @@
                   </div>
                 </div><!-- hidden-fields-area end -->
               </div><!-- custom-attr-wrap end -->
-              {{> /static/templates/custom_attributes/info.mustache}}
+              {{> /static/templates/custom_attributes/info.stache}}
             </div>
             {{^if isSnapshot}}
             <div class="info-pane__sidebar">

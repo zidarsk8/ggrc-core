@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/create-proposal-button.mustache';
+import template from './templates/create-proposal-button.stache';
 const tag = 'create-proposal-button';
 
 export default can.Component.extend({

@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './issue-tracker-enable.mustache';
+import template from './issue-tracker-enable.stache';
 import logger from './issue-tracker-log';
 import {getPageInstance} from '../current-page-utils';
 import Assessment from '../../../models/business-models/assessment';

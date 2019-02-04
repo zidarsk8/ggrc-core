@@ -6,10 +6,10 @@
 GGRC.Templates = GGRC.Templates || {};
 GGRC.templates_path = '/static/templates';
 
-let templates = require.context('./templates/', true, /\.mustache/);
+let templates = require.context('./templates/', true, /\.stache/);
 
 let prefix = './';
-let postfix = '.mustache';
+let postfix = '.stache';
 
 templates.keys().forEach((key) => {
   let prefixPos = key.indexOf(prefix);

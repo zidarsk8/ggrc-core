@@ -290,15 +290,15 @@ within GGRC. Additional fragments can be created and utilized as needed.
 But these templates are the main templates from which the majority of
 the UI is created.
 
--  ``info.mustache`` - Defines the “Info” widget on each object’s page.
+-  ``info.stache`` - Defines the “Info” widget on each object’s page.
     Defined per-widget in InfoWidget controller as the
    ``widget_view`` option, and specified using ``WidgetList``
    definitions.
--  ``extended_info.mustache`` - Defines the content of an object’s
+-  ``extended_info.stache`` - Defines the content of an object’s
    tooltip/popover in the LHN lists.  Specified as the ``tooltip_view``
    parameter when rendering
-   :src:`ggrc-client/js/templates/dashboard/lhn.mustache`.
--  ``modal_content.mustache`` - Defines the view for modal “create” or
+   :src:`ggrc-client/js/templates/dashboard/lhn.stache`.
+-  ``modal_content.stache`` - Defines the view for modal “create” or
    “edit” form functionality.  For most objects, this path is
    automatically generated using the ``data-template`` or
    ``data-object-plural`` attributes of the invoking element (see
@@ -425,7 +425,7 @@ following files:
 -  ``ggrc-client/js/controllers/modals/modals_controller.js``
 
 The view for a modal is defined in
-``/src/ggrc-client/js/templates/<class_name>/modal_content.mustache``.
+``/src/ggrc-client/js/templates/<class_name>/modal_content.stache``.
 
 More about modals in `modals.md <modals.md>`_.
 

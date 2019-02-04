@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './add-template-field.mustache';
+import template from './add-template-field.stache';
 
 export default can.Component.extend({
   tag: 'add-template-field',
@@ -97,7 +97,7 @@ export default can.Component.extend({
     /*
      * Get input placeholder value depended on type
      *
-     * @param {Object} options - Mustache options
+     * @param {Object} options - Template options
      */
     placeholder(options) {
       let types = this.attr('types');

@@ -46,8 +46,7 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 });
 
 function getTemplatePath(url) {
-  let match;
-  match = url.match(/\/static\/(templates)\/(.*)\.mustache/);
+  let match = url.match(/\/static\/(templates)\/(.*)\.stache/);
   return match && match[2];
 }
 
@@ -388,7 +387,7 @@ Mustache.registerHelper('is_allowed', function (...args) {
       // Passed in the context object instead of the context ID, so use the ID
       contextId = contextId.id;
     }
-    //  Using `context=null` in Mustache templates, when `null` is not defined,
+    //  Using `context=null` in templates, when `null` is not defined,
     //  causes `context_id` to be `""`.
     if (contextId === '' || contextId === undefined) {
       contextId = null;
@@ -1026,9 +1025,7 @@ Mustache.registerHelper('isScopeModel', function (instance, options) {
 });
 
 /*
-  if_recurring_workflow mustache helper
-
-  Given an object, it  determines if it's a workflow, and if it's a recurring
+  Given an object, it determines if it's a workflow, and if it's a recurring
   workflow or not.
 
   @param object - the object we want to check

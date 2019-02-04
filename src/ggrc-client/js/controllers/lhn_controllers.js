@@ -351,8 +351,8 @@ const LhnControl = can.Control.extend({}, {
 
 const LhnSearchControl = can.Control.extend({
   defaults: {
-    list_view: GGRC.templates_path + '/base_objects/search_result.mustache',
-    actions_view: GGRC.templates_path + '/base_objects/search_actions.mustache',
+    list_view: GGRC.templates_path + '/base_objects/search_result.stache',
+    actions_view: GGRC.templates_path + '/base_objects/search_actions.stache',
     list_selector: 'ul.top-level > li, ul.mid-level > li',
     list_toggle_selector: 'li > a.list-toggle',
     model_attr_selector: null,

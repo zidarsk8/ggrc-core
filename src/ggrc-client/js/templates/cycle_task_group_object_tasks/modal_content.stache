@@ -140,7 +140,7 @@
               placeholder="Select a Task Group"
               type="text"
               value="{{firstnonempty instance.cycle_task_group_title cycle_task_group.title}}"
-              data-template="/cycle_task_groups/autocomplete_result.mustache"
+              data-template="/cycle_task_groups/autocomplete_result.stache"
               tabindex="5" />
             {{else}}
               <input

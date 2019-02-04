@@ -175,7 +175,7 @@ describe('"getInstanceView" method', () => {
   });
 
   it('should return default "view" path', () => {
-    const expectedPath = `${GGRC.templates_path}/base_objects/info.mustache`;
+    const expectedPath = `${GGRC.templates_path}/base_objects/info.stache`;
 
     // "GGRC.Templates" const doesn't contain template for Vendor
     const instance = makeFakeInstance({model: Vendor})();
@@ -185,7 +185,7 @@ describe('"getInstanceView" method', () => {
   });
 
   it('should return object "view" path', () => {
-    const expectedPath = `${GGRC.templates_path}/risks/info.mustache`;
+    const expectedPath = `${GGRC.templates_path}/risks/info.stache`;
 
     // "GGRC.Templates" const contains template for Risk
     const instance = makeFakeInstance({model: Risk})();

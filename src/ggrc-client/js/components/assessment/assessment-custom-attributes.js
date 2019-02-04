@@ -4,7 +4,7 @@
  */
 
 import './info-pane/confirm-edit-action';
-import template from './custom-attributes.mustache';
+import template from './custom-attributes.stache';
 
 export default can.Component.extend({
   tag: 'assessment-custom-attributes',
