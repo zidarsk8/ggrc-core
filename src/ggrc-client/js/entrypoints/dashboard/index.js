@@ -22,7 +22,6 @@ import '../../components/clipboard-link/permalink';
 import '../../components/clipboard-link/shortlink';
 import '../../components/workflow/cycle-task-objects/cycle-task-objects';
 import '../../components/tabs/tab-container';
-import '../../components/lazy_open_close';
 import '../../components/revision-log/revision-log';
 import '../../components/quick_form/quick_update';
 import '../../components/reminder';
