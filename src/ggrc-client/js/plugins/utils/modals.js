@@ -9,7 +9,7 @@ import ModalsController from '../../controllers/modals/modals_controller';
  * Utils methods for showing standart modals
  */
 
-const path = GGRC.mustache_path || '/static/mustache';
+const path = GGRC.templates_path || '/static/templates';
 const BUTTON_VIEW_DONE = `${path}/modals/done_buttons.mustache`;
 const BUTTON_VIEW_CLOSE = `${path}/modals/close_buttons.mustache`;
 const BUTTON_VIEW_SAVE_CANCEL = `${path}/modals/save_cancel_buttons.mustache`;

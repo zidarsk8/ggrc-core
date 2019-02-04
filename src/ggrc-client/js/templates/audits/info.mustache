@@ -31,7 +31,7 @@
                 <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
               {{/is_info_pin}}
 
-              {{> '/static/mustache/base_objects/info-pane-utility.mustache'}}
+              {{> /static/templates/base_objects/info-pane-utility.mustache}}
             </div>
           </div>
         {{/instance}}
@@ -177,7 +177,7 @@
               {{/if }}
             </div><!-- hidden-fields-area end -->
           </div><!-- custom-attr-wrap end -->
-          {{>'/static/mustache/custom_attributes/info.mustache'}}
+          {{> /static/templates/custom_attributes/info.mustache}}
         </tab-panel>
         <tab-panel {(panels)}="panels" title-text="Change Log">
             <revision-log {instance}="instance"></revision-log>

@@ -209,7 +209,7 @@ import {changeUrl} from '../router';
             modal_description: 'Are you sure that you want' +
             ' to discard your changes?',
             modal_confirm: 'Continue Editing',
-            button_view: GGRC.mustache_path +
+            button_view: GGRC.templates_path +
               '/modals/discard_buttons.mustache',
             skip_refresh: true,
           }, function () {

@@ -35,7 +35,7 @@ export default can.Component.extend({
             modal_title: viewModel.attr('modal_title'),
             modal_description: viewModel.attr('modal_description'),
             button_view:
-              GGRC.mustache_path + '/modals/close_buttons.mustache',
+              GGRC.templates_path + '/modals/close_buttons.mustache',
           });
         });
     },

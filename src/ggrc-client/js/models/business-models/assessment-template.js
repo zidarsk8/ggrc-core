@@ -74,7 +74,7 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
       attr_name: 'modified_by',
       order: 71,
     }],
-    add_item_view: GGRC.mustache_path +
+    add_item_view: GGRC.templates_path +
               '/assessment_templates/tree_add_item.mustache',
   },
 

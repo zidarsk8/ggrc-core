@@ -7,7 +7,7 @@
   <spinner {toggle}="isLoading" class="spinner-wrapper active"></spinner>
   <inline-form-control {instance}="instance" {deferred-save}="deferredSave">
     <div class="tier-content">
-      {{> '/static/mustache/assessments/header.mustache' }}
+      {{> /static/templates/assessments/header.mustache}}
       <tab-container
         {instance}="instance">
           <tab-panel {(panels)}="panels" title-text="Assessment">
@@ -395,7 +395,7 @@
                     </div>
                 </div>
                 <div class="ggrc-form-item">
-                    {{> '/static/mustache/assessments/dates_list.mustache'}}
+                    {{> /static/templates/assessments/dates_list.mustache}}
                 </div>
                 <div class="ggrc-form-item">
                     <div class="ggrc-form-item__row">

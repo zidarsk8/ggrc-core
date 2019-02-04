@@ -281,7 +281,7 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
         /* webpackChunkName: "infiniteScroll" */
         '../controllers/infinite-scroll-controller'
       ).then(() => {
-        can.view.render(GGRC.mustache_path + template,
+        can.view.render(GGRC.templates_path + template,
           context, function (frag) {
             $ul.html(frag);
             new LhnTooltipsControl($ul);

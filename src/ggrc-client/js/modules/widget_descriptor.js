@@ -26,7 +26,7 @@ export default can.Construct.extend({
     widgetView [optional] - a template for rendering the info.
   */
   make_info_widget: function (instance, widgetView) {
-    let defaultInfoWidgetView = GGRC.mustache_path +
+    let defaultInfoWidgetView = GGRC.templates_path +
                                     '/base_objects/info.mustache';
     return new this(
       instance.constructor.shortName + ':info', {
@@ -55,7 +55,7 @@ export default can.Construct.extend({
     widgetView [optional] - a template for rendering the info.
   */
   make_summary_widget: function (instance, widgetView) {
-    let defaultView = GGRC.mustache_path +
+    let defaultView = GGRC.templates_path +
       '/base_objects/summary.mustache';
     return new this(
       instance.constructor.shortName + ':summary', {
@@ -75,7 +75,7 @@ export default can.Construct.extend({
       });
   },
   make_dashboard_widget: function (instance, widgetView) {
-    let defaultView = GGRC.mustache_path +
+    let defaultView = GGRC.templates_path +
       '/base_objects/dashboard.mustache';
     return new this(
       instance.constructor.shortName + ':dashboard', {

@@ -17,7 +17,7 @@ The client-side of GGRC is initially constructed from templates and/or
 views defined and rendered on the server. The templates and views
 provide a scaffolding for the UI. Rendering those elements invokes
 JavaScript code which bootstraps the majority of the client-side of GGRC
-which is constructed from CanJS Controls, Components and Mustache templates.
+which is constructed from CanJS Controls, Components and templates.
 
 Once the Controls are rendered, they take control of generating the
 remainder of the UI and attaching all relevant logic and user
@@ -297,7 +297,7 @@ the UI is created.
 -  ``extended_info.mustache`` - Defines the content of an object’s
    tooltip/popover in the LHN lists.  Specified as the ``tooltip_view``
    parameter when rendering
-   :src:`ggrc-client/js/mustache/dashboard/lhn.mustache`.
+   :src:`ggrc-client/js/templates/dashboard/lhn.mustache`.
 -  ``modal_content.mustache`` - Defines the view for modal “create” or
    “edit” form functionality.  For most objects, this path is
    automatically generated using the ``data-template`` or
@@ -308,10 +308,10 @@ Where to find view templates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The view files are in the following folder within a module
-``src/ggrc-client/js/mustache/``.
+``src/ggrc-client/js/templates/``.
 
 For example, the ``workflow`` views are in the following folder
-:src:`src/ggrc-client/js/mustache/workflows`
+:src:`src/ggrc-client/js/templates/workflows`
 
 View Helpers
 ^^^^^^^^^^^^
@@ -425,7 +425,7 @@ following files:
 -  ``ggrc-client/js/controllers/modals/modals_controller.js``
 
 The view for a modal is defined in
-``/src/ggrc-client/js/mustache/<class_name>/modal_content.mustache``.
+``/src/ggrc-client/js/templates/<class_name>/modal_content.mustache``.
 
 More about modals in `modals.md <modals.md>`_.
 

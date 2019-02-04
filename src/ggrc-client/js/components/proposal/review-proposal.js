@@ -21,7 +21,7 @@ export default can.Component.extend({
     define: {
       buttonView: {
         get() {
-          return `${GGRC.mustache_path}/modals/review_proposal.mustache`;
+          return `${GGRC.templates_path}/modals/review_proposal.mustache`;
         },
       },
       canReview: {

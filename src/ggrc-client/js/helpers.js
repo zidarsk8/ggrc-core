@@ -32,22 +32,22 @@ import {
   formatDate,
 } from './plugins/utils/date-utils';
 
-// Chrome likes to cache AJAX requests for Mustaches.
-let mustacheUrls = {};
+// Chrome likes to cache AJAX requests for template.
+let templateUrls = {};
 let Mustache = can.Mustache;
 $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-  if (/\.mustache$/.test(options.url)) {
-    if (mustacheUrls[options.url]) {
-      options.url = mustacheUrls[options.url];
+  if (/\.templates$/.test(options.url)) {
+    if (templateUrls[options.url]) {
+      options.url = templateUrls[options.url];
     } else {
-      mustacheUrls[options.url] = options.url += '?r=' + Math.random();
+      templateUrls[options.url] = options.url += '?r=' + Math.random();
     }
   }
 });
 
 function getTemplatePath(url) {
   let match;
-  match = url.match(/\/static\/(mustache|mockups)\/(.*)\.mustache/);
+  match = url.match(/\/static\/(templates)\/(.*)\.mustache/);
   return match && match[2];
 }
 

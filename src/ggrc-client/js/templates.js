@@ -4,18 +4,18 @@
 */
 
 GGRC.Templates = GGRC.Templates || {};
-GGRC.mustache_path = '/static/mustache';
+GGRC.templates_path = '/static/templates';
 
-let mustacheTemplates = require.context('./mustache/', true, /\.mustache/);
+let templates = require.context('./templates/', true, /\.mustache/);
 
 let prefix = './';
 let postfix = '.mustache';
 
-mustacheTemplates.keys().forEach((key) => {
+templates.keys().forEach((key) => {
   let prefixPos = key.indexOf(prefix);
   let postfixPos = key.lastIndexOf(postfix);
 
   let newKey = key.slice(prefixPos + prefix.length, postfixPos);
 
-  GGRC.Templates[newKey] = mustacheTemplates(key);
+  GGRC.Templates[newKey] = templates(key);
 });

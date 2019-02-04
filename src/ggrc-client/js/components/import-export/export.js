@@ -131,7 +131,7 @@ export default can.Component.extend({
               modal_description: `GDrive file is generated successfully.
                Click button below to view the file.`,
               gDriveLink: link,
-              button_view: `${GGRC.mustache_path}/modals/open_sheet.mustache`,
+              button_view: `${GGRC.templates_path}/modals/open_sheet.mustache`,
             }, () => {
               this.deleteJob(id);
             }, () => {

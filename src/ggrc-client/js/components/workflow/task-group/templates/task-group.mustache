@@ -29,7 +29,7 @@
                   <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
                     {{#using workflow=instance.workflow}}
                       {{^if_equals workflow.status 'Inactive'}}
-                        {{> /static/mustache/base_objects/edit_object_link.mustache}}
+                        {{> /static/templates/base_objects/edit_object_link.mustache}}
                       {{/if_equals}}
                     {{/using}}
                     <li>
@@ -50,7 +50,7 @@
       </div>
 
       <div class="pane-content">
-        {{> /static/mustache/task_groups/tier2_content.mustache}}
+        {{> /static/templates/task_groups/tier2_content.mustache}}
         <div class="info-pane__section">
         {{#if readyToRenderTaskGroupObjects}}
           <task-group-objects

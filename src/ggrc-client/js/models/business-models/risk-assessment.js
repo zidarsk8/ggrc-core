@@ -9,7 +9,7 @@ import timeboxed from '../mixins/timeboxed';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
-const path = GGRC.mustache_path + '/risk_assessments';
+const path = GGRC.templates_path + '/risk_assessments';
 
 export default Cacheable('CMS.Models.RiskAssessment', {
   root_object: 'risk_assessment',

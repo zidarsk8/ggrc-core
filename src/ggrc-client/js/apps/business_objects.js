@@ -21,25 +21,25 @@ import * as businessModels from '../models/business-models/index';
 import TreeViewConfig from '../apps/base_widgets';
 
 const summaryWidgetViews = Object.freeze({
-  audits: GGRC.mustache_path + '/audits/summary.mustache',
+  audits: GGRC.templates_path + '/audits/summary.mustache',
 });
 
 const infoWidgetViews = Object.freeze({
-  programs: GGRC.mustache_path + '/programs/info.mustache',
-  audits: GGRC.mustache_path + '/audits/info.mustache',
-  people: GGRC.mustache_path + '/people/info.mustache',
-  policies: GGRC.mustache_path + '/policies/info.mustache',
-  controls: GGRC.mustache_path + '/controls/info.mustache',
-  systems: GGRC.mustache_path + '/systems/info.mustache',
-  processes: GGRC.mustache_path + '/processes/info.mustache',
-  products: GGRC.mustache_path + '/products/info.mustache',
-  assessments: GGRC.mustache_path + '/assessments/info.mustache',
+  programs: GGRC.templates_path + '/programs/info.mustache',
+  audits: GGRC.templates_path + '/audits/info.mustache',
+  people: GGRC.templates_path + '/people/info.mustache',
+  policies: GGRC.templates_path + '/policies/info.mustache',
+  controls: GGRC.templates_path + '/controls/info.mustache',
+  systems: GGRC.templates_path + '/systems/info.mustache',
+  processes: GGRC.templates_path + '/processes/info.mustache',
+  products: GGRC.templates_path + '/products/info.mustache',
+  assessments: GGRC.templates_path + '/assessments/info.mustache',
   assessment_templates:
-    GGRC.mustache_path + '/assessment_templates/info.mustache',
-  issues: GGRC.mustache_path + '/issues/info.mustache',
-  evidence: GGRC.mustache_path + '/evidence/info.mustache',
-  documents: GGRC.mustache_path + '/documents/info.mustache',
-  risks: GGRC.mustache_path + '/risks/info.mustache',
+    GGRC.templates_path + '/assessment_templates/info.mustache',
+  issues: GGRC.templates_path + '/issues/info.mustache',
+  evidence: GGRC.templates_path + '/evidence/info.mustache',
+  documents: GGRC.templates_path + '/documents/info.mustache',
+  risks: GGRC.templates_path + '/risks/info.mustache',
 });
 
 let CoreExtension = {};
@@ -53,7 +53,7 @@ _.assign(CoreExtension, {
     let objectClass = getPageModel();
     let objectTable = objectClass && objectClass.table_plural;
     let object = getPageInstance();
-    let path = GGRC.mustache_path;
+    let path = GGRC.templates_path;
     let modelNames;
     let possibleModelType;
     let farModels;

@@ -11,11 +11,11 @@ import UserRole from '../models/service-models/user-role';
 const userRolesModalSelector = can.Control.extend({
   defaults: {
     base_modal_view:
-      GGRC.mustache_path + '/people_roles/base_modal.mustache',
+      GGRC.templates_path + '/people_roles/base_modal.mustache',
     option_column_view:
-      GGRC.mustache_path + '/people_roles/option_column.mustache',
+      GGRC.templates_path + '/people_roles/option_column.mustache',
     object_detail_view:
-      GGRC.mustache_path + '/people_roles/object_detail.mustache',
+      GGRC.templates_path + '/people_roles/object_detail.mustache',
 
     personId: null,
   },

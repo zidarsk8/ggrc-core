@@ -5,14 +5,14 @@
 
 <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
   <div class="tier-content">
-    {{>'/static/mustache/base_objects/general-page-header.mustache'}}
+    {{> /static/templates/base_objects/general-page-header.mustache}}
 
     <tab-container>
       <tab-panel {(panels)}="panels" title-text="Attributes">
         <div class="info-pane__body">
           <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-            {{>'/static/mustache/base_objects/description.mustache'}}
-            {{>'/static/mustache/base_objects/test_plan.mustache'}}
+            {{> /static/templates/base_objects/description.mustache}}
+            {{> /static/templates/base_objects/test_plan.mustache}}
 
             <div class="row-fluid wrap-row">
               <div class="span12">
@@ -109,7 +109,7 @@
                 </div><!-- row-fluid end -->
               </div><!-- hidden-fields-area end -->
             </div><!-- custom-attr-wrap end -->
-            {{>'/static/mustache/custom_attributes/info.mustache'}}
+            {{> /static/templates/custom_attributes/info.mustache}}
           </div>
           {{^if isSnapshot}}
           <div class="info-pane__sidebar">

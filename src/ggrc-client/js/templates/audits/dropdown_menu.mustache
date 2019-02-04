@@ -15,7 +15,7 @@
           </snapshot-scope-update>
         </li>
       {{/if}}
-      {{> /static/mustache/base_objects/edit_object_link.mustache}}
+      {{> /static/templates/base_objects/edit_object_link.mustache}}
 
       <li>
         <assessment-template-clone-button
@@ -83,7 +83,7 @@
       {options}="options">
         {{#is_allowed_to_map page_instance instance}}
           {{#isNotInScopeModel instance.type}}
-            {{> '/static/mustache/base_objects/unmap.mustache'}}
+            {{> /static/templates/base_objects/unmap.mustache}}
           {{/isNotInScopeModel}}
         {{/is_allowed_to_map}}
     </issue-unmap-dropdown-item>

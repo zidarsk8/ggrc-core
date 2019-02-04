@@ -49,7 +49,7 @@ export default can.Component.extend({
             modal_title: 'Clone Workflow',
             model: CloneWorkflow,
             instance: new CloneWorkflow({source_workflow: this.scope.workflow}),
-            content_view: GGRC.mustache_path +
+            content_view: GGRC.templates_path +
               '/workflows/clone_modal_content.mustache',
             custom_save_button_text: 'Proceed',
             button_view: BUTTON_VIEW_SAVE_CANCEL,

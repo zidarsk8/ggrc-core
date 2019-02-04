@@ -36,7 +36,7 @@ export const pinContentMinimizedClass = 'pin-content--minimized';
 
 export default can.Control.extend({
   defaults: {
-    view: GGRC.mustache_path + '/base_objects/info.mustache',
+    view: GGRC.templates_path + '/base_objects/info.mustache',
   },
 }, {
   init: function (el, options) {
@@ -153,7 +153,7 @@ export default can.Control.extend({
       modal_description: renderer(instance).textContent,
       modal_confirm: modalDetails.button,
       modal_title: modalDetails.title,
-      button_view: GGRC.mustache_path + '/quick_form/confirm_buttons.mustache',
+      button_view: GGRC.templates_path + '/quick_form/confirm_buttons.mustache',
     }, confirmDfd.resolve);
     return confirmDfd;
   },

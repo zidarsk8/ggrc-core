@@ -47,7 +47,7 @@ export default Cacheable('CMS.Models.Assessment', {
   statuses: ['Not Started', 'In Progress', 'In Review',
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
   tree_view_options: {
-    add_item_view: GGRC.mustache_path + '/assessments/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path + '/assessments/tree_add_item.mustache',
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',

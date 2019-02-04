@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{! transcluded via renderLive in, for example, mustache/sections/tier2_content.mustache }}
 {{#instance}}
   <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
     <div class="pane-header__container">
@@ -39,7 +38,7 @@
           <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
         {{/is_info_pin}}
 
-        {{> /static/mustache/base_objects/info-pane-utility.mustache}}
+        {{> /static/templates/base_objects/info-pane-utility.mustache}}
       </div>
     </div>
       {{#if snapshot}}
