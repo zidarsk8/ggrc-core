@@ -7,6 +7,7 @@ import DashboardWidgets from './dashboard_widgets_controller';
 import InfoPin from './info_pin_controller';
 import {
   isAdmin,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
@@ -85,6 +86,7 @@ const DashboardControl = can.Control.extend({
     if ($innernav.length && this.options.innernav_view) {
       let options = {
         ...this.options,
+        instance: getPageInstance(),
         showWidgetArea: this.showWidgetArea.bind(this),
       };
       $innernav.html(can.view(this.options.innernav_view, options));

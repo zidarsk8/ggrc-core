@@ -8,7 +8,6 @@ import './inner-nav-item';
 import './inner-nav-collapse';
 import '../add-tab-button/add-tab-button';
 import {
-  getPageInstance,
   isAdmin,
 } from '../../plugins/utils/current-page-utils';
 import {getCounts} from '../../plugins/utils/widgets-utils';
@@ -26,11 +25,6 @@ export default can.Component.extend({
   template,
   viewModel: {
     define: {
-      instance: {
-        get() {
-          return getPageInstance();
-        },
-      },
       counts: {
         get() {
           return getCounts();
@@ -56,6 +50,7 @@ export default can.Component.extend({
         },
       },
     },
+    instance: null,
     activeWidget: null,
     widgetDescriptors: [],
     widgetList: [],

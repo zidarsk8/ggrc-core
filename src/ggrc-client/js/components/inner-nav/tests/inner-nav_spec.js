@@ -87,8 +87,7 @@ describe('inner-nav component', () => {
             show_all_tabs: true,
           },
         }})();
-
-        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue(instance);
+        viewModel.attr('instance', instance);
 
         expect(viewModel.attr('showAllTabs')).toBe(true);
       });
@@ -151,7 +150,7 @@ describe('inner-nav component', () => {
             force_show_list: ['force show widget title'],
           },
         }})();
-        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue(instance);
+        viewModel.attr('instance', instance);
       });
 
       it('should set id', () => {
@@ -285,9 +284,8 @@ describe('inner-nav component', () => {
       describe('for Audit object', () => {
         it('should set first 5 widgets as priority if dashboard is not enabled',
           () => {
-            spyOn(CurrentPageUtils, 'getPageInstance')
-              .and.returnValue(new can.Map({type: 'Audit'}));
             spyOn(DashboardUtils, 'isDashboardEnabled').and.returnValue(false);
+            viewModel.attr('instance', {type: 'Audit'});
             viewModel.attr('widgetList', [{id: 0}, {id: 1}, {id: 2},
               {id: 3}, {id: 4}, {id: 5}, {id: 6}]);
 
@@ -306,9 +304,8 @@ describe('inner-nav component', () => {
 
         it('should set first 6 widgets as priority if dashboard is enabled',
           () => {
-            spyOn(CurrentPageUtils, 'getPageInstance')
-              .and.returnValue(new can.Map({type: 'Audit'}));
             spyOn(DashboardUtils, 'isDashboardEnabled').and.returnValue(true);
+            viewModel.attr('instance', {type: 'Audit'});
             viewModel.attr('widgetList', [{id: 0}, {id: 1}, {id: 2},
               {id: 3}, {id: 4}, {id: 5}, {id: 6}]);
 
@@ -325,8 +322,7 @@ describe('inner-nav component', () => {
 
       describe('for all objects except Audit', () => {
         it('sets all available widgets as priority', () => {
-          spyOn(CurrentPageUtils, 'getPageInstance')
-            .and.returnValue(new can.Map({type: 'type'}));
+          viewModel.attr('instance', {type: 'type'});
           viewModel.attr('widgetList', [{}, {}, {}]);
 
           viewModel.setTabsPriority();
@@ -352,7 +348,7 @@ describe('inner-nav component', () => {
             show_all_tabs: value,
           },
         }})();
-        spyOn(CurrentPageUtils, 'getPageInstance').and.returnValue(instance);
+        viewModel.attr('instance', instance);
       }
 
       it('should do nothing if should be shown all widgets', () => {
