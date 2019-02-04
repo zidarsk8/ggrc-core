@@ -5,11 +5,7 @@
 
 <ul class="tree-structure new-tree mapped-objects-tree">
   {{#mappedObjects}}
-    <li
-      class="tree-item task-item"
-      data-object-type="{{instance.class.table_singular}}"
-      {{#instance}}{{ data 'option' }}{{/instance}}
-      data-id="{{ instance.id }}">
+    <li class="tree-item task-item">
       <div class="item-main">
         <div class="item-wrap">
           <div class="openclose">
