@@ -318,10 +318,8 @@ View Helpers
 
 View helpers are defined using the Mustache `helper mechanism provided
 by CanJS <http://canjs.com/docs/can.mustache.Helpers.html>`_.  Core
-helpers are specified in
-:src:`ggrc-client/js/mustache_helpers.js`,
-and extension helpers should be specified in a file named similar to
-``src/<module_name>/js/<class_name>_mustache_helpers.js``.
+helpers are specified in 
+:src:`ggrc-client/js/helpers.js`.
 
 Extensions
 ~~~~~~~~~~
