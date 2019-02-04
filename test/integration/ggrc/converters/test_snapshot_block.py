@@ -22,7 +22,7 @@ class TestSnapshotBlockConverter(TestCase):
     """Test snapshots property for empty ids list."""
     converter = mock.MagicMock()
     block = SnapshotBlockConverter(converter, [])
-    self.assertEqual(next(block.snapshots()), [])
+    self.assertEqual(next(block.snapshots()), {})
 
   def test_snapshots_content(self):
     """Test snapshot content."""

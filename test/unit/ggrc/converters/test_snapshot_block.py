@@ -29,10 +29,6 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def _mock_snapshot_factory(content_list):
     return mock.MagicMock(return_value=content_list)
 
-  @staticmethod
-  def _mock_get_snapshot_content(content_list):
-    return mock.MagicMock(side_effect=content_list)
-
   @classmethod
   def _dummy_cad_snapshots(cls):
     return [
@@ -194,6 +190,10 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     self.block.get_value_string = lambda x: x or ""
     self.block.DATE_FIELDS = {
         "dummy_date"
+    }
+    self.block.child_type = "Dummy Object"
+    self.block._content_value_map = {
+        "Dummy Object": {}
     }
     self.assertEqual(
         self.block.get_content_string(content, attr_name),

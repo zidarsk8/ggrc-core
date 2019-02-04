@@ -8,7 +8,9 @@ Add Json and Compressed type declaration for use in ORM models.
 
 import json
 import pickle
+import zlib
 import sqlalchemy.types as types
+
 from ggrc import utils
 from ggrc.models import exceptions
 
@@ -76,11 +78,11 @@ class CompressedType(types.TypeDecorator):
 
   def process_result_value(self, value, dialect):
     if value is not None:
-      value = pickle.loads(value)
+      value = pickle.loads(zlib.decompress(value))
     return value
 
   def process_bind_param(self, value, dialect):
-    value = pickle.dumps(value)
+    value = zlib.compress(pickle.dumps(value))
     if len(value) > self.MAX_BINARY_LENGTH:
       raise exceptions.ValidationError("Log record content too long")
     return value
