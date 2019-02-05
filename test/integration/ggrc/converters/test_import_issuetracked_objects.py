@@ -370,7 +370,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("hotlist_id", "Hotlist ID", 321),
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
-      ("issue_type", "Issue Type", "BUG"),
+      ("issue_type", "Issue Type", "PROCESS"),
   )
   @ddt.unpack
   def test_audit_import_create_succeed(self, field, alias, value):
