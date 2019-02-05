@@ -30,6 +30,12 @@ def upgrade():
           SET name=replace(name, '/ ', '/');
           UPDATE categories
           SET name=replace(name, 'and', '&');
+          UPDATE categories
+          SET name='Package Verification & Code Release' 
+          WHERE name='Package Verification & Code release';
+          UPDATE categories
+          SET name='Not Applicable' 
+          WHERE name='Not applicable';
       """)
   )
 
