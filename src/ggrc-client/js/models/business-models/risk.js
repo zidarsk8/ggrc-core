@@ -11,7 +11,7 @@ import baseNotifications from '../mixins/base-notifications';
 import proposable from '../mixins/proposable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Risk', {
+export default Cacheable.extend({
   root_object: 'risk',
   root_collection: 'risks',
   category: 'risk',

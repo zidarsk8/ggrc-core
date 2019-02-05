@@ -12,7 +12,7 @@ import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Program', {
+export default Cacheable.extend({
   root_object: 'program',
   root_collection: 'programs',
   category: 'programs',

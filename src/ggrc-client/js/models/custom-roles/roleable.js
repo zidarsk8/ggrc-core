@@ -14,7 +14,7 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
  *
  * @class
  */
-export default Cacheable('CMS.Models.Roleable', {
+export default Cacheable.extend({
   findAll: function () {
     // We do not query the backend, this implementation is used to diplay
     // a list of objects in the Custom Roles widget.

@@ -14,7 +14,7 @@ import {getCustomAttributableModels} from '../../plugins/utils/models-utils';
   * CustomAttributeDefinitions as children
   *
   */
-export default Cacheable('CMS.Models.CustomAttributable', {
+export default Cacheable.extend({
   findAll: function () {
     let types = _.orderBy(getCustomAttributableModels(),
       'category', false);

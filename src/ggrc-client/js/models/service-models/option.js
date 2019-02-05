@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.Option', {
+export default Cacheable.extend({
   root_object: 'option',
   findAll: 'GET /api/options',
   findOne: 'GET /api/options/{id}',

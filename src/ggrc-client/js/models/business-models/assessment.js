@@ -20,7 +20,7 @@ import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import {getInstance} from '../../plugins/utils/models-utils';
 
-export default Cacheable('CMS.Models.Assessment', {
+export default Cacheable.extend({
   root_object: 'assessment',
   root_collection: 'assessments',
   category: 'governance',

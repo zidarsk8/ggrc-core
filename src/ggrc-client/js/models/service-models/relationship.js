@@ -6,7 +6,7 @@
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Relationship', {
+export default Cacheable.extend({
   root_object: 'relationship',
   root_collection: 'relationships',
   attributes: {

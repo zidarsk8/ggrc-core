@@ -13,7 +13,7 @@ import baseNotifications from '../mixins/base-notifications';
 import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Issue', {
+export default Cacheable.extend({
   root_object: 'issue',
   root_collection: 'issues',
   category: 'governance',

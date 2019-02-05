@@ -19,7 +19,7 @@ const getAccessControlList = () => {
   }] : [];
 };
 
-export default Cacheable('CMS.Models.Document', {
+export default Cacheable.extend({
   root_object: 'document',
   root_collection: 'documents',
   title_singular: 'Document',

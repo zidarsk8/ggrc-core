@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.ControlAssertion', {
+export default Cacheable.extend({
   root_object: 'control_assertion',
   root_collection: 'control_assertions',
   findAll: 'GET /api/control_assertions',

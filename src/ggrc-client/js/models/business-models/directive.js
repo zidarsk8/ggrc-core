@@ -10,7 +10,7 @@ import caUpdate from '../mixins/ca-update';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Directive', {
+export default Cacheable.extend({
   root_object: 'directive',
   root_collection: 'directives',
   category: 'governance',

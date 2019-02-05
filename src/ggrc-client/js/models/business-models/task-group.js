@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import contactable from '../mixins/contactable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.TaskGroup', {
+export default Cacheable.extend({
   root_object: 'task_group',
   root_collection: 'task_groups',
   category: 'workflow',

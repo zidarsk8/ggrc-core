@@ -93,7 +93,7 @@ function makeDateSerializer(type, key) {
   };
 }
 
-export default can.Model('can.Model.Cacheable', {
+export default can.Model.extend({
   root_object: '',
   attr_list: [
     {
