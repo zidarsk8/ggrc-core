@@ -325,7 +325,7 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
             let model = businessModels[objName];
 
             let res = can.map(ids, (id) => {
-              return getInstance(model.shortName, id);
+              return getInstance(model.model_singular, id);
             });
             dfd.resolve(res);
           });

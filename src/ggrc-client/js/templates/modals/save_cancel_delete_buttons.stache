@@ -38,7 +38,7 @@
               >Save &amp; Close</a>
           {{/new_object_form}}
           {{#new_object_form}}
-            {{^if_equals model.shortName "AssessmentTemplate"}}
+            {{^if_equals model.model_singular "AssessmentTemplate"}}
             <a
               tabindex="24"
               class="btn btn-small btn-lightBlue {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"

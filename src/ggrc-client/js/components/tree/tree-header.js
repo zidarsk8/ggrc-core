@@ -88,7 +88,7 @@ export default can.Component.extend({
       }
     },
     isActiveActionArea: function () {
-      let modelName = this.attr('model').shortName;
+      let modelName = this.attr('model').model_singular;
 
       return modelName === 'CycleTaskGroupObjectTask' || modelName === 'Cycle';
     },
@@ -98,7 +98,7 @@ export default can.Component.extend({
         return;
       }
 
-      sortingInfo = getSortingForModel(this.attr('model').shortName);
+      sortingInfo = getSortingForModel(this.attr('model').model_singular);
       this.attr('orderBy.field', sortingInfo.key);
       this.attr('orderBy.direction', sortingInfo.direction);
     },

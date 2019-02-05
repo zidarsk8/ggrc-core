@@ -38,7 +38,7 @@ export default can.Component.extend({
       show3bbs: {
         type: Boolean,
         get: function () {
-          let modelName = this.attr('model').shortName;
+          let modelName = this.attr('model').model_singular;
           return !isMyAssessments()
             && modelName !== 'Document'
             && modelName !== 'Evidence';
@@ -62,7 +62,7 @@ export default can.Component.extend({
           let model = this.attr('model');
 
           return parentInstance.type === 'Audit' &&
-            model.shortName === 'Assessment';
+            model.model_singular === 'Assessment';
         },
       },
       showBulkUpdate: {
@@ -74,7 +74,7 @@ export default can.Component.extend({
       showChangeRequest: {
         get() {
           const isCycleTask = (
-            this.attr('model').shortName === 'CycleTaskGroupObjectTask'
+            this.attr('model').model_singular === 'CycleTaskGroupObjectTask'
           );
 
           return (
@@ -90,7 +90,8 @@ export default can.Component.extend({
           let instance = this.attr('parentInstance');
           let model = this.attr('model');
           return !this.attr('isSnapshots') &&
-            (Permission.is_allowed('update', model.shortName, instance.context)
+            (Permission.is_allowed(
+              'update', model.model_singular, instance.context)
               || isAuditor(instance, GGRC.current_user));
         },
       },

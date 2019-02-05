@@ -916,7 +916,7 @@ export default can.Control.extend({
     instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
-      _.includes(saveContactModels, this.options.model.shortName)) {
+      _.includes(saveContactModels, this.options.model.model_singular)) {
       instance.attr('contact', this.options.attr('instance.contact'));
     }
 

@@ -118,7 +118,7 @@ export default TreeLoader({
         this.options.model.list_view_options.find_params);
     }
 
-    if (this.options.model.shortName === 'Person') {
+    if (this.options.model.model_singular === 'Person') {
       params.__sort = 'name,email';
       if (searchParams.search_term) {
         params.__search = searchParams.search_term;

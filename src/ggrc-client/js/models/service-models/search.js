@@ -77,8 +77,8 @@ export default can.Model.extend({
   getCountFor: function (type) {
     let result;
 
-    if (type && type.shortName) {
-      type = type.shortName;
+    if (type && type.model_singular) {
+      type = type.model_singular;
     }
     if (!this.counts[type]) {
       result = 0;

@@ -52,7 +52,7 @@ export default can.Control.extend({
       let countsName = this.options.countsName ||
         (this.options.content_controller_options &&
           this.options.content_controller_options.countsName) ||
-        this.options.model.shortName;
+        this.options.model.model_singular;
 
       this.options.widget_count.attr('count', counts.attr(countsName));
 

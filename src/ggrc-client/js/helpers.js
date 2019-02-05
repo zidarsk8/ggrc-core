@@ -407,7 +407,7 @@ Mustache.registerHelper('is_allowed', function (...args) {
   }
 
   if (resource) {
-    resourceType = resource.constructor.shortName;
+    resourceType = resource.constructor.model_singular;
     contextId = resource.context ? resource.context.id : null;
   }
 

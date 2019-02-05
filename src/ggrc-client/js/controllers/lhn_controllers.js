@@ -443,7 +443,7 @@ const LhnSearchControl = can.Control.extend({
       }
       modelNames = can.map(
         this.get_visible_lists(), this.proxy('get_list_model'));
-      modelName = instance.constructor.shortName;
+      modelName = instance.constructor.model_singular;
 
       if (modelNames.indexOf(modelName) > -1) {
         this.options.visible_lists[modelName].unshift(instance);

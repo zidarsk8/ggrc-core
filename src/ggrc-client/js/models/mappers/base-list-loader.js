@@ -32,8 +32,8 @@ import RefreshQueue from '../refresh_queue';
       for (i = 0; !foundResult && i < list.length; i++) {
         oldResult = list[i];
         if (oldResult.instance.id === result.instance.id &&
-          oldResult.instance.constructor.shortName ===
-          result.instance.constructor.shortName) {
+          oldResult.instance.constructor.model_singular ===
+          result.instance.constructor.model_singular) {
           foundResult = oldResult;
         }
       }
@@ -169,8 +169,8 @@ import RefreshQueue from '../refresh_queue';
         let mappingAttr = binding.list[instanceIndex].mappings;
 
         if (data.instance.id === instance.id &&
-          data.instance.constructor.shortName ===
-          instance.constructor.shortName) {
+          data.instance.constructor.model_singular ===
+          instance.constructor.model_singular) {
           if (mappingAttr.length === 0) {
             indexesToRemove.push(instanceIndex);
           } else {

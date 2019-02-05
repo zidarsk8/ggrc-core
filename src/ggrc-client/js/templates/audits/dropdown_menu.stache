@@ -21,7 +21,7 @@
         <assessment-template-clone-button
           {object-type}="'AssessmentTemplate'"
           {parent-id}="instance.id"
-          {parent-type}="instance.class.shortName">
+          {parent-type}="instance.class.model_singular">
           <i class="fa fa-sliders"></i>
           Define Assessment template
         </assessment-template-clone-button>
