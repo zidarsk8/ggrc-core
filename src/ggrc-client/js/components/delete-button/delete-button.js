@@ -45,26 +45,26 @@ export default can.Component.extend({
           GGRC.mustache_path + '/base_objects/confirm_delete.mustache',
       };
 
-      import(/* webpackChunkName: "modalsCtrls" */'../../controllers/modals')
-        .then(() => {
-          const $target = $('<div class="modal hide"></div>');
-          $target
-            .modal()
-            .ggrc_controllers_modals(modalSettings)
-            .on('click', '[data-toggle="delete"]', () => {
-              const dfd = this.onConfirm();
+      import(/* webpackChunkName: "modalsCtrls" */
+        '../../controllers/modals/modals_controller').then((module) => {
+        const ModalsController = module.default;
+        const $target = $('<div class="modal hide"></div>');
+        $target.modal();
 
-              bindXHRToButton(dfd, $target.find('[data-dismiss="modal"]'));
-              bindXHRToButton(dfd, $target.find('[data-toggle="delete"]'));
+        new ModalsController($target, modalSettings);
+        $target.on('click', '[data-toggle="delete"]', () => {
+          const dfd = this.onConfirm();
 
-              dfd.always(() => {
-                $target.modal('hide').remove();
-              });
-            })
-            .on('click.modal-form.close', '[data-dismiss="modal"]', () => {
-              $target.modal('hide').remove();
-            });
+          bindXHRToButton(dfd, $target.find('[data-dismiss="modal"]'));
+          bindXHRToButton(dfd, $target.find('[data-toggle="delete"]'));
+
+          dfd.always(() => {
+            $target.modal('hide').remove();
+          });
+        }).on('click.modal-form.close', '[data-dismiss="modal"]', () => {
+          $target.modal('hide').remove();
         });
+      });
     },
     onConfirm() {
       const instance = this.attr('instance');
