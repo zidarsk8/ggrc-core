@@ -45,7 +45,6 @@ blueprint = flask.Blueprint(
 )
 
 PERMISSION_CACHE_TIMEOUT = 3600  # 60 minutes
-PERMISSION_NAMESPACE = "permissions"
 
 
 def get_public_config(_):
@@ -142,30 +141,34 @@ def collect_permissions(src_permissions, context_id, permissions):
             })
 
 
-def query_memcache(key):
-  """Check if cached permissions are available
+def _get_memcache_client():
+  """Return memcache client if it's enabled, otherwise return None"""
+  if not cache_utils.has_memcache():
+    return None
+
+  return cache_utils.get_cache_manager().cache_object.memcache_client
+
+
+def query_memcache(cache, key):
+  """Get cached permissions from memcache is available
 
   Args:
+      cache (memcache client): mecahce client
       key (string): key of the stored permissions
   Returns:
-      cache (memcache_client): memcache client or None if caching
-                               is not available
       permissions_cache (dict): dict with all permissions or None if there
                                 was a cache miss
   """
-  if not getattr(settings, 'MEMCACHE_MECHANISM', False):
-    return None, None
 
-  cache = cache_utils.get_cache_manager().cache_object.memcache_client
   cached_keys_set = cache.get('permissions:list') or set()
   if key not in cached_keys_set:
     # We set the permissions:list variable so that we are able to batch
     # remove all permissions related keys from memcache
     cached_keys_set.add(key)
     cache.set('permissions:list', cached_keys_set, PERMISSION_CACHE_TIMEOUT)
-    return cache, None
+    return None
 
-  return cache, memcache.blob_get(cache, key, namespace=PERMISSION_NAMESPACE)
+  return memcache.blob_get(cache, key)
 
 
 def load_default_permissions(permissions):
@@ -388,6 +391,8 @@ def load_access_control_list(user, permissions):
 def store_results_into_memcache(permissions, cache, key):
   """Load personal context for user
 
+  This function must only be called if memcahe is enabled
+
   Args:
       permissions (dict): dict where the permissions will be stored
       cache (cache_manager): Cache manager that should be used for storing
@@ -396,8 +401,6 @@ def store_results_into_memcache(permissions, cache, key):
   Returns:
       None
   """
-  if cache is None:
-    return
 
   cached_keys_set = cache.get('permissions:list') or set()
   if key in cached_keys_set and \
@@ -406,9 +409,34 @@ def store_results_into_memcache(permissions, cache, key):
          key,
          permissions,
          exp_time=PERMISSION_CACHE_TIMEOUT,
-         namespace=PERMISSION_NAMESPACE,
      ):
     logger.error("Failed to set permissions data into memcache")
+
+
+def _load_permissions_from_database(user):
+  """Calculate permissions based on DB queries"""
+
+  permissions = {}
+
+  with benchmark("load_permissions > load default permissions"):
+    load_default_permissions(permissions)
+
+  with benchmark("load_permissions > load bootstrap admins"):
+    load_bootstrap_admin(user, permissions)
+
+  with benchmark("load_permissions > load external app permissions"):
+    load_external_app_permissions(permissions)
+
+  with benchmark("load_permissions > load user roles"):
+    load_user_roles(user, permissions)
+
+  with benchmark("load_permissions > load personal context"):
+    load_personal_context(user, permissions)
+
+  with benchmark("load_permissions > load access control list"):
+    load_access_control_list(user, permissions)
+
+  return permissions
 
 
 def load_permissions_for(user):
@@ -429,38 +457,27 @@ def load_permissions_for(user):
   'condition' is the string name of a conditional operator, such as 'contains'.
   'terms' are the arguments to the 'condition'.
   """
-  permissions = {}
   key = 'permissions:{}'.format(user.id)
 
+  # try to get cached permissions from memcahe
   with benchmark("load_permissions > query memcache"):
-    cache, result = query_memcache(key)
-    if result:
-      return result
+    cache = _get_memcache_client()
+    if cache:
+      result = query_memcache(cache, key)
+      if result:
+        return result
 
-  with benchmark("load_permissions > load default permissions"):
-    load_default_permissions(permissions)
+  # no permissions were stored in memcache for this user. Use DB to get perms
+  permissions = _load_permissions_from_database(user)
 
-  with benchmark("load_permissions > load bootstrap admins"):
-    load_bootstrap_admin(user, permissions)
-
-  with benchmark("load_permissions > load external app permissions"):
-    load_external_app_permissions(permissions)
-
-  with benchmark("load_permissions > load user roles"):
-    load_user_roles(user, permissions)
-
-  with benchmark("load_permissions > load personal context"):
-    load_personal_context(user, permissions)
-
-  with benchmark("load_permissions > load access control list"):
-    load_access_control_list(user, permissions)
-
+  # store calculated permissions into memcahe
   if not hasattr(flask.g, "referenced_object_stubs"):
     # In some cases for optimization we only load a small chunk of permissions
     # and in that case we can not cache the value because it might not contain
     # the permissions information for any subsequent request.
     with benchmark("load_permissions > store results into memcache"):
-      store_results_into_memcache(permissions, cache, key)
+      if cache:
+        store_results_into_memcache(permissions, cache, key)
 
   return permissions
 

@@ -12,7 +12,7 @@ from ggrc import login
 from ggrc import settings
 from ggrc.utils import benchmark
 from ggrc.utils import structures
-from ggrc.cache.memcache import MemCache
+from ggrc.cache.utils import clear_memcache
 from ggrc.converters import get_exportables
 from ggrc.converters import import_helper
 from ggrc.converters import base_block
@@ -125,10 +125,7 @@ class ImportConverter(BaseConverter):
 
   @classmethod
   def drop_cache(cls):
-    if not getattr(settings, 'MEMCACHE_MECHANISM', False):
-      return
-    memcache = MemCache()
-    memcache.clean()
+    clear_memcache()
 
 
 class ExportConverter(BaseConverter):
