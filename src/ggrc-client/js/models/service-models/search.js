@@ -4,6 +4,7 @@
 */
 
 export default can.Model.extend({
+  root_object: 'search',
   findOne: 'GET /search',
   init: function () {
     let _findOne;
