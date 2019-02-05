@@ -561,8 +561,7 @@ Mustache.registerHelper('dateTime', function (date) {
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
 let allowedActions = ['create', 'read', 'update', 'delete', '__GGRC_ADMIN__'];
-Mustache.registerHelper('is_allowed', function () {
-  let args = Array.prototype.slice.call(arguments, 0);
+Mustache.registerHelper('is_allowed', function (...args) {
   let actions = [];
   let resource;
   let resourceType;
@@ -573,7 +572,7 @@ Mustache.registerHelper('is_allowed', function () {
   let passed = true;
 
   // Resolve arguments
-  can.each(args, function (arg, i) {
+  args.forEach(function (arg, i) {
     while (typeof arg === 'function' && arg.isComputed) {
       arg = arg();
     }
@@ -619,7 +618,7 @@ Mustache.registerHelper('is_allowed', function () {
   }
 
   // Check permissions
-  can.each(actions, function (action) {
+  actions.forEach(function (action) {
     if (resource && Permission.is_allowed_for(action, resource)) {
       passed = true;
       return;
@@ -912,9 +911,8 @@ Mustache.registerHelper('urlPath', function () {
     conjunctions and disjunctions to one using a _.reduce(Array, function (Deferred, item) {}, $.when())
     pattern instead of _.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
-Mustache.registerHelper('if_helpers', function () {
-  let args = arguments;
-  let options = arguments[arguments.length - 1];
+Mustache.registerHelper('if_helpers', function (...args) {
+  let options = args[args.length - 1];
   let helperResult;
   let helperOptions = Object.assign({}, options, {
     fn: function () {
@@ -932,7 +930,7 @@ Mustache.registerHelper('if_helpers', function () {
   let disjunctions = [];
   let index = 0;
 
-  can.each(args, function (arg, i) {
+  args.forEach(function (arg, i) {
     if (i < args.length - 1) {
       if (typeof arg === 'string' && arg.match(/^\n\s*/)) {
         if (statement) {
@@ -1465,7 +1463,7 @@ Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
     parentInstance = Mustache.resolve(parentInstance);
   }
 
-  can.each(allRoles, (role) => {
+  allRoles.forEach((role) => {
     roles[role.id] = role;
   });
 

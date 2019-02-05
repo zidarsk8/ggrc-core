@@ -244,12 +244,22 @@ function getSnapshotItemQuery(instance, childId, childType) {
 
 /**
  * get snapshot counts
+ * @param {Array} widgets - available widgets names
  * @param {Object} instance - Object instance
- * @param {Array} data - Array of snapshot names
  * @return {Promise} Promise
  */
-function getSnapshotsCounts(instance) {
+function getSnapshotsCounts(widgets, instance) {
   let url = `${instance.selfLink}/snapshot_counts`;
+
+  let widgetsObject = widgets.filter((widget) => {
+    return isSnapshotRelated(instance.attr('type'), widget.name) ||
+      widget.isObjectVersion;
+  });
+
+  // return empty object as no widgets to update count
+  if (!widgetsObject.length) {
+    return $.Deferred().resolve({});
+  }
 
   const stopFn = tracker.start(
     tracker.FOCUS_AREAS.COUNTS,
@@ -259,7 +269,19 @@ function getSnapshotsCounts(instance) {
   return $.get(url)
     .then((counts) => {
       stopFn();
-      return counts;
+      let countsMap = {};
+      Object.keys(counts).forEach((name) => {
+        let widget = _.find(widgetsObject, (widgetObj) => {
+          return widgetObj.name === name;
+        });
+
+        if (widget) {
+          let countsName = widget.countsName || widget.name;
+          countsMap[countsName] = counts[name];
+        }
+      });
+
+      return countsMap;
     })
     .fail(() => {
       stopFn(true);

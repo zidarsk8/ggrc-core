@@ -104,7 +104,7 @@ export default TreeLoader({
       }
     });
     this.options.attr('child_options', this.options.child_options.slice(0));
-    can.each(this.options.child_options, function (options, i) {
+    _.forEach(this.options.child_options, function (options, i) {
       this.options.child_options.attr(i,
         new can.Map(Object.assign(options.attr(), allowed)));
     }.bind(this));
@@ -275,7 +275,7 @@ export default TreeLoader({
     v.attr('child_count', can.compute(function () {
       let totalChildren = 0;
       if (v.attr('child_options')) {
-        can.each(v.attr('child_options'), function (childCptions) {
+        _.forEach(v.attr('child_options'), function (childCptions) {
           let list = childCptions.attr('list');
           if (list) {
             totalChildren += list.attr('length');
@@ -311,7 +311,7 @@ export default TreeLoader({
     let that = this;
     let realAdd = [];
 
-    can.each(newVals, function (newVal) {
+    _.forEach(newVals, function (newVal) {
       if (that.element) {
         realAdd.push(newVal);
       }
@@ -345,7 +345,7 @@ export default TreeLoader({
     let BATCH = 200;
     let opId = this._add_child_lists_id = (this._add_child_lists_id || 0) + 1;
 
-    can.each(currentList, function (item) {
+    currentList.forEach(function (item) {
       listWindow.push(item);
       if (listWindow.length >= BATCH) {
         queue.push(listWindow);

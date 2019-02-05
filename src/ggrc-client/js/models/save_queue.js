@@ -55,7 +55,7 @@ export default can.Construct({
       dfd.always(function (data, type) {
         if (type === 'error') {
           stopFn(true);
-          can.each(objs, function (obj) {
+          objs.forEach(function (obj) {
             obj._dfd.reject(data);
           });
         }
@@ -63,7 +63,7 @@ export default can.Construct({
           stopFn(true);
           let task = data.background_task;
           // Resolve all the dfds with the task
-          can.each(objs, function (obj) {
+          objs.forEach(function (obj) {
             obj._dfd.resolve(task);
           });
         }
@@ -87,7 +87,7 @@ export default can.Construct({
   },
 
   _process_save_responses: function (bucket) {
-    can.each(bucket.save_responses, function (resp) {
+    bucket.save_responses.forEach(function (resp) {
       let objs = resp[0];
       let data = resp[1];
       let cb = function (single) {
@@ -96,7 +96,7 @@ export default can.Construct({
           return $.Deferred().resolve(this);
         };
       };
-      can.each(objs, function (obj, idx) {
+      _.forEach(objs, function (obj, idx) {
         let single = data[idx];
         // Add extra check to avoid possible exceptions
         single = Array.isArray(single) ? single : false;

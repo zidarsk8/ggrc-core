@@ -578,7 +578,7 @@ function registerModalHook(toggle, launchFn) {
 }
 
 $(function () {
-  can.each({
+  _.forEach({
     '': handlers.modal,
     form: handlers.form,
     deleteform: handlers.deleteform,

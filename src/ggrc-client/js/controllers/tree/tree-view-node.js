@@ -46,7 +46,7 @@ export default can.Control.extend({
     }
     if (opts instanceof can.Map) {
       this.options = opts;
-      can.each(this.constructor.defaults, function (v, k) {
+      _.forEach(this.constructor.defaults, function (v, k) {
         if (!that.options.hasOwnProperty(k)) {
           that.options.attr(k, v);
         }
@@ -157,7 +157,7 @@ export default can.Control.extend({
       originalChildList = [originalChildList];
     }
 
-    can.each(originalChildList, function (data, i) {
+    _.forEach(originalChildList, function (data, i) {
       let options = new can.Map();
       data.each(function (v, k) {
         options.attr(k, v);

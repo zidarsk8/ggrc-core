@@ -101,4 +101,15 @@ class IssueTrackedWithUrl(IssueTracked):
 
 class IssueTrackedWithConfig(IssueTracked):
   """Class that identifies IssueTracked models that have no url."""
-  pass
+  _aliases = {
+      "component_id": "Component ID",
+      "hotlist_id": "Hotlist ID",
+      "issue_priority": "Priority",
+      "issue_severity": "Severity",
+      "issue_type": "Issue Type",
+      "enabled": {
+          "display_name": "Ticket Tracker Integration",
+          "description": "Turn on integration with Ticket tracker, "
+                         "On / Off options are possible",
+      }
+  }

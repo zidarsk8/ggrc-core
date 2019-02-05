@@ -3,22 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../assessment-template-attributes';
+import Component from './assessment-template-attributes';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
 describe('assessment-template-attributes component', function () {
   describe('fieldRemoved() method', function () {
-    let method; // the method under test
     let viewModel;
     let remainingFields;
-    let $el;
-    let eventObj;
 
     beforeEach(function () {
       viewModel = getComponentVM(Component);
-      method = viewModel.fieldRemoved.bind(viewModel);
-      $el = $('<p></p>');
-      eventObj = $.Event('on-delete');
     });
 
     it('removes the deleted field from the fields list', function () {
@@ -31,7 +25,7 @@ describe('assessment-template-attributes component', function () {
       ];
       viewModel.attr('fields').replace(currentFields);
 
-      method(deletedField, $el, eventObj);
+      viewModel.fieldRemoved(deletedField);
 
       remainingFields = _.map(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'baz']);
@@ -47,7 +41,7 @@ describe('assessment-template-attributes component', function () {
       ];
       viewModel.attr('fields').replace(currentFields);
 
-      method(deletedField, $el, eventObj);
+      viewModel.fieldRemoved(deletedField);
 
       remainingFields = _.map(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'baz']);
@@ -65,7 +59,7 @@ describe('assessment-template-attributes component', function () {
 
       spyOn(console, 'warn');
 
-      method(deletedField, $el, eventObj);
+      viewModel.fieldRemoved(deletedField);
 
       remainingFields = _.map(viewModel.fields, 'title');
       expect(remainingFields).toEqual(['foo', 'bar', 'baz']);

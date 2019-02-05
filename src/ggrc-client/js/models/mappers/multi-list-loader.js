@@ -19,7 +19,7 @@ import Mappings from './mappings';
         binding.source_bindings = [];
       }
 
-      can.each(this.sources, function (source) {
+      _.forEach(this.sources, function (source) {
         let sourceBinding = Mappings.get_binding(source, binding.instance);
         if (source) {
           binding.source_bindings.push(sourceBinding);
@@ -46,7 +46,7 @@ import Mappings from './mappings';
       });
 
       sourceBinding.list.bind('remove', function (ev, results) {
-        can.each(results, function (result) {
+        _.forEach(results, function (result) {
           self.remove_instance(binding, result.instance, result);
         });
       });
@@ -54,7 +54,7 @@ import Mappings from './mappings';
     _refresh_stubs: function (binding) {
       let deferreds = [];
 
-      can.each(binding.source_bindings, function (sourceBinding) {
+      _.forEach(binding.source_bindings, function (sourceBinding) {
         deferreds.push(sourceBinding.refresh_stubs());
       });
 

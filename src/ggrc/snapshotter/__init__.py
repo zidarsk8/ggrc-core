@@ -29,7 +29,7 @@ from ggrc.snapshotter.helpers import create_snapshot_dict
 from ggrc.snapshotter.helpers import create_snapshot_revision_dict
 from ggrc.snapshotter.helpers import get_revisions
 from ggrc.snapshotter.helpers import get_snapshots
-from ggrc.snapshotter.indexer import reindex_pairs
+from ggrc.snapshotter import indexer
 
 from ggrc.snapshotter.rules import get_rules
 
@@ -47,6 +47,7 @@ class SnapshotGenerator(object):
     self.snapshots = dict()
     self.context_cache = dict()
     self.dry_run = dry_run
+    self.manual_snapshots = set()
 
   def add_parent(self, obj):
     """Add parent object and automatically scan neighborhood for snapshottable
@@ -60,6 +61,8 @@ class SnapshotGenerator(object):
           self.context_cache[key] = obj.context_id
           self.children = self.children | objs
           self.snapshots[key] = objs
+          if getattr(obj, "manual_snapshots", False):
+            self.manual_snapshots.add(key)
       return self.parents
 
   def add_family(self, parent, children):
@@ -145,7 +148,7 @@ class SnapshotGenerator(object):
                           revisions=revisions, _filter=_filter)
     updated = result.response
     if not self.dry_run:
-      reindex_pairs(updated)
+      indexer.reindex_pairs_bg(updated)
       self._copy_snapshot_relationships()
       self._create_audit_relationships()
     return result
@@ -268,9 +271,11 @@ class SnapshotGenerator(object):
 
     existing_scope = {Pair.from_4tuple(fields) for fields in query}
 
-    full_scope = {Pair(parent, child)
-                  for parent, children in self.snapshots.items()
-                  for child in children}
+    full_scope = set()
+    for parent, children in self.snapshots.items():
+      if parent not in self.manual_snapshots:
+        for child in children:
+          full_scope.add(Pair(parent, child))
 
     for_update = existing_scope
     for_create = full_scope - existing_scope
@@ -307,7 +312,7 @@ class SnapshotGenerator(object):
 
     to_reindex = updated | created
     if not self.dry_run:
-      reindex_pairs(to_reindex)
+      indexer.reindex_pairs_bg(to_reindex)
       self._remove_lost_snapshot_mappings()
       self._copy_snapshot_relationships()
       self._create_audit_relationships()
@@ -338,7 +343,7 @@ class SnapshotGenerator(object):
         revisions=revisions, _filter=_filter)
     created = result.response
     if not self.dry_run:
-      reindex_pairs(created)
+      indexer.reindex_pairs_bg(created)
       self._copy_snapshot_relationships()
       self._create_audit_relationships()
     return result

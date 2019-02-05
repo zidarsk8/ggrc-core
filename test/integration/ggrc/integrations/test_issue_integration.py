@@ -431,8 +431,11 @@ class TestIssueIntegration(ggrc.TestCase):
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_issue_tracker_error(self, update_issue_mock):
-    """Test that issue tracker does not change state
-       in case receiving an error."""
+    """Test issue tracker errors.
+
+    Issue in Issue tracker doesn't change state
+    in case receiving an error.
+    """
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
         issue_tracked_obj=factories.IssueFactory()

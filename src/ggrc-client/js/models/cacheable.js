@@ -223,7 +223,7 @@ export default can.Model('can.Model.Cacheable', {
     let that = this;
 
     if (staticProps.mixins) {
-      can.each(staticProps.mixins, function (mixin) {
+      _.forEach(staticProps.mixins, function (mixin) {
         mixin.add_to(that);
       });
       delete this.mixins;
@@ -431,6 +431,9 @@ export default can.Model('can.Model.Cacheable', {
         // "params" has valid ACL array.
         model.cleanupAcl();
       }
+
+      params = params.serialize ? params.serialize() : params;
+
       model.attr(params);
       model.updateCaObjects(params.custom_attribute_values);
     } else {
@@ -834,15 +837,3 @@ export default can.Model('can.Model.Cacheable', {
     return RefreshQueue.refresh_all(this, props, true);
   },
 });
-
-/* TODO: hack on can.Map should be removed or at least placed outside of Cacheable Model Class */
-let _oldAttr = can.Map.prototype.attr;
-can.Map.prototype.attr = function (key, val) {
-  if (key instanceof can.Map) {
-    if (arguments[0] === this) {
-      return this;
-    }
-    return _oldAttr.apply(this, [key.serialize()]);
-  }
-  return _oldAttr.apply(this, arguments);
-};

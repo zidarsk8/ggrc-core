@@ -124,7 +124,7 @@ export default can.Component.extend({
         return Revision.findAll(query);
       }.bind(this);
 
-      return can.when(
+      return $.when(
         findAll('resource'), findAll('source'), findAll('destination')
       ).then(function (objRevisions, mappingsSrc, mappingsDest) {
         // manually include people for modified_by since using __include would
@@ -457,7 +457,7 @@ export default can.Component.extend({
       diff.updatedAt = rev2.updated_at;
       diff.role = this._getRoleAtTime(madeByPersonId, rev2.updated_at);
 
-      can.each(rev2.content, function (value, fieldName) {
+      _.forEach(rev2.content, function (value, fieldName) {
         let origVal = rev1.content[fieldName];
         let displayName;
         let unifyValue = function (value) {

@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for CSV column definition tests."""
+# pylint: disable=too-many-lines
+
 from copy import deepcopy
 
 import ddt
@@ -385,6 +387,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Folder",
         "Last Deprecated Date",
+        "Component ID",
+        "Hotlist ID",
+        "Severity",
+        "Priority",
+        "Issue Type",
+        "Ticket Tracker Integration",
     }
     expected_fields = {
         "mandatory": {
@@ -419,6 +427,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Delete",
         "State",
+        "Component ID",
+        "Hotlist ID",
+        "Severity",
+        "Priority",
+        "Issue Type",
+        "Ticket Tracker Integration",
     }
     expected_fields = {
         "mandatory": {

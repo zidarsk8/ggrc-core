@@ -147,7 +147,7 @@ import RefreshQueue from '../refresh_queue';
 
       // These properties only exist if the user has read access
       if (binding.instance[objectJoinAttr]) {
-        can.each(binding.instance[objectJoinAttr].reify(), function (mapping) {
+        _.forEach(binding.instance[objectJoinAttr].reify(), function (mapping) {
           refreshQueue.enqueue(mapping);
         });
       }

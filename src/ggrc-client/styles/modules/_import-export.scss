@@ -291,6 +291,10 @@ $historyBlockWidth: 350px;
       padding: 20px 30px;
       border-bottom: 1px solid $itemBorder;
 
+      .btn-stop {
+        margin-left: 10px;
+      }
+
       &.disabled {
         @include opacity(0.5);
       }

@@ -145,7 +145,7 @@ describe('Mappings', function () {
 
   beforeAll(function () {
     // init all modules
-    can.each(widgetModules, function (module) {
+    widgetModules.forEach(function (module) {
       if (modules[module.name] && module.init_widgets) {
         module.init_widgets();
       }

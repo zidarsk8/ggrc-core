@@ -37,6 +37,11 @@ class AutomapperGenerator(object):
 
   COUNT_LIMIT = 10000
 
+  _AUTOMAP_WITHOUT_PERMISSION = [
+      {"Audit", "Issue"},
+      {"Snapshot", "Issue"},
+  ]
+
   def __init__(self):
     self.processed = set()
     self.queue = set()
@@ -63,7 +68,6 @@ class AutomapperGenerator(object):
 
   def generate_automappings(self, relationship):
     """Generate Automappings for a given relationship"""
-    # pylint: disable=protected-access
     self.auto_mappings = set()
 
     # initial relationship is special since it is already created and
@@ -78,12 +82,10 @@ class AutomapperGenerator(object):
         break
       src, dst = entry = self.queue.pop()
 
-      if {src.type, dst.type} != {"Audit", "Issue"}:
-        # Auditor doesn't have edit (+map) permission on the Audit,
-        # but the Auditor should be allowed to Raise an Issue.
-        # Since Issue-Assessment-Audit is the only rule that
-        # triggers Issue to Audit mapping, we should skip the
-        # permission check for it
+      if {src.type, dst.type} not in self._AUTOMAP_WITHOUT_PERMISSION:
+        # Mapping between some objects should be created even if there is no
+        # permission to edit (+map) this objects. Thus permissions check for
+        # them should be skipped.
         if not (permissions.is_allowed_update(src.type, src.id, None) and
                 permissions.is_allowed_update(dst.type, dst.id, None)):
           continue
@@ -245,7 +247,7 @@ class AutomapperGenerator(object):
 
 def register_automapping_listeners():
   """Register event listeners for auto mapper."""
-  # pylint: disable=unused-variable,unused-argument
+  # pylint: disable=unused-variable,unused-argument,protected-access
 
   def automap(session, _):
     """Automap after_flush handler."""

@@ -132,9 +132,9 @@ export default can.Component.extend({
       let result;
 
       if (cached.length === 2) {
-        result = can.when(cached);
+        result = $.when(cached);
       } else if (cached.length === 1) {
-        result = can.when(cached[0], Revision.findOne({id: notCached[0]}))
+        result = $.when(cached[0], Revision.findOne({id: notCached[0]}))
           .then(function () {
             return can.makeArray(arguments);
           });

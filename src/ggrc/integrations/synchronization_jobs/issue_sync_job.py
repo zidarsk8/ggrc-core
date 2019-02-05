@@ -95,7 +95,7 @@ def sync_statuses(issuetracker_state, sync_object):
 def sync_due_date(custom_fields, sync_object):
   """Sync issue object due date."""
   issue_tracker_due_date = custom_fields.get(
-      constants.CUSTOM_FIELDS_DUE_DATE
+      constants.CustomFields.DUE_DATE
   )
   date_format = "%Y-%m-%d"
 
@@ -111,8 +111,7 @@ def sync_issue_attributes():
   Synchronize issue status and email list (Primary contacts and Admins).
   """
   issuetracker_issues = sync_utils.collect_issue_tracker_info(
-      "Issue",
-      include_object=True
+      "Issue"
   )
 
   if not issuetracker_issues:
@@ -127,8 +126,7 @@ def sync_issue_attributes():
   ).first()
 
   processed_ids = set()
-  for batch in sync_utils.iter_issue_batches(issuetracker_issues.keys(),
-                                             include_emails=True):
+  for batch in sync_utils.iter_issue_batches(issuetracker_issues.keys()):
     for issue_id, issuetracker_state in batch.iteritems():
       issue_id = str(issue_id)
       issue_info = issuetracker_issues.get(issue_id)
@@ -146,7 +144,7 @@ def sync_issue_attributes():
       sync_verifier_email(issuetracker_state, sync_object, admin_role)
 
       custom_fields = {
-          constants.CUSTOM_FIELDS_DUE_DATE: sync_utils.parse_due_date(
+          constants.CustomFields.DUE_DATE: sync_utils.parse_due_date(
               issuetracker_state.get("custom_fields", [])
           )
       }

@@ -100,7 +100,7 @@ export default can.Component.extend({
 
       this.attr('isSaving', true);
 
-      can.when(...reusedObjectList).always(() => {
+      $.when(...reusedObjectList).always(() => {
         this.attr('selectedEvidences').replace([]);
         this.attr('isSaving', false);
         this.dispatch('afterObjectReused');

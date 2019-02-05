@@ -93,6 +93,6 @@ class TestDataHandler(TestCase):
     db.session.commit()
     get_cycle_task_dict(cycle_task)
     logger.warning.assert_called_once_with(
-        "Unmapped %s id %s from CycleTask id % has no revisions logged. ",
+        "Unmapped %s id %s from CycleTask id %s has no revisions logged. ",
         "Contract", contract.id, cycle_task.id
     )

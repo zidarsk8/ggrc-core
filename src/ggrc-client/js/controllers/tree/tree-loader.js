@@ -198,7 +198,8 @@ export default can.Control.extend({
 
     if (this.options.attr('is_subtree')) {
       // Check the list of items to be inserted for any duplicate items.
-      can.each(this.options.list || [], function (item) {
+
+      _.forEach(this.options.list, function (item) {
         idMap[item.instance.type + item.instance.id] = true;
       });
       toInsert = _.filter(items, function (item) {
@@ -208,7 +209,7 @@ export default can.Control.extend({
       toInsert = items;
     }
 
-    can.each(toInsert, function (item) {
+    _.forEach(toInsert, function (item) {
       let prepped = that.prepare_child_options(item, forcePrepareChildren);
       // Should we skip items without selfLink?
       if (prepped.instance.selfLink) {

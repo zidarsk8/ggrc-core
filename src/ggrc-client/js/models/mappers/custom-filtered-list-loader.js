@@ -81,7 +81,7 @@ import Mappings from './mappings';
         });
 
         binding.source_binding.list.bind('remove', function (ev, results) {
-          can.each(results, function (result) {
+          _.forEach(results, function (result) {
             self.remove_instance(binding, result.instance, result);
           });
         });

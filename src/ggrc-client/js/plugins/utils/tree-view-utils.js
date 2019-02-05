@@ -469,12 +469,12 @@ function loadItemsForSubTier(models, type, id, filter) {
         return batchRequests(params);
       });
 
-      resultDfd = can.when(...dfds).promise();
+      resultDfd = $.when(...dfds).promise();
 
       if (!related.initialized) {
         mappedDfd = initMappedInstances();
 
-        return can.when(mappedDfd, dfds).then(function () {
+        return $.when(mappedDfd, dfds).then(function () {
           return resultDfd;
         });
       }
@@ -627,7 +627,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
         });
     }
 
-    result = can.when(...countQuery.map((query) => batchRequests(query)))
+    result = $.when(...countQuery.map((query) => batchRequests(query)))
       .then((...response) => {
         let total = 0;
         let showMore = models.some(function (model, index) {

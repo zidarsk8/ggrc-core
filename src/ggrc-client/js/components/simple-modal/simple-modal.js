@@ -51,6 +51,9 @@ export default can.Component.extend({
       viewModel.attr('modalWrapper', modalWrapper);
       viewModel.showHideModal(viewModel.attr('state.open'));
     },
+    removed() {
+      this.viewModel.hide();
+    },
     '{viewModel.state} open'(state, ev, newValue) {
       this.viewModel.showHideModal(newValue);
     },

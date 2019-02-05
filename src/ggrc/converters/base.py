@@ -4,6 +4,7 @@
 """Base objects for csv file converters."""
 
 from collections import defaultdict
+
 from flask import g
 from google.appengine.ext import deferred
 

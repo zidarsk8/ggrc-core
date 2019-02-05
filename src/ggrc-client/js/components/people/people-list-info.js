@@ -5,7 +5,7 @@
 
 import template from './people-list-info.mustache';
 import '../../models/service-models/role';
-import PersonProfile from '../../models/service-models/person-profile';
+import {loadPersonProfile} from '../../plugins/utils/user-utils';
 
 let viewModel = can.Map.extend({
   instance: null,
@@ -36,10 +36,7 @@ let viewModel = can.Map.extend({
     this.attr('isRefreshed', true);
   },
   async loadPersonProfile() {
-    const profile = await PersonProfile.findOne({
-      id: this.attr('instance.profile.id'),
-    });
-    this.attr('profile', profile);
+    this.attr('profile', await loadPersonProfile(this.attr('instance')));
   },
 });
 

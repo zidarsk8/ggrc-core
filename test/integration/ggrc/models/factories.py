@@ -125,6 +125,7 @@ class ControlFactory(TitledFactory):
   class Meta:
     model = all_models.Control
 
+  assertions = factory.LazyAttribute(lambda m: [ControlAssertionFactory(), ])
   directive = factory.LazyAttribute(lambda m: RegulationFactory())
   recipients = ""
 
@@ -150,6 +151,18 @@ class AssessmentFactory(TitledFactory):
     model = all_models.Assessment
 
   audit = factory.LazyAttribute(lambda m: AuditFactory())
+
+
+class ControlAssertionFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.ControlAssertion
+
+  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
+  lft = None
+  rgt = None
+  depth = None
+  required = None
 
 
 class ControlCategoryFactory(ModelFactory):
@@ -536,6 +549,18 @@ class ImportExportFactory(ModelFactory):
     """Stub to disable parent method"""
 
 
+class BackgroundTaskFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.BackgroundTask
+
+
+class BackgroundOperationFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.BackgroundOperation
+
+
 class MetricFactory(TitledFactory):
 
   class Meta:
@@ -552,6 +577,36 @@ class CalendarEventFactory(TitledFactory):
 
   class Meta:
     model = all_models.CalendarEvent
+
+
+class RevisionFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.Revision
+
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Fix context related_object when audit is created"""
+    kwargs["action"] = kwargs.get("action", "created")
+    kwargs["content"] = kwargs.get("content", {})
+    kwargs["modified_by_id"] = kwargs.get(
+        "modified_by_id", PersonFactory().id
+    )
+    kwargs["obj"] = kwargs.get("obj", ControlFactory())
+
+    event = EventFactory(
+        modified_by_id=kwargs["modified_by_id"],
+        action="POST",
+        resource_id=kwargs["obj"].id,
+        resource_type=kwargs["obj"].__class__.__name__,
+    )
+
+    rev = target_class(*args, **kwargs)
+    rev.event_id = event.id
+    db.session.add(rev)
+    if getattr(db.session, "single_commit", True):
+      db.session.commit()
+    return rev
 
 
 def get_model_factory(model_name):
@@ -597,6 +652,7 @@ def get_model_factory(model_name):
       "Requirement": RequirementFactory,
       "Risk": RiskFactory,
       "Review": ReviewFactory,
+      "Revision": RevisionFactory,
       "RiskAssessment": RiskAssessmentFactory,
       "Standard": StandardFactory,
       "System": SystemFactory,

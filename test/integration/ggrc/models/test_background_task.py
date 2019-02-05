@@ -4,7 +4,6 @@
 """Tests for background_task model."""
 from integration.ggrc import api_helper
 from integration.ggrc import TestCase
-from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
 
 
@@ -14,24 +13,15 @@ class TestBackgroundTask(TestCase):
   def setUp(self):
     """setUp, nothing else to add."""
     super(TestBackgroundTask, self).setUp()
+    self.object_generator = ObjectGenerator()
     self.api = api_helper.Api()
 
   def test_bg_task_from_post(self):
     """Test filtering of GET response for BackgroundTask"""
     from ggrc.models import all_models
 
-    control_dict = {
-        "control": {
-            "title": "Control title",
-            "context": None,
-        },
-    }
-    response = self.api.send_request(
-        self.api.client.post,
-        all_models.Control,
-        control_dict,
-        {"X-GGRC-BackgroundTask": "true"},
-    )
+    response, _ = self.object_generator.generate_object(
+        all_models.Control, with_background_tasks=True)
     self.assertEqual(response.status_code, 201)
     bg_tasks = all_models.BackgroundTask.query.filter(
         all_models.BackgroundTask.name.like("%POST%")).all()
@@ -58,7 +48,6 @@ class TestPermissions(TestCase):
 
   def setUp(self):
     super(TestPermissions, self).setUp()
-    self.generator = Generator()
     self.api = api_helper.Api()
     self.object_generator = ObjectGenerator()
     self.init_users()
@@ -78,18 +67,8 @@ class TestPermissions(TestCase):
     """Only admin can use admin requirement"""
     from ggrc.models import all_models
 
-    control_dict = {
-        "control": {
-            "title": "Control title",
-            "context": None,
-        },
-    }
-    response = self.api.send_request(
-        self.api.client.post,
-        all_models.Control,
-        control_dict,
-        {"X-GGRC-BackgroundTask": "true"},
-    )
+    response, _ = self.object_generator.generate_object(
+        all_models.Control, with_background_tasks=True)
     self.assertEqual(response.status_code, 201)
 
     for role in ("reader", "creator", "admin"):

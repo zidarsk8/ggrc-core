@@ -64,7 +64,9 @@ export default can.Component.extend({
     },
     setRelevant: function () {
       this.viewModel.attr('relevant').replace([]);
-      can.each(this.viewModel.attr('relevantTo') || [], function (item) {
+
+      const relevantTo = this.viewModel.attr('relevantTo') || [];
+      _.forEach(relevantTo, function (item) {
         let model = new businessModels[item.type](item);
         this.viewModel.attr('relevant').push({
           readOnly: item.readOnly,

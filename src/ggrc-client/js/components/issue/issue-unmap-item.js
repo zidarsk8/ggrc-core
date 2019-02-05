@@ -75,7 +75,7 @@ export default can.Component.extend({
       const auditsQuery = this.buildQuery('Audit');
 
       this.attr('isLoading', true);
-      return can.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
+      return $.when(batchRequests(snapshotsQuery), batchRequests(auditsQuery))
         .done((snapshotsResponse, auditsResponse) => {
           const snapshots = snapshotsResponse.Snapshot;
           const audits = auditsResponse.Audit;
@@ -129,8 +129,6 @@ export default can.Component.extend({
         await relationship.unmap(true);
         if (currentObject === this.attr('issueInstance')) {
           navigate(this.attr('issueInstance.viewLink'));
-        } else {
-          this.attr('modalState.open', false);
         }
       } catch (error) {
         notifier('error', 'There was a problem with unmapping.');

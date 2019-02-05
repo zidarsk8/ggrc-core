@@ -38,6 +38,26 @@ class TestControlsImport(TestCase):
     self.assertEqual(control.documents_reference_url[0].link,
                      "https://img_123.jpg")
 
+  def test_import_controls_no_assertions(self):
+    """Test controls can not be imported without Assertions."""
+    response = self.import_file("controls_no_assertions.csv", safe=False)
+    expected_errors = {
+        "Control": {
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(
+                    line=7,
+                    column_name="Assertions"
+                ),
+                errors.MISSING_VALUE_ERROR.format(
+                    line=8,
+                    column_name="Assertions"
+                )
+            },
+        },
+    }
+    self._check_csv_response(response, expected_errors)
+    self.assertEqual(all_models.Control.query.count(), 0)
+
   def test_add_admin_to_document(self):
     """Test evidence should have current user as admin"""
     control = factories.ControlFactory()
@@ -385,7 +405,9 @@ class TestControlsImport(TestCase):
   def test_add_person_revision(self):
     """Test Control revision created if new person is assigned in import."""
     user = all_models.Person.query.filter_by(email="user@example.com").first()
-    control = factories.ControlFactory(modified_by=user)
+    with factories.single_commit():
+      control = factories.ControlFactory(modified_by=user)
+      objective = factories.ObjectiveFactory()
 
     revisions = db.session.query(all_models.Revision.action).filter_by(
         resource_type=control.type,
@@ -399,6 +421,7 @@ class TestControlsImport(TestCase):
         ("Admin", "user@example.com"),
         ("Control Operators", "user@example.com"),
         ("Control Owners", "user@example.com"),
+        ("Map:Objective", objective.slug),
     ]))
     self._check_csv_response(response, {})
     self.assertEqual(revisions.all(), [('created',), ('modified',)])
@@ -408,6 +431,7 @@ class TestControlsImport(TestCase):
     user = all_models.Person.query.filter_by(email="user@example.com").first()
     with factories.single_commit():
       control = factories.ControlFactory(modified_by=user)
+      objective = factories.ObjectiveFactory()
       person = factories.PersonFactory()
       for role_name in ("Admin", "Control Operators", "Control Owners"):
         control.add_person_with_role(person, role_name)
@@ -423,6 +447,7 @@ class TestControlsImport(TestCase):
         ("Code*", control.slug),
         ("Control Operators", "user@example.com"),
         ("Control Owners", "user@example.com"),
+        ("Map:Objective", objective.slug),
     ]))
     self._check_csv_response(response, {})
     self.assertEqual(revisions.all(), [('created',), ('modified',)])

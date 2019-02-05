@@ -101,6 +101,10 @@ class TestExternalPermissions(TestCase):
     if model_plural == "risks":
       model_data["risk_type"] = "some text"
 
+    if model_plural == "controls":
+      assertion = factories.ControlAssertionFactory()
+      model_data["assertions"] = [{"id": assertion.id}]
+
     response = self._post(
         "api/{}".format(model_plural),
         data=json.dumps({

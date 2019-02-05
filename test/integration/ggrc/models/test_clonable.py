@@ -318,23 +318,21 @@ class TestClonable(SnapshotterBaseTestCase):
     asmt_id = asmt.id
     audit = asmt.audit
     audit_id = audit.id
-    self.api.modify_object(audit, {
+    issue_payload = {
         "issue_tracker": {
             "enabled": True,
             "component_id": "11111",
             "hotlist_id": "222222",
         },
-    })
+    }
+    self.api.modify_object(audit, issue_payload)
     asmt = db.session.query(models.Assessment).get(asmt_id)
-    with patch.object(assessment_integration, '_is_issue_tracker_enabled',
-                      return_value=True):
-      self.api.modify_object(asmt, {
-          "issue_tracker": {
-              "enabled": True,
-              "component_id": "11111",
-              "hotlist_id": "222222",
-          },
-      })
+    with patch.object(
+        assessment_integration.AssessmentTrackerHandler,
+        '_is_tracker_enabled',
+        return_value=True
+    ):
+      self.api.modify_object(asmt, issue_payload)
 
     audit = db.session.query(models.Audit).get(audit_id)
     self.clone_audit(audit)

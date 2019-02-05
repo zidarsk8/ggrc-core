@@ -6,7 +6,8 @@
 import logging
 import datetime
 
-from ggrc.integrations import issues, integrations_errors, constants
+from ggrc.models.hooks.issue_tracker import assessment_integration
+from ggrc.integrations import integrations_errors, constants
 from ggrc.integrations.synchronization_jobs import sync_utils
 
 logger = logging.getLogger(__name__)
@@ -39,10 +40,10 @@ def _get_due_date(assessment_state):
   due_date = assessment_state["due_date"]
   if due_date is not None:
     return {
-        "name": constants.CUSTOM_FIELDS_DUE_DATE,
+        "name": constants.CustomFields.DUE_DATE,
         "value": due_date.strftime("%Y-%m-%d"),
         "type": "DATE",
-        "display_string": constants.CUSTOM_FIELDS_DUE_DATE,
+        "display_string": constants.CustomFields.DUE_DATE,
     }
   return None
 
@@ -279,16 +280,19 @@ def sync_assessment_attributes():  # noqa
   updates their statuses in accordance to the corresponding Assessments
   if differ.
   """
+  logger.error(
+      "Assessment synchronization start: %s",
+      datetime.datetime.utcnow()
+  )
   assessment_issues = sync_utils.collect_issue_tracker_info(
-      "Assessment",
-      include_ccs=True
+      "Assessment"
   )
   if not assessment_issues:
     return
-  logger.debug("Syncing state of %d issues.", len(assessment_issues))
+  logger.error("Syncing state of %d issues.", len(assessment_issues))
 
-  cli = issues.Client()
   processed_ids = set()
+  tracker_handler = assessment_integration.AssessmentTrackerHandler()
   for batch in sync_utils.iter_issue_batches(assessment_issues.keys()):
     for issue_id, issuetracker_state in batch.iteritems():
       issue_id, issue_info = _get_issue_info_by_issue_id(
@@ -301,18 +305,22 @@ def sync_assessment_attributes():  # noqa
         )
         continue
 
-      object_id = issue_info["object_id"]
       processed_ids.add(issue_id)
-      issue_payload = _prepare_issue_payload(issue_info)
 
-      if not _is_need_synchronize_issue(
-          object_id,
-          issue_payload,
-          issuetracker_state
-      ):
+      try:
+        tracker_handler.handle_assessment_sync(
+            issue_info,
+            issue_id,
+            issuetracker_state
+        )
+      except Exception as ex:  # pylint: disable=broad-except
+        logger.error(
+            "Unhandled synchronization error: %s %s %s",
+            issue_id,
+            issue_info,
+            ex
+        )
         continue
 
-      _update_issue(cli, issue_id, object_id, issue_payload)
-
-  logger.debug("Sync is done, %d issue(s) were processed.", len(processed_ids))
+  logger.error("Sync is done, %d issue(s) were processed.", len(processed_ids))
   _check_missing_ids(assessment_issues, processed_ids)

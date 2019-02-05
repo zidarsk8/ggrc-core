@@ -4,10 +4,10 @@
 */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../assessment_templates';
+import Component from './assessment-templates-dropdown';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
-describe('assessment-templates component', () => {
+describe('assessment-templates-dropdown component', () => {
   let viewModel;
 
   beforeAll(() => {

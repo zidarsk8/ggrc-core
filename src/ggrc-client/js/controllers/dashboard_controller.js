@@ -44,7 +44,7 @@ const Dashboard = can.Control({
 
     validModels = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
     // only change the display list
-    can.each(validModels, function (mName) {
+    validModels.forEach( function (mName) {
       savedChildTreeDisplayList = getChildTreeDisplayList(mName);
       if (savedChildTreeDisplayList !== null) {
         TreeViewConfig.attr('sub_tree_for').attr(mName + '.display_list',
@@ -104,7 +104,7 @@ const Dashboard = can.Control({
   },
 
   init_default_widgets: function () {
-    can.each(this.options.default_widgets, function (name) {
+    _.forEach(this.options.default_widgets, function (name) {
       let descriptor = this.options.widget_descriptors[name];
       this.add_dashboard_widget_from_descriptor(descriptor);
     }.bind(this));
@@ -138,7 +138,7 @@ const Dashboard = can.Control({
     return this.element.find('.widget-area');
   },
 
-  add_widget_from_descriptor: function () {
+  add_widget_from_descriptor: function (...args) {
     let descriptor = {};
     let that = this;
     let $element;
@@ -147,7 +147,7 @@ const Dashboard = can.Control({
     let $lastWidget;
 
     // Construct the final descriptor from one or more arguments
-    can.each(arguments, function (nameOrDescriptor) {
+    args.forEach(function (nameOrDescriptor) {
       if (typeof (nameOrDescriptor) === 'string') {
         nameOrDescriptor =
           that.options.widget_descriptors[nameOrDescriptor];

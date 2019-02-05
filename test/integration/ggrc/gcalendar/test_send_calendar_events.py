@@ -12,6 +12,8 @@ from ggrc.notifications import common
 from integration.ggrc.gcalendar import BaseCalendarEventTest
 
 
+@mock.patch("ggrc.gcalendar.calendar_api_service"
+            ".CalendarApiService.calendar_auth")
 class TestSendCalendarEvents(BaseCalendarEventTest):
   """Test calendar events builder class."""
 
@@ -20,8 +22,6 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
     super(TestSendCalendarEvents, self).setUp()
     self.client.get("/login")
 
-  @mock.patch("ggrc.gcalendar.calendar_api_service"
-              ".CalendarApiService.calendar_auth")
   def test_rebuild_existing_event(self, _):
     """Test rebuild of existing synced Calendar Event."""
     person, task, event = self.setup_person_task_event(date(2015, 1, 5))
@@ -32,8 +32,6 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
     self.assertIsNotNone(event)
     self.assertIsNotNone(self.get_relationship(task.id, event.id))
 
-  @mock.patch("ggrc.gcalendar.calendar_api_service"
-              ".CalendarApiService.calendar_auth")
   def test_event_change_date(self, _):
     """Test rebuild calendar event with changed date."""
     person, task, event = self.setup_person_task_event(date(2015, 1, 5))
@@ -47,8 +45,6 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
     self.assertIsNotNone(event)
     self.assertIsNotNone(self.get_relationship(task.id, event.id))
 
-  @mock.patch("ggrc.gcalendar.calendar_api_service"
-              ".CalendarApiService.calendar_auth")
   def test_create_event_without_send(self, _):
     """Test creation of event."""
     person, task, event = self.setup_person_task_event(date(2015, 1, 5))

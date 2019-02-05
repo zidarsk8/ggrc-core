@@ -451,9 +451,22 @@ class Resource(ModelView):
           logger.exception(err)
           message = translate_message(err)
           raise BadRequest(message)
+        except HTTPException as error:
+          logger.exception(error)
+          code = error.code or 500
+          # Since HTTPException may have both 4xx or 5xx codes
+          alternative_message = ggrc_errors.INTERNAL_SERVER_ERROR
+          if code < 500:
+            alternative_message = ggrc_errors.BAD_REQUEST_MESSAGE
+          message = error.description or alternative_message
+          return current_app.make_response((
+              json.dumps({"message": message, "code": code}),
+              code,
+              [("Content-Type", "application/json")],
+          ))
         except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
-          err.message = ggrc_errors.BAD_REQUEST_MESSAGE
+          err.message = ggrc_errors.INTERNAL_SERVER_ERROR
           raise
         finally:
           # When running integration tests, cache sometimes does not clear

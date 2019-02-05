@@ -647,6 +647,7 @@ def dashboard():
   return flask.render_template(
       "dashboard/index.haml",
       page_type="MY_WORK",
+      page_title="My Work",
   )
 
 
@@ -658,6 +659,7 @@ def object_browser():
   return flask.render_template(
       "dashboard/index.haml",
       page_type="ALL_OBJECTS",
+      page_title="All Objects",
   )
 
 

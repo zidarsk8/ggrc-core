@@ -6,7 +6,7 @@
 # this module will be refactored in the future when we will merge two sync
 # mechanisms into generic one
 
-import collections
+import datetime
 import itertools
 import logging
 import urlparse
@@ -14,20 +14,17 @@ import html2text
 
 import sqlalchemy as sa
 
-from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
-    ASSESSMENT_STATUSES_MAPPING
-from ggrc import access_control
 from ggrc import db
 from ggrc import utils
-from ggrc import settings
 from ggrc.models import all_models
 from ggrc.integrations import issues, constants
 from ggrc.integrations import integrations_errors
+from ggrc.integrations.synchronization_jobs import sync_utils
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import common_handlers
+from ggrc.models import exceptions
 
 from ggrc.rbac import permissions
-from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
@@ -35,1114 +32,2581 @@ from ggrc.utils import referenced_objects
 logger = logging.getLogger(__name__)
 
 
-_ISSUE_TRACKER_ENABLED = bool(settings.ISSUE_TRACKER_ENABLED)
-if not _ISSUE_TRACKER_ENABLED:
-  logger.debug('IssueTracker integration is disabled.')
+class AssessmentTrackerHandler(object):
+  """Module that used for integration Assessment with IssueTracker.
 
-_ASSESSMENT_MODEL_NAME = 'Assessment'
-_ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
-_AUDIT_MODEL_NAME = 'Audit'
+  Include all necessary validators, builders and handlers
+  """
 
-_SUPPORTED_MODEL_NAMES = {
-    _ASSESSMENT_TMPL_MODEL_NAME,
-    _AUDIT_MODEL_NAME,
-}
+  def __init__(self):
+    self._client = issues.Client()
 
-# mapping of model field name to API property name
-_ISSUE_TRACKER_UPDATE_FIELDS = (
-    ('title', 'title'),
-    ('issue_priority', 'priority'),
-    ('issue_severity', 'severity'),
-    ('component_id', 'component_id'),
-)
+  @staticmethod
+  def _validate_integer_fields(issue_info):
+    """Validate integer fields for issue.
 
-_INITIAL_COMMENT_TMPL = (
-    'This bug was auto-generated to track a GGRC assessment (a.k.a PBC Item). '
-    'Use the following link to find the assessment - %s.'
-)
+    Args:
+        issue_info: dictionary with issue
+        payload information
+    """
+    # Component ID
+    try:
+      component_id = issue_info["component_id"]
+    except KeyError:
+      raise exceptions.ValidationError("Component ID is mandatory.")
+    else:
+      try:
+        int(component_id)
+      except (ValueError, TypeError):
+        raise exceptions.ValidationError("Component ID must be a number.")
 
-_LINK_COMMENT_TMPL = (
-    'This bug was linked to a GGRC assessment (a.k.a PBC Item). Use the '
-    'following link to find the assessment - %s'
-)
+    # Hotlist ID
+    hotlist_id = issue_info.get("hotlist_id", "")
+    if hotlist_id:
+      try:
+        int(hotlist_id)
+      except ValueError:
+        raise exceptions.ValidationError("Hotlist ID must be a number.")
 
-_STATUS_CHANGE_COMMENT_TMPL = (
-    'The status of this bug was automatically synced to reflect current GGRC '
-    'assessment status. Current status of related GGRC Assessment is %s. '
-    'Use the following to link to get information from the GGRC Assessment '
-    'on why the status may have changed. '
-    'Link - %s'
-)
+  @staticmethod
+  def _validate_string_fields(issue_info):
+    """Validate string fields for issue.
 
-_ARCHIVED_TMPL = (
-    'Assessment has been archived. Changes to this GGRC Assessment will '
-    'not be tracked within this bug until Assessment is unlocked.'
-)
+    Args:
+        issue_info: dictionary with issue
+        payload information
+    """
+    # Ticket Type
+    try:
+      issue_type = issue_info["issue_type"]
+    except KeyError:
+      raise exceptions.ValidationError("Ticket Type is mandatory.")
+    else:
+      if not issue_type.strip():
+        raise exceptions.ValidationError("Ticket Type can not be blank.")
 
-_UNARCHIVED_TMPL = (
-    'Assessment has been unarchived. Changes to this GGRC Assessment will '
-    'be tracked within this bug.'
-)
+    # Ticket Priority
+    try:
+      issue_priority = issue_info["issue_priority"]
+    except KeyError:
+      raise exceptions.ValidationError("Ticket Priority is mandatory.")
+    else:
+      if issue_priority not in constants.AVAILABLE_PRIORITIES:
+        raise exceptions.ValidationError("Ticket Priority is incorrect.")
 
-_ENABLED_TMPL = (
-    'Changes to this GGRC Assessment will be tracked within this bug.'
-)
+    # Ticket Severity
+    try:
+      issue_severity = issue_info["issue_severity"]
+    except KeyError:
+      raise exceptions.ValidationError("Ticket Severity is mandatory.")
+    else:
+      if issue_severity not in constants.AVAILABLE_SEVERITIES:
+        raise exceptions.ValidationError("Ticket Severity is incorrect.")
 
-_DISABLED_TMPL = (
-    'Changes to this GGRC Assessment will no longer be '
-    'tracked within this bug.'
-)
+  @classmethod
+  def _validate_generic_fields(cls, issue_info):
+    """Validate generic fields for issue.
 
+    Args:
+        issue_info: dictionary with issue payload information
+    """
+    cls._validate_integer_fields(issue_info)
+    cls._validate_string_fields(issue_info)
 
-# Status transitions map for assessment without verifier.
-_NO_VERIFIER_STATUSES = {
-    # (from_status, to_status): 'issue_tracker_status'
-    ('Not Started', 'Completed'): 'VERIFIED',
-    ('In Progress', 'Completed'): 'VERIFIED',
+  def _validate_assessment_fields(self, issue_info):
+    """Validate assessment fields for issue
 
-    ('Completed', 'In Progress'): 'ASSIGNED',
-    ('Deprecated', 'In Progress'): 'ASSIGNED',
+      Args:
+          issue_info: dictionary with issue payload information
+    """
+    self._validate_generic_fields(issue_info)
 
-    ('Completed', 'Not Started'): 'ASSIGNED',
-    ('Deprecated', 'Not Started'): 'ASSIGNED',
+    # Title
+    try:
+      title = issue_info["title"]
+    except KeyError:
+      raise exceptions.ValidationError("Title is mandatory.")
+    else:
+      if not title.strip():
+        raise exceptions.ValidationError("Title can not be blank.")
 
-    ('Not Started', 'Deprecated'): 'OBSOLETE',
-    ('In Progress', 'Deprecated'): 'OBSOLETE',
-    ('Completed', 'Deprecated'): 'OBSOLETE',
-}
+  @classmethod
+  def prepare_issue_json(cls, assessment, issue_tracker_info=None,
+                         create_issuetracker=False):
+    """Prepare parameters for issue create in bulk mode.
 
-# Status transitions map for assessment with verifier.
-_VERIFIER_STATUSES = {
-    # (from_status, to_status, verified): 'issue_tracker_status'
-    # When verified is True 'Completed' means 'Completed and Verified'.
+    Args:
+      assessment: Instance of Assessment.
+      issue_tracker_info: Dict with IssueTracker info.
+      create_issuetracker: Bool indicator for crate issuetracker state.
+    Returns:
+        Dict with IssueTracker issue info.
+    """
+    del create_issuetracker  # Unused
 
-    # State: FIXED
-    ('Not Started', 'In Review', False): 'FIXED',
-    ('In Progress', 'In Review', False): 'FIXED',
-    ('Rework Needed', 'In Review', False): 'FIXED',
-    ('Completed', 'In Review', True): 'FIXED',
-    ('Deprecated', 'In Review', False): 'FIXED',
-
-    # State: ASSIGNED
-    ('In Review', 'In Progress', False): 'ASSIGNED',
-    # if gets from Completed and Verified to In Progress, can not be verified
-    ('Completed', 'In Progress', False): 'ASSIGNED',
-    ('Deprecated', 'In Progress', False): 'ASSIGNED',
-
-    # State: ASSIGNED
-    ('In Review', 'Rework Needed', False): 'ASSIGNED',
-    ('Completed', 'Rework Needed', True): 'ASSIGNED',
-    ('Deprecated', 'Rework Needed', False): 'ASSIGNED',
-
-    # State: FIXED (Verified)
-    ('Not Started', 'Completed', True): 'VERIFIED',
-    ('In Progress', 'Completed', True): 'VERIFIED',
-    ('In Review', 'Completed', True): 'VERIFIED',
-    ('Rework Needed', 'Completed', True): 'VERIFIED',
-    ('Deprecated', 'Completed', True): 'VERIFIED',
-
-    # State: ASSIGNED
-    ('In Review', 'Not Started', False): 'ASSIGNED',
-    ('Rework Needed', 'Not Started', False): 'ASSIGNED',
-    ('Completed', 'Not Started', True): 'ASSIGNED',
-    ('Deprecated', 'Not Started', False): 'ASSIGNED',
-
-    # State: WON'T FIX (OBSOLETE)
-    ('Not Started', 'Deprecated', False): 'OBSOLETE',
-    ('In Progress', 'Deprecated', False): 'OBSOLETE',
-    ('In Review', 'Deprecated', False): 'OBSOLETE',
-    ('Rework Needed', 'Deprecated', False): 'OBSOLETE',
-    ('Completed', 'Deprecated', True): 'OBSOLETE',
-}
-
-
-def _handle_assessment_tmpl_post(sender, objects=None, sources=None):
-  """Handles create event to AssessmentTemplate model."""
-  del sender  # Unused
-
-  for src in sources:
-    integration_utils.validate_issue_tracker_info(
-        src.get('issue_tracker') or {}
+    integration_utils.set_values_for_missed_fields(
+        assessment,
+        issue_tracker_info
+    )
+    issue_info = cls._update_with_assmt_data_for_ticket_create(
+        assessment,
+        issue_tracker_info
+    )
+    issue_payload = cls._build_payload_ticket_create(
+        assessment,
+        issue_info
     )
 
-  db.session.flush()
-  template_ids = {
-      obj.id for obj in objects
-  }
+    return issue_payload
 
-  if not template_ids:
-    return
+  @classmethod
+  def prepare_issue_update_json(cls, assessment, issue_tracker_info=None):
+    """Prepare parameters for issue update in bulk mode.
 
-  # TODO(anushovan): use joined query to fetch audits or even
-  #   issuetracker_issues with one query.
-  audit_map = {
-      r.destination_id: r.source_id
-      for r in all_models.Relationship.query.filter(
-          all_models.Relationship.source_type == 'Audit',
-          all_models.Relationship.destination_type == 'AssessmentTemplate',
-          all_models.Relationship.destination_id.in_(template_ids)).all()
-  }
+    Args:
+        assessment: Instance of Assessment.
+        issue_tracker_info: Dict with IssueTracker info.
+    Returns:
+        Dict with IssueTracker issue info.
+    """
+    if not issue_tracker_info:
+      issue_tracker_info = assessment.issue_tracker
 
-  if not audit_map:
-    return
+    integration_utils.set_values_for_missed_fields(
+        assessment,
+        issue_tracker_info
+    )
+    issue_info = cls._update_with_assmt_data_for_ticket_update(
+        assessment,
+        issue_tracker_info
+    )
+    issue_payload = cls._collect_payload_bulk_update(
+        assessment,
+        issue_info
+    )
 
-  audits = {
-      a.id: a
-      for a in all_models.Audit.query.filter(
-          all_models.Audit.id.in_(audit_map.values())).all()
-  }
+    return issue_payload
 
-  for obj, src in itertools.izip(objects, sources):
-    audit_id = audit_map.get(obj.id)
-    audit = audits.get(audit_id) if audit_id else None
-    if not audit or not _is_issue_tracker_enabled(audit=audit):
-      issue_tracker_info = {
-          'enabled': False,
+  @classmethod
+  def prepare_comment_update_json(cls, assessment, comment, author):
+    """Prepare parameters for comment update in bulk mode
+
+    Args:
+        assessment: Instance of Assessment.
+        comment: comment for issue
+        author: dictionary with issue information
+    Returns:
+        Dict with IssueTracker issue info.
+    """
+    issue_payload = cls._collect_payload_bulk_comment(
+        assessment,
+        comment,
+        author
+    )
+
+    return issue_payload
+
+  def _get_issuetracker_info(self, assessment_src):
+    """Get default issue information.
+
+    Args:
+        assessment_src: dictionary with issue information
+    Returns:
+        default information for Issue Tracker
+    """
+    issue_tracker_info_default = assessment_src.get("issue_tracker", {})
+    if not issue_tracker_info_default:
+      issue_tracker_info_default = self._get_issue_from_assmt_template(
+          assessment_src.get("template", {})
+      )
+    if not issue_tracker_info_default:
+      issue_tracker_info_default = self._get_issue_info_from_audit(
+          issue_tracker_info_default.get("audit", {})
+      )
+
+    return issue_tracker_info_default
+
+  @staticmethod
+  def _prepare_issue_delete(assessment):
+    """Prepare parameters for issue delete.
+
+    Args:
+        assessment: object from Assessment model
+
+    Returns:
+        issue_obj: object from IssueTracker model
+    """
+
+    issue_obj = assessment.issuetracker_issue
+    if issue_obj and issue_obj.enabled and issue_obj.issue_id:
+      issue_info = {
+          "status": "OBSOLETE",
+          "comment": (
+              "Assessment has been deleted. Changes to this GGRC "
+              "Assessment will no longer be tracked within this bug."
+          )
       }
     else:
-      issue_tracker_info = src.get('issue_tracker')
+      issue_info = {}
 
-    if not issue_tracker_info:
-      continue
+    return issue_obj, issue_info
+
+  def handle_assessment_create(self, assessment, assessment_src):
+    """Handle assessment issue create.
+
+    Args:
+        assessment: object from Assessment model
+        assessment_src: dictionary with issue information
+    """
+    if self._is_tracker_enabled(assessment.audit) and \
+            self._is_issue_enabled(assessment_src):
+      if assessment_src.get("issue_tracker", {}).get("issue_id"):
+        issue_id = assessment_src["issue_tracker"]["issue_id"]
+        if not self._is_already_linked(assessment, issue_id):
+          issue_info, _ = self._link_ticket(
+              assessment,
+              issue_id,
+              assessment_src
+          )
+
+          all_models.IssuetrackerIssue.create_or_update_from_dict(
+              assessment,
+              issue_info
+          )
+      else:
+        issue_info, _ = self._create_ticket(
+            assessment,
+            assessment_src
+        )
+        all_models.IssuetrackerIssue.create_or_update_from_dict(
+            assessment,
+            issue_info
+        )
+
+  def handle_assessment_delete(self, assessment):
+    """Handle assessment issue delete.
+
+    Args:
+        assessment: object from Assessment model
+    """
+    issue_obj, issue_info = self._prepare_issue_delete(
+        assessment
+    )
+
+    if issue_info and issue_obj:
+      sync_result = self._send_issue_delete(
+          issue_obj.issue_id,
+          issue_info
+      )
+      self._ticket_warnings_for_delete(
+          sync_result,
+          assessment
+      )
+
+    if issue_obj:
+      db.session.delete(issue_obj)
+
+  def handle_assessment_update(self, assessment, assessment_src,
+                               initial_state):
+    """Handle issue update.
+
+    Args:
+        assessment: object from Assessment model
+        assessment_src: dictionary with issue information
+        initial_state: initial state of Assessment before update
+    """
+    issue_obj = assessment.issuetracker_issue
+    issue_initial_obj = issue_obj.to_dict() if issue_obj else {}
+    issue_id_stored = issue_obj.issue_id if issue_obj else None
+
+    issue_info = assessment_src.get("issue_tracker", {})
+    issue_id_sent = issue_info.get("issue_id")
+
+    if self._is_tracker_enabled(assessment.audit):
+      if self._is_create_issue_mode(issue_id_stored, issue_id_sent):
+        if self._is_issue_enabled(assessment_src):
+          issue_db_info, _ = self._create_ticket(assessment, assessment_src)
+          all_models.IssuetrackerIssue.create_or_update_from_dict(
+              assessment,
+              issue_db_info
+          )
+      elif self._is_create_detach_issue_mode(issue_id_stored, issue_id_sent):
+        self._create_and_detach_ticket(
+            assessment,
+            issue_id_stored,
+            issue_id_sent,
+            assessment_src
+        )
+      elif self._is_link_issue_mode(issue_id_stored, issue_id_sent):
+        if self._is_issue_enabled(assessment_src):
+          if not self._is_already_linked(assessment, issue_id_sent):
+            issue_db_info, _ = self._link_ticket(
+                assessment,
+                issue_id_sent,
+                assessment_src
+            )
+            all_models.IssuetrackerIssue.create_or_update_from_dict(
+                assessment,
+                issue_db_info
+            )
+      elif self._is_update_issue_mode(issue_id_stored, issue_id_sent):
+        self._update_and_disable_ticket(
+            assessment,
+            initial_state,
+            issue_initial_obj,
+            issue_id_stored,
+            assessment_src
+        )
+      elif self._is_link_detach_issue_mode(issue_id_stored, issue_id_sent):
+        self._link_and_detach_ticket(
+            assessment,
+            issue_id_sent,
+            issue_id_stored,
+            assessment_src
+        )
+
+  def handle_assessment_sync(self, assessment_src, issue_id,
+                             issue_tracker_info):
+    """Handle assessment synchronization with IssueTracker.
+
+    Args:
+        assessment_src: Dictionary with Issue Information from ggrc.
+        issue_id: issue id for Issue Tracker
+        issue_tracker_info: Dictionary with Issue Information from tracker
+    """
+    assessment, issue_info = assessment_src["object"], assessment_src["state"]
+    if self._is_tracker_enabled(assessment.audit):
+      issue_db_info = self._collect_assessment_sync_info(
+          assessment,
+          issue_info
+      )
+      issue_payload = self._collect_payload_sync(
+          issue_db_info,
+          issue_tracker_info
+      )
+      if self._is_need_sync(assessment.id, issue_payload, issue_tracker_info):
+        sync_result = self._send_issue_sync(
+            issue_id,
+            issue_payload
+        )
+        self._ticket_warnings_for_sync(sync_result, assessment)
+        if sync_result.status == SyncResult.SyncResultStatus.SYNCED:
+          all_models.IssuetrackerIssue.create_or_update_from_dict(
+              assessment,
+              issue_db_info
+          )
+
+  def handle_audit_create(self, audit, audit_src):
+    """Handle audit create for Issue Tracker.
+
+    Args:
+        audit: object from Audit model
+        audit_src: dictionary with issue information
+    """
+    issue_db_info = self._collect_audit_info(
+        audit,
+        audit_src
+    )
     all_models.IssuetrackerIssue.create_or_update_from_dict(
-        obj, issue_tracker_info)
+        audit,
+        issue_db_info
+    )
 
+  def handle_audit_update(self, audit, audit_src):
+    """Handle audit update for Issue Tracker.
 
-def _handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
-                                initial_state=None):
-  """Handles update event to AssessmentTemplate model."""
-  del sender, service, initial_state  # Unused
+      Args:
+          audit: object from Audit model
+          audit_src: dictionary with issue information
+    """
+    issue_db_info = self._collect_audit_info(
+        audit,
+        audit_src
+    )
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        audit,
+        issue_db_info
+    )
 
-  issue_tracker_info = src.get('issue_tracker') or {}
-  integration_utils.validate_issue_tracker_info(issue_tracker_info)
+  def handle_audit_issues_update(self, audit, initial_state):
+    """Handle audit issues update for Issue Tracker.
 
-  audit = all_models.Audit.query.join(
-      all_models.Relationship,
-      all_models.Relationship.source_id == all_models.Audit.id,
-  ).filter(
-      all_models.Relationship.source_type == 'Audit',
-      all_models.Relationship.destination_type == 'AssessmentTemplate',
-      all_models.Relationship.destination_id == obj.id
-  ).first()
+    Args:
+        audit: object from Audit model
+        initial_state: object with previous Assessment state
+    """
+    is_start_update_audit = bool(
+        self._is_audit_initial_exist(initial_state) and
+        not self._is_audit_archive_the_same(audit, initial_state) and
+        audit.issue_tracker.get("enabled")
+    )
+    if is_start_update_audit:
+      import ggrc
+      # run background task for update issues,
+      # associated with audit
+      ggrc.views.start_update_audit_issues(
+          audit.id,
+          constants.ARCHIVED_TMPL
+          if audit.archived else constants.UNARCHIVED_TMPL
+      )
 
-  if not audit or not _is_issue_tracker_enabled(audit=audit):
-    issue_tracker_info = {
-        'enabled': False,
+  @staticmethod
+  def handle_audit_delete(audit):
+    """Handle audit issue delete.
+
+    Args:
+        audit: object from Audit model
+    """
+    if audit.issuetracker_issue:
+      db.session.delete(audit.issuetracker_issue)
+
+  def handle_assmt_template_create(self, assessment_template,
+                                   assmt_template_src):
+    """Handle assessment template create for Issue Tracker.
+
+    Args:
+        assessment_template: object from
+        Assessment Template model
+        assmt_template_src: dictionary with issue information
+    """
+    issue_db_info = self._collect_template_info(
+        assessment_template,
+        assmt_template_src
+    )
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        assessment_template,
+        issue_db_info
+    )
+
+  def handle_assmt_template_update(self, assessment_template,
+                                   assmt_template_src):
+    """Handle assessment template update for Issue Tracker.
+
+    Args:
+        assessment_template: object from
+        Assessment Template model
+        assmt_template_src: dictionary with issue information
+    """
+    issue_db_info = self._collect_template_info(
+        assessment_template,
+        assmt_template_src
+    )
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        assessment_template,
+        issue_db_info
+    )
+
+  @staticmethod
+  def handle_template_delete(assessment_template):
+    """Handle assessment template delete.
+
+    Args:
+        assessment_template: object
+        from Assessment Template model
+    """
+    if assessment_template.issuetracker_issue:
+      db.session.delete(assessment_template.issuetracker_issue)
+
+  def _create_ticket(self, assessment, assessment_src):
+    """Create Issue by Assessment info.
+
+    Args:
+        assessment: object from Assessment model
+        assessment_src: dictionary with payload information
+
+    Returns:
+        issuetracker_info: dictionary with information
+        for issue store
+        sync_result.status: status of request to Issue Tracker
+    """
+    issuetracker_info = self._get_issuetracker_info(assessment_src)
+    self._validate_assessment_fields(issuetracker_info)
+    issuetracker_info = self._update_with_assmt_data_for_ticket_create(
+        assessment,
+        issuetracker_info
+    )
+    issue_payload = self._build_payload_ticket_create(
+        assessment,
+        issuetracker_info
+    )
+    sync_result = self._send_issue_create(
+        issue_payload
+    )
+    self._update_issue_info(
+        sync_result,
+        issuetracker_info
+    )
+    self._ticket_warnings_for_create(
+        sync_result,
+        assessment
+    )
+
+    return issuetracker_info, sync_result.status
+
+  def _update_ticket(self, assessment, initial_state,
+                     issue_initial_obj, issue_id_stored,
+                     assessment_src):
+    # pylint: disable=too-many-arguments
+    """Update Issue by Assessment info.
+
+    Args:
+        assessment: object from Assessment model
+        initial_state: object with previous Assessment state
+        issue_initial_obj: issue information from previous Assessment
+        issue_id_stored: Issue id that stored for Assessment
+        assessment_src: dictionary with payload information
+
+    Returns:
+        issue_db_info: dictionary with information
+        for issue store
+        sync_result.status: status of request to Issue Tracker
+    """
+    issue_info = assessment_src.get("issue_tracker", {})
+    self._validate_assessment_fields(issue_info)
+    issue_db_info = self._update_with_assmt_data_for_ticket_update(
+        assessment,
+        issue_info
+    )
+    issue_payload = self._build_payload_ticket_update(
+        assessment,
+        initial_state,
+        issue_initial_obj,
+        issue_db_info,
+        assessment_src
+    )
+    sync_result = self._send_issue_update(
+        issue_id_stored,
+        issue_payload
+    )
+    self._ticket_warnings_for_update(
+        sync_result,
+        assessment
+    )
+
+    return issue_db_info, sync_result.status
+
+  def _link_ticket(self, assessment, issue_id, assessment_src):
+    """Link Issue with Assessment info.
+
+    Args:
+        assessment: object from Assessment model
+        issue_id: Issue Id for Assessment linking
+        assessment_src: dictionary with payload information
+
+    Returns:
+        issuetracker_info: dictionary with information
+        for issue store
+        sync_result.status: status of request to Issue Tracker
+    """
+    issuetracker_info = self._get_issuetracker_info(assessment_src)
+    self._validate_assessment_fields(issuetracker_info)
+    issuetracker_info = self._update_with_assmt_data_for_ticket_create(
+        assessment,
+        issuetracker_info
+    )
+    issue_payload = self._build_payload_ticket_link(
+        assessment,
+        issuetracker_info
+    )
+    sync_result = self._send_issue_link(
+        issue_id,
+        issue_payload
+    )
+    self._update_issue_info(
+        sync_result,
+        issuetracker_info
+    )
+    self._ticket_warnings_for_link(
+        sync_result,
+        assessment
+    )
+
+    return issuetracker_info, sync_result.status
+
+  def _detach_ticket(self, assessment, issue_id_stored,
+                     issue_id_sent, issue_info):
+    """Send detach comment to Issue.
+
+    Args:
+        assessment: object from Assessment model
+        issue_id_stored: previous Issue Id, stored into database
+        issue_id_sent: current Issue Id for Assessment
+        issue_info: dictionary with information for Issue store
+
+    Returns:
+        issue_info: dictionary with information
+        for issue store
+    """
+    issue_payload = self._build_payload_ticket_detach(
+        issue_id_sent
+    )
+    sync_result = self._send_issue_detach(
+        issue_id_stored,
+        issue_payload
+    )
+    self._update_issue_info_on_detach(
+        sync_result,
+        issue_info
+    )
+    self._ticket_warnings_for_detach(
+        sync_result,
+        assessment
+    )
+
+    return issue_info
+
+  def _add_disable_comment(self, assessment, issue_id):
+    """Send disable comment to Issue.
+
+    Args:
+        assessment: object from Assessment model
+        issue_id: Issue Id for Assessment
+
+    Returns:
+        sync_result.status: status of request to Issue Tracker
+    """
+    issue_payload = self._collect_payload_disable()
+    sync_result = self._send_issue_update(
+        issue_id,
+        issue_payload
+    )
+    self._ticket_warnings_for_update(
+        sync_result,
+        assessment
+    )
+
+    return sync_result.status
+
+  def _create_and_detach_ticket(self, assessment, issue_id_stored,
+                                issue_id_sent, assessment_src):
+    """'Create-detach' ticket on update
+
+    Args:
+        assessment: object from Assessment model
+        assessment_src: dictionary with issue information
+        issue_id_stored: issue id stored into db
+        issue_id_sent: issue id send from client
+    """
+    if self._is_issue_enabled(assessment_src):
+      issue_db_info, sync_status = self._create_ticket(
+          assessment,
+          assessment_src
+      )
+      if sync_status == SyncResult.SyncResultStatus.SYNCED:
+        self._detach_ticket(
+            assessment,
+            issue_id_stored,
+            issue_id_sent,
+            issue_db_info
+        )
+        all_models.IssuetrackerIssue.create_or_update_from_dict(
+            assessment,
+            issue_db_info
+        )
+
+  def _update_and_disable_ticket(self, assessment, initial_state,
+                                 issue_initial_obj, issue_id_stored,
+                                 assessment_src):
+    # pylint: disable=too-many-arguments
+    """Update - disable action on update
+
+    Args:
+        assessment: object from Assessment model
+        assessment_src: dictionary with issue information
+        issue_id_stored: issue id stored into db
+        issue_initial_obj: issue information from previous Assessment
+        initial_state: object with previous Assessment state
+    """
+    if self._is_issue_enabled(assessment_src):
+      issue_db_info, sync_status = self._update_ticket(
+          assessment,
+          initial_state,
+          issue_initial_obj,
+          issue_id_stored,
+          assessment_src
+      )
+      if sync_status == SyncResult.SyncResultStatus.SYNCED:
+        all_models.IssuetrackerIssue.create_or_update_from_dict(
+            assessment,
+            issue_db_info
+        )
+    elif issue_initial_obj.get("enabled") and assessment_src:
+      sync_status = self._add_disable_comment(
+          assessment,
+          issue_id_stored
+      )
+      if sync_status == SyncResult.SyncResultStatus.SYNCED:
+        all_models.IssuetrackerIssue.create_or_update_from_dict(
+            assessment,
+            {"enabled": False}
+        )
+
+  def _link_and_detach_ticket(self, assessment, issue_id_sent,
+                              issue_id_stored, assessment_src):
+    """'Link-detach' action on update
+
+    Args:
+        assessment: object from Assessment model
+        assessment_src: dictionary with issue information
+        issue_id_stored: issue id stored into db
+        issue_id_sent: issue id send from client
+    """
+    if self._is_issue_enabled(assessment_src):
+      if not self._is_already_linked(assessment, issue_id_sent):
+        issue_db_info, sync_status = self._link_ticket(
+            assessment,
+            issue_id_sent,
+            assessment_src
+        )
+        if sync_status == SyncResult.SyncResultStatus.SYNCED:
+          issue_db_info = self._detach_ticket(
+              assessment,
+              issue_id_stored,
+              issue_id_sent,
+              issue_db_info
+          )
+          all_models.IssuetrackerIssue.create_or_update_from_dict(
+              assessment,
+              issue_db_info
+          )
+
+  @staticmethod
+  def _get_issue_from_assmt_template(template_info):
+    """Get assessment template information.
+
+    Args:
+        template_info: dictionary with assessment
+        template information
+    """
+    if template_info:
+      assessment_template = referenced_objects.get(
+          template_info.get('type'),
+          template_info.get('id')
+      )
+      if assessment_template \
+              and hasattr(assessment_template, "issue_tracker"):
+        return assessment_template.issue_tracker
+    return {}
+
+  @staticmethod
+  def _get_issue_info_from_audit(audit_info):
+    """Get audit issue information.
+
+    Args:
+        audit_info: dictionary with audit information
+        for issue
+    """
+    if audit_info:
+      audit = referenced_objects.get(
+          audit_info.get('type'),
+          audit_info.get('id')
+      )
+      if audit and hasattr(audit, "issue_tracker"):
+        return audit.issue_tracker
+    return {}
+
+  @staticmethod
+  def _get_reporter(audit):
+    """Get reporter for issue tracker.
+
+    Args:
+        audit: object from Audit model
+
+    Returns:
+        reporter_email: email of audit captain.
+    """
+
+    captains = audit.get_persons_for_rolename("Audit Captains")
+    reporter_email = sorted([captain.email for captain in captains])[0] \
+        if captains else ""
+
+    return reporter_email
+
+  @staticmethod
+  def _get_assignee(assessment):
+    """Get assignee for issue tracker.
+
+    Args:
+        assessment: object from Assessment model
+    Returns:
+        assignee_email: email of assessment assignee.
+    """
+    assignees = assessment.get_persons_for_rolename("Assignees")
+    assignee_email = sorted([assignee.email for assignee in assignees])[0] \
+        if assignees else ""
+
+    return assignee_email
+
+  @staticmethod
+  def _is_assignee_exists(assessment, assignee):
+    """Check that current assignee exists.
+
+    Args:
+        assessment: assessment from Assessment model
+        assignee: assignee email stored for Issue Tracker
+    Returns:
+        Boolean indicator for assignee exists
+    """
+    assignees = assessment.get_persons_for_rolename("Assignees")
+    return bool([person.email for person in assignees
+                 if person.email == assignee])
+
+  @staticmethod
+  def _is_reporter_exists(audit, reporter):
+    """Check that current reporter exists.
+
+    Args:
+        audit: audit from Audit model
+        reporter: reporter email stored for Issue Tracker
+    Returns:
+        Boolean indicator for reporter exists
+    """
+    captains = audit.get_persons_for_rolename("Audit Captains")
+    return bool([person.email for person in captains
+                 if person.email == reporter])
+
+  def _get_assignee_on_sync(self, assessment, assignee_db):
+    """Get assignee for issue tracker on synchronization.
+
+    Args:
+        assessment: assessment from Assessment model
+        assignee_db: assignee email stored for Issue Tracker
+    Returns:
+        Assignee for Issue Tracker
+    """
+    if self._is_assignee_exists(assessment, assignee_db):
+      assignee = assignee_db
+    else:
+      assignee = self._get_assignee(assessment)
+
+    return assignee
+
+  def _get_reporter_on_sync(self, audit, reporter_db):
+    """Get reporter for issue tracker on synchronization.
+
+    Args:
+        audit: audit from Audit model
+        reporter_db: reporter email stored for Issue Tracker
+    Returns:
+        Reporter for Issue Tracker
+    """
+    if self._is_reporter_exists(audit, reporter_db):
+      reporter = reporter_db
+    else:
+      reporter = self._get_reporter(audit)
+
+    return reporter
+
+  @staticmethod
+  def _get_ccs(reporter, assignee, assessment):
+    """Get ccs for issue tracker.
+
+    Args:
+        reporter: reporter email for Issue Tracker
+        assignee: assignee email for Issue Tracker
+        assessment: object from Assessment model
+
+    Returns:
+        ccs: CC emails for Issue Tracker
+    """
+    captains = assessment.audit.get_persons_for_rolename(
+        "Audit Captains"
+    )
+    captain_emails = [captain.email for captain in captains]
+
+    assignees = assessment.get_persons_for_rolename("Assignees")
+    assignee_emails = [person.email for person in assignees]
+
+    emails = assignee_emails + captain_emails
+
+    return [email for email in emails
+            if email not in (reporter, assignee)]
+
+  @staticmethod
+  def _get_assessment_page_url(assessment):
+    """Returns string URL for assessment view page.
+
+    Args:
+        assessment: object from Assessment model
+
+    Returns:
+        URL for assessment view page
+    """
+    return urlparse.urljoin(
+        utils.get_url_root(),
+        utils.view_url_for(assessment)
+    )
+
+  @staticmethod
+  def _generate_custom_fields(fields):
+    """Generate custom fields for issue.
+
+    Args:
+        fields: dictionary with parameters
+
+    Returns:
+        List with "custom fields" for issue tracker
+    """
+    custom_fields = []
+
+    if fields.get("due_date"):
+      custom_fields.append(
+          {
+              "name": constants.CustomFields.DUE_DATE,
+              "value": fields["due_date"].strftime("%Y-%m-%d"),
+              "type": "DATE",
+              "display_string": constants.CustomFields.DUE_DATE
+          }
+      )
+
+    return custom_fields
+
+  @classmethod
+  def _get_create_comment(cls, assessment):
+    """Get comment for create issue.
+
+    Args:
+        assessment: object from Assessment model
+
+    Returns:
+        String for assessment comment
+    """
+    return cls._generate_comment(
+        assessment,
+        constants.INITIAL_COMMENT_TMPL
+    )
+
+  def _get_link_comment(self, assessment):
+    """Get comment for link issue.
+
+    Args:
+        assessment: object from Assessment model
+
+    Returns:
+        String for assessment comment
+    """
+    return self._generate_comment(
+        assessment,
+        constants.LINK_COMMENT_TMPL
+    )
+
+  @staticmethod
+  def _get_roles(assessment):
+    """Returns emails associated with an assessment grouped by role.
+
+    Args:
+      assessment: An instance of Assessment model.
+
+    Returns:
+      A dict of {'role name': {set of emails}}.
+    """
+    audit = assessment.audit
+    roles = {
+        role: {
+            acp.person.email for acp in acl.access_control_people
+        } for role, acl in audit.acr_name_acl_map.items()
     }
 
-  if issue_tracker_info:
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        obj, issue_tracker_info)
+    return roles
 
+  @staticmethod
+  def _get_state_comment(issue_initial_obj, issue_info):
+    """Get comment for enabled/disabled assessment.
 
-def _handle_deleted_after_commit(sender, obj=None, service=None, event=None):
-  """Handles IssueTracker information during delete event."""
-  del sender, service, event  # Unused
+    Args:
+        issue_initial_obj: issue information for previous Assessment state
+        issue_info: issue information for Assessment state
+    Returns:
+        String representation of comment
+    """
+    if issue_initial_obj.get("enabled") != issue_info.get("enabled"):
+      template = constants.ENABLED_TMPL \
+          if issue_info.get("enabled") else constants.DISABLED_TMPL
+    else:
+      template = ""
 
-  model_name = obj.__class__.__name__
-  if model_name not in _SUPPORTED_MODEL_NAMES:
-    return
+    return template
 
-  issue_obj = all_models.IssuetrackerIssue.get_issue(model_name, obj.id)
-  if issue_obj:
-    db.session.delete(issue_obj)
+  def _get_update_comment(self, assessment, initial_state,
+                          issue_initial_obj, assessment_src):
 
+    """Get comment for update issue.
 
-def _handle_audit_post(sender, objects=None, sources=None):
-  """Handles creating issue tracker related info."""
-  del sender  # Unused
-  for obj, src in itertools.izip(objects, sources):
-    issue_tracker_info = src.get('issue_tracker')
-    if not issue_tracker_info:
-      continue
-    _, issue_tracker_info["cc_list"] = _collect_audit_emails(
-        src.get("access_control_list", [])
+    Args:
+        assessment: object from Assessment model
+        initial_state: object for Assessment previous state
+        issue_initial_obj: issue information for Assessment previous state
+        assessment_src: dictionary with payload information from client
+    Returns:
+        status for issue payload
+        string representation of comment
+    """
+    comments = []
+
+    enabled_comment = self._get_state_comment(
+        issue_initial_obj,
+        assessment_src["issue_tracker"]
     )
-    integration_utils.validate_issue_tracker_info(issue_tracker_info)
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        obj, issue_tracker_info)
+    if enabled_comment:
+      comments.append(enabled_comment)
 
-
-def _handle_audit_put(sender, obj=None, src=None, service=None):
-  """Handles updating issue tracker related info."""
-  del sender, service  # Unused
-  issue_tracker_info = src.get('issue_tracker')
-  if issue_tracker_info:
-    _, issue_tracker_info["cc_list"] = _collect_audit_emails(
-        src.get("access_control_list", [])
+    status, status_comment = self._get_status_comment(
+        assessment,
+        initial_state
     )
-    integration_utils.validate_issue_tracker_info(issue_tracker_info)
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        obj, issue_tracker_info)
+    if status:
+      comments.append(status_comment)
 
+    comment_text, comment_author = self._get_added_comment_text(
+        assessment_src
+    )
+    if comment_text is not None:
+      comments.append(
+          constants.COMMENT_TMPL.format(
+              author=comment_author,
+              comment=comment_text,
+              model=assessment.__class__.__name__,
+              link=self._get_assessment_page_url(assessment)
+          )
+      )
 
-def _handle_audit_put_after_commit(sender, obj=None, **kwargs):
-  """Handles updating issue tracker related info."""
-  del sender  # Unused
+    return status, "\n\n".join(comments) if comments else ""
 
-  initial_state = kwargs.get('initial_state')
-  if not initial_state:
-    logger.debug(
-        'Initial state of an Audit is not provided, '
-        'skipping IssueTracker update.')
-    return
+  @staticmethod
+  def _get_added_comment_id(assessment_src):
+    """Returns comment ID from given request.
 
-  if (obj.archived == initial_state.archived or
-          not obj.issue_tracker.get('enabled', False)):
-    return
+    Args:
+        assessment_src: dictionary with payload
+        information from client
 
-  start_update_issue_job(
-      obj.id,
-      _ARCHIVED_TMPL if obj.archived else _UNARCHIVED_TMPL)
+    Returns:
+        Comment ID from given request
+    """
+    if not assessment_src:
+      return None
 
+    actions = assessment_src.get("actions") or {}
+    related = actions.get("add_related") or []
 
-# pylint: disable=too-many-locals, too-many-branches
-def _handle_issuetracker(sender, obj=None, src=None, **kwargs):  # noqa
-  """Handles IssueTracker information during assessment update event."""
-  del sender  # Unused
+    if not related:
+      return None
 
-  if not common_handlers.global_synchronization_enabled():
-    return
+    related_obj = related[0]
 
-  if not _is_issue_tracker_enabled(audit=obj.audit):
-    # Skip updating issue and info if feature is disabled on Audit level.
-    return
+    if related_obj.get("type") != "Comment":
+      return None
 
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _ASSESSMENT_MODEL_NAME, obj.id)
+    return related_obj.get("id")
 
-  initial_info = issue_obj.to_dict(
-      include_issue=True,
-      include_private=True) if issue_obj is not None else {}
-  new_info = src.get('issue_tracker') or {}
+  def _get_status_comment(self, assessment, initial_state):
+    """Return comment by current status.
 
-  issue_tracker_info = dict(initial_info, **new_info)
+    Args:
+        assessment: current state of Assessment
+        initial_state: initial state of Assessment
 
-  initial_issue_id = initial_info.get('issue_id')
-  old_ticket_id = int(initial_issue_id) if initial_issue_id else None
-  get_ticket_id = issue_tracker_info.get('issue_id', None)
-  ticket_id = int(get_ticket_id) if get_ticket_id else None
+    Returns:
+        Status for issue payload
+        Comment regarding status
+    """
+    if initial_state.status == assessment.status:
+      return None, None
 
-  needs_creation = (not issue_obj) or (not old_ticket_id) or (not ticket_id)
+    verifiers = self._get_roles(assessment).get("Verifiers")
+    status_text = assessment.status
+    if verifiers:
+      status = constants.VERIFIER_STATUSES.get(
+          (initial_state.status, assessment.status, assessment.verified)
+      )
+      # Corner case for custom status text.
+      if assessment.verified and assessment.status == "Completed":
+        status_text = "%s and Verified" % status_text
+    else:
+      status = constants.NO_VERIFIER_STATUSES.get(
+          (initial_state.status, assessment.status)
+      )
 
-  if issue_tracker_info.get('enabled'):
-    if needs_creation:
-      _create_issuetracker_info(obj, issue_tracker_info)
-      if not obj.warnings:
-        it_issue = all_models.IssuetrackerIssue.get_issue(
-            obj.__class__.__name__, obj.id
+    if status:
+      return status, constants.STATUS_CHANGE_TMPL % (
+          status_text, self._get_assessment_page_url(assessment)
+      )
+
+    return None, None
+
+  def _get_added_comment_text(self, assessment_src):
+    """Returns text of added comment.
+
+    Args:
+        assessment_src: dictionary with payload
+        information from client
+
+    Returns:
+        Comment description
+        Comment creator name
+    """
+    comment_id = self._get_added_comment_id(assessment_src)
+    if comment_id is not None:
+      comment_row = db.session.query(
+          all_models.Comment.description,
+          all_models.Person.email,
+          all_models.Person.name
+      ).outerjoin(
+          all_models.Person,
+          all_models.Person.id == all_models.Comment.modified_by_id,
+      ).filter(
+          all_models.Comment.id == comment_id
+      ).first()
+      if comment_row is not None:
+        desc, creator_email, creator_name = comment_row
+        if not creator_name:
+          creator_name = creator_email
+        return html2text.HTML2Text().handle(desc).strip(), creator_name
+    return None, None
+
+  @classmethod
+  def _generate_comment(cls, assessment, template):
+    """Generate comment by template.
+
+    Args:
+        assessment: object from Assessment model
+        template: String for template generation
+
+    Returns:
+        String for assessment comment
+    """
+    comments = [template % cls._get_assessment_page_url(assessment)]
+    test_plan = assessment.test_plan
+    if test_plan:
+      comments.extend([
+          "Following is the assessment Requirements/Assessment Procedure "
+          "from GGRC:",
+          html2text.HTML2Text().handle(test_plan).strip("\n"),
+      ])
+
+    return "\n".join(comments)
+
+  @classmethod
+  def _generate_common_comment(cls, assessment, comment, author):
+    """Generate comment with author.
+
+    Args:
+        assessment: object from Assessment model
+        comment: comment for issue
+        author: dictionary with issue information
+    Returns:
+        String for assessment comment
+    """
+    comment = html2text.HTML2Text().handle(comment).strip()
+    template = constants.COMMENT_TMPL.format(
+        author=author,
+        comment=comment,
+        model=assessment.__class__.__name__,
+        link=cls._get_assessment_page_url(assessment),
+    )
+
+    return template
+
+  @staticmethod
+  def _generate_detach_comment(issue_id):
+    """Generate detach comment.
+
+    Args:
+        issue_id: issue id for Issue Tracker.
+
+    Returns:
+        String for detach comment
+    """
+    template = (
+        "Another bug {issue_id} has been linked to track changes to the "
+        "GGRC Assessment. Changes to the GGRC Assessment will no longer be "
+        "tracked within this bug."
+    )
+
+    return template.format(issue_id=issue_id)
+
+  @classmethod
+  def _update_with_assmt_data_for_ticket_create(cls, assessment, assmt_src):
+    # pylint: disable=invalid-name
+    """Update issue information with assessment data.
+
+    Args:
+        assessment: object from Assessment model
+        assmt_src: dictionary with issue information
+
+    Returns:
+        issue_db_info: dictionary with information
+        for store issue into db
+    """
+    reporter = cls._get_reporter(assessment.audit)
+    assignee = cls._get_assignee(assessment)
+    ccs = cls._get_ccs(
+        reporter,
+        assignee,
+        assessment
+    )
+
+    issue_db_info = {
+        "object_id": assessment.id,
+        "object_type": assessment.__class__.__name__,
+        "title": assmt_src["title"],
+        "component_id": assmt_src["component_id"],
+        "hotlist_id": assmt_src.get("hotlist_id"),
+        "issue_tracked_obj": assessment,
+        "issue_type": assmt_src["issue_type"],
+        "issue_priority": assmt_src["issue_priority"],
+        "issue_severity": assmt_src["issue_severity"],
+        "enabled": True,
+        "assignee": assignee,
+        "reporter": reporter,
+        "cc_list": ccs,
+        "due_date": assessment.start_date,
+        "issue_id": assmt_src.get("issue_id")
+    }
+
+    return issue_db_info
+
+  @staticmethod
+  def _update_with_assmt_data_for_ticket_update(assessment, assmt_src):
+    # pylint: disable=invalid-name
+    """Collect issue information for assessment update.
+
+    Args:
+        assessment: object from Assessment model
+        assmt_src: dictionary with issue information
+
+    Returns:
+        issue_db_info: dictionary with information
+        for update issue db
+    """
+    issue_db_info = {
+        "object_id": assessment.id,
+        "object_type": assessment.__class__.__name__,
+        "title": assmt_src["title"],
+        "component_id": assmt_src["component_id"],
+        "hotlist_id": assmt_src.get("hotlist_id"),
+        "issue_tracked_obj": assessment,
+        "issue_type": assmt_src["issue_type"],
+        "issue_priority": assmt_src["issue_priority"],
+        "issue_severity": assmt_src["issue_severity"],
+        "enabled": True,
+        "due_date": assessment.start_date,
+        "issue_id": assmt_src["issue_id"],
+        "issue_url": assmt_src["issue_url"]
+    }
+
+    return issue_db_info
+
+  def _collect_assessment_sync_info(self, assessment, issue_info):
+    """Collect issue information for sync.
+
+    Args:
+        issue_info: dictionary with issue information for sync.
+    Returns:
+        issue_db_info: dictionary with information
+        for synchronization issue db
+    """
+    reporter = self._get_reporter_on_sync(
+        assessment.audit,
+        issue_info["reporter"]
+    )
+    assignee = self._get_assignee_on_sync(
+        assessment,
+        issue_info["assignee"]
+    )
+    ccs = self._get_ccs(
+        reporter,
+        assignee,
+        assessment
+    )
+
+    issue_db_info = {
+        "object_id": assessment.id,
+        "object_type": assessment.__class__.__name__,
+        "issue_tracked_obj": assessment,
+        "issue_type": issue_info["type"],
+        "component_id": issue_info["component_id"],
+        "issue_priority": issue_info["priority"],
+        "issue_severity": issue_info["severity"],
+        "enabled": True,
+        "status": issue_info["status"],
+        "assignee": assignee,
+        "reporter": reporter,
+        "cc_list": ccs,
+        "due_date": assessment.start_date
+    }
+
+    return issue_db_info
+
+  @staticmethod
+  def _collect_audit_info(audit, audit_src):
+    """Collect issue database information for audit.
+
+    Args:
+        audit: object from Audit model
+        audit_src: dictionary with issue information
+
+    Returns:
+        issue_db_info: dictionary with information
+        for store issue into db
+    """
+    issue_db_info = {
+        "object_id": audit.id,
+        "object_type": audit.__class__.__name__,
+        "component_id": audit_src.get(
+            "component_id",
+            constants.DEFAULT_ISSUETRACKER_VALUES["component_id"]
+        ),
+        "hotlist_id": audit_src.get("hotlist_id"),
+        "issue_type": audit_src.get(
+            "issue_type",
+            constants.DEFAULT_ISSUETRACKER_VALUES["issue_type"]
+        ),
+        "issue_priority": audit_src.get(
+            "issue_priority",
+            constants.DEFAULT_ISSUETRACKER_VALUES["issue_priority"]
+        ),
+        "issue_severity": audit_src.get(
+            "issue_severity",
+            constants.DEFAULT_ISSUETRACKER_VALUES["issue_severity"]
+        ),
+        "enabled": audit_src["enabled"]
+    }
+
+    return issue_db_info
+
+  @staticmethod
+  def _collect_template_info(assessment_template, assmt_template_src):
+    """Collect issue information for assessment template.
+
+    Args:
+        assessment_template: object from Assessment Template model
+        assmt_template_src: dictionary with issue information
+
+    Returns:
+        issue_db_info: dictionary with information
+        for store issue into db
+    """
+    issue_db_info = {
+        "object_id": assessment_template.id,
+        "object_type": assessment_template.__class__.__name__,
+        "component_id": assmt_template_src["component_id"],
+        "hotlist_id": assmt_template_src.get("hotlist_id"),
+        "issue_type": assmt_template_src["issue_type"],
+        "issue_priority": assmt_template_src["issue_priority"],
+        "issue_severity": assmt_template_src["issue_severity"],
+        "enabled": assmt_template_src["enabled"]
+    }
+
+    return issue_db_info
+
+  @classmethod
+  def _build_payload_ticket_create(cls, assessment, issue_info):
+    """Build payload for Issue create.
+
+    Args:
+        assessment: object from Assessment model
+        issue_info: dictionary with issue information
+
+    Returns:
+        issue_payload: dictionary with information
+        for issue payload
+    """
+    issue_payload = {
+        "component_id": int(issue_info["component_id"]),
+        "hotlist_ids": [int(issue_info["hotlist_id"])]
+        if issue_info["hotlist_id"] else [],
+        "title": issue_info["title"],
+        "type": issue_info["issue_type"],
+        "priority": issue_info["issue_priority"],
+        "severity": issue_info["issue_severity"],
+        "reporter": issue_info["reporter"],
+        "assignee": issue_info["assignee"],
+        "verifier": issue_info["assignee"],
+        "status": constants.STATUSES_MAPPING.get(
+            assessment.status
+        ),
+        "ccs": issue_info["cc_list"],
+        "comment": cls._get_create_comment(assessment)
+    }
+
+    custom_fields = cls._generate_custom_fields(
+        {"due_date": assessment.start_date}
+    )
+    if custom_fields:
+      issue_payload["custom_fields"] = custom_fields
+
+    return issue_payload
+
+  def _build_payload_ticket_link(self, assessment, issue_info):
+    """Build payload for link Issue ticket.
+
+    Args:
+        assessment: object from Assessment model
+        issue_info: dictionary with issue information
+
+    Returns:
+        issue_payload: dictionary with information
+        for issue link
+    """
+    issue_id = issue_info["issue_id"]
+    issue_tracker_info, error = self._get_issue(
+        issue_id
+    )
+
+    if error:
+      logger.error(
+          "Unable to link a ticket while creating object ID=%d: %s",
+          assessment.id,
+          error,
+      )
+      assessment.add_warning(
+          "Ticket tracker ID does not exist or you do not have access to it."
+      )
+      issue_payload = {}
+    else:
+      issue_info = self._merge_issue_information(
+          issue_info,
+          issue_tracker_info["issueState"]
+      )
+      issue_payload = {
+          "component_id": int(issue_info["component_id"]),
+          "hotlist_ids": [int(issue_info["hotlist_id"])]
+          if issue_info["hotlist_id"] else [],
+          "title": issue_info["title"],
+          "type": issue_info["issue_type"],
+          "priority": issue_info["issue_priority"],
+          "severity": issue_info["issue_severity"],
+          "reporter": issue_info["reporter"],
+          "assignee": issue_info["assignee"],
+          "verifier": issue_info["assignee"],
+          "status": constants.STATUSES_MAPPING.get(
+              assessment.status
+          ),
+          "ccs": issue_info["cc_list"],
+          "comment": self._get_link_comment(assessment)
+      }
+
+      custom_fields = self._generate_custom_fields(
+          {"due_date": assessment.start_date}
+      )
+      if custom_fields:
+        issue_payload["custom_fields"] = custom_fields
+
+    return issue_payload
+
+  def _build_payload_ticket_update(self, assessment, initial_state,
+                                   issue_initial_obj, issue_info,
+                                   assessment_src):
+    # pylint: disable=too-many-arguments
+    """Collect issue update payload for assessment.
+
+    Args:
+        assessment: object from Assessment model
+        initial_state: previous state of Assessment object
+        issue_initial_obj: issue information for previous Assessment state
+        issue_info: dictionary with issue information
+        assessment_src: dictionary with payload information from client
+
+    Returns:
+        issue_payload: dictionary with information
+        for issue update payload
+    """
+    status_comment, comment = self._get_update_comment(
+        assessment,
+        initial_state,
+        issue_initial_obj,
+        assessment_src
+    )
+    issue_payload = {
+        "component_id": int(issue_info["component_id"]),
+        "hotlist_ids": [int(issue_info["hotlist_id"])]
+        if issue_info["hotlist_id"] else [],
+        "title": issue_info["title"],
+        "priority": issue_info["issue_priority"],
+        "severity": issue_info["issue_severity"],
+        "status": constants.STATUSES_MAPPING.get(
+            assessment.status
+        ) if not status_comment else status_comment
+    }
+
+    custom_fields = self._generate_custom_fields(
+        {"due_date": assessment.start_date}
+    )
+
+    if custom_fields:
+      issue_payload["custom_fields"] = custom_fields
+
+    if comment:
+      issue_payload["comment"] = comment
+
+    return issue_payload
+
+  def _collect_payload_sync(self, issue_db_info, issue_tracker_info):
+    """Collect issue synchronization payload for assessment.
+
+    Args:
+        issue_db_info: Dictionary with Issue Information from db.
+        issue_tracker_info: Dictionary with Issue Information from tracker
+    Returns:
+        issue_payload: Dictionary with information
+        for Issue payload.
+    """
+    reporter = self._merge_reporter(
+        issue_db_info["reporter"],
+        issue_tracker_info["reporter"]
+    )
+    assignee = self._merge_assignee(
+        issue_db_info["assignee"],
+        issue_tracker_info["assignee"]
+    )
+    ccs = self._merge_ccs(
+        issue_db_info["cc_list"],
+        issue_tracker_info["ccs"]
+    )
+    if self._is_reporters_not_equals(
+        issue_db_info["reporter"],
+        issue_tracker_info["reporter"]
+    ):
+      ccs.add(issue_db_info["reporter"])
+
+    issue_payload = {
+        "component_id": int(issue_db_info["component_id"]),
+        "type": issue_db_info["issue_type"],
+        "priority": issue_db_info["issue_priority"],
+        "severity": issue_db_info["issue_severity"],
+        "reporter": reporter,
+        "assignee": assignee,
+        "verifier": assignee,
+        "status": constants.STATUSES_MAPPING.get(
+            issue_db_info.pop("status", None)
+        ),
+        "ccs": list(ccs)
+    }
+
+    custom_fields = self._generate_custom_fields(
+        {"due_date": issue_db_info["due_date"]}
+    )
+    if custom_fields:
+      issue_payload["custom_fields"] = custom_fields
+
+    return issue_payload
+
+  @classmethod
+  def _collect_payload_bulk_update(cls, assessment, issue_info):
+    """Collect issue bulk update payload for assessment.
+
+    Args:
+        assessment: object from Assessment model
+        issue_info: dictionary with issue information
+    Returns:
+        issue_payload: dictionary with information
+        for issue bulk update payload
+    """
+    issue_payload = {
+        "component_id": int(issue_info["component_id"]),
+        "hotlist_ids": [int(issue_info["hotlist_id"])]
+        if issue_info["hotlist_id"] else [],
+        "title": issue_info["title"],
+        "type": issue_info["issue_type"],
+        "priority": issue_info["issue_priority"],
+        "severity": issue_info["issue_severity"]
+    }
+
+    custom_fields = cls._generate_custom_fields(
+        {"due_date": assessment.start_date}
+    )
+    if custom_fields:
+      issue_payload["custom_fields"] = custom_fields
+
+    return issue_payload
+
+  @classmethod
+  def _collect_payload_bulk_comment(cls, assessment, comment, author):
+    """Collect issue bulk comment payload
+
+    Args:
+        assessment: object from Assessment model
+        comment: comment for issue
+        author: dictionary with issue information
+    Returns:
+        issue_payload: dictionary with information
+        for issue bulk update payload
+    """
+    issue_payload = {
+        "comment": cls._generate_common_comment(
+            assessment,
+            comment,
+            author
         )
-        new_ticket_id = it_issue.issue_id if it_issue else None
-        if old_ticket_id and new_ticket_id and old_ticket_id != new_ticket_id:
-          _detach_assessment(new_ticket_id, old_ticket_id)
-      return
+    }
 
-    _, issue_tracker_info['cc_list'] = _collect_assessment_emails(obj)
+    return issue_payload
 
-  else:
-    issue_tracker_info['enabled'] = False
+  def _build_payload_ticket_detach(self, issue_id):
+    """Collect detach assessment payload.
 
-  initial_assessment = kwargs.pop('initial_state', None)
+    Args:
+        issue_id: issue id for assessment
 
-  issue_tracker_info['title'] = obj.title
-  if not issue_tracker_info.get('due_date'):
-    issue_tracker_info['due_date'] = obj.start_date
-  issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
-      obj.status
+    Returns:
+        issue_payload: dictionary with information
+        for assessment detach
+    """
+    issue_payload = {
+        "comment": self._generate_detach_comment(issue_id),
+        "status": constants.OBSOLETE_ISSUE_STATUS
+    }
+
+    return issue_payload
+
+  @staticmethod
+  def _collect_payload_disable():
+    """Collect disable assessment payload.
+
+    Returns:
+        issue_payload: dictionary with information
+        for assessment disable
+    """
+    issue_payload = {
+        "comment": constants.DISABLED_TMPL
+    }
+
+    return issue_payload
+
+  def _merge_issue_information(self, issue_info_db, issue_tracker_info):
+    """Merge issue information with Issue Tracker.
+
+    Args:
+        issue_info_db: issue information from ggrc system
+        issue_tracker_info: issue information from Issue Tracker
+
+    Returns:
+        issue_info_db: updated issue information
+    """
+    reporter = self._merge_reporter(
+        issue_info_db["reporter"],
+        issue_tracker_info["reporter"]
+    )
+    assignee = self._merge_assignee(
+        issue_info_db["assignee"],
+        issue_tracker_info["assignee"]
+    )
+    ccs = self._merge_ccs(
+        issue_info_db["cc_list"],
+        issue_tracker_info.get("ccs", [])
+    )
+    if self._is_reporters_not_equals(
+        issue_info_db["reporter"],
+        issue_tracker_info["reporter"]
+    ):
+      ccs.add(issue_info_db["reporter"])
+
+    issue_info_db.update({
+        "assignee": assignee,
+        "reporter": reporter,
+        "cc_list": list(ccs)
+    })
+
+    return issue_info_db
+
+  @staticmethod
+  def _merge_reporter(reporter_db, reporter_tracker):
+    """Merge reporter with Issue Tracker.
+
+    Args:
+        reporter_db: reporter from ggrc system.
+        reporter_tracker: reporter from Issue Tracker.
+
+    Returns:
+        Reporter regarding business rules
+    """
+    return reporter_tracker or reporter_db or ""
+
+  @staticmethod
+  def _merge_assignee(assignee_db, assignee_tracker):
+    """Merge assignee with Issue Tracker.
+
+    Args:
+        assignee_db: assignee from ggrc system.
+        assignee_tracker: assignee from Issue Tracker.
+
+    Returns:
+        Assignee regarding business rules
+    """
+    return assignee_db or assignee_tracker or ""
+
+  @staticmethod
+  def _merge_ccs(ccs_db, ccs_tracker):
+    """Merge ccs with Issue Tracker.
+
+    Args:
+        ccs_db: ccs from ggrc system.
+        ccs_tracker: ccs from Issue Tracker.
+
+    Returns:
+        Union of ccs
+    """
+    ccs_db = set(ccs_db)
+    ccs_tracker = set(ccs_tracker)
+
+    ccs = ccs_db.union(ccs_tracker)
+
+    return ccs
+
+  def _send_issue_create(self, issue_payload):
+    """Create issue in Issue Tracker.
+
+    Args:
+        issue_payload: dictionary with information for issue payload
+
+    Returns:
+        SyncResult object with request status
+    """
+    try:
+      response = sync_utils.create_issue(
+          self._client,
+          issue_payload
+      )
+    except integrations_errors.Error as error:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.ERROR,
+          error=error
+      )
+    else:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.SYNCED,
+          issue_id=response["issueId"]
+      )
+
+  def _send_issue_update(self, issue_id, issue_payload):
+    """Update issue in Issue Tracker.
+
+    Args:
+        issue_id: issue id for Issue Tracker
+        issue_payload: dictionary with information
+        for issue payload
+
+    Returns:
+        SyncResult object with request status
+    """
+    try:
+      sync_utils.update_issue(
+          self._client,
+          issue_id,
+          issue_payload
+      )
+    except integrations_errors.Error as error:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.ERROR,
+          error=error,
+          issue_id=issue_id
+      )
+    else:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.SYNCED,
+          issue_id=issue_id
+      )
+
+  def _send_issue_sync(self, issue_id, issue_payload):
+    """Sync issue in Issue Tracker.
+
+    Args:
+        issue_id: issue id for Issue Tracker
+        issue_payload: dictionary with information
+        for issue payload
+    """
+    try:
+      sync_utils.update_issue(
+          self._client,
+          issue_id,
+          issue_payload
+      )
+    except integrations_errors.Error as error:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.ERROR,
+          error=error,
+          issue_id=issue_id
+      )
+    else:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.SYNCED,
+          issue_id=issue_id
+      )
+
+  def _send_issue_delete(self, issue_id, issue_info):
+    """Delete issue from Issue Tracker.
+
+    Args:
+        issue_id: issue id for Issue Tracker
+        issue_info: dictionary with issue information
+    """
+    try:
+      sync_utils.update_issue(
+          self._client,
+          issue_id,
+          issue_info
+      )
+    except integrations_errors.Error as error:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.ERROR,
+          error=error,
+          issue_id=issue_id
+      )
+    else:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.SYNCED,
+          issue_id=issue_id
+      )
+
+  def _send_issue_link(self, issue_id, issue_payload):
+    """Link assessment to issue in Issue Tracker.
+
+    Args:
+        issue_id: issue id for Issue Tracker
+        issue_payload: dictionary with information
+        for issue payload
+    """
+    try:
+      sync_utils.update_issue(
+          self._client,
+          issue_id,
+          issue_payload
+      )
+    except integrations_errors.Error as error:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.ERROR,
+          error=error
+      )
+    else:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.SYNCED,
+          issue_id=issue_id
+      )
+
+  def _send_issue_detach(self, issue_id, issue_payload):
+    """Detach assessment issue from Issue Tracker.
+
+    Args:
+        issue_id: previous issue id for Issue Tracker
+        issue_payload: dictionary with information
+        for issue payload
+    """
+    try:
+      sync_utils.update_issue(
+          self._client,
+          issue_id,
+          issue_payload
+      )
+    except integrations_errors.Error as error:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.ERROR,
+          error=error,
+          issue_id=issue_id
+      )
+    else:
+      return SyncResult(
+          status=SyncResult.SyncResultStatus.SYNCED
+      )
+
+  @staticmethod
+  def bulk_children_gen_allowed(assessment):
+    """Check if user has permissions to synchronize issuetracker issue.
+
+    Args:
+      assessment: Assessment instance for which issue
+      should be generated/updated.
+
+    Returns:
+      True if it's allowed, False if not allowed.
+    """
+    return all([
+        permissions.is_allowed_update_for(assessment),
+        permissions.is_allowed_update_for(assessment.audit)
+    ])
+
+  # pylint: disable=invalid-name
+  @staticmethod
+  def create_missing_issuetrackerissues(parent_type, parent_id):
+    """We need to create issue_tracker_info for related assessments.
+
+    Assessment created without issuetracker_issue if parent Audit's
+    issuetracker_issue is disabled. But load_issuetracked_objects assumes that
+    each Assessment has issuetracker_issue.
+
+    Returns:
+        List with Issuetracker issues.
+    """
+    new_issuetracker_issues = []
+    if parent_type == "Audit":
+      audit = all_models.Audit.query.get(parent_id)
+      if audit.issuetracker_issue and audit.assessments:
+        issue_tracker_info = audit.issuetracker_issue.get_issue(
+            parent_type, parent_id
+        ).to_dict()
+        for assessment in audit.assessments:
+          if assessment.issuetracker_issue is None:
+            new_issuetracker_issues.append(
+                all_models.IssuetrackerIssue.create_or_update_from_dict(
+                    assessment, issue_tracker_info
+                )
+            )
+            # flush is needed here to
+            # 'load_issuetracked_objects' be able to load
+            # missing assessments
+            db.session.flush()
+    return new_issuetracker_issues
+
+  @staticmethod
+  def load_issuetracked_objects(parent_type, parent_id):
+    """Fetch issuetracked objects from db."""
+    if parent_type != "Audit":
+      return []
+
+    return all_models.Assessment.query.join(
+        all_models.IssuetrackerIssue,
+        sa.and_(
+            all_models.IssuetrackerIssue.object_type == "Assessment",
+            all_models.IssuetrackerIssue.object_id == all_models.Assessment.id
+        )
+    ).join(
+        all_models.Audit,
+        all_models.Audit.id == all_models.Assessment.audit_id
+    ).filter(
+        all_models.Audit.id == parent_id,
+        all_models.IssuetrackerIssue.issue_id.is_(None)
+    ).options(
+        sa.orm.Load(all_models.Assessment).undefer_group(
+            "Assessment_complete",
+        ).subqueryload(
+            all_models.Assessment.audit
+        ).subqueryload(
+            all_models.Audit.issuetracker_issue
+        )
+    )
+
+  @staticmethod
+  def _is_tracker_enabled(audit):
+    """Returns a boolean whether issue tracker integration feature is enabled.
+
+    Args:
+      audit: object from Audit model
+
+    Returns:
+      A boolean, True if feature is enabled or False otherwise.
+    """
+    if not common_handlers.global_synchronization_enabled():
+      return False
+
+    audit_tracker_info = audit.issue_tracker or {}
+    if not audit_tracker_info.get("enabled"):
+      return False
+    return True
+
+  @staticmethod
+  def _is_audit_initial_exist(initial_state):
+    """Check that audit initial state exists.
+
+    Args:
+        initial_state: initial state of Assessment
+    Returns:
+        Boolean indicator for state
+    """
+    if not initial_state:
+      logger.debug(
+          "Initial state of an Audit is not provided, "
+          "skipping IssueTracker update."
+      )
+      return False
+    return True
+
+  @staticmethod
+  def _is_audit_archive_the_same(audit, initial_state):
+    """Check that archive for audit the same.
+
+    Args:
+        audit: object from Audit model
+        initial_state: initial state of Assessment
+    Returns:
+        Boolean indicator for state
+    """
+    return audit.archived == initial_state.archived
+
+  def _is_need_sync(self, assessment_id, issue_payload, issue_tracker_info):
+    """Check that synchronization necessary for assessment.
+
+    Args:
+        issue_payload: issue payload information for sync
+        issue_tracker_info: issue information from Issue Tracker
+    Returns:
+        Boolean indicator for issue synchronization
+    """
+    if not issue_payload.get("status"):
+      logger.error(
+          "Inexistent Issue Tracker status for assessment ID=%d "
+          "with status: %s.",
+          assessment_id,
+          issue_payload.get("status")
+      )
+
+      return False
+
+    is_custom_fields_same, remove_fields = self.custom_fields_processing(
+        issue_payload.get("custom_fields", []),
+        issue_tracker_info.get("custom_fields", [])
+    )
+    if remove_fields:
+      issue_payload.pop("custom_fields", [])
+
+    is_css_same = self._is_ccs_same(
+        issue_payload,
+        issue_tracker_info
+    )
+
+    is_common_fields_same = self._is_common_fields_same(
+        issue_payload,
+        issue_tracker_info
+    )
+
+    return not all([is_css_same, is_common_fields_same, is_custom_fields_same])
+
+  @staticmethod
+  def _is_creation_mode(issue_obj, issue_id):
+    """Indicator for assessment update mode.
+
+    Issue for assessment should be created in Issue Tracker
+    in some cases (turn on issue tracker sync and etc.).
+    This method is detect create or update mode for assessment,
+    that will be updated
+
+    Args:
+        issue_obj: Issue object for Assessment
+        issue_id: issue id from issue tracker payload
+
+    Returns:
+        Boolean indicator for update/create mode
+    """
+    return not (issue_obj and issue_obj.issue_id and issue_id)
+
+  @staticmethod
+  def _is_create_issue_mode(issue_id_stored, issue_id_sent):
+    """Update mode when issue will be created.
+
+    Args:
+        issue_id_stored: issue id from database
+        issue_id_sent: issue id from client
+
+    Returns:
+        Boolean indicator mode
+    """
+    return not issue_id_stored and not issue_id_sent
+
+  @staticmethod
+  def _is_create_detach_issue_mode(issue_id_stored, issue_id_sent):
+    """Update mode when issue will be created and detached another.
+
+    Args:
+        issue_id_stored: issue id from database
+        issue_id_sent: issue id from client
+
+    Returns:
+        Boolean indicator mode
+    """
+    return issue_id_stored and not issue_id_sent
+
+  @staticmethod
+  def _is_link_issue_mode(issue_id_stored, issue_id_sent):
+    """Update mode when issue will be linked.
+
+    Args:
+        issue_id_stored: issue id from database
+        issue_id_sent: issue id from client
+
+    Returns:
+        Boolean indicator mode
+    """
+    return not issue_id_stored and issue_id_sent
+
+  @staticmethod
+  def _is_update_issue_mode(issue_id_stored, issue_id_sent):
+    """Update mode when issue will be updated.
+
+    Args:
+        issue_id_stored: issue id from database
+        issue_id_sent: issue id from client
+
+    Returns:
+        Boolean indicator mode
+    """
+    return (issue_id_stored and
+            issue_id_sent and
+            int(issue_id_stored) == int(issue_id_sent))
+
+  @staticmethod
+  def _is_link_detach_issue_mode(issue_id_stored, issue_id_sent):
+    """Update mode when issue will be linked and detached another.
+
+    Args:
+        issue_id_stored: issue id from database
+        issue_id_sent: issue id from client
+
+    Returns:
+        Boolean indicator mode
+    """
+    return (issue_id_stored and
+            issue_id_sent and
+            issue_id_stored != issue_id_sent)
+
+  @staticmethod
+  def _is_reporters_not_equals(reporter_db, reporter_tracker):
+    """Check that current reports not equals
+
+    Args:
+        reporter_db: reporter from database
+        reporter_tracker: reporter from Issue Tracker
+
+    Returns:
+        Boolean indicator that reporter was changed
+    """
+    if reporter_db and reporter_tracker:
+      if reporter_db != reporter_tracker:
+        return True
+    return False
+
+  @staticmethod
+  def _is_already_linked(assessment, issue_id):
+    """Check that issue id already linked to object.
+
+    Args:
+        assessment: object from Assessment model
+        issue_id: issue id from issue tracker payload
+
+    Returns:
+        Boolean indicator for update/create mode
+    """
+    if integration_utils.is_already_linked(issue_id):
+      logger.error(
+          "Unable to link a ticket while creating "
+          "object ID=%d: %s ticket ID is "
+          "already linked to another GGRC object",
+          assessment.id,
+          issue_id
+      )
+      assessment.add_warning(
+          "This ticket was already linked to another "
+          "GGRC issue, assessment or "
+          "review object. Linking the same ticket "
+          "to multiple objects is not "
+          "allowed due to potential for conflicting updates."
+      )
+      return True
+
+    return False
+
+  @staticmethod
+  def _is_issue_enabled(assessment_src):
+    """Check that issue tracker enabled.
+
+    Args:
+      assessment_src: dictionary with issue information
+
+    Returns:
+      Boolean indicator that issue enabled
+    """
+    return assessment_src.get(
+        "issue_tracker", {}
+    ).get(
+        "enabled", False
+    )
+
+  @staticmethod
+  def _is_ccs_same(ccs_payload, ccs_tracker):
+    """Check that CCs calculated and Issue Tracker same.
+
+    Args:
+        ccs_payload: CCs calculated from ggrc.
+        ccs_tracker: CCs from Issue Tracker.
+
+    Returns:
+        Boolean indicator for CCs validation
+    """
+    ccs_payload = set(cc.strip() for cc in ccs_payload)
+    ccs_tracker = set(cc.strip() for cc in ccs_tracker)
+
+    return ccs_payload.issubset(ccs_tracker)
+
+  @staticmethod
+  def _is_common_fields_same(issue_payload, issue_tracker_info):
+    """Check that common fields for Issue Tracker same.
+
+    Args:
+        issue_payload: issue information on payload.
+        issue_tracker_info: issue information from Issue Tracker
+
+    Returns:
+        Boolean indicator for common fields validation
+    """
+    return all(
+        issue_payload.get(field) == issue_tracker_info.get(field)
+        for field in constants.COMMON_SYNCHRONIZATION_FIELDS
+    )
+
+  @staticmethod
+  def _update_issue_info(sync_result, issuetracker_info):
+    """Update issue tracker info after request to Tracker.
+
+    Args:
+        sync_result: object from SyncResult model
+        issuetracker_info: information for Issue tracker
+
+    Returns:
+        Updated dictionary with issue information
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      issuetracker_info["enabled"] = False
+    else:
+      issuetracker_info.update(
+          {
+              "issue_id": sync_result.issue_id,
+              "issue_url": integration_utils.build_issue_tracker_url(
+                  sync_result.issue_id
+              )
+          }
+      )
+
+  @staticmethod
+  def _update_issue_info_on_detach(sync_result, issuetracker_info):
+    """Update issue tracker info on detach request
+
+    Args:
+        sync_result: object from SyncResult model
+        issuetracker_info: information for Issue tracker
+
+    Returns:
+        Updated dictionary with issue information
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      issue_url = integration_utils.build_issue_tracker_url(
+          sync_result.issue_id
+      )
+      issuetracker_info.update({
+          "issue_id": sync_result.issue_id,
+          "issue_url": issue_url
+      })
+
+  @staticmethod
+  def _ticket_warnings_for_create(sync_result, assessment):
+    """Add warning for create ticket.
+
+    Args:
+        sync_result: object from SyncResult model
+        assessment: object from Assessment model
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      assessment.add_warning(constants.WarningsDescription.CREATE_ASSESSMENT)
+      logger.error(
+          constants.ErrorsDescription.CREATE_ASSESSMENT % (
+              assessment.id,
+              sync_result.error
+          ),
+          assessment.id,
+          sync_result.error
+      )
+
+  @staticmethod
+  def _ticket_warnings_for_link(sync_result, assessment):
+    """Add warning for link ticket.
+
+    Args:
+        sync_result: object from SyncResult model
+        assessment: object from Assessment model
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      assessment.add_warning(constants.WarningsDescription.LINK_ASSESSMENT)
+      logger.error(
+          constants.ErrorsDescription.LINK_ASSESSMENT,
+          assessment.id,
+          sync_result.error
+      )
+
+  @staticmethod
+  def _ticket_warnings_for_update(sync_result, assessment):
+    """Add warning for update ticket.
+
+    Args:
+        sync_result: object from SyncResult model
+        assessment: object from Assessment model
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      assessment.add_warning(constants.WarningsDescription.UPDATE_ASSESSMENT)
+      logger.error(
+          constants.ErrorsDescription.UPDATE_ASSESSMENT,
+          sync_result.issue_id,
+          assessment.id,
+          sync_result.error
+      )
+
+  @staticmethod
+  def _ticket_warnings_for_sync(sync_result, assessment):
+    """Add warning for synchronization ticket.
+
+    Args:
+        sync_result: object from SyncResult model
+        assessment: object from Assessment model
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      assessment.add_warning(constants.WarningsDescription.SYNC_ASSESSMENT)
+      logger.error(
+          constants.ErrorsDescription.SYNC_ASSESSMENT,
+          sync_result.issue_id,
+          assessment.id,
+          sync_result.error
+      )
+
+  @staticmethod
+  def _ticket_warnings_for_delete(sync_result, assessment):
+    """Add warning for delete ticket.
+
+    Args:
+        sync_result: object from SyncResult model
+        assessment: object from Assessment model
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      logger.error(
+          constants.ErrorsDescription.DELETE_ASSESSMENT,
+          sync_result.issue_id,
+          assessment.id,
+          sync_result.error
+      )
+
+  @staticmethod
+  def _ticket_warnings_for_detach(sync_result, assessment):
+    """Add warning for detach ticket.
+
+    Args:
+        sync_result: object from SyncResult model
+        assessment: object from Assessment model
+    """
+    if sync_result.status == SyncResult.SyncResultStatus.ERROR:
+      assessment.add_warning(
+          constants.WarningsDescription.DETACH_ASSESSMENT %
+          sync_result.issue_id
+      )
+      logger.error(
+          constants.ErrorsDescription.DETACH_ASSESSMENT,
+          sync_result.issue_id,
+          sync_result.error
+      )
+
+  @staticmethod
+  def custom_fields_processing(custom_fields_payload, custom_fields_tracker):
+    """Check that custom fields for Issue Tracker same.
+
+    Args:
+        custom_fields_payload: custom fields on issue payload
+        custom_fields_tracker: custom fields from Issue Tracker
+
+    Returns:
+        Boolean indicator for custom fields validation
+    """
+    if any(custom_fields_payload):
+      due_date_payload = datetime.datetime.strptime(
+          custom_fields_payload[0]["value"].strip(),
+          "%Y-%m-%d"
+      )
+    else:
+      due_date_payload = None
+
+    if any(custom_fields_tracker):
+      due_date_raw = sync_utils.parse_due_date(
+          custom_fields_tracker
+      )
+      if due_date_raw is None:
+        # due date is empty after processing,
+        # in that case we shouldn't synchronize custom fields
+        return True, True
+      else:
+        due_date_issuetracker = datetime.datetime.strptime(
+            due_date_raw,
+            "%Y-%m-%d"
+        )
+    else:
+      # custom fields is empty from issue tracker,
+      # in that case we shouldn't synchronize custom fields
+      return True, True
+
+    return due_date_payload == due_date_issuetracker, False
+
+  def _get_issue(self, issue_id):
+    """Get issue from Issue Tracker.
+
+    Args:
+        issue_id: issue id from issue tracker payload
+
+    Returns:
+        Issue Tracker information
+        Exceptions
+    """
+    try:
+      issue_tracker_info = self._client.get_issue(
+          issue_id
+      )
+      return issue_tracker_info, None
+    except integrations_errors.Error as error:
+      return {}, error
+
+
+class SyncResult(object):
+  # pylint: disable=too-few-public-methods
+  """Synchronization responses for Issue Tracker."""
+
+  class SyncResultStatus(object):
+    # pylint: disable=too-few-public-methods
+    """Synchronization statuses for Issue Tracker."""
+    SYNCED = "SYNCED"
+    ERROR = "ERROR"
+
+  def __init__(self, status, issue_id=None, error=None):
+    self.status = status
+    self.issue_id = issue_id
+    self.error = error
+
+
+def _hook_assmt_template_post(sender, objects=None, sources=None):
+  """Handles create event to AssessmentTemplate model."""
+  del sender
+
+  tracker_handler = AssessmentTrackerHandler()
+  for assessment_template, assmt_template_src in itertools.izip(objects,
+                                                                sources):
+    issue_info = assmt_template_src.get('issue_tracker')
+    if issue_info:
+      tracker_handler.handle_assmt_template_create(
+          assessment_template,
+          issue_info
+      )
+
+
+def _hook_assmt_template_put(sender, obj=None, src=None,
+                             service=None, initial_state=None):
+  """Handles update event to AssessmentTemplate model."""
+  del sender, service, initial_state
+
+  issue_info = src.get('issue_tracker')
+  if issue_info:
+    tracker_handler = AssessmentTrackerHandler()
+    tracker_handler.handle_assmt_template_update(
+        obj,
+        issue_info
+    )
+
+
+def _hook_assmt_template_delete(sender, obj=None,
+                                service=None, event=None):
+  """Handle deleting assessment template."""
+  del sender, service, event
+
+  tracker_handler = AssessmentTrackerHandler()
+  tracker_handler.handle_template_delete(obj)
+
+
+def _hook_audit_issue_post(sender, objects=None, sources=None):
+  """Handle creating audit issue related info."""
+  del sender
+
+  tracker_handler = AssessmentTrackerHandler()
+  for audit, audit_src in itertools.izip(objects, sources):
+    issue_info = audit_src.get('issue_tracker')
+    if issue_info:
+      tracker_handler.handle_audit_create(audit, issue_info)
+
+
+def _hook_audit_issue_put(sender, obj=None, src=None, service=None):
+  """Handle updating audit issue related info."""
+  del sender, service
+
+  issue_info = src.get('issue_tracker')
+  if issue_info:
+    tracker_handler = AssessmentTrackerHandler()
+    tracker_handler.handle_audit_update(obj, issue_info)
+
+
+def _hook_audit_issue_delete(sender, obj=None, service=None, event=None):
+  """Handle deleting audit issue related info."""
+  del sender, service, event
+
+  tracker_handler = AssessmentTrackerHandler()
+  tracker_handler.handle_audit_delete(obj)
+
+
+def _hook_assmt_issue_update(sender, obj=None, src=None,
+                             initial_state=None, **kwargs):
+  """Handle updating assessment issue related info."""
+  del sender, kwargs
+
+  tracker_handler = AssessmentTrackerHandler()
+  tracker_handler.handle_assessment_update(
+      obj,
+      src,
+      initial_state
   )
 
-  if ticket_id != old_ticket_id and issue_tracker_info['enabled']:
-    _link_assessment(obj, issue_tracker_info)
-    if not obj.warnings:
-      _detach_assessment(ticket_id, old_ticket_id)
-    return
 
-  try:
-    _update_issuetracker_issue(
-        obj, issue_tracker_info, initial_assessment, initial_info, src)
-  except integrations_errors.Error as error:
-    if error.status == 429:
-      logger.error(
-          'The request updating ticket ID=%d for assessment ID=%d was '
-          'rate limited: %s', ticket_id, obj.id, error)
-    else:
-      logger.error(
-          'Unable to update a ticket ID=%d while updating '
-          'assessment ID=%d: %s', ticket_id, obj.id, error)
-    obj.add_warning('Unable to update a ticket.')
+def _hook_audit_issues_update(sender, obj=None, **kwargs):
+  """Handle updating related issues for audit"""
+  del sender  # Unused
 
-  _update_issuetracker_info(obj, issue_tracker_info)
+  tracker_handler = AssessmentTrackerHandler()
+  tracker_handler.handle_audit_issues_update(
+      obj,
+      kwargs.get("initial_state")
+  )
 
 
-def _detach_assessment(new_ticket_id, old_ticket_id):
-  """Send to old IssueTracker ticket detachment comment."""
-  builder = issue_tracker_params_builder.AssessmentParamsBuilder()
-  params = builder.build_detach_comment(new_ticket_id)
-  query = params.get_issue_tracker_params()
-  try:
-    issues.Client().update_issue(old_ticket_id, query)
-  except integrations_errors.Error as error:
-    logger.error("Unable to add detach comment to ticket issue ID=%d: %s",
-                 old_ticket_id, error)
+def _hook_assmt_delete(sender, obj=None, service=None):
+  """Handle assessment delete event."""
+  del sender, service
 
-
-def _handle_assessment_deleted(sender, obj=None, service=None):
-  """Handles assessment delete event."""
-  del sender, service  # Unused
-
-  if not common_handlers.global_synchronization_enabled():
-    return
-
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _ASSESSMENT_MODEL_NAME, obj.id)
-
-  if issue_obj:
-    if (issue_obj.enabled and
-            issue_obj.issue_id and
-            _is_issue_tracker_enabled(audit=obj.audit)):
-      issue_params = {
-          'status': 'OBSOLETE',
-          'comment': (
-              'Assessment has been deleted. Changes to this GGRC '
-              'Assessment will no longer be tracked within this bug.'
-          ),
-      }
-      try:
-        issues.Client().update_issue(issue_obj.issue_id, issue_params)
-      except integrations_errors.Error as error:
-        logger.error('Unable to update a ticket ID=%s while deleting'
-                     ' assessment ID=%d: %s',
-                     issue_obj.issue_id, obj.id, error)
-    db.session.delete(issue_obj)
+  tracker_handler = AssessmentTrackerHandler()
+  tracker_handler.handle_assessment_delete(obj)
 
 
 def init_hook():
   """Initializes hooks."""
 
   signals.Restful.collection_posted.connect(
-      _handle_assessment_tmpl_post, sender=all_models.AssessmentTemplate)
-
+      _hook_audit_issue_post,
+      sender=all_models.Audit
+  )
   signals.Restful.model_put.connect(
-      _handle_assessment_tmpl_put, sender=all_models.AssessmentTemplate)
-
-  signals.Restful.model_deleted_after_commit.connect(
-      _handle_deleted_after_commit, sender=all_models.Audit)
-  signals.Restful.model_deleted_after_commit.connect(
-      _handle_deleted_after_commit, sender=all_models.AssessmentTemplate)
-
-  signals.Restful.collection_posted.connect(
-      _handle_audit_post, sender=all_models.Audit)
-
-  signals.Restful.model_put.connect(
-      _handle_audit_put, sender=all_models.Audit)
-
+      _hook_audit_issue_put,
+      sender=all_models.Audit
+  )
   signals.Restful.model_put_after_commit.connect(
-      _handle_audit_put_after_commit, sender=all_models.Audit)
-
+      _hook_audit_issues_update,
+      sender=all_models.Audit
+  )
+  signals.Restful.model_deleted_after_commit.connect(
+      _hook_audit_issue_delete,
+      sender=all_models.Audit
+  )
+  signals.Restful.collection_posted.connect(
+      _hook_assmt_template_post,
+      sender=all_models.AssessmentTemplate
+  )
+  signals.Restful.model_put.connect(
+      _hook_assmt_template_put,
+      sender=all_models.AssessmentTemplate
+  )
+  signals.Restful.model_deleted_after_commit.connect(
+      _hook_assmt_template_delete,
+      sender=all_models.AssessmentTemplate
+  )
   signals.Restful.model_put_before_commit.connect(
-      _handle_issuetracker, sender=all_models.Assessment)
-
+      _hook_assmt_issue_update,
+      sender=all_models.Assessment
+  )
   signals.Restful.model_deleted.connect(
-      _handle_assessment_deleted, sender=all_models.Assessment)
-
-
-def start_update_issue_job(audit_id, message):
-  """Creates background job for handling IssueTracker issue update."""
-  import ggrc
-  ggrc.views.start_update_audit_issues(audit_id, message)
-
-
-def handle_assessment_create(assessment, src):
-  """Handles issue tracker related data."""
-  if not common_handlers.global_synchronization_enabled():
-    return
-
-  # Get issue tracker data from request.
-  info = src.get('issue_tracker') or {}
-
-  if not info:
-    # Check assessment template for issue tracker data.
-    template = referenced_objects.get(
-        src.get('template', {}).get('type'),
-        src.get('template', {}).get('id'),
-    )
-    if template:
-      info = template.issue_tracker
-
-  if not info:
-    # Check audit for issue tracker data.
-    audit = referenced_objects.get(
-        src.get('audit', {}).get('type'),
-        src.get('audit', {}).get('id'),
-    )
-    if audit:
-      info = audit.issue_tracker
-
-  _create_issuetracker_info(assessment, info)
-
-
-def _handle_basic_props(issue_tracker_info, initial_info):
-  """Handles updates to basic issue tracker properties."""
-  issue_params = {}
-  for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
-    if name not in issue_tracker_info:
-      continue
-    value = issue_tracker_info[name]
-    if value != initial_info.get(name):
-      issue_params[api_name] = value
-  return issue_params
-
-
-def _get_roles(assessment):
-  """Returns emails associated with an assessment grouped by role.
-
-  Args:
-    assessment: An instance of Assessment model.
-
-  Returns:
-    A dict of {'role name': {set of emails}}.
-  """
-  all_roles = collections.defaultdict(set)
-
-  ac_list = access_control.list.AccessControlList
-  ac_role = access_control.role.AccessControlRole
-  ac_people = access_control.people.AccessControlPerson
-  query = db.session.query(
-      ac_people.person_id,
-      ac_role.name,
-      all_models.Person.email
-  ).join(
-      ac_list,
-  ).join(
-      ac_role,
-  ).join(
-      all_models.Person,
-  ).filter(
-      ac_list.object_type == _ASSESSMENT_MODEL_NAME,
-      ac_list.object_id == assessment.id,
-      ac_role.internal == sa.sql.false(),
+      _hook_assmt_delete,
+      sender=all_models.Assessment
   )
-  for row in query.all():
-    # row = (person_id, role_name, email)
-    all_roles[row[1]].add(row[2])
-
-  return all_roles
-
-
-def _collect_assessment_emails(assessment):
-  """Returns emails related to given assessment.
-
-  The lexicographical first Assignee is used for assignee_email.
-  Every other Assignee is used in related_people_emails.
-  Creators, Verifiers, Primary Contacts, Secondary Contacts
-  and any other Assessment custom roles should NOT be used in
-  related_people_emails.
-
-  Args:
-    assessment: An instance of Assessment model.
-
-  Returns:
-    A tuple of (assignee_email, [related_people_emails])
-  """
-  cc_list = _get_roles(assessment).get('Assignees')
-  cc_list = sorted(cc_list) if cc_list else []
-  assignee_email = cc_list.pop(0) if cc_list else None
-  return assignee_email, cc_list
-
-
-def _collect_audit_emails(acl_payload):
-  """Returns emails related to audit.
-
-  Args:
-    acl_payload: Dict with ACL data
-
-  Returns:
-    A tuple of (reporter_email, [related_people_emails])
-  """
-  role_id = access_control.role.get_ac_roles_for(
-      "Audit"
-  )["Audit Captains"].id
-
-  person_ids = [
-      acl["person"]["id"] for acl in acl_payload
-      if acl.get("ac_role_id") == role_id and acl.get("person", {}).get("id")
-  ]
-
-  if person_ids:
-    reporter_id = person_ids[0]
-
-    persons = db.session.query(
-        all_models.Person.id,
-        all_models.Person.email
-    ).filter(
-        all_models.Person.id.in_(person_ids)
-    )
-
-    persons = {person[0]: person[1]
-               for person in persons}
-    reporter_email = persons.pop(reporter_id)
-    cc_list = persons.values()
-
-    return reporter_email, cc_list
-  return "", []
-
-
-def get_audit_ccs(assessment):
-  """Returns audit CCs regarding assessment.
-
-  Args:
-    assessment: An instance of Assessment model.
-
-  Returns:
-    List of audit ccs
-  """
-  audit_issuetracker_issue = assessment.audit.issuetracker_issue
-  if audit_issuetracker_issue is not None and audit_issuetracker_issue.cc_list:
-    audit_ccs = audit_issuetracker_issue.cc_list.split(",")
-  else:
-    audit_ccs = []
-
-  return audit_ccs
-
-
-def group_cc_emails(object_ccs, additional_ccs):
-  """Returns grouped cc emails.
-
-  Args:
-    object_ccs: first list of  ccs
-    additional_ccs: additional list of ccs
-
-  Returns:
-    Grouped list of ccs
-  """
-  object_ccs = frozenset(object_ccs)
-  additional_ccs = frozenset(additional_ccs)
-  grouped_ccs = list(object_ccs.union(additional_ccs))
-
-  return grouped_ccs
-
-
-def _get_assessment_url(assessment):
-  """Returns string URL for assessment view page."""
-  return urlparse.urljoin(utils.get_url_root(), utils.view_url_for(assessment))
-
-
-def _build_status_comment(assessment, initial_assessment):
-  """Returns status message if status gets changed or None otherwise."""
-  if initial_assessment.status == assessment.status:
-    return None, None
-
-  verifiers = _get_roles(assessment).get('Verifiers')
-  status_text = assessment.status
-  if verifiers:
-    status = _VERIFIER_STATUSES.get(
-        (initial_assessment.status, assessment.status, assessment.verified))
-    # Corner case for custom status text.
-    if assessment.verified and assessment.status == 'Completed':
-      status_text = '%s and Verified' % status_text
-  else:
-    status = _NO_VERIFIER_STATUSES.get(
-        (initial_assessment.status, assessment.status))
-
-  if status:
-    return status, _STATUS_CHANGE_COMMENT_TMPL % (
-        status_text, _get_assessment_url(assessment))
-
-  return None, None
-
-
-def _fill_current_value(issue_params, assessment, initial_info):
-  """Fills unchanged props with current values."""
-  current_issue_params = {}
-  for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
-    current_issue_params[api_name] = initial_info.get(name)
-  issue_params = dict(current_issue_params, **issue_params)
-
-  if 'status' not in issue_params:
-    # Resend status on any change.
-    status_value = ASSESSMENT_STATUSES_MAPPING.get(assessment.status)
-    if status_value:
-      issue_params['status'] = status_value
-
-  if 'hotlist_ids' not in issue_params:
-    # Resend hotlists on any change.
-    current_hotlist_id = initial_info.get('hotlist_id')
-    issue_params['hotlist_ids'] = [current_hotlist_id] if (
-        current_hotlist_id) else []
-
-  return issue_params
-
-
-def _get_added_comment_id(src):
-  """Returns comment ID from given request."""
-  if not src:
-    return None
-
-  actions = src.get('actions') or {}
-  related = actions.get('add_related') or []
-
-  if not related:
-    return None
-
-  related_obj = related[0]
-
-  if related_obj.get('type') != 'Comment':
-    return None
-
-  return related_obj.get('id')
-
-
-def _get_added_comment_text(src):
-  """Returns comment text from given request."""
-  comment_id = _get_added_comment_id(src)
-  if comment_id is not None:
-    comment_row = db.session.query(
-        all_models.Comment.description,
-        all_models.Person.email,
-        all_models.Person.name
-    ).outerjoin(
-        all_models.Person,
-        all_models.Person.id == all_models.Comment.modified_by_id,
-    ).filter(
-        all_models.Comment.id == comment_id
-    ).first()
-    if comment_row is not None:
-      desc, creator_email, creator_name = comment_row
-      if not creator_name:
-        creator_name = creator_email
-      return html2text.HTML2Text().handle(desc).strip(), creator_name
-  return None, None
-
-
-def _is_issue_tracker_enabled(audit=None):
-  """Returns a boolean whether issue tracker integration feature is enabled.
-
-  Args:
-    audit: An optional instance of Audit model. If given function check if
-        issue tracker integration is enabled for given audit as well.
-
-  Returns:
-    A boolean, True if feature is enabled or False otherwise.
-  """
-  if not _ISSUE_TRACKER_ENABLED:
-    return False
-
-  if audit is not None:
-    audit_issue_tracker_info = audit.issue_tracker or {}
-
-    if not bool(audit_issue_tracker_info.get('enabled')):
-      return False
-
-  return True
-
-
-def get_issue_info(obj):
-  """Retrieve IssueTrackerIssue from obj.
-
-  Args:
-      obj: Instance of IssueTracked object.
-  """
-  if hasattr(obj, "audit"):
-    issue_obj = obj.audit.issuetracker_issue
-  else:
-    issue_obj = obj.issuetracker_issue
-  return issue_obj.to_dict() if issue_obj else {}
-
-
-def get_reporter_email(assessment):
-  """Get reporter email for assessment."""
-  person = all_models.Person
-  acl = all_models.AccessControlList
-  acr = all_models.AccessControlRole
-  acp = all_models.AccessControlPerson
-
-  reporter_email = db.session.query(
-      person.email,
-  ).join(
-      acp
-  ).join(
-      acl,
-  ).join(
-      acr,
-  ).filter(
-      acr.name == "Audit Captains",
-      acl.object_id == assessment.audit_id,
-      acl.object_type == all_models.Audit.__name__,
-  ).order_by(
-      person.email,
-  ).first()
-
-  if reporter_email:
-    reporter_email = reporter_email.email
-  return reporter_email
-
-
-def create_asmnt_comment(assessment, issue_id):
-  """Create comment for generated IssueTracker issue related to assessment.
-
-  Args:
-      assessment: Instance of Assessment for which comment should be created.
-      issue_id: Issue Tracker ticket ID
-  Returns:
-      String with created comments separated with '\n'.
-  """
-  comment_tmpl = _LINK_COMMENT_TMPL if issue_id else _INITIAL_COMMENT_TMPL
-  comments = [comment_tmpl % _get_assessment_url(assessment)]
-  test_plan = assessment.test_plan
-  if test_plan:
-    comments.extend([
-        "Following is the assessment Requirements/Assessment Procedure "
-        "from GGRC:",
-        html2text.HTML2Text().handle(test_plan).strip("\n"),
-    ])
-
-  return "\n".join(comments)
-
-
-def prepare_issue_json(assessment, issue_tracker_info=None,
-                       create_issuetracker=False):
-  """Create json that will be sent to IssueTracker.
-
-  Args:
-      assessment: Instance of Assessment.
-      issue_tracker_info: Dict with IssueTracker info.
-      create_issuetracker: Bool indicator for crate issuetracker state.
-
-  Returns:
-      Dict with IssueTracker issue info.
-  """
-  if not issue_tracker_info:
-    issue_tracker_info = assessment.audit.issuetracker_issue.to_dict()
-    issue_tracker_info['title'] = assessment.title
-    issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
-        assessment.status
-    )
-
-  integration_utils.normalize_issue_tracker_info(issue_tracker_info)
-  integration_utils.set_values_for_missed_fields(assessment,
-                                                 issue_tracker_info)
-  assignee_email, cc_list = _collect_assessment_emails(assessment)
-  if assignee_email is not None:
-    issue_tracker_info['assignee'] = assignee_email
-    issue_tracker_info['cc_list'] = cc_list
-
-  hotlist_id = issue_tracker_info.get('hotlist_id')
-  issue_id = issue_tracker_info.get('issue_id') if issue_tracker_info else None
-  issue_params = {
-      'component_id': issue_tracker_info['component_id'],
-      'hotlist_ids': [hotlist_id] if hotlist_id else [],
-      'title': issue_tracker_info['title'],
-      'type': issue_tracker_info['issue_type'],
-      'priority': issue_tracker_info['issue_priority'],
-      'severity': issue_tracker_info['issue_severity'],
-      'reporter': get_reporter_email(assessment),
-      'assignee': '',
-      'verifier': '',
-      'status': issue_tracker_info['status'],
-      'comment': create_asmnt_comment(assessment, issue_id),
-  }
-  custom_fields = []
-
-  due_date = issue_tracker_info.get('due_date')
-  if due_date:
-    custom_fields.append({
-        "name": constants.CUSTOM_FIELDS_DUE_DATE,
-        "value": due_date.strftime("%Y-%m-%d"),
-        "type": "DATE",
-        "display_string": constants.CUSTOM_FIELDS_DUE_DATE
-    })
-
-  if custom_fields:
-    issue_params['custom_fields'] = custom_fields
-
-  assignee = issue_tracker_info.get('assignee')
-  if assignee:
-    if not issue_tracker_info['status']:
-      issue_params['status'] = 'ASSIGNED'
-    issue_params['assignee'] = assignee
-    issue_params['verifier'] = assignee
-
-  if create_issuetracker:
-    cc_list = issue_tracker_info.get('cc_list', [])
-    audit_ccs = get_audit_ccs(assessment)
-    grouped_ccs = group_cc_emails(object_ccs=cc_list, additional_ccs=audit_ccs)
-    if grouped_ccs:
-      issue_params['ccs'] = grouped_ccs
-    else:
-      issue_params['ccs'] = []
-
-  return issue_params
-
-
-def _link_assessment(assessment, issue_tracker_info):
-  """Link Assessment to existing IssueTracker ticket"""
-  ticket_id = issue_tracker_info['issue_id']
-  if integration_utils.is_already_linked(ticket_id):
-    logger.error(
-        "Unable to link a ticket while creating object ID=%d: %s ticket ID is "
-        "already linked to another GGRC object",
-        assessment.id,
-        ticket_id,
-    )
-    assessment.add_warning(
-        "This ticket was already linked to another GGRC issue, assessment or "
-        "review object. Linking the same ticket to multiple objects is not "
-        "allowed due to potential for conflicting updates."
-    )
-    return
-
-  try:
-    response = issues.Client().get_issue(ticket_id)
-  except integrations_errors.Error as error:
-    logger.error(
-        "Unable to link a ticket while creating object ID=%d: %s",
-        assessment.id,
-        error,
-    )
-    assessment.add_warning(
-        "Ticket tracker ID does not exist or you do not have access to it."
-    )
-    return
-
-  issue_params = prepare_issue_json(assessment, issue_tracker_info, True)
-  issuetracker_ccs = response.get("issueState", {}).get("ccs", [])
-  grouped_ccs = group_cc_emails(object_ccs=issue_params.get("ccs", []),
-                                additional_ccs=issuetracker_ccs)
-  issue_params["ccs"] = grouped_ccs
-  try:
-    issues.Client().update_issue(ticket_id, issue_params)
-  except integrations_errors.Error as error:
-    logger.error(
-        'Unable to link a ticket while creating assessment ID=%d: %s',
-        assessment.id, error)
-    issue_tracker_info['enabled'] = False
-    assessment.add_warning('Unable to link a ticket.')
-  else:
-    issue_url = integration_utils.build_issue_tracker_url(ticket_id)
-    issue_tracker_info['issue_url'] = issue_url
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        assessment, issue_tracker_info)
-
-
-def _create_new_issuetracker_ticket(assessment, issue_tracker_info):
-  """Create new IssueTracker ticket for assessment"""
-  issue_tracker_request = prepare_issue_json(
-      assessment,
-      issue_tracker_info,
-      create_issuetracker=True
-  )
-  try:
-    res = issues.Client().create_issue(issue_tracker_request)
-  except integrations_errors.Error as error:
-    logger.error(
-        'Unable to create a ticket while creating assessment ID=%d: %s',
-        assessment.id, error)
-    issue_tracker_info['enabled'] = False
-    assessment.add_warning('Unable to create a ticket.')
-  else:
-    issue_id = res['issueId']
-    issue_url = integration_utils.build_issue_tracker_url(issue_id)
-    issue_tracker_info['issue_id'] = issue_id
-    issue_tracker_info['issue_url'] = issue_url
-
-
-def _create_issuetracker_info(assessment, issue_tracker_info):
-  """Creates an entry for IssueTracker model."""
-  if not issue_tracker_info.get('title'):
-    issue_tracker_info['title'] = assessment.title
-  if not issue_tracker_info.get('due_date'):
-    issue_tracker_info['due_date'] = assessment.start_date
-  issue_tracker_info['status'] = ASSESSMENT_STATUSES_MAPPING.get(
-      assessment.status
-  )
-
-  if (issue_tracker_info.get('enabled') and
-          _is_issue_tracker_enabled(audit=assessment.audit)):
-    if issue_tracker_info.get("issue_id"):
-      _link_assessment(assessment, issue_tracker_info)
-    else:
-      _create_new_issuetracker_ticket(assessment, issue_tracker_info)
-      all_models.IssuetrackerIssue.create_or_update_from_dict(
-          assessment, issue_tracker_info)
-
-
-def _update_issuetracker_issue(assessment, issue_tracker_info,  # noqa
-                               initial_assessment, initial_info, request):
-  """Collects information and sends a request to update external issue."""
-  # pylint: disable=too-many-locals
-  issue_id = issue_tracker_info.get('issue_id')
-  if not issue_id:
-    return
-
-  comments = []
-
-  # Handle switching of 'enabled' property.
-  enabled = issue_tracker_info.get('enabled', False)
-  if initial_info.get('enabled', False) != enabled:
-    # Add comment about toggling feature and process further.
-    comments.append(_ENABLED_TMPL if enabled else _DISABLED_TMPL)
-  elif not enabled:
-    # If feature remains in the same status which is 'disabled'.
-    return
-
-  integration_utils.normalize_issue_tracker_info(issue_tracker_info)
-
-  issue_params = _handle_basic_props(issue_tracker_info, initial_info)
-
-  # Handle status update.
-  status_value, status_comment = _build_status_comment(
-      assessment, initial_assessment)
-  if status_value:
-    issue_params['status'] = status_value
-    comments.append(status_comment)
-
-  # Attach user comments if any.
-  comment_text, comment_author = _get_added_comment_text(request)
-  if comment_text is not None:
-    builder = issue_tracker_params_builder.AssessmentParamsBuilder()
-    comments.append(
-        builder.COMMENT_TMPL.format(
-            author=comment_author,
-            comment=comment_text,
-            model=_ASSESSMENT_MODEL_NAME,
-            link=_get_assessment_url(assessment)))
-
-  if comments:
-    issue_params['comment'] = '\n\n'.join(comments)
-
-  # Handle hotlist ID update.
-  hotlist_id = issue_tracker_info.get('hotlist_id')
-  if hotlist_id is not None and hotlist_id != initial_info.get('hotlist_id'):
-    issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
-
-  # handle assignee and cc_list update
-  assignee_email, cc_list = _collect_assessment_emails(assessment)
-  del cc_list
-
-  if assignee_email is not None:
-    issue_tracker_info['assignee'] = assignee_email
-    issue_params['assignee'] = assignee_email
-    issue_params['verifier'] = assignee_email
-
-  custom_fields = []
-
-  # handle due_date update
-  due_date = issue_tracker_info.get('due_date')
-  if due_date:
-    custom_fields.append({
-        "name": constants.CUSTOM_FIELDS_DUE_DATE,
-        "value": due_date.strftime("%Y-%m-%d"),
-        "type": "DATE",
-        "display_string": constants.CUSTOM_FIELDS_DUE_DATE
-    })
-
-  if custom_fields:
-    issue_params['custom_fields'] = custom_fields
-
-  if issue_params:
-    # Resend all properties upon any change.
-    issue_params = _fill_current_value(issue_params, assessment, initial_info)
-    issues.Client().update_issue(issue_id, issue_params)
-
-
-def _update_issuetracker_info(assessment, issue_tracker_info):
-  """Updates an entry for IssueTracker model."""
-  if not _is_issue_tracker_enabled(audit=assessment.audit):
-    issue_tracker_info['enabled'] = False
-
-  all_models.IssuetrackerIssue.create_or_update_from_dict(
-      assessment, issue_tracker_info)
-
-
-def bulk_children_gen_allowed(obj):
-  """Check if user has permissions to synchronize issuetracker issue.
-
-  Args:
-      obj: Assessment instance for which issue should be generated/updated.
-
-  Returns:
-      True if it's allowed, False if not allowed.
-  """
-  return all([
-      permissions.is_allowed_update_for(obj),
-      permissions.is_allowed_update_for(obj.audit)
-  ])
-
-
-# pylint: disable=invalid-name
-def create_missing_issuetrackerissues(parent_type, parent_id):
-  """We need to create issue_tracker_info for related assessments.
-
-  Assessment created without issuetracker_issue if parent Audit's
-  issuetracker_issue is disabled. But load_issuetracked_objects assumes that
-  each Assessment has issuetracker_issue.
-
-  Returns:
-      List with Issuetracker issues.
-  """
-  new_issuetracker_issues = []
-  if parent_type == "Audit":
-    audit = all_models.Audit.query.get(parent_id)
-    if audit.issuetracker_issue and audit.assessments:
-      issue_tracker_info = audit.issuetracker_issue.get_issue(
-          parent_type, parent_id
-      ).to_dict()
-      for assessment in audit.assessments:
-        if assessment.issuetracker_issue is None:
-          new_issuetracker_issues.append(
-              all_models.IssuetrackerIssue.create_or_update_from_dict(
-                  assessment, issue_tracker_info
-              )
-          )
-          # flush is needed here to 'load_issuetracked_objects' be able to load
-          # missing assessments
-          db.session.flush()
-  return new_issuetracker_issues
-
-
-def load_issuetracked_objects(parent_type, parent_id):
-  """Fetch issuetracked objects from db."""
-  if parent_type != "Audit":
-    return []
-
-  return all_models.Assessment.query.join(
-      all_models.IssuetrackerIssue,
-      sa.and_(
-          all_models.IssuetrackerIssue.object_type == "Assessment",
-          all_models.IssuetrackerIssue.object_id == all_models.Assessment.id,
-      )
-  ).join(
-      all_models.Audit,
-      all_models.Audit.id == all_models.Assessment.audit_id,
-  ).filter(
-      all_models.Audit.id == parent_id,
-      all_models.IssuetrackerIssue.issue_id.is_(None),
-  ).options(
-      sa.orm.Load(all_models.Assessment).undefer_group(
-          "Assessment_complete",
-      ).subqueryload(
-          all_models.Assessment.audit
-      ).subqueryload(
-          all_models.Audit.issuetracker_issue
-      )
-  )
-
-
-def prepare_issue_update_json(assmt, issue_tracker_info=None):
-  """Prepare issuetracker issue json for Assessment object update."""
-  if not issue_tracker_info:
-    issue_tracker_info = assmt.issue_tracker
-
-  integration_utils.set_values_for_missed_fields(assmt, issue_tracker_info)
-  builder = issue_tracker_params_builder.AssessmentParamsBuilder()
-  builder.handle_issue_tracker_info(assmt, issue_tracker_info)
-  issue_tracker_params = builder.params
-  params = issue_tracker_params.get_issue_tracker_params()
-  return params
-
-
-def prepare_comment_update_json(object_, comment, author):
-  """Prepare json for adding comment to IssueTracker issue"""
-  builder = issue_tracker_params_builder.AssessmentParamsBuilder()
-  params = builder.build_params_for_comment(object_, comment, author)
-  return params.get_issue_tracker_params()

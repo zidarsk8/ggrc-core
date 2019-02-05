@@ -116,7 +116,7 @@ describe('issue-unmap-item component', () => {
       reqDeferred = $.Deferred();
       spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
       spyOn(QueryAPI, 'batchRequests');
-      spyOn(can, 'when').and.returnValue(reqDeferred);
+      spyOn($, 'when').and.returnValue(reqDeferred);
       spyOn($.prototype, 'trigger');
     });
 

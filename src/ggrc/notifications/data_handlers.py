@@ -95,24 +95,26 @@ def _get_updated_roles(new_list, old_list, roles):
 
 def _get_revisions(obj, created_at):
   """Get current revision and revision before notification is created"""
-  new_rev = db.session.query(models.Revision) \
-      .filter_by(resource_id=obj.id, resource_type=obj.type) \
-      .order_by(models.Revision.id.desc()) \
-      .first()
-  old_rev = db.session.query(models.Revision) \
-      .filter_by(resource_id=obj.id, resource_type=obj.type) \
-      .filter(sa.and_(models.Revision.created_at < created_at,
-                      models.Revision.id < new_rev.id)) \
-      .order_by(models.Revision.id.desc()) \
-      .first()
-  if not old_rev:
-    old_rev = db.session.query(models.Revision) \
-        .filter_by(resource_id=obj.id, resource_type=obj.type) \
-        .filter(sa.and_(models.Revision.created_at == created_at,
-                        models.Revision.id < new_rev.id)) \
-        .order_by(models.Revision.id) \
-        .first()
-  return new_rev, old_rev
+  filtered_revisions = db.session.query(models.Revision).filter_by(
+      resource_id=obj.id,
+      resource_type=obj.type
+  )
+  new_revision = filtered_revisions.order_by(models.Revision.id.desc()).first()
+  if not new_revision:
+    logger.warning("Missing revision found for object: "
+                   "resource_id: %s, resource_type: %s", obj.id, obj.type)
+    return [], []
+
+  old_revision = filtered_revisions.filter(
+      models.Revision.created_at < created_at,
+      models.Revision.id < new_revision.id
+  ).order_by(models.Revision.id.desc()).first()
+  if not old_revision:
+    old_revision = filtered_revisions.filter(
+        models.Revision.created_at == created_at,
+        models.Revision.id < new_revision.id
+    ).order_by(models.Revision.id).first()
+  return new_revision, old_revision
 
 
 def _get_updated_fields(obj, created_at, definitions, roles):
