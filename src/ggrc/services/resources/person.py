@@ -11,7 +11,9 @@ from logging import getLogger
 import sqlalchemy as sa
 from sqlalchemy.orm.exc import NoResultFound
 
-from werkzeug.exceptions import Forbidden, BadRequest, MethodNotAllowed
+from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import MethodNotAllowed
 from dateutil import parser as date_parser
 
 from ggrc import db
@@ -274,21 +276,23 @@ class PersonResource(common.ExtendedResource):
     """Returns workflow statistic for authorized user."""
     # pylint: disable=invalid-name,redefined-builtin
     base_query = db.session.query(
-        all_models.Workflow
+        all_models.Workflow,
     ).join(
         all_models.AccessControlList,
-        all_models.AccessControlList.object_id == all_models.Workflow.id
+        all_models.AccessControlList.object_id ==
+        all_models.Workflow.id,
     ).join(
         all_models.AccessControlPerson,
         all_models.AccessControlPerson.ac_list_id ==
-        all_models.AccessControlList.id
+        all_models.AccessControlList.id,
     ).join(
         all_models.AccessControlRole,
         all_models.AccessControlList.ac_role_id ==
-        all_models.AccessControlRole.id
+        all_models.AccessControlRole.id,
     ).join(
         all_models.Person,
-        all_models.AccessControlPerson.person_id == all_models.Person.id
+        all_models.AccessControlPerson.person_id ==
+        all_models.Person.id,
     )
 
     finish_condition = sa.or_(
@@ -296,22 +300,22 @@ class PersonResource(common.ExtendedResource):
             all_models.Workflow.is_verification_needed ==
             sa.true(),
             all_models.CycleTaskGroupObjectTask.status ==
-            'Verified'
+            'Verified',
         ),
         sa.and_(
             all_models.Workflow.is_verification_needed ==
             sa.false(),
             all_models.CycleTaskGroupObjectTask.status ==
-            'Finished'
+            'Finished',
         )
     )
 
     tasks_query = base_query.join(
         all_models.Cycle,
-        all_models.Workflow.id == all_models.Cycle.workflow_id
+        all_models.Workflow.id == all_models.Cycle.workflow_id,
     ).join(
         all_models.CycleTaskGroupObjectTask,
-        all_models.CycleTaskGroupObjectTask.cycle_id == all_models.Cycle.id
+        all_models.CycleTaskGroupObjectTask.cycle_id == all_models.Cycle.id,
     ).filter(
         sa.and_(
             all_models.AccessControlPerson.person_id == id,
@@ -320,7 +324,7 @@ class PersonResource(common.ExtendedResource):
             all_models.AccessControlRole.name == 'Admin',
         )
     ).group_by(
-        all_models.Workflow.id
+        all_models.Workflow.id,
     ).order_by(
         "due_date"
     ).with_entities(
@@ -349,10 +353,10 @@ class PersonResource(common.ExtendedResource):
             all_models.AccessControlRole.name == 'Admin',
         )
     ).group_by(
-        all_models.Workflow.id
+        all_models.Workflow.id,
     ).with_entities(
         all_models.Workflow.id.label("workflow_id"),
-        sa.func.group_concat(all_models.Person.email).label("owners")
+        sa.func.group_concat(all_models.Person.email).label("owners"),
     )
     owners_result = dict(owners_query.all())
 
@@ -363,7 +367,7 @@ class PersonResource(common.ExtendedResource):
       response_object["workflows"].append({
           "workflow": {
               "id": row.workflow_id,
-              "title": row.workflow_title
+              "title": row.workflow_title,
           },
           "owners": sorted(owners_result[row.workflow_id].split(",")),
           "task_stat": {
