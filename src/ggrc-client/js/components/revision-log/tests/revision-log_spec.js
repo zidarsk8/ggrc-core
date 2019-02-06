@@ -286,7 +286,7 @@ describe('revision-log component', function () {
 
       it('returns specified object composed from revisions ' +
       'with not empty revisionsForCompare ' +
-      'if there is more revisions then pageSize', () => {
+      'if there is more revisions than pageSize', () => {
         const expected = {
           object: [jasmine.objectContaining(revisions[2])],
           mappings: [revisions[0], revisions[1]].map((revision) =>
@@ -303,7 +303,7 @@ describe('revision-log component', function () {
 
       it('returns specified object composed from revisions' +
       'with empty revisionsForCompare ' +
-      'if there is not more revisions then pageSize', () => {
+      'if there is not more revisions than pageSize', () => {
         const expected = {
           object: [jasmine.objectContaining(revisions[2])],
           mappings: [revisions[0], revisions[1]].map((revision) =>
@@ -323,7 +323,7 @@ describe('revision-log component', function () {
         viewModel.attr('pageInfo.pageSize', 3);
 
         const result =
-          viewModel.composeRevisionsData(revisions, revisionsForCompare);
+          viewModel.composeRevisionsData(revisions);
 
         result.object.forEach((revision) => {
           expect(revision.isReified).toBe(true);
