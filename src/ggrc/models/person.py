@@ -59,6 +59,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       foreign_keys='PersonProfile.person_id',
       uselist=False,
       backref="person",
+      cascade='all, delete-orphan',
   )
   access_control_people = db.relationship(
       'AccessControlPerson',
