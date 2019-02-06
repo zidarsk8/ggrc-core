@@ -216,11 +216,11 @@ class CustomAttributable(object):
                                         value.get("attribute_object") else
                                         None)
 
-      attr = self._values_map.get(value.get("custom_attribute_id"))
-      if attr:
-        attr.attributable = self
-        attr.attribute_value = value.get("attribute_value")
-        attr.attribute_object_id = value.get("attribute_object_id")
+      existing_value = self._values_map.get(value.get("custom_attribute_id"))
+      if existing_value:
+        existing_value.attributable = self
+        existing_value.attribute_value = value.get("attribute_value")
+        existing_value.attribute_object_id = value.get("attribute_object_id")
       elif "custom_attribute_id" in value:
         # this is automatically appended to self._custom_attribute_values
         # on attributable=self
