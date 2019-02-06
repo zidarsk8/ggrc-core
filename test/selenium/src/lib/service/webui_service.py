@@ -12,6 +12,7 @@ from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
 from lib.page import dashboard, export_page
+from lib.page.modal.request_review import RequestReviewModal
 from lib.page.widget import object_modal
 from lib.utils import (
     selenium_utils, file_utils, conftest_utils, test_utils, ui_utils)
@@ -458,6 +459,16 @@ class BaseWebUiService(object):
     modal.fill_form(**changes)
     modal.save_and_close()
 
+  def submit_for_review(self, obj, user_email, comment_msg):
+    """Submit object for review scenario."""
+    self.open_info_page_of_obj(obj).open_submit_for_review_popup()
+    RequestReviewModal(self.driver).fill_and_submit(user_email, comment_msg)
+
+  def approve_review(self, obj):
+    """Approve review scenario."""
+    self.open_info_page_of_obj(obj).click_approve_review()
+    ui_utils.wait_for_alert("Review is complete.")
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -487,21 +498,6 @@ class SnapshotsWebUiService(BaseWebUiService):
     """
     obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).panel)
     return obj_info_panel.has_link_to_get_latest_version()
-
-  def submit_obj_for_review(self, obj, usr_email, comment_msg):
-    """Submit control for review scenario."""
-    widget = self.open_info_page_of_obj(obj)
-    widget.open_submit_for_review_popup()
-    widget.select_assignee_user(usr_email)
-    widget.leave_request_review_comment(comment_msg)
-    widget.click_request()
-    return self.info_widget_cls(self.driver)
-
-  def approve_review(self, obj):
-    """Approve review scenario."""
-    widget = self.open_info_page_of_obj(obj)
-    widget.click_approve_review()
-    ui_utils.wait_for_alert("Review is complete.")
 
 
 class AuditsService(BaseWebUiService):

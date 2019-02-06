@@ -133,6 +133,10 @@ class RelatedPeopleList(object):
     """Get emails of people"""
     return [el.text for el in self._root.elements(class_name="person-name")]
 
+  def is_element_exists(self):
+    """Returns whether element exists."""
+    return self._root.exists
+
 
 class RelatedUrls(object):
   """Represents reference / evidence url section on info widgets"""
