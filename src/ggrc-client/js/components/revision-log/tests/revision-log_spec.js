@@ -13,6 +13,12 @@ import Stub from '../../../models/stub';
 import * as ReifyUtils from '../../../plugins/utils/reify-utils';
 
 describe('revision-log component', function () {
+  let viewModel;
+
+  beforeEach(function () {
+    viewModel = getComponentVM(Component);
+  });
+
   describe('init() method', () => {
     let init;
 
@@ -35,12 +41,6 @@ describe('revision-log component', function () {
 
       expect(viewModel.fetchItems).toHaveBeenCalled();
     });
-  });
-
-  let viewModel;
-
-  beforeEach(function () {
-    viewModel = getComponentVM(Component);
   });
 
   describe('defining default scope values', function () {
