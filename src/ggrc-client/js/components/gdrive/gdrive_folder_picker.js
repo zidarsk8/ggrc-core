@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2018 Google Inc.
+ * Copyright (C) 2019 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import '../action-toolbar/action-toolbar';
 import {
   uploadFiles,
+  getGDriveItemId,
   findGDriveItemById,
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils';
@@ -14,6 +15,7 @@ import template from './templates/gdrive_folder.mustache';
 export default can.Component.extend({
   tag: 'ggrc-gdrive-folder-picker',
   template,
+  leakScope: true,
   viewModel: {
     define: {
       readonly: {
@@ -29,6 +31,12 @@ export default can.Component.extend({
         get() {
           return !this.attr('readonly') &&
             !this.attr('_folder_change_pending');
+        },
+      },
+      folderId: {
+        type: String,
+        get() {
+          return getGDriveItemId(this.attr('folder_error.message'));
         },
       },
     },

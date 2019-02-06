@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -191,14 +191,40 @@ describe('assessment-info-pane component', () => {
       });
 
       describe('if instance is not archived', () => {
-        it('returns true if instance status is editable otherwise false',
-          function () {
-            allStatuses.forEach((status) => {
-              vm.attr('instance.status', status);
-              expect(vm.attr('editMode'))
-                .toBe(editableStatuses.includes(status));
-            });
+        it('returns true if instance status and currentState' +
+        'have equal editable otherwise false',
+        function () {
+          allStatuses.forEach((status) => {
+            vm.attr('instance.status', status);
+            vm.attr('currentState', status);
+            expect(vm.attr('editMode'))
+              .toBe(editableStatuses.includes(status));
           });
+        });
+
+        it('returns false if instance status is editable and currentState' +
+        'is NOT editable',
+        () => {
+          vm.attr('instance.status', editableStatuses[0]);
+          vm.attr('currentState', nonEditableStates[0]);
+          expect(vm.attr('editMode')).toBeFalsy();
+        });
+
+        it('returns false if instance status is NOT editable and currentState' +
+        'is editable',
+        () => {
+          vm.attr('instance.status', nonEditableStates[0]);
+          vm.attr('currentState', editableStatuses[0]);
+          expect(vm.attr('editMode')).toBeFalsy();
+        });
+
+        it('returns false if instance status and currentState' +
+        'have different EDITABLE statuses',
+        () => {
+          vm.attr('instance.status', editableStatuses[1]);
+          vm.attr('currentState', editableStatuses[0]);
+          expect(vm.attr('editMode')).toBeFalsy();
+        });
       });
     });
 
@@ -1292,6 +1318,35 @@ describe('assessment-info-pane component', () => {
     });
   });
 
+  describe('beforeStatusSave() method', () => {
+    const defaultAssessmentStatus = 'DefaultStatus';
+    beforeEach(() => {
+      vm.attr('instance', {
+        status: defaultAssessmentStatus,
+      });
+
+      vm.attr('previousStatus', undefined);
+    });
+
+    it('should set new status', () => {
+      const newStatus = 'NewAssessmnetStatus';
+      vm.beforeStatusSave.call(vm, newStatus, false);
+
+      expect(vm.attr('instance.status')).toEqual(newStatus);
+      expect(vm.attr('previousStatus')).toEqual(defaultAssessmentStatus);
+    });
+
+    it('should set previous status. Undo is TRUE', () => {
+      const newStatus = 'NewAssessmnetStatus';
+      vm.attr('previousStatus', defaultAssessmentStatus);
+
+      vm.beforeStatusSave.call(vm, newStatus, true);
+
+      expect(vm.attr('instance.status')).toEqual(defaultAssessmentStatus);
+      expect(vm.attr('previousStatus')).toBe(undefined);
+    });
+  });
+
   describe('onStateChange() method', () => {
     let method;
     let instanceSave;
@@ -1336,15 +1391,24 @@ describe('assessment-info-pane component', () => {
       });
     });
 
-    it('returns status back on undo action', (done) => {
-      vm.attr('instance.previousStatus', 'FooBar');
+    it('should set status from response', (done) => {
+      const newStatus = 'new status';
+      const newStatusFromResponse = 'status from response';
+      const currentStatus = 'current status';
+
+      vm.attr('currentState', currentStatus);
       instanceSave.resolve();
 
+      spyOn(vm.attr('deferredSave'), 'execute').and.
+        returnValue($.Deferred().resolve(
+          {status: newStatusFromResponse}
+        ));
+
       method({
-        undo: true,
-        status: 'newStatus',
+        undo: false,
+        status: newStatus,
       }).then(() => {
-        expect(vm.attr('instance.status')).toBe('FooBar');
+        expect(vm.attr('currentState')).toBe(newStatusFromResponse);
         done();
       });
     });

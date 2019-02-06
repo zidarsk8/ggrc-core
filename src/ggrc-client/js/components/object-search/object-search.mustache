@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -15,8 +15,8 @@
 <div class="modal-filter modal-body">
   <collapsible-panel {soft-mode}="true" {title-text}="'filter'" {(expanded)}="showSearch">
     <advanced-search-wrapper
-      {model-name}="model.singular"
-      {model-display-name}="model.name"
+      {model-name}="model.model_singular"
+      {model-display-name}="model.title_plural"
       {^mapping-items}="*mappingItems"
       {^filter-items}="*filterItems"
       {^status-item}="*statusItem"

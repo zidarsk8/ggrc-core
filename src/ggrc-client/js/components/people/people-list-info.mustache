@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -83,25 +83,15 @@
           <div class="span12">
             <h6>Authorizations</h6>
             <p>
-              {{#person_roles instance "System|Admin"}}
-                {{#if roles.length}}
-                  {{#roles}}
-                    <span class="role">
-                      {{permission_summary}}
-                    </span>
-                  {{/roles}}
-                {{else}}
-                  <li>
-                    <div class="item-data">
-                      <div class="tree-title-area">
-                        <span class="no-role">
-                          No Role
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                {{/if}}
-              {{/person_roles}}
+              {{^if isNoRole}}
+                <span class="role">
+                  {{instance.system_wide_role}}
+                </span>
+              {{else}}
+                <span class="no-role">
+                  No Role
+                </span>
+              {{/if}}
             </p>
           </div>
         </div>

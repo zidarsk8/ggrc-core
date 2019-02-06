@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Snapshot object"""
@@ -6,32 +6,39 @@
 import collections
 from datetime import datetime
 
+from sqlalchemy import event
+from sqlalchemy import func
+from sqlalchemy import inspect
+from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import orm
-from sqlalchemy import event
-from sqlalchemy import inspect
 from sqlalchemy.orm.session import Session
-from sqlalchemy import func
-from sqlalchemy.sql.expression import tuple_
-from werkzeug.exceptions import InternalServerError
+from sqlalchemy.sql.expression import tuple_, and_, or_
+from werkzeug import exceptions
 
 from ggrc import builder
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
-from ggrc.utils import benchmark, errors
+from ggrc.access_control import roleable
 from ggrc.login import get_current_user_id
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import revision
-from ggrc.models.mixins import base
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
+from ggrc.models.mixins import base
+from ggrc.models.mixins import rest_handable
+from ggrc.models.mixins import with_last_assessment_date
+from ggrc.utils import benchmark
+from ggrc.utils import errors
 
 
-class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
-               base.ContextRBAC, mixins.Base, db.Model):
+class Snapshot(rest_handable.WithDeleteHandable,
+               roleable.Roleable,
+               relationship.Relatable,
+               with_last_assessment_date.WithLastAssessmentDate,
+               base.ContextRBAC,
+               mixins.Base,
+               db.Model):
   """Snapshot object that holds a join of parent object, revision, child object
   and parent object's context.
 
@@ -166,6 +173,34 @@ class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
         db.Index("ix_snapshots_parent", "parent_type", "parent_id"),
         db.Index("ix_snapshots_child", "child_type", "child_id"),
     )
+
+  def _check_related_objects(self):
+    """Checks that Snapshot mapped only to Audits before deletion"""
+    for obj in self.related_objects():
+      if obj.type not in ("Audit", "Snapshot"):
+        db.session.rollback()
+        raise exceptions.Conflict(description="Snapshot should be mapped "
+                                              "to Audit only before deletion")
+      elif obj.type == "Snapshot":
+        rel = relationship.Relationship
+        related_originals = db.session.query(rel.query.filter(
+            or_(and_(rel.source_id == obj.child_id,
+                     rel.source_type == obj.child_type,
+                     rel.destination_id == self.child_id,
+                     rel.destination_type == self.child_type),
+                and_(rel.destination_id == obj.child_id,
+                     rel.destination_type == obj.child_type,
+                     rel.source_id == self.child_id,
+                     rel.source_type == self.child_type)
+                )).exists()).scalar()
+        if related_originals:
+          db.session.rollback()
+          raise exceptions.Conflict(description="Snapshot should be mapped to "
+                                                "Audit only before deletion")
+
+  def handle_delete(self):
+    """Handle model_deleted signal for Snapshot"""
+    self._check_related_objects()
 
 
 class Snapshotable(object):
@@ -337,7 +372,7 @@ def _set_latest_revisions(objects):
   for o in objects:
     o.revision_id = id_map.get((o.child_type, o.child_id))
     if o.revision_id is None:
-      raise InternalServerError(errors.MISSING_REVISION)
+      raise exceptions.InternalServerError(errors.MISSING_REVISION)
 
 
 event.listen(Session, 'before_flush', handle_post_flush)

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -29,6 +29,7 @@ let DOCUMENT_KIND_MAP = {
 
 export default can.Component.extend({
   tag: 'related-documents',
+  leakScope: true,
   viewModel: {
     instance: {},
     modelType: 'Document',

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -10,6 +10,7 @@ import TreeViewConfig from '../../apps/base_widgets';
 export default can.Component.extend({
   tag: 'relevant-filter',
   template,
+  leakScope: true,
   viewModel: {
     relevant_menu_item: '@',
     operators: [{title: 'AND', value: 'AND'}, {title: 'OR', value: 'OR'}],
@@ -35,7 +36,8 @@ export default can.Component.extend({
       });
     },
     menu() {
-      const workflowRelatedTypes = ['TaskGroup', 'Workflow'];
+      const workflowRelatedTypes = ['Cycle', 'CycleTaskGroup',
+        'CycleTaskGroupObjectTask', 'TaskGroup', 'Workflow'];
       const baseWidgetsTypes = can.Map.keys(
         TreeViewConfig.attr('base_widgets_by_type')
       );

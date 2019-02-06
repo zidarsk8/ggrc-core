@@ -1,10 +1,9 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Contains Info Widget functionality specific to info panels
 (split done as `info_widget` module is too large.
 """
 from lib.page.modal import update_object
-from lib.constants import locator
 
 
 class InfoPanel(object):
@@ -13,21 +12,27 @@ class InfoPanel(object):
 
   def __init__(self, root):
     self._root = root
-    self._locators = locator.WidgetInfoPanel
 
   @property
   def title(self):
     """Return panel title"""
-    return self._root.element(class_name='pane-header__title-details').\
-        h3().text
+    return self._root.element(
+        class_name='pane-header__title-details').h3().text
 
   @property
   def is_minimized(self):
+    """Check if info panel is minimized."""
     return self._root.parent(class_name='pin-content--minimized').exists
 
   @property
   def is_maximized(self):
+    """Check if info panel is maximized."""
     return self._root.parent(class_name='pin-content--maximized').exists
+
+  @property
+  def is_opened(self):
+    """Check if info panel is opened."""
+    return self._root.exists
 
   @property
   def button_minimize(self):

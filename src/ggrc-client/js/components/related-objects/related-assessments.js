@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -29,6 +29,7 @@ const defaultOrderBy = [
 export default can.Component.extend({
   tag: 'related-assessments',
   template,
+  leakScope: true,
   viewModel: {
     define: {
       unableToReuse: {
@@ -104,7 +105,7 @@ export default can.Component.extend({
         this.attr('selectedEvidences').replace([]);
         this.attr('isSaving', false);
         this.dispatch('afterObjectReused');
-        this.attr('instance').dispatch('refreshInstance');
+        this.dispatch('refreshAssessment');
       });
     },
     loadRelatedAssessments() {

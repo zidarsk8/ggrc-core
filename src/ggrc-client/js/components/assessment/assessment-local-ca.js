@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -17,6 +17,7 @@ import {getPlainText} from '../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'assessment-local-ca',
+  leakScope: true,
   viewModel: {
     instance: null,
     fields: [],
@@ -224,7 +225,7 @@ export default can.Component.extend({
     '{viewModel.instance} showInvalidField': function (ev) {
       let pageType = getPageInstance().type;
       let $container = (pageType === 'Assessment') ?
-        $('.object-area') : $('.cms_controllers_info_pin');
+        $('.object-area') : $('.pin-content');
       let $body = (pageType === 'Assessment') ?
         $('.inner-content.widget-area') : $('.info-pane__body');
       let field;

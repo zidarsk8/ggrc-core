@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -62,7 +62,7 @@ import template from './info-pane.mustache';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 import pubsub from '../../../pub-sub';
 import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
-import {notifier} from '../../../plugins/utils/notifiers-utils';
+import {notifier, notifierXHR} from '../../../plugins/utils/notifiers-utils';
 import Evidence from '../../../models/business-models/evidence';
 import * as businessModels from '../../../models/business-models';
 
@@ -74,6 +74,7 @@ const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 export default can.Component.extend({
   tag: 'assessment-info-pane',
   template: template,
+  leakScope: true,
   viewModel: {
     define: {
       verifiers: {
@@ -163,10 +164,22 @@ export default can.Component.extend({
       editMode: {
         type: 'boolean',
         get: function () {
-          let status = this.attr('instance.status');
+          if (this.attr('instance.archived')) {
+            return false;
+          }
 
-          return !this.attr('instance.archived') &&
-            editableStatuses.includes(status);
+          // instance's state is changed before sending a request to server
+          const instanceStatus = this.attr('instance.status');
+
+          // current state is changed after receiving a server's response
+          const currentState = this.attr('currentState');
+
+          // the state when a request was sent, but a response wasn't received
+          if (currentState !== instanceStatus) {
+            return false;
+          }
+
+          return editableStatuses.includes(instanceStatus);
         },
         set: function () {
           this.onStateChange({state: 'In Progress', undo: false});
@@ -214,6 +227,8 @@ export default can.Component.extend({
     onStateChangeDfd: {},
     formState: {},
     noItemsText: '',
+    currentState: '',
+    previousStatus: undefined,
     initialState: 'Not Started',
     deprecatedState: 'Deprecated',
     assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
@@ -471,56 +486,77 @@ export default can.Component.extend({
           this.attr('instance').save().done(resolve).fail(reject);
         }.bind(this), 1000));
     },
+    refreshAssessment() {
+      this.attr('instance').refresh().then((response) => {
+        this.setCurrentState(response.status);
+      });
+    },
+    beforeStatusSave(newStatus, isUndo) {
+      const instance = this.attr('instance');
+
+      if (isUndo) {
+        instance.attr('status', this.attr('previousStatus'));
+        this.attr('previousStatus', undefined);
+      } else {
+        this.attr('previousStatus', instance.attr('status'));
+        instance.attr('status', newStatus);
+      }
+    },
+    afterStatusSave(savedStatus) {
+      this.attr('instance.status', savedStatus);
+      this.setCurrentState(savedStatus);
+    },
+    setCurrentState(state) {
+      this.attr('currentState', state);
+    },
     onStateChange: function (event) {
-      let isUndo = event.undo;
-      let newStatus = event.state;
-      let instance = this.attr('instance');
-      let initialState = this.attr('initialState');
-      let deprecatedState = this.attr('deprecatedState');
-      let isArchived = instance.attr('archived');
-      let previousStatus = instance.attr('previousStatus') || 'In Progress';
-      let stopFn = tracker.start(instance.type,
+      const isUndo = event.undo;
+      const newStatus = event.state;
+      const instance = this.attr('instance');
+      const status = instance.attr('status');
+      const initialState = this.attr('initialState');
+      const deprecatedState = this.attr('deprecatedState');
+      const isArchived = instance.attr('archived');
+      const previousStatus = this.attr('previousStatus');
+      const stopFn = tracker.start(instance.type,
         tracker.USER_JOURNEY_KEYS.INFO_PANE,
         tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
-      const resetStatusOnConflict = (object, xhr) => {
-        if (xhr && xhr.status === 409 && xhr.remoteObject) {
-          instance.attr('status', xhr.remoteObject.status);
-        }
-      };
 
       if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
         return $.Deferred().resolve();
       }
 
       this.attr('onStateChangeDfd', $.Deferred());
-
-      if (isUndo) {
-        instance.attr('previousStatus', undefined);
-      } else {
-        instance.attr('previousStatus', instance.attr('status'));
-      }
       this.attr('isUpdatingState', true);
 
-      return this.attr('deferredSave').execute(() => {
-        if (isUndo) {
-          instance.attr('status', previousStatus);
-        } else {
-          instance.attr('status', newStatus);
+      return this.attr('deferredSave').execute(
+        this.beforeStatusSave.bind(this, newStatus, isUndo)
+      ).then((resp) => {
+        const newStatus = resp.status;
+        this.afterStatusSave(newStatus);
+
+        this.attr('isUndoButtonVisible', !isUndo);
+
+        if (newStatus === 'In Review' && !isUndo) {
+          notifier('info', 'The assessment is complete. ' +
+          'The verifier may revert it if further input is needed.');
         }
 
-        if (instance.attr('status') === 'In Review' && !isUndo) {
-          $(document.body).trigger('ajax:flash',
-            {hint: 'The assessment is complete. ' +
-            'The verifier may revert it if further input is needed.'});
-        }
-      }).then(() => {
         this.attr('onStateChangeDfd').resolve();
         pubsub.dispatch({
           type: 'refetchOnce',
           modelNames: relatedAssessmentsTypes,
         });
         stopFn();
-      }).fail(resetStatusOnConflict).always(() => {
+      }).fail((object, xhr) => {
+        if (xhr && xhr.status === 409 && xhr.remoteObject) {
+          instance.attr('status', xhr.remoteObject.status);
+        } else {
+          this.afterStatusSave(status);
+          this.attr('previousStatus', previousStatus);
+          notifierXHR('error')(xhr);
+        }
+      }).always(() => {
         this.attr('isUpdatingState', false);
       });
     },
@@ -577,16 +613,23 @@ export default can.Component.extend({
         this.refreshCounts([countKey]);
       }
     },
+    resetCurrentState() {
+      this.setCurrentState(this.attr('instance.status'));
+      this.attr('previousStatus', undefined);
+      this.attr('isUndoButtonVisible', false);
+    },
   },
   init: function () {
     this.viewModel.initializeFormFields();
     this.viewModel.initGlobalAttributes();
     this.viewModel.updateRelatedItems();
     this.viewModel.initializeDeferredSave();
-
     this.viewModel.setVerifierRoleId();
   },
   events: {
+    inserted() {
+      this.viewModel.resetCurrentState();
+    },
     [`{viewModel.instance} ${REFRESH_MAPPING.type}`](scope, event) {
       const viewModel = this.viewModel;
       viewModel.attr('mappedSnapshots')
@@ -611,6 +654,7 @@ export default can.Component.extend({
     },
     '{viewModel.instance} modelAfterSave': function () {
       this.viewModel.attr('isAssessmentSaving', false);
+      this.viewModel.setCurrentState(this.viewModel.attr('instance.status'));
     },
     '{viewModel.instance} assessment_type'() {
       const onSave = () => {
@@ -626,6 +670,8 @@ export default can.Component.extend({
       this.viewModel.initializeFormFields();
       this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
+
+      this.viewModel.resetCurrentState();
     },
     '{pubsub} objectDeleted'(pubsub, event) {
       let instance = event.instance;

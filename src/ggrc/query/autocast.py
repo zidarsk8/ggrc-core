@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Autocast module, populate sent expression"""
@@ -7,7 +7,6 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
-from ggrc.models.reflection import AttributeInfo
 from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext.attributes import FullTextAttr, DatetimeValue, DateValue
 from ggrc.query.exceptions import BadQueryException
@@ -49,19 +48,16 @@ def is_autocast_required_for(exp):
 
 def get_fulltext_parsed_value(klass, key):
   """Get fulltext parser if it's exists """
-  attrs = AttributeInfo.gather_attrs(klass, '_fulltext_attrs')
+
   if not issubclass(klass, Indexed):
-    return
+    return None
+
+  attrs = klass.get_fulltext_attrs()
   for attr in attrs:
-    if isinstance(attr, FullTextAttr) and attr.with_template:
-      attr_key = klass.PROPERTY_TEMPLATE.format(attr.alias)
-    elif isinstance(attr, FullTextAttr):
-      attr_key = attr.alias
-    else:
-      attr_key = klass.PROPERTY_TEMPLATE.format(attr)
-      attr = FullTextAttr(key, key)
-    if attr_key == key:
+    if klass.get_fulltext_attr_name(attr) == key:
       return attr
+
+  return None
 
 
 def get_parsers(klass, key):

@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module with Person model definition."""
@@ -59,6 +59,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       foreign_keys='PersonProfile.person_id',
       uselist=False,
       backref="person",
+      cascade='all, delete-orphan',
   )
   access_control_people = db.relationship(
       'AccessControlPerson',

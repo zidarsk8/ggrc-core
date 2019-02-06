@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for notifications for models with Reviewable mixin."""
 import collections
 
 import ddt
+import freezegun
 from mock import mock
 from mock import patch
 
@@ -379,6 +380,52 @@ class TestReviewNotification(TestCase):
 
       # 1 emails to owners -> object state updated
       self.assertEqual(3, call_count["review_owners"])
+
+  @patch("google.appengine.api.mail.send_mail")
+  @freezegun.freeze_time("2019-01-15 12:00:00")
+  def test_notification_subject(self, send_mail_mock):
+    """Test that emails are sent with proper subject."""
+    expected_subject = "GGRC Change requests review digest " \
+                       "for 01/15/2019 04:00:00 PST"
+
+    reviewer = factories.PersonFactory()
+    reviewer_role_id = all_models.AccessControlRole.query.filter_by(
+        name="Reviewer",
+        object_type="Review",
+    ).one().id
+
+    with factories.single_commit():
+      control_admin = factories.PersonFactory()
+      control = factories.ControlFactory()
+      control.add_person_with_role_name(control_admin, "Admin")
+
+    email_message = "email email_message"
+    _, review = self.generator.generate_object(
+        all_models.Review,
+        {
+            "reviewable": {
+                "type": control.type,
+                "id": control.id,
+            },
+            "context": None,
+            "notification_type":
+                all_models.Review.NotificationTypes.EMAIL_TYPE,
+            "status": all_models.Review.STATES.REVIEWED,
+            "email_message": email_message,
+            "access_control_list": [{
+                "ac_role_id": reviewer_role_id,
+                "person": {
+                    "id": reviewer.id
+                },
+            }],
+        },
+    )
+
+    self.api.modify_object(review.reviewable, {"title": "new title"})
+    with mock.patch.object(fast_digest.DIGEST_TMPL, "render"):
+      fast_digest.send_notification()
+      for call_item in send_mail_mock.call_args_list:
+        self.assertEqual(expected_subject, call_item[1]["subject"])
 
 
 def _call_counter(mocked_obj):

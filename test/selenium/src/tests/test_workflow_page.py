@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow smoke tests."""
 # pylint: disable=no-self-use
@@ -174,6 +174,13 @@ class TestWorkflowSetupTab(base.Test):
     workflow_ui_facade.delete_task_group(app_task_group)
     assert not workflow_ui_facade.task_group_objs(app_workflow)
     assert ui_facade.active_tab_name() == "Setup (0)"
+
+  def test_add_task_group(self, app_workflow, selenium):
+    """Test creation of task group."""
+    task_group = workflow_entity_factory.TaskGroupFactory().create()
+    workflow_ui_facade.add_task_group(app_workflow, task_group)
+    assert workflow_ui_facade.task_group_objs(app_workflow)
+    assert ui_facade.active_tab_name() == "Setup (1)"
 
 
 class TestActivateWorkflow(base.Test):

@@ -1,34 +1,22 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import {getModelByType} from '../../plugins/utils/models-utils';
 import * as businessModels from '../business-models';
 import Permission from '../../permission';
-import TreeViewConfig from '../../apps/base_widgets';
 
 /*
   class Mappings
   represents everything known about how GGRC objects connect to each other.
 
-  a Mappings instance contains the set of known mappings for a module, such as "ggrc_core"
-  or "ggrc_gdrive_integration".  The set of all Mappings instances is used throughout the
+  a Mappings instance contains the set of known mappings.
+  The set of all Mappings instances is used throughout the
   system to build widgets, map and unmap objects, etc.
-
-  To configure a new Mappings instance, use the following format :
-  { <mixin name or source object type> : {
-      _mixins : [ <mixin name>, ... ],
-      _canonical : { <option type> : <name of mapping in parent object>, ... }
-      <mapping name> : Proxy(...) | Direct(...)
-                      | Multi(...)
-                      | CustomFilter(...),
-      ...
-    }
-  }
 */
 export default can.Construct.extend({
-  modules: {},
+  config: null,
   getTypeGroups: function () {
     return {
       entities: {
@@ -59,10 +47,8 @@ export default can.Construct.extend({
       return [];
     }
 
-    let canonical = this.get_canonical_mappings_for(type);
-    let list = TreeViewConfig.attr('base_widgets_by_type')[type];
-    const compacted = _.compact([_.keys(canonical), list]);
-    return _.intersection(...compacted);
+    let allowedToMap = this.getAllowedToMapModels(type);
+    return _.keys(allowedToMap);
   },
   /**
    * Determine if two types of models can be mapped
@@ -192,10 +178,10 @@ export default can.Construct.extend({
    * @return {Array} - list of available mappings
    */
   getAvailableMappings(type) {
-    let canonical = this.get_canonical_mappings_for(type);
-    let related = this.get_related_mappings_for(type);
+    let allowedToMap = this.getAllowedToMapModels(type);
+    let related = this.getIndirectlyMappedModels(type);
 
-    return Object.assign({}, canonical, related);
+    return Object.assign({}, allowedToMap, related);
   },
   /**
    * Return grouped types.
@@ -225,8 +211,6 @@ export default can.Construct.extend({
       category: cmsModel.category,
       name: cmsModel.title_plural,
       value: cmsModel.model_singular,
-      singular: cmsModel.model_singular,
-      plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
     };
   },
   /**
@@ -250,85 +234,59 @@ export default can.Construct.extend({
     group.items.push(type);
   },
   /*
-    return all mappings from all modules for an object type.
+    return all mappings for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all mappings (instances of GGRC.ListLoaders.BaseListLoader) by mapping name
-    Example: Mappings.get_mappings_for('Program')
+    Example: Mappings.getMappingsFor('Program')
   */
-  get_mappings_for: function (object) {
+  getMappingsFor: function (object) {
     let mappings = {};
-    _.forEach(this.modules, function (mod, name) {
-      if (mod[object]) {
-        _.forEach(mod[object], function (mapping, mappingName) {
-          if (mappingName === '_canonical') {
-            return;
-          }
-          mappings[mappingName] = mapping;
-        });
-      }
-    });
+    let objectConfig = this.config[object];
+    if (objectConfig && objectConfig.mappers) {
+      _.forEach(objectConfig.mappers, function (mapping, mappingName) {
+        mappings[mappingName] = mapping;
+      });
+    }
     return mappings;
   },
   /*
-    return all canonical mappings (suitable for joining) from all modules for an object type.
+    return all allowed mappings (suitable for joining) for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all mappings (instances of CMS.Models)
   */
-  get_canonical_mappings_for: function (object) {
+  getAllowedToMapModels: function (object) {
+    return this._getModelsFromConfig(object, 'map');
+  },
+  _getModelsFromConfig(object, prop) {
     let mappings = {};
-    _.forEach(this.modules, (mod, name) => {
-      if (mod._canonical_mappings && mod._canonical_mappings[object]) {
-        _.forEach(mod._canonical_mappings[object],
-          (mappingName, model) => {
-            mappings[model] = businessModels[model];
-          });
-      }
-    });
+    let config = this.config;
+    if (config[object] && config[object][prop]) {
+      _.forEach(config[object][prop],
+        (model) => {
+          mappings[model] = businessModels[model];
+        });
+    }
     return mappings;
   },
-  get_mapper: function (mappingName, type) {
+  getMapper: function (mappingName, type) {
     let mapper;
-    let mappers = this.get_mappings_for(type);
+    let mappers = this.getMappingsFor(type);
     if (mappers) {
       mapper = mappers[mappingName];
       return mapper;
     }
   },
-  _get_binding_attr: function (mapper) {
+  _getBindingAttr: function (mapper) {
     if (typeof (mapper) === 'string') {
       return '_' + mapper + '_binding';
     }
   },
-  // checks if binding exists without throwing debug statements
-  // modeled after what get_binding is doing
-  has_binding: function (mapper, model) {
-    let binding;
-    let mapping;
-    let bindingAttr = this._get_binding_attr(mapper);
-
-    if (bindingAttr) {
-      binding = model[bindingAttr];
-    }
-
-    if (!binding) {
-      if (typeof (mapper) === 'string') {
-        mapping = this.get_mapper(mapper, model.constructor.shortName);
-        if (!mapping) {
-          return false;
-        }
-      } else if (!(mapper instanceof GGRC.ListLoaders.BaseListLoader)) {
-        return false;
-      }
-    }
-
-    return true;
-  },
-  get_binding: function (mapper, model) {
+  getBinding: function (mapper, model) {
     let mapping;
     let binding;
-    let bindingAttr = this._get_binding_attr(mapper);
+    let bindingAttr = this._getBindingAttr(mapper);
 
     if (bindingAttr) {
       binding = model[bindingAttr];
@@ -337,7 +295,7 @@ export default can.Construct.extend({
     if (!binding) {
       if (typeof (mapper) === 'string') {
       // Lookup and attach named mapper
-        mapping = this.get_mapper(mapper, model.constructor.shortName);
+        mapping = this.getMapper(mapper, model.constructor.shortName);
         if (!mapping) {
           console.warn(
             `No such mapper: ${model.constructor.shortName}.${mapper}`);
@@ -357,132 +315,21 @@ export default can.Construct.extend({
     }
     return binding;
   },
-  get_list_loader: function (name, model) {
-    let binding = this.get_binding(name, model);
-    return binding.refresh_list();
-  },
   /*
-    return all related mappings from all modules for an object type.
+    return all possible indirectly mapped models for an object type.
     object - a string representing the object type's shortName
 
     return: a keyed object of all related mappings (instances of CMS.Models)
   */
-  get_related_mappings_for(object) {
-    let mappings = {};
-    _.forEach(this.modules, (mod) => {
-      if (mod._related_mappings && mod._related_mappings[object]) {
-        _.forEach(mod._related_mappings[object],
-          (mappingName, model) => {
-            mappings[model] = businessModels[model];
-          });
-      }
-    });
-    return mappings;
+  getIndirectlyMappedModels(object) {
+    return this._getModelsFromConfig(object, 'indirectMappings');
   },
 }, {
-  /*
-    On init:
-    kick off the application of mixins to the mappings and resolve canonical mappings
-  */
-  init: function (name, opts) {
-    let createdMappings;
-    let that = this;
-    this.constructor.modules[name] = this;
-    this._canonical_mappings = {};
-    this._related_mappings = {};
-    if (this.groups) {
-      _.forEach(this.groups, function (group, name) {
-        if (typeof group === 'function') {
-          that.groups[name] = $.proxy(group, that.groups);
-        }
-      });
-    }
-    createdMappings = this.create_mappings(opts);
-    _.forEach(createdMappings, function (mappings, objectType) {
-      if (mappings._canonical) {
-        that._fillInMappings(objectType,
-          mappings._canonical, that._canonical_mappings);
-      }
-
-      if (mappings._related) {
-        that._fillInMappings(objectType,
-          mappings._related, that._related_mappings);
-      }
-    });
-    $.extend(this, createdMappings);
-  },
-  _fillInMappings(objectType, config, mappings) {
-    if (!mappings[objectType]) {
-      mappings[objectType] = {};
+  init: function (definitions) {
+    if (this.constructor.config) {
+      throw new Error('Mappings are already initialized.');
     }
 
-    _.forEach(config, (optionTypes, mappingName) => {
-      if (!can.isArray(optionTypes)) {
-        optionTypes = [optionTypes];
-      }
-      optionTypes.forEach((optionType) => {
-        mappings[objectType][optionType] = mappingName;
-      });
-    });
-  },
-  // Recursively handle mixins -- this function should not be called directly.
-  reify_mixins: function (definition, definitions) {
-    let that = this;
-    let finalDefinition = {};
-    if (definition._mixins) {
-      _.forEach(definition._mixins, function (mixin) {
-        if (typeof (mixin) === 'string') {
-          // If string, recursive lookup
-          if (!definitions[mixin]) {
-            console.warn('Undefined mixin: ' + mixin, definitions);
-          } else {
-            _.merge(finalDefinition,
-              that.reify_mixins(definitions[mixin], definitions));
-          }
-        } else if (_.isFunction(mixin)) {
-          // If function, call with current definition state
-          mixin(finalDefinition);
-        } else {
-          // Otherwise, assume object and extend
-          if (finalDefinition._canonical && mixin._canonical) {
-            mixin = Object.assign({}, mixin);
-
-            _.forEach(mixin._canonical, function (types, mapping) {
-              if (finalDefinition._canonical[mapping]) {
-                if (!can.isArray(finalDefinition._canonical[mapping])) {
-                  finalDefinition._canonical[mapping] =
-                    [finalDefinition._canonical[mapping]];
-                }
-                finalDefinition._canonical[mapping] =
-                  can.unique(finalDefinition._canonical[mapping]
-                    .concat(types));
-              } else {
-                finalDefinition._canonical[mapping] = types;
-              }
-            });
-            finalDefinition._canonical = Object.assign({}, mixin._canonical,
-              finalDefinition._canonical);
-            delete mixin._canonical;
-          }
-          Object.assign(finalDefinition, mixin);
-        }
-      });
-    }
-    _.merge(finalDefinition, definition);
-    delete finalDefinition._mixins;
-    return finalDefinition;
-  },
-
-  // create mappings for definitions -- this function should not be called directly/
-  create_mappings: function (definitions) {
-    let mappings = {};
-
-    _.forEach(definitions, (definition, name) => {
-      // Only output the mappings if it's a model, e.g., uppercase first letter
-      if (name[0] === name[0].toUpperCase()) {
-        mappings[name] = this.reify_mixins(definition, definitions);
-      }
-    });
-    return mappings;
+    this.constructor.config = definitions;
   },
 });

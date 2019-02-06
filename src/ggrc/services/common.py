@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -151,15 +151,6 @@ class ModelView(View):
     return mapper.polymorphic_on.in_(polymorphic_on_values)
 
   @staticmethod
-  def _get_matching_types(model):
-    mapper = model._sa_class_manager.mapper
-    if len(list(mapper.self_and_descendants)) == 1:
-      return mapper.class_.__name__
-
-    # FIXME: Actually needs to use 'self_and_descendants'
-    return [m.class_.__name__ for m in mapper.self_and_descendants]
-
-  @staticmethod
   def get_match_columns(model):
     mapper = model._sa_class_manager.mapper
     columns = []
@@ -261,16 +252,16 @@ class ModelView(View):
             query = query.filter(self.model.id.in_(j_resources))
     if '__search' in request.args:
       terms = request.args['__search']
-      types = self._get_matching_types(self.model)
       indexer = get_indexer()
-      models = indexer._get_grouped_types(types)
-      search_query = indexer.get_permissions_query(models, 'read')
-      search_query = sa.and_(search_query, indexer._get_filter_query(terms))
+      search_query = indexer.get_permissions_query([self.model.__name__],
+                                                   'read')
+      search_query = sa.and_(search_query,
+                             indexer.get_filter_query(terms, self.model))
       search_query = db.session.query(indexer.record_type.key).filter(
           search_query)
       if '__mywork' in request.args:
-        search_query = indexer._add_owner_query(
-            search_query, models, get_current_user_id())
+        search_query = indexer.search_get_owner_query(
+            search_query, [self.model], get_current_user_id())
       search_subquery = search_query.subquery()
       query = query.filter(self.model.id.in_(search_subquery))
     order_properties = []
@@ -480,7 +471,7 @@ class Resource(ModelView):
     """POST operation handler."""
     raise NotImplementedError()
 
-  def get(self, id):
+  def get(self, id):  # pylint: disable=redefined-builtin
     """Default JSON request handlers"""
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -584,7 +575,8 @@ class Resource(ModelView):
       raise Forbidden()
 
   @utils.validate_mimetype("application/json")
-  def put(self, id):
+  def put(self, id):  # pylint: disable=redefined-builtin
+    """PUT operation handler."""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -679,7 +671,8 @@ class Resource(ModelView):
     else:
       flask.g.referenced_object_stubs = {obj.type: {obj.id}}
 
-  def delete(self, id):
+  def delete(self, id):  # pylint: disable=redefined-builtin
+    """DELETE operation handler."""
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
@@ -725,7 +718,7 @@ class Resource(ModelView):
 
   @staticmethod
   def has_cache():
-    return getattr(settings, 'MEMCACHE_MECHANISM', False)
+    return cache_utils.has_memcache()
 
   def apply_paging(self, matches_query):
     page_size = min(

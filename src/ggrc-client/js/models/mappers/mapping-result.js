@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -17,7 +17,7 @@
    *    `binding.instance`, then, is the instance on which the original,
    *    unfiltered list is specified.
    */
-  can.Map.extend('GGRC.ListLoaders.MappingResult', {}, {
+  GGRC.ListLoaders.MappingResult = can.Map.extend({}, {
     init: function (instance, mappings, binding) {
       if (!mappings) {
         // Assume item was passed in as an object

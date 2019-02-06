@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """All GGRC model classes grouped together for convenience."""
@@ -161,7 +161,7 @@ all_models = [  # pylint: disable=invalid-name
     Vendor,
 ]
 
-__all__ = [m.__name__ for m in all_models]
+__all__ = list(m.__name__ for m in all_models)
 
 
 def register_model(model):

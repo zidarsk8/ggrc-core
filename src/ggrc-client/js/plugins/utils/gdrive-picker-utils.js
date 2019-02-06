@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -114,4 +114,12 @@ export function findGDriveItemById(id) {
 
   return gapiClient.authorizeGapi(['https://www.googleapis.com/auth/drive'])
     .then(() => gapiClient.makeGapiRequest({path, method: 'get'}));
+}
+
+export function getGDriveItemId(msg) {
+  if (!msg) {
+    return;
+  }
+  msg = msg.split(' ');
+  return msg[msg.length-1];
 }

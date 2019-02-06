@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -27,7 +27,8 @@ import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
 import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
-import '../dropdown/dropdown-options-loader';
+import '../dropdown/dropdown-multiselect-wrapper';
+import '../dropdown/dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
 import template from './templates/tree-widget-container.mustache';
@@ -53,6 +54,7 @@ import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
 import exportMessage from './templates/export-message.mustache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
 let viewModel;
 
@@ -388,12 +390,16 @@ viewModel = can.Map.extend({
     }
 
     function onDestroyed(ev, instance) {
-      let current;
+      const activeTabType = businessModels[activeTabModel].model_singular;
+      const isSnapshotTab =
+        isSnapshotType(instance) &&
+        instance.child_type === activeTabType;
 
       if (_verifyRelationship(instance, activeTabModel) ||
-        instance instanceof businessModels[activeTabModel]) {
+        instance instanceof businessModels[activeTabModel] ||
+        isSnapshotTab) {
         if (self.attr('showedItems').length === 1) {
-          current = self.attr('pageInfo.current');
+          const current = self.attr('pageInfo.current');
           self.attr('pageInfo.current',
             current > 1 ? current - 1 : 1);
         }
@@ -406,8 +412,8 @@ viewModel = can.Map.extend({
 
         // TODO: This is a workaround.We need to update communication between
         //       info-pin and tree views through Observer
-        if (!self.attr('$el').closest('.cms_controllers_info_pin').length) {
-          $('.cms_controllers_info_pin').control().unsetInstance();
+        if (!self.attr('$el').closest('.pin-content').length) {
+          $('.pin-content').control().unsetInstance();
         }
       } else {
         // reinit mapped instances (subTree uses mapped instances)
@@ -642,6 +648,7 @@ viewModel = can.Map.extend({
 export default can.Component.extend({
   tag: 'tree-widget-container',
   template,
+  leakScope: true,
   viewModel,
   init: function () {
     this.viewModel.setColumnsConfiguration();

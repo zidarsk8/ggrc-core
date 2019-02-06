@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -51,37 +51,6 @@ describe('CanJS extensions', function () {
     it('should return same value for snake case', function () {
       expect(method('hello_world')).toBe('hello_world');
       expect(method('hello_world_hi_there')).toBe('hello_world_hi_there');
-    });
-    it('should throw a type error in case of non string', function () {
-      expect(function () {
-        method(42);
-      }).toThrow(new TypeError('Invalid type, string required.'));
-      expect(function () {
-        method({a: 1});
-      }).toThrow(new TypeError('Invalid type, string required.'));
-    });
-  });
-
-  describe('using spaceCamelCase', function () {
-    let method;
-
-    beforeEach(function () {
-      method = can.spaceCamelCase;
-    });
-
-    it('should return camel case from space case', function () {
-      expect(method('hello_world')).toBe('Hello World');
-      expect(method('hello_world_hi_there')).toBe('Hello World Hi There');
-      expect(method('my_number_4_and_number_5')).toBe(
-        'My Number 4 And Number 5');
-    });
-    it('should return same value for one word', function () {
-      expect(method('hello')).toBe('Hello');
-      expect(method('Hello')).toBe('Hello');
-    });
-    it('should return properly capitalized for camelCase input', function () {
-      expect(method('helloWorld')).toBe('Hello World');
-      expect(method('helloWorldHiThere')).toBe('Hello World Hi There');
     });
     it('should throw a type error in case of non string', function () {
       expect(function () {

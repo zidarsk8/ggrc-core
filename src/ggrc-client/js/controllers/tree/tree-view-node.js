@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -11,6 +11,7 @@ import {
   isObjectContextPage,
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import TreeViewControl from './tree-view';
 import TreeViewOptions from './tree-view-options';
 
 function _firstElementChild(el) {
@@ -27,7 +28,6 @@ function _firstElementChild(el) {
 }
 
 export default can.Control.extend({
-  pluginName: 'cms_controllers_tree_view_node',
   defaults: {
     model: null,
     parent: null,
@@ -131,6 +131,7 @@ export default can.Control.extend({
       this.options,
       this._ifNotRemoved(function (frag) {
         this.replace_element(frag);
+        this.add_control();
 
         if (isActive) {
           this.element.addClass('active');
@@ -174,6 +175,13 @@ export default can.Control.extend({
 
     this.options.attr('child_options', newChildList);
     this.options.attr('_added_child_list', true);
+  },
+
+  add_control: function () {
+    const subTree = this.element.find('.tree-view-control');
+    if (subTree && subTree.length) {
+      return new TreeViewControl(subTree[0], subTree.data('options'));
+    }
   },
 
   // data is an entry from child options.  if child options is an array, run once for each.
@@ -230,7 +238,7 @@ export default can.Control.extend({
     oldEl.data('controls', []);
     this.off();
     oldEl.replaceWith(el);
-    this.element = firstchild.addClass(this.constructor.pluginName)
+    this.element = firstchild.addClass('tree-view-node')
       .data(oldData);
 
     if (this.options.is_subtree &&
@@ -249,21 +257,24 @@ export default can.Control.extend({
     let childTreeDfds = [];
     let that = this;
 
-    this.element.find('.cms_controllers_tree_view')
+    this.element.find('.tree-view-control')
       .each(function (_, el) {
         let $el = $(el);
         let childTreeControl;
 
         //  Ensure this targets only direct child trees, not sub-tree trees
-        if ($el.closest('.' + that.constructor.pluginName).is(that.element)) {
+        if ($el.closest('.tree-view-node').is(that.element)) {
           childTreeControl = $el.control();
-          if (childTreeControl) {
-            that.options.attr('subTreeLoading', true);
-            childTreeDfds.push(childTreeControl.display()
-              .then(function () {
-                that.options.attr('subTreeLoading', false);
-              }));
+
+          if (!childTreeControl) {
+            childTreeControl = that.add_control();
           }
+
+          that.options.attr('subTreeLoading', true);
+          childTreeDfds.push(childTreeControl.display()
+            .then(function () {
+              that.options.attr('subTreeLoading', false);
+            }));
         }
       });
 
@@ -307,7 +318,7 @@ export default can.Control.extend({
 
   '.openclose:not(.active) click': function (el, ev) {
     // Ignore unless it's a direct child
-    if (el.closest('.' + this.constructor.pluginName).is(this.element)) {
+    if (el.closest('.tree-view-node').is(this.element)) {
       this.expand();
     }
   },

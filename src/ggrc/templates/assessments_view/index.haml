@@ -1,4 +1,4 @@
--# Copyright (C) 2018 Google Inc.
+-# Copyright (C) 2019 Google Inc.
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 -extends 'layouts/base.haml'
@@ -21,7 +21,7 @@
   %script{ type:'text/javascript', src:'{{config.get("DASHBOARD_JS_PATH")}}' }
 
 -block body
-  .area.flex-box.flex-col.area--distraction-free{ 'class': '={ model_display_class }' }
+  #pageContent.page-content.flex-box.flex-col.page-content--distraction-free{ 'class': '={ model_display_class }' }
     #page-header
       -block header
 

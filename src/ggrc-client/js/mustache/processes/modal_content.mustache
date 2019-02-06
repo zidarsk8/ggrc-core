@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -100,7 +100,16 @@
         <a data-id="hide_network_zone_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div data-id="network_zone_dd" tabindex="9">
-        {{{option_select this "network_zone" "network_zone"}}}
+        <model-loader {path}="'service-models/option'">
+          <dropdown-wrapper {model-constructor}="loadedModel"
+                            {(value)}="instance.network_zone" 
+                            {role}="'network_zone'">
+            <dropdown {options-list}="options"
+                      ($change)="selectedChanged" name="selected"
+                      {no-value}="true" {no-value-label}="'---'">
+            </dropdown>
+          </dropdown-wrapper>
+        </model-loader>
       </div>
     </div>
   </div>

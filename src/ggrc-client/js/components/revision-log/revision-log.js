@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -42,6 +42,7 @@ let _EMBED_MAPPINGS = {
 export default can.Component.extend({
   tag: 'revision-log',
   template,
+  leakScope: true,
   viewModel: {
     _LIST_FIELDS: _LIST_FIELDS,
     _DATE_FIELDS: _DATE_FIELDS,
@@ -770,7 +771,7 @@ export default can.Component.extend({
       currentAssignees = _.groupBy(
         _.flattenDeep(_.map(assigneeList, function (assignableType) {
           return _.map(
-            Mappings.get_binding(assignableType.mapping, instance).list,
+            Mappings.getBinding(assignableType.mapping, instance).list,
             function (person) {
               return {
                 id: person.instance.id,

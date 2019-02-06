@@ -1,7 +1,8 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Memcache implements the remote AppEngine Memcache mechanism."""
 
+import logging
 from collections import OrderedDict
 from copy import deepcopy
 
@@ -9,6 +10,14 @@ from google.appengine.api import memcache
 
 from ggrc.cache import cache
 from ggrc import settings
+
+
+logger = logging.getLogger(__name__)
+
+
+def has_memcache():
+  # type: () -> bool
+  return getattr(settings, 'MEMCACHE_MECHANISM', False)
 
 
 class MemCache(cache.Cache):
@@ -268,7 +277,8 @@ class _Decorated(object):
 
   @property
   def active(self):
-    return settings.MEMCACHE_MECHANISM
+    # type: () -> bool
+    return has_memcache()
 
   def get_key(self, *args, **kwargs):
     """Return key name for sent args and kwargs"""

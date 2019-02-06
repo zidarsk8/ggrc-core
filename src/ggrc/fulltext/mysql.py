@@ -1,6 +1,8 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
+
+import logging
 
 import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declared_attr
@@ -10,9 +12,23 @@ from sqlalchemy import event
 
 from ggrc import db
 from ggrc.fulltext.sql import SqlIndexer
-from ggrc.models import all_models
+from ggrc.fulltext.mixin import Indexed
+from ggrc.models import all_models, get_model
 from ggrc.query import my_objects
 from ggrc.rbac import permissions
+
+
+logger = logging.getLogger(__name__)
+
+
+ATTRIBUTE_ALIASES_TO_SEARCH_IN = (
+    'title',
+    'name',
+    'email',
+    'notes',
+    'description',
+    'slug'
+)
 
 
 # pylint: disable=too-few-public-methods
@@ -41,10 +57,31 @@ class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
   @staticmethod
-  def _get_filter_query(terms):
+  def _get_attr_names_to_search_in(model):
+    """Get list of indexed attribute names"""
+
+    attrs = model.get_fulltext_attrs()
+
+    aliases = dict((attr.alias, attr) for attr in attrs)
+
+    ret = []
+    # Get list of attribute names by alias name
+    for name in ATTRIBUTE_ALIASES_TO_SEARCH_IN:
+      if name in aliases:
+        ret.append(model.get_fulltext_attr_name(aliases[name]))
+
+    return ret
+
+  @classmethod
+  def get_filter_query(cls, terms, model=None):
     """Get the whitelist of fields to filter in full text table."""
-    whitelist = MysqlRecordProperty.property.in_(
-        ['title', 'name', 'email', 'notes', 'description', 'slug'])
+
+    if not model or not issubclass(model, Indexed):
+      # Only indexed models are supported
+      return sa.false()
+
+    attr_names = cls._get_attr_names_to_search_in(model)
+    whitelist = MysqlRecordProperty.property.in_(attr_names)
 
     if not terms:
       return whitelist
@@ -110,112 +147,297 @@ class MysqlIndexer(SqlIndexer):
     if not extra_param:
       return query
 
-    models = [m for m in all_models.all_models if m.__name__ == type_name]
+    model = get_model(type_name)
 
-    if not models:
+    if model is None:
       return query
-    model_klass = models[0]
 
     return query.filter(self.record_type.key.in_(
         db.session.query(
-            model_klass.id.label('id')
+            model.id.label('id')
         ).filter_by(**extra_param)
     ))
 
-  @staticmethod
-  def _get_grouped_types(types=None, extra_params=None):
-    """Return list of model names from all model names
+  def _get_search_query(self, model, permission_type, owner_id,
+                        terms, extra_filter):
+    """Get SELECT for a single model based on filter parameters"""
+    model_name = model.__name__
 
-    if they in sended types and extra_params"""
-    model_names = []
-    for model_klass in all_models.all_models:
-      model_name = model_klass.__name__
-      if types and model_name not in types:
-        continue
-      if extra_params and model_name in extra_params:
-        continue
-      model_names.append(model_name)
-    return model_names
-
-  # pylint: disable=too-many-arguments
-  def search(self, terms, types=None, permission_type='read',
-             contact_id=None, extra_params=None):
-    """Prepare the search query and return the results set based on the
-    full text table."""
-    extra_params = extra_params or {}
-    model_names = self._get_grouped_types(types, extra_params)
     columns = (
         self.record_type.key.label('key'),
         self.record_type.type.label('type'),
-        self.record_type.property.label('property'),
         self.record_type.content.label('content'),
         sa.case(
             [(self.record_type.property == 'title', sa.literal(0))],
-            else_=sa.literal(1)).label('sort_key'))
+            else_=sa.literal(1)).label('sort_key')
+    )
 
     query = db.session.query(*columns)
+    query = query.filter(self.get_filter_query(terms, model))
+    query = self.search_get_owner_query(query, [model_name], owner_id)
     query = query.filter(self.get_permissions_query(
-        model_names, permission_type))
-    query = query.filter(self._get_filter_query(terms))
-    query = self.search_get_owner_query(query, types, contact_id)
+        [model_name], permission_type))
 
-    model_names = self._get_grouped_types(types)
+    if extra_filter:
+      query = self._add_extra_params_query(query, model_name, extra_filter)
 
-    unions = [query]
-    # Add extra_params and extra_colums:
-    for key, value in extra_params.iteritems():
-      if key not in model_names:
-        continue
-      extra_q = db.session.query(*columns)
-      extra_q = extra_q.filter(
-          self.get_permissions_query([key], permission_type))
-      extra_q = extra_q.filter(self._get_filter_query(terms))
-      extra_q = self.search_get_owner_query(extra_q, [key], contact_id)
-      extra_q = self._add_extra_params_query(extra_q, key, value)
-      unions.append(extra_q)
-    all_queries = sa.union(*unions)
-    all_queries = aliased(all_queries.order_by(
-        all_queries.c.sort_key, all_queries.c.content))
-    return db.session.execute(
-        select([all_queries.c.key, all_queries.c.type]).distinct())
+    return query
+
+  def _get_count_query(self, model, owner_id,
+                       terms, column_name, extra_filter=None):
+    """Get SELECT for a single model based on filter parameters"""
+    model_name = model.__name__
+
+    columns = (
+        self.record_type.type.label("type"),
+        sa.func.count(sa.distinct(self.record_type.key)).label("count"),
+        sa.literal(column_name)
+    )
+
+    query = db.session.query(*columns)
+    query = query.filter(self.get_filter_query(terms, model))
+    query = self.search_get_owner_query(query, [model_name], owner_id)
+    query = query.filter(self.get_permissions_query([model_name]))
+
+    if extra_filter is not None:
+      query = self._add_extra_params_query(query, model_name, extra_filter)
+
+    query = query.group_by(self.record_type.type)
+
+    return query
+
+  @staticmethod
+  def _merge_extra_params(types,  # type: List[str]
+                          extra_params,  # type: Dict[str, Dict[str, str]]
+                          extra_columns  # type: Dict[str, str]
+                          ):
+    # type: (...) -> Dict[str, Dict[str, Dict[str, str]]]
+    """Merge models without extra filter and models with extra filter
+
+    Convert model names into model classes (if exist).
+    Then, make dict (model -> dict(column_name -> extra_filter_or_empty_dict)
+
+    Example of args/result:
+    >>> _merge_extra_params(\
+            types =  ["Standard", "Requirement", "contract", "notype1"],\
+            extra_params = {\
+                "A1": {"title": "abc"},\
+                "A2": {"field": "value"},\
+                "CONTRACT": {"somefield": "somevalue"},\
+                "notype2": {"field1": "field2"}\
+            },\
+            extra_columns = {\
+                "A1": "Standard",\
+                "A2": "Requirement"\
+            }\
+        )
+      {
+          Standard: {
+              "A1": {"title": "abc"},
+              "A2": {"field": "value"}
+          },
+          Requirement: {
+              "Requirement": {}
+          },
+          Contract: {
+              "Contract": {"somefield": "somevalue"}
+          }
+      }
+
+
+    Args:
+      types: list of model names to be searched in
+      extra_params: dict(model_name -> extra_filter)
+      extra_columns: dict(column_name -> model_name)
+
+    Return:
+      dict (model -> dict(column_name -> extra_filter_or_none))
+    """
+
+    # convert type names and column names into model classes (if model exist)
+
+    for column_name, type_ in extra_columns.iteritems():
+      # column name can be specified without extra filter in extra_params
+      if column_name not in extra_params:
+        extra_params[column_name] = dict()
+
+    extra_params_with_models = dict()  # dict(model -> dict(column) -> filter)
+    for type_, extra_filter in extra_params.iteritems():
+      column_name = None
+      if type_ in extra_columns:
+        column_name = type_
+        # convert column name into type name
+        type_ = extra_columns[type_]
+
+      model = get_model(type_)
+
+      if model is not None:
+        if column_name is None:
+          # set column name to model name if type name was
+          # specified in extra_params
+          column_name = model.__name__
+
+        extra_params_with_models.setdefault(
+            model, dict())[column_name] = extra_filter
+
+    models_in_types = set(get_model(i) for i in types)
+    models_in_types.discard(None)
+    models_in_extra_params = set(extra_params_with_models.keys())
+
+    # get models which are in types but not in extra_params
+    models_no_extra = models_in_types - models_in_extra_params
+    # get models which are in types and extra_params
+    models_only_extra = models_in_types & models_in_extra_params
+
+    # now get final dict:
+    # models in models_no_extra do not have extra filter
+    ret = dict((model, {model.__name__: dict()})
+               for model in models_no_extra)
+    # models in models_only_extra has extra filter
+    # this expression also removes models which are in
+    # extra_params/extra_columns but not in types
+    ret.update((model, extra_filter)
+               for model, extra_filter in extra_params_with_models.iteritems()
+               if model in models_only_extra)
+
+    return ret
+
+  def search(self,
+             terms,  # type: str
+             types=None,  # type: List[str]
+             permission_type='read',  # type: str
+             contact_id=None,  # type: int
+             extra_params=None  # Dict[str, Dict[str, str]]
+             ):
+    # type: (...) -> List[Tuple[int, str]]
+    """Prepare the search query and return the results set based on the
+    full text table.
+
+    Example of request/response:
+
+      Request:
+        type = ["Requirement", "Standard"]
+        terms = "qq"
+        permission_type = "read"
+        contact_id = 10
+        extra_params = {"Standard": {"title": "aa"}}
+      Expected response:
+        1) requirements which are readable by current user and
+           are owned by user with id=10 and
+           contain "qq" in indexed fields
+        2) standards which are readable by current user and
+           contain "qq" in indexed fields and
+           are owned by user with id=10 and
+           where title="aa"
+
+    Args:
+      terms: string to search in fulltext attributes
+      types: optional list of model names to search in
+      permission_type: permission type
+      contact_id: id of objects owner or None to omit this filter
+      extra_params: dict(model_name -> dict(field_of_model -> value_to_filter))
+    Return:
+      iterable object of search results ResultProxy or empty list
+    """
+
+    types = types or list()
+    extra_params = extra_params or dict()
+
+    queries = []
+
+    models_and_extra_filters = self._merge_extra_params(
+        types, extra_params, dict())
+    for model, columns_and_filters in models_and_extra_filters.iteritems():
+      for _, extra_filter in columns_and_filters.iteritems():
+        # Get SELECT query for single model with optional extra filter
+        query = self._get_search_query(model=model,
+                                       permission_type=permission_type,
+                                       owner_id=contact_id,
+                                       terms=terms,
+                                       extra_filter=extra_filter)
+        queries.append(query)
+
+    if not queries:
+      return list()
+
+    query = sa.union(*queries)
+    query = aliased(query.order_by(query.c.sort_key, query.c.content))
+
+    final_query = select([query.c.key, query.c.type]).distinct()
+
+    return db.session.execute(final_query)
 
   # pylint: disable=too-many-arguments
-  def counts(self, terms, types=None, contact_id=None,
-             extra_params=None, extra_columns=None):
-    """Prepare the search query, but return only count for each of
-     the requested objects."""
-    extra_params = extra_params or {}
-    extra_columns = extra_columns or {}
-    model_names = self._get_grouped_types(types, extra_params)
-    query = db.session.query(
-        self.record_type.type, sa.func.count(sa.distinct(
-            self.record_type.key)), sa.literal(""))
-    query = query.filter(self.get_permissions_query(model_names))
-    query = query.filter(self._get_filter_query(terms))
-    query = self.search_get_owner_query(query, types, contact_id)
-    query = query.group_by(self.record_type.type)
-    all_extra_columns = dict(extra_columns.items() +
-                             [(p, p) for p in extra_params
-                              if p not in extra_columns])
-    if not all_extra_columns:
-      return query.all()
+  def counts(self,
+             terms,  # type: str
+             types=None,  # type: List[str]
+             contact_id=None,  # type: int
+             extra_params=None,  # Dict[str, Dict[str, str]]
+             extra_columns=None):
+    # type: (...) -> List[Tuple[str, int, str]]
+    """Prepare the search query and return the results set based on the
+    full text table
 
-    # Add extra_params and extra_colums:
-    for key, value in all_extra_columns.iteritems():
-      extra_q = db.session.query(
-          self.record_type.type,
-          sa.func.count(sa.distinct(self.record_type.key)),
-          sa.literal(key)
-      )
-      extra_q = extra_q.filter(self.get_permissions_query([value]))
-      extra_q = extra_q.filter(self._get_filter_query(terms))
-      extra_q = self.search_get_owner_query(extra_q, [value], contact_id)
-      extra_q = self._add_extra_params_query(extra_q,
-                                             value,
-                                             extra_params.get(key, None))
-      extra_q = extra_q.group_by(self.record_type.type)
-      query = query.union(extra_q)
-    return query.all()
+    Example of request/response:
+
+      Request:
+        type = ["Requirement", "Standard"]
+        terms = "qq"
+        contact_id = 10
+        extra_params = {"AA": {"title": "aa"}}
+        extra_columns = {"AA": "Standard"}
+      Expected response:
+        ["Requirement": <count>, "Requirement",
+         "Standard", <count>, "AA"
+        ]
+
+        Filter for "Requirement":
+          requirements which are readable by current user and
+          are owned by user with id=10 and
+          contain "qq" in indexed fields
+        Filter for "AA":
+          standards which are readable by current user and
+          contain "qq" in indexed fields and
+          are owned by user with id=10 and
+          where title="aa"
+
+    Args:
+      terms: string to search in fulltext attributes
+      types: optional list of model names to search in
+      contact_id: id of objects owner or None to omit this filter
+      extra_params: dict(model_or_column_name -> dict(field_of_model ->
+                                                      value_to_filter))
+      extra_columns: dict(column_name -> model_name)
+
+    Return:
+      iterable object of search results ResultProxy or empty list
+      Each items is Tuple[model_name, count, column_name]
+    """
+
+    types = types or list()
+    extra_params = extra_params or dict()
+    extra_columns = extra_columns or dict()
+
+    # "types" can contain column name instead of type name.
+    # Convert it to type name
+    types = list(extra_columns.get(t, t) for t in types)
+
+    queries = []
+
+    models_and_extra_filters = self._merge_extra_params(
+        types, extra_params, extra_columns)
+    for model, columns_and_filters in models_and_extra_filters.iteritems():
+      for column_name, extra_filter in columns_and_filters.iteritems():
+        query = self._get_count_query(model, contact_id, terms, column_name,
+                                      extra_filter)
+        queries.append(query)
+
+    if not queries:
+      return list()
+
+    query = sa.union(*queries)
+
+    return db.session.execute(query)
 
 
 Indexer = MysqlIndexer

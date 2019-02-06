@@ -1,151 +1,141 @@
 {{!
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#instance}}
   <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+    <wrapper-assessment-template {instance}="instance">
+      <div class="tier-content">
 
-    <div class="tier-content">
+        <div class="pane-header">
+          <div class="pane-header__container">
+            <div class="pane-header__title" data-test-id="title_0ad9fbaf">
+              {{#is_info_pin}}
+                <h6>Title</h6>
+              {{/is_info_pin}}
+              <div class="pane-header__title-details">
+                <h3>{{title}}</h3>
 
-      <div class="pane-header">
-        <div class="pane-header__container">
-          <div class="pane-header__title" data-test-id="title_0ad9fbaf">
-            {{#is_info_pin}}
-              <h6>Title</h6>
-            {{/is_info_pin}}
-            <div class="pane-header__title-details">
-              <h3>{{title}}</h3>
-
-              {{#if status}}
-                <span>
-                  <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
-                </span>
-              {{/if}}
+                {{#if status}}
+                  <span>
+                    <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
+                  </span>
+                {{/if}}
+              </div>
             </div>
-          </div>
-          <div class="pane-header__toolbar">
-            {{#is_info_pin}}
-              <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
-            {{/is_info_pin}}
+            <div class="pane-header__toolbar">
+              {{#is_info_pin}}
+                <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
+              {{/is_info_pin}}
 
-            {{> '/static/mustache/base_objects/info-pane-utility.mustache'}}
+              {{> '/static/mustache/base_objects/info-pane-utility.mustache'}}
+            </div>
           </div>
         </div>
-      </div>
 
-      <tab-container>
-        <tab-panel {(panels)}="panels" title-text="Attributes">
-          <div class="row-fluid wrap-row">
-            <div class="span4">
-              <h6>Objects under assessment</h6>
-              {{#if template_object_type}}
-                {{template_object_type}}
-              {{else}}
-                <span class="empty-message">None</span>
-              {{/if}}
-            </div>
-
-            <div class="span4">
-              <h6>Copy Assessment Procedure from mapped object</h6>
-              {{#if test_plan_procedure}}YES{{else}}NO{{/if}}
-            </div>
-
-            <div class="span4">
-              <h6>Default procedure description</h6>
-              {{#if procedure_description}}
-                {{{procedure_description}}}
-              {{else}}
-                <span class="empty-message">None</span>
-              {{/if}}
-            </div>
-          </div>
-
-          <div class="row-fluid wrap-row">
-            <div class="span4">
-              <h6>Default Assignees</h6>
-              {{#if default_people.assignees}}
-                {{#if_string default_people.assignees}}
-                  {{get_item DEFAULT_PEOPLE_LABELS default_people.assignees}}
+        <tab-container>
+          <tab-panel {(panels)}="panels" title-text="Attributes">
+            <div class="row-fluid wrap-row">
+              <div class="span4">
+                <h6>Objects under assessment</h6>
+                {{#if template_object_type}}
+                  {{template_object_type}}
                 {{else}}
+                  <span class="empty-message">None</span>
+                {{/if}}
+              </div>
+
+              <div class="span4">
+                <h6>Copy Assessment Procedure from mapped object</h6>
+                {{#if test_plan_procedure}}YES{{else}}NO{{/if}}
+              </div>
+
+              <div class="span4">
+                <h6>Default procedure description</h6>
+                {{#if procedure_description}}
+                  {{{procedure_description}}}
+                {{else}}
+                  <span class="empty-message">None</span>
+                {{/if}}
+              </div>
+            </div>
+
+            <div class="row-fluid wrap-row">
+              <div class="span4">
+                <h6>Default Assignees</h6>
+                {{#if default_people.assignees}}
                   {{#if default_people.assignees.length}}
                     <ul class="person-info-list">
                       {{#each default_people.assignees}}
-                        <li>
-                          <person-data {person-id}="{{.}}"></person-data>
-                        </li>
+                        <li><person-data {person-id}="{{.}}"></person-data></li>
                       {{/each}}
                     </ul>
                   {{else}}
-                    <span class="empty-message">None</span>
+                    {{defaultAssigneeLabel}}
                   {{/if}}
-                {{/if_string}}
-              {{else}}
-                <span class="empty-message">None</span>
-              {{/if}}
-            </div>
-
-            <div class="span4">
-              <h6>Default Verifiers</h6>
-              {{#if default_people.verifiers}}
-                {{#if_string default_people.verifiers}}
-                  {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
                 {{else}}
+                  <span class="empty-message">None</span>
+                {{/if}}
+              </div>
+
+              <div class="span4">
+                <h6>Default Verifiers</h6>
+                {{#if default_people.verifiers}}
                   {{#if default_people.verifiers.length}}
                     <ul class="person-info-list">
                       {{#each default_people.verifiers}}
-                        <li>
-                          <person-data {person-id}="{{.}}"></person-data>
-                        </li>
+                        <li><person-data {person-id}="{{.}}"></person-data></li>
                       {{/each}}
                     </ul>
                   {{else}}
-                    <span class="empty-message">None</span>
+                    {{defaultVerifierLabel}}
                   {{/if}}
-                {{/if_string}}
-              {{else}}
-                <span class="empty-message">None</span>
-              {{/if}}
-            </div>
+                {{else}}
+                  <span class="empty-message">None</span>
+                {{/if}}
+              </div>
 
-            <div class="span4">
-              <h6>Code</h6>
-              <span class="empty-message">{{slug}}</span>
-            </div>
-          </div>
-
-          {{#if instance.can_use_issue_tracker}}
-            <div class="row-fluid wrap-row">
-              <div class="expanded-area">
-                <div class="info-expand">
-                  <a class="show-hidden-fields info-show-hide active" href="javascript://">
-                    <span class="out">
-                      <i class="fa fa-caret-right"></i>
-                      SHOW
-                    </span>
-                    <span class="in">
-                      <i class="fa fa-caret-down"></i>
-                      HIDE
-                    </span>
-                    TICKET TRACKER INFO
-                  </a>
-                </div>
-                <div class="hidden-fields-area">
-                  <info-issue-tracker-fields
-                    {instance}="instance"
-                    {note}="'Turns on Ticket Tracker integration.'">
-                  </info-issue-tracker-fields>
-                </div>
+              <div class="span4">
+                <h6>Code</h6>
+                <span class="empty-message">{{slug}}</span>
               </div>
             </div>
-          {{/if }}
 
-        </tab-panel>
-        <tab-panel {(panels)}="panels" title-text="Change Log">
-            <revision-log {instance}="instance"></revision-log>
-        </tab-panel>
-      </tab-container>
-    </div><!-- tier-content end -->
+            {{#if instance.can_use_issue_tracker}}
+              <div class="row-fluid wrap-row">
+                <div class="expanded-area">
+                  <div class="info-expand">
+                    <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                      <span class="out">
+                        <i class="fa fa-caret-right"></i>
+                        SHOW
+                      </span>
+                      <span class="in">
+                        <i class="fa fa-caret-down"></i>
+                        HIDE
+                      </span>
+                      TICKET TRACKER INFO
+                    </a>
+                  </div>
+                  <div class="hidden-fields-area">
+                    <info-issue-tracker-fields
+                      {instance}="instance"
+                      {note}="'Turns on Ticket Tracker integration.'">
+                    </info-issue-tracker-fields>
+                  </div>
+                </div>
+              </div>
+            {{/if }}
+
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Change Log">
+              <revision-log {instance}="instance"></revision-log>
+          </tab-panel>
+        </tab-container>
+      </div><!-- tier-content end -->
+
+    </wrapper-assessment-template>
   </section>
 
   {{#if is_info_widget}}

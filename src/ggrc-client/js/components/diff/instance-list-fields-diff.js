@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc., authors, and contributors
+ Copyright (C) 2019 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -49,12 +49,12 @@ const viewModel = DiffBaseVM.extend({
   },
   buildDisplayNames(diffData) {
     const currentDisplayNames = this.getDisplayValue(diffData.currentVal);
-    const modifiedDiplayNames = this.getDisplayValue(diffData.modifiedVal);
+    const modifiedDisplayNames = this.getDisplayValue(diffData.modifiedVal);
     const attrName = this.getAttrDisplayName(diffData.attrName);
     const diff = {
       attrName,
       currentVal: currentDisplayNames,
-      modifiedVal: modifiedDiplayNames,
+      modifiedVal: modifiedDisplayNames,
     };
 
     return diff;
@@ -74,6 +74,7 @@ const viewModel = DiffBaseVM.extend({
 export default can.Component.extend({
   tag,
   template,
+  leakScope: true,
   viewModel: viewModel,
   events: {
     buildDiff() {

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -926,7 +926,7 @@ describe('revision-log component', function () {
           }],
         },
       });
-      spyOn(Mappings, 'get_binding').and.callFake((mappingName) => {
+      spyOn(Mappings, 'getBinding').and.callFake((mappingName) => {
         let bindingData = {
           related_requesters: {
             list: [

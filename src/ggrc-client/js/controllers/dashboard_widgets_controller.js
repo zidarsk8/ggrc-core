@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -8,8 +8,7 @@ import {
 } from '../plugins/utils/widgets-utils';
 import {getPageModel} from '../plugins/utils/current-page-utils';
 
-export default can.Control({
-  pluginName: 'dashboard_widgets',
+export default can.Control.extend({
   defaults: {
     model: null,
     widget_id: '',

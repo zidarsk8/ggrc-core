@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -33,7 +33,7 @@ const viewModel = can.Map.extend({
   },
   async loadMappedObjects() {
     const mappedObjectsBindings = await Mappings
-      .get_binding('info_related_objects', this.attr('instance'))
+      .getBinding('info_related_objects', this.attr('instance'))
       .refresh_instances();
     return mappedObjectsBindings.map((binding) =>
       binding.instance ||
@@ -48,5 +48,6 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'cycle-task-modal',
+  leakScope: true,
   viewModel,
 });

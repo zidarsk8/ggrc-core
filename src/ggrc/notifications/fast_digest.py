@@ -1,7 +1,8 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """  Fast digest handlers """
+from datetime import datetime
 import itertools
 
 from werkzeug import exceptions
@@ -11,21 +12,27 @@ from ggrc import db
 from ggrc import rbac
 from ggrc import settings
 
-from ggrc.notifications.proposal_helpers import build_prosal_data
-from ggrc.notifications.proposal_helpers import get_email_proposal_list
-from ggrc.notifications.proposal_helpers import mark_proposals_sent
-from ggrc.notifications.review_helpers import build_review_data
-from ggrc.notifications.review_helpers import get_review_notifications
-from ggrc.notifications.review_helpers import move_notifications_to_history
+from ggrc.notifications import data_handlers
+from ggrc.notifications import proposal_helpers
+from ggrc.notifications import review_helpers
 
-DIGEST_TITLE = "Proposal Digest"
+
+DIGEST_TITLE_TMPL = "GGRC Change requests review digest for {}"
 DIGEST_TMPL = settings.JINJA2.get_template("notifications/fast_digest.html")
+
+
+def build_subject():
+  """Build notification subject."""
+  user_datetime = data_handlers.as_user_time(
+      datetime.utcnow(),
+  )
+  return DIGEST_TITLE_TMPL.format(user_datetime)
 
 
 def build_address_body(proposals, review_notifications):
   """yields email address and email body"""
-  proposal_dict = build_prosal_data(proposals)
-  review_dict = build_review_data(review_notifications)
+  proposal_dict = proposal_helpers.build_prosal_data(proposals)
+  review_dict = review_helpers.build_review_data(review_notifications)
   people = set(
       itertools.chain(
           proposal_dict.iterkeys(),
@@ -47,19 +54,20 @@ def build_address_body(proposals, review_notifications):
 
 def send_notification():
   """Send notifications about proposals."""
-  proposals = get_email_proposal_list()
-  review_notifications = get_review_notifications()
+  proposals = proposal_helpers.get_email_proposal_list()
+  review_notifications = review_helpers.get_review_notifications()
+  subject = build_subject()
   for addressee, html in build_address_body(proposals,
                                             review_notifications):
     mail.send_mail(
         sender=getattr(settings, "APPENGINE_EMAIL"),
         to=addressee.email,
-        subject=DIGEST_TITLE,
+        subject=subject,
         body="",
         html=html,
     )
-  mark_proposals_sent(proposals)
-  move_notifications_to_history(review_notifications)
+  proposal_helpers.mark_proposals_sent(proposals)
+  review_helpers.move_notifications_to_history(review_notifications)
   db.session.commit()
 
 
@@ -67,8 +75,8 @@ def present_notifications():
   """Present fast digest notifications."""
   if not rbac.permissions.is_admin():
     raise exceptions.Forbidden()
-  proposals = get_email_proposal_list()
-  review_notifications = get_review_notifications()
+  proposals = proposal_helpers.get_email_proposal_list()
+  review_notifications = review_helpers.get_review_notifications()
   generator = (
       u"<h1> email to {}</h1>\n {}".format(addressee.email, body)
       for addressee, body in build_address_body(proposals,

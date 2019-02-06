@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -12,6 +12,7 @@ import {getVisibleColumnsConfig, getSortingForModel}
 export default can.Component.extend({
   tag: 'tree-header',
   template,
+  leakScope: true,
   viewModel: {
     define: {
       cssClasses: {

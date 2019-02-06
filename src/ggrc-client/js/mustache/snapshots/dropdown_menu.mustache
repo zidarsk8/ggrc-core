@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -55,6 +55,17 @@
             {{/is_allowed_to_map}}
         {{/if_helpers}}
     {{/is_info_pin}}
+    {{^if instance.snapshot.archived}}
+      {{#if_instance_of page_instance "Audit"}}
+        {{#is_allowed_to_map page_instance instance.snapshot}}
+          <li>
+            <delete-button
+              {instance}="instance.snapshot">
+            </delete-button>
+          </li>
+        {{/is_allowed_to_map}}
+      {{/if_instance_of}}
+    {{/if}}
 </three-dots-menu>
 
 {{/instance}}

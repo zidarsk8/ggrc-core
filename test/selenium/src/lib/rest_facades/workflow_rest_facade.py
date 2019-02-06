@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """REST facade for Workflow objects (functions also create entity objects)."""
 from lib.app_entity_factory import workflow_entity_factory

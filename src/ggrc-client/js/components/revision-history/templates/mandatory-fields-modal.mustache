@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -37,17 +37,15 @@
   </div>
   <div class="simple-modal__footer">
     <div class="simple-modal__toolbar">
-      <button type="button"
-        class="btn btn-small btn-green simple-modal__toolbar-item"
-        {{disable_if_errors instance}}
-        {{#if loading}}disabled{{/if}}
-        ($click)="save()">
-          Apply
+      <button class="btn btn-small btn-green simple-modal__toolbar-item"
+              type="button" ($click)="save()" {{#if isDisabled}}disabled{{/if}}>
+        Apply
       </button>
-      <button type="button"
-              class="btn btn-small btn-white simple-modal__toolbar-item"
-              ($click)="cancel()">Cancel</button>
-      <spinner toggle="loading"></spinner>
+      <button class="btn btn-small btn-white simple-modal__toolbar-item"
+              type="button" ($click)="cancel()">
+        Cancel
+      </button>
+      <spinner {toggle}="loading"></spinner>
     </div>
   </div>
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test api helper.
@@ -12,6 +12,7 @@ This api helper also helps with delete and put requests where it fetches the
 latest etag needed for such requests.
 """
 import logging
+from urllib import urlencode
 
 import flask
 
@@ -80,6 +81,7 @@ class Api(object):
 
   @staticmethod
   def api_link(obj, obj_id=None):
+    """return API link to the object with ID"""
     obj_id = "" if obj_id is None else "/" + str(obj_id)
     return "/api/%s%s" % (obj._inflector.table_plural, obj_id)
 
@@ -106,7 +108,7 @@ class Api(object):
     headers.update(self.user_headers)
 
     json_data = self.resource.as_json(data)
-    logging.info("request json" + json_data)
+    logging.info("request json: %s", json_data)
     response = request(api_link, data=json_data, headers=headers.items())
     if response.status_code == 401:
       self.set_user()
@@ -208,9 +210,25 @@ class Api(object):
       api_link = "{}?{}".format(api_link, args_str)
     return self.client.delete(api_link, headers=headers)
 
-  def search(self, types, query="", counts=False, relevant_objects=None):
+  def search(self, types, query="", counts=False, relevant_objects=None,
+             extra_params=None, extra_columns=None):
     """Api search call."""
-    link = '/search?q={}&types={}&counts_only={}'.format(query, types, counts)
+
+    params = {
+        'q': query,
+        'types': types,
+        'counts_only': str(counts)
+    }
+
+    if extra_params is not None:
+      params['extra_params'] = extra_params
+
+    if extra_columns is not None:
+      params['extra_columns'] = extra_columns
+
     if relevant_objects is not None:
-      link += '&relevant_objects=' + relevant_objects
-    return (self.client.get(link), self.headers)
+      params['relevant_objects'] = relevant_objects
+
+    link = "/search?{}".format(urlencode(params))
+
+    return self.client.get(link), self.headers

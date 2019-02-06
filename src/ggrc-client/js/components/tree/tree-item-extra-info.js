@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -10,7 +10,7 @@ import Requirement from '../../models/business-models/requirement';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 import CycleTaskGroup from '../../models/business-models/cycle-task-group';
 import Cycle from '../../models/business-models/cycle';
-
+import {formatDate} from '../../plugins/utils/date-utils';
 import template from './templates/tree-item-extra-info.mustache';
 
 let viewModel = can.Map.extend({
@@ -104,6 +104,18 @@ let viewModel = can.Map.extend({
         return isWorkflowOverdue || isCycleTasksOverdue;
       },
     },
+    endDate: {
+      type: String,
+      get() {
+        let date = this.attr('instance.end_date');
+        let today = moment().startOf('day');
+        let startOfDate = moment(date).startOf('day');
+        if (!date || today.diff(startOfDate, 'days') === 0) {
+          return 'Today';
+        }
+        return formatDate(date, true);
+      },
+    },
     cssClasses: {
       type: 'string',
       get: function () {
@@ -169,5 +181,6 @@ let viewModel = can.Map.extend({
 export default can.Component.extend({
   tag: 'tree-item-extra-info',
   template,
+  leakScope: true,
   viewModel,
 });

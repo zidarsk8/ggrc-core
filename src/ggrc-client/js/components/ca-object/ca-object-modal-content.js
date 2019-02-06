@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -14,6 +14,7 @@ import {getAssigneeType} from '../../plugins/ggrc_utils';
 export default can.Component.extend({
   tag: 'ca-object-modal-content',
   template: template,
+  leakScope: true,
   viewModel: {
     define: {
       comment: {

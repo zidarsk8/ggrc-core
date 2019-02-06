@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -10,6 +10,7 @@ import {
   isAllObjects,
 } from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
+import Mappings from '../../models/mappers/mappings';
 
 const viewModel = can.Map.extend({
   define: {
@@ -67,6 +68,13 @@ const viewModel = can.Map.extend({
     return prohibitedMapList[instanceType] &&
       prohibitedMapList[instanceType].includes(shortName);
   },
+  isAllowedToMap(target) {
+    let source = this.attr('instance');
+    let isMappable = Mappings.isMappableType(source.attr('type'), target);
+    let canMap = Mappings.allowedToMap(source, target);
+
+    return isMappable && canMap;
+  },
   sortWidgets() {
     this.attr('widgetList',
       _.sortBy(this.attr('widgetList'), 'internav_display'));
@@ -76,6 +84,7 @@ const viewModel = can.Map.extend({
 export default can.Component.extend({
   tag: 'add-tab-button',
   template,
+  leakScope: true,
   viewModel,
   events: {
     // top nav dropdown position
@@ -98,6 +107,12 @@ export default can.Component.extend({
         return options.fn(options.contexts);
       }
 
+      return options.inverse(options.contexts);
+    },
+    canMapObject(modelShortName, options) {
+      if (this.isAllowedToMap(modelShortName())) {
+        return options.fn(options.contexts);
+      }
       return options.inverse(options.contexts);
     },
   },

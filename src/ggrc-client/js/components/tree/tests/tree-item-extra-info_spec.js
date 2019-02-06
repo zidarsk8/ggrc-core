@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -112,6 +112,56 @@ describe('tree-item-extra-info component', function () {
 
         expect(result).toBe(false);
       });
+  });
+
+  describe('endDate property', () => {
+    let result;
+
+    it('returns "Today" for today', () => {
+      viewModel.attr('instance', {
+        end_date: new Date(),
+      });
+      result = viewModel.attr('endDate');
+      expect(result).toEqual('Today');
+    });
+
+    it('returns date for tomorrow', () => {
+      let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+      let expected = moment(tomorrow).format('MM/DD/YYYY');
+
+      viewModel.attr('instance', {
+        end_date: tomorrow,
+      });
+      result = viewModel.attr('endDate');
+      expect(result).toEqual(expected);
+    });
+
+    it('returns date for yesterday', () => {
+      let yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+      let expected = moment(yesterday).format('MM/DD/YYYY');
+
+      viewModel.attr('instance', {
+        end_date: yesterday,
+      });
+      result = viewModel.attr('endDate');
+      expect(result).toEqual(expected);
+    });
+
+    it('returns date string when date is passed in', () => {
+      viewModel.attr('instance', {
+        end_date: new Date(2000, 2, 2),
+      });
+      result = viewModel.attr('endDate');
+      expect(result).toEqual('03/02/2000');
+    });
+
+    it('returns "Today" for falsey', () => {
+      viewModel.attr('instance', {
+        end_date: null,
+      });
+      result = viewModel.attr('endDate');
+      expect(result).toEqual('Today');
+    });
   });
 
   describe('processPendingContent() method', () => {

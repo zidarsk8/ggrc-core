@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -9,18 +9,23 @@ import {notifier} from '../plugins/utils/notifiers-utils';
  * Shows modal window that inform user about requested scopes.
  */
 let showGapiModal = function ({scopes, onAccept, onDecline}) {
-  let $modal = $('.ggrc_controllers_gapi_modal');
+  let $modal = $('.gapi-modal-control');
   if (!$modal.length) {
-    import(/* webpackChunkName: "modalsCtrls" */'../controllers/modals/')
-      .then(() => {
-        $('<div class="modal hide">').modal_form()
-          .appendTo(document.body).ggrc_controllers_gapi_modal({
-            modal_title: 'Please log in to Google API',
-            new_object_form: true,
-            scopes,
-            onAccept,
-            onDecline,
-          });
+    import(
+      /* webpackChunkName: "modalsCtrls" */
+      '../controllers/modals/gapi-modal'
+    )
+      .then((module) => {
+        const modal = $('<div class="modal hide">').modal_form();
+        modal.appendTo(document.body);
+
+        new module.default(modal, {
+          modal_title: 'Please log in to Google API',
+          new_object_form: true,
+          scopes,
+          onAccept,
+          onDecline,
+        });
       });
   } else {
     $modal.modal_form('show');

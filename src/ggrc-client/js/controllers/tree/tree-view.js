@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -12,9 +12,8 @@ import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
 import Mappings from '../../models/mappers/mappings';
 
-export default TreeLoader({
+const TreeViewControl = TreeLoader.extend({
   // static properties
-  pluginName: 'cms_controllers_tree_view',
   defaults: {
     model: null,
     show_view: null,
@@ -77,10 +76,14 @@ export default TreeLoader({
 
     this.options.attr('filter_states', filterStates);
 
-    this.element.closest('.widget')
-      .on('widget_hidden', this.widget_hidden.bind(this));
-    this.element.closest('.widget')
-      .on('widget_shown', this.widget_shown.bind(this));
+    const widget = this.element.closest('.widget');
+
+    if (widget && !widget.hasClass('tree-view-control-attached')) {
+      widget.on('widget_hidden', this.widget_hidden.bind(this));
+      widget.on('widget_shown', this.widget_shown.bind(this));
+
+      widget.addClass('tree-view-control-attached');
+    }
 
     this.element.uniqueId();
 
@@ -212,9 +215,10 @@ export default TreeLoader({
         // TODO investigate why is this method sometimes called twice
         return undefined; // not ready, will try again
       }
-      this.find_all_deferred = Mappings.get_list_loader(
+      let binding = Mappings.getBinding(
         this.options.mapping,
         this.options.parent_instance);
+      this.find_all_deferred = binding.refresh_list();
     } else if (this.options.list_loader) {
       this.find_all_deferred =
         this.options.list_loader(this.options.parent_instance);
@@ -302,7 +306,7 @@ export default TreeLoader({
     // elements by ids
     removedItemsIds.forEach((id) => {
       this.element
-        .find(`.cms_controllers_tree_view_node[data-object-id="${id}"]`)
+        .find(`.tree-view-node[data-object-id="${id}"]`)
         .remove();
     });
   },
@@ -317,23 +321,6 @@ export default TreeLoader({
       }
     });
     this.enqueue_items(realAdd);
-  },
-
-  '.tree-structure subtree_loaded': function (el, ev) {
-    let instanceId;
-    let parent;
-    ev.stopPropagation();
-    instanceId = el.closest('.tree-item').data('object-id');
-    parent = _.reduce(this.options.list, function (a, b) {
-      switch (true) {
-        case !!a: return a;
-        case b.instance.id === instanceId: return b;
-        default: return null;
-      }
-    }, null);
-    if (parent && !parent.children_drawn) {
-      parent.attr('children_drawn', true);
-    }
   },
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   add_child_lists: function (list) {
@@ -466,3 +453,5 @@ export default TreeLoader({
     this.element.children('.tree-item').remove();
   },
 });
+
+export default TreeViewControl;

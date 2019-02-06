@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test api service for google calendar."""
@@ -46,6 +46,7 @@ class TestCalendarApiService(unittest.TestCase):
             "timeZone": "UTC",
         },
         "attendees": [{"email": "someuser@example.com"}],
+        "locked": True,
         "sendNotifications": False,
         "guestsCanModify": False,
         "guestsCanInviteOthers": False,
@@ -78,6 +79,10 @@ class TestCalendarApiService(unittest.TestCase):
             "timeZone": "UTC",
         },
         "attendees": [{"email": "someuser@example.com"}],
+        "locked": True,
+        "sendNotifications": False,
+        "guestsCanModify": False,
+        "guestsCanInviteOthers": False,
     }
     self.events_mock.update.assert_called_with(
         calendarId="primary",

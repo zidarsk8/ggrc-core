@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -14,7 +14,7 @@ import router, {buildUrl} from '../router';
 import '../components/add-tab-button/add-tab-button';
 import pubSub from '../pub-sub';
 
-export default can.Control({
+export default can.Control.extend({
   defaults: {
     internav_view: '/static/mustache/dashboard/internav_list.mustache',
     pin_view: '.pin-content',
@@ -172,7 +172,7 @@ export default can.Control({
   },
 
   update_widget: function (widgetElement, index) {
-    let widgetOptions = $(widgetElement).control('dashboard_widgets').options;
+    let widgetOptions = $(widgetElement).control().options;
     let widgetId = widgetOptions.widget_id;
     let widget = this.widget_by_selector('#' + widgetId);
     let widgetName = widgetOptions.widget_name;

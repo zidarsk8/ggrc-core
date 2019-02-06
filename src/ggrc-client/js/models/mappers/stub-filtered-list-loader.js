@@ -1,13 +1,13 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import Mappings from './mappings';
 
 (function (GGRC, can) {
-  GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.StubFilteredListLoader', {},
-    {
+  GGRC.ListLoaders.StubFilteredListLoader =
+    GGRC.ListLoaders.BaseListLoader.extend({}, {
       init: function (source, filterFn) {
         this._super();
 
@@ -19,7 +19,7 @@ import Mappings from './mappings';
         let matchingResults;
 
         if (typeof this.source === 'string') {
-          binding.source_binding = Mappings.get_binding(
+          binding.source_binding = Mappings.getBinding(
             this.source,
             binding.instance);
         } else {

@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -207,8 +207,6 @@
         </div>
       </div>
     {{/if}}
-
-    {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
 
     {{#if instance.can_use_issue_tracker}}
       <div class="expanded-area">

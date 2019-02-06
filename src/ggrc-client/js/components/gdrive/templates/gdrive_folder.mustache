@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -63,7 +63,7 @@
       {{#if folder_error}}
         <action-toolbar class="action-toolbar">
           <small>
-            <strong>Warning:</strong> You need permission to access {{instance.class.title_singular}} folder. <a href="https://drive.google.com/folderview?id={{grdive_msg_to_id folder_error.message}}&usp=sharing#">Request access.</a>
+            <strong>Warning:</strong> You need permission to access {{instance.class.title_singular}} folder. <a href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">Request access.</a>
           </small>
           <div class="action-toolbar__controls">
             {{^if readonly}}

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -777,12 +777,12 @@ describe('mappers', function () {
           .toHaveBeenCalledWith(binding, sourceBinding.list, 0);
       });
 
-      it('sets up source_binding from the binding via get_binding, ' +
+      it('sets up source_binding from the binding via getBinding, ' +
          'if the source_binding property does not exist', function () {
         rll = new LL.ReifyingListLoader('dummy_binding');
         spyOn(rll, 'insert_from_source_binding');
         binding = {};
-        spyOn(Mappings, 'get_binding').and.returnValue(sourceBinding);
+        spyOn(Mappings, 'getBinding').and.returnValue(sourceBinding);
         rll.init_listeners(binding);
         expect(binding.source_binding).toBe(sourceBinding);
         expect(rll.insert_from_source_binding)

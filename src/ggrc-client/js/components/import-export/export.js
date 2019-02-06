@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -35,6 +35,7 @@ import QueryParser from '../../generated/ggrc_filter_query_parser';
 export default can.Component.extend({
   tag: 'csv-export',
   template: csvExportTemplate,
+  leakScope: true,
   viewModel: {
     define: {
       exportAllowed: {
@@ -183,7 +184,7 @@ export default can.Component.extend({
         current_time: fileSafeCurrentDate(),
       };
 
-      $('.area > section.content').animate({scrollTop: 0}, 'slow');
+      $('.page-content > section.content').animate({scrollTop: 0}, 'slow');
 
       runExport(data)
         .then((jobInfo) => {

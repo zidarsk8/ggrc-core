@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -289,14 +289,14 @@ describe('related-assessments component', () => {
           });
         });
 
-        it('dispatches "refreshInstance" event on instance', (done) => {
-          spyOn(viewModel.attr('instance'), 'dispatch');
+        it('dispatches "refreshAssessment" event on instance', (done) => {
+          spyOn(viewModel, 'dispatch');
 
           viewModel.reuseSelected();
 
           saveDfd.resolve().then(() => {
-            expect(viewModel.attr('instance').dispatch)
-              .toHaveBeenCalledWith('refreshInstance');
+            expect(viewModel.dispatch)
+              .toHaveBeenCalledWith('refreshAssessment');
             done();
           });
         });

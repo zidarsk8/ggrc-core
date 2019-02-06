@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -144,8 +144,8 @@ let viewModel = can.Map.extend({
   handleLHNOpening() {
     if (!this.attr('lhnInitialized')) {
       import(/* webpackChunkName: "lhn" */'../../controllers/lhn_controllers')
-        .then(() => {
-          $('#lhn').cms_controllers_lhn();
+        .then((module) => {
+          new module.LhnControl('#lhn');
           this.attr('lhnInitialized', true);
         });
     }
@@ -155,6 +155,7 @@ let viewModel = can.Map.extend({
 export default can.Component.extend({
   tag: 'page-header',
   template,
+  leakScope: true,
   viewModel,
   events: {
     '{window} resize': _.debounce(function () {

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -20,6 +20,7 @@ const icons = {
 export default can.Component.extend({
   tag,
   template: '<i class="fa form-validation-icon__body {{iconCls}}"></i>',
+  leakScope: true,
   viewModel: {
     define: {
       validation: {},

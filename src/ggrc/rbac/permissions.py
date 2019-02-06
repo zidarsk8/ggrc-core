@@ -1,10 +1,7 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Basic RBAC permissions module."""
-
-from flask import g
-from flask.ext.login import current_user
 
 from ggrc import login
 from ggrc.extensions import get_extension_instance
@@ -26,9 +23,7 @@ def permissions_for(user=None):
 
 def get_user():
   """Get selected user."""
-  if hasattr(g, 'user'):
-    return g.user
-  return current_user
+  return login.get_current_user(use_external_user=False)
 
 
 def is_allowed_create(resource_type, resource_id, context_id):
@@ -48,7 +43,7 @@ def is_allowed_create_for(instance):
 
 def has_system_wide_update():
   """Check if user has system wide update access to all objects."""
-  user = login.get_current_user(use_external_user=False)
+  user = get_user()
   system_wide_role = getattr(user, "system_wide_role",
                              SystemWideRoles.NO_ACCESS)
   return system_wide_role in SystemWideRoles.update_roles
@@ -56,7 +51,7 @@ def has_system_wide_update():
 
 def has_system_wide_read():
   """Check if user has system wide read access to all objects."""
-  user = login.get_current_user(use_external_user=False)
+  user = get_user()
   system_wide_role = getattr(user, "system_wide_role",
                              SystemWideRoles.NO_ACCESS)
   return system_wide_role in SystemWideRoles.read_roles

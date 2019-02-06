@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -8,6 +8,7 @@ import {getRolesForType} from '../../plugins/utils/acl-utils';
 
 export default can.Component.extend({
   tag: 'related-people-access-control',
+  leakScope: true,
   viewModel: {
     instance: {},
     deferredSave: null,

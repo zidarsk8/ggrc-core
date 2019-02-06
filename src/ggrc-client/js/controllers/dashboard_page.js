@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -10,6 +10,7 @@ import Search from '../models/service-models/search';
 export default can.Component.extend({
   tag: 'dashboard-widgets',
   template: '<content/>',
+  leakScope: true,
   scope: {
     initial_wf_size: 5,
     workflow_view: GGRC.mustache_path +

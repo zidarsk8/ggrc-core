@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -63,8 +63,7 @@ import Stub from '../../models/stub';
 import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 
-export default can.Control({
-  pluginName: 'ggrc_controllers_modals',
+export default can.Control.extend({
   defaults: {
     preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',
     header_view: GGRC.mustache_path + '/modals/modal_header.mustache',
@@ -520,7 +519,6 @@ export default can.Control({
     let $elem;
     let value;
     let model;
-    let $other;
 
     if (!(instance instanceof this.options.model)) {
       instance = this.options.instance =
@@ -563,35 +561,13 @@ export default can.Control({
           // Setting a "lookup field is handled in the autocomplete() method"
           return;
         }
-      } else if (name[name.length - 1] === 'date') {
-        name.pop(); // date is a pseudoproperty of datetime objects
-        if (!value) {
-          value = null;
-        } else {
-          value = this.options.model.convert.date(value);
-          $other = this.options.$content
-            .find("[name='" + name.join('.') + ".time']");
-          if ($other.length) {
-            value = moment(value).add(parseInt($other.val(), 10)).toDate();
-          }
-        }
-      } else if (name[name.length - 1] === 'time') {
-        name.pop(); // time is a pseudoproperty of datetime objects
-        value = moment(this.options.instance.attr(name.join('.')))
-          .startOf('day').add(parseInt(value, 10)).toDate();
       } else {
         value = new can.Map({}).attr(name.slice(1).join('.'), value);
       }
     }
 
     value = value && value.serialize ? value.serialize() : value;
-    if (name[0] === 'custom_attributes') {
-      const caId = Number(name[1]);
-      const caValue = value[name[1]];
-      instance.customAttr(caId, caValue);
-    } else if (name[0] !== 'people') {
-      instance.attr(name[0], value);
-    }
+    instance.attr(name[0], value);
   },
   '[data-before], [data-after] change': function (el, ev) {
     if (this.wasDestroyed()) {
@@ -942,10 +918,7 @@ export default can.Control({
     let instance = new this.options.model(params);
     let saveContactModels = ['TaskGroup', 'TaskGroupTask'];
 
-    instance.attr('_suppress_errors', true)
-      .attr('custom_attribute_definitions',
-        this.options.instance.custom_attribute_definitions)
-      .attr('custom_attributes', new can.Map());
+    instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
       _.includes(saveContactModels, this.options.model.shortName)) {
@@ -1079,7 +1052,7 @@ export default can.Control({
       return false;
     }
     return $trigger.data('updateHash') ||
-      !$trigger.closest('.modal, .cms_controllers_info_pin').length;
+      !$trigger.closest('.modal, .pin-content').length;
   },
 
   update_hash_fragment: function () {

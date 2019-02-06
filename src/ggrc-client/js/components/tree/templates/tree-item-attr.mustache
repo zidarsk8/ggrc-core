@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -131,11 +131,9 @@
     <div class="role tree-title-area">
       <div class="item-data">
         <div class="tree-title-area">
-          {{#user_roles instance parentInstance}}
-            <span class="role" rel="tooltip" data-original-title="{{rolesList}}">
-              {{rolesStr}}
-            </span>
-          {{/user_roles}}
+          <span class="role" rel="tooltip">
+            {{userRoles}}
+          </span>
         </div>
       </div>
     </div>

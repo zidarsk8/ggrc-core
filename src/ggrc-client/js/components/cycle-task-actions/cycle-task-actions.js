@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -106,6 +106,7 @@ let viewModel = can.Map.extend({
 export default can.Component.extend({
   tag: 'cycle-task-actions',
   template,
+  leakScope: true,
   viewModel,
   events: {
     inserted: function () {

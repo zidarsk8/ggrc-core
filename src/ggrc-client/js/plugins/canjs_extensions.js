@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 (function ($, can) {
@@ -73,17 +73,6 @@
       });
     };
 
-  // Turn camelCase or snake-case strings into Camel Space strings
-  can.spaceCamelCase = function (string) {
-    if (!_.isString(string)) {
-      throw new TypeError('Invalid type, string required.');
-    }
-
-    return can.underscore(string)
-      .split('_')
-      .map(can.capitalize)
-      .join(' ');
-  };
   can.camelCaseToUnderscore = function (string) {
     if (!_.isString(string)) {
       throw new TypeError('Invalid type, string required.');
