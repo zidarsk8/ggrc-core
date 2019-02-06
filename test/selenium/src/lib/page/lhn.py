@@ -264,6 +264,9 @@ class _Scope(lhn.DropdownStatic):
     self.toggle_facilities = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_FACILITIES,
         locator.LhnMenu.COUNT_FACILITIES)
+    self.toggle_key_reports = lhn.Toggle(
+        self._driver, locator.LhnMenu.TOGGLE_KEY_REPORTS,
+        locator.LhnMenu.COUNT_KEY_REPORTS)
     self.toggle_markets = lhn.Toggle(
         self._driver, locator.LhnMenu.TOGGLE_MARKETS,
         locator.LhnMenu.COUNT_MARKETS)
@@ -339,6 +342,13 @@ class _Scope(lhn.DropdownStatic):
     """
     self.toggle_facilities.toggle()
     return _Facilities(self._driver)
+
+  def select_key_reports(self):
+    """
+    Return: _KeyReports
+    """
+    self.toggle_key_reports.toggle()
+    return _KeyReports(self._driver)
 
   def select_markets(self):
     """
@@ -430,6 +440,13 @@ class _Facilities(lhn.AccordionGroup):
   _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_FACILITIES
   _locator_spinny = locator.LhnMenu.SPINNY_FACILITIES
   _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_FACILITIES
+
+
+class _KeyReports(lhn.AccordionGroup):
+  """Key Reports dropdown in LHN."""
+  _locator_button_create_new = locator.LhnMenu.BUTTON_CREATE_NEW_KEY_REPORTS
+  _locator_spinny = locator.LhnMenu.SPINNY_KEY_REPORTS
+  _locator_accordion_members = locator.LhnMenu.ACCORDION_MEMBERS_KEY_REPORTS
 
 
 class _Markets(lhn.AccordionGroup):
