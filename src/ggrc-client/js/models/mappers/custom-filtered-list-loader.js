@@ -19,8 +19,8 @@ import Mappings from './mappings';
 
    Rejected Deferreds are treated as false.
    */
-  GGRC.ListLoaders.StubFilteredListLoader(
-    'GGRC.ListLoaders.CustomFilteredListLoader', {}, {
+  GGRC.ListLoaders.CustomFilteredListLoader =
+    GGRC.ListLoaders.StubFilteredListLoader.extend({}, {
       process_result: function (binding, result, newResult, include) {
         let self = this;
         if (include) {

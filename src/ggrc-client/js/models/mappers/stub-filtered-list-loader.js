@@ -6,8 +6,8 @@
 import Mappings from './mappings';
 
 (function (GGRC, can) {
-  GGRC.ListLoaders.BaseListLoader('GGRC.ListLoaders.StubFilteredListLoader', {},
-    {
+  GGRC.ListLoaders.StubFilteredListLoader =
+    GGRC.ListLoaders.BaseListLoader.extend({}, {
       init: function (source, filterFn) {
         this._super();
 

@@ -17,7 +17,7 @@
    *    `binding.instance`, then, is the instance on which the original,
    *    unfiltered list is specified.
    */
-  can.Map.extend('GGRC.ListLoaders.MappingResult', {}, {
+  GGRC.ListLoaders.MappingResult = can.Map.extend({}, {
     init: function (instance, mappings, binding) {
       if (!mappings) {
         // Assume item was passed in as an object
