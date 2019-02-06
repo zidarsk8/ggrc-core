@@ -5,7 +5,7 @@
 
 import * as QueryAPI from '../utils/query-api-utils';
 
-describe('GGRC Utils Query API', function () {
+describe('QueryAPI utils', function () {
   describe('batchRequests() method', function () {
     let batchRequests = QueryAPI.batchRequests;
 
@@ -30,7 +30,7 @@ describe('GGRC Utils Query API', function () {
         });
       });
 
-    it('does several ajax calls for delays cals', function (done) {
+    it('does several ajax calls for delays calls', function (done) {
       batchRequests(1);
       batchRequests(2);
       batchRequests(3);
