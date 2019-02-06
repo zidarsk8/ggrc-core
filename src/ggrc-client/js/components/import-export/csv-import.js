@@ -282,7 +282,10 @@ export default can.Component.extend({
           if (xhr && xhr.responseJSON && xhr.responseJSON.message &&
             xhr.responseJSON.message === 'Wrong status') {
             deleteJob();
+            return;
           }
+
+          handleAjaxError(xhr);
         });
     },
     trackStatusOfImport(jobId, timeout = PRIMARY_TIMEOUT) {
