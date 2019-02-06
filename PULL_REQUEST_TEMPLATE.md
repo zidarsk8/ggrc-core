@@ -32,7 +32,8 @@ This PR is `on hold` until the dependencies are merged:
 <!-- If your PR includes a migration include the additional checklist items
 # Migration checklist
 - [ ] Migration passes all checks from our [PR review guidelines](https://github.com/google/ggrc-core/blob/dev/docs/source/contributing/git/reviewing_pull_requests.rst#reviewing-a-pr-containing-database-migration-scripts)
-- [ ] Upon merging, add 'check migration chain' and 'kokoro:run' labels to all open PRs with a label 'migration'
+- [ ] Upon merging, add 'check migration chain' and 'kokoro:force-run' labels to all open PRs with a label 'migration'
+- [ ] Upon merging, update 'table structure changes' in weekly deployment documentation
 -->
 
 # PR Review checklist
