@@ -116,7 +116,7 @@
         {{/case}}
 
         {{#case 'In Progress'}}
-          <div class="">Import in Progress: <spinner-component toggle:from="true"></spinner-component></div>
+          <div>Import in Progress: <spinner-component toggle:from="true"></spinner-component></div>
           <button type="button"
                   class="btn btn-small btn-white margin-top-20"
                   on:el:click="stopImport(jobId)">
