@@ -6,19 +6,24 @@
 
 from collections import defaultdict
 
-from ddt import data
-from ddt import ddt
-from ddt import unpack
+import ddt
 
 from ggrc.models import all_models
-from integration.ggrc import TestCase
+from integration import ggrc
 from integration.ggrc.models import factories as ggrc_factories
 from integration.ggrc_workflows.models import factories
 
 
-@ddt
-class TestExportTasks(TestCase):
+@ddt.ddt
+class TestExportTasks(ggrc.TestCase):
   """Test imports for basic workflow objects."""
+
+  CYCLES_TASKS_COUNT = (
+      # (Cycle count, tasks in cycle)
+      (0, 0),
+      (1, 2),
+      (2, 1),
+  )
 
   model = all_models.CycleTaskGroup
 
@@ -67,14 +72,8 @@ class TestExportTasks(TestCase):
           results[task.id] = cycle_task_group.slug
     return results
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_task_title(self, group_count, task_count):
     """Test filter groups by task title"""
     generated = self.generate_tasks_for_cycle(group_count, task_count)
@@ -85,14 +84,8 @@ class TestExportTasks(TestCase):
       ).one()
       self.assert_slugs("task title", task.title, [slug])
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_group_title(self, group_count, task_count):
     """Test filter groups by title"""
     generated = self.generate_tasks_for_cycle(group_count, task_count)
@@ -103,14 +96,8 @@ class TestExportTasks(TestCase):
       ).one()
       self.assert_slugs("group title", task.cycle_task_group.title, [slug])
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_task_due_date(self, group_count, task_count):
     """Test filter by task due date"""
     due_date_dict = defaultdict(set)
@@ -125,14 +112,8 @@ class TestExportTasks(TestCase):
     for due_date, slugs in due_date_dict.iteritems():
       self.assert_slugs("task due date", due_date, list(slugs))
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_group_due_date(self, group_count, task_count):
     """Test filter by group due date"""
     due_date_dict = defaultdict(set)
@@ -147,14 +128,8 @@ class TestExportTasks(TestCase):
     for due_date, slugs in due_date_dict.iteritems():
       self.assert_slugs("group due date", due_date, list(slugs))
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_group_assignee(self, group_count, task_count):
     """Test filter by group assignee name or email"""
     generated = self.generate_tasks_for_cycle(group_count, task_count)
@@ -168,14 +143,8 @@ class TestExportTasks(TestCase):
       self.assert_slugs(
           "group assignee", task.cycle_task_group.contact.name, [slug])
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_task_assignee(self, group_count, task_count):
     """Test filter cycles by task assignee name or email"""
     generated = self.generate_tasks_for_cycle(group_count, task_count)
@@ -189,14 +158,8 @@ class TestExportTasks(TestCase):
       self.assert_slugs("task assignees", assignees[0].email, [slug])
       self.assert_slugs("task assignees", assignees[0].name, [slug])
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (0, 0),
-      (1, 1),
-      (2, 1),
-      (2, 2),
-  )
-  @unpack  # pylint: disable=invalid-name
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_task_secondary_assignee(self, group_count, task_count):
     """Test filter cycles by task secondary assignee name or email"""
     generated = self.generate_tasks_for_cycle(group_count, task_count)
@@ -213,11 +176,8 @@ class TestExportTasks(TestCase):
       self.assert_slugs("task secondary assignees",
                         s_assignees[0].name, [slug])
 
-  @data(
-      #  (Cycle count, tasks in cycle)
-      (2, 2),
-  )
-  @unpack
+  @ddt.data(*CYCLES_TASKS_COUNT)
+  @ddt.unpack
   def test_filter_by_task_comment(self, cycle_count, task_count):
     """Test filter groups by task comments."""
     filter_params = {}
