@@ -29,7 +29,7 @@ export default Cacheable('CMS.Models.TaskGroup', {
   },
 
   tree_view_options: {
-    add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path + '/task_groups/tree_add_item.stache',
     mapper_attr_list: [
       {attr_title: 'Summary', attr_name: 'title'},
       {attr_title: 'Assignee', attr_name: 'assignee',

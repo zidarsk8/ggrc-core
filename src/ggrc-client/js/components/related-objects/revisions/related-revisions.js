@@ -4,7 +4,7 @@
  */
 
 import Pagination from '../../base-objects/pagination';
-import template from './templates/related-revisions.mustache';
+import template from './templates/related-revisions.stache';
 import './related-revisions-item';
 import Revision from '../../../models/service-models/revision.js';
 const tag = 'related-revisions';

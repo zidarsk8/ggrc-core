@@ -9,7 +9,7 @@ import timeboxed from '../mixins/timeboxed';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
-const path = GGRC.mustache_path + '/risk_assessments';
+const path = GGRC.templates_path + '/risk_assessments';
 
 export default Cacheable('CMS.Models.RiskAssessment', {
   root_object: 'risk_assessment',
@@ -47,7 +47,7 @@ export default Cacheable('CMS.Models.RiskAssessment', {
         attr_sort_field: 'ra_counsel',
       },
     ],
-    add_item_view: path + '/tree_add_item.mustache',
+    add_item_view: path + '/tree_add_item.stache',
   },
   sub_tree_view_options: {
     default_filter: ['Program'],

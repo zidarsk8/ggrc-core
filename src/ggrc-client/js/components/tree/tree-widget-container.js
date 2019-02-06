@@ -31,7 +31,7 @@ import '../dropdown/dropdown-multiselect-wrapper';
 import '../dropdown/dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
-import template from './templates/tree-widget-container.mustache';
+import template from './templates/tree-widget-container.stache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {
   REFRESH_RELATED,
@@ -52,7 +52,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 import Cacheable from '../../models/cacheable';
 import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
-import exportMessage from './templates/export-message.mustache';
+import exportMessage from './templates/export-message.stache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 

@@ -7,7 +7,7 @@ import '../../related-objects/related-people-access-control';
 import '../../related-objects/related-people-access-control-group';
 import '../../people/deletable-people-group';
 
-import template from './templates/lhn-popup-people.mustache';
+import template from './templates/lhn-popup-people.stache';
 
 export default can.Component.extend({
   tag: 'lhn-popup-people',

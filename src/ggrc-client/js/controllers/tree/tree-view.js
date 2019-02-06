@@ -300,7 +300,7 @@ const TreeViewControl = TreeLoader.extend({
     this.removeFromList(this.options.list, removedItemsIds);
     this.removeFromList(this.options.filteredList, removedItemsIds);
 
-    // NB: since row element are not rendered with mustache and binded element
+    // NB: since row element are not rendered with template and binded element
     // not always reflected in the filteredList ( for newly created items )
     // we are just removeing the items from the lists and removing the DOM
     // elements by ids

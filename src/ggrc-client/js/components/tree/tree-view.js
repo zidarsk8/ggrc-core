@@ -4,7 +4,7 @@
  */
 
 import '../sort/sort-by';
-import template from './templates/tree-view.mustache';
+import template from './templates/tree-view.stache';
 
 let viewModel = can.Map.extend({
   define: {

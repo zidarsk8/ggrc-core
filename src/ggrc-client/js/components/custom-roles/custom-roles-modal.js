@@ -8,7 +8,7 @@ import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
 import '../autocomplete/autocomplete';
 import '../external-data-autocomplete/external-data-autocomplete';
-import template from './templates/custom-roles-modal.mustache';
+import template from './templates/custom-roles-modal.stache';
 
 export default can.Component.extend({
   tag: 'custom-roles-modal',

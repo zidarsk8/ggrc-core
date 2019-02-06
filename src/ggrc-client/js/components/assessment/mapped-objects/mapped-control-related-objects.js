@@ -4,7 +4,7 @@
  */
 
 import '../../collapsible-panel/collapsible-panel';
-import template from './mapped-control-related-objects.mustache';
+import template from './mapped-control-related-objects.stache';
 
 const tag = 'assessment-mapped-control-related-objects';
 /**

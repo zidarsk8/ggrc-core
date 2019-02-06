@@ -8,7 +8,7 @@ import {
   getRolesForType,
   peopleWithRoleId,
 } from '../../plugins/utils/acl-utils';
-import template from './access-control-list-roles-helper.mustache';
+import template from './access-control-list-roles-helper.stache';
 
 export default can.Component.extend({
   tag: 'access-control-list-roles-helper',

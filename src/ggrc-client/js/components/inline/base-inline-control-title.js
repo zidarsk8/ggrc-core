@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './base-inline-control-title.mustache';
+import template from './base-inline-control-title.stache';
 
 export default can.Component.extend({
   tag: 'base-inline-control-title',

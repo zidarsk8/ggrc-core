@@ -4,7 +4,7 @@
 */
 
 import '../datepicker/datepicker';
-import template from './effective-dates.mustache';
+import template from './effective-dates.stache';
 
 export default can.Component.extend({
   tag: 'effective-dates',

@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './recently-viewed.mustache';
+import template from './recently-viewed.stache';
 import {getRecentlyViewedObjects} from '../../plugins/utils/recently-viewed-utils';
 import * as businessModels from '../../models/business-models';
 

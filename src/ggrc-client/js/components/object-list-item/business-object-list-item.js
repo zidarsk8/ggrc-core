@@ -4,7 +4,7 @@
  */
 
 import * as businessModels from '../../models/business-models';
-import template from './business-object-list-item.mustache';
+import template from './business-object-list-item.stache';
 
 let tag = 'business-object-list-item';
 /**

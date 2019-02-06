@@ -92,7 +92,7 @@ module.exports = function (env) {
           options: '$',
         }],
       }, {
-        test: /\.mustache/,
+        test: /\.stache/,
         loader: 'raw-loader',
       }, {
         test: /\.js$/,

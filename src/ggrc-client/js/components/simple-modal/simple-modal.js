@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './simple-modal.mustache';
+import template from './simple-modal.stache';
 
 /**
  * Simple Modal Component is a general abstraction to visualize

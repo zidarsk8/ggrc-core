@@ -7,7 +7,7 @@ import {
   hasQuestions,
   getQuestionsUrl,
 } from '../../plugins/utils/ggrcq-utils';
-import template from './questions-link.mustache';
+import template from './questions-link.stache';
 
 export default can.Component.extend({
   tag: 'questions-link',

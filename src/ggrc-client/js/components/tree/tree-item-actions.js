@@ -5,7 +5,7 @@
 
 import '../lazy-render/lazy-render';
 import '../show-related-assessments-button/show-related-assessments-button';
-import template from './templates/tree-item-actions.mustache';
+import template from './templates/tree-item-actions.stache';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';

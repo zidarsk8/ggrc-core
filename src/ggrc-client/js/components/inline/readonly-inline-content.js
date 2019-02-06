@@ -5,7 +5,7 @@
 
 import '../form/fields/dropdown-form-field';
 import '../person/person-data';
-import template from './readonly-inline-content.mustache';
+import template from './readonly-inline-content.stache';
 
 export default can.Component.extend({
   tag: 'readonly-inline-content',

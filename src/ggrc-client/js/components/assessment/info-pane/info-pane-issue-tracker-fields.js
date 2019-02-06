@@ -4,7 +4,7 @@
  */
 
 import '../../assessment/info-pane/confirm-edit-action';
-import template from './templates/info-pane-issue-tracker-fields.mustache';
+import template from './templates/info-pane-issue-tracker-fields.stache';
 import {showTrackerNotification} from
   '../../issue-tracker/temporary-issue-tracker-notification.js';
 

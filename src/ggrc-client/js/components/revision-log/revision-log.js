@@ -7,7 +7,7 @@ import './revision-log-data';
 import '../paginate/paginate';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
-import template from './revision-log.mustache';
+import template from './revision-log.stache';
 import tracker from '../../tracker';
 import {getHighestAssigneeRole} from '../../plugins/ggrc_utils';
 import Revision from '../../models/service-models/revision';

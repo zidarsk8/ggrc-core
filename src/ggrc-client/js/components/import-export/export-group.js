@@ -4,7 +4,7 @@
 */
 
 import './export-panel';
-import template from './templates/export-group.mustache';
+import template from './templates/export-group.stache';
 import panelModel from './panel';
 
 export default can.Component.extend('exportGroup', {

@@ -9,7 +9,7 @@ import {
   buildModifiedListField,
 } from '../../plugins/utils/object-history-utils';
 import {caDefTypeName} from '../../plugins/utils/custom-attribute/custom-attribute-config';
-import template from './templates/restore-revision.mustache';
+import template from './templates/restore-revision.stache';
 const tag = 'restore-revision';
 
 export default can.Component.extend({

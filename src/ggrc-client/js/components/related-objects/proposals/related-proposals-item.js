@@ -10,7 +10,7 @@ import '../../diff/instance-acl-diff';
 import '../../diff/instance-gca-diff';
 import '../../diff/instance-mapping-fields-diff';
 import '../../diff/instance-list-fields-diff';
-import template from './templates/related-proposals-item.mustache';
+import template from './templates/related-proposals-item.stache';
 import {getPersonInfo} from '../../../plugins/utils/user-utils';
 import {getFormattedLocalDate} from '../../../plugins/utils/date-utils';
 const tag = 'related-proposals-item';

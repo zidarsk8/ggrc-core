@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './sortable-column.mustache';
+import template from './sortable-column.stache';
 
 export default can.Component.extend({
   tag: 'sortable-column',

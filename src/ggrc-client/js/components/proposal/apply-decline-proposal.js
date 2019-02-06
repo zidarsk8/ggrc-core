@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/apply-decline-proposal.mustache';
+import template from './templates/apply-decline-proposal.stache';
 import {REFRESH_TAB_CONTENT} from '../../events/eventTypes';
 import {formatDate} from '../../plugins/utils/date-utils';
 import Proposal from '../../models/service-models/proposal';

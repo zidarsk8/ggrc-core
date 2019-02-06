@@ -13,7 +13,7 @@ import '../state-colors-map/state-colors-map';
 import '../spinner/spinner';
 import '../tree_pagination/tree_pagination';
 import Pagination from '../base-objects/pagination';
-import template from './templates/related-assessments.mustache';
+import template from './templates/related-assessments.stache';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import tracker from '../../tracker';

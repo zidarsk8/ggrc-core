@@ -17,7 +17,7 @@ The client-side of GGRC is initially constructed from templates and/or
 views defined and rendered on the server. The templates and views
 provide a scaffolding for the UI. Rendering those elements invokes
 JavaScript code which bootstraps the majority of the client-side of GGRC
-which is constructed from CanJS Controls, Components and Mustache templates.
+which is constructed from CanJS Controls, Components and templates.
 
 Once the Controls are rendered, they take control of generating the
 remainder of the UI and attaching all relevant logic and user
@@ -290,15 +290,15 @@ within GGRC. Additional fragments can be created and utilized as needed.
 But these templates are the main templates from which the majority of
 the UI is created.
 
--  ``info.mustache`` - Defines the “Info” widget on each object’s page.
+-  ``info.stache`` - Defines the “Info” widget on each object’s page.
     Defined per-widget in InfoWidget controller as the
    ``widget_view`` option, and specified using ``WidgetList``
    definitions.
--  ``extended_info.mustache`` - Defines the content of an object’s
+-  ``extended_info.stache`` - Defines the content of an object’s
    tooltip/popover in the LHN lists.  Specified as the ``tooltip_view``
    parameter when rendering
-   :src:`ggrc-client/js/mustache/dashboard/lhn.mustache`.
--  ``modal_content.mustache`` - Defines the view for modal “create” or
+   :src:`ggrc-client/js/templates/dashboard/lhn.stache`.
+-  ``modal_content.stache`` - Defines the view for modal “create” or
    “edit” form functionality.  For most objects, this path is
    automatically generated using the ``data-template`` or
    ``data-object-plural`` attributes of the invoking element (see
@@ -308,20 +308,18 @@ Where to find view templates
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The view files are in the following folder within a module
-``src/ggrc-client/js/mustache/``.
+``src/ggrc-client/js/templates/``.
 
 For example, the ``workflow`` views are in the following folder
-:src:`src/ggrc-client/js/mustache/workflows`
+:src:`src/ggrc-client/js/templates/workflows`
 
 View Helpers
 ^^^^^^^^^^^^
 
 View helpers are defined using the Mustache `helper mechanism provided
 by CanJS <http://canjs.com/docs/can.mustache.Helpers.html>`_.  Core
-helpers are specified in
-:src:`ggrc-client/js/mustache_helpers.js`,
-and extension helpers should be specified in a file named similar to
-``src/<module_name>/js/<class_name>_mustache_helpers.js``.
+helpers are specified in 
+:src:`ggrc-client/js/helpers.js`.
 
 Extensions
 ~~~~~~~~~~
@@ -427,7 +425,7 @@ following files:
 -  ``ggrc-client/js/controllers/modals/modals_controller.js``
 
 The view for a modal is defined in
-``/src/ggrc-client/js/mustache/<class_name>/modal_content.mustache``.
+``/src/ggrc-client/js/templates/<class_name>/modal_content.stache``.
 
 More about modals in `modals.md <modals.md>`_.
 

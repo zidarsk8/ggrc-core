@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './tree_pagination.mustache';
+import template from './tree_pagination.stache';
 
 /**
  * A component that renders a tree pagination widget

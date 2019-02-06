@@ -4,7 +4,7 @@
 */
 
 import baseAutocompleteResults from './../custom-autocomplete/autocomplete-results';
-import template from './templates/label-autocomplete-results.mustache';
+import template from './templates/label-autocomplete-results.stache';
 
 export default can.Component.extend({
   tag: 'label-autocomplete-results',

@@ -9,7 +9,7 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import '../object-list/object-list';
 import {applyTypeFilter} from '../../plugins/ggrc_utils';
-import template from './mapped-objects.mustache';
+import template from './mapped-objects.stache';
 import Mappings from '../../models/mappers/mappings';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 

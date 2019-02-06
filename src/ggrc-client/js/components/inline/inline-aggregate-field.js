@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './inline-aggregate-field.mustache';
+import template from './inline-aggregate-field.stache';
 import viewModelBase from '../aggregate-field-vm';
 
 const viewModel = viewModelBase.extend({

@@ -5,7 +5,7 @@
 
 import BaseTreeItemVM from './tree-item-base-vm';
 import './tree-item-extra-info';
-import template from './templates/sub-tree-item.mustache';
+import template from './templates/sub-tree-item.stache';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 
 let viewModel = BaseTreeItemVM.extend({

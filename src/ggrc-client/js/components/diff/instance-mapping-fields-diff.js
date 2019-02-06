@@ -6,7 +6,7 @@
 import {getModelInstance} from '../../plugins/utils/models-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
-import template from './templates/instance-diff-items.mustache';
+import template from './templates/instance-diff-items.stache';
 const tag = 'instance-mapping-fields-diff';
 
 const viewModel = DiffBaseVM.extend({

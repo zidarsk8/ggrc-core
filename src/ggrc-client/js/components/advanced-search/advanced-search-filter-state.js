@@ -5,7 +5,7 @@
 
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
-import template from './advanced-search-filter-state.mustache';
+import template from './advanced-search-filter-state.stache';
 import {isScopeModel} from '../../plugins/utils/models-utils';
 
 /**

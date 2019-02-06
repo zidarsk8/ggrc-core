@@ -4,7 +4,7 @@
 */
 
 // Common templates
-import '../mustache-templates';
+import '../templates';
 
 import '../apps/base_widgets';
 import '../tracker';
@@ -21,7 +21,7 @@ import '../plugins/tooltip';
 import '../plugins/popover';
 import '../plugins/popover_template';
 import '../components/simple-modal/simple-modal';
-import '../mustache_helper';
+import '../helpers';
 import '../generated/ggrc_filter_query_parser';
 
 // Models

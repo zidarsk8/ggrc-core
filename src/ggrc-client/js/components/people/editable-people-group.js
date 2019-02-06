@@ -10,7 +10,7 @@ import '../external-data-autocomplete/external-data-autocomplete';
 import '../person/person-data';
 import peopleGroupVM from '../view-models/people-group-vm';
 import {isInnerClick} from '../../plugins/ggrc_utils';
-import template from './editable-people-group.mustache';
+import template from './editable-people-group.stache';
 
 const SHOW_MODAL_LIMIT = 4;
 

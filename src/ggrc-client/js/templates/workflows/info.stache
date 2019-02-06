@@ -1,0 +1,186 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+
+  <div class="tier-content">
+    <div class="pane-header">
+      <div class="pane-header__container">
+      {{#instance}}
+          <div class="pane-header__title">
+            {{#is_info_pin}}
+              <h6>Title</h6>
+            {{/is_info_pin}}
+            <div class="pane-header__title-details">
+              <h3>{{title}}</h3>
+              <span>
+                <span class="state-value {{addclass 'state' status}}">{{status}}</span>
+              </span>
+              {{#instance.next_cycle_start_date}}
+                {{#if instance.unit}}
+                  {{^if instance.recurrences}}
+                    <span>
+                      <span class="state-value state-archived">Archived</span>
+                    </span>
+                  {{/if}}
+                {{/if}}
+              {{/instance.next_cycle_start_date}}
+            </div>
+          </div>
+
+          <div class="pane-header__toolbar">
+            {{#is_info_pin}}
+              <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
+            {{/is_info_pin}}
+
+            <div class="info-pane-utility">
+              {{#is_allowed 'update' instance context='for'}}
+                <div class="details-wrap">
+                  <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
+                    <span class="bubble"></span>
+                    <span class="bubble"></span>
+                    <span class="bubble"></span>
+                  </a>
+                  <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
+                    {{^is_info_pin}}
+                        <li>
+                          <a href="javascript://" data-toggle="modal-ajax-form" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal-wide" title="Edit {{model.model_title}}" data-object-id="{{instance.id}}">
+                            <i class="fa fa-pencil-square-o"></i>
+                            Edit Workflow Info
+                          </a>
+                        </li>
+                    {{/is_info_pin}}
+
+                    <li>
+                      <permalink {instance}="instance"/>
+                    </li>
+
+                    {{^is_info_pin}}
+                      <li>
+                        <workflow-clone workflow="instance">
+                          <a href="javascript://">
+                            <i class="fa fa-clone"></i>
+                            Clone Workflow
+                          </a>
+                        </workflow-clone>
+                      </li>
+                      {{#if instance.recurrences}}
+                        <li>
+                          <workflow-start-cycle workflow="instance">
+                          {{#instance.can_start_cycle}}
+                            <a href="#workflowStart">
+                              <i class="fa fa-sliders"></i>
+                              Manually Start a Cycle
+                            </a>
+                          {{/instance.can_start_cycle}}
+                          </workflow-start-cycle>
+                        </li>
+                        <li>
+                          <workflow-deactivate workflow="instance">
+                            <a href="#workflowStart">
+                              <i class="fa fa-archive"></i>
+                              Archive workflow
+                            </a>
+                          </workflow-deactivate>
+                        </li>
+                      {{/if}}
+                      {{#is_allowed 'delete' instance}}
+                          <li>
+                            <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                              <i class="fa fa-trash"></i>
+                              Delete
+                            </a>
+                          </li>
+                        {{/is_allowed}}
+                    {{/is_info_pin}}
+
+                    {{#is_info_pin}}
+                      {{#if instance.viewLink}}
+                        <li>
+                          <a href="{{instance.viewLink}}">
+                            <i class="fa fa-long-arrow-right"></i>
+                            Open {{instance.class.title_singular}}
+                          </a>
+                        </li>
+                      {{/if}}
+                    {{/is_info_pin}}
+
+                  </ul>
+                </div>
+              {{/is_allowed}}
+            </div>
+          </div>
+      {{/instance}}
+    </div>
+    </div>
+
+    <tab-container>
+      <tab-panel {(panels)}="panels" title-text="Attributes">
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            <h6>Description</h6>
+            <div class="rtf-block">
+              <read-more {text}="instance.description"></read-more>
+            </div>
+          </div>
+        </div>
+
+        {{> /static/templates/controls/contacts.stache}}
+
+        <div class="row-fluid wrap-row">
+          <div class="span6">
+            <h6>
+              Repeat Workflow
+            </h6>
+            <p>
+              <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
+                                 hide-repeat-off="false">
+              </repeat-on-summary>
+            <p>
+          </div>
+          <div class="span6">
+            {{#instance.recurrences}}
+              <h6>Next cycle start date</h6>
+              {{date instance.next_cycle_start_date}}
+            {{/instance.recurrences}}
+          </div>
+        </div>
+        <div class="row-fluid wrap-row">
+          <div class="span6">
+            <h6>Need Verification for tasks?</h6>
+            <input type="checkbox" name="is_verification_needed"
+                {{#if instance.is_verification_needed}}checked="checked"{{/if}}
+                disabled tabindex="-1">
+              Show Verify button next to tasks
+          </div>
+        </div>
+        <div class="row-fluid wrap-row">
+            <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance" placeholder="If selected, all workflow attachments go here." />
+        </div>
+        <div class="row-fluid wrap-row">
+          <div class="span6">
+            <h6>Code</h6>
+            <p>{{{instance.slug}}}</p>
+          </div>
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
+            {{> /static/templates/custom_attributes/info.stache}}
+          </div>
+        </div>
+      </tab-panel>
+      <tab-panel {(panels)}="panels" title-text="Change Log">
+          <revision-log {instance}="instance"></revision-log>
+      </tab-panel>
+    </tab-container>
+  </div> <!-- end tier-content -->
+
+</section>
+
+  {{#if is_info_widget}}
+    <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
+  {{/if}}
+{{/instance}}

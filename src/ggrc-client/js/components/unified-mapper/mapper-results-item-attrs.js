@@ -6,7 +6,7 @@
 import '../tree/tree-item-custom-attribute';
 import '../tree/tree-field';
 import '../tree/tree-item-attr';
-import template from './templates/mapper-results-item-attrs.mustache';
+import template from './templates/mapper-results-item-attrs.stache';
 
 export default can.Component.extend({
   tag: 'mapper-results-item-attrs',

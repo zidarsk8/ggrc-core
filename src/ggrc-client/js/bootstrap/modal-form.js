@@ -209,8 +209,8 @@ import {changeUrl} from '../router';
             modal_description: 'Are you sure that you want' +
             ' to discard your changes?',
             modal_confirm: 'Continue Editing',
-            button_view: GGRC.mustache_path +
-              '/modals/discard_buttons.mustache',
+            button_view: GGRC.templates_path +
+              '/modals/discard_buttons.stache',
             skip_refresh: true,
           }, function () {
             can.trigger(instance, 'modal:dismiss');
@@ -415,7 +415,7 @@ import {changeUrl} from '../router';
       }
 
       for (type in flash) {
-        // data prop is reserved for mustache template data and
+        // data prop is reserved for template data and
         // we don't expect to have ajax:flash of a "data" type
         if ( type === 'data' ) {
           continue;

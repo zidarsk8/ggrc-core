@@ -4,7 +4,7 @@
 */
 
 import './issue-unmap';
-import template from './issue-unmap-dropdown-item.mustache';
+import template from './issue-unmap-dropdown-item.stache';
 
 export default can.Component.extend({
   tag: 'issue-unmap-dropdown-item',

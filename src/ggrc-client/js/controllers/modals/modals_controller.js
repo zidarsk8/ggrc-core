@@ -65,10 +65,10 @@ import {getUrlParams, changeHash} from '../../router';
 
 export default can.Control.extend({
   defaults: {
-    preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',
-    header_view: GGRC.mustache_path + '/modals/modal_header.mustache',
+    preload_view: GGRC.templates_path + '/dashboard/modal_preload.stache',
+    header_view: GGRC.templates_path + '/modals/modal_header.stache',
     custom_attributes_view:
-    GGRC.mustache_path + '/custom_attributes/modal_content.mustache',
+    GGRC.templates_path + '/custom_attributes/modal_content.stache',
     button_view: null,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)

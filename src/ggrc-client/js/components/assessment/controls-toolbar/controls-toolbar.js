@@ -5,7 +5,7 @@
 
 import '../../custom-attributes/custom-attributes-actions';
 import '../../object-state-toolbar/object-state-toolbar';
-import template from './controls-toolbar.mustache';
+import template from './controls-toolbar.stache';
 
 export default can.Component.extend({
   tag: 'assessment-controls-toolbar',

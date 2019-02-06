@@ -46,7 +46,7 @@ export default Mixin({}, {
       confirm({
         modal_description: DESCRIPTION,
         modal_title: TITLE,
-        button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache',
+        button_view: GGRC.templates_path + '/gdrive/confirm_buttons.stache',
       }, confirmation.resolve, confirmation.reject);
     }
 

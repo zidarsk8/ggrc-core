@@ -75,7 +75,7 @@ export default can.Construct.extend({
    * @param {Object} source - the source object the mapping
    * @param {Object} target - the target object of the mapping
    * @param {Object} options - the options objects, similar to the one that is
-   *   passed as an argument to Mustache helpers
+   *   passed as an argument to helpers
    *
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */

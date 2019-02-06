@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/three-dots-menu.mustache';
+import template from './templates/three-dots-menu.stache';
 
 const viewModel = can.Map.extend({
   disabled: true,

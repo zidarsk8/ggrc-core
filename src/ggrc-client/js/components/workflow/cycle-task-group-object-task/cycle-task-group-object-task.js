@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/cycle-task-group-object-task.mustache';
+import template from './templates/cycle-task-group-object-task.stache';
 import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown';
 import '../../comment/comment-data-provider';
