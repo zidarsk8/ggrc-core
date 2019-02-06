@@ -11,6 +11,7 @@ import RefreshQueue from '../../../models/refresh_queue';
 import Revision from '../../../models/service-models/revision';
 import Stub from '../../../models/stub';
 import * as ReifyUtils from '../../../plugins/utils/reify-utils';
+import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
 
 describe('revision-log component', function () {
   let viewModel;
@@ -131,6 +132,82 @@ describe('revision-log component', function () {
 
       viewModel.fetchItems().fail(() => {
         expect(viewModel.attr('isLoading')).toBe(false);
+        done();
+      });
+    });
+  });
+
+  describe('fetchRevisions() method', () => {
+    let requestDfd;
+
+    beforeEach(() => {
+      requestDfd = $.Deferred();
+      spyOn(viewModel, 'getQueryFilter').and.returnValue('filter');
+      spyOn(QueryApiUtils, 'buildParam').and.returnValue('buildedParams');
+      spyOn(QueryApiUtils, 'batchRequests').and.returnValue(requestDfd);
+      spyOn(viewModel, 'makeRevisionModels').and.returnValue('revisionsModels');
+    });
+
+    it('builds params according to passed params', () => {
+      const pageInfo = {
+        current: 123,
+        pageSize: 321,
+      };
+      viewModel.attr('pageInfo', pageInfo);
+      const page = {
+        current: pageInfo.current,
+        pageSize: pageInfo.pageSize,
+        buffer: 1,
+        sort: [{
+          direction: 'desc',
+          key: 'created_at',
+        }],
+      };
+      viewModel.fetchRevisions();
+
+      expect(QueryApiUtils.buildParam).toHaveBeenCalledWith(
+        'Revision',
+        page,
+        null,
+        null,
+        'filter'
+      );
+      expect(QueryApiUtils.buildParam.calls.count()).toBe(1);
+    });
+
+    it('batches request with builded params', () => {
+      viewModel.fetchRevisions();
+
+      expect(QueryApiUtils.batchRequests).toHaveBeenCalledWith('buildedParams');
+    });
+
+    it('assigns total of received data to pageInfo of viewModel', (done) => {
+      const revisionsData = {total: 696};
+      requestDfd.resolve({Revision: revisionsData});
+
+      viewModel.fetchRevisions().then(() => {
+        expect(viewModel.attr('pageInfo.total')).toBe(revisionsData.total);
+        done();
+      });
+    });
+
+    it('makes revision models from received data', (done) => {
+      const revisionsData = {};
+      requestDfd.resolve({Revision: revisionsData});
+
+      viewModel.fetchRevisions().then(() => {
+        expect(viewModel.makeRevisionModels)
+          .toHaveBeenCalledWith(revisionsData);
+        done();
+      });
+    });
+
+    it('returns revisions models', (done) => {
+      const revisionsData = {};
+      requestDfd.resolve({Revision: revisionsData});
+
+      viewModel.fetchRevisions().then((revisions) => {
+        expect(revisions).toBe('revisionsModels');
         done();
       });
     });
