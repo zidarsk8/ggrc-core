@@ -15,6 +15,92 @@ describe('revision-page component', function () {
     viewModel = getComponentVM(Component);
   });
 
+  describe('computeChanges() method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, '_computeRoleChanges').and.returnValue('roleHistory');
+      spyOn(viewModel, '_loadACLPeople');
+      spyOn(viewModel, '_computeObjectChanges');
+      spyOn(viewModel, '_computeMappingChanges');
+    });
+
+    it('sets computed roleHistory', () => {
+      // set of 'revisions' attr calls computeChanges
+      viewModel.attr('revisions', {});
+
+      expect(viewModel.attr('roleHistory')).toBe('roleHistory');
+    });
+
+    it('calls _loadACLPeople', () => {
+      viewModel.attr('revisions', {
+        object: 'object',
+      });
+
+      expect(viewModel._loadACLPeople).toHaveBeenCalledWith('object');
+    });
+
+    it('assigns computed object changes to changeHistory attr', () => {
+      const revisions = new can.Map({
+        object: [],
+        revisionsForCompare: [],
+      });
+      viewModel._computeObjectChanges.and.returnValue('computedObjectChanges');
+
+      viewModel.attr('revisions', revisions);
+
+      expect(viewModel.attr('changeHistory'))
+        .toEqual(jasmine.arrayContaining(['computedObjectChanges']));
+      expect(viewModel._computeObjectChanges)
+        .toHaveBeenCalledWith(revisions.object, revisions.revisionsForCompare);
+      expect(viewModel._computeObjectChanges.calls.count()).toBe(1);
+    });
+
+    it('assigns computed mapping changes to changeHistory attr', () => {
+      const revisions = new can.Map({
+        mappings: [],
+      });
+      viewModel._computeMappingChanges
+        .and.returnValue('computedMappingChanges');
+
+      viewModel.attr('revisions', revisions);
+
+      expect(viewModel.attr('changeHistory'))
+        .toEqual(jasmine.arrayContaining(['computedMappingChanges']));
+      expect(viewModel._computeMappingChanges)
+        .toHaveBeenCalledWith(revisions.mappings);
+      expect(viewModel._computeMappingChanges.calls.count()).toBe(1);
+    });
+
+    it('sorts all computed changes by "updatedAt" in descending order ' +
+    'in changeHistory attr', () => {
+      viewModel._computeObjectChanges.and.returnValue([{
+        id: 1,
+        updatedAt: 3,
+      }, {
+        id: 2,
+        updatedAt: 1,
+      }]);
+      viewModel._computeMappingChanges.and.returnValue([{
+        id: 3,
+        updatedAt: 2,
+      }]);
+      const expected = [{
+        id: 1,
+        updatedAt: 3,
+      }, {
+        id: 3,
+        updatedAt: 2,
+      }, {
+        id: 2,
+        updatedAt: 1,
+      }];
+
+      viewModel.attr('revisions', {});
+
+      expect(viewModel.attr('changeHistory').serialize())
+        .toEqual(expected);
+    });
+  });
+
   describe('_computeObjectChanges() method', function () {
     it('computes an empty list on empty Revision history', function () {
       let result;
