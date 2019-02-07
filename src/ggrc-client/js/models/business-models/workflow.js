@@ -92,8 +92,7 @@ export default Cacheable('CMS.Models.Workflow', {
         taskGroup = new TaskGroup({
           title: taskGroupTitle,
           workflow: instance,
-          contact: instance.people && instance.people[0]
-            || instance.modified_by,
+          contact: instance.modified_by,
           context: instance.context,
         });
         return taskGroup.save();

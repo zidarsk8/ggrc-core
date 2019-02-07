@@ -4,7 +4,6 @@
  */
 
 import Cacheable from '../cacheable';
-import Person from './person';
 import contactable from '../mixins/contactable';
 import Stub from '../stub';
 
@@ -48,7 +47,6 @@ export default Cacheable('CMS.Models.TaskGroup', {
     this.validateNonBlank('title');
     this.validateNonBlank('contact');
     this.validateNonBlank('workflow');
-    this.validateContact(['_transient.contact', 'contact']);
 
     this.bind('updated', function (ev, instance) {
       if (instance instanceof that) {
@@ -58,19 +56,6 @@ export default Cacheable('CMS.Models.TaskGroup', {
     this.bind('destroyed', function (ev, inst) {
       if (inst instanceof that) {
         inst.refresh_all_force('workflow', 'context');
-      }
-    });
-  },
-  validateContact: function (attrNames, options) {
-    this.validate(attrNames, options, function (newVal) {
-      const reifiedContact = newVal && newVal instanceof can.Map ?
-        Person.findInCacheById(newVal.id) : false;
-      const hasEmail = reifiedContact ? reifiedContact.email : false;
-      options = options || {};
-
-      if (!hasEmail) {
-        return options.message ||
-          'No valid contact selected for assignee';
       }
     });
   },
