@@ -19,7 +19,6 @@
   "globals": {
     "_": false,
     "can": false,
-    "CMS": false,
     "GGRC": false,
     "moment": false,
     "Mustache": false,
