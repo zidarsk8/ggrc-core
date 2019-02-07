@@ -84,7 +84,7 @@ class BaseIssueTrackerParamsBuilder(object):
 
     issue_hotlist_id = issue_tracker_info.get("hotlist_id")
     self.params.hotlist_id = issue_hotlist_id or \
-        default_values["hotlist_id"]
+        default_values["issue_hotlist_id"]
 
     issue_type = issue_tracker_info.get("issue_type")
     self.params.issue_type = issue_type or \
