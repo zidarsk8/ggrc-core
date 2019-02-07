@@ -8,7 +8,7 @@ import isFunction from 'can-util/js/is-function/is-function';
 
 export default can.Component.extend({
   tag: 'info-pin-buttons',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     onChangeMaximizedState: null,
