@@ -12,28 +12,7 @@
             <div class="span12">
               <div class="item-data">
                 <div class="tree-title-area">
-                  <ul>
-                    {{#revisions}}
-                    {{^if_equals resource_type 'Context'}}
-                      <li>
-                        <strong>
-                          {{firstnonempty description display_name}}
-                        </strong>
-                      </li>
-                    {{/if_equals}}
-                    {{/revisions}}
-                    <li>
-                      <span class="event-owner">
-                        by
-                        <person-data {person}="modified_by"></person-data>
-                      </span>
-                    </li>
-                    <li>
-                      <span class="event-time">
-                        on {{dateTime created_at}}
-                      </span>
-                    </li>
-                  </ul>
+                  <event-item {event}="."></event-item>
                 </div>
               </div>
             </div>
