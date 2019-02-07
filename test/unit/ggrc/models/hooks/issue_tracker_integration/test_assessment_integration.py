@@ -219,3 +219,79 @@ class TestUtilityFunctions(unittest.TestCase):
           "assignee2@test.com",
           reporter_tracker
       )
+
+  def test_is_issue_create_enabled(self):
+    """Test 'is issue tracker enabled' on create."""
+    # pylint: disable=protected-access
+    assessment_src = {
+        "issue_tracker": {
+            "enabled": True,
+        },
+    }
+
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    is_issue_enabled = tracker_handler._is_issue_on_create_enabled(
+        assessment_src
+    )
+
+    self.assertTrue(is_issue_enabled)
+
+  def test_is_issue_create_disabled(self):
+    """Test 'is issue tracker disabled' on create."""
+    # pylint: disable=protected-access
+    assessment_src = {
+        "issue_tracker": {
+            "enabled": False,
+        },
+    }
+
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    is_issue_enabled = tracker_handler._is_issue_on_create_enabled(
+        assessment_src
+    )
+
+    self.assertFalse(is_issue_enabled)
+
+  @mock.patch(
+      'ggrc.models.hooks.issue_tracker.assessment_integration.'
+      'AssessmentTrackerHandler._get_issue_from_assmt_template'
+  )
+  def test_is_issue_enabled_template(self, get_issue_mock):
+    """Test 'is issue tracker enabled' from assessment template."""
+    # pylint: disable=protected-access
+    get_issue_mock.return_value = True
+    assessment_src = {
+        "template": {
+            "type": 1,
+            "id": 1,
+        },
+    }
+
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    is_issue_enabled = tracker_handler._is_issue_on_create_enabled(
+        assessment_src
+    )
+
+    self.assertTrue(is_issue_enabled)
+
+  @mock.patch(
+      'ggrc.models.hooks.issue_tracker.assessment_integration.'
+      'AssessmentTrackerHandler._get_issue_from_assmt_template'
+  )
+  def test_is_issue_disabled_template(self, get_issue_mock):
+    """Test 'is issue tracker disabled' from assessment template."""
+    # pylint: disable=protected-access
+    get_issue_mock.return_value = False
+    assessment_src = {
+        "template": {
+            "type": 1,
+            "id": 1,
+        },
+    }
+
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    is_issue_enabled = tracker_handler._is_issue_on_create_enabled(
+        assessment_src
+    )
+
+    self.assertFalse(is_issue_enabled)
