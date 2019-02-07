@@ -69,6 +69,17 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       "Checkbox": lambda self: self._validate_checkbox(),
   }
 
+  # This is a flag used to skip custom attribute validation. The reason for 
+  # this flag is that we do not set default values for mandatory custom 
+  # attributes so modifying an object title but leaving all other attributes
+  # alone should not raise an error.
+  _dirty = False
+
+  @orm.validates("attribute_object_id", include_removes=True)
+  def validate_attribute_object_id(self, value, is_removed):
+    self._dirty |= is_removed
+    return value
+
   @property
   def latest_revision(self):
     """Latest revision of CAV (used for comment precondition check)."""
@@ -265,7 +276,11 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
 
   def _validate_mandatory_mapping(self):
     """Validate mandatory mapping attribute"""
-    if self.custom_attribute.mandatory and not self.attribute_object_id:
+    if (
+        self.custom_attribute.mandatory and 
+        not self.attribute_object_id and 
+        self._dirty
+    ):
       raise ValueError('Missing mandatory attribute: %s' %
                        self.custom_attribute.title)
 
