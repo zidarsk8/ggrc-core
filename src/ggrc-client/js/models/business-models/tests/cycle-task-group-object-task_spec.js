@@ -5,8 +5,8 @@
 
 import CycleTaskGroupObjectTask from '../cycle-task-group-object-task';
 import Workflow from '../workflow';
-import Cycle from '../cycle';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import * as ReifyUtils from '../../../plugins/utils/reify-utils';
 
 describe('CycleTaskGroupObjectTask model', function () {
   let fakeCTModelCreator;
@@ -44,7 +44,7 @@ describe('CycleTaskGroupObjectTask model', function () {
         },
       });
 
-      spyOn(Cycle, 'findInCacheById').and.returnValue(instance.cycle);
+      spyOn(ReifyUtils, 'reify').and.returnValue(instance.cycle);
 
       method = Model.prototype.responseOptionsEditable.bind(instance);
     });
