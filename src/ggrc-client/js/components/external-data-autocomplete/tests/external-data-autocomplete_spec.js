@@ -268,7 +268,7 @@ describe('external-data-autocomplete component', () => {
 
         viewModel.createOrGet(item)
           .then(() => {
-            expect(ReifyUtils.reify).toHaveBeenCalled();
+            expect(ReifyUtils.reify).toHaveBeenCalledWith(model);
             done();
           });
       });
