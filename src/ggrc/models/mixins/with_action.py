@@ -7,6 +7,7 @@ A mixin for processing actions on an object in the scope of put request .
 """
 
 from collections import namedtuple, defaultdict
+import werkzeug.exceptions as wzg_exceptions
 
 from ggrc import db
 from ggrc.login import get_current_user
@@ -18,6 +19,7 @@ from ggrc.models.exceptions import ValidationError
 from ggrc.models.reflection import ApiAttributes
 from ggrc.models.reflection import Attribute
 from ggrc.models.relationship import Relationship
+from ggrc.rbac import permissions
 
 
 class WithAction(object):
@@ -184,6 +186,15 @@ class WithAction(object):
         deleted.append(rel)
       return [], deleted
 
+    def _check_related_permissions(self, obj):
+      """Check permissions before deleting related Evidence or Document"""
+      if not permissions.is_allowed_delete(
+          obj.type, obj.id, obj.context_id) \
+         and not permissions.has_conditions("delete", obj.type):
+        raise wzg_exceptions.Forbidden()
+      if not permissions.is_allowed_delete_for(obj):
+        raise wzg_exceptions.Forbidden()
+
   class DocumentAction(BaseAction):
     """Document action"""
 
@@ -207,6 +218,19 @@ class WithAction(object):
                      kind=action.kind,
                      context=parent.context)
       return obj
+
+    def remove_related(self, parent, _action):
+      """Remove relationship"""
+      action = self._validate(_action, self.RemoveRelated)
+      deleted = []
+      obj = self._get(action)
+      # pylint: disable=protected-access
+      rel = parent._relationships_map.get((obj.type, obj.id))
+      self._check_related_permissions(obj)
+      if rel:
+        db.session.delete(rel)
+        deleted.append(rel)
+      return [], deleted
 
   class EvidenceAction(BaseAction):
     """Evidence action"""
@@ -245,6 +269,7 @@ class WithAction(object):
       obj = self._get(action)
       # pylint: disable=protected-access
       rel = parent._relationships_map.get((obj.type, obj.id))
+      self._check_related_permissions(obj)
       if rel:
         db.session.delete(rel)
         deleted.append(rel)
