@@ -22,7 +22,7 @@ def upgrade():
   op.execute("""
     ALTER TABLE access_control_people
     ADD CONSTRAINT uq_access_control_people
-    UNIQUE (person_id, ac_list_id);
+    UNIQUE (id, person_id, ac_list_id);
   """)
   op.execute("""
     ALTER TABLE access_control_people
