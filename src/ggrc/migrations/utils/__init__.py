@@ -237,61 +237,6 @@ def clean_new_revisions(connection):
   connection.execute(text("truncate objects_without_revisions"))
 
 
-# pylint: disable=too-many-arguments
-def create_missing_admins(connection, migration_user_id, admin_role_id,
-                          table_mame, object_type, revision_action):
-  """Insert into access_control_list admin role
-
-  If we have 'create' revision -> take modified_by_id as Admin
-  else set current migration user as Admin
-
-  If there are multiple 'create' revisions, take each distinct modified_by_id
-  as Admin, because there is no way of knowing which of the duplicate revisions
-  is correct.
-
-  Args:
-    connection: SQLAlchemy connection object;
-    migration_user_id: the id of Migrator user (used as a default Admin);
-    admin_role_id: ACR.id of the correct Admin role;
-    table_name: name of the table with ids of objects with no Admins;
-    object_type: string name of object type processed (e.g. 'Document');
-    revision_action: the value for Revision.action field (e.g. 'created').
-  """
-  sql = """
-      INSERT INTO access_control_list (
-        person_id,
-        ac_role_id,
-        object_id,
-        object_type,
-        created_at,
-        modified_by_id,
-        updated_at)
-      SELECT
-        IF(r.modified_by_id is NOT NULL,
-           r.modified_by_id, {migration_user_id}) as person_id,
-        :admin_role_id,
-        twoa.id as object_id,
-        :object_type,
-        NOW(),
-        :migration_user_id,
-        NOW()
-      FROM {table_mame} twoa
-        LEFT OUTER JOIN revisions r ON
-          r.resource_id=twoa.id
-          AND r.resource_type=:object_type
-          AND r.action=:revision_action
-      GROUP BY object_id, person_id
-  """.format(migration_user_id=migration_user_id,
-             table_mame=table_mame)
-  connection.execute(
-      text(sql),
-      migration_user_id=migration_user_id,
-      admin_role_id=admin_role_id,
-      object_type=object_type,
-      revision_action=revision_action,
-  )
-
-
 def create_event(connection, user_id, resource_type,
                  action='BULK'):
   """Create event. Can be used for creating revisions in migrations"""
