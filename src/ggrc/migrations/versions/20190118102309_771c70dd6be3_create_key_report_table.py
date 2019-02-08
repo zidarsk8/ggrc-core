@@ -22,7 +22,7 @@ from ggrc.migrations.utils import (
 from ggrc.migrations.utils import acr_propagation
 
 revision = '771c70dd6be3'
-down_revision = '7582cfa2cf63'
+down_revision = 'c3224a449d11'
 
 # Here we store name of ACR, read, update, delete, mandatory flags
 KEY_REPORT_ACRS = {
