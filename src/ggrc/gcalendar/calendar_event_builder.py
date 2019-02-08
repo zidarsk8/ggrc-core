@@ -116,8 +116,8 @@ class CalendarEventBuilder(object):
       for event_id in events_ids:
         self._delete_event_relationship(event_id, task.id)
     except Exception as exp:   # pylint: disable=broad-except
-      logger.warn("Generating of event for task %d has failed with the "
-                  "following error %s.", task.id, exp.message)
+      logger.exception("Generating of event for task %d has failed with the "
+                       "following error %s.", task.id, exp.message)
 
   def _get_event_by_date_and_attendee(self, attendee_id, end_date):
     """Get calendar events by attendee and due date."""
