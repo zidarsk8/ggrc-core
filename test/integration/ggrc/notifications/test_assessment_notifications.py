@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests of assessment notifications."""
+from collections import OrderedDict
+
 from ggrc import db
 from ggrc.notifications import common
 from ggrc.models import Person, Assessment, AccessControlRole
@@ -121,6 +123,41 @@ class TestAssessmentNotification(TestCase):
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
     self.assertEqual(updated[self.assessment.id]["updated_fields"], ["CA1"])
+
+  def test_ca_change_by_import(self):
+    """Test notification when custom attribute value is changed by import"""
+
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(status="Completed")
+      factories.CustomAttributeDefinitionFactory(
+          definition_type="assessment",
+          title="Test GCAD",
+      )
+      assessment_slug = assessment.slug
+      assessment_id = assessment.id
+      user = all_models.Person.query.filter_by(
+          email="user@example.com").first()
+      assessment.add_person_with_role_name(user, "Assignees")
+
+    from flask import g
+    setattr(g, '_current_user', user)
+
+    import_data = OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment_slug),
+        ("Test GCAD", "test value"),
+    ])
+    response = self.import_data(import_data)
+    self._check_csv_response(response, {})
+
+    notifs, _ = common.get_daily_notifications()
+
+    self.assertEqual(len(notifs), 2)
+    assessment = all_models.Assessment.query.get(assessment_id)
+    cad = assessment.get_custom_attribute_definitions().filter_by(
+        title="Test GCAD").first()
+    self.assertEqual(
+        [i.attribute_value for i in cad.attribute_values], ["test value"])
 
   def test_person_attr_change(self):
     """Test notification when person attribute value is changed"""
