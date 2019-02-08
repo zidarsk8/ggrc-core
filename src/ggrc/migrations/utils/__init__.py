@@ -10,7 +10,7 @@ Place here your migration helpers that is shared among number of migrations.
 
 from collections import namedtuple
 
-from sqlalchemy import text, Integer, String
+from sqlalchemy import text, Integer, String, inspect
 from sqlalchemy.sql import and_, table, column
 from sqlalchemy.sql import func
 from sqlalchemy.sql import select
@@ -178,13 +178,16 @@ def last_insert_id(connection):
 def _check_modified_by_id_column_exists(connection):
   """Return True if column modified_by_id exists"""
 
+  schema_name = inspect(connection).default_schema_name
+
   sql = """
           SELECT 1 FROM information_schema.columns
-          WHERE table_name = 'objects_without_revisions' and
-                column_name = 'modified_by_id';
+          WHERE table_name = 'objects_without_revisions' AND
+                column_name = 'modified_by_id' AND
+                table_schema = :current_schema
   """
 
-  result = connection.execute(sql)
+  result = connection.execute(text(sql), current_schema=schema_name)
   return True if result.scalar() else False
 
 
