@@ -17,7 +17,6 @@ from logging import getLogger
 from StringIO import StringIO
 from datetime import datetime
 
-from apiclient.errors import HttpError
 from googleapiclient import errors
 
 import flask
@@ -115,7 +114,7 @@ def handle_export_request_error(handle_function):
     except wzg_exceptions.Unauthorized as ex:
       raise wzg_exceptions.Unauthorized("%s %s" % (ex.message,
                                                    app_errors.RELOAD_PAGE))
-    except HttpError as e:
+    except errors.HttpError as e:
       message = json.loads(e.content).get("error").get("message")
       if e.resp.code == 401:
         raise wzg_exceptions.Unauthorized("%s %s" % (message,
