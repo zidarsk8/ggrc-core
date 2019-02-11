@@ -51,7 +51,7 @@ class TestReader(TestCase):
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
         "System", "Process", "Project", "AccessGroup",
-        "Metric", "TechnologyEnvironment", "ProductGroup",
+        "Metric", "TechnologyEnvironment", "ProductGroup", "KeyReport"
     ])
     for model_singular in base_models:
       try:

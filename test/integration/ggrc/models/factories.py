@@ -358,6 +358,12 @@ class SystemFactory(TitledFactory):
     model = all_models.System
 
 
+class KeyReportFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.KeyReport
+
+
 class ProcessFactory(TitledFactory):
 
   class Meta:
@@ -633,6 +639,7 @@ def get_model_factory(model_name):
       "ImportExport": ImportExportFactory,
       "Issue": IssueFactory,
       "IssueTrackerIssue": IssueTrackerIssueFactory,
+      "KeyReport": KeyReportFactory,
       "Label": LabelFactory,
       "Market": MarketFactory,
       "Metric": MetricFactory,

@@ -81,6 +81,7 @@ class TestExternalPermissions(TestCase):
       all_models.Risk,
       all_models.Standard,
       all_models.System,
+      all_models.KeyReport,
       all_models.TechnologyEnvironment,
       all_models.Threat,
       all_models.Vendor,

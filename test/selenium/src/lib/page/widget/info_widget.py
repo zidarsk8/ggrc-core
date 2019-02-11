@@ -952,6 +952,14 @@ class Facilities(InfoWidget):
     super(Facilities, self).__init__(driver)
 
 
+class KeyReports(InfoWidget):
+  """Model for Key Report object Info pages and Info panels."""
+  _locators = locator.WidgetInfoKeyReport
+
+  def __init__(self, driver):
+    super(KeyReports, self).__init__(driver)
+
+
 class Markets(InfoWidget):
   """Model for Market object Info pages and Info panels."""
   _locators = locator.WidgetInfoMarket

@@ -199,6 +199,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
       [{"status": "Not Launched"}, {"status": "Draft"}, "Project"],
       [{"status": "Not Launched"}, {"status": "Draft"}, "Requirement"],
       [{"status": "Not Launched"}, {"status": "Draft"}, "System"],
+      [{"status": "Not Launched"}, {"status": "Draft"}, "KeyReport"],
       [{"status": "Not Launched"}, {"status": "Draft"}, "Vendor"],
       [{"status": "Not Launched"}, {"status": "Draft"}, "Risk"],
       [{"status": "Not Launched"}, {"status": "Draft"}, "Threat"],

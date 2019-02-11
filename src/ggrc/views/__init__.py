@@ -853,6 +853,7 @@ def contributed_object_views():
       models.Vendor,
       models.Metric,
       models.ProductGroup,
+      models.KeyReport,
   ]
   return [registry.object_view(obj) for obj in contributed_objects]
 

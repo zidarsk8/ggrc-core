@@ -580,6 +580,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "Metric",
       "TechnologyEnvironment",
       "ProductGroup",
+      "KeyReport",
   ]
 
   ALL_OBJECT_COUNTS = [
@@ -613,6 +614,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "Metric",
       "TechnologyEnvironment",
       "ProductGroup",
+      "KeyReport",
   ]
 
   def setUp(self):

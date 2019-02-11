@@ -36,6 +36,7 @@ class Lhn(object):
           cls.PRODUCT_GROUPS,
           cls.PROJECTS,
           cls.FACILITIES,
+          cls.KEY_REPORTS,
           cls.MARKETS,
           cls.METRICS,
           cls.TECHNOLOGY_ENVIRONMENTS,
