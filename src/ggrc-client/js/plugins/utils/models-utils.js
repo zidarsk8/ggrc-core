@@ -7,12 +7,7 @@ import {notifier} from './notifiers-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import * as businessModels from '../../models/business-models';
 import * as serviceModels from '../../models/service-models';
-import * as mappingModels from '../../models/mapping-models';
-
-const allModels = Object.assign({},
-  businessModels,
-  serviceModels,
-  mappingModels);
+import allModels from '../../models/all-models';
 
 const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
 
@@ -139,31 +134,6 @@ const getModelByType = (type) => {
     return null;
   }
   return allModels[type];
-};
-
-
-can.Map.prototype.reify = function () {
-  let type;
-  let model;
-
-  if (this instanceof can.Model) {
-    return this;
-  }
-
-  type = this.type;
-  model = allModels[type];
-
-  if (!model) {
-    console.warn('`reify()` called with unrecognized type', this);
-  } else {
-    return model.model(this);
-  }
-};
-
-can.List.prototype.reify = function () {
-  return new can.List(can.map(this, function (obj) {
-    return obj.reify();
-  }));
 };
 
 /**

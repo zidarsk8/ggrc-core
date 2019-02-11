@@ -88,7 +88,6 @@ export default can.Control.extend({
   },
 }, {
   init: function () {
-    let currentUser;
     let userFetch;
 
     if (!(this.options instanceof can.Map)) {
@@ -104,11 +103,7 @@ export default can.Control.extend({
     // loaded before rendering the form, otherwise initial validation can
     // incorrectly fail for form fields whose values rely on current user's
     // attributes.
-    currentUser = Person.findInCacheById(GGRC.current_user.id);
-
-    if (currentUser) {
-      currentUser = currentUser.reify();
-    }
+    const currentUser = Person.findInCacheById(GGRC.current_user.id);
 
     if (!currentUser) {
       userFetch = Person.findOne({id: GGRC.current_user.id});

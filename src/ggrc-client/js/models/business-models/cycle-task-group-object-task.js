@@ -5,6 +5,7 @@
 
 import Cacheable from '../cacheable';
 import CycleTaskGroup from './cycle-task-group';
+import Workflow from './workflow';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {REFRESH_SUB_TREE} from '../../events/eventTypes';
 import {getPageType} from '../../plugins/utils/current-page-utils';
@@ -15,6 +16,7 @@ import accessControlList from '../mixins/access-control-list';
 import caUpdate from '../mixins/ca-update';
 import cycleTaskNotifications from '../mixins/cycle-task-notifications';
 import Stub from '../stub';
+import {reify} from '../../plugins/utils/reify-utils';
 
 function populateFromWorkflow(form, workflow) {
   if (!workflow || typeof workflow === 'string') {
@@ -26,12 +28,9 @@ function populateFromWorkflow(form, workflow) {
     form.removeAttr('cycle_task_group');
     return;
   }
-  if (workflow.reify) {
-    workflow = workflow.reify();
-  } else {
-    console.warn('Can\'t reify workflow');
-    return;
-  }
+
+  workflow = Workflow.findInCacheById(workflow.id);
+
   if (typeof workflow.cycles === undefined || !workflow.cycles) {
     $(document.body).trigger(
       'ajax:flash',
@@ -257,9 +256,9 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
         return;
       }
     } else {
-      cycle = form.cycle.reify();
+      cycle = reify(form.cycle);
       if (!_.isUndefined(cycle.workflow)) {
-        form.attr('workflow', cycle.workflow.reify());
+        form.attr('workflow', reify(cycle.workflow));
       }
     }
   },
@@ -279,8 +278,8 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
    *   false otherwise
    */
   responseOptionsEditable: function () {
-    let cycle = this.attr('cycle').reify();
-    let status = this.attr('status');
+    const cycle = reify(this.attr('cycle'));
+    const status = this.attr('status');
 
     return cycle.attr('is_current') &&
       !_.includes(['Finished', 'Verified'], status);

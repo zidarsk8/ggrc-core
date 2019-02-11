@@ -7,6 +7,7 @@ import {getModelInstance} from '../../plugins/utils/models-utils';
 import {buildModifiedListField} from '../../plugins/utils/object-history-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
+import {reify} from './../../plugins/utils/reify-utils';
 import template from './templates/instance-diff-items.stache';
 const tag = 'instance-list-fields-diff';
 
@@ -67,7 +68,7 @@ const viewModel = DiffBaseVM.extend({
   },
   loadFieldList(values) {
     // get from cache
-    return values.map((item) => item.reify());
+    return values.map((item) => reify(item));
   },
 });
 

@@ -27,7 +27,5 @@ export default Cacheable('CMS.Models.CycleTaskGroup', {
 
   init: function () {
     this._super(...arguments);
-    this.validateNonBlank('contact');
-    this.validateContact(['_transient.contact', 'contact']);
   },
 }, {});

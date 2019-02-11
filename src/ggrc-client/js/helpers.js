@@ -26,6 +26,7 @@ import {
 import Search from './models/service-models/search';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
+import {reify, isReifiable} from './plugins/utils/reify-utils';
 import Mappings from './models/mappers/mappings';
 import {
   getFormattedLocalDate,
@@ -306,9 +307,9 @@ Mustache.registerHelper('using', function (options) {
       if (options.hash.hasOwnProperty(i)) {
         arg = options.hash[i];
         arg = Mustache.resolve(arg);
-        if (arg && arg.reify) {
-          refreshQueue.enqueue(arg.reify());
-          frame.attr(i, arg.reify());
+        if (arg && isReifiable(arg)) {
+          refreshQueue.enqueue(reify(arg));
+          frame.attr(i, reify(arg));
         } else {
           frame.attr(i, arg);
         }
@@ -591,7 +592,7 @@ Mustache.registerHelper('default_audit_title', function (instance, options) {
     return;
   }
 
-  program = program.reify();
+  program = reify(program);
   new RefreshQueue().enqueue(program).trigger().then(function () {
     title = (new Date()).getFullYear() + ': ' + program.title + ' - Audit';
 

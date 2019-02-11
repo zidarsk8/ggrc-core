@@ -47,7 +47,6 @@ export default Cacheable('CMS.Models.TaskGroup', {
     this.validateNonBlank('title');
     this.validateNonBlank('contact');
     this.validateNonBlank('workflow');
-    this.validateContact(['_transient.contact', 'contact']);
 
     this.bind('updated', function (ev, instance) {
       if (instance instanceof that) {
