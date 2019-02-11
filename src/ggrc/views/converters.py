@@ -259,28 +259,28 @@ def run_export(task):
   exportable_objects = task.parameters.get("exportable_objects")
 
   try:
-    ie = import_export.get(ie_id)
+    ie_job = import_export.get(ie_id)
     check_for_previous_run()
 
-    content, _ = make_export(objects, exportable_objects, ie)
-    db.session.refresh(ie)
-    if ie.status == "Stopped":
+    content, _ = make_export(objects, exportable_objects, ie_job)
+    db.session.refresh(ie_job)
+    if ie_job.status == "Stopped":
       return utils.make_simple_response()
-    ie.status = "Finished"
-    ie.end_at = datetime.utcnow()
-    ie.content = content
+    ie_job.status = "Finished"
+    ie_job.end_at = datetime.utcnow()
+    ie_job.content = content
     db.session.commit()
 
     job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email,
-                          ie.title, ie_id)
+                          ie_job.title, ie_id)
   except models_exceptions.ExportStoppedException:
     logger.info("Export was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Export failed: %s", e.message)
-    ie = import_export.get(ie_id)
+    ie_job = import_export.get(ie_id)
     try:
-      ie.status = "Failed"
-      ie.end_at = datetime.utcnow()
+      ie_job.status = "Failed"
+      ie_job.end_at = datetime.utcnow()
       db.session.commit()
       job_emails.send_email(job_emails.EXPORT_CRASHED, user.email)
       return utils.make_simple_response(e.message)
