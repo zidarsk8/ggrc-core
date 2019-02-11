@@ -7,6 +7,9 @@ This module handles all view related function to import and export pages
 including the import/export api endponts.
 """
 
+# pylint: disable=inconsistent-return-statements
+# TODO: Remove this suppression after pylint update to v.1.8.3 or higher.
+
 import re
 
 from functools import wraps
