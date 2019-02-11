@@ -145,9 +145,8 @@ validatejs.validators.validateDefaultVerifiers = (value) => {
 };
 
 validatejs.validators.validateIssueTrackerIssueId = (value,
-  options, key, attributes) => {
-  if (!['Fixed', 'Fixed and Verified', 'Deprecated']
-    .includes(attributes.status)) {
+  statuses, key, attributes) => {
+  if (!statuses.includes(attributes.status)) {
     return;
   }
 

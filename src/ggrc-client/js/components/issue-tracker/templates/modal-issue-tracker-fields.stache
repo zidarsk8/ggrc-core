@@ -56,7 +56,11 @@
         </label>
         <div class="ggrc-form-item__multiple-row--double">
           <div class="ggrc-form-item__note">
-            {{{linkingNote}}}
+            {{^if isTicketIdMandatory}}
+              {{{linkingNote}}}
+            {{else}}
+              {{{mandatoryTicketIdNote}}}
+            {{/if}}
           </div>
         </div>
         <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.issue_id"}}field-failure{{/isValidAttr}}">
