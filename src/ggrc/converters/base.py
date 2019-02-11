@@ -9,20 +9,19 @@ import sqlalchemy as sa
 from flask import g
 from google.appengine.ext import deferred
 
-from ggrc import login, db
+from ggrc import db
+from ggrc import login
 from ggrc import settings
-from ggrc.utils import benchmark
-from ggrc.utils import structures
-from ggrc.models import exceptions, all_models
 from ggrc.cache.utils import clear_memcache
+from ggrc.converters import base_block
 from ggrc.converters import get_exportables
 from ggrc.converters import import_helper
-from ggrc.converters import base_block
-from ggrc.converters.snapshot_block import SnapshotBlockConverter
-from ggrc.converters.import_helper import extract_relevant_data
-from ggrc.converters.import_helper import split_blocks
-from ggrc.converters.import_helper import CsvStringBuilder
+from ggrc.converters import snapshot_block
 from ggrc.fulltext import get_indexer
+from ggrc.models import exceptions
+from ggrc.models import all_models
+from ggrc.utils import benchmark
+from ggrc.utils import structures
 
 
 class BaseConverter(object):
@@ -69,11 +68,11 @@ class ImportConverter(BaseConverter):
 
   def initialize_block_converters(self):
     """Initialize block converters."""
-    offsets_and_data_blocks = split_blocks(self.csv_data)
+    offsets_and_data_blocks = import_helper.split_blocks(self.csv_data)
     for offset, data, csv_lines in offsets_and_data_blocks:
       class_name = data[1][0].strip().lower()
       object_class = self.exportable.get(class_name)
-      raw_headers, rows = extract_relevant_data(data)
+      raw_headers, rows = import_helper.extract_relevant_data(data)
       block_converter = base_block.ImportBlockConverter(
           self,
           object_class=object_class,
@@ -117,7 +116,9 @@ class ImportConverter(BaseConverter):
     from ggrc import views
     views.background_update_issues(parameters=arg_list)
 
-  def _start_compute_attributes_job(self, revision_ids):
+  @staticmethod
+  def _start_compute_attributes_job(revision_ids):
+    """Starts deferred task to calculate computed attributes."""
     if revision_ids:
       cur_user = login.get_current_user()
       deferred.defer(
@@ -169,7 +170,8 @@ class ExportConverter(BaseConverter):
       fields = object_data.get("fields", "all")
       if class_name == "Snapshot":
         self.block_converters.append(
-            SnapshotBlockConverter(self, object_ids, fields=fields)
+            snapshot_block.SnapshotBlockConverter(self, object_ids,
+                                                  fields=fields),
         )
       else:
         block_converter = base_block.ExportBlockConverter(
@@ -197,7 +199,7 @@ class ExportConverter(BaseConverter):
                        for converter in self.block_converters])
     table_width += 1  # One line for 'Object line' column
 
-    csv_string_builder = CsvStringBuilder(table_width)
+    csv_string_builder = import_helper.CsvStringBuilder(table_width)
     for block_converter in self.block_converters:
       with benchmark("Generate export file header"):
         csv_header = block_converter.generate_csv_header()
