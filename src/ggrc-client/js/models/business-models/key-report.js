@@ -34,7 +34,6 @@ export default Cacheable('CMS.Models.KeyReport', {
   attributes: {
     context: Stub,
     modified_by: Stub,
-    network_zone: Stub,
   },
   defaults: {
     title: '',
