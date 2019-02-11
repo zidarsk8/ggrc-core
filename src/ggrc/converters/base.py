@@ -4,14 +4,16 @@
 """Base objects for csv file converters."""
 
 from collections import defaultdict
+import sqlalchemy as sa
 
 from flask import g
 from google.appengine.ext import deferred
 
-from ggrc import login
+from ggrc import login, db
 from ggrc import settings
 from ggrc.utils import benchmark
 from ggrc.utils import structures
+from ggrc.models import exceptions, all_models
 from ggrc.cache.utils import clear_memcache
 from ggrc.converters import get_exportables
 from ggrc.converters import import_helper
@@ -136,12 +138,13 @@ class ExportConverter(BaseConverter):
   blocks and columns are handled in the correct order.
   """
 
-  def __init__(self, ids_by_type, exportable_queries=None):
+  def __init__(self, ids_by_type, exportable_queries=None, ie_job=None):
     super(ExportConverter, self).__init__()
     self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
     self.block_converters = []
     self.ids_by_type = ids_by_type
     self.exportable_queries = exportable_queries or []
+    self.ie_job = ie_job
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
@@ -205,6 +208,8 @@ class ExportConverter(BaseConverter):
         csv_string_builder.append_line(csv_header[1])
 
       for line in block_converter.generate_row_data():
+        if self._get_job_status() == all_models.ImportExport.STOPPED_STATUS:
+          raise exceptions.ExportStoppedException()
         line.insert(0, "")
         csv_string_builder.append_line(line)
 
@@ -233,3 +238,16 @@ class ExportConverter(BaseConverter):
     else:
       queries = self.ids_by_type
     return queries
+
+  def _get_job_status(self):
+    """Get status of current ImportExport job."""
+    if not self.ie_job:
+      return None
+    return db.engine.execute(
+        sa.text("""
+                SELECT status
+                FROM import_exports
+                WHERE id = :ie_id
+        """),
+        {"ie_id": self.ie_job.id},
+    ).fetchone()[0]

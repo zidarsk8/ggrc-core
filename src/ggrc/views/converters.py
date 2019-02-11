@@ -25,7 +25,7 @@ from flask import render_template
 from werkzeug.exceptions import (
     BadRequest, InternalServerError, Unauthorized, Forbidden, NotFound
 )
-
+from ggrc.models.exceptions import ExportStoppedException
 from ggrc import db, utils
 from ggrc.app import app
 from ggrc.cloud_api import task_queue
@@ -163,13 +163,14 @@ def handle_export_csv_template_request():
   return export_file(export_to, filename, csv_string)
 
 
-def make_export(objects, exportable_objects=None):
+def make_export(objects, exportable_objects=None, ie_job=None):
   """Make export"""
   query_helper = QueryHelper(objects)
   ids_by_type = query_helper.get_ids()
   converter = ExportConverter(
       ids_by_type=ids_by_type,
       exportable_queries=exportable_objects,
+      ie_job=ie_job,
   )
   csv_data = converter.export_csv_data()
   object_names = "_".join(converter.get_object_names())
@@ -250,7 +251,7 @@ def run_export(task):
     ie = import_export.get(ie_id)
     check_for_previous_run()
 
-    content, _ = make_export(objects, exportable_objects)
+    content, _ = make_export(objects, exportable_objects, ie)
     db.session.refresh(ie)
     if ie.status == "Stopped":
       return utils.make_simple_response()
@@ -261,7 +262,8 @@ def run_export(task):
 
     job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email,
                           ie.title, ie_id)
-
+  except ExportStoppedException:
+    logger.info("Export was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Export failed: %s", e.message)
     ie = import_export.get(ie_id)
