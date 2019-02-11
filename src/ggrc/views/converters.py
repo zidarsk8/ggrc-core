@@ -29,27 +29,22 @@ from werkzeug import exceptions as wzg_exceptions
 
 
 from ggrc import db
+from ggrc import login
 from ggrc import settings
 from ggrc import utils
 from ggrc.app import app
 from ggrc.cloud_api import task_queue
+from ggrc.converters import base
 from ggrc.converters import get_exportables
-from ggrc.converters.base import ExportConverter
-from ggrc.converters.base import ImportConverter
-from ggrc.converters.import_helper import count_objects
-from ggrc.converters.import_helper import get_export_filename
-from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.converters.import_helper import read_csv_file
+from ggrc.converters import import_helper
 from ggrc.gdrive import file_actions as fa
-from ggrc.login import get_current_user
-from ggrc.login import login_required
 from ggrc.models import all_models
 from ggrc.models import background_task
+from ggrc.models import exceptions as models_exceptions
 from ggrc.models import import_export
-from ggrc.models.exceptions import ExportStoppedException
 from ggrc.notifications import job_emails
-from ggrc.query.exceptions import BadQueryException
-from ggrc.query.builder import QueryHelper
+from ggrc.query import builder
+from ggrc.query import exceptions as query_exceptions
 from ggrc.utils import benchmark
 from ggrc.utils import errors as app_errors
 
@@ -115,7 +110,7 @@ def handle_export_request_error(handle_function):
     """Wrapper for handle exceptions during exporting"""
     try:
       return handle_function(*args, **kwargs)
-    except BadQueryException as exception:
+    except query_exceptions.BadQueryException as exception:
       raise wzg_exceptions.BadRequest(exception.message)
     except wzg_exceptions.Unauthorized as ex:
       raise wzg_exceptions.Unauthorized("%s %s" % (ex.message,
@@ -158,9 +153,11 @@ def get_csv_template(objects):
     class_name = object_data["object_name"]
     object_class = EXPORTABLES_MAP[class_name]
     ignore_fields = IGNORE_FIELD_IN_TEMPLATE.get(class_name, [])
-    filtered_fields = [field for field in
-                       get_object_column_definitions(object_class)
-                       if field not in ignore_fields]
+    filtered_fields = [
+        field for field in
+        import_helper.get_object_column_definitions(object_class)
+        if field not in ignore_fields
+    ]
     object_data["fields"] = filtered_fields
   return make_export(objects)
 
@@ -178,9 +175,9 @@ def handle_export_csv_template_request():
 
 def make_export(objects, exportable_objects=None, ie_job=None):
   """Make export"""
-  query_helper = QueryHelper(objects)
+  query_helper = builder.QueryHelper(objects)
   ids_by_type = query_helper.get_ids()
-  converter = ExportConverter(
+  converter = base.ExportConverter(
       ids_by_type=ids_by_type,
       exportable_queries=exportable_objects,
       ie_job=ie_job,
@@ -233,7 +230,9 @@ def make_response(data):
 def make_import(csv_data, dry_run, ie_job=None):
   """Make import"""
   try:
-    converter = ImportConverter(ie_job, dry_run=dry_run, csv_data=csv_data)
+    converter = base.ImportConverter(ie_job,
+                                     dry_run=dry_run,
+                                     csv_data=csv_data)
     converter.import_csv_data()
     return converter.get_info()
   except Exception as e:  # pylint: disable=broad-except
@@ -255,7 +254,7 @@ def check_for_previous_run():
 @background_task.queued_task
 def run_export(task):
   """Run export"""
-  user = get_current_user()
+  user = login.get_current_user()
   ie_id = task.parameters.get("ie_id")
   objects = task.parameters.get("objects")
   exportable_objects = task.parameters.get("exportable_objects")
@@ -275,7 +274,7 @@ def run_export(task):
 
     job_emails.send_email(job_emails.EXPORT_COMPLETED, user.email,
                           ie.title, ie_id)
-  except ExportStoppedException:
+  except models_exceptions.ExportStoppedException:
     logger.info("Export was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Export failed: %s", e.message)
@@ -298,12 +297,14 @@ def run_export(task):
 def run_import_phases(task):
   """Execute import phases"""
   ie_id = task.parameters.get("ie_id")
-  user = get_current_user()
+  user = login.get_current_user()
   try:
     ie_job = import_export.get(ie_id)
     check_for_previous_run()
 
-    csv_data = read_csv_file(StringIO(ie_job.content.encode("utf-8")))
+    csv_data = import_helper.read_csv_file(
+        StringIO(ie_job.content.encode("utf-8"))
+    )
 
     if ie_job.status == "Analysis":
       info = make_import(csv_data, True, ie_job)
@@ -369,34 +370,34 @@ def init_converter_views():
   # pylint: disable=unused-variable
   # The view function trigger a false unused-variable.
   @app.route("/_service/export_csv", methods=["POST"])
-  @login_required
+  @login.login_required
   def handle_export_csv():
     """Calls export handler"""
     with benchmark("handle export request"):
       return handle_export_request()
 
   @app.route("/_service/export_csv_template", methods=["POST"])
-  @login_required
+  @login.login_required
   def handle_export_csv_template():
     """Calls export csv template handler"""
     with benchmark("handle export csv template"):
       return handle_export_csv_template_request()
 
   @app.route("/_service/import_csv", methods=["POST"])
-  @login_required
+  @login.login_required
   def handle_import_csv():
     """Calls import handler"""
     with benchmark("handle import request"):
       return handle_import_request()
 
   @app.route("/import")
-  @login_required
+  @login.login_required
   def import_view():
     """Get import view"""
     return render_template("import_export/import.haml")
 
   @app.route("/export")
-  @login_required
+  @login.login_required
   def export_view():
     """Get export view"""
     return render_template("import_export/export.haml")
@@ -461,7 +462,7 @@ def handle_import_put(**kwargs):
   """Handle import put"""
   command = kwargs.get("command2")
   ie_id = kwargs.get("id2")
-  user = get_current_user()
+  user = login.get_current_user()
   if user.system_wide_role == 'No Access':
     raise wzg_exceptions.Forbidden()
   if not ie_id or not command or command not in ("start", "stop"):
@@ -528,7 +529,7 @@ def handle_import_post(**kwargs):
   csv_data, csv_content, filename = fa.get_gdrive_file_data(file_meta)
   check_import_filename(filename)
   try:
-    objects, results, failed = count_objects(csv_data)
+    objects, results, failed = import_helper.count_objects(csv_data)
     ie = import_export.create_import_export_entry(
         content=csv_content,
         gdrive_metadata=file_meta,
@@ -584,14 +585,16 @@ def handle_export_post(**kwargs):
   objects = request_json.get("objects")
   exportable_objects = request_json.get("exportable_objects", [])
   current_time = request.json.get("current_time")
-  user = get_current_user()
+  user = login.get_current_user()
   if user.system_wide_role == 'No Access':
     raise wzg_exceptions.Forbidden()
   if not objects or not current_time:
     raise wzg_exceptions.BadRequest(
         app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
   try:
-    filename = get_export_filename(objects, current_time, exportable_objects)
+    filename = import_helper.get_export_filename(objects,
+                                                 current_time,
+                                                 exportable_objects)
     ie = import_export.create_import_export_entry(
         job_type="Export",
         status="In Progress",
