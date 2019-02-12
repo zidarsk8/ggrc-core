@@ -55,14 +55,15 @@ Add the NewObject to appropriate roles in
 Frontend
 --------
 
-Create a CMS.Models.Cacheable object
+Create a Cacheable object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ..  code-block:: javascript
 
     import Stub from '../stub';
+    import Cacheable from '../cacheable';
 
-    can.Model.Cacheable("CMS.Models.NewObject", {
+    export default Cacheable.extend({
       root_object : "new_object",
       root_collection : "new_objects",
       findOne : "GET /api/new_objects/{id}",
