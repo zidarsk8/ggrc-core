@@ -12,7 +12,7 @@ import scopeObjectNotifications from '../mixins/scope-object-notifications';
 import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.KeyReport', {
+export default Cacheable.extend({
   root_object: 'key_report',
   root_collection: 'key_reports',
   category: 'scope',
@@ -41,7 +41,7 @@ export default Cacheable('CMS.Models.KeyReport', {
     status: 'Draft',
   },
   tree_view_options: {
-    attr_list: can.Model.Cacheable.attr_list.concat([
+    attr_list: Cacheable.attr_list.concat([
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'},
