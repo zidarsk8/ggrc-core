@@ -193,7 +193,7 @@ const MAP_OBJECTS = {
  * @event deferredMapObjects
  * @type {object}
  * @property {string} type - Event name.
- * @property {Stub[]|can.Model.Cacheable[]} objects - Mapped objects (always
+ * @property {Stub[]|Cacheable[]} objects - Mapped objects (always
  * contain "id" and "type" fields).
  */
 const DEFERRED_MAP_OBJECTS = {

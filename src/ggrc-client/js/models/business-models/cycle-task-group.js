@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.CycleTaskGroup', {
+export default Cacheable.extend({
   root_object: 'cycle_task_group',
   root_collection: 'cycle_task_groups',
   category: 'workflow',

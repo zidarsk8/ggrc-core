@@ -32,8 +32,8 @@ For example, ``GGRC.page_object`` is the object rendered by the current page
 (e.g. a Program), as it was received from the server (mapped objects are
 stubs).
 
-``CMS.Models.<MODEL>.cache`` stores the loaded objects. For example,
-``CMS.Models.Program.cache`` will have an array of all the loaded
+``<Imported Cacheable Model>.cache`` stores the loaded objects. For example,
+``<Imported Cacheable Model>`` will have an array of all the loaded
 programs.
 
 
@@ -245,10 +245,10 @@ Are they cached?
 
 -  Client-side:
 
-   -  can.Model.Cacheable
+   -  Cacheable
 
       -  Once a model is retrieved to the browser, it is stored in
-         ``CMS.Models.<model_name>.cache[<id>]``.  Once present, it is
+         ``<Imported Cacheable Model>.cache[<id>]``.  Once present, it is
          only requested again via the ``<instance>.refresh()`` method.
       -  A model can be conditionally pulled from the server (if it only
          exists on the client in stub form) by enqueueing it into a

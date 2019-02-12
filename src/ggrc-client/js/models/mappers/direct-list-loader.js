@@ -5,7 +5,15 @@
 
 import RefreshQueue from '../refresh_queue';
 import Cacheable from '../cacheable';
+import {Person, Cycle} from '../business-models';
 import {reify} from '../../plugins/utils/reify-utils';
+import {Role} from '../service-models';
+
+const directListModels = {
+  Person,
+  Cycle,
+  Role,
+};
 
 (function (GGRC, can) {
   /*  DirectListLoader
@@ -28,7 +36,7 @@ import {reify} from '../../plugins/utils/reify-utils';
       },
       init_listeners: function (binding) {
         let self = this;
-        let model = CMS.Models[this.model_name] || Cacheable;
+        let model = directListModels[this.model_name] || Cacheable;
 
         binding.instance.bind(this.object_join_attr, function (ev, _new, _old) {
           if (binding._refresh_stubs_deferred &&
@@ -56,7 +64,7 @@ import {reify} from '../../plugins/utils/reify-utils';
         });
       },
       is_valid_mapping: function (binding, mapping) {
-        let model = CMS.Models[this.model_name] || Cacheable;
+        let model = directListModels[this.model_name] || Cacheable;
         let objectModel = binding.instance.constructor;
 
         return (mapping instanceof model && mapping[this.object_attr] &&

@@ -10,7 +10,7 @@ import Cacheable from '../cacheable';
  *
  * @class
  */
-export default Cacheable('CMS.Models.AccessControlRole', {
+export default Cacheable.extend({
   root_object: 'access_control_role',
   root_collection: 'access_control_roles',
   category: 'access_control_roles',

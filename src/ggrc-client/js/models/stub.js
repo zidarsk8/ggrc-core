@@ -6,7 +6,7 @@
 let Stub = can.Map.extend({
   setup(model) {
     let type = (model instanceof can.Model)
-      ? model.constructor.shortName
+      ? model.constructor.model_singular
       : model.type;
     let href = model.selfLink || model.href;
 

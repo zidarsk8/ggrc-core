@@ -6,7 +6,7 @@
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.Comment', {
+export default Cacheable.extend({
   root_object: 'comment',
   root_collection: 'comments',
   findOne: 'GET /api/comments/{id}',

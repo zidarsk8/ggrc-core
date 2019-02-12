@@ -43,7 +43,7 @@ const viewModel = can.Map.extend({
 
         return _.filter(widgetList, (widget) => {
           return this.isNotObjectVersion(widget.internav_display) &&
-            !this.isNotProhibitedMap(widget.model.shortName) &&
+            !this.isNotProhibitedMap(widget.model.model_singular) &&
             widget.attr('placeInAddTab');
         });
       },

@@ -62,20 +62,20 @@ _.assign(CoreExtension, {
     // Info and summary widgets display the object information instead of listing
     // connected objects.
     if (summaryWidgetViews[objectTable]) {
-      widgetList.add_widget(object.constructor.shortName, 'summary', {
+      widgetList.add_widget(object.constructor.model_singular, 'summary', {
         content_controller: SummaryWidgetController,
         instance: object,
         widget_view: summaryWidgetViews[objectTable],
       });
     }
     if (isDashboardEnabled(object)) {
-      widgetList.add_widget(object.constructor.shortName, 'dashboard', {
+      widgetList.add_widget(object.constructor.model_singular, 'dashboard', {
         content_controller: DashboardWidget,
         instance: object,
         widget_view: path + '/base_objects/dashboard_widget.stache',
       });
     }
-    widgetList.add_widget(object.constructor.shortName, 'info', {
+    widgetList.add_widget(object.constructor.model_singular, 'info', {
       content_controller: InfoWidget,
       instance: object,
       widget_view: infoWidgetViews[objectTable],
@@ -117,7 +117,7 @@ _.assign(CoreExtension, {
     if (/^\/assessments_view/.test(window.location.pathname)) {
       farModels = ['Assessment'];
     } else {
-      farModels = baseWidgetsByType[object.constructor.shortName];
+      farModels = baseWidgetsByType[object.constructor.model_singular];
     }
 
     // here we are going to define extra descriptor options, meaning that
@@ -204,15 +204,16 @@ _.assign(CoreExtension, {
         $.extend(descriptor, extraDescriptorOptions.all[modelName]);
       }
 
-      if (extraDescriptorOptions[object.constructor.shortName] &&
-          extraDescriptorOptions[object.constructor.shortName][modelName]) {
+      if (extraDescriptorOptions[object.constructor.model_singular] &&
+          extraDescriptorOptions[
+            object.constructor.model_singular][modelName]) {
         $.extend(descriptor,
-          extraDescriptorOptions[object.constructor.shortName][modelName]);
+          extraDescriptorOptions[object.constructor.model_singular][modelName]);
       }
 
       descriptor.widgetType = 'treeview';
       widgetList.add_widget(
-        object.constructor.shortName, widgetId, descriptor);
+        object.constructor.model_singular, widgetId, descriptor);
     });
   },
 });

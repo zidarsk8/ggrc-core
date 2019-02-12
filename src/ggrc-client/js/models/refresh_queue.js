@@ -81,13 +81,13 @@ const RefreshQueueManager = can.Construct({}, {
   enqueue: function (obj, force) {
     let self = this;
     let model = obj.constructor;
-    let modelName = model.shortName;
+    let modelName = model.model_singular;
     let foundQueue = null;
     let id = obj.id;
 
     if (!obj.selfLink) {
       if (obj instanceof can.Model) {
-        modelName = obj.constructor.shortName;
+        modelName = obj.constructor.model_singular;
       } else if (obj.type) {
         // FIXME: obj.kind is to catch invalid stubs coming from Directives
         modelName = obj.type || obj.kind;

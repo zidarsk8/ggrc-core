@@ -115,14 +115,14 @@ describe('task-list component', () => {
       events = Component.prototype.events;
     });
 
-    describe('"{CMS.Models.TaskGroupTask} created"() event',
+    describe('"{TaskGroupTask} created"() event',
       () => {
         let handler;
         let eventsScope;
 
         beforeEach(function () {
           eventsScope = {viewModel};
-          handler = events['{CMS.Models.TaskGroupTask} created']
+          handler = events['{TaskGroupTask} created']
             .bind(eventsScope);
         });
 
@@ -141,14 +141,14 @@ describe('task-list component', () => {
         });
       });
 
-    describe('"{CMS.Models.TaskGroupTask} destroyed"() event',
+    describe('"{TaskGroupTask} destroyed"() event',
       () => {
         let handler;
         let eventsScope;
 
         beforeEach(function () {
           eventsScope = {viewModel};
-          handler = events['{CMS.Models.TaskGroupTask} destroyed']
+          handler = events['{TaskGroupTask} destroyed']
             .bind(eventsScope);
         });
 

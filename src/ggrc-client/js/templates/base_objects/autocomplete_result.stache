@@ -21,9 +21,9 @@
   </li>
 {{/if}}
 {{#if model}}
-{{#is_allowed "create" model.shortName context=null}}
+{{#is_allowed "create" model.model_singular context=null}}
     {{^if disableCreate}}
-      {{^if_equals model.shortName "Workflow"}}
+      {{^if_equals model.model_singular "Workflow"}}
         <li class="ui-menu-item add-new oneline" data-ui-autocomplete-item="">
           <a data-object-plural="{{model.table_plural}}"
              data-modal-class="modal-wide"

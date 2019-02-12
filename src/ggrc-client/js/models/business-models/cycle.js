@@ -24,7 +24,7 @@ function refreshWorkflow(ev, instance) {
   }
 }
 
-export default Cacheable('CMS.Models.Cycle', {
+export default Cacheable.extend({
   root_object: 'cycle',
   root_collection: 'cycles',
   category: 'workflow',

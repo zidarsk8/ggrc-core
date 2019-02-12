@@ -12,7 +12,7 @@ import scopeObjectNotifications from '../mixins/scope-object-notifications';
 import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Project', {
+export default Cacheable.extend({
   root_object: 'project',
   root_collection: 'projects',
   category: 'scope',

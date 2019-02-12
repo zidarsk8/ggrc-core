@@ -3,7 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Model('GGRC.Models.Search', {
+export default can.Model.extend({
+  root_object: 'search',
   findOne: 'GET /search',
   init: function () {
     let _findOne;
@@ -76,8 +77,8 @@ export default can.Model('GGRC.Models.Search', {
   getCountFor: function (type) {
     let result;
 
-    if (type && type.shortName) {
-      type = type.shortName;
+    if (type && type.model_singular) {
+      type = type.model_singular;
     }
     if (!this.counts[type]) {
       result = 0;

@@ -12,7 +12,7 @@ import scopeObjectNotifications from '../mixins/scope-object-notifications';
 import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.TechnologyEnvironment', {
+export default Cacheable.extend({
   root_object: 'technology_environment',
   root_collection: 'technology_environments',
   category: 'scope',

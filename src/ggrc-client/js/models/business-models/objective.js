@@ -11,7 +11,7 @@ import baseNotifications from '../mixins/base-notifications';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Objective', {
+export default Cacheable.extend({
   root_object: 'objective',
   root_collection: 'objectives',
   category: 'objectives',

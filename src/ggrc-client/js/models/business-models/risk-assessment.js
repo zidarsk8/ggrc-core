@@ -12,7 +12,7 @@ import Program from './program';
 
 const path = GGRC.templates_path + '/risk_assessments';
 
-export default Cacheable('CMS.Models.RiskAssessment', {
+export default Cacheable.extend({
   root_object: 'risk_assessment',
   root_collection: 'risk_assessments',
   category: 'risk_assessment',

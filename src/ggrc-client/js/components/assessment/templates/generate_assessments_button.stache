@@ -29,7 +29,7 @@
   {{/is_allowed}}
 {{else}}
   {{#if_instance_of audit 'Audit'}}
-    {{#if_in model.shortName 'Assessment,Control'}}
+    {{#if_in model.model_singular 'Assessment,Control'}}
       {{^if audit.archived}}
         {{#is_allowed 'update' audit context="for"}}
             <li class="generate-control-assessments">

@@ -6,7 +6,7 @@
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Context', {
+export default Cacheable.extend({
   root_object: 'context',
   root_collection: 'contexts',
   category: 'contexts',

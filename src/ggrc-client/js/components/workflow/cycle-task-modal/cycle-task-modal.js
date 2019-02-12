@@ -15,7 +15,7 @@ import * as businessModels from '../../../models/business-models';
 const viewModel = can.Map.extend({
   instance: null,
   /**
-  * @type {can.Model.Cacheable[]}
+  * @type {Cacheable[]}
   */
   mappedObjects: [],
   /**
@@ -23,7 +23,7 @@ const viewModel = can.Map.extend({
   */
   preMappedStubs: [],
   /**
-  * @type {can.Model.Cacheable[]}
+  * @type {Cacheable[]}
   */
   preMappedObjects: [],
   loadPreMappedObjects() {

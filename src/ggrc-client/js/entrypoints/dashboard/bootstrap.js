@@ -25,7 +25,7 @@ import {PageObjectControl} from '../../controllers/dashboard_controller';
 const instance = getPageInstance();
 const location = window.location.pathname;
 const isAssessmentsView = isMyAssessments();
-const modelName = instance.constructor.shortName;
+const modelName = instance.constructor.model_singular;
 let defaults;
 let widgetList;
 let widgetModels;

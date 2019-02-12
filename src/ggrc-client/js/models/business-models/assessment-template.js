@@ -18,7 +18,7 @@ import Stub from '../stub';
  * AssessmentTemplate helps avoiding repeatedly defining the same set of
  * Assessment object properties for each new instance.
  */
-export default Cacheable('CMS.Models.AssessmentTemplate', {
+export default Cacheable.extend({
   root_object: 'assessment_template',
   root_collection: 'assessment_templates',
   model_singular: 'AssessmentTemplate',

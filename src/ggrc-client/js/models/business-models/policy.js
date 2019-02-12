@@ -6,7 +6,7 @@
 import Directive from './directive';
 import accessControlList from '../mixins/access-control-list';
 
-export default Directive('CMS.Models.Policy', {
+export default Directive.extend({
   root_object: 'policy',
   root_collection: 'policies',
   model_plural: 'Policies',

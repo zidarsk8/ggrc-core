@@ -76,7 +76,7 @@ export default can.Component.extend({
           filter: model,
           textValue: '',
           menu: this.viewModel.attr('menu'),
-          model_name: model.constructor.shortName,
+          model_name: model.constructor.model_singular,
         });
       }, this);
     },

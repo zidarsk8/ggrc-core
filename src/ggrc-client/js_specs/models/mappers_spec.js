@@ -541,7 +541,7 @@ describe('mappers', function () {
       let Dummy;
       beforeAll(function () {
         Dummy = can.Map.extend();
-        Dummy.shortName = 'Dummy';
+        Dummy.model_singular = 'Dummy';
       });
 
       it('removes no instance when nothing is supplied to remove', function () {
@@ -554,7 +554,7 @@ describe('mappers', function () {
       it("removes no instance when instance doesn't match type", function () {
         let instance = new Dummy({id: 3});
         let WrongClass = can.Map.extend();
-        WrongClass.shortName = 'Wrong';
+        WrongClass.model_singular = 'Wrong';
         let wrongInstance = new WrongClass({id: 3});
         let binding = {list: [{instance: instance, mappings: []}]};
         ll.remove_instance(binding, wrongInstance, 'b');

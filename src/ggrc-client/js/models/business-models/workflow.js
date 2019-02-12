@@ -10,7 +10,7 @@ import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Workflow', {
+export default Cacheable.extend({
   root_object: 'workflow',
   root_collection: 'workflows',
   category: 'workflow',

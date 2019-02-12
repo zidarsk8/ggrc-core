@@ -126,7 +126,7 @@ function isScopeModel(type) {
 /**
  * Return Model Constructor Instance
  * @param {String} type - Model type
- * @return {CMS.Model.Cacheble|null} - Return Model Constructor
+ * @return {Cacheble|null} - Return Model Constructor
  */
 const getModelByType = (type) => {
   if (!type || typeof type !== 'string') {

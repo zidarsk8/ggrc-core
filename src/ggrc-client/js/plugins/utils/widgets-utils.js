@@ -84,7 +84,7 @@ function getWidgetModels(modelName, path) {
     .filter((name) => widgetList[name].widgetType === 'treeview')
     .map((widgetName) => {
       return isObjectVersion(widgetName) ? widgetName :
-        widgetList[widgetName].content_controller_options.model.shortName;
+        widgetList[widgetName].content_controller_options.model.model_singular;
     });
 }
 
@@ -204,7 +204,7 @@ function refreshCounts() {
     return $.Deferred().resolve();
   }
 
-  widgets = getWidgetModels(pageInstance.constructor.shortName, location);
+  widgets = getWidgetModels(pageInstance.constructor.model_singular, location);
 
   return initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
 }

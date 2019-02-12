@@ -147,7 +147,7 @@ const Permission = can.Construct({
     }.bind(this);
 
     let actionObj = permissions[action] || {};
-    let shortName = instance.constructor && instance.constructor.shortName;
+    let shortName = instance.constructor && instance.constructor.model_singular;
     let instanceType = instance.type || shortName;
     let typeObj = actionObj[instanceType] || {};
     let conditionsByContext = typeObj.conditions || {};

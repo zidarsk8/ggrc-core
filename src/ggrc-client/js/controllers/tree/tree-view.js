@@ -68,7 +68,8 @@ const TreeViewControl = TreeLoader.extend({
   },
 
   init: function (el, opts) {
-    let states = StateUtils.getStatesForModel(this.options.model.shortName);
+    let states = StateUtils
+      .getStatesForModel(this.options.model.model_singular);
 
     let filterStates = states.map(function (state) {
       return {value: state};
@@ -165,7 +166,7 @@ const TreeViewControl = TreeLoader.extend({
     let self = this;
     let options = this.options;
     let counts;
-    let countsName = options.countsName || options.model.shortName;
+    let countsName = options.countsName || options.model.model_singular;
 
     if (this.options.parent_instance && this.options.mapping) {
       counts = getCounts();

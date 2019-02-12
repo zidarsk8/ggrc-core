@@ -5,6 +5,11 @@
 
 import RefreshQueue from '../refresh_queue';
 import {reify} from '../../plugins/utils/reify-utils';
+import {Relationship} from '../service-models';
+
+const proxyListModels = {
+  Relationship,
+};
 
 (function (GGRC, can) {
   /*  ProxyListLoader
@@ -31,7 +36,7 @@ import {reify} from '../../plugins/utils/reify-utils';
       },
       init_listeners: function (binding) {
         let self = this;
-        let model = CMS.Models[this.model_name];
+        let model = proxyListModels[this.model_name];
         let objectJoinValue = binding.instance[this.object_join_attr];
 
         binding.instance.bind(this.object_join_attr, function (ev, _new, _old) {
@@ -67,9 +72,9 @@ import {reify} from '../../plugins/utils/reify-utils';
         });
       },
       is_valid_mapping: function (binding, mapping) {
-        let model = CMS.Models[this.model_name];
+        let model = proxyListModels[this.model_name];
         let objectModel = binding.instance.constructor;
-        let optionModel = CMS.Models[this.option_model_name];
+        let optionModel = proxyListModels[this.option_model_name];
 
         return (mapping.constructor === model && mapping[this.object_attr] &&
           (reify(mapping[this.object_attr]) === binding.instance ||
@@ -143,7 +148,7 @@ import {reify} from '../../plugins/utils/reify-utils';
         }
       },
       _refresh_stubs: function (binding) {
-        let model = CMS.Models[this.model_name];
+        let model = proxyListModels[this.model_name];
         let refreshQueue = new RefreshQueue();
         let objectJoinAttr = this.object_join_attr || model.table_plural;
 

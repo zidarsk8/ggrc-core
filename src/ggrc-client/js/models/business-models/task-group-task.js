@@ -17,7 +17,7 @@ import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.TaskGroupTask', {
+export default Cacheable.extend({
   root_object: 'task_group_task',
   root_collection: 'task_group_tasks',
   findAll: 'GET /api/task_group_tasks',

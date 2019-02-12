@@ -18,7 +18,7 @@
     <div class="dropdown-menu {{#if_equals filteredWidgets.length 1}} one-item {{/if}}" role="menu">
       {{#filteredWidgets}}
           <div class="inner-nav-item">
-            {{#shouldCreateObject instance model.shortName}}
+            {{#shouldCreateObject instance model.model_singular}}
               <a
                 href="{{urlPath}}{{internav_href}}"
                 rel="tooltip"
@@ -50,13 +50,13 @@
               </a>
             {{else}}
               <a href="{{urlPath}}{{ internav_href }}"
-                {{#canMapObject model.shortName}}
-                  {{^if_equals model.shortName 'Assessment'}}
+                {{#canMapObject model.model_singular}}
+                  {{^if_equals model.model_singular 'Assessment'}}
                     data-clickable="true"
                     data-toggle="unified-mapper"
-                    data-join-option-type="{{model.shortName}}"
+                    data-join-option-type="{{model.model_singular}}"
                     data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.class.shortName}}"
+                    data-join-object-type="{{instance.class.model_singular}}"
                   {{/if_equals}}
                 {{/canMapObject}}>
                 <div class="oneline">

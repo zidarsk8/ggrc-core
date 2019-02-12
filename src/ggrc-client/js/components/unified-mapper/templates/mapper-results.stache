@@ -9,7 +9,7 @@
     <div class="list-header">
       {{^disableColumnsConfiguration}}
         <mapper-results-columns-configuration
-          model-type="getDisplayModel.shortName"
+          model-type="getDisplayModel.model_singular"
           available-columns="columns.available"
           {(selected-columns)}="columns.selected">
         </mapper-results-columns-configuration>

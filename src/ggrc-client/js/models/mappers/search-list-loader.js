@@ -5,6 +5,15 @@
 
 import Cacheable from '../cacheable';
 import {reify} from '../../plugins/utils/reify-utils';
+import {Search} from '../service-models';
+import AccessControlRole from '../custom-roles/access-control-role';
+import CustomAttributeDefinition
+  from '../custom-attributes/custom-attribute-definition';
+
+const searchModels = {
+  AccessControlRole,
+  CustomAttributeDefinition,
+};
 
 (function (GGRC, can) {
   /*  SearchListLoader
@@ -123,8 +132,7 @@ import {reify} from '../../plugins/utils/reify-utils';
           result = this.query_function(binding);
           result.pipe(function (mappings) {
             _.forEach(mappings, function (entry, i) {
-              let _class = CMS.Models[entry.type] ||
-                GGRC.Models[entry.type];
+              let _class = searchModels[entry.type] || Search;
               mappings[i] = new _class({id: entry.id});
             });
 

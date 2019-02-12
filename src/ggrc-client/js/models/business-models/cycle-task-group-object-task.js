@@ -62,7 +62,7 @@ function populateFromWorkflow(form, workflow) {
   });
 }
 
-export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
+export default Cacheable.extend({
   root_object: 'cycle_task_group_object_task',
   root_collection: 'cycle_task_group_object_tasks',
   mixins: [

@@ -13,7 +13,7 @@ import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 import Program from './program';
 
-export default Cacheable('CMS.Models.Audit', {
+export default Cacheable.extend({
   root_object: 'audit',
   root_collection: 'audits',
   category: 'programs',

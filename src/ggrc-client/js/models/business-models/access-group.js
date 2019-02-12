@@ -11,7 +11,7 @@ import scopeObjectNotifications from '../mixins/scope-object-notifications';
 import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.AccessGroup', {
+export default Cacheable.extend({
   root_object: 'access_group',
   root_collection: 'access_groups',
   category: 'scope',

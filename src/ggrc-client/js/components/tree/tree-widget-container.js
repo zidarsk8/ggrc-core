@@ -95,7 +95,7 @@ viewModel = can.Map.extend({
     modelName: {
       type: String,
       get: function () {
-        return this.attr('model').shortName;
+        return this.attr('model').model_singular;
       },
     },
     statusFilterVisible: {
@@ -461,7 +461,7 @@ viewModel = can.Map.extend({
     }
 
     return function (needDestroy) {
-      activeTabModel = this.options.model.shortName;
+      activeTabModel = this.options.model.model_singular;
       self = this;
       if (needDestroy) {
         // Remove listeners for inactive tabs
@@ -709,7 +709,7 @@ export default can.Component.extend({
         return;
       }
 
-      currentModelName = vm.attr('model').shortName;
+      currentModelName = vm.attr('model').model_singular;
 
       if (currentModelName === ev.destinationType) {
         this.reloadTree();

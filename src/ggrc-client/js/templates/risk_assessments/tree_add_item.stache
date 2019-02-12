@@ -22,7 +22,7 @@
       </a>
     {{/is_allowed}}
 {{else}}
-    {{#is_allowed_to_map parent_instance model.shortName}}
+    {{#is_allowed_to_map parent_instance model.model_singular}}
       <a
         href="javascript://"
         class="action-button create-button"
