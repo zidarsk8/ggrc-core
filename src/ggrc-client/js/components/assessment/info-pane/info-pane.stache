@@ -151,7 +151,7 @@
                             {{#if urlsEditMode}}
                                 <create-url
                                     {context}="instance.context"
-                                    (set-edit-mode)="setUrlEditMode(false, 'urls')"
+                                    (set-edit-mode)="setUrlEditMode(false)"
                                     (before-create)="addItems(%event, 'urls')"
                                     (created)="addRelatedItem(%event, 'urls')">
                                     <form class="create-form">
@@ -170,7 +170,7 @@
                                 </create-url>
                             {{else}}
                                 <confirm-edit-action
-                                    (set-edit-mode)="setUrlEditMode(true, 'urls')"
+                                    (set-edit-mode)="setUrlEditMode(true)"
                                     (set-in-progress)="setInProgressState()"
                                     {is-edit-icon-denied}="isEditDenied"
                                     {instance}="instance"

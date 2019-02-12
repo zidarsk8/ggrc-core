@@ -63,7 +63,7 @@
                     <create-url
                         {type}="documentTypes.urls"
                         {context}="instance.context"
-                        (set-edit-mode)="setUrlEditMode(false, 'urls')"
+                        (set-edit-mode)="setUrlEditMode(false)"
                         (before-create)="addItems(%event, 'urls')"
                         (created)="addRelatedItem(%event, 'urls')">
                         <form class="create-form">
@@ -82,7 +82,7 @@
                     </create-url>
                 {{else}}
                     <button type="button" class="btn btn-small btn-gray"
-                        ($click)="setUrlEditMode(true, 'urls')">Add</button>
+                        ($click)="setUrlEditMode(true)">Add</button>
                 {{/if}}
             </div>
         {{/if}}
@@ -99,7 +99,7 @@
                                 {is-disabled}="isUpdatingEvidences"
             >Save</comment-add-button>
         {{/if}}
-            <button type="button" class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide; setUrlEditMode(false, 'urls')">Close</button>
+            <button type="button" class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide; setUrlEditMode(false)">Close</button>
         </div>
     </div>
 </div>

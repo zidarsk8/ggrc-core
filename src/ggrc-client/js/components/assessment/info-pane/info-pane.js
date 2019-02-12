@@ -240,8 +240,8 @@ export default can.Component.extend({
         pageInstance.attr('id')
       );
     },
-    setUrlEditMode: function (value, type) {
-      this.attr(type + 'EditMode', value);
+    setUrlEditMode: function (value) {
+      this.attr('urlsEditMode', value);
     },
     setInProgressState: function () {
       this.onStateChange({state: 'In Progress', undo: false});
