@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Builder the prepare diff in special format between current
@@ -288,3 +288,48 @@ def prepare(instance, content):
       current_content=current_data,
       new_content=content,
   )
+
+
+def prepare_content_diff(instance_meta_info, l_content, r_content):
+  """Prepare diff between two revisions contents of same instance.
+
+  This functionality is needed for `not_empty_revisions` query API operator.
+  The main difference between this function and `prepare` is that this one
+  takes into account all revision's content fields and not just fields
+  explicitly marked as updateable on instance model.
+
+  Args:
+      instance_meta_info (MetaInfo): object of particular instance.
+      l_content (dict): content of first revision.
+      r_content (dict): content of second revision.
+
+  Returns:
+      A dict representing the diff between two revision contents.
+  """
+  diff = _construct_diff(instance_meta_info, l_content, r_content)
+
+  remaining_fields = set(r_content.keys())
+  remaining_fields -= {f.name for f in instance_meta_info.fields}
+  remaining_fields -= {f.name for f in instance_meta_info.mapping_fields}
+  remaining_fields -= {f.name for f in instance_meta_info.mapping_list_fields}
+  remaining_fields -= {
+      # Diff for `access_control_list` and `custom_attribute_values` has
+      # already been calculated in `_construct_diff` function call.
+      "access_control_list",
+      "custom_attribute_values",
+      # The following fields are ignored cause they may differ but revisions
+      # still may represent objects of same state.
+      "created_at",
+      "updated_at",
+      "modified_by",
+      "modified_by_id",
+  }
+
+  remaining_fields = {meta_info.Field(f, False) for f in remaining_fields}
+  diff["other"] = generate_fields(
+      fields=remaining_fields,
+      proposed_content=r_content,
+      current_data=l_content,
+  )
+
+  return diff

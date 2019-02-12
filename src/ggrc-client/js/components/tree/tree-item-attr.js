@@ -1,8 +1,9 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 import {formatDate} from '../../plugins/utils/date-utils';
+import {getUserRoles} from '../../plugins/utils/user-utils';
 import template from './templates/tree-item-attr.mustache';
 
 // attribute names considered "default" and representing a date
@@ -32,6 +33,7 @@ const RICH_TEXT_ATTRS = Object.freeze({
 export default can.Component.extend({
   tag: 'tree-item-attr',
   template,
+  leakScope: true,
   viewModel: {
     instance: null,
     name: '',
@@ -40,6 +42,12 @@ export default can.Component.extend({
         type: String,
         get() {
           return this.getDefaultValue();
+        },
+      },
+      userRoles: {
+        type: String,
+        get() {
+          return getUserRoles(this.attr('instance')).join(', ');
         },
       },
     },

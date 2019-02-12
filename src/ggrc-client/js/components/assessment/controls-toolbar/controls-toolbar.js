@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -10,9 +10,13 @@ import template from './controls-toolbar.mustache';
 export default can.Component.extend({
   tag: 'assessment-controls-toolbar',
   template: template,
+  leakScope: true,
   viewModel: {
     instance: null,
     verifiers: [],
+    isInfoPaneSaving: false,
+    isUndoButtonVisible: false,
+    currentState: '',
     onStateChange: function (event) {
       this.dispatch({
         type: 'onStateChange',

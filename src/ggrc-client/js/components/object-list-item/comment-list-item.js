@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -15,58 +15,68 @@ const tag = 'comment-list-item';
 export default can.Component.extend({
   tag,
   template,
+  leakScope: true,
   viewModel: {
     instance: {},
     baseInstance: {},
     define: {
       showIcon: {
-        type: 'boolean',
+        type: Boolean,
         value: false,
       },
       iconCls: {
-        get: function () {
+        get() {
           return this.attr('showIcon') ?
             'fa-' + this.attr('itemData.title').toLowerCase() :
             '';
         },
       },
       itemData: {
-        get: function () {
+        get() {
           return this.attr('instance');
         },
       },
       commentText: {
-        get: function () {
+        get() {
           return this.attr('itemData.description');
         },
       },
       commentCreationDate: {
-        get: function () {
+        get() {
           return this.attr('itemData.created_at');
         },
       },
       commentAuthor: {
-        get: function () {
+        get() {
           return this.attr('itemData.modified_by') || false;
         },
       },
       commentAuthorType: {
-        get: function () {
-          return this.attr('itemData.assignee_type') || false;
+        get() {
+          function capitalizeFirst(type) {
+            return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+          }
+
+          const assignee = _.chain(this.attr('itemData.assignee_type'))
+            .split(',')
+            .head()
+            .trim()
+            .value();
+          return assignee ? `(${capitalizeFirst(assignee)})` : '';
         },
       },
       hasRevision: {
-        get: function () {
+        get() {
           return this.attr('commentRevision') || false;
         },
       },
       commentRevision: {
-        get: function () {
+        get() {
           return this.attr('itemData.custom_attribute_revision');
         },
       },
       customAttributeData: {
-        get: function () {
+        get() {
           return this.attr('commentRevision.custom_attribute.title') +
          ':' + this.attr('commentRevision.custom_attribute_stored_value');
         },

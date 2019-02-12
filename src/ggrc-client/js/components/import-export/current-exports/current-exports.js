@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -9,6 +9,7 @@ import {jobStatuses} from '../../../plugins/utils/import-export-utils';
 export default can.Component.extend({
   tag: 'current-exports',
   template,
+  leakScope: true,
   viewModel: {
     exports: [],
     disabled: {},

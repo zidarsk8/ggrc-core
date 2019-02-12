@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for the ggrc.notifications.notification_handlers module."""
 
-from datetime import datetime
+import datetime
 import unittest
-import mock
 
 import ddt
+import mock
+import pytz
 
 from ggrc.notifications import data_handlers
 
@@ -21,16 +22,44 @@ class TestAsUserTime(unittest.TestCase):
 
   def test_converting_dst_timestamp(self):
     """Test converting timestamps in daylight saving time part of the year."""
-    timestamp = datetime(2017, 6, 13, 15, 40, 37)
+    timestamp = datetime.datetime(2017, 6, 13, 15, 40, 37)
     result = data_handlers.as_user_time(timestamp)
     self.assertEqual(result, "06/13/2017 08:40:37 PDT")
 
   def test_converting_non_dst_timestamp(self):
     """Test converting timestamps in non-daylight saving time part of the year.
     """
-    timestamp = datetime(2017, 2, 13, 15, 40, 37)
+    timestamp = datetime.datetime(2017, 2, 13, 15, 40, 37)
     result = data_handlers.as_user_time(timestamp)
     self.assertEqual(result, "02/13/2017 07:40:37 PST")
+
+  def test_converting_custom_timezone(self):
+    """Test converting timestamp with custom timezone."""
+    timestamp = datetime.datetime(2019, 1, 15, 12, 00, 00)
+    result = data_handlers.as_user_time(
+        timestamp,
+        datetime_tz=pytz.timezone("US/Eastern")
+    )
+    self.assertEqual(result, "01/15/2019 07:00:00 EST")
+
+  def test_converting_custom_format(self):
+    """Test converting timestamp with custom format."""
+    timestamp = datetime.datetime(2019, 1, 15, 12, 00, 00)
+    result = data_handlers.as_user_time(
+        timestamp,
+        datetime_format="%m/%d/%Y %I:%M:%S %p %z"
+    )
+    self.assertEqual(result, "01/15/2019 04:00:00 AM -0800")
+
+  def test_converting_formatter(self):
+    """Test converting timestamp with additional formatter function."""
+    timestamp = datetime.datetime(2019, 1, 15, 12, 00, 00)
+    result = data_handlers.as_user_time(
+        timestamp,
+        datetime_format="%m/%d/%Y %I:%M:%S %p %z",
+        formatter="Timestamp {}".format,
+    )
+    self.assertEqual(result, "Timestamp 01/15/2019 04:00:00 AM -0800")
 
   @ddt.data(
       {

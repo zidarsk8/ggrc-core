@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -31,11 +31,11 @@
 
       <div class="lhs-nav">
         <ul class="top-level">
-          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Program" li_class="programs" template_view='/static/mustache/programs/search_result.mustache'}}}
-          {{{renderLive '/static/mustache/workflows/lhn_search.mustache' type="Workflow" li_class="workflow" template_view="/static/mustache/workflows/search_result.mustache" tooltip_view='/workflows/extended_info.mustache'}}}
-          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Audit" li_class="programs" tooltip_view='/audits/extended_info.mustache' template_view='/static/mustache/audits/search_result.mustache'}}}
-          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Assessment" tooltip_view='/assessments/assignable_extended_info.mustache' li_class="programs" actions="/static/mustache/base_objects/empty.mustache"}}}
-          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Issue" li_class="programs" actions="/static/mustache/base_objects/search_actions.mustache"}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Program" title_plural="Programs" li_class="programs" template_view='/static/mustache/programs/search_result.mustache'}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Workflow" title_plural="Workflows" li_class="workflow" template_view="/static/mustache/workflows/search_result.mustache" tooltip_view='/workflows/extended_info.mustache'}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Audit" title_plural="Audits" li_class="programs" tooltip_view='/audits/extended_info.mustache' template_view='/static/mustache/audits/search_result.mustache'}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Assessment" title_plural="Assessments" tooltip_view='/assessments/assignable_extended_info.mustache' li_class="programs" actions="/static/mustache/base_objects/empty.mustache"}}}
+          {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Issue" title_plural="Issues" li_class="programs" actions="/static/mustache/base_objects/search_actions.mustache"}}}
         </ul>
       </div>
 
@@ -53,11 +53,11 @@
             </a>
             <div class="content">
               <ul class="mid-level">
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Regulation" li_class="governance"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Policy" li_class="governance"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Standard" li_class="governance"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Contract" li_class="governance"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Requirement" li_class="governance"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Regulation" title_plural="Regulations" li_class="governance"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Policy" title_plural="Policies" li_class="governance"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Standard" title_plural="Standards" li_class="governance"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Contract" title_plural="Contracts" li_class="governance"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Requirement" title_plural="Requirements" li_class="governance"}}}
               </ul>
             </div>
           </li>
@@ -69,8 +69,8 @@
             </a>
             <div class="content">
               <ul class="mid-level">
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Control" li_class="controls"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Objective" li_class="objectives"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Control" title_plural="Controls" li_class="controls"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Objective" title_plural="Objectives" li_class="objectives"}}}
               </ul>
             </div>
           </li>
@@ -82,7 +82,7 @@
             </a>
             <div class="content">
               <ul class="mid-level">
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Person" li_class="entities" template_view='/static/mustache/people/search_result.mustache'}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Person" title_plural="People" li_class="entities" template_view='/static/mustache/people/search_result.mustache'}}}
               </ul>
             </div>
           </li>
@@ -94,19 +94,19 @@
             </a>
             <div class="content">
               <ul class="mid-level">
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="AccessGroup" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="OrgGroup" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="System" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Process" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="DataAsset" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Product" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="ProductGroup" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Project" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Facility" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Market" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Metric" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="TechnologyEnvironment" li_class="business"}}}
-                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Vendor" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="AccessGroup" title_plural="Access Groups" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="OrgGroup" title_plural="Org Groups" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="System" title_plural="Systems" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Process" title_plural="Processes" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="DataAsset" title_plural="Data Assets" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Product" title_plural="Products" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="ProductGroup" title_plural="Product Groups" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Project" title_plural="Projects" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Facility" title_plural="Facilities" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Market" title_plural="Markets" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Metric" title_plural="Metrics" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="TechnologyEnvironment" title_plural="Technology Environments" li_class="business"}}}
+                {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="Vendor" title_plural="Vendors" li_class="business"}}}
               </ul>
             </div>
           </li>

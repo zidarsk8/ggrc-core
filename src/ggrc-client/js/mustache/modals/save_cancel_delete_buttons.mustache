@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -32,7 +32,7 @@
           {{^new_object_form}}
             <a
               tabindex="25"
-              class="btn btn-small btn-green {{disable_if_errors instance}}"
+              class="btn btn-small btn-green {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>
@@ -41,14 +41,14 @@
             {{^if_equals model.shortName "AssessmentTemplate"}}
             <a
               tabindex="24"
-              class="btn btn-small btn-lightBlue {{disable_if_errors instance}}"
+              class="btn btn-small btn-lightBlue {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"
               data-toggle="modal-submit-addmore"
               href="javascript://"
               >Save &amp; Add Another</a>
             {{/if_equals}}
             <a
               tabindex="25"
-              class="btn btn-small btn-green {{disable_if_errors instance}}"
+              class="btn btn-small btn-green {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>

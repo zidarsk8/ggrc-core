@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc., authors, and contributors
+ Copyright (C) 2019 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -15,11 +15,14 @@ const tag = 'create-proposal';
 export default can.Component.extend({
   tag,
   template,
+  leakScope: true,
   viewModel: {
     define: {
-      isDisabledButton: {
+      isDisabled: {
+        type: Boolean,
         get() {
-          return !this.hasChanges() || this.attr('loading');
+          let hasErrors = this.instance.computed_unsuppressed_errors();
+          return hasErrors || !this.hasChanges() || this.attr('loading');
         },
       },
     },

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -7,6 +7,7 @@ import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {refreshTGRelatedItems} from '../../plugins/utils/workflow-utils';
 import TaskGroup from '../../models/business-models/task-group';
+import ModalsController from '../../controllers/modals/modals_controller';
 
 let CloneTaskGroup = Cacheable({
   defaults: {
@@ -41,7 +42,8 @@ export default can.Component.extend({
         .then(() => {
           const contentView =
             `${GGRC.mustache_path}/task_groups/clone_modal_content.mustache`;
-          $target.ggrc_controllers_modals({
+
+          new ModalsController($target, {
             modal_title: 'Clone Task Group',
             model: CloneTaskGroup,
             instance: new CloneTaskGroup({
@@ -50,10 +52,13 @@ export default can.Component.extend({
             content_view: contentView,
             custom_save_button_text: 'Proceed',
             button_view: BUTTON_VIEW_SAVE_CANCEL,
-          }).on('modal:success', (e, clonedTg) => {
+          });
+
+          $target.on('modal:success', (e, clonedTg) => {
             refreshTGRelatedItems(clonedTg);
           });
         });
     },
   },
+  leakScope: true,
 });

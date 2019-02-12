@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -15,10 +15,20 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 export default can.Component.extend({
   tag: 'assessment-template-clone',
   template,
+  leakScope: true,
   viewModel: function () {
     return ObjectOperationsBaseVM.extend({
       isAuditPage() {
         return getPageInstance().type === 'Audit';
+      },
+      extendInstanceData(instance) {
+        instance = instance().serialize();
+        let audit = _.pick(instance, ['id', 'type', 'issue_tracker']);
+        let context = {
+          id: instance.context.id,
+          type: instance.context.type,
+        };
+        return JSON.stringify({audit, context});
       },
     });
   },

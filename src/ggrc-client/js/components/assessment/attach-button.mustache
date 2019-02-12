@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -41,7 +41,7 @@
         <small>
         {{#if error.errors}}
             You need permission to upload files to the audit folder. <a
-            href="https://drive.google.com/folderview?id={{grdive_msg_to_id error.message}}&usp=sharing#">Request
+            href="https://drive.google.com/folderview?id={{folderId}}&usp=sharing#">Request
             access.</a>
         {{else}}
             <strong>Warning:</strong> GDrive folder could not be accessed without authorization. <a

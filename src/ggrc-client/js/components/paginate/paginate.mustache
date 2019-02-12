@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -7,7 +7,7 @@
 
 {{#if totalPages}}
 <ul class="pagination">
-  <li {{#if_match currentPage 1}}class="disabled"{{/if_equals}}>
+  <li class="{{^if hasPrevPage}}disabled{{/if}}">
     <a can-click="setPrevious" href="#">Previous</a>
   </li>
   <li>
@@ -15,7 +15,7 @@
       <span>{{currentPage}} of {{totalPages}}</span>
     </span>
   </li>
-  <li {{#if_match currentPage totalPages}}class="disabled"{{/if_equals}}>
+  <li class="{{^if hasNextPage}}disabled{{/if}}">
     <a can-click="setNext" href="#">Next</a>
   </li>
 </ul>

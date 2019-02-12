@@ -1,11 +1,12 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Workflow UI facade."""
 from lib import url, users
 from lib.constants import object_states
 from lib.entities import cycle_entity_population, ui_dict_convert
 from lib.page import dashboard
-from lib.page.widget import workflow_tabs, task_group_info_panel, workflow_page
+from lib.page.widget import (
+    workflow_tabs, task_group_info_panel, workflow_page, object_modal)
 from lib.ui import internal_ui_operations, ui_facade
 from lib.utils import selenium_utils
 
@@ -59,6 +60,13 @@ def get_objs_added_to_task_group(task_group):
   setup_tab = workflow_tabs.SetupTab()
   setup_tab.open_via_url(task_group.workflow)
   return setup_tab.get_objs_added_to_task_group(task_group)
+
+
+def add_task_group(workflow, task_group):
+  """Adds task group."""
+  workflow_tabs.SetupTab().open_via_url(workflow)
+  dashboard.Dashboard().start_task_group()
+  object_modal.get_modal_obj("task_group").submit_obj(task_group)
 
 
 def delete_task_group(task_group):

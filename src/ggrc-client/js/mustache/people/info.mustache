@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -70,9 +70,11 @@
               <div class="span12">
                 <h6>Authorizations</h6>
                 <span>
-                  {{#user_roles instance}}
-                    {{rolesStr}}
-                  {{/user_roles}}
+                  {{#if_equals instance.system_wide_role 'No Access'}}
+                    No Role
+                  {{else}}
+                    {{instance.system_wide_role}}
+                  {{/if_equals}}
                 </span>
               </div>
             </div>

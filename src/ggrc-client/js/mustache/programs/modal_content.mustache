@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -18,13 +18,11 @@
         <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
       </label>
-      {{^if_null '1'}}
       <input tabindex="1"
              data-test-id="new_program_field_title_a63ed79d"
              class="input-block-level"
-          placeholder="Enter Title"
+             placeholder="Enter Title"
              name="title" type="text" value="{{title}}" autofocus>
-      {{/if_null}}
       {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
     </div>
   </div>

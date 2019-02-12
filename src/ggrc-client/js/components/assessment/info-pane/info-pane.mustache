@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -217,8 +217,11 @@
                     {{#unless isEditDenied}}
                       <assessment-controls-toolbar class="assessment-controls-toolbar"
                           {instance}="instance"
+                          {current-state}="currentState"
                           {verifiers}="verifiers"
                           {form-state}="formState"
+                          {is-info-pane-saving}="isInfoPaneSaving"
+                          {is-undo-button-visible}="isUndoButtonVisible"
                           (on-state-change)="onStateChange(%event)"
                       ></assessment-controls-toolbar>
                     {{/unless}}
@@ -289,6 +292,7 @@
                 <related-assessments
                     {instance}="instance"
                     {need-reuse}="true"
+                    (refresh-assessment)="refreshAssessment"
                     (after-object-reused)="updateItems('files', 'urls')">
                 </related-assessments>
             {{/instance}}

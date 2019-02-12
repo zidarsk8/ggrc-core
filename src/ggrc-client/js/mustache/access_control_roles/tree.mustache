@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -45,8 +45,7 @@
             </tr>
           </thead>
           {{#child_options.0}}
-          <tbody class="tree-structure new-tree" {{data 'options'}}
-            {{ (el) -> el.cms_controllers_tree_view(el.data("options")) }}>
+          <tbody class="tree-structure new-tree tree-view-control" {{data 'options'}}>
           </tbody>
           {{/child_options.0}}
           <!-- Custom attribute definitions here -->

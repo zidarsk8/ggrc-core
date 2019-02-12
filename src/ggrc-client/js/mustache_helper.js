@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -23,9 +23,7 @@ import {
   buildCountParams,
   batchRequests,
 } from './plugins/utils/query-api-utils';
-import Option from './models/service-models/option';
 import Search from './models/service-models/search';
-import Person from './models/business-models/person';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import Mappings from './models/mappers/mappings';
@@ -144,108 +142,12 @@ Mustache.registerHelper('if_equals', function (val1, val2, options) {
   return exec();
 });
 
-Mustache.registerHelper('if_match', function (val1, val2, options) {
-  let _val1 = resolveComputed(val1);
-  let _val2 = resolveComputed(val2);
-  function exec() {
-    let re = new RegExp(_val2);
-    if (re.test(_val1)) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-  return exec();
-});
-
 Mustache.registerHelper('in_array', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack);
 
   return options[_.includes(haystack, needle) ?
     'fn' : 'inverse'](options.contexts);
-});
-
-Mustache.registerHelper('if_null', function (val1, options) {
-  let that = this;
-  let _val1;
-  function exec() {
-    if (_val1 === null || _val1 === undefined) return options.fn(that);
-    else return options.inverse(that);
-  }
-  if (typeof val1 === 'function') {
-    if (val1.isComputed) {
-      val1.bind('change', function (ev, newVal) {
-        _val1 = newVal;
-        return exec();
-      });
-    }
-    _val1 = val1.call(this);
-  } else {
-    _val1 = val1;
-  }
-  return exec();
-});
-
-/**
-   * Check if the given argument is a string and render the corresponding
-   * block in the template.
-   *
-   * Example usage:
-   *
-   *   {{#if_string someValue}}
-   *      {{someValue}} is a string
-   *   {{else}}
-   *     {{someValue}} is NOT a string
-   *   {{/if_string}}
-   *
-   * @param {*} thing - the argument to check
-   * @param {Object} options - a CanJS options argument passed to every helper
-   *
-   */
-Mustache.registerHelper('if_string', function (thing, options) {
-  let resolved;
-
-  if (arguments.length !== 2) {
-    throw new Error(
-      'Invalid number of arguments (' +
-        (arguments.length - 1) + // do not count the auto-provided options arg
-        '), expected 1.');
-  }
-
-  resolved = Mustache.resolve(thing);
-
-  if (_.isString(resolved)) {
-    return options.fn(options.context);
-  }
-
-  return options.inverse(options.context);
-});
-
-/**
-   * Return the value of the given object's property.
-   *
-   * If the first argument is not an object, an error is raised.
-   *
-   * @param {Object | Function} object - the object itself
-   * @param {String | Function} key - the name of the property to retrieve
-   * @param {Object} options - the Mustache options object
-   *
-   * @return {*} - the value of the property object[key]
-   */
-Mustache.registerHelper('get_item', function (object, key, options) {
-  if (arguments.length !== 3) {
-    throw new Error(
-      'Invalid number of arguments (' +
-        (arguments.length - 1) + // do not count the auto-provided options arg
-        '), expected 2.');
-  }
-
-  object = Mustache.resolve(object);
-
-  if (!_.isObject(object)) {
-    throw new Error('First argument must be an object.');
-  }
-
-  key = Mustache.resolve(key);
-  return object[key];
 });
 
 // Resolve and return the first computed value from a list
@@ -391,56 +293,6 @@ function deferRender(tagPrefix, funcs, deferred) {
   return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
 }
 
-Mustache.registerHelper('with_current_user_as', function (name, options) {
-  if (!options) {
-    options = name;
-    name = 'current_user';
-  }
-  let pageObject = Person.findInCacheById(GGRC.current_user.id) ||
-    Person.model(GGRC.current_user);
-
-  if (pageObject) {
-    let po = {};
-    po[name] = pageObject;
-    options.contexts = options.contexts.add(po);
-    return options.fn(options.contexts);
-  } else {
-    return options.inverse(options.contexts);
-  }
-});
-
-Mustache.registerHelper('option_select',
-  function (object, attrName, role, options) {
-    let selectedOption = object.attr(attrName);
-    let selectedId = selectedOption ? selectedOption.id : null;
-    let optionsDfd = Option.for_role(role);
-    let tabindex = options.hash && options.hash.tabindex;
-    let tagPrefix = 'select class="span12"';
-
-    function getSelectHtml(options) {
-      return [
-        '<select class="span12" model="Option" name="' + attrName + '"',
-        tabindex ? ' tabindex=' + tabindex : '',
-        '>',
-        '<option value=""',
-        !selectedId ? ' selected=selected' : '',
-        '>---</option>',
-        can.map(options, function (option) {
-          return [
-            '<option value="', option.id, '"',
-            selectedId === option.id ? ' selected=selected' : '',
-            '>',
-            option.title,
-            '</option>',
-          ].join('');
-        }).join('\n'),
-        '</select>',
-      ].join('');
-    }
-
-    return deferRender(tagPrefix, getSelectHtml, optionsDfd);
-  });
-
 Mustache.registerHelper('using', function (options) {
   let refreshQueue = new RefreshQueue();
   let frame = new can.Map();
@@ -470,64 +322,6 @@ Mustache.registerHelper('using', function (options) {
   }
 
   return deferRender('span', finish, refreshQueue.trigger());
-});
-
-Mustache.registerHelper('person_roles', function (person, scope, options) {
-  let rolesDeferred = new $.Deferred();
-  let refreshQueue = new RefreshQueue();
-
-  if (!options) {
-    options = scope;
-    scope = null;
-  }
-
-  person = Mustache.resolve(person);
-  person = person.reify();
-  refreshQueue.enqueue(person);
-  // Force monitoring of changes to `person.user_roles`
-  person.attr('user_roles');
-  refreshQueue.trigger().then(function () {
-    let userRoles = person.user_roles.reify();
-    let userRolesRefreshQueue = new RefreshQueue();
-
-    userRolesRefreshQueue.enqueue(userRoles);
-    userRolesRefreshQueue.trigger().then(function () {
-      let roles = can.map(
-        can.makeArray(userRoles),
-        function (userRole) {
-          if (userRole.role) {
-            return userRole.role.reify();
-          }
-        });
-      let rolesRefreshQueue = new RefreshQueue();
-      rolesRefreshQueue.enqueue(roles.splice());
-      rolesRefreshQueue.trigger().then(function () {
-        roles = can.map(can.makeArray(roles), function (role) {
-          if (!scope || new RegExp(scope).test(role.scope)) {
-            return role;
-          }
-        });
-
-        //  "Superuser" roles are determined from config
-        //  FIXME: Abstraction violation
-        if ((!scope || new RegExp(scope).test('System'))
-            && GGRC.config.BOOTSTRAP_ADMIN_USERS
-            && ~GGRC.config.BOOTSTRAP_ADMIN_USERS.indexOf(person.email)) {
-          roles.unshift({
-            permission_summary: 'Superuser',
-            name: 'Superuser',
-          });
-        }
-        rolesDeferred.resolve(roles);
-      });
-    });
-  });
-
-  function finish(roles) {
-    return options.fn({roles: roles});
-  }
-
-  return deferRender('span', finish, rolesDeferred);
 });
 
 /**
@@ -702,17 +496,6 @@ Mustache.registerHelper('attach_spinner', function (spinOpts, styles) {
   };
 });
 
-Mustache.registerHelper('json_escape', function (obj, options) {
-  let str = JSON.stringify(String(resolveComputed(obj) || ''));
-  return str.substr(1, str.length - 2);
-});
-
-Mustache.registerHelper('json_stringify', function (obj, options) {
-  let fields = (options.hash && options.hash.fields || '').split(',');
-  obj = Mustache.resolve(obj);
-  return JSON.stringify(_.pick(obj.serialize(), fields));
-});
-
 function localizeDate(date, options, tmpl, allowNonISO) {
   let formats = [
     'YYYY-MM-DD',
@@ -746,23 +529,6 @@ Mustache.registerHelper('localize_date', function (date, allowNonISO, options) {
   return localizeDate(date, options, 'MM/DD/YYYY', allowNonISO);
 });
 
-/**
- *  Helper for rendering date or 'Today' string.
- *
- *  @param {Date} value - the date object; if it's falsey the current (local) date is used
- *  @return {String} - 'Today' or date string in the following format: MM/DD/YYYY
- */
-Mustache.registerHelper('localize_date_today', function (value) {
-  let date = resolveComputed(value);
-  let today = moment().startOf('day');
-  let startOfDate = moment(date).startOf('day');
-  // TODO: [Overdue] Move this logic to helper.
-  if (!value || (date && today.diff(startOfDate, 'days') === 0)) {
-    return 'Today';
-  }
-  return localizeDate(value, value, 'MM/DD/YYYY');
-});
-
 Mustache.registerHelper('normalizeLink', (value) => {
   let link = resolveComputed(value);
   if (link) {
@@ -772,31 +538,9 @@ Mustache.registerHelper('normalizeLink', (value) => {
   return link;
 });
 
-Mustache.registerHelper('capitalize', function (value, options) {
-  value = resolveComputed(value) || '';
-  return can.capitalize(value);
-});
-
 Mustache.registerHelper('lowercase', function (value, options) {
   value = resolveComputed(value) || '';
   return value.toLowerCase();
-});
-
-Mustache.registerHelper('assignee_types', function (value, options) {
-  function capitalizeFirst(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-  value = resolveComputed(value) || '';
-  value = _.head(_.map(value.split(','), function (type) {
-    let lowercaseType = _.trim(type).toLowerCase();
-
-    if (lowercaseType === 'assessor') {
-      lowercaseType = 'assignee';
-    }
-
-    return lowercaseType;
-  }));
-  return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
 });
 
 Mustache.registerHelper('is_dashboard', function (options) {
@@ -897,8 +641,8 @@ Mustache.registerHelper('urlPath', function () {
 
   Example:
     {{#if_helpers '\
-      #if_match' page_object.constructor.shortName 'Project' '\
-      and ^if_match' page_object.constructor.shortName 'Audit|Program|Person' '\
+      #if_equals' instance.status 'Assigned' '\
+      and ^if_equals' instance.type 'Audit|Program|Person' '\
     ' _1_hash_arg_for_second_statement=something}}
       matched all conditions
     {{else}}
@@ -1015,14 +759,6 @@ Mustache.registerHelper('if_helpers', function (...args) {
   }
 });
 
-Mustache.registerHelper('with_model_as',
-  function (varName, modelName, options) {
-    let frame = {};
-    modelName = resolveComputed(Mustache.resolve(modelName));
-    frame[varName] = modalModels[modelName];
-    return options.fn(options.contexts.add(frame));
-  });
-
 Mustache.registerHelper('if_in', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack).split(',');
@@ -1120,14 +856,6 @@ Mustache.registerHelper('with_mapping_count',
     dfd);
   });
 
-Mustache.registerHelper('log', function () {
-  let args = can.makeArray(arguments).slice(0, arguments.length - 1);
-  console.warn(
-    ...['Mustache log'].concat(_.map(args, function (arg) {
-      return resolveComputed(arg);
-    })));
-});
-
 Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   let options = arguments[arguments.length - 1];
   let _disableCreate = Mustache.resolve(disableCreate);
@@ -1144,106 +872,6 @@ Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
       }));
     });
   };
-});
-
-Mustache.registerHelper('grdive_msg_to_id', function (message) {
-  let msg = Mustache.resolve(message);
-
-  if (!msg) {
-    return;
-  }
-
-  msg = msg.split(' ');
-  return msg[msg.length-1];
-});
-
-Mustache.registerHelper('disable_if_errors', function (instance) {
-  let ins;
-  let res;
-  ins = Mustache.resolve(instance);
-  res = ins.computed_unsuppressed_errors();
-  if (res === null || res === undefined) {
-    return '';
-  } else {
-    return 'disabled';
-  }
-});
-
-/**
- * Helper method for determining the file type of a Document object from its
- * file name extension.
- *
- * @param {Object} instance - an instance of a model object of type "Document"
- * @return {String} - determined file type or "default" for unknown/missing
- *   file name extensions.
- *
- * @throws {String} If the type of the `instance` is not "Document" or if its
- *   "title" attribute is empty.
- */
-Mustache.registerHelper('file_type', function (instance) {
-  let extension;
-  let filename;
-  let parts;
-  let DEFAULT_VALUE = 'default';
-  let FILE_EXTENSION_TYPES;
-  let FILE_TYPES;
-
-  FILE_TYPES = Object.freeze({
-    PLAIN_TXT: 'txt',
-    IMAGE: 'img',
-    PDF: 'pdf',
-    OFFICE_DOC: 'doc',
-    OFFICE_SHEET: 'xls',
-    ARCHIVE: 'zip',
-  });
-
-  FILE_EXTENSION_TYPES = Object.freeze({
-    // plain text files
-    txt: FILE_TYPES.PLAIN_TXT,
-
-    // image files
-    jpg: FILE_TYPES.IMAGE,
-    jpeg: FILE_TYPES.IMAGE,
-    png: FILE_TYPES.IMAGE,
-    gif: FILE_TYPES.IMAGE,
-    bmp: FILE_TYPES.IMAGE,
-    tiff: FILE_TYPES.IMAGE,
-
-    // PDF documents
-    pdf: FILE_TYPES.PDF,
-
-    // Office-like text documents
-    doc: FILE_TYPES.OFFICE_DOC,
-    docx: FILE_TYPES.OFFICE_DOC,
-    odt: FILE_TYPES.OFFICE_DOC,
-
-    // Office-like spreadsheet documents
-    xls: FILE_TYPES.OFFICE_SHEET,
-    xlsx: FILE_TYPES.OFFICE_SHEET,
-    ods: FILE_TYPES.OFFICE_SHEET,
-
-    // archive files
-    zip: FILE_TYPES.ARCHIVE,
-    rar: FILE_TYPES.ARCHIVE,
-    '7z': FILE_TYPES.ARCHIVE,
-    gz: FILE_TYPES.ARCHIVE,
-    tar: FILE_TYPES.ARCHIVE,
-  });
-
-  if (instance.type !== 'Document') {
-    throw new Error('Cannot determine file type for a non-document object');
-  }
-
-  filename = instance.title || '';
-  if (!filename) {
-    throw new Error("Cannot determine the object's file name");
-  }
-
-  parts = filename.split('.');
-  extension = (parts.length === 1) ? '' : parts[parts.length - 1];
-  extension = extension.toLowerCase();
-
-  return FILE_EXTENSION_TYPES[extension] || DEFAULT_VALUE;
 });
 
 Mustache.registerHelper('debugger', function () {
@@ -1311,66 +939,6 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   value = value.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
   return toLowerCase ? value.toLowerCase() : value;
 });
-
-/**
-   * Checks if two object types are mappable
-   *
-   * @param {String} source - Source type
-   * @param {String} target - Target type
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper('is_mappable_type',
-  function (source, target, options) {
-    target = Mustache.resolve(target);
-    source = Mustache.resolve(source);
-    if (Mappings.isMappableType(source, target)) {
-      return options.fn(options.contexts);
-    }
-    return options.inverse(options.contexts);
-  }
-);
-
-/**
-   * Check if property's value did not pass validation, and render the
-   * corresponding block in the template. The error messages, if any, are
-   * available in the "error" variable within the "truthy" block.
-   *
-   * Example usage:
-   *
-   *   {{#validation_error validationErrors propertyName}}
-   *     Invalid value for the property {{propertyName}}: {{errors.0}}
-   *   {{else}}
-   *     Hooray, no errors, a correct value is set!
-   *   {{/validation_error}}
-   *
-   * @param {Object} validationErrors - an object containing validation results
-   *   of a can.Model instance
-   * @param {Number} propertyName - Name of the property to check for
-   *   validation errors
-   * @param {Object} options - a CanJS options argument passed to every helper
-   */
-Mustache.registerHelper(
-  'validation_error',
-  function (validationErrors, propertyName, options) {
-    let errors;
-    let property;
-    let contextStack;
-
-    validationErrors = Mustache.resolve(validationErrors) || {};
-    if (_.isFunction(validationErrors)) {
-      validationErrors = Mustache.resolve(validationErrors) || {};
-    }
-
-    property = Mustache.resolve(propertyName);
-    errors = validationErrors[property] || [];
-
-    if (errors.length > 0) {
-      contextStack = options.contexts.add({errors: errors});
-      return options.fn(contextStack);
-    }
-    return options.inverse(options.contexts);
-  }
-);
 
 Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
   let isInScope;
@@ -1448,45 +1016,6 @@ Mustache.registerHelper('has_role', function (role, instance, options) {
   } else {
     return options.inverse(options.contexts);
   }
-});
-
-Mustache.registerHelper('user_roles', (person, parentInstance, options) => {
-  const allRoles = GGRC.access_control_roles;
-  let roles = {};
-  let allRoleNames = [];
-
-  if (!options) {
-    // if parent instance is not defined in helper use page instance
-    options = parentInstance;
-    parentInstance = Mustache.resolve(getPageInstance);
-  } else {
-    parentInstance = Mustache.resolve(parentInstance);
-  }
-
-  allRoles.forEach((role) => {
-    roles[role.id] = role;
-  });
-
-  person = Mustache.resolve(person);
-
-  if (parentInstance && parentInstance.access_control_list) {
-    allRoleNames = _.uniq(parentInstance.access_control_list.filter(
-      (acl) => {
-        return acl.person.id === person.id && acl.ac_role_id in roles;
-      }).map((acl) => {
-      return roles[acl.ac_role_id].name;
-    }));
-  } else {
-    let globalRole = person.system_wide_role === 'No Access'
-      ? 'No Role'
-      : person.system_wide_role;
-    allRoleNames = [globalRole];
-  }
-
-  return options.fn({
-    rolesStr: allRoleNames.join(', '),
-    rolesList: allRoleNames.join('\n'),
-  });
 });
 
 Mustache.registerHelper('isScopeModel', function (instance, options) {

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -34,6 +34,7 @@ import '../../components/snapshotter/scope-update';
 import '../../components/page-header/page-header';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/unmap-button/unmap-button';
+import '../../components/delete-button/delete-button';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-urls';
 import '../../components/inline/inline';

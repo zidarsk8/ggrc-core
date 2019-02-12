@@ -1,11 +1,14 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import Permission from '../../permission';
 import template from './attach-button.mustache';
-import {findGDriveItemById} from '../../plugins/utils/gdrive-picker-utils';
+import {
+  getGDriveItemId,
+  findGDriveItemById,
+} from '../../plugins/utils/gdrive-picker-utils';
 
 const tag = 'attach-button';
 
@@ -13,6 +16,7 @@ export default can.Component.extend({
   tag,
   template,
   confirmationCallback: '@',
+  leakScope: true,
   viewModel: {
     define: {
       hasPermissions: {
@@ -26,6 +30,12 @@ export default can.Component.extend({
           } else {
             setValue(false);
           }
+        },
+      },
+      folderId: {
+        type: String,
+        get() {
+          return getGDriveItemId(this.attr('error.message'));
         },
       },
     },

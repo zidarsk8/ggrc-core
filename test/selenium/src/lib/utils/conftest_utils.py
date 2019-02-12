@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """PyTest fixture utils."""
 import os
@@ -18,12 +18,6 @@ def get_lhn_accordion(driver, object_name):
     method_name = factory.get_method_lhn_select(object_name)
     lhn_menu = getattr(lhn_menu, method_name)()
   return getattr(lhn_menu, constants.method.SELECT_PREFIX + object_name)()
-
-
-def delete_obj_via_info_widget(driver, object_name):
-  """Delete object via Info Widget."""
-  (factory.get_cls_widget(object_name, is_info=True)(driver)
-   .open_3bbs().select_delete().confirm_delete())
 
 
 class DevLogRetriever(object):

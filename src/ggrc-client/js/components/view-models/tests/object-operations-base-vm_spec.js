@@ -1,11 +1,12 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import Mappings from '../../../models/mappers/mappings';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
+import Control from '../../../models/business-models/control';
 
 describe('object-operations-base viewModel', function () {
   'use strict';
@@ -37,6 +38,15 @@ describe('object-operations-base viewModel', function () {
     it('returns parentInstance', function () {
       let result = baseVM.attr('parentInstance');
       expect(result).toEqual('parentInstance');
+    });
+  });
+
+  describe('get() for baseVM.model', () => {
+    it('returns model based on type attribute', () => {
+      baseVM.attr('type', 'Control');
+
+      let result = baseVM.attr('model');
+      expect(result).toEqual(Control);
     });
   });
 
@@ -99,34 +109,6 @@ describe('object-operations-base viewModel', function () {
         method('Type1');
         expect(vm.prepareConfig).toHaveBeenCalled();
       });
-  });
-
-  describe('modelFromType() method', function () {
-    it('returns undefined if no models', function () {
-      let result = baseVM.modelFromType('program');
-      expect(result).toEqual(undefined);
-    });
-
-    it('returns model config by model value', function () {
-      let result;
-      let types = {
-        governance: {
-          items: [{
-            value: 'v1',
-          }, {
-            value: 'v2',
-          }, {
-            value: 'v3',
-          }],
-        },
-      };
-
-      spyOn(Mappings, 'getMappingTypes')
-        .and.returnValue(types);
-
-      result = baseVM.modelFromType('v2');
-      expect(result).toEqual(types.governance.items[1]);
-    });
   });
 
   describe('update() method', function () {

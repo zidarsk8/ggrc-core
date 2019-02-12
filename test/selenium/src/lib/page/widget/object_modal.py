@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modals for creating / making changes to objects:
 * New object
@@ -20,7 +20,8 @@ def get_modal_obj(obj_type, _selenium=None):
       "control": ControlModal,
       "risk": RiskModal,
       "workflow": WorkflowModal,
-      "task_group_task": TaskGroupTaskModal
+      "task_group_task": TaskGroupTaskModal,
+      "task_group": TaskGroupModal
   }
   return mapping.get(obj_type.lower(), BaseObjectModal)()
 
@@ -224,3 +225,11 @@ class TaskGroupTaskModal(BaseObjectModal):
   def set_due_date(self, date):
     """Sets a date in the due date datepicker."""
     self._due_date_picker.set_value(date)
+
+
+class TaskGroupModal(BaseObjectModal):
+  """Represents task group object modal."""
+
+  def __init__(self):
+    super(TaskGroupModal, self).__init__()
+    self._fields = ["title"]

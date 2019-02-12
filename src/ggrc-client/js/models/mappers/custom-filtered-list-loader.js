@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -19,8 +19,8 @@ import Mappings from './mappings';
 
    Rejected Deferreds are treated as false.
    */
-  GGRC.ListLoaders.StubFilteredListLoader(
-    'GGRC.ListLoaders.CustomFilteredListLoader', {}, {
+  GGRC.ListLoaders.CustomFilteredListLoader =
+    GGRC.ListLoaders.StubFilteredListLoader.extend({}, {
       process_result: function (binding, result, newResult, include) {
         let self = this;
         if (include) {
@@ -53,7 +53,7 @@ import Mappings from './mappings';
         }
 
         if (typeof this.source === 'string') {
-          binding.source_binding = Mappings.get_binding(
+          binding.source_binding = Mappings.getBinding(
             this.source,
             binding.instance);
         } else {

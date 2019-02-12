@@ -1,10 +1,11 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 attrs==18.2.0
 inflection==0.3.1
 holidays==0.3.1  # version should match version in requirements.txt
 nerodia==0.13.0
+more-itertools==5.0.0
 pytest==3.6.4
 pytest-cov==2.6.0
 pytest-env==0.6.2

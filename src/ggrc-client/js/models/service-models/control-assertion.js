@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -10,8 +10,4 @@ export default Cacheable('CMS.Models.ControlAssertion', {
   root_collection: 'control_assertions',
   findAll: 'GET /api/control_assertions',
   findOne: 'GET /api/control_assertions/{id}',
-  tree_view_options: {
-    show_view: '/static/mustache/controls/categories_tree.mustache',
-    start_expanded: false,
-  },
 }, {});

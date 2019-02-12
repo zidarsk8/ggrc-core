@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -8,6 +8,7 @@ import template from './people-list.mustache';
 export default can.Component.extend({
   tag: 'people-list',
   template,
+  leakScope: true,
   viewModel: {
     peopleList: [],
     instance: null,
@@ -36,6 +37,14 @@ export default can.Component.extend({
             }
           }
           return newValue;
+        },
+      },
+      validationError: {
+        type: String,
+        get() {
+          let errors = this.instance.computed_errors();
+          let attr = this.attr('peopleListAttr');
+          return errors && errors[attr] ? errors[attr] : '';
         },
       },
     },

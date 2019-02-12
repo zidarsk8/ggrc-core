@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """This module contains custom operators for query helper"""
@@ -21,7 +21,7 @@ from ggrc.query import autocast
 from ggrc.query import my_objects
 from ggrc.query.exceptions import BadQueryException
 from ggrc.snapshotter import rules
-from ggrc.utils.revisions_diff import builder as revdiff_builder
+from ggrc.utils import revisions_diff
 
 
 GETATTR_WHITELIST = {
@@ -485,7 +485,12 @@ def cascade_unmappable(exp, object_class, target_class, query):
 
 @validate("resource_type", "resource_id")
 def not_empty_revisions(exp, object_class, target_class, query):
-  """Filter revisions containing object state changes."""
+  """Filter revisions containing object state changes.
+
+  This operator is useful if revisions with object state changes are needed.
+  Revisions without object state changes are created when object editing
+  without any actual changes is performed.
+  """
   if object_class is not all_models.Revision:
     raise BadQueryException("'not_empty_revisions' operator works with "
                             "Revision only")
@@ -506,11 +511,18 @@ def not_empty_revisions(exp, object_class, target_class, query):
   )
 
   current_instance = resource_cls.query.get(resource_id)
-
+  current_instance_meta = revisions_diff.meta_info.MetaInfo(current_instance)
+  latest_rev_content = revisions_diff.builder.get_latest_revision_content(
+      current_instance,
+  )
   prev_diff = None
   revision_with_changes = []
   for revision in query:
-    diff = revdiff_builder.prepare(current_instance, revision.content)
+    diff = revisions_diff.builder.prepare_content_diff(
+        instance_meta_info=current_instance_meta,
+        l_content=latest_rev_content,
+        r_content=revision.content,
+    )
     if diff != prev_diff:
       revision_with_changes.append(revision.id)
       prev_diff = diff
@@ -526,6 +538,7 @@ LT_OPERATOR = validate("left", "right")(build_op_shortcut(operator.lt))
 GT_OPERATOR = validate("left", "right")(build_op_shortcut(operator.gt))
 LE_OPERATOR = validate("left", "right")(build_op_shortcut(operator.le))
 GE_OPERATOR = validate("left", "right")(build_op_shortcut(operator.ge))
+
 
 OPS = {
     "AND": and_operation,

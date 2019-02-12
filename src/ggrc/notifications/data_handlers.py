@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Data handlers for notifications for objects in ggrc module.
@@ -50,22 +50,30 @@ def get_object_url(obj):
   return urlparse.urljoin(utils.get_url_root(), url)
 
 
-def as_user_time(utc_datetime):
+def as_user_time(utc_datetime, datetime_tz=None, datetime_format=None,
+                 formatter=None):
   """Convert a UTC time stamp to a localized user-facing string.
 
   Args:
     utc_datetime: naive datetime.datetime, intepreted as being in UTC
+    datetime_tz: time zone to use with `utc_datetime`
+    datetime_format: datetime string representation format
+    formatter: callable which performs additional formatting. Takes one
+      parameter which is `utc_datetime` formatted with `datetime_format`.
 
   Returns:
     A user-facing string representing the given time in a localized format.
   """
   # NOTE: For the time being, the majority of users are located in US/Pacific
   # time zone, thus the latter is used to convert UTC times read from database.
-  pacific_tz = timezone("US/Pacific")
-  datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
+  datetime_tz = datetime_tz or timezone("US/Pacific")
+  datetime_format = datetime_format or DATE_FORMAT_US + " %H:%M:%S %Z"
 
-  local_time = utc_datetime.replace(tzinfo=pytz.utc).astimezone(pacific_tz)
-  return local_time.strftime(datetime_format)
+  local_time = utc_datetime.replace(tzinfo=pytz.utc).astimezone(datetime_tz)
+  local_time_repr = local_time.strftime(datetime_format)
+  if formatter is not None:
+    local_time_repr = formatter(local_time_repr)
+  return local_time_repr
 
 
 def _group_acl_persons_by_role_id(acl_list):

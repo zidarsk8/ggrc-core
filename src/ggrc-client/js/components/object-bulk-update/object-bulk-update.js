@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -18,6 +18,7 @@ import Mappings from '../../models/mappers/mappings';
 export default can.Component.extend({
   tag: 'object-bulk-update',
   template: template,
+  leakScope: true,
   viewModel: function (attrs, parentViewModel) {
     let type = attrs.type;
     let targetStates = getBulkStatesForModel(type);

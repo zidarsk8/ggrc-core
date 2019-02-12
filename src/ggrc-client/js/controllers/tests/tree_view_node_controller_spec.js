@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -28,6 +28,7 @@ describe('TreeViewNode Controller', function () {
         add_child_lists_to_child: jasmine.createSpy(),
         _ifNotRemoved: jasmine.createSpy().and.returnValue(ifNotRemovedResult),
         replace_element: jasmine.createSpy(),
+        add_control: jasmine.createSpy(),
       };
 
       method = Ctrl.prototype.draw_node.bind(ctrlInst);

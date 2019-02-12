@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -9,6 +9,7 @@
   {instance}="instance">
   <button type="button"
           class="btn btn-small btn-gray custom-attributes-actions__edit-button"
+          {{#if disabled}}disabled{{/if}}
           ($click)="confirmEdit()">
     Edit Answers
   </button>

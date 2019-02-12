@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -66,6 +66,7 @@ const viewModel = {
 export default can.Component.extend({
   tag: 'read-more',
   template,
+  leakScope: true,
   viewModel,
   init() {
     const observedElement = $(arguments[0]).children()[0];

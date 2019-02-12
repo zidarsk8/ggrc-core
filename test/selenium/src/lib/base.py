@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Base classes."""
 # pylint: disable=too-few-public-methods
@@ -302,10 +302,10 @@ class Toggle(Element):
     Args: on_el (bool)
     """
     if on_el and not self.is_activated:
-      self.element.click()
+      self.click_via_js()
       self.is_activated = True
     elif not on_el and self.is_activated:
-      self.element.click()
+      self.click_via_js()
       self.is_activated = False
 
 

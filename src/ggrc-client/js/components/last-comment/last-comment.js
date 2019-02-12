@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -13,6 +13,7 @@ import Comment from '../../models/service-models/comment';
 export default can.Component.extend({
   tag: 'last-comment',
   template: template,
+  leakScope: true,
   viewModel: can.Map.extend({
     define: {
       instance: {

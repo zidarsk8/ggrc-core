@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -9,7 +9,6 @@ import {bindXHRToButton} from '../../plugins/utils/modals';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default ModalsController({
-  pluginName: 'ggrc_controllers_delete',
   defaults: {
     skip_refresh: true,
   },

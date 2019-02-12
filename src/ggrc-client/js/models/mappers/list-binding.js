@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -8,7 +8,7 @@ import RefreshQueue from '../refresh_queue';
 (function (GGRC, can) {
   /*  GGRC.ListLoaders.ListBinding
    */
-  can.Construct('GGRC.ListLoaders.ListBinding', {}, {
+  GGRC.ListLoaders.ListBinding = can.Construct.extend({}, {
     init: function (instance, loader) {
       this.instance = instance;
       this.loader = loader;

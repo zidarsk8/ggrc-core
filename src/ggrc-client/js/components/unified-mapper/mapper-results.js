@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 import './mapper-results-item';
@@ -33,6 +33,7 @@ const DEFAULT_PAGE_SIZE = 10;
 export default can.Component.extend({
   tag: 'mapper-results',
   template,
+  leakScope: true,
   viewModel: {
     define: {
       paging: {

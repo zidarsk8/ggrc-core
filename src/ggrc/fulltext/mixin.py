@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Module contains Indexed mixin class"""
 import itertools
@@ -10,6 +10,7 @@ from ggrc import db
 
 from ggrc import fulltext
 from ggrc import utils
+from ggrc.models.reflection import AttributeInfo
 
 
 class ReindexRule(namedtuple("ReindexRule", ["model", "rule", "fields"])):
@@ -88,3 +89,27 @@ class Indexed(object):
   @classmethod
   def indexed_query(cls):
     return cls.query.options(orm.Load(cls).load_only("id"),)
+
+  @classmethod
+  def get_fulltext_attrs(cls):
+    # type: () -> Dict[unicode, fulltext.attributes.FullTextAttr]
+    """Get all fulltext attributes represented as FullTextAttribute objects """
+
+    raw_attrs = AttributeInfo.gather_attrs(cls, '_fulltext_attrs')
+    # Convert attrs represented as string into FullTextAttr objects
+    attrs = [attr if isinstance(attr, fulltext.attributes.FullTextAttr) else
+             fulltext.attributes.FullTextAttr(attr, attr)
+             for attr in raw_attrs]
+
+    return attrs
+
+  @classmethod
+  def get_fulltext_attr_name(cls, attr):
+    # type: (fulltext.attributes.FullTextAttr) -> unicode
+    """Get name of attribute which is instance of FullTextAttr class"""
+    assert isinstance(attr, fulltext.attributes.FullTextAttr)
+
+    if attr.with_template:
+      return cls.PROPERTY_TEMPLATE.format(attr.alias)
+
+    return attr.alias

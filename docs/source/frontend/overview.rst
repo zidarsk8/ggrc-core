@@ -488,12 +488,6 @@ Mappings essentially turn the entire system into a
 
 Mappings are defined in :src:`ggrc-client/js/models/mappers/mappings-ggrc.js`.
 
-We don't have a function that gets all the objects mapped to a given
-object. You can get the mappings of an instance by calling
-``instance.get_mappings('_mapping_')`` if the mappings are already
-loaded, or by calling
-``instance.get_binding('_mapping_').refresh_list()`` if they are not.
-
 Types of Mappings
 ^^^^^^^^^^^^^^^^^
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2018 Google Inc.
+  Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -7,6 +7,7 @@ import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {navigate} from '../../plugins/utils/current-page-utils';
 import Workflow from '../../models/business-models/workflow';
+import ModalsController from '../../controllers/modals/modals_controller';
 
 let CloneWorkflow = Cacheable({
   defaults: {
@@ -44,7 +45,7 @@ export default can.Component.extend({
       $target.modal_form({}, el);
       import(/* webpackChunkName: "modalsCtrls" */'../../controllers/modals')
         .then(() => {
-          $target.ggrc_controllers_modals({
+          new ModalsController($target, {
             modal_title: 'Clone Workflow',
             model: CloneWorkflow,
             instance: new CloneWorkflow({source_workflow: this.scope.workflow}),
@@ -56,4 +57,5 @@ export default can.Component.extend({
         });
     },
   },
+  leakScope: true,
 });

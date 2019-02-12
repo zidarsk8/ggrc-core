@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Google Inc.
+# Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module contains service for Google Calendar API."""
@@ -57,6 +57,7 @@ class CalendarApiService(object):
             'timeZone': kwargs.get('timezone', 'UTC'),
         },
         'attendees': [{'email': x} for x in attendees],
+        'locked': kwargs.get('locked', True),
         'sendNotifications': kwargs.get('send_notifications', False),
         'guestsCanModify': kwargs.get('guests_can_modify', False),
         'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
@@ -91,6 +92,10 @@ class CalendarApiService(object):
             'timeZone': kwargs.get('timezone', 'UTC'),
         },
         'attendees': [{'email': x} for x in attendees],
+        'locked': kwargs.get('locked', True),
+        'sendNotifications': kwargs.get('send_notifications', False),
+        'guestsCanModify': kwargs.get('guests_can_modify', False),
+        'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
     }
     return self.calendar_service.events().update(
         calendarId=calendar_id, body=event, eventId=event_id).execute()

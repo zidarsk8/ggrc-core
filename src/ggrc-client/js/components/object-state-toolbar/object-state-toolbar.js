@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2018 Google Inc.
+ Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -15,6 +15,7 @@ const activeStates = ['In Progress', 'Rework Needed', 'Not Started'];
 export default can.Component.extend({
   tag,
   template,
+  leakScope: true,
   viewModel: {
     define: {
       updateState: {
@@ -35,20 +36,19 @@ export default can.Component.extend({
         },
       },
     },
+    instanceState: '',
     disabled: false,
+    isUndoButtonVisible: false,
     verifiers: [],
     instance: {},
     isActiveState: function () {
-      return activeStates.includes(this.attr('instance.status'));
+      return activeStates.includes(this.attr('instanceState'));
     },
     isInProgress: function () {
-      return this.attr('instance.status') === 'In Progress';
+      return this.attr('instanceState') === 'In Progress';
     },
     isInReview: function () {
-      return this.attr('instance.status') === 'In Review';
-    },
-    hasPreviousState: function () {
-      return !!this.attr('instance.previousStatus');
+      return this.attr('instanceState') === 'In Review';
     },
     changeState: function (newState, isUndo) {
       if (this.attr('instance._hasValidationErrors')) {

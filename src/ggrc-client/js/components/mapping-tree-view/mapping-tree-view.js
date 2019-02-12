@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -10,6 +10,7 @@ import Mappings from '../../models/mappers/mappings';
 export default can.Component.extend({
   tag: 'mapping-tree-view',
   template,
+  leakScope: true,
   viewModel: {
     treeViewClass: '@',
     expandable: '@',
@@ -39,7 +40,7 @@ export default can.Component.extend({
       }
     });
 
-    binding = Mappings.get_binding(
+    binding = Mappings.getBinding(
       this.viewModel.mapping,
       this.viewModel.parentInstance);
 

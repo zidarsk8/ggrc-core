@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -14,6 +14,7 @@ import tracker from '../../../tracker';
 export default can.Component.extend({
   tag: 'assessment-templates-dropdown',
   template,
+  leakScope: true,
   viewModel: {
     responses: [],
     instance: null,

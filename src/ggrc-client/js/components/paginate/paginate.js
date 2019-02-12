@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Google Inc.
+    Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -8,7 +8,22 @@ import template from './paginate.mustache';
 export default can.Component.extend({
   tag: 'paginate',
   template,
+  leakScope: true,
   viewModel: {
+    define: {
+      hasPrevPage: {
+        type: Boolean,
+        get() {
+          return this.attr('currentPage') !== 1;
+        },
+      },
+      hasNextPage: {
+        type: Boolean,
+        get() {
+          return this.attr('currentPage') !== this.attr('totalPages');
+        },
+      },
+    },
     list: null,
     current: 0,
     /**
