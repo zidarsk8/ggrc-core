@@ -5,6 +5,7 @@
 
 from lib import base
 from lib.element import page_elements
+from lib.utils import selenium_utils
 
 
 class WithPageElements(base.WithBrowser):
@@ -57,3 +58,13 @@ class WithObjectReview(base.WithBrowser):
   def __init__(self, driver):
     super(WithObjectReview, self).__init__(driver)
     self.request_review_btn = self._browser.button(text="Request Review")
+    self.mark_reviewed_btn = self._browser.element(text="Mark Reviewed")
+
+  def open_submit_for_review_popup(self):
+    """Open submit for control popup by clicking on corresponding button."""
+    self.request_review_btn.click()
+    selenium_utils.wait_for_js_to_load(self._driver)
+
+  def click_approve_review(self):
+    """Click approve review button."""
+    self.mark_reviewed_btn.click()

@@ -24,7 +24,7 @@ class Representation(object):
       "secondary_contacts", "audit_captains", "auditors",
       "control_operators", "control_owners",
       "principal_assignees", "secondary_assignees", "managers", "editors",
-      "readers"]  # multiply
+      "readers", "reviewers"]  # multiply
 
   @property
   def attrs_names(self):
@@ -102,7 +102,8 @@ class Representation(object):
         "CONTROL_OPERATORS": "control_operators",
         "CONTROL_OWNERS": "control_owners",
         "URL": "url",
-        "ID": "id", "RISK_TYPE": "risk_type"
+        "ID": "id", "RISK_TYPE": "risk_type",
+        "REVIEWERS": "reviewers"
     }
     csv_remap_items = {
         csv.REVISION_DATE: "updated_at"
@@ -725,7 +726,7 @@ class ProgramEntity(Entity):
     self.delete_attrs("admins")
     self.set_attrs(
         "managers", "editors", "readers", "primary_contacts",
-        "secondary_contacts", **attrs)
+        "secondary_contacts", "reviewers", **attrs)
 
 
 class ControlEntity(Entity):
