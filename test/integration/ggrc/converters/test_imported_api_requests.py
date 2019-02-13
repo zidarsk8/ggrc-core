@@ -76,7 +76,7 @@ class TestComprehensiveSheets(TestCase):
         self.generator.api.get_query(model, "")
         if counter.get > limit:
           print collections.Counter(counter.queries).most_common(1)
-        self.assertLess(
+        self.assertLessEqual(
             counter.get,
             limit,
             "Query count for object {} exceeded: {}/{}".format(
