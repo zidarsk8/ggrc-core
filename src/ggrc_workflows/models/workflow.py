@@ -27,7 +27,6 @@ from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
-from ggrc_workflows.services import google_holidays
 
 
 class Workflow(roleable.Roleable,
