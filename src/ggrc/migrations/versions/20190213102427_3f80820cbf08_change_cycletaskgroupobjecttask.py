@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3f80820cbf08'
-down_revision = 'c3224a449d11'
+down_revision = 'a8a44ea42a2b91'
 
 columns = ["finished_date", "verified_date"]
 
@@ -34,10 +34,4 @@ def upgrade():
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  for column in columns:
-    op.alter_column(
-        "cycle_task_group_object_tasks",
-        column,
-        existing_type=sa.Date,
-        type_=sa.DateTime
-    )
+  raise NotImplementedError("Downgrade is not supported")

@@ -283,7 +283,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "description": self.task_group_tasks_active[3]["description"],
             "start_date": "2016-07-19",
             "end_date": "2016-07-22",
-            "finished_date": "2016-07-01 00:00:00",
+            "finished_date": "2016-07-01",
             "verified_date": "None",
             "status": "Finished"
         },
@@ -292,8 +292,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "description": self.task_group_tasks_active[4]["description"],
             "start_date": "2016-07-25",
             "end_date": "2016-07-29",
-            "finished_date": "2016-07-01 00:00:00",
-            "verified_date": "2016-07-01 00:00:00",
+            "finished_date": "2016-07-01",
+            "verified_date": "2016-07-01",
             "status": "Verified"
         }
     }
@@ -379,7 +379,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "description": self.task_group_tasks_historical[3]["description"],
             "start_date": "2014-05-19",
             "end_date": "2014-05-23",
-            "finished_date": "2014-05-01 00:00:00",
+            "finished_date": "2014-05-01",
             "verified_date": "None",
             "status": "Finished"
         },
@@ -388,8 +388,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "description": self.task_group_tasks_historical[4]["description"],
             "start_date": "2014-05-23",
             "end_date": "2014-05-30",
-            "finished_date": "2014-05-01 00:00:00",
-            "verified_date": "2014-05-01 00:00:00",
+            "finished_date": "2014-05-01",
+            "verified_date": "2014-05-01",
             "status": "Verified"
         }
     }
@@ -433,7 +433,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_active[3]["description"] + " four",
             "start_date": "2016-06-19",
             "end_date": "2016-06-24",
-            "finished_date": "2016-07-19 00:00:00",
+            "finished_date": "2016-07-19",
             "verified_date": "None",
             "status": "Finished"
         },
@@ -443,8 +443,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_active[4]["description"] + " five",
             "start_date": "2016-06-25",
             "end_date": "2016-06-30",
-            "finished_date": "2016-07-25 00:00:00",
-            "verified_date": "2016-08-30 00:00:00",
+            "finished_date": "2016-07-25",
+            "verified_date": "2016-08-30",
             "status": "Verified"
         },
         "CYCLETASK-6": {
@@ -483,7 +483,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[3]["description"] + " four",
             "start_date": "2014-04-19",
             "end_date": "2014-04-24",
-            "finished_date": "2014-05-19 00:00:00",
+            "finished_date": "2014-05-19",
             "verified_date": "None",
             "status": "Finished"
         },
@@ -493,8 +493,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[4]["description"] + " five",
             "start_date": "2014-04-25",
             "end_date": "2014-04-30",
-            "finished_date": "2014-05-25 00:00:00",
-            "verified_date": "2014-06-30 00:00:00",
+            "finished_date": "2014-05-25",
+            "verified_date": "2014-06-30",
             "status": "Verified"
         }
     }
