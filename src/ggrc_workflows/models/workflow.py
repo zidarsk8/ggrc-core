@@ -213,8 +213,7 @@ class Workflow(roleable.Roleable,
   @classmethod
   def first_work_day(cls, day):
     """Get first work day."""
-    holidays = google_holidays.GoogleHolidays()
-    while day.isoweekday() > cls.WORK_WEEK_LEN or day in holidays:
+    while day.isoweekday() > cls.WORK_WEEK_LEN:
       day -= relativedelta.relativedelta(days=1)
     return day
 
