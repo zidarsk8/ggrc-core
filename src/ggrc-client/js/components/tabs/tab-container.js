@@ -22,6 +22,7 @@ export default can.Component.extend({
         },
       },
     },
+    tabOptions: {},
     hideOneTab: true,
     selectedTabIndex: 0,
     panels: [],
@@ -66,11 +67,12 @@ export default can.Component.extend({
     setLastErrorTab: function (tabIndex) {
       this.attr('lastErrorTab', tabIndex);
     },
-    navigate(tabId) {
+    navigate(tabId, tabOptions) {
       const panels = this.attr('panels');
       const panel = _.find(panels, (panel) => panel.tabId === tabId);
 
       if (panel) {
+        this.attr('tabOptions', tabOptions);
         this.setActivePanel(panel.tabIndex);
       }
     },
@@ -95,7 +97,7 @@ export default can.Component.extend({
       this.viewModel.setActivePanel(this.viewModel.lastErrorTab);
     },
     [`{viewModel.instance} ${NAVIGATE_TO_TAB.type}`](el, ev) {
-      this.viewModel.navigate(ev.tabId);
+      this.viewModel.navigate(ev.tabId, ev.options);
     },
   },
 });

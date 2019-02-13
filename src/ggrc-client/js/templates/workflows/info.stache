@@ -173,7 +173,7 @@
         </div>
       </tab-panel>
       <tab-panel {(panels)}="panels" title-text="Change Log">
-          <revision-log {instance}="instance"></revision-log>
+          <revision-log {instance}="instance" {options}="tabOptions"></revision-log>
       </tab-panel>
     </tab-container>
   </div> <!-- end tier-content -->

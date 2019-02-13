@@ -5,7 +5,7 @@
 
 import * as QueryAPI from '../utils/query-api-utils';
 
-describe('GGRC Utils Query API', function () {
+describe('QueryAPI utils', function () {
   describe('batchRequests() method', function () {
     let batchRequests = QueryAPI.batchRequests;
 
@@ -30,7 +30,7 @@ describe('GGRC Utils Query API', function () {
         });
       });
 
-    it('does several ajax calls for delays cals', function (done) {
+    it('does several ajax calls for delays calls', function (done) {
       batchRequests(1);
       batchRequests(2);
       batchRequests(3);
@@ -45,6 +45,38 @@ describe('GGRC Utils Query API', function () {
       }, 150);
     });
   });
+
+  describe('buildParam(objName, page, relevant, fields, filters) method',
+    () => {
+      let page;
+
+      describe('when page.current and page.pageSize are defined', () => {
+        beforeEach(() => {
+          page = {
+            current: 7,
+            pageSize: 10,
+          };
+        });
+
+        it('returns correct limit when buffer is not defined', () => {
+          let result = QueryAPI.buildParam('SomeName', page);
+
+          expect(result).toEqual(jasmine.objectContaining({
+            limit: [60, 70],
+          }));
+        });
+
+        it('adds buffer to right limit if buffer defined', () => {
+          page.buffer = 1;
+
+          let result = QueryAPI.buildParam('SomeName', page);
+
+          expect(result).toEqual(jasmine.objectContaining({
+            limit: [60, 71],
+          }));
+        });
+      });
+    });
 
   describe('buildCountParams() method', function () {
     let relevant = {

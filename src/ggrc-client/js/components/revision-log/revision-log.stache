@@ -10,57 +10,18 @@
         <label class="flex-box">
           <input type="checkbox"
                  ($change)="changeLastUpdatesFilter(%element)"
-                 {($checked)}="showLastReviewUpdates"
+                 {($checked)}="options.showLastReviewUpdates"
           />
           Show updates after last review
         </label>
       </div>
     {{/if}}
-    <paginate list="changeHistory" per-page="10" current="currentPage">
-      <ul class="entry-list">
-        {{#entries}}
-          <li {{#reviewWasChanged}} class="revision-log__status-{{reviewWasChanged}}" {{/reviewWasChanged}}>
-            <span class="person-label {{lowercase role }}"></span>
-            <div class="w-status">
-              <div class="entry-author">
-                <person-data {person}="madeBy"></person-data>made changes &mdash; {{dateTime updatedAt}}
-              </div>
-                <div class="third-col">
-                  <p class="instruction">Field</p>
-                </div>
-                <div class="third-col">
-                  <p class="instruction">Original value</p>
-                </div>
-                <div class="third-col">
-                  <p class="instruction">New value</p>
-                </div>
-              {{#changes}}
-                <div class="clearfix {{#if isRole}}role-row{{/if}}">
-                  <div class="third-col revision-log__field-name">
-                    {{{fieldName}}}
-                  </div>
-                  <div class="third-col">
-                    <revision-log-data {is-loading}="isLoading" {data}="origVal"></revision-log-data>
-                  </div>
-                  <div class="third-col">
-                    <revision-log-data {is-loading}="isLoading" {data}="newVal"></revision-log-data>
-                  </div>
-                </div>
-              {{/changes}}
-            </div>
-          </li>
-        {{/entries}}
-
-        {{^list}}
-          {{#isLoading}}
-            <li class="spinner">
-              <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-            </li>
-          {{else}}
-            <li>The history of changes is currently empty.</li>
-          {{/isLoading}}
-        {{/list}}
-      </ul>
-    </paginate>
+    <div class="grid-data__toolbar flex-box">
+      <tree-pagination {paging}="pageInfo"></tree-pagination>
+    </div>
+    <revision-page
+        {revisions}="revisions"
+        {instance}="instance"
+        {is-loading}="isLoading"></revision-page>
   </div>
 {{/revisions_diff}}
