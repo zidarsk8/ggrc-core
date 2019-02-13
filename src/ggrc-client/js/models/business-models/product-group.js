@@ -12,7 +12,7 @@ import scopeObjectNotifications from '../mixins/scope-object-notifications';
 import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.ProductGroup', {
+export default Cacheable.extend({
   root_object: 'product_group',
   root_collection: 'product_groups',
   category: 'scope',

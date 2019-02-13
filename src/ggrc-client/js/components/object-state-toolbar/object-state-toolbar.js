@@ -4,7 +4,7 @@
  */
 
 import {SWITCH_TO_ERROR_PANEL, SHOW_INVALID_FIELD} from '../../events/eventTypes';
-import template from './object-state-toolbar.mustache';
+import template from './object-state-toolbar.stache';
 
 const tag = 'object-state-toolbar';
 const activeStates = ['In Progress', 'Rework Needed', 'Not Started'];

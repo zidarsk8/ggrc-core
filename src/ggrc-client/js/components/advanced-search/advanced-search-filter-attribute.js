@@ -4,7 +4,7 @@
  */
 
 import '../dropdown/autocomplete-dropdown';
-import template from './advanced-search-filter-attribute.mustache';
+import template from './advanced-search-filter-attribute.stache';
 
 /**
  * Filter Attribute view model.

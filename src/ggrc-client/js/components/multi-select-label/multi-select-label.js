@@ -4,7 +4,7 @@
 */
 
 import {sortByName} from '../../plugins/utils/label-utils';
-import template from './templates/multi-select-label.mustache';
+import template from './templates/multi-select-label.stache';
 import './../custom-autocomplete/autocomplete-input';
 import './label-autocomplete-results';
 

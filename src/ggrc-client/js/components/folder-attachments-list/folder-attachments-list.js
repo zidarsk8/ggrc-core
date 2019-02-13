@@ -11,7 +11,7 @@ import {
   DOCUMENT_CREATE_FAILED,
 } from '../../events/eventTypes';
 import Permission from '../../permission';
-import template from './folder-attachments-list.mustache';
+import template from './folder-attachments-list.stache';
 
 /**
  * Wrapper Component for rendering and managing of folder and

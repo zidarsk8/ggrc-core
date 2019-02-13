@@ -33,16 +33,16 @@ RiskAssessmentsExtension.init_widgets = function () {
     treeWidgets[type] = treeWidgets[type].concat(['RiskAssessment']);
   });
   if (pageInstance
-    && allowedObjectTypes.includes(pageInstance.constructor.shortName)) {
-    descriptor[pageInstance.constructor.shortName] = {
+    && allowedObjectTypes.includes(pageInstance.constructor.model_singular)) {
+    descriptor[pageInstance.constructor.model_singular] = {
       RiskAssessment: {
         widget_id: 'risk_assessments',
         widget_name: 'Risk Assessments',
         widgetType: 'treeview',
         treeViewDepth: 0,
         content_controller_options: {
-          add_item_view: GGRC.mustache_path +
-            '/risk_assessments/tree_add_item.mustache',
+          add_item_view: GGRC.templates_path +
+            '/risk_assessments/tree_add_item.stache',
           parent_instance: pageInstance,
           model: RiskAssessment,
         },

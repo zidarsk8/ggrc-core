@@ -5,7 +5,7 @@
 
 import '../tree/tree-header-selector';
 import '../tree/tree-visible-column-checkbox';
-import tmpl from './templates/mapper-results-columns-configuration.mustache';
+import tmpl from './templates/mapper-results-columns-configuration.stache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import * as businessModels from '../../models/business-models';
 

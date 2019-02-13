@@ -33,6 +33,7 @@ class Types(object):
       "Threat",
       "Metric",
       "ProductGroup",
+      "KeyReport",
   }
 
   parents = {

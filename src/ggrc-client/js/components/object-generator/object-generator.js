@@ -13,7 +13,7 @@ import '../../components/unified-mapper/mapper-results';
 import '../../components/mapping-controls/mapping-type-selector';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import * as businessModels from '../../models/business-models';
-import template from './object-generator.mustache';
+import template from './object-generator.stache';
 
 /**
  * A component implementing a modal for mapping objects to other objects,

@@ -3,12 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Construct.extend('can.Model.Mixin', {
+const Mixin = can.Construct.extend({
   newInstance: function () {
     throw new Error('Mixins cannot be directly instantiated');
   },
   add_to: function (cls) {
-    if (this === can.Model.Mixin) {
+    if (this === Mixin) {
       throw new Error('Must only add a subclass of Mixin to an object,' +
         ' not Mixin itself');
     }
@@ -21,7 +21,7 @@ export default can.Construct.extend('can.Model.Mixin', {
         let oldfn;
 
         key = ~key.indexOf(':') ? key.substr(key.indexOf(':') + 1) : key;
-        if (fn !== can.Model.Mixin[key] && !blockedKeys.includes(key)) {
+        if (fn !== Mixin[key] && !blockedKeys.includes(key)) {
           oldfn = obj[key];
           // TODO support other ways of adding functions.
           //  E.g. "override" (doesn't call super fn at all)
@@ -70,3 +70,5 @@ export default can.Construct.extend('can.Model.Mixin', {
     }
   },
 }, {});
+
+export default Mixin;

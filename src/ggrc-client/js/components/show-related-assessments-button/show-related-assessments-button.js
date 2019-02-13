@@ -4,7 +4,7 @@
  */
 
 import '../related-objects/related-assessments';
-import template from './show-related-assessments-button.mustache';
+import template from './show-related-assessments-button.stache';
 import {hasRelatedAssessments} from '../../plugins/utils/models-utils';
 
 export default can.Component.extend({

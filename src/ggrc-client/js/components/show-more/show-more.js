@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './show-more.mustache';
+import template from './show-more.stache';
 
 /**
  * A component that limits list of items to acceptable count and shows

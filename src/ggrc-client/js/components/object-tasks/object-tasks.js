@@ -7,7 +7,7 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
-import template from './object-tasks.mustache';
+import template from './object-tasks.stache';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 
 const REQUIRED_TYPE = 'CycleTaskGroupObjectTask';

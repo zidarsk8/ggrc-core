@@ -23,14 +23,14 @@ import '../show-more/show-more';
 import './download-template/download-template';
 import './import-history/import-history';
 import '../collapsible-panel/collapsible-panel';
-import quickTips from './templates/quick-tips.mustache';
-import template from './templates/csv-import.mustache';
+import quickTips from './templates/quick-tips.stache';
+import template from './templates/csv-import.stache';
 import {
   backendGdriveClient,
   gapiClient,
 } from '../../plugins/ggrc-gapi-client';
 import {getPickerElement} from '../../plugins/ggrc_utils';
-import errorTemplate from './templates/import-error.mustache';
+import errorTemplate from './templates/import-error.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {
   isConnectionLost,

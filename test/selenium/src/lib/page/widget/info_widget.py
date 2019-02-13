@@ -222,6 +222,11 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Returns Primary Contacts page element"""
     return self._related_people_list("Primary Contacts", self._root)
 
+  @property
+  def reviewers(self):
+    """Returns Reviewers page element."""
+    return self._related_people_list("Reviewer", self._root)
+
   def global_custom_attributes(self):
     """Returns GCA values."""
     return self.get_custom_attributes()
@@ -288,6 +293,8 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
           last_updated_by=self.modified_by(),
           updated_at=self.updated_at()
       )
+    if self.reviewers.is_element_exists():
+      scope["reviewers"] = self.reviewers.get_people_emails()
     self.update_obj_scope(scope)
     return scope
 
@@ -813,41 +820,12 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
       review_msg = self._browser.element(class_name="object-review__body").text
     self._extend_list_all_scopes(self._elements.OBJECT_REVIEW_FULL, review_msg)
 
-  def open_submit_for_review_popup(self):
-    """Open submit for control popub by clicking on corresponding button."""
-    self._browser.button(text="Request Review").click()
-    selenium_utils.wait_for_js_to_load(self._driver)
-
-  def select_assignee_user(self, user_email):
-    """Select assignee user from dropdown on submit for review popup."""
-    self._browser.text_field(placeholder="Add person").set(user_email)
-    ui_utils.select_user(self._browser, user_email)
-
   def select_first_available_date(self):
     """Select first available day on datepicker on submit for review popup."""
     date_picker = base.DatePicker(
         self._driver, WidgetInfoControl.DATE_PICKER_FIELD,
         WidgetInfoControl.DATE_PICKER_LOCATOR)
     date_picker.select_month_start()
-
-  def click_request(self):
-    """Click request."""
-    self._browser.element(
-        xpath="//div[@class='simple-modal request-review-modal']"
-              "//button[contains(., 'Request')]").click()
-    selenium_utils.wait_for_js_to_load(self._driver)
-
-  def click_approve_review(self):
-    """Click approve review button."""
-    self._browser.element(text="Mark Reviewed").click()
-
-  def leave_request_review_comment(self, comment_msg):
-    """Leave request review comment."""
-    comments_elem = self._browser.element(
-        xpath="//div[@class='simple-modal request-review-modal']"
-              "//div[@data-placeholder='Enter comment']")
-    comments_elem.click()
-    comments_elem.send_keys(comment_msg)
 
   def click_propose_changes(self):
     """Click on Propose Changes button."""
@@ -950,6 +928,14 @@ class Facilities(InfoWidget):
 
   def __init__(self, driver):
     super(Facilities, self).__init__(driver)
+
+
+class KeyReports(InfoWidget):
+  """Model for Key Report object Info pages and Info panels."""
+  _locators = locator.WidgetInfoKeyReport
+
+  def __init__(self, driver):
+    super(KeyReports, self).__init__(driver)
 
 
 class Markets(InfoWidget):

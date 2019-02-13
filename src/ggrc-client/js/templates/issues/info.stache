@@ -1,0 +1,140 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+    <div class="tier-content">
+      {{> /static/templates/base_objects/general-page-header.stache}}
+
+      <tab-container>
+        <tab-panel {(panels)}="panels" title-text="Attributes">
+          <div class="info-pane__body">
+            <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
+              {{#if instance.issueCreated}}
+                <div class="info-pane__section">
+                  <div class="issue-tracker-url">
+                      <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                          Open Ticket
+                      </a>
+                  </div>
+                </div>
+              {{/if}}
+
+              {{> /static/templates/base_objects/description.stache}}
+              {{> /static/templates/issues/remediation_plan.stache}}
+              {{> /static/templates/base_objects/notes.stache}}
+
+              <div class="row-fluid wrap-row">
+                <div data-test-id="title_manager_7a906d2e">
+                  <custom-roles
+                    {instance}="instance"
+                    {read-only}="instance.issueTrackerEnabled"></custom-roles>
+                </div>
+              </div>
+
+              {{> /static/templates/base_objects/reference-urls.stache}}
+
+              <div class="row-fluid wrap-row">
+                <folder-attachments-list {title}="'Attachment'"
+                                      {instance}="instance">
+                </folder-attachments-list>
+              </div>
+
+              <div class="custom-attr-wrap info-pane__section">
+                <div class="row-fluid">
+                  <div class="span12">
+                    <div class="info-expand">
+                      <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                        <span class="out">
+                          <i class="fa fa-caret-right"></i>
+                          Show
+                        </span>
+                        <span class="in">
+                          <i class="fa fa-caret-down"></i>
+                          Hide
+                        </span>
+                        Advanced
+                      </a>
+                    </div>
+                  </div>
+                </div><!-- row-fluid end -->
+                <div class="hidden-fields-area">
+                  <div class="row-fluid wrap-row">
+                    <div class="span4">
+                      <h6>Code</h6>
+                      <p>
+                        {{slug}}
+                      </p>
+                    </div>
+                    <div class="span4">
+                      <h6>Effective Date</h6>
+                      {{#if start_date}}
+                        <p>
+                          {{localize_date start_date}}
+                        </p>
+                      {{else}}
+                        <span class="empty-message">None</span>
+                      {{/if}}
+                    </div>
+                    <div class="span4">
+                      <h6>Last Deprecated Date</h6>
+                      {{#if end_date}}
+                        <p>
+                          {{localize_date end_date}}
+                        </p>
+                      {{else}}
+                        <span class="empty-message">None</span>
+                      {{/if}}
+                    </div>
+                  </div><!-- row-fluid end -->
+                  {{#if instance.can_use_issue_tracker}}
+                    <info-issue-tracker-fields
+                      {instance}="instance"
+                      {show-id}="true"
+                      {linking-note}="'If you would like to keep the existing bug linked to this issue do not edit this attribute. If you would like to link to a different ticket, either clear this attribute to generate new or provide an existing ticket number.''"
+                      {note}="'Turns on Ticket Tracker integration. Any subsequent updates to admins, primary contacts, secondary contacts and state fields should be made through tracking system and will be synced automatically to GGRC.'"
+                      {show-title}="true">
+                    </info-issue-tracker-fields>
+                  {{/if}}
+                  <div class="row-fluid wrap-row">
+                    <div class="span4">
+                      <h6>Due Date</h6>
+                      {{#if due_date}}
+                        <p>
+                          {{localize_date due_date}}
+                        </p>
+                      {{else}}
+                        <span class="empty-message">None</span>
+                      {{/if}}
+                    </div>
+                  </div>
+                </div><!-- hidden-fields-area end -->
+              </div><!-- custom-attr-wrap end -->
+              {{> /static/templates/custom_attributes/info.stache}}
+            </div>
+            {{^if isSnapshot}}
+            <div class="info-pane__sidebar">
+              <div class="info-pane__section-title">Responses/Comments</div>
+              <comments-section class="flex-box flex-col"
+                {instance}="instance"
+                {notification}="'Notify Admins, Primary and Secondary Contacts'">
+              </comments-section>
+            </div>
+            {{/if}}
+          </div>
+        </tab-panel>
+        {{^if isSnapshot}}
+          <tab-panel {(panels)}="panels" title-text="Change Log">
+              <revision-log {instance}="instance"></revision-log>
+          </tab-panel>
+        {{/if}}
+      </tab-container>
+    </div><!-- tier-content end -->
+  </section>
+
+  {{#if is_info_widget}}
+    <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
+  {{/if}}
+{{/instance}}

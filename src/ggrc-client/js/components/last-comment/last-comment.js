@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './last-comment.mustache';
+import template from './last-comment.stache';
 import RefreshQueue from '../../models/refresh_queue';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
 import {COMMENT_CREATED} from '../../events/eventTypes';

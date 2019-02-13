@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.BackgroundTask', {
+export default Cacheable.extend({
   root_object: 'background_task',
   root_collection: 'background_tasks',
   findAll: 'GET /api/background_tasks',

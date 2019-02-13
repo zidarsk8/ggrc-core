@@ -8,10 +8,11 @@ import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
+import Program from './program';
 
-const path = GGRC.mustache_path + '/risk_assessments';
+const path = GGRC.templates_path + '/risk_assessments';
 
-export default Cacheable('CMS.Models.RiskAssessment', {
+export default Cacheable.extend({
   root_object: 'risk_assessment',
   root_collection: 'risk_assessments',
   category: 'risk_assessment',
@@ -47,7 +48,7 @@ export default Cacheable('CMS.Models.RiskAssessment', {
         attr_sort_field: 'ra_counsel',
       },
     ],
-    add_item_view: path + '/tree_add_item.mustache',
+    add_item_view: path + '/tree_add_item.stache',
   },
   sub_tree_view_options: {
     default_filter: ['Program'],
@@ -66,7 +67,7 @@ export default Cacheable('CMS.Models.RiskAssessment', {
   save: function () {
     // Make sure the context is always set to the parent program
     if (!this.context || !this.context.id) {
-      this.attr('context', this.program.reify().context);
+      this.attr('context', Program.findInCacheById(this.program.id).context);
     }
     return this._super(...arguments);
   },

@@ -218,10 +218,6 @@
   background: $lightGray;
   border-bottom: 1px solid $infoMessageBorder;
   padding-bottom: 40px;
-  .white-widget & {
-    background: $white;
-    border-top: 1px solid $infoMessageBorder;
-  }
   h2 {
     line-height: 36px;
     font-size: 24px;

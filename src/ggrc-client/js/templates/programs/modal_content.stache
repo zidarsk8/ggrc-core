@@ -1,0 +1,141 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{!div class="modal-body"}}
+<div class="hideable-holder">
+{{#instance}}
+<form action="javascript://">
+  <input type="hidden" name="kind" value="Directive" />
+  {{> /static/templates/base_objects/form_restore.stache}}
+
+  <!-- Title Row -->
+  <div class="row-fluid">
+    <div data-test-id="label_title_2c925d94" class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
+      <label class="form-label">
+        Title
+        <i class="fa fa-asterisk"></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
+      </label>
+      <input tabindex="1"
+             data-test-id="new_program_field_title_a63ed79d"
+             class="input-block-level"
+             placeholder="Enter Title"
+             name="title" type="text" value="{{title}}" autofocus>
+      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
+    </div>
+  </div>
+
+  <!-- Description & owner/contact block  -->
+  <div class="row-fluid">
+    <div data-test-id="label_description_2c925d94"  class="span6 hidable">
+      <label>
+        Description
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
+      <div class="rich-text" data-test-id="new_program_field_description_1fb8bc06">
+          <rich-text
+            tabindex="3"
+            {hidden-toolbar}="true"
+            {placeholder}="'Enter Description'"
+            {(content)}="instance.description">
+          </rich-text>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="span12 hide-wrap hidable">
+      {{#new_object_form}}
+        <access-control-list-roles-helper
+          {instance}="instance"
+          {is-new-instance}="new_object_form"
+          {order-of-roles}="instance.class.orderOfRoles">
+        </access-control-list-roles-helper>
+      {{/new_object_form}}
+      {{^new_object_form}}
+        <access-control-list-roles-helper
+          {instance}="instance"
+          {is-new-instance}="new_object_form"
+          {read-only}="instance.readOnlyProgramRoles"
+          {include-roles}="instance.class.programRoles">
+        </access-control-list-roles-helper>
+        <access-control-list-roles-helper
+          {instance}="instance"
+          {is-new-instance}="new_object_form"
+          {exclude-roles}="instance.class.programRoles">
+        </access-control-list-roles-helper>
+      {{/new_object_form}}
+    </div>
+  </div>
+
+  <!-- Notes & Process/Reference url block -->
+  <div class="row-fluid">
+    <div data-test-id="label_notes_2c925d94"  class="span6 hidable">
+      <label>
+        Notes
+        <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
+      <div class="rich-text" data-test-id="new_program_field_notes_75b8bc05">
+          <rich-text
+            tabindex="6"
+            {hidden-toolbar}="true"
+            {placeholder}="'Enter Notes'"
+            {(content)}="instance.notes">
+          </rich-text>
+      </div>
+    </div>
+    <div class="span6 hide-wrap hidable">
+      <div class="row-fluid inner-hide">
+        {{> /static/templates/base_objects/modal-content-reference-urls.stache}}
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div data-id="folder_hidden" class="span6 hidable">
+      <ggrc-gdrive-folder-picker instance="instance" deferred="true" tabindex="7">
+      </ggrc-gdrive-folder-picker>
+    </div>
+  </div>
+
+  <!--Code & network block-->
+
+  <div class="row-fluid">
+    <div class="span4 hidable">
+      <label>
+        Code
+        <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
+      <input {{^if new_object_form}} disabled {{/if}} data-test-id="new_program_field_code_334276e2"
+             tabindex="8"
+             class="input-block-level" name="slug" placeholder="PROGRAM-XXX" type="text" value="{{slug}}">
+    </div>
+    <div test-id="new_program_field_effective_date_f2783a28">
+      <div class="span4 hidable">
+        <effective-dates instance="instance"/>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span4 hidable">
+      <label>
+        State
+        <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      </label>
+        <dropdown data-test-id="new_program_dropdown_state_036a1fa6"
+                  options-list="model.statuses"
+                  name="instance.status"
+                  tabindex="23">
+        </dropdown>
+    </div>
+  </div>
+
+</form>
+{{/instance}}
+</div>
+{{!/div}}

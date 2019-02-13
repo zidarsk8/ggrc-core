@@ -10,11 +10,11 @@ import caUpdate from '../mixins/ca-update';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Directive', {
+export default Cacheable.extend({
   root_object: 'directive',
   root_collection: 'directives',
   category: 'governance',
-  // `rootModel` overrides `model.shortName` when determining polymorphic types
+  // `rootModel` overrides `model.model_singular` when determining polymorphic types
   root_model: 'Directive',
   findAll: '/api/directives',
   findOne: '/api/directives/{id}',

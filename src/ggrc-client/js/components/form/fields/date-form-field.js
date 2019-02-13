@@ -4,7 +4,7 @@
  */
 
 import '../../datepicker/datepicker';
-import template from './date-form-field.mustache';
+import template from './date-form-field.stache';
 
 export default can.Component.extend({
   tag: 'date-form-field',

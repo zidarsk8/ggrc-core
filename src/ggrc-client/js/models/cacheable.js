@@ -93,7 +93,7 @@ function makeDateSerializer(type, key) {
   };
 }
 
-export default can.Model('can.Model.Cacheable', {
+export default can.Model.extend({
   root_object: '',
   attr_list: [
     {
@@ -160,7 +160,6 @@ export default can.Model('can.Model.Cacheable', {
   setup: function (construct, name, statics, prototypes) {
     let staticProps = statics;
     let protoProps = prototypes; // eslint-disable-line
-    let overrideFindAll = false;
 
     // if name for model was not set
     if (typeof name !== 'string') {
@@ -168,23 +167,21 @@ export default can.Model('can.Model.Cacheable', {
       staticProps = name;
     }
 
-    if (this.fullName === 'can.Model.Cacheable') {
-      this.findAll = function () {
-        throw new Error(
-          'No default findAll() exists for subclasses of Cacheable');
-      };
-      this.findPage = function () {
-        throw new Error(
-          'No default findPage() exists for subclasses of Cacheable');
-      };
-    } else if ((!staticProps || !staticProps.findAll) &&
-      this.findAll === can.Model.Cacheable.findAll) {
-      if (this.root_collection) {
-        this.findAll = 'GET /api/' + this.root_collection;
-      } else {
-        overrideFindAll = true;
+    if (!staticProps || !staticProps.findAll) {
+      if (!this.findAll || !this.root_collection) {
+        this.findAll = () => {
+          throw new Error(
+            'No default findAll() exists for subclasses of Cacheable');
+        };
+        this.findPage = () => {
+          throw new Error(
+            'No default findPage() exists for subclasses of Cacheable');
+        };
+      } else if (this.root_collection) {
+        this.findAll = `GET /api/${this.root_collection}`;
       }
     }
+
     if (this.root_collection) {
       this.model_plural = staticProps.model_plural || this.root_collection
         .replace(/(?:^|_)([a-z])/g, function (s, l) {
@@ -230,9 +227,6 @@ export default can.Model('can.Model.Cacheable', {
     }
 
     let ret = this._super(...arguments);
-    if (overrideFindAll) {
-      this.findAll = can.Model.Cacheable.findAll;
-    }
 
     // set up default attribute converters/serializers for all classes
     Object.assign(this.attributes, {

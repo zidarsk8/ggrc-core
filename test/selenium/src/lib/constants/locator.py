@@ -926,6 +926,10 @@ class WidgetInfoFacility(WidgetSnapshotsInfoPanel):
   """Locators for Facility Info widgets."""
 
 
+class WidgetInfoKeyReport(WidgetSnapshotsInfoPanel):
+  """Locators for Key Report Info widgets."""
+
+
 class WidgetInfoProject(WidgetSnapshotsInfoPanel):
   """Locators for Project Info widgets."""
 
@@ -1130,6 +1134,7 @@ class AdminCustomAttributes(object):
           objects.VENDORS, objects.PEOPLE,
           objects.ACCESS_GROUPS, objects.ORG_GROUPS, objects.PRODUCTS,
           objects.MARKETS, objects.PROCESSES, objects.FACILITIES,
+          objects.KEY_REPORTS,
           objects.PROJECTS, objects.DATA_ASSETS, objects.SYSTEMS)
       for id_, name in enumerate(items, start=1):
         setattr(cls,

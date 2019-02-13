@@ -19,7 +19,7 @@ import {
   toObject,
   transformQuery,
 } from '../../../plugins/utils/snapshot-utils';
-import template from './templates/mapped-controls.mustache';
+import template from './templates/mapped-controls.stache';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 const tag = 'assessment-mapped-controls';

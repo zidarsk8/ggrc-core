@@ -34,6 +34,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
 from ggrc.models.mixins.base import Base
+from ggrc.models.utils import validate_option
 from ggrc.fulltext import attributes
 
 
@@ -691,6 +692,60 @@ class Folderable(object):
   _api_attrs = reflection.ApiAttributes('folder')
   _fulltext_attrs = ['folder']
   _aliases = {"folder": "Folder"}
+
+
+class WithNetworkZone(object):
+  """Mixin that add network zone option."""
+
+  network_zone_id = db.Column(db.Integer, nullable=True)
+
+  @declared_attr
+  def network_zone(cls):  # pylint: disable=no-self-argument
+    return db.relationship(
+        "Option",
+        primaryjoin="and_(foreign({}.network_zone_id) == Option.id, "
+                    "Option.role == 'network_zone')".format(cls.__name__),
+        uselist=False,
+    )
+
+  _api_attrs = reflection.ApiAttributes(
+      "network_zone",
+  )
+  _fulltext_attrs = [
+      "network_zone",
+  ]
+  _aliases = {
+      "network_zone": {
+          "display_name": "Network Zone",
+      },
+  }
+
+  @orm.validates("network_zone")
+  def validate_network_zone(self, key, option):
+    return validate_option(
+        self.__class__.__name__, key, option, 'network_zone')
+
+  @classmethod
+  def eager_query(cls):
+    query = super(WithNetworkZone, cls).eager_query()
+    return query.options(
+        orm.joinedload(
+            "network_zone"
+        ).undefer_group(
+            "Option_complete",
+        )
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    query = super(WithNetworkZone, cls).indexed_query()
+    return query.options(
+        orm.joinedload(
+            "network_zone",
+        ).undefer_group(
+            "Option_complete",
+        )
+    )
 
 
 def person_relation_factory(relation_name, fulltext_attr=None, api_attr=None):

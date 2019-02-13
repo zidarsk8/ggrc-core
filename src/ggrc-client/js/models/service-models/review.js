@@ -6,7 +6,7 @@
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Review', {
+export default Cacheable.extend({
   root_object: 'review',
   root_collection: 'reviews',
   table_singular: 'review',

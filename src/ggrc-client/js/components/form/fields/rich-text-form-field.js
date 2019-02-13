@@ -4,7 +4,7 @@
  */
 
 import '../../rich_text/rich_text';
-import template from './rich-text-form-field.mustache';
+import template from './rich-text-form-field.stache';
 
 export default can.Component.extend({
   tag: 'rich-text-form-field',

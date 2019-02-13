@@ -1,6 +1,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from sqlalchemy import orm
 from sqlalchemy.orm import validates
 
 from ggrc import db
@@ -12,7 +13,6 @@ from ggrc.models import mixins
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
-from ggrc.models.utils import validate_option
 from ggrc.models import reflection
 
 
@@ -28,6 +28,7 @@ class SystemOrProcess(ScopedCommentable,
                       mixins.TestPlanned,
                       mixins.LastDeprecatedTimeboxed,
                       mixins.base.ContextRBAC,
+                      mixins.WithNetworkZone,
                       mixins.ScopeObject,
                       mixins.Folderable,
                       db.Model):
@@ -38,13 +39,6 @@ class SystemOrProcess(ScopedCommentable,
   infrastructure = deferred(db.Column(db.Boolean), 'SystemOrProcess')
   is_biz_process = db.Column(db.Boolean, default=False)
   version = deferred(db.Column(db.String), 'SystemOrProcess')
-  network_zone_id = deferred(db.Column(db.Integer), 'SystemOrProcess')
-  network_zone = db.relationship(
-      'Option',
-      primaryjoin='and_(foreign(SystemOrProcess.network_zone_id) == Option.id,'
-      ' Option.role == "network_zone")',
-      uselist=False,
-  )
 
   __mapper_args__ = {
       'polymorphic_on': is_biz_process
@@ -54,53 +48,32 @@ class SystemOrProcess(ScopedCommentable,
   _api_attrs = reflection.ApiAttributes(
       'infrastructure',
       'version',
-      'network_zone',
       reflection.Attribute('is_biz_process', create=False, update=False),
   )
   _fulltext_attrs = [
       'infrastructure',
       'version',
-      'network_zone',
   ]
   _sanitize_html = ['version']
   _aliases = {
       "documents_file": None,
-      "network_zone": {
-          "display_name": "Network Zone",
-      },
   }
-
-  @validates('network_zone')
-  def validate_system_options(self, key, option):
-    return validate_option(
-        self.__class__.__name__, key, option, 'network_zone')
-
-  @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
-
-    query = super(SystemOrProcess, cls).eager_query()
-    return query.options(
-        orm.joinedload('network_zone'))
-
-  @classmethod
-  def indexed_query(cls):
-    from sqlalchemy import orm
-
-    query = super(SystemOrProcess, cls).eager_query()
-    return query.options(
-        orm.joinedload(
-            'network_zone',
-        ).undefer_group(
-            "Option_complete",
-        )
-    )
 
   @staticmethod
   def _extra_table_args(cls):
     return (
         db.Index('ix_{}_is_biz_process'.format(cls.__tablename__),
                  'is_biz_process'),
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    query = super(SystemOrProcess, cls).indexed_query()
+    return query.options(
+        orm.Load(cls).load_only(
+            'infrastructure',
+            'version'
+        )
     )
 
 

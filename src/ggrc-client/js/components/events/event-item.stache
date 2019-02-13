@@ -1,0 +1,37 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#event}}
+  <ul>
+    {{#revisions_stub}}
+      {{^if_equals resource_type 'Context'}}
+        <li>
+          <strong>
+            {{description}}
+          </strong>
+        </li>
+      {{/if_equals}}
+    {{/revisions_stub}}
+    {{#if hasHiddenRevisions}} 
+      <li>
+        <strong>
+          + {{hiddenRevisionsCount}} more 
+          {{#if_equals hiddenRevisionsCount 1}} revision {{else}} revisions {{/if_equals}}
+        </strong>
+      </li>
+    {{/if}}
+    <li>
+      <span class="event-owner">
+        by
+        <person-data {person}="modified_by"></person-data>
+      </span>
+    </li>
+    <li>
+      <span class="event-time">
+        on {{dateTime created_at}}
+      </span>
+    </li>
+  </ul>
+{{/event}}

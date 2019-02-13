@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './comment-input.mustache';
+import template from './comment-input.stache';
 
 export default can.Component.extend({
   tag: 'comment-input',

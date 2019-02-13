@@ -11,11 +11,11 @@ import '../../components/object-search/object-search';
 import {
   isInScopeModel,
 } from '../../plugins/utils/snapshot-utils';
-import asmtTemplateCloneTemplate from './assessment-template-clone-modal.mustache';
-import objectGeneratorTemplate from './object-generator-modal.mustache';
-import objectMapperTemplate from './object-mapper-modal.mustache';
-import objectSearchTemplate from './object-search-modal.mustache';
-import objectBulkUpdateTemplate from './object-bulk-update-modal.mustache';
+import asmtTemplateCloneTemplate from './assessment-template-clone-modal.stache';
+import objectGeneratorTemplate from './object-generator-modal.stache';
+import objectMapperTemplate from './object-mapper-modal.stache';
+import objectSearchTemplate from './object-search-modal.stache';
+import objectBulkUpdateTemplate from './object-bulk-update-modal.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import * as businessModels from '../../models/business-models';
 import {changeUrl} from '../../router';

@@ -10,7 +10,7 @@ import '../../diff/instance-mapping-fields-diff';
 import '../../diff/instance-list-fields-diff';
 import '../../revision-history/restored-revision-comparer-config';
 import {getPersonInfo} from '../../../plugins/utils/user-utils';
-import template from './templates/related-revisions-item.mustache';
+import template from './templates/related-revisions-item.stache';
 const tag = 'related-revisions-item';
 
 export default can.Component.extend({

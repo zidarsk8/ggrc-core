@@ -26,10 +26,10 @@ export default can.Construct.extend({
     widgetView [optional] - a template for rendering the info.
   */
   make_info_widget: function (instance, widgetView) {
-    let defaultInfoWidgetView = GGRC.mustache_path +
-                                    '/base_objects/info.mustache';
+    let defaultInfoWidgetView = GGRC.templates_path +
+                                    '/base_objects/info.stache';
     return new this(
-      instance.constructor.shortName + ':info', {
+      instance.constructor.model_singular + ':info', {
         widget_id: 'info',
         widget_name: function () {
           if (instance.constructor.title_singular === 'Person') {
@@ -55,10 +55,10 @@ export default can.Construct.extend({
     widgetView [optional] - a template for rendering the info.
   */
   make_summary_widget: function (instance, widgetView) {
-    let defaultView = GGRC.mustache_path +
-      '/base_objects/summary.mustache';
+    let defaultView = GGRC.templates_path +
+      '/base_objects/summary.stache';
     return new this(
-      instance.constructor.shortName + ':summary', {
+      instance.constructor.model_singular + ':summary', {
         widget_id: 'summary',
         widget_name: function () {
           return instance.constructor.title_singular + ' Summary';
@@ -75,10 +75,10 @@ export default can.Construct.extend({
       });
   },
   make_dashboard_widget: function (instance, widgetView) {
-    let defaultView = GGRC.mustache_path +
-      '/base_objects/dashboard.mustache';
+    let defaultView = GGRC.templates_path +
+      '/base_objects/dashboard.stache';
     return new this(
-      instance.constructor.shortName + ':dashboard', {
+      instance.constructor.model_singular + ':dashboard', {
         widget_id: 'dashboard',
         widget_name: function () {
           if (instance.constructor.title_singular === 'Person') {
@@ -152,8 +152,8 @@ export default can.Construct.extend({
     $.extend(...([true, descriptor].concat(extenders || [])));
 
     return new this(
-      instance.constructor.shortName + ':' +
-      id || instance.constructor.shortName,
+      instance.constructor.model_singular + ':' +
+      id || instance.constructor.model_singular,
       descriptor
     );
   },

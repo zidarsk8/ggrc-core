@@ -1,0 +1,68 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+    <div class="tier-content">
+      {{> /static/templates/base_objects/general-page-header.stache}}
+
+      <tab-container>
+        <tab-panel {(panels)}="panels" title-text="{{instance.type}}">
+          <div class="info-pane__body">
+            <div class="info-pane__main-content info-pane__main-content-with-sidebar">
+              <div class="row-fluid wrap-row">
+                <h6>
+                  {{#if_equals instance.kind "FILE"}}
+                  Attachment
+                  {{else}}
+                  Url
+                  {{/if_equals}}
+                </h6>
+                <document-object-list-item
+                  {instance}="instance">
+                </document-object-list-item>
+              </div>
+
+              {{> /static/templates/base_objects/description.stache}}
+              {{> /static/templates/base_objects/contacts.stache}}
+
+              <div class="row-fluid wrap-row">
+                <div class="span4">
+                  <div class="info-pane__section-title">Code</div>
+                  <span>{{instance.slug}}</span>
+                </div>
+                <div class="span4">
+                  <div class="info-pane__section-title">Type</div>
+                  <span>{{instance.kindTitle}}</span>
+                </div>
+                <div class="span4">
+                  <div class="info-pane__section-title">Last Deprecated Date</div>
+                  {{#if instance.last_deprecated_date}}
+                    <span>{{localize_date instance.last_deprecated_date}}</span>
+                  {{else}}
+                    <span class="empty-message">None</span>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+            <div class="info-pane__sidebar">
+              <div class="info-pane__section-title">Responses/Comments</div>
+              <comments-section class="flex-box flex-col"
+                {instance}="instance">
+              </comments-section>
+            </div>
+          </div>
+        </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Change Log">
+              <revision-log {instance}="instance"></revision-log>
+          </tab-panel>
+      </tab-container>
+    </div><!-- tier-content end -->
+  </section>
+
+  {{#if is_info_widget}}
+    <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
+  {{/if}}
+{{/instance}}

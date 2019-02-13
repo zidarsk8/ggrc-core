@@ -10,7 +10,7 @@ import './advanced-search-filter-state';
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import template from './advanced-search-filter-container.mustache';
+import template from './advanced-search-filter-container.stache';
 
 /**
  * Filter Container view model.

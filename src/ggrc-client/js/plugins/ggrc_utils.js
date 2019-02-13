@@ -184,6 +184,18 @@ function getAssigneeType(instance) {
   return userType;
 }
 
+function getTruncatedList(items) {
+  const itemsLimit = 5;
+  const mainContent = items
+    .slice(0, itemsLimit)
+    .join('\n');
+  const lastLine = items.length > itemsLimit
+    ? `\n and ${items.length - itemsLimit} more`
+    : '';
+
+  return mainContent + lastLine;
+}
+
 export {
   applyTypeFilter,
   isInnerClick,
@@ -194,4 +206,5 @@ export {
   getPlainText,
   getHighestAssigneeRole,
   getAssigneeType,
+  getTruncatedList,
 };

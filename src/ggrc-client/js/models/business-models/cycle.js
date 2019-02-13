@@ -7,28 +7,24 @@ import Cacheable from '../cacheable';
 import Permission from '../../permission';
 import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
+import Workflow from './workflow';
 
-function refreshAttr(instance, attr) {
-  let result;
-  if (instance.attr(attr).reify().selfLink) {
-    result = instance.attr(attr).reify().refresh();
-  } else {
-    result = $.Deferred().resolve();
+function refreshWorkflow(ev, instance) {
+  if (instance instanceof this === false) {
+    return;
   }
 
-  return result;
+  Permission.refresh();
+
+  const workflowId = instance.attr('workflow.id');
+  const model = Workflow.findInCacheById(workflowId);
+
+  if (model.selfLink) {
+    model.refresh();
+  }
 }
 
-function refreshAttrWrap(attr) {
-  return function (ev, instance) {
-    if (instance instanceof this) {
-      Permission.refresh();
-      refreshAttr(instance, attr);
-    }
-  };
-}
-
-export default Cacheable('CMS.Models.Cycle', {
+export default Cacheable.extend({
   root_object: 'cycle',
   root_collection: 'cycles',
   category: 'workflow',
@@ -62,7 +58,7 @@ export default Cacheable('CMS.Models.Cycle', {
   },
   init: function () {
     this._super(...arguments);
-    this.bind('created', refreshAttrWrap('workflow').bind(this));
+    this.bind('created', refreshWorkflow.bind(this));
   },
 }, {
   init: function () {

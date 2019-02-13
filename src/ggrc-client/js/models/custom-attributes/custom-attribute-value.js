@@ -6,7 +6,7 @@
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.CustomAttributeValue', {
+export default Cacheable.extend({
   root_object: 'custom_attribute_value',
   root_collection: 'custom_attribute_values',
   category: 'custom_attribute_values',

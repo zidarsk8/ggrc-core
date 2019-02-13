@@ -11,7 +11,7 @@ import '../../components/unified-mapper/mapper-results';
 import '../../components/mapping-controls/mapping-type-selector';
 import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
-import template from './object-search.mustache';
+import template from './object-search.stache';
 
 export default can.Component.extend({
   tag: 'object-search',

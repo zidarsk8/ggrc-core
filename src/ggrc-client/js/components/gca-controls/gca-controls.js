@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './gca-controls.mustache';
+import template from './gca-controls.stache';
 import '../custom-attributes/custom-attributes-field';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import {CONTROL_TYPE} from './../../plugins/utils/control-utils';

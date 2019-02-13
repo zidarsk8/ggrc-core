@@ -33,7 +33,7 @@ WORKFLOW_OBJECT_TYPES = {
     "System", "Process",
     "DataAsset", "Facility", "Market", "Product", "Project", "Issue",
     "AccessGroup", "Risk", "Threat",
-    "Metric", "TechnologyEnvironment", "ProductGroup",
+    "Metric", "TechnologyEnvironment", "ProductGroup", "KeyReport"
 }
 
 WORKFLOW_OBJECT_TYPES = set(t for t in WORKFLOW_OBJECT_TYPES if

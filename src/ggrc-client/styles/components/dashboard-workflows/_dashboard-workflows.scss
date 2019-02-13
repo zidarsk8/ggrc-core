@@ -1,0 +1,22 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.dashboard-workflows {
+  &__owners {
+    display: flex;
+    max-width: calc(100% - 55px);
+
+    &-content {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .due-in-date,
+  .completed-percent {
+    color: $darkGray;
+  }
+}

@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.Role', {
+export default Cacheable.extend({
   root_object: 'role',
   root_collection: 'roles',
   findAll: 'GET /api/roles',

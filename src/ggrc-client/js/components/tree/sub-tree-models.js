@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/sub-tree-models.mustache';
+import template from './templates/sub-tree-models.stache';
 import childModelsMap from '../tree/child-models-map';
 import {
   getModelsForSubTier,

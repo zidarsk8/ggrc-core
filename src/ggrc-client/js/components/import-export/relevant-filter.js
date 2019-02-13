@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './templates/relevant-filter.mustache';
+import template from './templates/relevant-filter.stache';
 import * as businessModels from '../../models/business-models';
 import TreeViewConfig from '../../apps/base_widgets';
 
@@ -76,7 +76,7 @@ export default can.Component.extend({
           filter: model,
           textValue: '',
           menu: this.viewModel.attr('menu'),
-          model_name: model.constructor.shortName,
+          model_name: model.constructor.model_singular,
         });
       }, this);
     },

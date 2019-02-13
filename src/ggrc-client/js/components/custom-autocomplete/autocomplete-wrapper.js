@@ -56,7 +56,7 @@ export default can.Map.extend({
     let modelConstructor = this.attr('modelConstructor');
 
     let res = can.map(ids, function (id) {
-      return getInstance(modelConstructor.shortName, id);
+      return getInstance(modelConstructor.model_singular, id);
     });
 
     return new $.Deferred().resolve(res);

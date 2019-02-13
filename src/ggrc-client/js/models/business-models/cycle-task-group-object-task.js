@@ -5,6 +5,7 @@
 
 import Cacheable from '../cacheable';
 import CycleTaskGroup from './cycle-task-group';
+import Workflow from './workflow';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {REFRESH_SUB_TREE} from '../../events/eventTypes';
 import {getPageType} from '../../plugins/utils/current-page-utils';
@@ -15,8 +16,7 @@ import accessControlList from '../mixins/access-control-list';
 import caUpdate from '../mixins/ca-update';
 import cycleTaskNotifications from '../mixins/cycle-task-notifications';
 import Stub from '../stub';
-
-const _mustachePath = GGRC.mustache_path + '/cycle_task_group_object_tasks';
+import {reify} from '../../plugins/utils/reify-utils';
 
 function populateFromWorkflow(form, workflow) {
   if (!workflow || typeof workflow === 'string') {
@@ -28,12 +28,9 @@ function populateFromWorkflow(form, workflow) {
     form.removeAttr('cycle_task_group');
     return;
   }
-  if (workflow.reify) {
-    workflow = workflow.reify();
-  } else {
-    console.warn('Can\'t reify workflow');
-    return;
-  }
+
+  workflow = Workflow.findInCacheById(workflow.id);
+
   if (typeof workflow.cycles === undefined || !workflow.cycles) {
     $(document.body).trigger(
       'ajax:flash',
@@ -65,7 +62,7 @@ function populateFromWorkflow(form, workflow) {
   });
 }
 
-export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
+export default Cacheable.extend({
   root_object: 'cycle_task_group_object_task',
   root_collection: 'cycle_task_group_object_tasks',
   mixins: [
@@ -95,11 +92,12 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
   info_pane_options: {
     mapped_objects: {
       mapping: 'info_related_objects',
-      show_view: GGRC.mustache_path + '/base_templates/subtree.mustache',
+      show_view: GGRC.templates_path + '/base_templates/subtree.stache',
     },
   },
   tree_view_options: {
-    add_item_view: _mustachePath + '/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path +
+      '/cycle_task_group_object_tasks/tree_add_item.stache',
     attr_list: [
       {
         attr_title: 'Task Title',
@@ -258,9 +256,9 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
         return;
       }
     } else {
-      cycle = form.cycle.reify();
+      cycle = reify(form.cycle);
       if (!_.isUndefined(cycle.workflow)) {
-        form.attr('workflow', cycle.workflow.reify());
+        form.attr('workflow', reify(cycle.workflow));
       }
     }
   },
@@ -280,8 +278,8 @@ export default Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
    *   false otherwise
    */
   responseOptionsEditable: function () {
-    let cycle = this.attr('cycle').reify();
-    let status = this.attr('status');
+    const cycle = reify(this.attr('cycle'));
+    const status = this.attr('status');
 
     return cycle.attr('is_current') &&
       !_.includes(['Finished', 'Verified'], status);

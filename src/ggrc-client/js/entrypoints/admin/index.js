@@ -18,6 +18,7 @@ import '../../components/inline/inline';
 import '../../components/inline/base-inline-control-title';
 import '../../components/page-header/page-header';
 import '../../components/user-roles-selector-button/user-roles-selector-button';
+import '../../components/events/event-item';
 
 import '../../common-handlers';
 

@@ -17,7 +17,7 @@ import {
   isSnapshotScope,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
-import template from './templates/tree-actions.mustache';
+import template from './templates/tree-actions.stache';
 
 export default can.Component.extend({
   tag: 'tree-actions',
@@ -32,13 +32,13 @@ export default can.Component.extend({
             false :
             this.attr('options').add_item_view ||
             this.attr('model').tree_view_options.add_item_view ||
-            GGRC.mustache_path + '/base_objects/tree_add_item.mustache';
+            GGRC.templates_path + '/base_objects/tree_add_item.stache';
         },
       },
       show3bbs: {
         type: Boolean,
         get: function () {
-          let modelName = this.attr('model').shortName;
+          let modelName = this.attr('model').model_singular;
           return !isMyAssessments()
             && modelName !== 'Document'
             && modelName !== 'Evidence';
@@ -62,7 +62,7 @@ export default can.Component.extend({
           let model = this.attr('model');
 
           return parentInstance.type === 'Audit' &&
-            model.shortName === 'Assessment';
+            model.model_singular === 'Assessment';
         },
       },
       showBulkUpdate: {
@@ -74,7 +74,7 @@ export default can.Component.extend({
       showChangeRequest: {
         get() {
           const isCycleTask = (
-            this.attr('model').shortName === 'CycleTaskGroupObjectTask'
+            this.attr('model').model_singular === 'CycleTaskGroupObjectTask'
           );
 
           return (
@@ -90,7 +90,8 @@ export default can.Component.extend({
           let instance = this.attr('parentInstance');
           let model = this.attr('model');
           return !this.attr('isSnapshots') &&
-            (Permission.is_allowed('update', model.shortName, instance.context)
+            (Permission.is_allowed(
+              'update', model.model_singular, instance.context)
               || isAuditor(instance, GGRC.current_user));
         },
       },

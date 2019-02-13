@@ -14,7 +14,7 @@ export default can.Control.extend({
     widget_id: '',
     widget_name: '',
     widget_icon: '',
-    widget_view: '/static/mustache/dashboard/object_widget.mustache',
+    widget_view: '/static/templates/dashboard/object_widget.stache',
     widget_guard: null,
     widget_initial_content: '',
     show_filter: false,
@@ -52,7 +52,7 @@ export default can.Control.extend({
       let countsName = this.options.countsName ||
         (this.options.content_controller_options &&
           this.options.content_controller_options.countsName) ||
-        this.options.model.shortName;
+        this.options.model.model_singular;
 
       this.options.widget_count.attr('count', counts.attr(countsName));
 

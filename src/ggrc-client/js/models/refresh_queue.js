@@ -3,15 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import * as businessModels from './business-models';
-import * as serviceModels from './service-models';
-import * as mappingModels from './mapping-models';
-
-const allModels = Object.assign({},
-  businessModels,
-  serviceModels,
-  mappingModels
-);
+import {reify} from '../plugins/utils/reify-utils';
+import allModels from './all-models';
 
 /*  RefreshQueue
  *
@@ -88,13 +81,13 @@ const RefreshQueueManager = can.Construct({}, {
   enqueue: function (obj, force) {
     let self = this;
     let model = obj.constructor;
-    let modelName = model.shortName;
+    let modelName = model.model_singular;
     let foundQueue = null;
     let id = obj.id;
 
     if (!obj.selfLink) {
       if (obj instanceof can.Model) {
-        modelName = obj.constructor.shortName;
+        modelName = obj.constructor.model_singular;
       } else if (obj.type) {
         // FIXME: obj.kind is to catch invalid stubs coming from Directives
         modelName = obj.type || obj.kind;
@@ -244,7 +237,7 @@ const RefreshQueue = can.Construct({
     if (deferreds.length) {
       $.when(...deferreds).then(function () {
         self.deferred.resolve(can.map(self.objects, function (obj) {
-          return obj.reify();
+          return reify(obj);
         }));
       }, function () {
         self.deferred.reject(...arguments);

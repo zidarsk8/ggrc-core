@@ -8,7 +8,7 @@ import ModalsController from './modals_controller';
 export default ModalsController({
   defaults: {
     skip_refresh: true,
-    content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache',
+    content_view: GGRC.templates_path + '/gdrive/auth_button.stache',
   },
   init: function () {
     this._super(...arguments);

@@ -96,7 +96,7 @@ export default can.Construct.extend({
   */
   get_current_page_widgets: function () {
     return this.get_widget_list_for(
-      getPageInstance().constructor.shortName);
+      getPageInstance().constructor.model_singular);
   },
 }, {
   init: function (name, opts) {

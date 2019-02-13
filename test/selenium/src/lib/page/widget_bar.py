@@ -293,6 +293,10 @@ class Facilities(_ObjectWidgetBar):
   """Widget bar of Facility objects."""
 
 
+class KeyReports(_ObjectWidgetBar):
+  """Widget bar of Key Report objects."""
+
+
 class Markets(_ObjectWidgetBar):
   """Widget bar of Market objects."""
 

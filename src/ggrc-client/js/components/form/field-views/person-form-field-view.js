@@ -4,7 +4,7 @@
  */
 
 import '../../person/person-data';
-import template from './person-form-field-view.mustache';
+import template from './person-form-field-view.stache';
 
 export default can.Component.extend({
   tag: 'person-form-field-view',

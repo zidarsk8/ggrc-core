@@ -18,7 +18,7 @@ import Stub from '../stub';
  * AssessmentTemplate helps avoiding repeatedly defining the same set of
  * Assessment object properties for each new instance.
  */
-export default Cacheable('CMS.Models.AssessmentTemplate', {
+export default Cacheable.extend({
   root_object: 'assessment_template',
   root_collection: 'assessment_templates',
   model_singular: 'AssessmentTemplate',
@@ -74,8 +74,8 @@ export default Cacheable('CMS.Models.AssessmentTemplate', {
       attr_name: 'modified_by',
       order: 71,
     }],
-    add_item_view: GGRC.mustache_path +
-              '/assessment_templates/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path +
+              '/assessment_templates/tree_add_item.stache',
   },
 
   /**

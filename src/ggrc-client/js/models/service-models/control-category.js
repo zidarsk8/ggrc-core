@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.ControlCategory', {
+export default Cacheable.extend({
   root_object: 'control_category',
   root_collection: 'control_categories',
   findAll: 'GET /api/control_categories',

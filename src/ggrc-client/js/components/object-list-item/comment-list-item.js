@@ -6,7 +6,7 @@
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import '../person/person-data';
 import '../spinner/spinner';
-import template from './comment-list-item.mustache';
+import template from './comment-list-item.stache';
 
 const tag = 'comment-list-item';
 /**

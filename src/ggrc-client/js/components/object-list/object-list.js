@@ -5,7 +5,7 @@
 
 import '../show-more/show-more';
 import '../spinner/spinner';
-import template from './object-list.mustache';
+import template from './object-list.stache';
 
 const tag = 'object-list';
 /**

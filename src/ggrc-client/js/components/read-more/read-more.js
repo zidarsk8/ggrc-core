@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './read-more.mustache';
+import template from './read-more.stache';
 
 const readMore = 'Read More';
 const readLess = 'Read Less';

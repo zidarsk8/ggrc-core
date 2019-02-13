@@ -4,7 +4,7 @@
 */
 
 import '../../dropdown/multiselect-dropdown';
-import template from './download-template.mustache';
+import template from './download-template.stache';
 import {downloadTemplate, download} from '../../../plugins/utils/import-export-utils';
 import {backendGdriveClient} from '../../../plugins/ggrc-gapi-client';
 import {confirm} from '../../../plugins/utils/modals';
@@ -100,7 +100,7 @@ const viewModel = can.Map.extend({
         modal_description: `GDrive file is generated successfully.
          Click button below to view the file.`,
         gDriveLink: link,
-        button_view: `${GGRC.mustache_path}/modals/open_sheet.mustache`,
+        button_view: `${GGRC.templates_path}/modals/open_sheet.stache`,
       });
     }).always(() => {
       this.attr('isLoading', false);

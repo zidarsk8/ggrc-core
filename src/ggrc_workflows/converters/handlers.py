@@ -191,6 +191,7 @@ class ObjectsColumnHandler(multi_object.ObjectsColumnHandler):
       all_models.ProductGroup.__name__,
       all_models.Risk.__name__,
       all_models.Threat.__name__,
+      all_models.KeyReport.__name__,
   )
 
   def get_value(self):

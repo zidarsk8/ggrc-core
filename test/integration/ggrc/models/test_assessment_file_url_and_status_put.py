@@ -2,12 +2,15 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for Assessment action and status change."""
+import itertools
 import ddt
 
 from ggrc.models import all_models
 
 from integration import ggrc
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -166,3 +169,37 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
 
     relationship = all_models.Relationship.query.get(rel_id)
     self.assertIsNone(relationship)
+
+  @ddt.data(
+      *itertools.product(("Assignees", "Creators", "Verifiers"),
+                         ("Creator", "Editor", "Reader"))
+  )
+  @ddt.unpack
+  # pylint: disable=invalid-name
+  def test_remove_related_forbidden_for_system_roles(self, role, system_role):
+    """Test system roles are not allowed to delete related evidence"""
+    asmt_id = self.asmt.id
+    with factories.single_commit():
+      self._prepare_mandatory_evidence_cad()
+      factories.RelationshipFactory(
+          source=self.asmt,
+          destination=self.evidence,
+      )
+      person = factories.PersonFactory()
+      creator_role = all_models.Role.query.filter(
+          all_models.Role.name == system_role
+      ).one()
+      rbac_factories.UserRoleFactory(role=creator_role, person=person)
+      factories.AccessControlPersonFactory(
+          ac_list=self.asmt.acr_name_acl_map[role],
+          person=person,
+      )
+    evid_id = self.evidence.id
+    self.api.set_user(person)
+    response = self.api.put(all_models.Assessment.query.get(asmt_id), {
+        "actions": {"remove_related": [{"id": evid_id,
+                                        "type": "Evidence"}]},
+    })
+    self.assert403(response)
+    evidence = all_models.Evidence.query.get(evid_id)
+    self.assertIsNotNone(evidence)

@@ -1,0 +1,66 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<model-loader {path}="'business-models/task-group-task'">
+  <related-objects
+    {paging}="paging"
+    {initial-order-by}="initialOrderBy"
+    {base-instance}="baseInstance"
+    {(related-objects)}="items"
+    {model-constructor}="loadedModel"
+    {related-items-type}="'TaskGroupTask'">
+    <div class="task-list">
+      <div class="task_group_tasks__header">
+          <div class="task_group_tasks__header-item">
+              Title
+          </div>
+          <div class="task_group_tasks__header-item">
+              Task Assignees
+          </div>
+          <div class="task_group_tasks__header-item">
+              Task Secondary Assignees
+          </div>
+          <div class="task_group_tasks__header-item">
+              Initial Setup
+          </div>
+          <div class="task_group_tasks__header-item">
+              Next Cycle
+          </div>
+          <div class="task_group_tasks__header-item-edit">
+          </div>
+      </div>
+      <div class="task_group_tasks__list">
+        <object-list
+          {items}="items"
+          {is-loading}="isLoading"
+          {list-type}="'GRID'">
+            {{> /static/templates/task_group_tasks/task_group_subtree.stache}}
+        </object-list>
+      </div>
+    </div>
+    <div class="grid-data__toolbar grid-data__toolbar_bottom flex-box">
+      <div class="grid-data__toolbar_lhs-items">
+        {{#if showCreateTaskButton}}
+          <div class="grid-data__toolbar-item">
+            <a
+              class="btn btn-small btn-darkBlue"
+              rel="tooltip"
+              data-placement="right"
+              data-original-title="Create Task"
+              data-object-plural="task_group_tasks"
+              data-modal-class="modal-wide" href="javascript://"
+              data-object-singular="TaskGroupTask"
+              data-toggle="modal-ajax-form"
+              data-modal-reset="reset"
+              data-object-params='{ "task_group": {{baseInstance.id}}, "context": {{baseInstance.context.id}}, "modal_title": "Create New Task" }'>
+              Create Task
+            </a>
+          </div>
+        {{/if}}
+      </div>
+      <tree-pagination {paging}="paging" class="grid-data__toolbar-item" placement="top"></tree-pagination>
+    </div>
+  </related-objects>
+</model-loader>

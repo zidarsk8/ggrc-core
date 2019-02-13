@@ -11,7 +11,7 @@ import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 import Relationship from '../service-models/relationship';
 
-export default Cacheable('CMS.Models.Requirement', {
+export default Cacheable.extend({
   root_object: 'requirement',
   root_collection: 'requirements',
   model_plural: 'Requirements',

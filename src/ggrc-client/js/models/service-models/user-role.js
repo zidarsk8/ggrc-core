@@ -7,7 +7,7 @@ import Role from './role';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.UserRole', {
+export default Cacheable.extend({
   root_object: 'user_role',
   root_collection: 'user_roles',
   findAll: 'GET /api/user_roles',

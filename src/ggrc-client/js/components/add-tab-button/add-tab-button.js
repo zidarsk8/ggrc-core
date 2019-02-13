@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './add-tab-button.mustache';
+import template from './add-tab-button.stache';
 import {
   getPageType,
   isMyWork,
@@ -43,7 +43,7 @@ const viewModel = can.Map.extend({
 
         return _.filter(widgetList, (widget) => {
           return this.isNotObjectVersion(widget.internav_display) &&
-            !this.isNotProhibitedMap(widget.model.shortName) &&
+            !this.isNotProhibitedMap(widget.model.model_singular) &&
             widget.attr('placeInAddTab');
         });
       },

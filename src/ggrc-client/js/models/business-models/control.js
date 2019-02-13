@@ -13,7 +13,7 @@ import assertionsCategories from '../mixins/assertions-categories';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Control', {
+export default Cacheable.extend({
   root_object: 'control',
   root_collection: 'controls',
   category: 'governance',

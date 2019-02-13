@@ -13,7 +13,7 @@ import '../show-more/show-more';
 import '../related-objects/related-comments';
 import './object-popover';
 import {convertValuesToFormFields} from '../../plugins/utils/ca-utils';
-import template from './related-assessment-popover.mustache';
+import template from './related-assessment-popover.stache';
 
 /**
  * Simple wrapper component to load Related to Parent Object Snapshots of Controls and Objectives

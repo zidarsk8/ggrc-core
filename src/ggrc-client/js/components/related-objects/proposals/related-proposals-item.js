@@ -10,9 +10,11 @@ import '../../diff/instance-acl-diff';
 import '../../diff/instance-gca-diff';
 import '../../diff/instance-mapping-fields-diff';
 import '../../diff/instance-list-fields-diff';
-import template from './templates/related-proposals-item.mustache';
+import template from './templates/related-proposals-item.stache';
 import {getPersonInfo} from '../../../plugins/utils/user-utils';
 import {getFormattedLocalDate} from '../../../plugins/utils/date-utils';
+import {reify, isReifiable} from '../../../plugins/utils/reify-utils';
+
 const tag = 'related-proposals-item';
 
 export default can.Component.extend({
@@ -89,11 +91,11 @@ export default can.Component.extend({
       return text;
     },
     getPersonEmail(person) {
-      if (!person || !person.reify) {
+      if (!person || !isReifiable(person)) {
         return '';
       }
 
-      return person.reify().email;
+      return reify(person).email;
     },
     buildTooltipMessage(startWord, email, date, comment) {
       if (!comment) {

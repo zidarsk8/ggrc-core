@@ -4,7 +4,7 @@
  */
 
 import Permission from '../../permission';
-import template from './attach-button.mustache';
+import template from './attach-button.stache';
 import {
   getGDriveItemId,
   findGDriveItemById,

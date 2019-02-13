@@ -110,7 +110,7 @@ describe('tree-actions component', () => {
 
   describe('showImport get() method', () => {
     beforeEach(() => {
-      vm.attr('model', {shortName: 'shortName'});
+      vm.attr('model', {model_singular: 'shortName'});
       vm.attr('parentInstance', {context: {}});
     });
 
@@ -155,21 +155,21 @@ describe('tree-actions component', () => {
 
   describe('show3bbs get() method', () => {
     it('returns false for MyAssessments page', () => {
-      vm.attr('model', {shortName: 'any page'});
+      vm.attr('model', {model_singular: 'any page'});
       spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(true);
 
       expect(vm.attr('show3bbs')).toBeFalsy();
     });
 
     it('returns false for Documents page', () => {
-      vm.attr('model', {shortName: 'Document'});
+      vm.attr('model', {model_singular: 'Document'});
       spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(false);
 
       expect(vm.attr('show3bbs')).toBeFalsy();
     });
 
     it('returns false for Evidence page', () => {
-      vm.attr('model', {shortName: 'Evidence'});
+      vm.attr('model', {model_singular: 'Evidence'});
       spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(false);
 
       expect(vm.attr('show3bbs')).toBeFalsy();
@@ -177,7 +177,7 @@ describe('tree-actions component', () => {
 
     it('returns true for any page except My assessments, Document, Evidence',
       () => {
-        vm.attr('model', {shortName: 'any page'});
+        vm.attr('model', {model_singular: 'any page'});
         spyOn(CurrentPageUtils, 'isMyAssessments').and.returnValue(false);
 
         expect(vm.attr('show3bbs')).toBeTruthy();
