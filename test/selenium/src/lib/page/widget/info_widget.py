@@ -466,8 +466,11 @@ class CycleTask(InfoWidget):
     objs = []
     row_els = self._browser.element(text="Mapped objects").next_sibling().lis()
     for obj_row in row_els:
-      obj_id = int(obj_row.data_id)
-      entity_obj_name = obj_row.data_object_type
+      # link to the obj is for example 'http://localhost:8080/controls/1'
+      # last number is obj id
+      obj_id = int(obj_row.link().href.split("/")[-1])
+      entity_obj_name = objects.get_singular(
+          obj_row.link().href.split("/")[-2])
       obj_title = obj_row.text
       factory = entity_factory_common.get_factory_by_obj_name(
           entity_obj_name)()

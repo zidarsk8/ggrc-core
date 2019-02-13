@@ -181,42 +181,6 @@ Mustache.registerHelper('is_empty', (data, options) => {
   return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
-// Render a named template with the specified context, serialized and
-// augmented by 'options.hash'
-Mustache.registerHelper('render', function (template, context, options) {
-  if (!options) {
-    options = context;
-    context = this;
-  }
-
-  if (typeof context === 'function') {
-    context = context();
-  }
-
-  if (typeof template === 'function') {
-    template = template();
-  }
-
-  context = $.extend({}, context.serialize ? context.serialize() : context);
-
-  if (options.hash) {
-    for (let k in options.hash) {
-      if (options.hash.hasOwnProperty(k)) {
-        context[k] = options.hash[k];
-        if (typeof context[k] === 'function') {
-          context[k] = context[k]();
-        }
-      }
-    }
-  }
-
-  let ret = can.view.render(template, context instanceof can.view.Scope ?
-    context :
-    new can.view.Scope(context));
-  // can.view.hookup(ret);
-  return ret;
-});
-
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
 // apply options.hash
 Mustache.registerHelper('renderLive', function (template, context, options) {

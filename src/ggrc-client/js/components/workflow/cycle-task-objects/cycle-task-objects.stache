@@ -1,0 +1,30 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<ul class="tree-structure new-tree mapped-objects-tree">
+  {{#mappedObjects}}
+    <li class="tree-item task-item">
+      <div class="item-main">
+        <div class="item-wrap">
+          <div class="select">
+            <span class="status-label status-draft"></span>
+            <div class="item-data">
+              <div class="row-fluid">
+                <div class="span8">
+                  <div class="cycle-task-objects__content">
+                    <i class="fa fa-{{instance.class.table_singular}} color"></i>
+                    <a href="{{instance.viewLink}}" target="_blank" class="cycle-task-objects__object-link">
+                      {{firstexist instance.name instance.title instance.description}}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+  {{/mappedObjects}}
+</ul>
