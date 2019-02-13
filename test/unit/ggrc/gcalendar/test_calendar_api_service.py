@@ -50,6 +50,7 @@ class TestCalendarApiService(unittest.TestCase):
         "sendNotifications": False,
         "guestsCanModify": False,
         "guestsCanInviteOthers": False,
+        "transparency": "transparent",
     }
     self.events_mock.insert.assert_called_with(calendarId="primary",
                                                body=expected_body)
@@ -83,6 +84,7 @@ class TestCalendarApiService(unittest.TestCase):
         "sendNotifications": False,
         "guestsCanModify": False,
         "guestsCanInviteOthers": False,
+        "transparency": "transparent",
     }
     self.events_mock.update.assert_called_with(
         calendarId="primary",
