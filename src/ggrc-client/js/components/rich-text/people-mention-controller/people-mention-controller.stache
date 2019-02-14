@@ -10,12 +10,12 @@
     {model-constructor}="loadedModel"
     >
 
-  <label-autocomplete-results
+  <people-autocomplete-results
       {(current-value)}="currentValue"
       {items}="result"
       {(show-results)}="showResults"
       {show-new-value}="showNewValue"
       (add-new-item)="createLabel(%event)"
       (select-item)="personSelected(%event)"
-    ></label-autocomplete-results>
+    ></people-autocomplete-results>
 </people-autocomplete-wrapper>
