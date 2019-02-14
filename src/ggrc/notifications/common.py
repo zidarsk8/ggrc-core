@@ -297,7 +297,7 @@ def send_daily_digest_notifications():
 
     with benchmark("sending daily emails"):
       for user_email, data in notif_data.iteritems():
-        data = modify_data(data, user_email)
+        data = modify_data(data)
         email_body = settings.EMAIL_DIGEST.render(digest=data)
         send_email(user_email, subject, email_body)
         sent_emails.append(user_email)
@@ -391,8 +391,8 @@ def show_pending_notifications():
   _, notif_data = get_pending_notifications()
 
   for day_notif in notif_data.itervalues():
-    for user_email, data in day_notif.iteritems():
-      data = modify_data(data, user_email)
+    for data in day_notif.itervalues():
+      data = modify_data(data)
   return settings.EMAIL_PENDING.render(data=sorted(notif_data.iteritems()))
 
 
@@ -407,8 +407,8 @@ def show_daily_digest_notifications():
     raise Forbidden()
 
   _, notif_data = get_daily_notifications()
-  for user_email, data in notif_data.iteritems():
-    data = modify_data(data, user_email)
+  for data in notif_data.itervalues():
+    data = modify_data(data)
   return settings.EMAIL_DAILY.render(data=notif_data)
 
 
@@ -467,7 +467,7 @@ def send_email(user_email, subject, body):
   message.send()
 
 
-def modify_data(data, user_email):
+def modify_data(data):
   """Modify notification data dictionary.
 
   For easier use in templates, it computes/aggregates some additional
@@ -476,7 +476,6 @@ def modify_data(data, user_email):
 
   Args:
     data (dict): notification data.
-    user_email (string): email address of the user that `data` was built for
 
   Returns:
     dict: the received dict with some additional fields for easier traversal
@@ -489,7 +488,7 @@ def modify_data(data, user_email):
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
 
-  data["unsubscribe_url"] = unsubscribe_url(user_email)
+  data["unsubscribe_url"] = unsubscribe_url(data["user"]["id"])
 
   # Move comment notifications for same object into list and sort by
   # created_at field

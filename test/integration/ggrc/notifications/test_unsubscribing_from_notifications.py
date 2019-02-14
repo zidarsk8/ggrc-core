@@ -24,7 +24,7 @@ class TestUnsubscribeFromNotifications(TestCase):
     """Anonymous users should not be allowed to unsubscribe anyone."""
     self.client.get("/logout")
     person = all_models.Person.query.first()
-    url = unsubscribe_url(person.email)
+    url = unsubscribe_url(person.id)
     response = self.client.get(url)
     self.assertEqual(response.status_code, 302)
 
@@ -32,7 +32,7 @@ class TestUnsubscribeFromNotifications(TestCase):
     """Unsubscribing users other than self should results in HTTP 403."""
     person = all_models.Person.query.first()
 
-    url = unsubscribe_url("not-my-" + person.email)
+    url = unsubscribe_url(person.id + 123)
     response = self.client.get(url)
 
     self.assertEqual(response.status_code, 403)
@@ -53,7 +53,7 @@ class TestUnsubscribeFromNotifications(TestCase):
     db.session.add(config)
     db.session.flush()
 
-    url = unsubscribe_url(person.email)
+    url = unsubscribe_url(person.id)
     response = self.client.get(url)
     self.assert200(response)
 
@@ -71,7 +71,7 @@ class TestUnsubscribeFromNotifications(TestCase):
     work, too.
     """
     person = all_models.Person.query.first()
-    url = unsubscribe_url(person.email)
+    url = unsubscribe_url(person.id)
     response = self.client.get(url)
     self.assert200(response)
 
@@ -92,7 +92,7 @@ class TestUnsubscribeFromNotifications(TestCase):
     )
     db.session.add(config)
     db.session.flush()
-    url = unsubscribe_url(person.email)
+    url = unsubscribe_url(person.id)
     response = self.client.get(url)
     self.assert200(response)
 

@@ -36,6 +36,6 @@ def init_notification_views(app):
       view_func=login_required(common.send_calendar_events))
 
   app.add_url_rule(
-      "/_notifications/unsubscribe/<path:email>",
+      "/_notifications/unsubscribe/<int:user_id>",
       "unsubscribe_from_notifications",
       view_func=login_required(unsubscribe.unsubscribe_from_notifications))

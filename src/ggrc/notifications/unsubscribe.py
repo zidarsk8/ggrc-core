@@ -5,7 +5,6 @@
 
 from logging import getLogger
 
-import urllib
 import urlparse
 
 from flask import render_template
@@ -19,14 +18,14 @@ from ggrc.utils import get_url_root
 logger = getLogger(__name__)
 
 
-def unsubscribe_from_notifications(email):
+def unsubscribe_from_notifications(user_id):
   """Unsubscribe the owner of the given email from daily notifications.
 
   For the action to succeed, the email owner must be logged in with that email,
   otherwise an authorization error is returned.
 
   Args:
-    email (unicode): user's email address
+    user_id (int): user's id
 
   Returns:
     HTTP response indicating the outcome of the action requested.
@@ -41,9 +40,9 @@ def unsubscribe_from_notifications(email):
         is_error=status_code == 500
     ), status_code
 
-  if current_user.email != email:
-    msg = u"User %s tried to unsubscribe a user other than self (%s)"
-    logger.warning(msg, current_user.email, email)
+  if current_user.id != user_id:
+    msg = u"User (%s) tried to unsubscribe a user other than self (%s)"
+    logger.warning(msg, current_user.id, user_id)
     return render_unsubscribe_template(
         "Not unsubscribed",
         "Cannot unsubscribe other people",
@@ -71,24 +70,28 @@ def unsubscribe_from_notifications(email):
     db.session.commit()
   except Exception as e:  # pylint: disable=broad-except
     logger.exception(e.message)
-    return render_unsubscribe_template("Unsubscribed Failed", email, 500)
-  return render_unsubscribe_template("You have been unsubscribed", email)
+    return render_unsubscribe_template(
+        "Unsubscribed Failed",
+        current_user.email,
+        500
+    )
+  return render_unsubscribe_template(
+      "You have been unsubscribed",
+      current_user.email
+  )
 
 
-def unsubscribe_url(email):
+def unsubscribe_url(user_id):
   """Generate a user-specific URL for unsubscribing from notifications.
 
   Args:
-    email (basestring): user's email address
+    id (int): user's id
 
   Returns:
     url (string): unsubscribe URL
   """
-  if isinstance(email, unicode):
-    email = email.encode("utf-8")
-
   url = urlparse.urljoin(
       get_url_root(),
-      "_notifications/unsubscribe/{}".format(urllib.quote_plus(email))
+      "_notifications/unsubscribe/{}".format(user_id)
   )
   return url
