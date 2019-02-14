@@ -18,7 +18,7 @@ from ggrc.models import types
 
 # revision identifiers, used by Alembic.
 revision = '25a1b9502690'
-down_revision = '4b53c40122a2'
+down_revision = '0d7a3a0aa3da'
 
 
 def _compress_bg_tasks_payload():
