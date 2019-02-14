@@ -213,6 +213,7 @@ new Mappings({
   // Workflow
   TaskGroup: {
     map: [...coreObjects, 'Program'],
+    indirectMappings: ['Workflow'],
   },
   TaskGroupTask: {
     indirectMappings: ['Person', 'Workflow'],
@@ -222,7 +223,7 @@ new Mappings({
   },
   CycleTaskGroupObjectTask: {
     map: [...coreObjects, 'Audit', 'Program'],
-    indirectMappings: ['Person'],
+    indirectMappings: ['Person', 'Workflow'],
 
     mappers: {
       // Needed for related_objects mapper
