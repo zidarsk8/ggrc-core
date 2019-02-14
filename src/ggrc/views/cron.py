@@ -24,13 +24,13 @@ def send_error_notification(message):
 
 
 def run_job(job):
-  """Call sent job.
+  """Execute the provided job.
 
-  Failuare on job will just logged and don't stop runner.
+     Failure on job will just logged and don't stop runner.
   """
   try:
     job()
-  except:  # pylint: disable=bare-except
+  except Exception:  # pylint: disable=broad-except
     logger.exception("Job '%s' failed", job.__name__)
     send_error_notification(
         "Job '%s' failed with: \n%s" % (job.__name__, format_exc())
@@ -46,12 +46,22 @@ def job_runner(name):
 
 
 def nightly_cron_endpoint():
-  """Endpoint running nightly jobs from all modules"""
+  """Endpoint running nightly jobs from all modules."""
   return job_runner("NIGHTLY_CRON_JOBS")
 
 
+def nightly_notifications_cron_endpoint():
+  """Endpoint for nightly notifications jobs."""
+  return job_runner("NIGHTLY_NOTIFICATIONS_CRON_JOBS")
+
+
+def nightly_send_events_cron_endpoint():
+  """Endpoint for nightly event sending jobs."""
+  return job_runner("NIGHTLY_SEND_EVENTS_JOB")
+
+
 def hourly_issue_tracker_sync_endpoint():
-  """Endpoint running hourly jobs from all modules"""
+  """Endpoint running hourly jobs from all modules."""
   return job_runner("HOURLY_CRON_JOBS")
 
 
@@ -69,7 +79,20 @@ def init_cron_views(app):
   """Init all cron jobs' endpoints"""
   app.add_url_rule(
       "/nightly_cron_endpoint", "nightly_cron_endpoint",
-      view_func=nightly_cron_endpoint)
+      view_func=nightly_cron_endpoint
+  )
+
+  app.add_url_rule(
+      "/nightly_send_events_cron_endpoint",
+      "nightly_send_events_cron_endpoint",
+      view_func=nightly_send_events_cron_endpoint
+  )
+
+  app.add_url_rule(
+      "/nightly_notifications_cron_endpoint",
+      "nightly_notifications_cron_endpoint",
+      view_func=nightly_notifications_cron_endpoint
+  )
 
   app.add_url_rule(
       "/hourly_issue_tracker_sync_endpoint",
