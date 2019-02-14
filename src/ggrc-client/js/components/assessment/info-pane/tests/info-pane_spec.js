@@ -312,11 +312,10 @@ describe('assessment-info-pane component', () => {
   });
 
   describe('setUrlEditMode() method', () => {
-    it('sets value for VM attribute based on type', function () {
-      const type = 'Type';
-      const value = new can.Map({data: 'Important data'});
-      const expectedProp = `${type}EditMode`;
-      vm.setUrlEditMode(value, type);
+    it('sets value for \'urlsEditMode\' attribute', function () {
+      const value = false;
+      const expectedProp = 'urlsEditMode';
+      vm.setUrlEditMode(value);
       expect(vm.attr(expectedProp)).toBe(value);
     });
   });

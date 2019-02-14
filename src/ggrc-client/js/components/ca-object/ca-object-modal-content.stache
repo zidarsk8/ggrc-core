@@ -63,16 +63,17 @@
                     <create-url
                         {type}="documentTypes.urls"
                         {context}="instance.context"
+                        (set-edit-mode)="setUrlEditMode(false)"
                         (before-create)="addItems(%event, 'urls')"
                         (created)="addRelatedItem(%event, 'urls')">
                         <form class="create-form">
                             <fieldset class="create-form__layout">
                                 <input {($value)}="value" class="create-form__input" type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
                                 <div class="create-form__controls">
-                                    <button type="button" class="create-form__confirm" ($click)="create; setUrlEditMode(false, 'urls')">
+                                    <button type="button" class="create-form__confirm" ($click)="create">
                                         <i class="fa fa-check"></i>
                                     </button>
-                                    <button type="button" class="create-form__cancel" ($click)="clear; setUrlEditMode(false, 'urls')">
+                                    <button type="button" class="create-form__cancel" ($click)="clear">
                                         <i class="fa fa-times"></i>
                                     </button>
                                 </div>
@@ -81,7 +82,7 @@
                     </create-url>
                 {{else}}
                     <button type="button" class="btn btn-small btn-gray"
-                        ($click)="setUrlEditMode(true, 'urls')">Add</button>
+                        ($click)="setUrlEditMode(true)">Add</button>
                 {{/if}}
             </div>
         {{/if}}
@@ -98,7 +99,7 @@
                                 {is-disabled}="isUpdatingEvidences"
             >Save</comment-add-button>
         {{/if}}
-            <button type="button" class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide; setUrlEditMode(false, 'urls')">Close</button>
+            <button type="button" class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide; setUrlEditMode(false)">Close</button>
         </div>
     </div>
 </div>
