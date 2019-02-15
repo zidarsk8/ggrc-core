@@ -259,7 +259,7 @@ class TestUtilityFunctions(unittest.TestCase):
   def test_is_issue_enabled_template(self, get_issue_mock):
     """Test 'is issue tracker enabled' from assessment template."""
     # pylint: disable=protected-access
-    get_issue_mock.return_value = True
+    get_issue_mock.return_value = {"enabled": True}
     assessment_src = {
         "template": {
             "type": 1,
@@ -278,10 +278,11 @@ class TestUtilityFunctions(unittest.TestCase):
       'ggrc.models.hooks.issue_tracker.assessment_integration.'
       'AssessmentTrackerHandler._get_issue_from_assmt_template'
   )
-  def test_is_issue_disabled_template(self, get_issue_mock):
+  @ddt.data({}, {"enabled": False})
+  def test_is_issue_disabled_template(self, return_value, get_issue_mock):
     """Test 'is issue tracker disabled' from assessment template."""
     # pylint: disable=protected-access
-    get_issue_mock.return_value = False
+    get_issue_mock.return_value = return_value
     assessment_src = {
         "template": {
             "type": 1,
