@@ -2244,7 +2244,8 @@ class AssessmentTrackerHandler(object):
       return issue_tracker_info.get("enabled", False)
 
     template_info = assessment_src.get("template", {})
-    return bool(cls._get_issue_from_assmt_template(template_info))
+    template_issue_info = cls._get_issue_from_assmt_template(template_info)
+    return template_issue_info.get("enabled", False)
 
   @staticmethod
   def _is_ccs_same(ccs_payload, ccs_tracker):
