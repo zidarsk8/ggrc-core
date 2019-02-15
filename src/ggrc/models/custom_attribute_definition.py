@@ -3,6 +3,7 @@
 
 """Custom attribute definition module"""
 
+import re
 import flask
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import declared_attr
@@ -268,6 +269,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
          instance. This means we can have two CAD with a name "my cad", with
          different attributable_id fields.
       4) Names must not match any existing custom attribute role name
+      5) Names should be stripped
 
     Third rule is handled by the database with unique key uq_custom_attribute
     (`definition_type`,`definition_id`,`title`).
@@ -284,6 +286,8 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     Returns:
       value if the name passes all uniqueness checks.
     """
+
+    value = value if value is None else re.sub(r"\s+", " ", value).strip()
 
     if key == "title" and self.definition_type:
       name = value.lower()
