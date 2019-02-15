@@ -8,6 +8,7 @@
     {model-name}="'Person'"
     {query-field}="'email'"
     {model-constructor}="loadedModel"
+    {action-key}="actionKey"
     >
 
   <people-autocomplete-results
@@ -17,5 +18,6 @@
       {show-new-value}="showNewValue"
       (add-new-item)="createLabel(%event)"
       (select-item)="personSelected(%event)"
+      {action-key}="actionKey"
     ></people-autocomplete-results>
 </people-autocomplete-wrapper>

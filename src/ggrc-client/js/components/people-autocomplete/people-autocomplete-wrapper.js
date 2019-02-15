@@ -17,6 +17,7 @@ let viewModel = baseAutocompleteWrapper.extend({
   objectsToExclude: [],
   showResults: false,
   showNewValue: false,
+  actionKey: null,
   define: {
     currentValue: {
       set(newValue) {
