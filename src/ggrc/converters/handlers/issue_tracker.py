@@ -4,13 +4,12 @@
 
 import re
 
+from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
+from ggrc.integrations import constants
+from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
-from ggrc.models import Assessment, AssessmentTemplate, Issue
-from ggrc.converters import errors
-from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
-    default_values
 
 
 class IssueTrackerColumnHandler(handlers.ColumnHandler):
@@ -33,8 +32,11 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
   def _get_default_value(self):
     """Get default value for missed value in Issue Tracker attribute column."""
     value = None
-    is_assmt = isinstance(self.row_converter.obj, Assessment)
-    is_assmt_template = isinstance(self.row_converter.obj, AssessmentTemplate)
+    default_values = constants.DEFAULT_ISSUETRACKER_VALUES
+    is_assmt = isinstance(self.row_converter.obj,
+                          all_models.Assessment)
+    is_assmt_template = isinstance(self.row_converter.obj,
+                                   all_models.AssessmentTemplate)
     if is_assmt or is_assmt_template:
       value = self.row_converter.obj.audit.issue_tracker.get(self.key)
     default_value = value or default_values.get(self.key)
@@ -134,14 +136,15 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
     return self._false
 
   def _needs_status_check(self):
-    """Check if we should check status befor turn integration On.
+    """Check if we should check status before turn integration On.
 
     According to our business rules we shouldn't generate tickets for Issues
     in some statuses. We can turn integration On for all already linked Issues.
     """
-    if isinstance(self.row_converter.obj, Issue):
-      if not self.row_converter.obj.issue_tracker.get("issue_id"):
-        return True
+    is_issue = isinstance(self.row_converter.obj, all_models.Issue)
+    has_issue_id = self.row_converter.obj.issue_tracker.get("issue_id")
+    if is_issue and not has_issue_id:
+      return True
     return False
 
   def _get_status(self):
