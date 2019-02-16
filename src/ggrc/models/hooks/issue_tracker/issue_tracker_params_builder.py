@@ -61,6 +61,7 @@ class BaseIssueTrackerParamsBuilder(object):
       "hotlist_id",
       "issue_severity",
       "issue_priority",
+      "title",
   )
 
   def __init__(self):
