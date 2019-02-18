@@ -221,7 +221,7 @@ export default can.Component.extend({
         .then(function () {
           let message = instance.child_type +
         ' was refreshed successfully.';
-          notifier('success', [message]);
+          notifier('success', message);
         });
     },
 

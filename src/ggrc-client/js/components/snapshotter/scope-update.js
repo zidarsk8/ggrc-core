@@ -76,7 +76,7 @@ export default can.Component.extend({
       let message =
         'Audit refresh is in progress. This may take several minutes.';
 
-      notifier('progress', [message]);
+      notifier('progress', message);
     },
     _updateVisibleContainer: function () {
       let visibleContainer = $('tree-widget-container:visible');
@@ -91,7 +91,7 @@ export default can.Component.extend({
     _showSuccessMsg: function () {
       let message = 'Audit was refreshed successfully.';
       $('alert-progress').remove();
-      notifier('success', [message]);
+      notifier('success', message);
     },
   },
 });

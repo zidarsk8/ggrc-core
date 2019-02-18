@@ -556,7 +556,7 @@ export default can.Component.extend({
         } else {
           this.afterStatusSave(status);
           this.attr('previousStatus', previousStatus);
-          notifierXHR('error')(xhr);
+          notifierXHR('error', xhr);
         }
       }).always(() => {
         this.attr('isUpdatingState', false);
