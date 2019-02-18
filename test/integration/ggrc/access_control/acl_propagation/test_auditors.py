@@ -66,6 +66,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "read": True,
               "read_original": False,
               "update": (False, "unimplemented"),
+              "delete": False,
               "get_latest_version": False,
           },
           "Issue Assessment": {
@@ -153,6 +154,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
           "Snapshot Audit": {
               "read": True,
               "read_original": True,
+              "delete": False,
               "update": (False, "unimplemented"),
               "get_latest_version": True,
           },
@@ -243,6 +245,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "read": True,
               "read_original": True,
               "update": True,
+              "delete": False,
               "get_latest_version": True,
           },
           "Issue Assessment": {
@@ -280,7 +283,6 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "add_comment": True,
               "read_comments": True
           }
-
       },
   }
 
