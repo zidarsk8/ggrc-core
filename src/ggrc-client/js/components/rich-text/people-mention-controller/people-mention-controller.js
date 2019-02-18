@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../../people-autocomplete/people-autocomplete-wrapper';
+
 import template from './people-mention-controller.stache';
 
 const MENTION_REGEX = /(^.*[\s]|^)[@+]([\S]*)$/s;
