@@ -9,7 +9,7 @@ import '../../components/object-mapper/object-mapper';
 import '../../components/object-generator/object-generator';
 import '../../components/object-search/object-search';
 import {
-  isInScopeModel,
+  isAuditScopeModel,
 } from '../../plugins/utils/snapshot-utils';
 import asmtTemplateCloneTemplate from './assessment-template-clone-modal.stache';
 import objectGeneratorTemplate from './object-generator-modal.stache';
@@ -72,7 +72,7 @@ const ObjectMapper = can.Control.extend({
       throw new Error(OBJECT_REQUIRED_MESSAGE);
     }
 
-    if (isInScopeModel(data.join_object_type) && !isSearch) {
+    if (isAuditScopeModel(data.join_object_type) && !isSearch) {
       openForSnapshots(data);
     } else {
       openForCommonObjects(data, isSearch);
@@ -114,11 +114,11 @@ const ObjectMapper = can.Control.extend({
       }
 
       let model = businessModels[data.join_object_type];
-      let inScopeObject =
+      let auditScopeObject =
         model.findInCacheById(data.join_object_id);
-      let scopeObject = inScopeObject.attr('audit');
+      let audit = auditScopeObject.attr('audit');
 
-      if (!scopeObject.id) {
+      if (!audit.id) {
         notifier('error', DATA_CORRUPTION_MESSAGE);
         setTimeout(function () {
           changeUrl('/dashboard');
@@ -132,9 +132,9 @@ const ObjectMapper = can.Control.extend({
         type: data.join_option_type,
         relevantTo: [{
           readOnly: true,
-          type: scopeObject.type,
-          id: scopeObject.id,
-          title: scopeObject.title,
+          type: audit.type,
+          id: audit.id,
+          title: audit.title,
         }],
       });
       self.launch(btn, Object.assign(config, data));

@@ -71,9 +71,9 @@ describe('object-mapper component', function () {
         expect(result.attr('useSnapshots')).toEqual(true);
       });
 
-      it('do not use Snapshots if not an in-scope model', function () {
+      it('do not use Snapshots if not an audit-scope model', function () {
         let result;
-        spyOn(SnapshotUtils, 'isInScopeModel')
+        spyOn(SnapshotUtils, 'isAuditScopeModel')
           .and.returnValue(false);
         result = Component.prototype.viewModel({}, parentViewModel)();
         expect(result.attr('useSnapshots')).toEqual(false);
@@ -523,29 +523,29 @@ describe('object-mapper component', function () {
       viewModel.attr(originalVM);
     });
 
-    it('returns true if it is not an in-scope model',
+    it('returns true if it is not an audit-scope model',
       function () {
         let result;
-        spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
+        spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(false);
         result = viewModel.allowedToCreate();
         expect(result).toEqual(true);
       });
 
-    it('returns true if it is an in-scope model but mapped type is not ' +
+    it('returns true if it is an audit-scope model but mapped type is not ' +
     'snapshotable',
     function () {
       let result;
-      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
+      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
       result = viewModel.allowedToCreate();
       expect(result).toEqual(true);
     });
 
-    it('returns false if it is an in-scope model and mapped type is ' +
+    it('returns false if it is an audit-scope model and mapped type is ' +
     'snapshotable',
     function () {
       let result;
       viewModel.attr('type', 'Control');
-      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
+      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
       result = viewModel.allowedToCreate();
       expect(result).toEqual(false);
     });
@@ -562,9 +562,9 @@ describe('object-mapper component', function () {
       viewModel.attr(originalVM);
     });
 
-    it('returns false if is an in-scope model', function () {
+    it('returns false if is an audit-scope model', function () {
       let result;
-      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
+      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(true);
       result = viewModel.showWarning();
       expect(result).toEqual(false);
     });
@@ -572,7 +572,7 @@ describe('object-mapper component', function () {
     it('returns true if source object is a Snapshot parent and mapped type ' +
     'is snapshotable', function () {
       let result;
-      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
+      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(false);
       viewModel.attr('object', 'Audit');
       viewModel.attr('type', 'Control');
       result = viewModel.showWarning();
@@ -582,7 +582,7 @@ describe('object-mapper component', function () {
     it('returns true if mapped object is both a ' +
       'Snapshot parent and snapshotable', function () {
       let result;
-      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
+      spyOn(SnapshotUtils, 'isAuditScopeModel').and.returnValue(false);
       spyOn(SnapshotUtils, 'isSnapshotParent').and.callFake(function (v) {
         return v === 'o';
       });

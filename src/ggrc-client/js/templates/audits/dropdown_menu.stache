@@ -82,9 +82,9 @@
       {instance}="instance"
       {options}="options">
         {{#is_allowed_to_map page_instance instance}}
-          {{#isNotInScopeModel instance.type}}
+          {{#isNotAuditScopeModel instance.type}}
             {{> /static/templates/base_objects/unmap.stache}}
-          {{/isNotInScopeModel}}
+          {{/isNotAuditScopeModel}}
         {{/is_allowed_to_map}}
     </issue-unmap-dropdown-item>
 

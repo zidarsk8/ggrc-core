@@ -16,7 +16,7 @@ import template from './object-mapper.stache';
 import tracker from '../../tracker';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import {
-  isInScopeModel,
+  isAuditScopeModel,
   isSnapshotModel,
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
@@ -121,12 +121,12 @@ export default can.Component.extend({
        */
       deferred: false,
       allowedToCreate: function () {
-        // Don't allow to create new instances for "In Scope" Objects that
+        // Don't allow to create new instances for "Audit Scope" Objects that
         // are snapshots
-        let isInScopeSrc = isInScopeModel(this.attr('object'));
+        let isAuditScopeSrc = isAuditScopeModel(this.attr('object'));
 
-        return !isInScopeSrc ||
-          (isInScopeSrc && !isSnapshotModel(this.attr('type')));
+        return !isAuditScopeSrc ||
+          (isAuditScopeSrc && !isSnapshotModel(this.attr('type')));
       },
       showAsSnapshots: function () {
         if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
@@ -135,15 +135,15 @@ export default can.Component.extend({
         return false;
       },
       showWarning: function () {
-        let isInScopeSrc = isInScopeModel(this.attr('object'));
+        let isAuditScopeSrc = isAuditScopeModel(this.attr('object'));
         let isSnapshotParentSrc = isSnapshotParent(this.attr('object'));
         let isSnapshotParentDst = isSnapshotParent(this.attr('type'));
         let isSnapshotModelSrc = isSnapshotModel(this.attr('object'));
         let isSnapshotModelDst = isSnapshotModel(this.attr('type'));
 
         let result =
-          // Dont show message if source is inScope model, for example Assessment.
-          !isInScopeSrc &&
+          // Dont show message if source is auditScope model, for example Assessment.
+          !isAuditScopeSrc &&
           // Show message if source is snapshotParent and destination is snapshotable.
           ((isSnapshotParentSrc && isSnapshotModelDst) ||
           // Show message if destination is snapshotParent and source is snapshotable.
