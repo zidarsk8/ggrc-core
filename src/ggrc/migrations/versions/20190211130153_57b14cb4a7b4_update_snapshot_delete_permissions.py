@@ -13,7 +13,7 @@ from ggrc.migrations.utils.acr_propagation import propagate_roles
 
 # revision identifiers, used by Alembic.
 revision = '57b14cb4a7b4'
-down_revision = '0472c1760a69'
+down_revision = '59b41fe6c145'
 
 
 UPDATED_PERMISSIONS = {
