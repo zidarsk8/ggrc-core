@@ -19,5 +19,23 @@ export default can.Component.extend({
     linkingNote: '',
     setIssueTitle: false,
     allowToChangeId: false,
+    isTicketIdMandatory: false,
+    setTicketIdMandatory() {
+      let instance = this.attr('instance');
+
+      if (instance.class.model_singular === 'Issue') {
+        this.attr('isTicketIdMandatory',
+          ['Fixed', 'Fixed and Verified', 'Deprecated']
+            .includes(instance.attr('status')));
+      }
+    },
+  },
+  events: {
+    inserted() {
+      this.viewModel.setTicketIdMandatory();
+    },
+    '{viewModel.instance} status'() {
+      this.viewModel.setTicketIdMandatory();
+    },
   },
 });
