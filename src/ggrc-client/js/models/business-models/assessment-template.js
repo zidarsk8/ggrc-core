@@ -5,8 +5,6 @@
 
 import Cacheable from '../cacheable';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import inScopeObjects from '../mixins/in-scope-objects';
-import inScopeObjectsPreload from '../mixins/in-scope-objects-preload';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import Stub from '../stub';
@@ -28,8 +26,6 @@ export default Cacheable.extend({
   table_singular: 'assessment_template',
   table_plural: 'assessment_templates',
   mixins: [
-    inScopeObjects,
-    inScopeObjectsPreload,
     refetchHash,
     assessmentIssueTracker,
   ],

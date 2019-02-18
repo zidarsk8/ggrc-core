@@ -5,7 +5,7 @@
 
 import Spinner from 'spin.js';
 import {
-  isInScopeModel,
+  isAuditScopeModel,
   isSnapshotParent,
 } from './plugins/utils/snapshot-utils';
 import {
@@ -904,13 +904,13 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   return toLowerCase ? value.toLowerCase() : value;
 });
 
-Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
-  let isInScope;
+Mustache.registerHelper('isNotAuditScopeModel', function (modelName, options) {
+  let isAuditScope;
   modelName = _.isFunction(modelName) ? modelName() : modelName;
-  isInScope = isInScopeModel(modelName);
+  isAuditScope = isAuditScopeModel(modelName);
   // Temporary Modification to remove possibility to unmap Audit
-  isInScope = isInScope || isSnapshotParent(modelName);
-  return isInScope ? options.inverse(this) : options.fn(this);
+  isAuditScope = isAuditScope || isSnapshotParent(modelName);
+  return isAuditScope ? options.inverse(this) : options.fn(this);
 });
 
 Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
