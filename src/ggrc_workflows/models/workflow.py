@@ -27,7 +27,6 @@ from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
-from ggrc_workflows.services import google_holidays
 
 
 class Workflow(roleable.Roleable,
@@ -213,8 +212,7 @@ class Workflow(roleable.Roleable,
   @classmethod
   def first_work_day(cls, day):
     """Get first work day."""
-    holidays = google_holidays.GoogleHolidays()
-    while day.isoweekday() > cls.WORK_WEEK_LEN or day in holidays:
+    while day.isoweekday() > cls.WORK_WEEK_LEN:
       day -= relativedelta.relativedelta(days=1)
     return day
 
