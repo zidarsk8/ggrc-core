@@ -8,7 +8,7 @@ import {
   customAttributeResolver,
   objectListResolver,
 } from './conflict-resolvers';
-import {messages} from '../../plugins/utils/notifiers-utils';
+import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
 export function tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj) {
   let hasConflict = false;
@@ -70,9 +70,7 @@ export default function resolveConflict(xhr, obj) {
     stillHasConflict =
       tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj);
     if (stillHasConflict) {
-      $(document.body).trigger('ajax:flash', {
-        warning: messages[409],
-      });
+      notifierXHR('warning', {status: 409});
       xhr.remoteObject = remoteAttrs;
       return new $.Deferred().reject(xhr, 409, 'CONFLICT');
     }
