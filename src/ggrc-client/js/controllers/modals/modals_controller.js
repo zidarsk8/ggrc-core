@@ -65,10 +65,10 @@ import {getUrlParams, changeHash} from '../../router';
 
 export default can.Control.extend({
   defaults: {
-    preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',
-    header_view: GGRC.mustache_path + '/modals/modal_header.mustache',
+    preload_view: GGRC.templates_path + '/dashboard/modal_preload.stache',
+    header_view: GGRC.templates_path + '/modals/modal_header.stache',
     custom_attributes_view:
-    GGRC.mustache_path + '/custom_attributes/modal_content.mustache',
+    GGRC.templates_path + '/custom_attributes/modal_content.stache',
     button_view: null,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
@@ -88,7 +88,6 @@ export default can.Control.extend({
   },
 }, {
   init: function () {
-    let currentUser;
     let userFetch;
 
     if (!(this.options instanceof can.Map)) {
@@ -104,11 +103,7 @@ export default can.Control.extend({
     // loaded before rendering the form, otherwise initial validation can
     // incorrectly fail for form fields whose values rely on current user's
     // attributes.
-    currentUser = Person.findInCacheById(GGRC.current_user.id);
-
-    if (currentUser) {
-      currentUser = currentUser.reify();
-    }
+    const currentUser = Person.findInCacheById(GGRC.current_user.id);
 
     if (!currentUser) {
       userFetch = Person.findOne({id: GGRC.current_user.id});
@@ -921,7 +916,7 @@ export default can.Control.extend({
     instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
-      _.includes(saveContactModels, this.options.model.shortName)) {
+      _.includes(saveContactModels, this.options.model.model_singular)) {
       instance.attr('contact', this.options.attr('instance.contact'));
     }
 

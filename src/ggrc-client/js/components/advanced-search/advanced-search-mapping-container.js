@@ -8,7 +8,7 @@ import './advanced-search-mapping-criteria';
 import './advanced-search-filter-operator';
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import template from './advanced-search-mapping-container.mustache';
+import template from './advanced-search-mapping-container.stache';
 
 /**
  * Mapping Container view model.

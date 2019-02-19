@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './comments-section.mustache';
+import template from './comments-section.stache';
 import './comment-data-provider';
 import './comment-add-form';
 import './mapped-comments';

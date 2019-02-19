@@ -1,0 +1,97 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+  {{#if_helpers '\n #is_dashboard_or_all' '\n and #if' is_info_widget}}
+    {{> /static/templates/dashboard/info/info.stache}}
+  {{else}}
+    <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+      <div class="tier-content">
+        <div class="pane-header">
+          <div class="pane-header__container">
+            <div class="pane-header__title">
+              <div class="row-fluid wrap-row">
+                <div class="span12">
+                  <h6>Name</h6>
+                  {{#if name}}
+                    <h3>{{name}}
+                      {{#if_equals system_wide_role 'No Access'}}
+                        <span class="user-disabled">
+                          (Inactive user)
+                        </span>
+                      {{/if_equals}}
+                    </h3>
+                  {{else}}
+                    <span class="empty-message">None</span>
+                  {{/if}}
+                </div>
+              </div>
+              <div class="row-fluid wrap-row">
+                <div class="span12">
+                  <h6>Email</h6>
+                  {{#if email}}
+                    <a href='mailto:{{email}}' target="_blank">{{email}}</a>
+                  {{else}}
+                    <span class="empty-message">None</span>
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+            <div class="pane-header__toolbar">
+              {{#is_info_pin}}
+                <info-pin-buttons class="details-wrap"
+                                  maximized="maximized"
+                                  on-change-maximized-state="@onChangeMaximizedState"
+                                  on-close="@onClose">
+                </info-pin-buttons>
+                <div class="info-pane-utility">
+                  {{> /static/templates/people/dropdown_menu.stache}}
+                </div>
+              {{/is_info_pin}}
+            </div>
+          </div>
+        </div>
+
+        <tab-container>
+          <tab-panel {(panels)}="panels" title-text="Attributes">
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Company</h6>
+                {{#if company}}
+                  <p>{{company}}</p>
+                {{else}}
+                  <span class="empty-message">None</span>
+                {{/if}}
+              </div>
+            </div>
+            <div class="row-fluid wrap-row">
+              <div class="span12">
+                <h6>Authorizations</h6>
+                <span>
+                  {{#if_equals instance.system_wide_role 'No Access'}}
+                    No Role
+                  {{else}}
+                    {{instance.system_wide_role}}
+                  {{/if_equals}}
+                </span>
+              </div>
+            </div>
+            {{> /static/templates/custom_attributes/info.stache}}
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Change Log">
+            <revision-log {instance}="instance"></revision-log>
+          </tab-panel>
+        </tab-container>
+      </div>
+    </section>
+
+    {{#if is_info_widget}}
+      <info-pane-footer {created-at}="instance.created_at"
+                        {modified-at}="instance.updated_at"
+                        {modified-by}="instance.modified_by">
+      </info-pane-footer>
+    {{/if}}
+  {{/if_helpers}}
+{{/instance}}

@@ -10,7 +10,7 @@ import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Workflow', {
+export default Cacheable.extend({
   root_object: 'workflow',
   root_collection: 'workflows',
   category: 'workflow',
@@ -58,7 +58,6 @@ export default Cacheable('CMS.Models.Workflow', {
       }],
     display_attr_names: ['title', 'status', 'updated_at', 'Admin',
       'Workflow Member'],
-    adminRoleName: 'Admin',
   },
 
   init: function () {
@@ -92,8 +91,7 @@ export default Cacheable('CMS.Models.Workflow', {
         taskGroup = new TaskGroup({
           title: taskGroupTitle,
           workflow: instance,
-          contact: instance.people && instance.people[0]
-            || instance.modified_by,
+          contact: instance.modified_by,
           context: instance.context,
         });
         return taskGroup.save();

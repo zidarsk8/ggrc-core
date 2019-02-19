@@ -4,7 +4,7 @@
  */
 
 import '../spinner/spinner';
-import template from './autocomplete-results.mustache';
+import template from './autocomplete-results.stache';
 
 /**
  * The component is used to show autocomplete results and handle user's clicks.

@@ -64,7 +64,7 @@
 }
 
 .#{$fa-css-prefix}-role {
-  &:before { content: $fa-var-key; }
+  &:before { content: $fa-var-address-card; }
   &.color { color: $black; }
 }
 
@@ -252,6 +252,11 @@
 }
 .#{$fa-css-prefix}-technology_environment {
   &:before { content: $fa-var-th; }
+  &.color { color: $green; }
+}
+
+.#{$fa-css-prefix}-key_report {
+  &:before { content: $fa-var-key; }
   &.color { color: $green; }
 }
 

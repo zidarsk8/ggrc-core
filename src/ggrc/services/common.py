@@ -23,6 +23,8 @@ from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy as sa
 import sqlalchemy.orm.exc
+from sqlalchemy.orm import load_only
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
@@ -52,6 +54,7 @@ logger = logging.getLogger(__name__)
 
 
 CACHE_EXPIRY_COLLECTION = 60
+MAX_AMOUNT_OF_REVISIONS = 100  # this is used on admin events page
 
 
 def set_ids_for_new_custom_attributes(parent_obj):
@@ -1268,6 +1271,65 @@ class Resource(ModelView):
       inclusions = ()
     return inclusions
 
+  def get_events_resources(self, model, ids):
+    """Get events resources representation from the db.
+
+    Returned events look like the following:
+    {u'events': [{u'created_at': u'2019-01-22T13:18:26',
+                  u'id': 955,
+                  u'modified_by': {u'id': 2,
+                                   u'type': u'Person'},
+                  u'resource_type': u'Control',
+                  u'revisions': [{u'description': u'New Control created'}],
+                  u'revisions_count': 1,
+                  u'type': u'Event'},
+                  ...],
+    """
+    # pylint: disable=no-self-use
+    resources = {}
+    events = db.session.query(
+        ggrc.models.Event,
+        func.count(
+            ggrc.models.Revision.id
+        ).label("revisions_count")
+    ).join(
+        ggrc.models.Revision,
+        ggrc.models.Event.id ==
+        ggrc.models.Revision.event_id
+    ).filter(
+        model.id.in_(ids.keys())
+    ).group_by(
+        ggrc.models.Event.id
+    ).all()
+    for event, revisions_count in events:
+      event_resource = {
+          "id": event.id,
+          "resource_type": event.resource_type,
+          "created_at": event.created_at,
+          "modified_by": event.modified_by,
+          "revisions_count": revisions_count,
+          "type": "Event",
+          "revisions_stub": [],
+      }
+      revisions = db.session.query(
+          ggrc.models.Revision
+      ).filter(
+          ggrc.models.Revision.event_id ==
+          event.id
+      ).options(load_only(
+          "_content",
+          "action",
+          "resource_type",
+          "event_id")
+      ).limit(MAX_AMOUNT_OF_REVISIONS)
+      for revision in revisions:
+        event_resource['revisions_stub'].append(
+            {'description': revision.description,
+             'resource_type': revision.resource_type}
+        )
+      resources[ids[event.id]] = event_resource
+    return resources
+
   def build_page_object_for_json(self, paging):
     def page_url(params):
       return base_url + '?' + urlencode(utils.encoded_dict(params))
@@ -1297,15 +1359,21 @@ class Resource(ModelView):
     # FIXME: This is cheating -- `matches` should be allowed to be any model
     model = self.model
     ids = {m[0]: m for m in matches}
-    with benchmark("Query database for matches"):
-      query = model.eager_query()
-      # We force the query here so that we can benchmark it
-      objs = query.filter(model.id.in_(ids.keys())).all()
-    with benchmark("Publish objects"):
-      resources = {}
-      includes = self.get_properties_to_include(request.args.get('__include'))
-      for obj in objs:
-        resources[ids[obj.id]] = ggrc.builder.json.publish(obj, includes)
+    if model.__name__ == "Event":
+      with benchmark("Query database for events"):
+        resources = self.get_events_resources(model, ids)
+    else:
+      with benchmark("Query database for matches"):
+        query = model.eager_query()
+        # We force the query here so that we can benchmark it
+        objs = query.filter(model.id.in_(ids.keys())).all()
+        with benchmark("Publish objects"):
+          resources = {}
+          includes = self.get_properties_to_include(
+              request.args.get('__include')
+          )
+          for obj in objs:
+            resources[ids[obj.id]] = ggrc.builder.json.publish(obj, includes)
     with benchmark("Publish representation"):
       ggrc.builder.json.publish_representation(resources)
     return resources

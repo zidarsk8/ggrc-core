@@ -16,7 +16,7 @@ def create_proposal(selenium, obj):
   return proposal_ui_service.ProposalsService(selenium).create_proposal(obj)
 
 
-def apply_proposal(selenium, obj, proposal_to_apply, proposal_to_change):
+def apply_proposal(selenium, obj, proposal_to_apply, proposals_to_change):
   """Apply an obj proposal."""
   proposal_service = proposal_ui_service.ProposalsService(selenium)
   proposal_service.apply_proposal(obj, proposal_to_apply)
@@ -24,7 +24,8 @@ def apply_proposal(selenium, obj, proposal_to_apply, proposal_to_change):
   # after applying the proposal obj attr is changed and every proposals to this
   # obj attr should change cur_value
   obj.__dict__[change["obj_attr_type"].lower()] = change["cur_value"]
-  proposal_to_change.changes[0]["cur_value"] = change["cur_value"]
+  for proposal_to_change in proposals_to_change:
+    proposal_to_change.changes[0]["cur_value"] = change["cur_value"]
 
 
 def decline_proposal(selenium, obj, proposal):

@@ -6,7 +6,7 @@
 import {ROLES_CONFLICT} from '../../events/eventTypes';
 import '../custom-roles/custom-roles';
 import '../custom-roles/custom-roles-modal';
-import template from './templates/assessment-people.mustache';
+import template from './templates/assessment-people.stache';
 
 const tag = 'assessment-people';
 

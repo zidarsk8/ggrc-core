@@ -6,7 +6,7 @@
 // The component for 'custom-autocomplete'. Handles user input and propagates it
 // to 'autocomplete-wrapper'.
 
-import template from './templates/autocomplete-input.mustache';
+import template from './templates/autocomplete-input.stache';
 
 export const keyMap = {
   ENTER: 13,

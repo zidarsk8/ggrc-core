@@ -25,7 +25,7 @@ import {PageObjectControl} from '../../controllers/dashboard_controller';
 const instance = getPageInstance();
 const location = window.location.pathname;
 const isAssessmentsView = isMyAssessments();
-const modelName = instance.constructor.shortName;
+const modelName = instance.constructor.model_singular;
 let defaults;
 let widgetList;
 let widgetModels;
@@ -47,8 +47,8 @@ new PageObjectControl('#pageContent', {
   widget_descriptors: widgetList,
   default_widgets: defaults || [],
   instance: getPageInstance(),
-  header_view: GGRC.mustache_path + '/base_objects/page_header.mustache',
-  GGRC: GGRC, // make the global object available in Mustache templates
+  header_view: GGRC.templates_path + '/base_objects/page_header.stache',
+  GGRC: GGRC, // make the global object available in templates
   page_title: function (controller) {
     return controller.options.instance.title;
   },

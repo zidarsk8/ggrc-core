@@ -344,6 +344,7 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
         "Directive",
         "Facility",
         "Issue",
+        "KeyReport",
         "Market",
         "Objective",
         "OrgGroup",

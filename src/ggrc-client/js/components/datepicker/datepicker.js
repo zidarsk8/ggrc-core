@@ -8,7 +8,7 @@ import {
   isInnerClick,
 } from '../../plugins/ggrc_utils';
 import {DATE_FORMAT} from '../../plugins/utils/date-utils';
-import template from './datepicker.mustache';
+import template from './datepicker.stache';
 
 export default can.Component.extend({
   tag: 'datepicker',

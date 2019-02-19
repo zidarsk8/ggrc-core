@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.PersonProfile', {
+export default Cacheable.extend({
   root_object: 'person_profile',
   root_collection: 'people_profiles',
   findOne: 'GET /api/people_profiles/{id}',

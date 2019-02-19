@@ -11,11 +11,11 @@ Create Date: 2018-11-21 12:03:34.260255
 
 import datetime
 
+import sqlalchemy as sa
 from sqlalchemy import func
 from alembic import op
 
 from ggrc.migrations import utils
-from ggrc.models import all_models
 from ggrc.migrations.utils.acr_propagation import propagate_roles
 from ggrc.migrations.utils import migrator
 
@@ -53,8 +53,15 @@ CONTROL_PROPAGATION = {
 
 def update_recipients(connection, migrator_id):
   """Updates recipients field for Control model. """
-  control_table = all_models.Control.__table__
+  control_table = sa.sql.table(
+      "controls",
+      sa.Column('id', sa.Integer(), nullable=False),
+      sa.Column('recipients', sa.String(length=250), nullable=True),
+      sa.Column('updated_at', sa.DateTime, nullable=False),
+      sa.Column('modified_by_id', sa.Integer, nullable=True)
+  )
 
+  # replace all None data with empty string for recipients field
   for old_role_name, new_role_name in ROLE_MAPPING.iteritems():
     connection.execute(control_table.update().values(
         recipients=func.replace(control_table.c.recipients,
@@ -74,7 +81,13 @@ def update_recipients(connection, migrator_id):
 
 def update_role_names(connection, migrator_id):
   """Updates role names for Control model. """
-  roles_table = all_models.AccessControlRole.__table__
+  roles_table = sa.sql.table(
+      "access_control_roles",
+      sa.Column('object_type', sa.String(length=250), nullable=False),
+      sa.Column('name', sa.String(length=250), nullable=False),
+      sa.Column('updated_at', sa.DateTime, nullable=False),
+      sa.Column('modified_by_id', sa.Integer, nullable=True)
+  )
 
   for old_role_name, new_role_name in ROLE_MAPPING.iteritems():
     connection.execute(
@@ -90,7 +103,14 @@ def update_role_names(connection, migrator_id):
 
 def update_templates_definitions(connection, migrator_id):
   """Updates assessment templates default_people value."""
-  template_table = all_models.AssessmentTemplate.__table__
+  template_table = sa.sql.table(
+      "assessment_templates",
+      sa.Column('id', sa.Integer(), nullable=False),
+      sa.Column('template_object_type', sa.String(length=250), nullable=True),
+      sa.Column('default_people', sa.Text(), nullable=False),
+      sa.Column('updated_at', sa.DateTime, nullable=False),
+      sa.Column('modified_by_id', sa.Integer, nullable=True)
+  )
 
   template_entities = connection.execute(
       template_table.select().where(

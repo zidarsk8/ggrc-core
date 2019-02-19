@@ -33,7 +33,7 @@ export default TreeLoader({
     list_view: null,
     list_objects: null,
     list_loader: null,
-    tooltip_view: '/static/mustache/dashboard/object_tooltip.mustache',
+    tooltip_view: '/static/templates/dashboard/object_tooltip.stache',
   },
 }, {
   init: function () {
@@ -118,7 +118,7 @@ export default TreeLoader({
         this.options.model.list_view_options.find_params);
     }
 
-    if (this.options.model.shortName === 'Person') {
+    if (this.options.model.model_singular === 'Person') {
       params.__sort = 'name,email';
       if (searchParams.search_term) {
         params.__search = searchParams.search_term;

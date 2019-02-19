@@ -5,6 +5,15 @@
 
 import RefreshQueue from '../refresh_queue';
 import Cacheable from '../cacheable';
+import {Person, Cycle} from '../business-models';
+import {reify} from '../../plugins/utils/reify-utils';
+import {Role} from '../service-models';
+
+const directListModels = {
+  Person,
+  Cycle,
+  Role,
+};
 
 (function (GGRC, can) {
   /*  DirectListLoader
@@ -27,7 +36,7 @@ import Cacheable from '../cacheable';
       },
       init_listeners: function (binding) {
         let self = this;
-        let model = CMS.Models[this.model_name] || Cacheable;
+        let model = directListModels[this.model_name] || Cacheable;
 
         binding.instance.bind(this.object_join_attr, function (ev, _new, _old) {
           if (binding._refresh_stubs_deferred &&
@@ -55,13 +64,13 @@ import Cacheable from '../cacheable';
         });
       },
       is_valid_mapping: function (binding, mapping) {
-        let model = CMS.Models[this.model_name] || Cacheable;
+        let model = directListModels[this.model_name] || Cacheable;
         let objectModel = binding.instance.constructor;
 
         return (mapping instanceof model && mapping[this.object_attr] &&
-        (mapping[this.object_attr].reify() === binding.instance ||
-        (mapping[this.object_attr].reify().constructor === objectModel &&
-        mapping[this.object_attr].id === binding.instance.id)));
+          (reify(mapping[this.object_attr]) === binding.instance ||
+          (reify(mapping[this.object_attr]).constructor === objectModel &&
+          mapping[this.object_attr].id === binding.instance.id)));
       },
       filter_and_insert_instances_from_mappings: function (binding, mappings) {
         let self = this;
@@ -129,7 +138,7 @@ import Cacheable from '../cacheable';
         return refreshQueue.trigger().then(function () {
           let objectJoinAttr = that.object_join_attr;
           let mappings = binding.instance[objectJoinAttr] &&
-            binding.instance[objectJoinAttr].reify();
+            reify(binding.instance[objectJoinAttr]);
 
           that.insert_instances_from_mappings(binding, mappings);
         });

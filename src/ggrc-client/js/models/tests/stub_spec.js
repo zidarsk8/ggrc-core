@@ -8,7 +8,7 @@ import Stub from '../stub';
 describe('Stub model', () => {
   let TestModel;
   beforeAll(() => {
-    TestModel = can.Model.extend({shortName: 'testModel'}, {});
+    TestModel = can.Model.extend({model_singular: 'testModel'}, {});
   });
 
   it('Creates correct stub for single model', () => {

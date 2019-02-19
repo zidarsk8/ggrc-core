@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/text-form-field.mustache';
+import template from './templates/text-form-field.stache';
 
 const TEXT_FORM_FIELD_VM = {
   define: {

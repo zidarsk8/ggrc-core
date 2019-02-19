@@ -55,14 +55,15 @@ Add the NewObject to appropriate roles in
 Frontend
 --------
 
-Create a CMS.Models.Cacheable object
+Create a Cacheable object
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ..  code-block:: javascript
 
     import Stub from '../stub';
+    import Cacheable from '../cacheable';
 
-    can.Model.Cacheable("CMS.Models.NewObject", {
+    export default Cacheable.extend({
       root_object : "new_object",
       root_collection : "new_objects",
       findOne : "GET /api/new_objects/{id}",
@@ -122,16 +123,16 @@ Create a ModuleExtension object:
 Add NewObject to the LHN
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-In :src:`ggrc-client/mustache/dashboard/lhn.mustache` add the line:
+In :src:`ggrc-client/js/templates/dashboard/lhn.stache` add the line:
 
 ..  code-block:: javascript
 
-    {{{renderLive '/static/mustache/dashboard/lhn_search.mustache' type="NewObject" li_class="class"}}}
+    {{{renderLive '/static/templates/dashboard/lhn_search.stache' type="NewObject" li_class="class"}}}
 
-Create mustache files
+Create template files
 ---------------------
 
-``new_object/modal_content.mustache`` is the only mandatory mustache
-file that needs to be created. Creating all the other mustache files is
-optional. If the mustache file is not found in ``new_object`` it will be
+``new_object/modal_content.stache`` is the only mandatory template
+file that needs to be created. Creating all the other template files is
+optional. If the template file is not found in ``new_object`` it will be
 taken from ``base_objects``.

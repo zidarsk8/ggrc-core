@@ -55,6 +55,7 @@ class TestSlugPrefix(unittest.TestCase):
       'Metric': 'METRIC',
       'ProductGroup': 'PRODUCTGROUP',
       'TechnologyEnvironment': 'TECHNOLOGYENVIRONMENT',
+      'KeyReport': 'KEYREPORT',
   }
 
   @ddt.data(*all_models.all_models)

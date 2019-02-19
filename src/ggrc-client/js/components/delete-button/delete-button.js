@@ -36,13 +36,13 @@ export default can.Component.extend({
       const model = instance.class;
       const modalSettings = {
         button_view:
-          GGRC.mustache_path + '/modals/delete_cancel_buttons.mustache',
+          GGRC.templates_path + '/modals/delete_cancel_buttons.stache',
         model,
         instance,
         modal_title: 'Delete ' + model.title_singular,
         skip_refresh: true,
         content_view:
-          GGRC.mustache_path + '/base_objects/confirm_delete.mustache',
+          GGRC.templates_path + '/base_objects/confirm_delete.stache',
       };
 
       import(/* webpackChunkName: "modalsCtrls" */
@@ -95,7 +95,7 @@ export default can.Component.extend({
             relatedToOriginal,
             relatedToSnapshot,
             content_view:
-              `${GGRC.mustache_path}/modals/snapshot-related-objects.mustache`,
+              `${GGRC.templates_path}/modals/snapshot-related-objects.stache`,
             button_view: BUTTON_VIEW_CLOSE,
           });
         });

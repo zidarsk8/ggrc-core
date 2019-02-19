@@ -1,0 +1,16 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+  <a class="{{cssClasses}}"
+      href="javascript://"
+      rel="tooltip"
+      data-placement="left"
+      data-toggle="unified-mapper"
+      data-join-object-id="{{instance.id}}"
+      data-join-object-type="{{instance.class.model_singular}}"
+  >
+    <i class="fa fa-code-fork"></i>
+    {{title}}
+  </a>

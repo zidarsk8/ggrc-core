@@ -10,7 +10,7 @@ import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/base-notifications';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Threat', {
+export default Cacheable.extend({
   root_object: 'threat',
   root_collection: 'threats',
   category: 'risk',

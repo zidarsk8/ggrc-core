@@ -1,0 +1,54 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if button}}
+  {{#is_allowed 'update' audit context="for"}}
+    <a
+      href="javascript://"
+      class="generate-control-assessments btn btn-small btn-darkBlue"
+      rel="tooltip"
+      data-placement="bottom"
+      title="Generate Assessments"
+      data-original-title="Generate Assessments">
+      Autogenerate
+    </a>
+  {{else}}
+    {{#is_auditor}}
+        <a
+          href="javascript://"
+          class="generate-control-assessments btn btn-small btn-darkBlue"
+          rel="tooltip"
+          data-placement="bottom"
+          title="Generate Assessments"
+          data-original-title="Generate Assessments">
+          Autogenerate
+        </a>
+    {{/is_auditor}}
+  {{/is_allowed}}
+{{else}}
+  {{#if_instance_of audit 'Audit'}}
+    {{#if_in model.model_singular 'Assessment,Control'}}
+      {{^if audit.archived}}
+        {{#is_allowed 'update' audit context="for"}}
+            <li class="generate-control-assessments">
+              <a href="javascript://">
+                <i class="fa fa-fw fa-magic"></i>
+                Generate Assessments
+              </a>
+            </li>
+        {{else}}
+          {{#is_auditor}}
+            <li class="generate-control-assessments">
+              <a href="javascript://">
+                <i class="fa fa-fw fa-magic"></i>
+                Generate Assessments
+              </a>
+            </li>
+          {{/is_auditor}}
+        {{/is_allowed}}
+      {{/if}}
+    {{/if_in}}
+  {{/if_instance_of}}
+{{/if}}

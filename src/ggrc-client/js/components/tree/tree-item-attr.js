@@ -4,7 +4,7 @@
  */
 import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
-import template from './templates/tree-item-attr.mustache';
+import template from './templates/tree-item-attr.stache';
 
 // attribute names considered "default" and representing a date
 const DATE_ATTRS = Object.freeze({

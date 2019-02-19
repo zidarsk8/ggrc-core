@@ -7,7 +7,7 @@ import {buildModifiedACL} from '../../plugins/utils/object-history-utils';
 import {getRoleById} from '../../plugins/utils/acl-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
-import template from './templates/instance-diff-items.mustache';
+import template from './templates/instance-diff-items.stache';
 const tag = 'instance-acl-diff';
 
 const viewModel = DiffBaseVM.extend({

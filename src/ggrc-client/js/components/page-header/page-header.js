@@ -19,13 +19,14 @@ import {
   isObjectContextPage,
   isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
-import template from './page-header.mustache';
+import template from './page-header.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 let colorsMap = {
   AccessGroup: 'header-style-1',
   OrgGroup: 'header-style-1',
   System: 'header-style-1',
+  KeyReport: 'header-style-1',
   Process: 'header-style-1',
   DataAsset: 'header-style-1',
   Product: 'header-style-1',

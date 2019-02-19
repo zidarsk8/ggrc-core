@@ -1,0 +1,23 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="row-fluid">
+  <!-- Left side Get started column -->
+  <div class="span3 side-wrap">
+    <div class="inner-content">
+      <section class="widget get-started">
+        <header class="get-started__header">
+          <h2>Get Started</h2>
+        </header>
+        <section class="get-started__content">
+          {{> /static/templates/dashboard/info/get_started.stache}}
+        </section><!-- Widget content end -->
+      </section><!-- Widget end -->
+    </div><!-- inner-content end -->
+  </div>
+  <!-- Right side workflow and task trees area -->
+  <dashboard-workflows class="span9 content-wrap">
+  </dashboard-workflows>
+</div>

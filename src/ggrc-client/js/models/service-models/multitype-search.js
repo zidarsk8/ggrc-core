@@ -5,4 +5,4 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.MultitypeSearch', {}, {});
+export default Cacheable.extend({}, {});

@@ -12,7 +12,7 @@ import scopeObjectNotifications from '../mixins/scope-object-notifications';
 import questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.Process', {
+export default Cacheable.extend({
   root_object: 'process',
   root_collection: 'processes',
   model_plural: 'Processes',
@@ -48,7 +48,7 @@ export default Cacheable('CMS.Models.Process', {
     status: 'Draft',
   },
   tree_view_options: {
-    attr_list: can.Model.Cacheable.attr_list.concat([
+    attr_list: Cacheable.attr_list.concat([
       {
         attr_title: 'Network Zone',
         attr_name: 'network_zone',

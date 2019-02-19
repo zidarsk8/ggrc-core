@@ -68,7 +68,8 @@ const TreeViewControl = TreeLoader.extend({
   },
 
   init: function (el, opts) {
-    let states = StateUtils.getStatesForModel(this.options.model.shortName);
+    let states = StateUtils
+      .getStatesForModel(this.options.model.model_singular);
 
     let filterStates = states.map(function (state) {
       return {value: state};
@@ -165,7 +166,7 @@ const TreeViewControl = TreeLoader.extend({
     let self = this;
     let options = this.options;
     let counts;
-    let countsName = options.countsName || options.model.shortName;
+    let countsName = options.countsName || options.model.model_singular;
 
     if (this.options.parent_instance && this.options.mapping) {
       counts = getCounts();
@@ -300,7 +301,7 @@ const TreeViewControl = TreeLoader.extend({
     this.removeFromList(this.options.list, removedItemsIds);
     this.removeFromList(this.options.filteredList, removedItemsIds);
 
-    // NB: since row element are not rendered with mustache and binded element
+    // NB: since row element are not rendered with template and binded element
     // not always reflected in the filteredList ( for newly created items )
     // we are just removeing the items from the lists and removing the DOM
     // elements by ids

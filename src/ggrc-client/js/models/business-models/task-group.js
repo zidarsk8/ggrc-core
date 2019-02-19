@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import contactable from '../mixins/contactable';
 import Stub from '../stub';
 
-export default Cacheable('CMS.Models.TaskGroup', {
+export default Cacheable.extend({
   root_object: 'task_group',
   root_collection: 'task_groups',
   category: 'workflow',
@@ -29,7 +29,7 @@ export default Cacheable('CMS.Models.TaskGroup', {
   },
 
   tree_view_options: {
-    add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path + '/task_groups/tree_add_item.stache',
     mapper_attr_list: [
       {attr_title: 'Summary', attr_name: 'title'},
       {attr_title: 'Assignee', attr_name: 'assignee',
@@ -47,7 +47,6 @@ export default Cacheable('CMS.Models.TaskGroup', {
     this.validateNonBlank('title');
     this.validateNonBlank('contact');
     this.validateNonBlank('workflow');
-    this.validateContact(['_transient.contact', 'contact']);
 
     this.bind('updated', function (ev, instance) {
       if (instance instanceof that) {

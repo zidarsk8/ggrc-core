@@ -13,7 +13,7 @@ import Assessment from '../../models/business-models/assessment';
 describe('SummaryWidgetController', function () {
   'use strict';
 
-  describe('"{CMS.Models.Assessment} updated" handler', function () {
+  describe('"{Assessment} updated" handler', function () {
     let method;
     let ctrlInst;
 
@@ -23,7 +23,7 @@ describe('SummaryWidgetController', function () {
           forceRefresh: false,
         },
       };
-      method = Ctrl.prototype['{CMS.Models.Assessment} updated'].bind(ctrlInst);
+      method = Ctrl.prototype['{Assessment} updated'].bind(ctrlInst);
     });
 
     it('sets true to options.forceRefresh', function () {

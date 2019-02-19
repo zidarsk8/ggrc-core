@@ -153,7 +153,7 @@ def _all_rules():
                 'Policy', 'Process', 'Product', 'Program', 'Project',
                 'Regulation', 'Risk', 'Requirement', 'Standard',
                 'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
-                'TechnologyEnvironment'}
+                'TechnologyEnvironment', 'KeyReport'}
 
   snapshots = snapshotter.rules.Types.all
 
@@ -184,6 +184,7 @@ def _all_rules():
       "Vendor": all_models,
       "Metric": all_models,
       "ProductGroup": all_models,
+      "KeyReport": all_models,
   }
 
   # Audit and Audit-scope objects

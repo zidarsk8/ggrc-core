@@ -6,7 +6,7 @@
 import '../form/form-validation-icon';
 import '../form/form-validation-text';
 import '../custom-attributes/custom-attributes-field-view';
-import template from './custom-attributes.mustache';
+import template from './custom-attributes.stache';
 
 export default can.Component.extend({
   tag: 'custom-attributes',

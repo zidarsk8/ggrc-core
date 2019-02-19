@@ -1,0 +1,21 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="info-pane-utility">
+    <questions-link {instance}="instance">
+      Questionnaire
+      <i class="fa fa-external-link"></i>
+    </questions-link>
+    <show-related-assessments-button instance="instance" extra-btn-css="btn-small"></show-related-assessments-button>
+    {{#if instance.snapshot}}
+        {{> /static/templates/snapshots/dropdown_menu.stache}}
+    {{else}}
+        {{#if_equals instance.type 'Audit'}}
+            {{> /static/templates/audits/dropdown_menu.stache}}
+        {{else}}
+            {{> /static/templates/base_objects/dropdown_menu.stache}}
+        {{/if_equals}}
+     {{/if}}
+</div>

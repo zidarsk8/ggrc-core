@@ -12,7 +12,7 @@ import Cacheable from '../cacheable';
  *
  * This is useful for e.g. reconstruction of an object's change history.
  */
-export default Cacheable('CMS.Models.Revision', {
+export default Cacheable.extend({
   root_object: 'revision',
   root_collection: 'revisions',
 

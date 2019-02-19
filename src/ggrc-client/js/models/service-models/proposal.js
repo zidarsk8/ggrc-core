@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.Proposal', {
+export default Cacheable.extend({
   root_object: 'proposal',
   root_collection: 'proposals',
   table_singular: 'proposal',

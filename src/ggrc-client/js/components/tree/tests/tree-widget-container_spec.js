@@ -12,7 +12,7 @@ import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
-import exportMessage from '../templates/export-message.mustache';
+import exportMessage from '../templates/export-message.stache';
 import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 describe('tree-widget-container component', function () {
@@ -93,7 +93,7 @@ describe('tree-widget-container component', function () {
 
     beforeEach(function () {
       vm.attr({
-        model: {shortName: 'modelName'},
+        model: {model_singular: 'modelName'},
         options: {
           parent_instance: {},
         },
@@ -263,7 +263,7 @@ describe('tree-widget-container component', function () {
       beforeEach(function () {
         vm.attr({
           model: {
-            shortName: modelName,
+            model_singular: modelName,
           },
           modelName: modelName,
         });
@@ -537,7 +537,7 @@ describe('tree-widget-container component', function () {
   describe('setSortingConfiguration() method', () => {
     beforeEach(() => {
       vm.attr('model', {
-        shortName: 'shortModelName',
+        model_singular: 'shortModelName',
       });
     });
 
@@ -561,7 +561,7 @@ describe('tree-widget-container component', function () {
 
     beforeEach(() => {
       vm.attr('model', {
-        shortName: 'shortModelName',
+        model_singular: 'shortModelName',
       });
       method = Component.prototype.init.bind({viewModel: vm});
       spyOn(vm, 'setSortingConfiguration');
@@ -748,7 +748,7 @@ describe('tree-widget-container component', function () {
       request = new can.List([{testRequest: true}]);
 
       vm.attr('model', {
-        shortName: modelName,
+        model_singular: modelName,
       });
       vm.attr('options', {
         parent_instance: parent,

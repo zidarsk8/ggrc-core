@@ -37,13 +37,15 @@ class TestProposals(base.Test):
            [proposal_creator])]
       control = rest_facade.create_control(custom_roles=control_custom_roles)
       users.set_current_user(proposal_creator)
-      proposal = proposal_ui_facade.create_proposal(selenium, control)
-      # proposal_creator has not access to proposals, so proposal datetime is
-      # taken by control_creator
-      users.set_current_user(control_creator)
-      proposal.datetime = (
+      proposal_to_apply = proposal_ui_facade.create_proposal(selenium, control)
+      proposal_to_apply.datetime = (
           proposal_rest_service.ProposalsService().get_proposal_creation_date(
-              control, proposal))
+              control, proposal_to_apply))
+      proposal_to_decline = proposal_ui_facade.create_proposal(
+          selenium, control)
+      proposal_to_decline.datetime = (
+          proposal_rest_service.ProposalsService().get_proposal_creation_date(
+              control, proposal_to_decline))
       users.set_current_user(global_reader)
       proposal_from_gr = proposal_ui_facade.create_proposal(selenium, control)
       proposal_from_gr.datetime = (
@@ -53,33 +55,34 @@ class TestProposals(base.Test):
                              "proposal_creator": proposal_creator,
                              "global_reader": global_reader,
                              "control": control,
-                             "proposal": proposal,
+                             "proposal_to_apply": proposal_to_apply,
+                             "proposal_to_decline": proposal_to_decline,
                              "proposal_from_gr": proposal_from_gr}
     return TestProposals._data
 
   @pytest.fixture()
   def apply_proposal(self, test_data, selenium):
     """Apply proposal."""
-    if test_data["proposal"].status == object_states.PROPOSED:
+    if test_data["proposal_to_apply"].status == object_states.PROPOSED:
       users.set_current_user(test_data["control_creator"])
       proposal_ui_facade.apply_proposal(
-          selenium, test_data["control"], test_data["proposal"],
-          test_data["proposal_from_gr"])
+          selenium, test_data["control"], test_data["proposal_to_apply"],
+          [test_data["proposal_from_gr"], test_data["proposal_to_decline"]])
 
   @pytest.fixture()
   def decline_proposal(self, test_data, selenium):
     """Decline proposal."""
-    if test_data["proposal_from_gr"].status == object_states.PROPOSED:
+    if test_data["proposal_to_decline"].status == object_states.PROPOSED:
       users.set_current_user(test_data["control_creator"])
       proposal_ui_facade.decline_proposal(
-          selenium, test_data["control"], test_data["proposal_from_gr"])
+          selenium, test_data["control"], test_data["proposal_to_decline"])
 
   @classmethod
-  def check_ggrc_5091(cls, login_user, condition):
-    """Check if it is xfail because of GGRC-5091 or fail."""
+  def check_ggrc_6591(cls, login_user, condition):
+    """Check if it is xfail because of GGRC-6591 or fail."""
     if login_user == "proposal_creator":
       base.Test().check_xfail_or_fail(
-          condition, "Issue GGRC-5091",
+          condition, "Issue GGRC-6591\n",
           "There are no proposals in the list from ui.")
 
   @pytest.mark.parametrize(
@@ -91,12 +94,13 @@ class TestProposals(base.Test):
   ):
     """Check proposal is created on Change Proposal tab."""
     users.set_current_user(test_data[login_user])
-    exp_visible_proposals = [test_data["proposal_from_gr"],
-                             test_data["proposal"]]
+    exp_proposals = [
+        test_data["proposal_from_gr"], test_data["proposal_to_decline"],
+        test_data["proposal_to_apply"]]
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["control"])
-    self.check_ggrc_5091(login_user, len(actual_proposals) > 0)
-    assert exp_visible_proposals == actual_proposals
+    self.check_ggrc_6591(login_user, actual_proposals == exp_proposals)
+    assert exp_proposals == actual_proposals
 
   @pytest.mark.parametrize(
       "login_user, apply_btns_exist",
@@ -109,17 +113,18 @@ class TestProposals(base.Test):
     """Check proposal apply buttons exist for proposal recipient and do
     not exist for proposal creators."""
     users.set_current_user(test_data[login_user])
-    exp_proposals = [test_data["proposal_from_gr"],
-                     test_data["proposal"]]
+    exp_proposals = [
+        test_data["proposal_from_gr"], test_data["proposal_to_decline"],
+        test_data["proposal_to_apply"]]
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["control"])
-    self.check_ggrc_5091(login_user, len(actual_proposals) > 0)
+    self.check_ggrc_6591(login_user, actual_proposals == exp_proposals)
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["control"], exp_proposals, apply_btns_exist)
 
   @pytest.mark.parametrize(
       "proposal, proposal_author",
-      [("proposal", "proposal_creator"),
+      [("proposal_to_apply", "proposal_creator"),
        ("proposal_from_gr", "global_reader")]
   )
   def test_check_proposals_email_connects_to_correct_obj(
@@ -137,7 +142,7 @@ class TestProposals(base.Test):
     """Check if proposal comparison window has correct info."""
     users.set_current_user(test_data["control_creator"])
     proposal_ui_facade.assert_proposal_comparison_window_has_correct_info(
-        selenium, test_data["control"], test_data["proposal"])
+        selenium, test_data["control"], test_data["proposal_to_apply"])
 
   @pytest.mark.parametrize(
       "login_user",
@@ -150,8 +155,7 @@ class TestProposals(base.Test):
     users.set_current_user(test_data[login_user])
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["control"])
-    self.check_ggrc_5091(login_user, len(actual_proposals) > 0)
-    assert test_data["proposal"] in actual_proposals
+    assert test_data["proposal_to_apply"] in actual_proposals
 
   def test_check_proposals_apply_btn_after_applying(
       self, test_data, apply_proposal, selenium
@@ -159,7 +163,8 @@ class TestProposals(base.Test):
     """Check an applied proposal apply button does not exist."""
     users.set_current_user(test_data["control_creator"])
     proposal_ui_facade.assert_proposal_apply_btns_exist(
-        selenium, test_data["control"], [test_data["proposal"]], False)
+        selenium, test_data["control"], [test_data["proposal_to_apply"]],
+        False)
 
   @pytest.mark.parametrize(
       "login_user",
@@ -172,8 +177,7 @@ class TestProposals(base.Test):
     users.set_current_user(test_data[login_user])
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["control"])
-    self.check_ggrc_5091(login_user, len(actual_proposals) > 0)
-    assert test_data["proposal_from_gr"] in actual_proposals
+    assert test_data["proposal_to_decline"] in actual_proposals
 
   def test_check_proposals_apply_btn_after_declining(
       self, test_data, decline_proposal, selenium
@@ -181,4 +185,5 @@ class TestProposals(base.Test):
     """Check an applied proposal apply button does not exist."""
     users.set_current_user(test_data["control_creator"])
     proposal_ui_facade.assert_proposal_apply_btns_exist(
-        selenium, test_data["control"], [test_data["proposal_from_gr"]], True)
+        selenium, test_data["control"], [test_data["proposal_to_decline"]],
+        True)

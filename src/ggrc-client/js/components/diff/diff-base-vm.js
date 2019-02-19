@@ -29,7 +29,7 @@ export default can.Map({
       return this.attr('emptyValue');
     }
 
-    // display_name is function in case when object is CMS.Model
+    // display_name is function in case when object is instance of Cacheable
     displayName = typeof object.display_name === 'function' ?
       object.display_name() :
       object.display_name;

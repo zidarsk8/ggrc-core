@@ -4,12 +4,13 @@
  */
 
 import Proposal from '../../models/service-models/proposal';
-import template from './templates/create-proposal.mustache';
+import template from './templates/create-proposal.stache';
 import {hasPending as hasPendingUtil} from '../../plugins/ggrc_utils';
 import {
   REFRESH_TAB_CONTENT,
   REFRESH_COMMENTS,
 } from '../../events/eventTypes';
+import {getRole} from '../../plugins/utils/acl-utils';
 const tag = 'create-proposal';
 
 export default can.Component.extend({
@@ -32,13 +33,17 @@ export default can.Component.extend({
     create(element, event) {
       const instance = this.attr('instance');
       const instanceFields = instance.attr();
-      let proposal;
+      const proposalEditorRole = getRole('Proposal', 'ProposalEditor');
 
       event.preventDefault();
       this.attr('loading', true);
 
-      proposal = {
+      let proposal = {
         agenda: this.attr('proposalAgenda'),
+        access_control_list: [{
+          ac_role_id: proposalEditorRole.id,
+          person: {type: 'Person', id: GGRC.current_user.id},
+        }],
         instance: {
           id: instanceFields.id,
           type: instanceFields.type,

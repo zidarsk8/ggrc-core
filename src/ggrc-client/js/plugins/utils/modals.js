@@ -9,19 +9,19 @@ import ModalsController from '../../controllers/modals/modals_controller';
  * Utils methods for showing standart modals
  */
 
-const path = GGRC.mustache_path || '/static/mustache';
-const BUTTON_VIEW_DONE = `${path}/modals/done_buttons.mustache`;
-const BUTTON_VIEW_CLOSE = `${path}/modals/close_buttons.mustache`;
-const BUTTON_VIEW_SAVE_CANCEL = `${path}/modals/save_cancel_buttons.mustache`;
+const path = GGRC.templates_path || '/static/templates';
+const BUTTON_VIEW_DONE = `${path}/modals/done_buttons.stache`;
+const BUTTON_VIEW_CLOSE = `${path}/modals/close_buttons.stache`;
+const BUTTON_VIEW_SAVE_CANCEL = `${path}/modals/save_cancel_buttons.stache`;
 const BUTTON_VIEW_SAVE_CANCEL_DELETE = // eslint-disable-line
-  `${path}/modals/save_cancel_delete_buttons.mustache`;
+  `${path}/modals/save_cancel_delete_buttons.stache`;
 const BUTTON_VIEW_CONFIRM_CANCEL = // eslint-disable-line
-  `${path}/modals/confirm_cancel_buttons.mustache`;
+  `${path}/modals/confirm_cancel_buttons.stache`;
 const CONTENT_VIEW_WARNING =
-  `${path}/base_objects/confirm_warning.mustache`;
-const BUTTON_VIEW_CONFIRM = `${path}/modals/confirm_button.mustache`;
-const CONTENT_VIEW_CONFIRM = `${path}/modals/confirm.mustache`;
-const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
+  `${path}/base_objects/confirm_warning.stache`;
+const BUTTON_VIEW_CONFIRM = `${path}/modals/confirm_button.stache`;
+const CONTENT_VIEW_CONFIRM = `${path}/modals/confirm.stache`;
+const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.stache`;
 
 /**
  * Shows a warning popup within given options. If a user confirms

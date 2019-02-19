@@ -4,7 +4,7 @@
  */
 
 import RefreshQueue from '../../models/refresh_queue';
-import template from './person-data.mustache';
+import template from './person-data.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Person from '../../models/business-models/person';
 

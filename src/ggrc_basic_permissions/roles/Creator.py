@@ -188,6 +188,7 @@ permissions = {
         "Requirement",
         "SystemOrProcess",
         "System",
+        "KeyReport",
         "Process",
         "Metric",
         "ProductGroup",

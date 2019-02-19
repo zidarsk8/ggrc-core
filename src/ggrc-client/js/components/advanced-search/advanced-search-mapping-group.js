@@ -5,7 +5,7 @@
 
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import template from './advanced-search-mapping-group.mustache';
+import template from './advanced-search-mapping-group.stache';
 
 /**
  * Mapping Group view model.

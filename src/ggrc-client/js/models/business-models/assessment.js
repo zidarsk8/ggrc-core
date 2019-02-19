@@ -20,7 +20,7 @@ import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import {getInstance} from '../../plugins/utils/models-utils';
 
-export default Cacheable('CMS.Models.Assessment', {
+export default Cacheable.extend({
   root_object: 'assessment',
   root_collection: 'assessments',
   category: 'governance',
@@ -47,7 +47,7 @@ export default Cacheable('CMS.Models.Assessment', {
   statuses: ['Not Started', 'In Progress', 'In Review',
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
   tree_view_options: {
-    add_item_view: GGRC.mustache_path + '/assessments/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path + '/assessments/tree_add_item.stache',
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',

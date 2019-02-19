@@ -5,7 +5,7 @@
 
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import template from './advanced-search-filter-group.mustache';
+import template from './advanced-search-filter-group.stache';
 
 /**
  * Filter Group view model.

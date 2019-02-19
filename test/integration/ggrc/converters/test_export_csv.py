@@ -633,6 +633,7 @@ class TestExportMultipleObjects(TestCase):
       "Risk Assessment",
       "Risk",
       "Threat",
+      "Key Report",
   )
   def test_asmnt_procedure_export(self, model):
     """Test export of Assessment Procedure. {}"""

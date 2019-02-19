@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './mapping-tree-view.mustache';
+import template from './mapping-tree-view.stache';
 import '../object-list-item/editable-document-object-list-item';
 import Mappings from '../../models/mappers/mappings';
 

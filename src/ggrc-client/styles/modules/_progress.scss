@@ -17,15 +17,6 @@
         &-label {
           color: $gray;
         }
-
-        people-with-role-inline-field {
-          width: calc(100% - 55px);
-
-          .inline-aggregate-field {
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
-        }
       }
     }
   }

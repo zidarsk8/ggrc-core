@@ -5,7 +5,7 @@
 
 import './collapsible-panel-header';
 import './collapsible-panel-body';
-import template from './collapsible-panel.mustache';
+import template from './collapsible-panel.stache';
 
 const tag = 'collapsible-panel';
 let viewModel = can.Map.extend({

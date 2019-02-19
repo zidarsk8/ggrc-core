@@ -20,9 +20,11 @@ import Assessment from '../models/business-models/assessment';
 
 export default can.Control({
   defaults: {
+    Assessment,
+    Relationship,
     model: getPageModel(),
     instance: getPageInstance(),
-    widget_view: GGRC.mustache_path + '/base_objects/summary.mustache',
+    widget_view: GGRC.templates_path + '/base_objects/summary.stache',
     isLoading: true,
     isShown: false,
     forceRefresh: false,
@@ -51,7 +53,7 @@ export default can.Control({
   init: function () {
     let frag;
     if (this.element.data('widget-view')) {
-      this.options.widget_view = GGRC.mustache_path +
+      this.options.widget_view = GGRC.templates_path +
         this.element.data('widget-view');
     }
     this.element.closest('.widget')
@@ -82,9 +84,9 @@ export default can.Control({
       this.options.forceRefresh = true;
     }
   },
-  '{CMS.Models.Relationship} destroyed': 'onRelationshipChange',
-  '{CMS.Models.Relationship} created': 'onRelationshipChange',
-  '{CMS.Models.Assessment} updated': function (model, ev, instance) {
+  '{Relationship} destroyed': 'onRelationshipChange',
+  '{Relationship} created': 'onRelationshipChange',
+  '{Assessment} updated': function (model, ev, instance) {
     if (instance instanceof Assessment) {
       this.options.forceRefresh = true;
     }
@@ -94,7 +96,7 @@ export default can.Control({
       .closest('[data-widget-view]')
       .attr('data-widget-view');
     return (widgetView && widgetView.length > 0) ?
-      GGRC.mustache_path + widgetView :
+      GGRC.templates_path + widgetView :
       this.options.widget_view;
   },
   widget_shown: function (event) {

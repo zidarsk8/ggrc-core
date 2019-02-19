@@ -1,0 +1,20 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if showTooltip}}
+  <div
+    rel="tooltip"
+    data-original-title="{{tooltipContent}}"
+  >
+    {{#items}}
+      <div class="tree-field__item">{{.}}</div>
+    {{/items}}
+  </div>
+{{else}}
+  {{#items}}
+    <div class="tree-field__item">{{.}}</div>
+  {{/items}}
+{{/if}}
+

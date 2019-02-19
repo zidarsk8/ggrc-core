@@ -9,7 +9,7 @@ import '../../components/advanced-search/advanced-search-wrapper';
 import '../../components/unified-mapper/mapper-results';
 import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
-import template from './assessment-template-clone.mustache';
+import template from './assessment-template-clone.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({

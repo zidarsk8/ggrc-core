@@ -61,6 +61,7 @@ class CalendarApiService(object):
         'sendNotifications': kwargs.get('send_notifications', False),
         'guestsCanModify': kwargs.get('guests_can_modify', False),
         'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
+        'transparency': kwargs.get('transparency', 'transparent'),
     }
     return self.calendar_service.events().insert(
         calendarId=calendar_id, body=event).execute()
@@ -96,6 +97,7 @@ class CalendarApiService(object):
         'sendNotifications': kwargs.get('send_notifications', False),
         'guestsCanModify': kwargs.get('guests_can_modify', False),
         'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
+        'transparency': kwargs.get('transparency', 'transparent'),
     }
     return self.calendar_service.events().update(
         calendarId=calendar_id, body=event, eventId=event_id).execute()

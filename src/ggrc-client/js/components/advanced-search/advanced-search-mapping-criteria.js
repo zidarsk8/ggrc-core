@@ -6,7 +6,7 @@
 import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
-import template from './advanced-search-mapping-criteria.mustache';
+import template from './advanced-search-mapping-criteria.stache';
 import Mappings from '../../models/mappers/mappings';
 import * as businessModels from '../../models/business-models';
 

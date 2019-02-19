@@ -11,7 +11,7 @@ import {
 } from '../../plugins/utils/snapshot-utils';
 import '../custom-attributes/custom-attributes-field-view';
 import '../related-objects/related-people-access-control';
-import template from './detailed-business-object-list-item.mustache';
+import template from './detailed-business-object-list-item.stache';
 
 const tag = 'detailed-business-object-list-item';
 /**

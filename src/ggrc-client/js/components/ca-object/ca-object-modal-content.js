@@ -7,7 +7,7 @@ import '../comment/comment-input';
 import '../comment/comment-add-button';
 import '../object-list-item/editable-document-object-list-item';
 import '../assessment/attach-button';
-import template from './ca-object-modal-content.mustache';
+import template from './ca-object-modal-content.stache';
 import tracker from '../../tracker';
 import {getAssigneeType} from '../../plugins/ggrc_utils';
 

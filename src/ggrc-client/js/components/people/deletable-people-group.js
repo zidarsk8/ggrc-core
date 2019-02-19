@@ -5,7 +5,7 @@
 
 import '../person/person-data';
 import viewModel from '../view-models/people-group-vm';
-import template from './deletable-people-group.mustache';
+import template from './deletable-people-group.stache';
 
 export default can.Component.extend({
   tag: 'deletable-people-group',

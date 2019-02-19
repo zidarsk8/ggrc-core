@@ -9,7 +9,7 @@ import caUpdate from '../mixins/ca-update';
 import Stub from '../stub';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
 
-export default Cacheable('CMS.Models.Person', {
+export default Cacheable.extend({
   root_object: 'person',
   root_collection: 'people',
   category: 'entities',

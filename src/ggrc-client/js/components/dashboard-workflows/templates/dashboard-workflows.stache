@@ -1,0 +1,115 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="inner-content dashboard-workflows">
+  <section class="widget dashboard small-margin">
+    <header class="header widget-nav">
+      <div class="row-fluid">
+        <div class="span12">
+          <ul>
+            <li class="active">
+              <a href="javascript://">
+                My Active Workflows ({{workflows.length}})
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <section class="content">
+      <ul class="new-tree tree-one dashboard-tree workflow-tree">
+        {{#shownWorkflows}}
+          <li class="tree-item">
+            <div class="item-wrap">
+              <div class="row-fluid">
+                <div class="span5">
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      <div class="oneline">
+                        <a href="{{workflowLink}}">{{workflowTitle}}</a>
+                        <div class="tree-title-area__subtitle">
+                          <div class="tree-title-area__subtitle-label">
+                            Owned by:&nbsp
+                          </div>
+                          <div
+                            class="dashboard-workflows__owners"
+                            rel="tooltip"
+                            data-placement="top"
+                            data-original-title="{{owners.tooltipContent}}">
+                            <span class="dashboard-workflows__owners-content">{{owners.inlineList}}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="span5">
+                  <div class="tree-progress">
+                    <ul class="item-util">
+                      {{#if taskStatistic.overdue}}
+                        <li class="overdue-text">
+                          {{overdueCountMessage taskStatistic}} <span class="completed-percent">/ {{taskStatistic.completedPercent}}% completed</span>
+                        </li>
+                      {{else}}
+                        <li class="progress-text">
+                          {{totalCountMessage taskStatistic.total}} <span class="completed-percent">/ {{taskStatistic.completedPercent}}% completed</span>
+                        </li>
+                      {{/if}}
+                    </ul>
+                  </div>
+                </div>
+                <div class="span2">
+                  <div class="right">
+                    {{#if taskStatistic.overdue}}
+                      <span class="overdue">Overdue</span>
+                    {{else}}
+                      <span>Due on</span>
+                    {{/if}}
+                      <ul class="item-util">
+                        <li>
+                          <span class="due-in-date">{{taskStatistic.dueInDate}}</span>
+                        </li>
+                      </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        {{/shownWorkflows}}
+        {{#unless workflows.length}}
+          {{#if isLoading}}
+            <li>
+              <div class="zero-state">
+                <h2>Loading...</h2>
+              </div>
+            </li>
+          {{else}}
+            <li>
+              <div class="zero-state">
+                <h2>You don't have any workflows in progress</h2>
+              </div>
+            </li>
+          {{/if}}
+        {{/unless}}
+      </ul><!-- tree-structure end -->
+
+      {{#if showToggleListButton}}
+        <a
+          href="javascript://"
+          class="workflow-trigger"
+          role="button"
+          ($click)="toggleWorkflowList"
+        >
+          {{#if showAllWorkflows}}
+            Show top 5 workflows
+          {{else}}
+            Show all my workflows
+          {{/if}}
+        </a>
+      {{/if}}
+    </section>
+  </section><!-- Widget end -->
+
+</div><!-- inner-content end -->

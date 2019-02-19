@@ -5,7 +5,7 @@
 
 import '../release-notes-list/release-notes-list';
 
-import template from './release-notes-modal.mustache';
+import template from './release-notes-modal.stache';
 
 const viewModel = can.Map.extend({
   define: {

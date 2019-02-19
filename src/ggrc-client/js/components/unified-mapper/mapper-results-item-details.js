@@ -7,7 +7,7 @@ import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
 import '../unarchive_link';
-import template from './templates/mapper-results-item-details.mustache';
+import template from './templates/mapper-results-item-details.stache';
 import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({

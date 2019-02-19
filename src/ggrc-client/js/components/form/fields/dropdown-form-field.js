@@ -4,7 +4,7 @@
  */
 
 import '../../dropdown/dropdown';
-import template from './dropdown-form-field.mustache';
+import template from './dropdown-form-field.stache';
 
 export default can.Component.extend({
   tag: 'dropdown-form-field',

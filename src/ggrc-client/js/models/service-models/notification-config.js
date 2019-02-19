@@ -5,7 +5,7 @@
 
 import Cacheable from '../cacheable';
 
-export default Cacheable('CMS.Models.NotificationConfig', {
+export default Cacheable.extend({
   root_object: 'notification_config',
   root_collection: 'notification_configs',
   category: 'person',

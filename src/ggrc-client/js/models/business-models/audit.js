@@ -11,8 +11,9 @@ import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
+import Program from './program';
 
-export default Cacheable('CMS.Models.Audit', {
+export default Cacheable.extend({
   root_object: 'audit',
   root_collection: 'audits',
   category: 'programs',
@@ -50,7 +51,7 @@ export default Cacheable('CMS.Models.Audit', {
       'Issues', 'Assessments', 'Evidence'],
   },
   tree_view_options: {
-    add_item_view: GGRC.mustache_path + '/audits/tree_add_item.mustache',
+    add_item_view: GGRC.templates_path + '/audits/tree_add_item.stache',
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',
@@ -151,10 +152,11 @@ export default Cacheable('CMS.Models.Audit', {
     let _super = this._super;
     let args = arguments;
     if (!this.context || !this.context.id) {
-      return this.program.reify().refresh().then(function (program) {
-        this.attr('context', program.context);
-        return _super.apply(this, args);
-      }.bind(this));
+      return Program.findInCacheById(this.program.id).refresh().
+        then(function (program) {
+          this.attr('context', program.context);
+          return _super.apply(this, args);
+        }.bind(this));
     }
     return _super.apply(this, args);
   },

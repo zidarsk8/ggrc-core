@@ -8,7 +8,7 @@ from lib import users, base
 from lib.constants import objects, element
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
-from lib.utils import selenium_utils, ui_utils
+from lib.utils import selenium_utils, ui_utils, string_utils
 
 from lib.entities import entities_factory
 
@@ -149,3 +149,14 @@ def check_user_menu_has_icons(user_menu):
     assert item.element.find_element_by_class_name(
         'fa').get_attribute('class') != ''
   assert user_menu.email.text == users.current_user().name
+
+
+def submit_obj_for_review(selenium, obj, user):
+  """Submit object for review scenario."""
+  _get_ui_service(selenium, obj).submit_for_review(
+      obj, user.email, string_utils.StringMethods.random_string())
+
+
+def get_object(selenium, obj):
+  """Get and return object from Info page."""
+  return _get_ui_service(selenium, obj).get_obj_from_info_page(obj)

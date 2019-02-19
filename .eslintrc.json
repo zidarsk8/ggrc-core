@@ -19,7 +19,6 @@
   "globals": {
     "_": false,
     "can": false,
-    "CMS": false,
     "GGRC": false,
     "moment": false,
     "Mustache": false,
@@ -50,6 +49,14 @@
       1, "always-multiline"
     ],
     "indent": [2, 2, {
+      "FunctionDeclaration": {
+        "body": 1,
+        "parameters": 1
+      },
+      "FunctionExpression": {
+        "body": 1,
+        "parameters": 1
+      },
       "SwitchCase": 1
     }],
     "id-length": [1, {

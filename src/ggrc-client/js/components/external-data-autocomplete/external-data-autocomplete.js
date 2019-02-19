@@ -7,7 +7,8 @@ import './external-data-provider';
 import './autocomplete-results';
 import '../spinner/spinner';
 import * as businessModels from '../../models/business-models';
-import template from './external-data-autocomplete.mustache';
+import {reify, isReifiable} from '../../plugins/utils/reify-utils';
+import template from './external-data-autocomplete.stache';
 
 /**
  * The autocomplete component used to load data from external sources.
@@ -134,7 +135,7 @@ export default can.Component.extend({
         let data = response[0];
         let model = data[1][ModelClass.root_object];
 
-        model = model.reify ? model.reify() : model;
+        model = isReifiable(model) ? reify(model) : model;
 
         let result = ModelClass.cache[model.id] || new ModelClass(model);
 
