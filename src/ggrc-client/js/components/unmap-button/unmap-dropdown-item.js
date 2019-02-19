@@ -26,23 +26,23 @@ export default can.Component.extend({
       },
       denyIssueUnmap: {
         get: function () {
-          return !Mappings.allowedToUnmap(this.attr('page_instance'),
-            this.attr('instance'))
-            && ((this.attr('page_instance.type') === 'Audit'
-                && !this.attr('instance.allow_unmap_from_audit'))
-              || (this.attr('instance.type') === 'Audit'
-                && !this.attr('page_instance.allow_unmap_from_audit')));
+          return this.attr('issueUnmap')
+              && ((this.attr('page_instance.type') === 'Audit'
+                  && !this.attr('instance.allow_unmap_from_audit'))
+                || (this.attr('instance.type') === 'Audit'
+                  && !this.attr('page_instance.allow_unmap_from_audit')));
         },
       },
       isAllowedToUnmap: {
         get() {
-          let pageInstance = this.attr('page_instance');
-          let instance = this.attr('instance');
+          let source = this.attr('page_instance');
+          let destination = this.attr('instance');
           let options = this.attr('options');
 
-          return Mappings.allowedToUnmap(pageInstance, instance)
+          return Mappings.allowedToUnmap(source, destination)
             && !(isAllObjects() || isMyWork())
-            && options.attr('isDirectlyRelated');
+            && options.attr('isDirectlyRelated')
+            && !this.attr('denyIssueUnmap');
         },
       },
       isMappableExternally: {

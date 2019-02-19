@@ -2,43 +2,43 @@
   Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
+{{#if isAllowedToUnmap}}
+  <li class="border">
 
-{{#if issueUnmap}}
-  {{#unless denyIssueUnmap}}
-    <li class="border"></li>
+  {{#if issueUnmap}}
+
+    <unmap-button
+      {prevent-click}="true"
+      {source}="page_instance"
+      {destination}="instance"
+      class="unmap-link">
+        <issue-unmap-item
+          (unmap-issue)="unmapInstance()"
+          {source}="page_instance"
+          {destination}="instance">
+            <i class="fa fa-ban"></i>Unmap
+        </issue-unmap-item>
+    </unmap-button>
+
+  {{else}}
+
+    {{^if isMappableExternally}}
       <unmap-button
-        {prevent-click}="true"
         {source}="page_instance"
         {destination}="instance"
         class="unmap-link">
-          <issue-unmap-item
-            (unmap-issue)="unmapInstance()"
-            {source}="page_instance"
-            {destination}="instance">
-              <i class="fa fa-ban"></i>Unmap
-          </issue-unmap-item>
+          <i class="fa fa-ban"></i>Unmap
       </unmap-button>
-    </li>
-  {{/unless}}
-{{else}}
-  {{#isAllowedToUnmap}}
-    <li class="border">
-      {{^if isMappableExternally}}
-        <unmap-button
-          {source}="page_instance"
-          {destination}="instance"
-          class="unmap-link">
-            <i class="fa fa-ban"></i>Unmap
-        </unmap-button>
-      {{else}}
-        <questionnaire-mapping-link 
-          {instance}="page_instance" 
-          {destination-model}="instance.constructor" 
-          {type}="'unmap'">
-            <i class="fa fa-fw fa-external-link"></i>
-            Unmap in new frontend
-        </questionnaire-mapping-link>
-      {{/if}}
-    </li>
-  {{/isAllowedToUnmap}}
+    {{else}}
+      <questionnaire-mapping-link 
+        {instance}="page_instance" 
+        {destination-model}="instance.constructor" 
+        {type}="'unmap'">
+          <i class="fa fa-fw fa-external-link"></i>
+          Unmap in new frontend
+      </questionnaire-mapping-link>
+    {{/if}}
+    
+  {{/if}}
+  </li>
 {{/if}}

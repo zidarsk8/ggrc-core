@@ -10,7 +10,6 @@ import {
   buildParam,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
-import Mappings from '../../models/mappers/mappings';
 import {
   getPageInstance,
   navigate,

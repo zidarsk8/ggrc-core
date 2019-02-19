@@ -40,13 +40,18 @@ describe('unmap-dropdown-item component', function () {
       it('returns true if page_instance.type equals to "Audit" and' +
       'instance.allow_unmap_from_audit is false', function () {
         viewModel.attr('page_instance.type', 'Audit');
+
+        viewModel.attr('instance.type', 'Issue');
         viewModel.attr('instance.allow_unmap_from_audit', false);
+
         expect(viewModel.attr('denyIssueUnmap')).toBe(true);
       });
 
       it('returns true if instance.type equals to "Audit" and ' +
       'page_instance.allow_unmap_from_audit is false', function () {
         viewModel.attr('instance.type', 'Audit');
+
+        viewModel.attr('page_instance.type', 'Issue');
         viewModel.attr('page_instance.allow_unmap_from_audit', false);
         expect(viewModel.attr('denyIssueUnmap')).toBe(true);
       });
@@ -117,6 +122,85 @@ describe('unmap-dropdown-item component', function () {
         viewModel.attr('options.isDirectlyRelated', false);
 
         expect(viewModel.attr('isAllowedToUnmap')).toBe(false);
+      });
+
+      it('returns false when source is Issue and destination is Audit and ' +
+      'allow_unmap_from_audit is FALSE', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Issue');
+        viewModel.attr('page_instance.allow_unmap_from_audit', false);
+
+        viewModel.attr('instance.type', 'Audit');
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(false);
+      });
+
+      it('returns true when source is Issue and destination is Audit and ' +
+      'allow_unmap_from_audit is TRUE', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Issue');
+        viewModel.attr('page_instance.allow_unmap_from_audit', true);
+
+        viewModel.attr('instance.type', 'Audit');
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(true);
+      });
+
+      it('returns false when source is Audit and destination is Issue and ' +
+      'allow_unmap_from_audit is FALSE', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Audit');
+
+        viewModel.attr('instance.type', 'Issue');
+        viewModel.attr('instance.allow_unmap_from_audit', false);
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(false);
+      });
+
+      it('returns true when source is Audit and destination is Issue and ' +
+      'allow_unmap_from_audit is TRUE', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Audit');
+
+        viewModel.attr('instance.type', 'Issue');
+        viewModel.attr('instance.allow_unmap_from_audit', true);
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(true);
+      });
+
+      it('returns true when unmapping is allowed', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(true);
       });
     });
   });
