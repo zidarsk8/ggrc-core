@@ -423,9 +423,10 @@ function loadFirstTierItems(modelName,
  * @param {String} type - Type of parent object.
  * @param {Number} id - ID of parent object.
  * @param {String} filter - Filter.
+ * @param {Object} pageInfo - Information about pagination, sorting and filtering
  * @return {Promise} - Items for sub tier.
  */
-function loadItemsForSubTier(models, type, id, filter) {
+function loadItemsForSubTier(models, type, id, filter, pageInfo) {
   let relevant = {
     type: type,
     id: id,
@@ -446,14 +447,15 @@ function loadItemsForSubTier(models, type, id, filter) {
 
       dfds = loadedModelObjects.map(function (modelObject) {
         let subTreeFields = getSubTreeFields(type, modelObject.name);
-        let pageInfo = {};
-        let params;
 
-        if (countMap[modelObject.name]) {
-          pageInfo.current = 1;
-          pageInfo.pageSize = countMap[modelObject.name];
+        if (!pageInfo && countMap[modelObject.name]) {
+          pageInfo = {
+            current: 1,
+            pageSize: countMap[modelObject.name],
+          };
         }
-        params = buildParam(
+
+        let params = buildParam(
           modelObject.name,
           pageInfo,
           relevant,
@@ -485,6 +487,7 @@ function loadItemsForSubTier(models, type, id, filter) {
       let directlyRelated = [];
       let notRelated = [];
       let response = can.makeArray(arguments);
+      let total;
 
       loadedModelObjects.forEach(function (modelObject, index) {
         let values;
@@ -492,8 +495,10 @@ function loadItemsForSubTier(models, type, id, filter) {
         if (isSnapshotModel(modelObject.name) &&
           response[index].Snapshot) {
           values = response[index].Snapshot.values;
+          total = response[index].Snapshot.total;
         } else {
           values = response[index][modelObject.name].values;
+          total = response[index][modelObject.name].total;
         }
 
         values.forEach(function (source) {
@@ -511,6 +516,7 @@ function loadItemsForSubTier(models, type, id, filter) {
         directlyItems: directlyRelated,
         notDirectlyItems: notRelated,
         showMore: showMore,
+        total: total,
       };
     });
 }
