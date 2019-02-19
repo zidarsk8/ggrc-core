@@ -4,7 +4,7 @@
 */
 
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
-import '../issue/issue-unmap';
+import '../issue/issue-unmap-item';
 import template from './unmap-dropdown-item.stache';
 import Mappings from '../../models/mappers/mappings';
 import {
@@ -15,7 +15,7 @@ import {
 export default can.Component.extend({
   tag: 'unmap-dropdown-item',
   template,
-  leakScope: true,
+  leakScope: false,
   viewModel: {
     define: {
       issueUnmap: {
