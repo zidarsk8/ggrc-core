@@ -373,7 +373,9 @@ export default can.Component.extend({
               tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
           }
         })
-        .fail(function () {
+        .fail(function (instance, xhr) {
+          notifierXHR('error', xhr);
+
           if (type === 'comments') {
             tracker.stop(assessment.type,
               tracker.USER_JOURNEY_KEYS.INFO_PANE,

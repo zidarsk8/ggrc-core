@@ -889,6 +889,7 @@ describe('assessment-info-pane component', () => {
     describe('if deferredSave was rejected', () => {
       beforeEach(function () {
         dfd.reject(assessment);
+        spyOn(NotifiersUtils, 'notifierXHR');
       });
 
       it('sets "isUpdating{<passed capitalized type>}" property to false',
