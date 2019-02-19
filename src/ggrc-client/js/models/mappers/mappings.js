@@ -61,11 +61,10 @@ export default can.Construct.extend({
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
   isMappableType: function (target, source) {
-    let result;
     if (!target || !source) {
       return false;
     }
-    result = this.getMappingList(target);
+    let result = this.getMappingList(target);
     return _.includes(result, source);
   },
   /**
@@ -79,15 +78,8 @@ export default can.Construct.extend({
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
   allowedToMap: function (source, target, options) {
-    let canMap = false;
-    let targetType;
-    let sourceType;
-    let targetContext;
-    let sourceContext;
-    let createContexts;
-
-    targetType = this._getType(target);
-    sourceType = this._getType(source);
+    let targetType = this._getType(target);
+    let sourceType = this._getType(source);
 
     // special check for snapshot:
     if (options &&
@@ -102,12 +94,12 @@ export default can.Construct.extend({
       return false;
     }
 
-    targetContext = _.exists(target, 'context.id');
-    sourceContext = _.exists(source, 'context.id');
-    createContexts = _.exists(
+    let targetContext = _.exists(target, 'context.id');
+    let sourceContext = _.exists(source, 'context.id');
+    let createContexts = _.exists(
       GGRC, 'permissions.create.Relationship.contexts');
 
-    canMap = Permission.is_allowed_for('update', source) ||
+    let canMap = Permission.is_allowed_for('update', source) ||
       _.includes(createContexts, sourceContext) ||
       // Also allow mapping to source if the source is about to be created.
       _.isUndefined(source.created_at);
@@ -225,15 +217,12 @@ export default can.Construct.extend({
    * @param {object} groups - type groups
    */
   _addFormattedType: function (modelName, groups) {
-    let group;
-    let type;
-    let cmsModel;
-    cmsModel = getModelByType(modelName);
+    let cmsModel = getModelByType(modelName);
     if (!cmsModel || !cmsModel.title_singular) {
       return;
     }
-    type = this._prepareCorrectTypeFormat(cmsModel);
-    group = !groups[type.category] ?
+    let type = this._prepareCorrectTypeFormat(cmsModel);
+    let group = !groups[type.category] ?
       groups.governance :
       groups[type.category];
 
@@ -293,11 +282,9 @@ export default can.Construct.extend({
     return mappings;
   },
   getMapper: function (mappingName, type) {
-    let mapper;
     let mappers = this.getMappingsFor(type);
     if (mappers) {
-      mapper = mappers[mappingName];
-      return mapper;
+      return mappers[mappingName];
     }
   },
   _getBindingAttr: function (mapper) {
@@ -306,7 +293,6 @@ export default can.Construct.extend({
     }
   },
   getBinding: function (mapper, model) {
-    let mapping;
     let binding;
     let bindingAttr = this._getBindingAttr(mapper);
 
@@ -317,7 +303,7 @@ export default can.Construct.extend({
     if (!binding) {
       if (typeof (mapper) === 'string') {
       // Lookup and attach named mapper
-        mapping = this.getMapper(mapper, model.constructor.model_singular);
+        let mapping = this.getMapper(mapper, model.constructor.model_singular);
         if (!mapping) {
           console.warn(
             `No such mapper: ${model.constructor.model_singular}.${mapper}`);
