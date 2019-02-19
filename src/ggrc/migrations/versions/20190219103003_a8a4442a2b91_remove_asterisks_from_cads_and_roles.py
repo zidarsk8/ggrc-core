@@ -15,10 +15,10 @@ from alembic import op
 
 from ggrc.models import all_models
 
+
 # revision identifiers, used by Alembic.
 revision = 'a8a44ea42a2b91'
 down_revision = '59b41fe6c145'
-
 
 
 def update_name(row_id, name, field, table, connection):
@@ -42,7 +42,7 @@ def _generate_new_name(original_name, column, table, connection):
 
 
 def get_roles_to_update(connection):
-  """Get list of all access control roles that have name with symbol '*' in it"""
+  """Get list of all access control roles with symbol '*' in it"""
   res = connection.execute(sa.text("""
     SELECT id, {0}
     FROM {1}
@@ -53,20 +53,21 @@ def get_roles_to_update(connection):
 
 
 def get_attributes_to_update(connection):
-  """Get list of all custom attribute definitions that have title with symbol '*' in it"""
+  """Get list of all custom attribute definitions with symbol '*' in it"""
   res = connection.execute(sa.text("""
     SELECT id, {0}
     FROM {1}
     WHERE {0} like '%*%';
-  """.format('title', all_models.CustomAttributeDefinition.__tablename__))).fetchall()
+  """.format('title',
+             all_models.CustomAttributeDefinition.__tablename__))).fetchall()
   return res
 
 
 def is_exists(value, name, table, connection):
   """Check is column name with value exists in table"""
   result = connection.execute(sa.text("""
-    SELECT * 
-    FROM {} 
+    SELECT *
+    FROM {}
     WHERE {} = '{}';
   """.format(table, name, value))).fetchall()
   if result:
@@ -80,11 +81,14 @@ def upgrade():
 
   roles_to_update = get_roles_to_update(connection)
   for role in roles_to_update:
-    update_name(role.id, role.name, 'name', all_models.AccessControlRole.__tablename__, connection)
+    update_name(role.id, role.name, 'name',
+                all_models.AccessControlRole.__tablename__, connection)
 
   attributes_to_update = get_attributes_to_update(connection)
   for attribute in attributes_to_update:
-    update_name(attribute.id, attribute.title, 'title', all_models.CustomAttributeDefinition.__tablename__, connection)
+    update_name(attribute.id, attribute.title,
+                'title', all_models.CustomAttributeDefinition.__tablename__,
+                connection)
 
 
 def downgrade():
