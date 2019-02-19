@@ -351,10 +351,12 @@ describe('issue-unmap-item component', () => {
     const targetTitle = 'TEST_TARGET_TITLE';
 
     beforeEach(() => {
-      viewModel.attr('issueInstance', {
+      viewModel.attr('source', {
+        type: 'Issue',
         title: issueTitle,
       });
-      viewModel.attr('target', {
+      viewModel.attr('destination', {
+        type: targetType,
         title: targetTitle,
         'class': {
           title_singular: targetType,

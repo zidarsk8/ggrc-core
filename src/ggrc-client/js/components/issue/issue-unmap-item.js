@@ -30,9 +30,23 @@ export default can.Component.extend({
           return new Pagination({pageSizeSelect: [5, 10, 15]});
         },
       },
+      issueInstance: {
+        get() {
+          return this.attr('source.type') === 'Issue'
+            ? this.attr('source')
+            : this.attr('destination');
+        },
+      },
+      target: {
+        get() {
+          return this.attr('source.type') === 'Issue'
+            ? this.attr('destination')
+            : this.attr('source');
+        },
+      },
     },
-    issueInstance: {},
-    target: {},
+    source: {},
+    destination: {},
     modalTitle: 'Unmapping',
     showRelatedObjects: false,
     isLoading: false,
@@ -42,11 +56,6 @@ export default can.Component.extend({
     modalState: {
       open: false,
     },
-    canUnmap() {
-      return Mappings.allowedToUnmap(this.attr('issueInstance'),
-        this.attr('target'));
-    },
-
     processRelatedSnapshots() {
       this.loadRelatedObjects().done(() => {
         if (this.attr('total')) {

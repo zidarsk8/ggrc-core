@@ -5,39 +5,20 @@
 
 {{#if issueUnmap}}
   {{#unless denyIssueUnmap}}
-    {{#is page_instance.type "Issue"}}
+    <li class="border"></li>
       <unmap-button
         {prevent-click}="true"
         {source}="page_instance"
-        {destination}="instance">
+        {destination}="instance"
+        class="unmap-link">
           <issue-unmap-item
             (unmap-issue)="unmapInstance()"
-            {issue-instance}="page_instance"
-            {target}="instance">
-              <li class="border">
-                <span class="unmap-link">
-                  <i class="fa fa-ban"></i>Unmap
-                </span>
-              </li>
+            {source}="page_instance"
+            {destination}="instance">
+              <i class="fa fa-ban"></i>Unmap
           </issue-unmap-item>
       </unmap-button>
-    {{else}}
-      <unmap-button
-        {prevent-click}="true"
-        {source}="instance"
-        {destination}="page_instance">
-          <issue-unmap-item
-            (unmap-issue)="unmapInstance()"
-            {issue-instance}="instance"
-            {target}="page_instance">
-              <li class="border">
-                <span class="unmap-link">
-                  <i class="fa fa-ban"></i>Unmap
-                </span>
-              </li>
-          </issue-unmap-item>
-      </unmap-button>
-    {{/is}}
+    </li>
   {{/unless}}
 {{else}}
   {{#isAllowedToUnmap}}
