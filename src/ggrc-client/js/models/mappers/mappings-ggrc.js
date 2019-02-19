@@ -76,11 +76,13 @@ new Mappings({
 
   Program: {
     map: [...coreObjects, 'Document'],
+    unmap: [...coreObjects, 'Document'],
     indirectMappings: ['Audit', 'Person', 'TaskGroup', 'Workflow'],
   },
 
   Document: {
     map: [...coreObjects, 'Program'],
+    unmap: [...coreObjects, 'Program'],
     indirectMappings: ['Person'],
   },
 
@@ -200,6 +202,7 @@ new Mappings({
   },
   Assessment: {
     map: [...snapshotableObjects, 'Issue'],
+    unmap: [...snapshotableObjects, 'Issue'],
     indirectMappings: ['Audit', 'Evidence', 'Person'],
   },
   Evidence: {
@@ -212,6 +215,7 @@ new Mappings({
   // Workflow
   TaskGroup: {
     map: [...coreObjects, 'Program'],
+    unmap: [...coreObjects, 'Program'],
     indirectMappings: ['Workflow'],
   },
   TaskGroupTask: {
@@ -222,6 +226,7 @@ new Mappings({
   },
   CycleTaskGroupObjectTask: {
     map: [...coreObjects, 'Audit', 'Program'],
+    unmap: [...coreObjects, 'Audit', 'Program'],
     indirectMappings: ['Person', 'Workflow'],
 
     mappers: {

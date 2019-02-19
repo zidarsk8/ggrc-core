@@ -260,15 +260,7 @@ export default can.Construct.extend({
    * @return {Object} a keyed object of allowed for unmapping models
    */
   getAllowedToUnmapModels(object) {
-    let unmapModels = this._getModelsFromConfig(object, 'unmap');
-
-    if (!_.keys(unmapModels).length) {
-      let allowedToMap = this.getAllowedToMapModels(object);
-      let externalMap = this.getExternalMapModels(object);
-      unmapModels = Object.assign({}, allowedToMap, externalMap);
-    }
-
-    return unmapModels;
+    return this._getModelsFromConfig(object, 'unmap');
   },
   _getModelsFromConfig(object, prop) {
     let mappings = {};
