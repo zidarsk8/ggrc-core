@@ -20,58 +20,75 @@ from ggrc.models import all_models
 revision = 'a8a44ea42a2b91'
 down_revision = '57b14cb4a7b4'
 
+roles_table = all_models.AccessControlRole.__tablename__
+attributes_table = all_models.CustomAttributeDefinition.__tablename__
 
-def update_name(row_id, name, field, table, connection):
+tables_descriptions = {roles_table: {'name': 'name',
+                                     'object_type': 'object_type'},
+                       attributes_table: {'name': 'title',
+                                          'object_type': 'definition_type'}}
+
+
+def update_name(element, table, connection):
   """Update fields in DB to remove symbol '*'"""
-  new_name = _generate_new_name(name, field, table, connection)
+  fields = tables_descriptions[table]
+  new_name = _generate_new_name(element[fields['name']],
+                                element[fields['object_type']],
+                                connection)
   connection.execute(sa.text("""
-    UPDATE {}
-    SET {} = '{}'
-    WHERE id = {};
-  """.format(table, field, new_name, row_id)))
+    UPDATE {table}
+    SET {field_name} = '{field_value}'
+    WHERE id = {row_id};
+  """.format(table=table, field_name=fields['name'],
+             field_value=new_name, row_id=element.id)))
 
 
-def _generate_new_name(original_name, column, table, connection):
+def _generate_new_name(original_name, object_type, connection):
   """Remove symbol '*' from name and add appendix if new name already exists"""
   new_name = original_name.replace('*', '')
   iterator = 0
-  while is_exists(new_name, column, table, connection):
+  while is_exists(new_name, object_type, connection):
     iterator += 1
     new_name = "{}-{}".format(original_name.replace('*', ''), iterator)
   return new_name
 
 
-def get_roles_to_update(connection):
-  """Get list of all access control roles with symbol '*' in it"""
-  res = connection.execute(sa.text("""
-    SELECT id, {0}
-    FROM {1}
-    WHERE {0} like '%*%'
-    AND internal = 0;
-  """.format('name', all_models.AccessControlRole.__tablename__))).fetchall()
+def get_elements_to_update(connection, table):
+  """Get list of all elements in table with symbol '*' in it"""
+  query = """
+    SELECT id, {name_field}, {object_type_field}
+    FROM {table}
+    WHERE {name_field} like '%*%'
+  """
+  if table == roles_table:
+    query += "AND internal = 0;"
+  else:
+    query += ";"
+  fields = tables_descriptions[table]
+  sa_query = sa.text(query.format(table=table,
+                                  name_field=fields['name'],
+                                  object_type_field=fields['object_type']))
+  res = connection.execute(sa_query).fetchall()
   return res
 
 
-def get_attributes_to_update(connection):
-  """Get list of all custom attribute definitions with symbol '*' in it"""
-  res = connection.execute(sa.text("""
-    SELECT id, {0}
-    FROM {1}
-    WHERE {0} like '%*%';
-  """.format('title',
-             all_models.CustomAttributeDefinition.__tablename__))).fetchall()
-  return res
-
-
-def is_exists(value, name, table, connection):
+def is_exists(new_name_value, object_type, connection):
   """Check is column name with value exists in table"""
-  result = connection.execute(sa.text("""
-    SELECT *
-    FROM {}
-    WHERE {} = '{}';
-  """.format(table, name, value))).fetchall()
-  if result:
-    return True
+  query = """
+    SELECT 1
+    FROM {table_name}
+    WHERE {field_name} = '{name_value}'
+    AND {object_type_field} = '{object_type_value}';
+  """
+  for table, fields in tables_descriptions.items():
+    sa_query = sa.text(query.format(table_name=table,
+                                    field_name=fields['name'],
+                                    name_value=new_name_value,
+                                    object_type_field=fields['object_type'],
+                                    object_type_value=object_type))
+    result = connection.execute(sa_query).fetchall()
+    if result:
+      return True
   return False
 
 
@@ -79,16 +96,11 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
 
-  roles_to_update = get_roles_to_update(connection)
-  for role in roles_to_update:
-    update_name(role.id, role.name, 'name',
-                all_models.AccessControlRole.__tablename__, connection)
-
-  attributes_to_update = get_attributes_to_update(connection)
-  for attribute in attributes_to_update:
-    update_name(attribute.id, attribute.title,
-                'title', all_models.CustomAttributeDefinition.__tablename__,
-                connection)
+  for table in tables_descriptions:
+    elements_to_update = get_elements_to_update(connection=connection,
+                                                table=table)
+    for element in elements_to_update:
+      update_name(element, table, connection)
 
 
 def downgrade():
