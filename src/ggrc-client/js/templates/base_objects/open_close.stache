@@ -4,9 +4,6 @@
 }}
 {{#unless instance.snapshot}}
 <div class="openclose">
-  {{#if_instance_of instance "Cycle|CycleTaskGroup|CycleTaskGroupObjectTask"}}
-    <span class="status-label {{#if instance.isOverdue}}status-overdue{{/if}} {{addclass 'status' instance.status}}"></span>
-  {{/if_instance_of}}
   <i class="fa fa-caret-right"></i>
 </div>
 {{/unless}}

@@ -18,7 +18,7 @@ export default can.Component.extend({
       this.attr('deferredSave').push(function () {
         self.attr('instance.' + args.propName, args.value);
       }).fail(function (instance, xhr) {
-        notifierXHR('error')(xhr);
+        notifierXHR('error', xhr);
       });
     },
   },

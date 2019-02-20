@@ -7,6 +7,7 @@
 import Permission from '../../permission';
 import template from './templates/related-urls.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import {sanitizer} from '../../plugins/utils/url-utils';
 
 export default can.Component.extend({
   tag: 'related-urls',
@@ -66,16 +67,6 @@ export default can.Component.extend({
       }
     },
     /**
-     * @description Validates user input
-     *
-     * @param  {String} data Data for validation
-     * @return {Boolean} - If incoming string is empty it returns false,
-     * otherwise true
-     */
-    validateUserInput: function (data) {
-      return data.length > 0;
-    },
-    /**
      * Handle changes during toggling form visibility.
      *
      * @param  {Boolean} isVisible - New value for form visibility
@@ -99,27 +90,22 @@ export default can.Component.extend({
      * @return {Boolean} - it returns false to prevent page refresh
      */
     submitCreateUrlForm: function (url) {
-      let existingUrls;
-      let trimmedUrl = url.trim();
-      let isValid = this.validateUserInput(trimmedUrl);
+      let newUrl = sanitizer(url);
 
       // non-valid user input case - empty string
-      if (!isValid) {
-        notifier('error', 'Please enter a URL.');
-        this.toggleFormVisibility(true);
+      if (!newUrl.isValid) {
         return false;
       }
 
       // duplicate URLs check
-      existingUrls = _.map(this.attr('urls'), 'link');
+      let existingUrls = _.map(this.attr('urls'), 'link');
 
-      if (_.includes(existingUrls, trimmedUrl)) {
+      if (_.includes(existingUrls, newUrl.value)) {
         notifier('error', 'URL already exists.');
-        this.toggleFormVisibility(true, true);
         return false;
       }
 
-      this.createUrl(trimmedUrl);
+      this.createUrl(newUrl.value);
 
       this.toggleFormVisibility(false);
       return false;

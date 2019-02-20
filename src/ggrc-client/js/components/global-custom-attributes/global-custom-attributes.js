@@ -70,7 +70,7 @@ export default can.Component.extend({
           instance.backup();
         })
         .fail(function (instance, xhr) {
-          notifierXHR('error')(xhr);
+          notifierXHR('error', xhr);
         })
         .always(function () {
           this.attr('isSaving', false);

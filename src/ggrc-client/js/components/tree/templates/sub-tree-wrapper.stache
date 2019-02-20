@@ -13,6 +13,10 @@
       ></sub-tree-item>
     {{/directlyItems}}
 
+    {{#if showPagination}}
+      <tree-pagination {paging}="{paging}"></tree-pagination>
+    {{/if}}
+
     {{#if showMore}}
       <div class="sub-tree-link">
         <a href="{{showAllRelatedLink}}" target="_blank">

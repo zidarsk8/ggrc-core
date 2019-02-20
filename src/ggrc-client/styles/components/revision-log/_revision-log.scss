@@ -23,9 +23,13 @@ revision-log {
       }
     }
 
-    .entry-list li {
-      margin: 0;
-      padding: 16px;
+    .entry-list {
+      width: 100%;
+
+      li {
+        margin: 0;
+        padding: 16px;
+      }
     }
 
     &__status-reviewed {

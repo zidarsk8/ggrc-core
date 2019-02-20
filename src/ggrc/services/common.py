@@ -5,6 +5,7 @@
 """GGRC Collection REST services implementation. Common to all GGRC collection
 resources.
 """
+# pylint: disable=too-many-lines
 
 import datetime
 import collections
@@ -107,8 +108,7 @@ def update_snapshot_index(cache):
 
 class ModelView(View):
   """Basic view handler for all models"""
-  # pylint: disable=too-many-public-methods
-  # pylint: disable=protected-access
+  # pylint: disable=too-many-public-methods, protected-access
   # access to _sa_class_manager is needed for fetching the right mapper
   DEFAULT_PAGE_SIZE = 20
   MAX_PAGE_SIZE = 100
@@ -556,7 +556,8 @@ class Resource(ModelView):
       ))
     return None
 
-  def json_update(self, obj, src):
+  @staticmethod
+  def json_update(obj, src):
     ggrc.builder.json.update(obj, src)
 
   def patch(self):
@@ -875,10 +876,12 @@ class Resource(ModelView):
         cache_utils.get_cache_key(None, id_=obj.id, type_=obj.type),
     )
 
-  def json_create(self, obj, src):
+  @staticmethod
+  def json_create(obj, src):
     ggrc.builder.json.create(obj, src)
 
-  def get_context_id_from_json(self, src):
+  @staticmethod
+  def get_context_id_from_json(src):
     """Get context id from json."""
     context = src.get('context', None)
     if context:
@@ -1271,7 +1274,8 @@ class Resource(ModelView):
       inclusions = ()
     return inclusions
 
-  def get_events_resources(self, model, ids):
+  @staticmethod
+  def get_events_resources(model, ids):
     """Get events resources representation from the db.
 
     Returned events look like the following:
@@ -1285,7 +1289,6 @@ class Resource(ModelView):
                   u'type': u'Event'},
                   ...],
     """
-    # pylint: disable=no-self-use
     resources = {}
     events = db.session.query(
         ggrc.models.Event,

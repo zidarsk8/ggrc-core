@@ -6,8 +6,6 @@
 import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
-import inScopeObjects from '../mixins/in-scope-objects';
-import inScopeObjectsPreload from '../mixins/in-scope-objects-preload';
 import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/base-notifications';
 import issueTracker from '../mixins/issue-tracker';
@@ -25,8 +23,6 @@ export default Cacheable.extend({
   mixins: [
     caUpdate,
     timeboxed,
-    inScopeObjects,
-    inScopeObjectsPreload,
     accessControlList,
     baseNotifications,
     issueTracker,
@@ -104,6 +100,18 @@ export default Cacheable.extend({
       function () {
         if (this.attr('issue_tracker.enabled') &&
           !this.attr('issue_tracker.title')) {
+          return 'cannot be blank';
+        }
+      }
+    );
+
+    this.validate(
+      'issue_tracker_issue_id',
+      function () {
+        if (this.attr('issue_tracker.enabled') &&
+          ['Fixed', 'Fixed and Verified', 'Deprecated']
+            .includes(this.attr('status')) &&
+            !this.attr('issue_tracker.issue_id')) {
           return 'cannot be blank';
         }
       }

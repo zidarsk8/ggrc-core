@@ -14,6 +14,7 @@ import tracker from '../../tracker';
 import template from './templates/gdrive_file.stache';
 import {
   notifier,
+  notifierXHR,
   messages,
 } from '../../plugins/utils/notifiers-utils';
 import Context from '../../models/service-models/context';
@@ -193,13 +194,7 @@ export default can.Component.extend({
         this.attr('instance').refresh();
         return can.makeArray(arguments);
       }, (xhr) => {
-        let message = (xhr.responseJSON && xhr.responseJSON.message) ?
-          xhr.responseJSON.message :
-          xhr.responseText;
-
-        if (message) {
-          notifier('error', message);
-        }
+        notifierXHR('error', xhr);
       });
     },
   },

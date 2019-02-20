@@ -3,11 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {checkValues} from '../conflict-resolution';
+import {tryResolveConflictValues} from '../conflict-resolution';
 import * as conflictResolvers from '../conflict-resolvers';
 
 describe('cacheable conflict resolution', () => {
-  describe('checkValues method', () => {
+  describe('tryResolveConflictValues method', () => {
     beforeEach(() => {
       spyOn(conflictResolvers, 'simpleFieldResolver');
       spyOn(conflictResolvers, 'customAttributeResolver');
@@ -18,7 +18,7 @@ describe('cacheable conflict resolution', () => {
         updated_at: 'test',
       };
 
-      let hasConflict = checkValues(baseAttrs);
+      let hasConflict = tryResolveConflictValues(baseAttrs);
 
       expect(hasConflict).toBe(false);
       expect(conflictResolvers.simpleFieldResolver).not.toHaveBeenCalled();
@@ -30,7 +30,8 @@ describe('cacheable conflict resolution', () => {
         custom_attribute_values: 'test',
       };
 
-      let hasConflict = checkValues(baseAttrs, [], [], new can.List());
+      let hasConflict =
+        tryResolveConflictValues(baseAttrs, [], [], new can.List());
 
       expect(hasConflict).toBeFalsy();
       expect(conflictResolvers.simpleFieldResolver).not.toHaveBeenCalled();
@@ -42,7 +43,8 @@ describe('cacheable conflict resolution', () => {
         test: 'test',
       };
 
-      let hasConflict = checkValues(baseAttrs, [], [], new can.List());
+      let hasConflict =
+        tryResolveConflictValues(baseAttrs, [], [], new can.List());
 
       expect(hasConflict).toBeFalsy();
       expect(conflictResolvers.simpleFieldResolver).toHaveBeenCalled();
@@ -55,7 +57,8 @@ describe('cacheable conflict resolution', () => {
       };
       conflictResolvers.simpleFieldResolver.and.returnValue(true);
 
-      let hasConflict = checkValues(baseAttrs, [], [], new can.List());
+      let hasConflict =
+        tryResolveConflictValues(baseAttrs, [], [], new can.List());
 
       expect(hasConflict).toBe(true);
     });

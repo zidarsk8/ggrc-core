@@ -143,10 +143,12 @@ export default can.Component.extend({
       this.attr('review', event.review);
     },
     showLastChanges() {
-      this.attr('review').setShowLastReviewUpdates(true);
       this.attr('instance').dispatch({
         ...NAVIGATE_TO_TAB,
         tabId: 'change-log',
+        options: {
+          showLastReviewUpdates: true,
+        },
       });
     },
   },

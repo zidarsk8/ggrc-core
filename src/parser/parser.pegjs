@@ -68,6 +68,7 @@ simple_exp
       };
     }
   / relevant_exp
+  / not_empty_revisions_expr
   / paren_exp
   / text_exp
   / in_exp
@@ -80,6 +81,16 @@ relevant_exp
         op: {name: "relevant"},
         ids: relevant.slice(1),
       };
+    }
+
+not_empty_revisions_expr
+  = left:word _+ "not_empty_revisions_for" _+ right:word
+    {
+      return {
+        op: {name: "not_empty_revisions"},
+        resource_type: left,
+        resource_id: right,
+      }
     }
 
 text_exp
@@ -113,7 +124,6 @@ in_exp
         right: right,
       }
     }
-
 
 word
   = unquoted_word

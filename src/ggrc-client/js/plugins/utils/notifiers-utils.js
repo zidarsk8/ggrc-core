@@ -35,16 +35,18 @@ function notifier(type, message, data) {
   $('body').trigger('ajax:flash', props);
 }
 
-function notifierXHR(type, message) {
-  return function (err) {
-    let status = err && err.status ? err.status : null;
+function notifierXHR(type, xhr) {
+  let message = (xhr.responseJSON && xhr.responseJSON.message) ?
+    xhr.responseJSON.message :
+    xhr.responseText;
 
-    if (status && !message) {
-      message = messages[status];
-    }
+  let status = xhr && xhr.status ? xhr.status : null;
 
-    notifier(type, message);
-  };
+  if (!message && status) {
+    message = messages[status];
+  }
+
+  notifier(type, message);
 }
 
 window.addEventListener('error', (event) => {

@@ -26,6 +26,7 @@ from ggrc.gcalendar import calendar_event_builder
 from ggrc.gcalendar import calendar_event_sync
 from ggrc.models import Person
 from ggrc.models import Notification, NotificationHistory
+from ggrc.notifications.unsubscribe import unsubscribe_url
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
 from ggrc.notifications.notification_handlers import SEND_TIME
@@ -404,6 +405,7 @@ def show_daily_digest_notifications():
   # pylint: disable=invalid-name
   if not permissions.is_admin():
     raise Forbidden()
+
   _, notif_data = get_daily_notifications()
   for data in notif_data.itervalues():
     data = modify_data(data)
@@ -420,8 +422,9 @@ def send_calendar_events():
       sync = calendar_event_sync.CalendarEventsSync()
       sync.sync_cycle_tasks_events()
   except Exception as exp:
-    logger.error(exp.message)
-    error_msg = exp.message
+    error_msg = ("Sending of calendar events failed with the following "
+                 "error {}".format(exp.message))
+    logger.exception(error_msg)
   return utils.make_simple_response(error_msg)
 
 
@@ -484,6 +487,8 @@ def modify_data(data):
     for cycle in data["cycle_data"].values():
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
+
+  data["unsubscribe_url"] = unsubscribe_url(data["user"]["id"])
 
   # Move comment notifications for same object into list and sort by
   # created_at field

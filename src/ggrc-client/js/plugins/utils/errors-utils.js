@@ -37,7 +37,7 @@ function handleAjaxError(jqxhr, errorThrown = '') {
     if (message) {
       notifier('error', message);
     } else {
-      notifierXHR('error')(jqxhr);
+      notifierXHR('error', jqxhr);
     }
   }
 }

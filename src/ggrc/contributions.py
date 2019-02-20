@@ -12,10 +12,16 @@ from ggrc.notifications import data_handlers
 from ggrc.notifications import import_export as import_export_notifications
 
 NIGHTLY_CRON_JOBS = [
+    import_export.clear_overtimed_tasks,
+]
+
+NIGHTLY_SEND_EVENTS_JOB = [
+    common.send_calendar_events,
+]
+
+NIGHTLY_NOTIFICATIONS_CRON_JOBS = [
     common.generate_cycle_tasks_notifs,
     common.send_daily_digest_notifications,
-    common.send_calendar_events,
-    import_export.clear_overtimed_tasks,
 ]
 
 HOURLY_CRON_JOBS = [

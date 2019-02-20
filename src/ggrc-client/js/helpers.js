@@ -5,7 +5,7 @@
 
 import Spinner from 'spin.js';
 import {
-  isInScopeModel,
+  isAuditScopeModel,
   isSnapshotParent,
 } from './plugins/utils/snapshot-utils';
 import {
@@ -179,42 +179,6 @@ Mustache.registerHelper('is_empty', (data, options) => {
     can.isPlainObject(data) ? data : data.attr()
   );
   return options[result ? 'fn' : 'inverse'](options.contexts);
-});
-
-// Render a named template with the specified context, serialized and
-// augmented by 'options.hash'
-Mustache.registerHelper('render', function (template, context, options) {
-  if (!options) {
-    options = context;
-    context = this;
-  }
-
-  if (typeof context === 'function') {
-    context = context();
-  }
-
-  if (typeof template === 'function') {
-    template = template();
-  }
-
-  context = $.extend({}, context.serialize ? context.serialize() : context);
-
-  if (options.hash) {
-    for (let k in options.hash) {
-      if (options.hash.hasOwnProperty(k)) {
-        context[k] = options.hash[k];
-        if (typeof context[k] === 'function') {
-          context[k] = context[k]();
-        }
-      }
-    }
-  }
-
-  let ret = can.view.render(template, context instanceof can.view.Scope ?
-    context :
-    new can.view.Scope(context));
-  // can.view.hookup(ret);
-  return ret;
 });
 
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
@@ -940,13 +904,13 @@ Mustache.registerHelper('un_camel_case', function (str, toLowerCase) {
   return toLowerCase ? value.toLowerCase() : value;
 });
 
-Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
-  let isInScope;
+Mustache.registerHelper('isNotAuditScopeModel', function (modelName, options) {
+  let isAuditScope;
   modelName = _.isFunction(modelName) ? modelName() : modelName;
-  isInScope = isInScopeModel(modelName);
+  isAuditScope = isAuditScopeModel(modelName);
   // Temporary Modification to remove possibility to unmap Audit
-  isInScope = isInScope || isSnapshotParent(modelName);
-  return isInScope ? options.inverse(this) : options.fn(this);
+  isAuditScope = isAuditScope || isSnapshotParent(modelName);
+  return isAuditScope ? options.inverse(this) : options.fn(this);
 });
 
 Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {

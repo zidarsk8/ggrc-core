@@ -8,9 +8,9 @@ import {
   customAttributeResolver,
   objectListResolver,
 } from './conflict-resolvers';
-import {messages} from '../../plugins/utils/notifiers-utils';
+import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
-export function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
+export function tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj) {
   let hasConflict = false;
 
   Object.keys(baseAttrs).forEach((key) => {
@@ -54,8 +54,9 @@ export function checkValues(baseAttrs, attrs, remoteAttrs, obj) {
 export default function resolveConflict(xhr, obj) {
   let attrs = _.merge({}, obj.attr());
   let baseAttrs = _.merge({}, obj._backupStore()) || {};
+
   return obj.refresh().then(function (obj) {
-    let conflict = false;
+    let stillHasConflict = false;
     let remoteAttrs = _.merge({}, obj.attr());
 
     if (can.Object.same(remoteAttrs, attrs)) {
@@ -66,14 +67,14 @@ export default function resolveConflict(xhr, obj) {
       return obj.attr(attrs).save();
     }
     // check what properties changed -- we can merge if the same prop wasn't changed on both
-    conflict = checkValues(baseAttrs, attrs, remoteAttrs, obj);
-    if (conflict) {
-      $(document.body).trigger('ajax:flash', {
-        warning: messages[409],
-      });
+    stillHasConflict =
+      tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj);
+    if (stillHasConflict) {
+      notifierXHR('warning', {status: 409});
       xhr.remoteObject = remoteAttrs;
       return new $.Deferred().reject(xhr, 409, 'CONFLICT');
     }
+
     return obj.save();
   });
 }

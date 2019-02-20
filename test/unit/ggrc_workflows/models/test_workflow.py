@@ -108,7 +108,7 @@ class TestWorkflowState(unittest.TestCase):
   @ddt.data(
       # (expected, setup_date),
       (date(2016, 12, 30), date(2016, 12, 31)),
-      (date(2016, 12, 30), date(2017, 1, 2)),
+      (date(2017, 1, 2), date(2017, 1, 2)),
       (date(2017, 8, 4), date(2017, 8, 5)),
       (date(2017, 8, 4), date(2017, 8, 6)),
       (date(2017, 8, 7), date(2017, 8, 7)),
