@@ -50,7 +50,6 @@ import {
 } from '../../plugins/utils/controllers';
 import {REFRESH_MAPPING} from '../../events/eventTypes';
 import {
-  notifier,
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
 import {
@@ -151,7 +150,7 @@ export default can.Control.extend({
         }
       })
       .fail((error) => {
-        notifierXHR('error')(error);
+        notifierXHR('error', error);
         this.element.modal_form('hide');
       });
   },
@@ -976,10 +975,10 @@ export default can.Control.extend({
   save_error: function (_, error) {
     if (error) {
       if (error.status !== 409) {
-        notifier('error', error.responseText);
+        notifierXHR('error', error);
       } else {
         clearTimeout(error.warningId);
-        notifierXHR('warning')(error);
+        notifierXHR('warning', error);
       }
     }
     // enable ui after a fail
