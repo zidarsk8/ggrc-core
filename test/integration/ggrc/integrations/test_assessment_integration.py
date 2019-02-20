@@ -846,14 +846,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
   def test_change_assessment_status(self, status,
                                     additional_kwargs,
                                     mocked_update_issue):
-    """Issue status should be changed for assessment
-    with {status} status."""
-    email1 = "email1@example.com"
-    assignee_role_id = AccessControlRole.query.filter_by(
-        object_type="Assessment",
-        name="Assignees"
-    ).first().id
-    assignees = [factories.PersonFactory(email=email1)]
+    """Issue status should be changed for assessment with {status} status."""
     iti_issue_id = []
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
@@ -870,12 +863,12 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         '_is_tracker_enabled',
         return_value=True
     ):
-      acl = [acl_helper.get_acl_json(assignee_role_id, assignee.id)
-             for assignee in assignees]
-      self.api.put(asmt, {
-          "access_control_list": acl,
-          "status": status,
-      })
+      self.api.put(
+          asmt,
+          {
+              "status": status,
+          },
+      )
       kwargs = {'component_id': 123123,
                 'severity': "S2",
                 'title': iti.title,
