@@ -237,14 +237,15 @@ describe('inner-nav view model', () => {
       expect(result.countsName).toBe('name');
     });
 
-    it('should use model shortName as countsName if no other options', () => {
-      let result = viewModel.createWidget({
-        model: {
-          shortName: 'name',
-        },
+    it('should use model model_singular as countsName if no other options',
+      () => {
+        let result = viewModel.createWidget({
+          model: {
+            model_singular: 'name',
+          },
+        });
+        expect(result.countsName).toBe('name');
       });
-      expect(result.countsName).toBe('name');
-    });
 
     it('should not set countsName if widget is uncountable', () => {
       let result = viewModel.createWidget({

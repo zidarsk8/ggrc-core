@@ -66,9 +66,9 @@
                   {{#canMapObject model.model_singular}}
                     data-clickable="true"
                     data-toggle="unified-mapper"
-                    data-join-option-type="{{model.shortName}}"
+                    data-join-option-type="{{model.model_singular}}"
                     data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.class.shortName}}"
+                    data-join-object-type="{{instance.class.model_singular}}"
                   {{/canMapObject}}>
                   <div class="oneline">
                     <i class="fa fa-fw fa-{{ icon }} color"></i>

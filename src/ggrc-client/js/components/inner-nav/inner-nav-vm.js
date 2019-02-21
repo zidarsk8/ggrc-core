@@ -82,7 +82,7 @@ export default can.Map.extend({
     let countsName = descriptor.countsName ||
         (descriptor.content_controller_options &&
           descriptor.content_controller_options.countsName) ||
-        descriptor.model.shortName;
+        descriptor.model.model_singular;
     let model = this.attr('instance').constructor;
     let forceShowList = model.obj_nav_options.force_show_list || [];
 
@@ -132,7 +132,7 @@ export default can.Map.extend({
      */
   isInProhibitedMap(widget) {
     const instanceType = this.attr('instance.type');
-    const shortName = widget.model.shortName;
+    const shortName = widget.model.model_singular;
 
     return prohibitedMapList[instanceType] &&
         prohibitedMapList[instanceType].includes(shortName);
