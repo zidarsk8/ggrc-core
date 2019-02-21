@@ -225,6 +225,40 @@ class TestGlobalCustomAttributes(ProductTestCase):
     self.assertIn("id", cav)
 
   @ddt.data(
+      (" abc ", "abc"),
+      ("    abc  abc ", "abc abc"),
+      ("abc", "abc"),
+      ("", ""),
+  )
+  @ddt.unpack
+  def test_cad_title_strip(self, title, validated_title):
+    """Test CAD title strip on validation."""
+    with factories.single_commit():
+      cad = factories.CustomAttributeDefinitionFactory(
+          definition_type="control",
+          attribute_type=all_models.CustomAttributeDefinition.ValidTypes.TEXT,
+          title=title,
+      )
+    cad_resp = self.generator.api.get(cad, cad.id)
+    self.assert200(cad_resp)
+    self.assertEquals(cad_resp.json['custom_attribute_definition']['title'],
+                      validated_title)
+
+  def test_cad_title_strip_unique(self):
+    """Test CAD title stripped should be unique."""
+    factories.CustomAttributeDefinitionFactory(
+        definition_type="control",
+        attribute_type=all_models.CustomAttributeDefinition.ValidTypes.TEXT,
+        title="abc",
+    )
+    with self.assertRaises(ValueError):
+      factories.CustomAttributeDefinitionFactory(
+          definition_type="control",
+          attribute_type=all_models.CustomAttributeDefinition.ValidTypes.TEXT,
+          title=" abc ",
+      )
+
+  @ddt.data(
       (all_models.CustomAttributeDefinition.ValidTypes.TEXT, ""),
       (all_models.CustomAttributeDefinition.ValidTypes.RICH_TEXT, ""),
       (all_models.CustomAttributeDefinition.ValidTypes.DROPDOWN, ""),
