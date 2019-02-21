@@ -422,9 +422,8 @@ def send_calendar_events():
       sync = calendar_event_sync.CalendarEventsSync()
       sync.sync_cycle_tasks_events()
   except Exception as exp:
-    error_msg = ("Sending of calendar events failed with the following "
-                 "error {}".format(exp.message))
-    logger.exception(error_msg)
+    logger.error(exp.message)
+    error_msg = exp.message
   return utils.make_simple_response(error_msg)
 
 

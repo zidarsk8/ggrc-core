@@ -206,7 +206,7 @@ class AssessmentTrackerHandler(object):
 
     return issue_payload
 
-  def _get_issuetracker_info(self, assessment_src):
+  def _get_issuetracker_info(self, assessment, assessment_src):
     """Get default issue information.
 
     Args:
@@ -219,6 +219,7 @@ class AssessmentTrackerHandler(object):
       issue_tracker_info_default = self._get_issue_from_assmt_template(
           assessment_src.get("template", {})
       )
+      issue_tracker_info_default["title"] = assessment.title
     if not issue_tracker_info_default:
       issue_tracker_info_default = self._get_issue_info_from_audit(
           issue_tracker_info_default.get("audit", {})
@@ -259,7 +260,7 @@ class AssessmentTrackerHandler(object):
         assessment_src: dictionary with issue information
     """
     if self._is_tracker_enabled(assessment.audit) and \
-            self._is_issue_enabled(assessment_src):
+            self._is_issue_on_create_enabled(assessment_src):
       if assessment_src.get("issue_tracker", {}).get("issue_id"):
         issue_id = assessment_src["issue_tracker"]["issue_id"]
         if not self._is_already_linked(assessment, issue_id):
@@ -519,7 +520,10 @@ class AssessmentTrackerHandler(object):
         for issue store
         sync_result.status: status of request to Issue Tracker
     """
-    issuetracker_info = self._get_issuetracker_info(assessment_src)
+    issuetracker_info = self._get_issuetracker_info(
+        assessment,
+        assessment_src
+    )
     self._validate_assessment_fields(issuetracker_info)
     issuetracker_info = self._update_with_assmt_data_for_ticket_create(
         assessment,
@@ -598,7 +602,10 @@ class AssessmentTrackerHandler(object):
         for issue store
         sync_result.status: status of request to Issue Tracker
     """
-    issuetracker_info = self._get_issuetracker_info(assessment_src)
+    issuetracker_info = self._get_issuetracker_info(
+        assessment,
+        assessment_src
+    )
     self._validate_assessment_fields(issuetracker_info)
     issuetracker_info = self._update_with_assmt_data_for_ticket_create(
         assessment,
@@ -2218,6 +2225,27 @@ class AssessmentTrackerHandler(object):
     ).get(
         "enabled", False
     )
+
+  @classmethod
+  def _is_issue_on_create_enabled(cls, assessment_src):
+    """Check that issue tracker on create enabled.
+
+    Args:
+      assessment_src: dictionary with issue information
+
+    Returns:
+      Boolean indicator that issue enabled
+    """
+    issue_tracker_info = assessment_src.get(
+        "issue_tracker", {}
+    )
+
+    if issue_tracker_info:
+      return issue_tracker_info.get("enabled", False)
+
+    template_info = assessment_src.get("template", {})
+    template_issue_info = cls._get_issue_from_assmt_template(template_info)
+    return template_issue_info.get("enabled", False)
 
   @staticmethod
   def _is_ccs_same(ccs_payload, ccs_tracker):

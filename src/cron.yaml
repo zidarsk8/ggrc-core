@@ -4,17 +4,9 @@
 # See https://developers.google.com/appengine/docs/python/config/appconfig
 
 cron:
-- description: GGRC - starting point for nightly batch jobs
+- description: GGRC workflow - starting point for all batch jobs
   url: /nightly_cron_endpoint
-  schedule: every day 00:40
-  timezone: US/Pacific
-- description: GGRC - starting point for nightly notifications jobs
-  url: /nightly_notifications_cron_endpoint
   schedule: every day 01:00
-  timezone: US/Pacific
-- description: GGRC - starting point for nightly event sending jobs
-  url: /nightly_send_events_cron_endpoint
-  schedule: every day 00:45
   timezone: US/Pacific
 - description: GGRC - Hourly Issue Tracker sync job
   url: /hourly_issue_tracker_sync_endpoint

@@ -1314,8 +1314,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     reopened_notifs = self._get_notifications(notif_type="assessment_reopened")
     self.assertEqual(reopened_notifs.count(), 1)
 
-  @ddt.data("/_notifications/send_daily_digest",
-            "nightly_notifications_cron_endpoint")
+  @ddt.data("/_notifications/send_daily_digest", "nightly_cron_endpoint")
   @patch("ggrc.notifications.common.send_email")
   def test_notifications_missing_revision(self, url, send_email):
     """Test notifications with missing revision"""
