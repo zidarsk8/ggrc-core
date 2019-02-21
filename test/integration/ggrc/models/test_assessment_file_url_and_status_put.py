@@ -6,7 +6,6 @@ import itertools
 import ddt
 
 from ggrc.models import all_models
-
 from integration import ggrc
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models \
@@ -170,14 +169,10 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
     relationship = all_models.Relationship.query.get(rel_id)
     self.assertIsNone(relationship)
 
-  @ddt.data(
-      *itertools.product(("Assignees", "Creators", "Verifiers"),
-                         ("Creator", "Editor", "Reader"))
-  )
-  @ddt.unpack
+  @ddt.data("Creator", "Editor", "Reader")
   # pylint: disable=invalid-name
-  def test_remove_related_forbidden_for_system_roles(self, role, system_role):
-    """Test system roles are not allowed to delete related evidence"""
+  def test_remove_related_forbidden_for_system_roles(self, system_role):
+    """Test `system_role` without ACR isn't allowed to delete evidence."""
     asmt_id = self.asmt.id
     with factories.single_commit():
       self._prepare_mandatory_evidence_cad()
@@ -185,6 +180,38 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
           source=self.asmt,
           destination=self.evidence,
       )
+      person = factories.PersonFactory()
+      system_role = all_models.Role.query.filter(
+          all_models.Role.name == system_role,
+      ).one()
+      rbac_factories.UserRoleFactory(role=system_role, person=person)
+
+    evid_id = self.evidence.id
+    self.api.set_user(person)
+    response = self.api.put(all_models.Assessment.query.get(asmt_id), {
+        "actions": {"remove_related": [{"id": evid_id,
+                                        "type": "Evidence"}]},
+    })
+    self.assert403(response)
+    evidence = all_models.Evidence.query.get(evid_id)
+    self.assertIsNotNone(evidence)
+
+  @ddt.data(
+      *itertools.product(("Assignees", "Creators", "Verifiers"),
+                         ("Creator", "Editor", "Reader"))
+  )
+  @ddt.unpack
+  # pylint: disable=invalid-name
+  def test_remove_evidence_allowed(self, role, system_role):
+    """Test `system_role` with ACR `role` is allowed to delete evidence."""
+    asmt_id = self.asmt.id
+    with factories.single_commit():
+      self._prepare_mandatory_evidence_cad()
+      rel = factories.RelationshipFactory(
+          source=self.asmt,
+          destination=self.evidence,
+      )
+      rel_id = rel.id
       person = factories.PersonFactory()
       creator_role = all_models.Role.query.filter(
           all_models.Role.name == system_role
@@ -200,6 +227,6 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
         "actions": {"remove_related": [{"id": evid_id,
                                         "type": "Evidence"}]},
     })
-    self.assert403(response)
-    evidence = all_models.Evidence.query.get(evid_id)
-    self.assertIsNotNone(evidence)
+    self.assert200(response)
+    relationship = all_models.Relationship.query.get(rel_id)
+    self.assertIsNone(relationship)
