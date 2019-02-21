@@ -37,10 +37,11 @@ def update_name(element, table, connection):
                                 connection)
   connection.execute(sa.text("""
     UPDATE {table}
-    SET {field_name} = '{field_value}'
+    SET {field_name} = :field_value
     WHERE id = {row_id};
-  """.format(table=table, field_name=fields['name'],
-             field_value=new_name, row_id=element.id)))
+  """.format(table=table,
+             field_name=fields['name'],
+             row_id=element.id)), field_value=new_name)
 
 
 def _generate_new_name(original_name, object_type, connection):
@@ -77,16 +78,16 @@ def is_exists(new_name_value, object_type, connection):
   query = """
     SELECT 1
     FROM {table_name}
-    WHERE {field_name} = '{name_value}'
-    AND {object_type_field} = '{object_type_value}';
+    WHERE {field_name} = :name_value
+    AND {object_type_field} = :object_type_value;
   """
   for table, fields in tables_descriptions.items():
     sa_query = sa.text(query.format(table_name=table,
                                     field_name=fields['name'],
-                                    name_value=new_name_value,
-                                    object_type_field=fields['object_type'],
-                                    object_type_value=object_type))
-    result = connection.execute(sa_query).fetchall()
+                                    object_type_field=fields['object_type']))
+    result = connection.execute(sa_query,
+                                name_value=new_name_value,
+                                object_type_value=object_type).fetchall()
     if result:
       return True
   return False
