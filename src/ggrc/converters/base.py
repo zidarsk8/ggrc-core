@@ -4,14 +4,15 @@
 """Base objects for csv file converters."""
 
 from collections import defaultdict
-import sqlalchemy as sa
 
+import sqlalchemy as sa
 from flask import g
 from google.appengine.ext import deferred
 
 from ggrc import db
 from ggrc import login
 from ggrc import settings
+from ggrc.cache import utils as cache_utils
 from ggrc.cache.utils import clear_memcache
 from ggrc.converters import base_block
 from ggrc.converters import get_exportables
@@ -146,6 +147,7 @@ class ExportConverter(BaseConverter):
     self.ids_by_type = ids_by_type
     self.exportable_queries = exportable_queries or []
     self.ie_job = ie_job
+    self.cache_manager = cache_utils.get_cache_manager()
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
@@ -210,7 +212,8 @@ class ExportConverter(BaseConverter):
         csv_string_builder.append_line(csv_header[1])
 
       for line in block_converter.generate_row_data():
-        if self._get_job_status() == all_models.ImportExport.STOPPED_STATUS:
+        ie_status = self.get_ie_status_from_cache()
+        if ie_status == all_models.ImportExport.STOPPED_STATUS:
           raise exceptions.ExportStoppedException()
         line.insert(0, "")
         csv_string_builder.append_line(line)
@@ -219,6 +222,20 @@ class ExportConverter(BaseConverter):
       csv_string_builder.append_line([])
 
     return csv_string_builder.get_csv_string()
+
+  def add_ie_status_to_cache(self):
+    """Add export job status to memcache"""
+    cache_key = cache_utils.get_ie_cache_key(self.ie_job)
+    self.cache_manager.cache_object.memcache_client.add(cache_key,
+                                                        "In Progress")
+
+  def get_ie_status_from_cache(self):
+    """Get export job status from memcahe if exists, from DB otherwise."""
+    cache_key = cache_utils.get_ie_cache_key(self.ie_job)
+    ie_status = self.cache_manager.cache_object.memcache_client.get(cache_key)
+    if not ie_status:
+      ie_status = self._get_job_status()
+    return ie_status
 
   def _get_exportable_queries(self):
     """Get a list of filtered object queries regarding exportable items.

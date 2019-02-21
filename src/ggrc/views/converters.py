@@ -32,6 +32,7 @@ from ggrc import login
 from ggrc import settings
 from ggrc import utils
 from ggrc.app import app
+from ggrc.cache import utils as cache_utils
 from ggrc.cloud_api import task_queue
 from ggrc.converters import base
 from ggrc.converters import get_exportables
@@ -675,6 +676,7 @@ def handle_export_stop(**kwargs):
       if getattr(settings, "APPENGINE_INSTANCE", "local") != "local":
         stop_ie_bg_tasks(ie_job)
       db.session.commit()
+      expire_ie_cache(ie_job)
       return make_import_export_response(ie_job.log_json())
   except wzg_exceptions.Forbidden:
     raise
@@ -682,7 +684,14 @@ def handle_export_stop(**kwargs):
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
         app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
-  raise wzg_exceptions.BadRequest(app_errors.WRONG_STATUS)
+  raise wzg_exceptions.BadRequest(app_errors.STOPPED_WARNING)
+
+
+def expire_ie_cache(ie_job):
+  """Expire export status cache to force DB request."""
+  cache_manager = cache_utils.get_cache_manager()
+  cache_key = cache_utils.get_ie_cache_key(ie_job)
+  cache_manager.cache_object.memcache_client.delete(cache_key)
 
 
 def get_ie_bg_tasks(ie_job):
