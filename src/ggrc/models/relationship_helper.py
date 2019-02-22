@@ -234,9 +234,4 @@ def get_ids_related_to(object_type, related_type, related_ids=None):
   queries.extend(get_special_mappings(
       object_type, related_type, related_ids))
 
-  if (object_type in Types.trans_scope and related_type in Types.all or
-          object_type in Types.all and related_type in Types.trans_scope):
-    queries.append(_assessment_object_mappings(
-        object_type, related_type, related_ids))
-
   return _array_union(queries)
