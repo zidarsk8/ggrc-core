@@ -19,7 +19,7 @@ export default can.Component.extend({
   viewModel: {
     define: {
       issueUnmap: {
-        get: function () {
+        get() {
           return this.attr('page_instance.type') === 'Issue' ||
             this.attr('instance.type') === 'Issue';
         },
@@ -33,6 +33,19 @@ export default can.Component.extend({
                   && !this.attr('page_instance.allow_unmap_from_audit')));
         },
       },
+      denySnapshotUnmap: {
+        get() {
+          let source = this.attr('page_instance');
+          let destination = this.attr('instance');
+
+          if (destination.attr('type') === 'Snapshot') {
+            return source.attr('type') === 'Assessment' &&
+              destination.attr('archived');
+          }
+
+          return false;
+        },
+      },
       isAllowedToUnmap: {
         get() {
           let source = this.attr('page_instance');
@@ -42,7 +55,8 @@ export default can.Component.extend({
           return Mappings.allowedToUnmap(source, destination)
             && !(isAllObjects() || isMyWork())
             && options.attr('isDirectlyRelated')
-            && !this.attr('denyIssueUnmap');
+            && !this.attr('denyIssueUnmap')
+            && !this.attr('denySnapshotUnmap');
         },
       },
       isMappableExternally: {

@@ -202,6 +202,48 @@ describe('unmap-dropdown-item component', function () {
 
         expect(viewModel.attr('isAllowedToUnmap')).toBe(true);
       });
+
+      it('returns false when parent instance is Assessment and ' +
+        'snapshot is archived', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Assessment');
+        viewModel.attr('instance.type', 'Snapshot');
+        viewModel.attr('instance.archived', true);
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(false);
+      });
+
+      it('returns true when parent instance is Assessment and ' +
+        'snapshot is not archived', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Assessment');
+        viewModel.attr('instance.type', 'Snapshot');
+        viewModel.attr('instance.archived', false);
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(true);
+      });
+
+      it('returns true when parent instance is Issue and ' +
+        'snapshot is archived', () => {
+        Mappings.allowedToUnmap.and.returnValue(true);
+        CurrentPageUtils.isAllObjects.and.returnValue(false);
+        CurrentPageUtils.isMyWork.and.returnValue(false);
+        viewModel.attr('options.isDirectlyRelated', true);
+
+        viewModel.attr('page_instance.type', 'Issue');
+        viewModel.attr('instance.type', 'Snapshot');
+        viewModel.attr('instance.archived', true);
+
+        expect(viewModel.attr('isAllowedToUnmap')).toBe(true);
+      });
     });
   });
 });
