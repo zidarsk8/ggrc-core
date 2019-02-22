@@ -90,9 +90,10 @@ class AccessControlRole(attributevalidator.AttributeValidator,
   def validates_name(self, key, value):  # pylint: disable=no-self-use
     """Validate Custom Role name uniquness.
 
-    Custom Role names need to follow 2 uniqueness rules:
+    Custom Role names need to follow 3 uniqueness rules:
       1) Names must not match any attribute name on any existing object.
       2) Object level CAD names must not match any global CAD name.
+      3) Names should not contains "*" symbol
 
     This validator should check for name collisions for 1st and 2nd rule.
 
@@ -124,6 +125,10 @@ class AccessControlRole(attributevalidator.AttributeValidator,
       raise ValueError(u"Global custom attribute '{}' "
                        u"already exists for this object type"
                        .format(name))
+
+    if key == "name" and "*" in name:
+      raise ValueError(u"Attribute name contains unsupported symbol '*'")
+
     return value
 
 
