@@ -145,7 +145,7 @@ export default can.Component.extend({
         this.attr('isLoading', false);
       }
     },
-    showNoRelationhipError() {
+    showNoRelationshipError() {
       const issueTitle = this.attr('issueInstance.title');
       const targetTitle = this.attr('target.title');
       const targetType = this.attr('target').class.title_singular;
@@ -168,7 +168,7 @@ export default can.Component.extend({
         if (!relationship) {
           // if there is no relationship it mean that user try to unmap
           // original object from Issue automapped to snapshot via assessment
-          this.viewModel.showNoRelationhipError();
+          this.viewModel.showNoRelationshipError();
         } else if (this.viewModel.attr('target.type') === 'Assessment' &&
           !this.viewModel.attr('issueInstance.allow_unmap_from_audit')) {
           // In this case we should show modal with related objects.
