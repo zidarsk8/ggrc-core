@@ -19,13 +19,14 @@ def get_latest_revision_content(instance):
   key = (instance.type, instance.id)
   content = g.latest_revision_content.get(key)
   if not content:
-    content = all_models.Revision.query.filter(
+    last_rev = all_models.Revision.query.filter(
         all_models.Revision.resource_id == instance.id,
         all_models.Revision.resource_type == instance.type
     ).order_by(
         all_models.Revision.created_at.desc(),
         all_models.Revision.id.desc(),
-    ).first().content
+    ).first()
+    content = last_rev.content if last_rev is not None else None
     g.latest_revision_content[key] = content
   return content
 
@@ -183,7 +184,10 @@ def generate_cav_diff(cads, proposed, revisioned):
       revisioned_value = revisioned_cavs[cad.id]
     if proposed_val != revisioned_value:
       value, person_id = proposed_val
-      person = person_obj_by_id(int(person_id)) if person_id else None
+      if person_id and not person_id == "None":
+        person = person_obj_by_id(int(person_id))
+      else:
+        person = None
       diff[cad.id] = {
           "attribute_value": value,
           "attribute_object": person,
@@ -296,7 +300,7 @@ def prepare(instance, content):
   )
 
 
-def prepare_content_diff(instance_meta_info, l_content, r_content):
+def prepare_content_full_diff(instance_meta_info, l_content, r_content):
   """Prepare diff between two revisions contents of same instance.
 
   This functionality is needed for `not_empty_revisions` query API operator.
@@ -339,3 +343,40 @@ def prepare_content_diff(instance_meta_info, l_content, r_content):
   )
 
   return diff
+
+
+def changes_present(obj, new_rev_content, prev_rev_content=None,
+                    obj_meta=None):
+  """Check if `new_rev_content` contains obj changes.
+
+  Checks whether `new_rev_content` contains changes in `obj` state or not. If
+  `prev_rev_content` is not passed to this function, the latest revision of
+  `obj` will be taken. Note that in this case revision whose content is passed
+  as `new_rev_content` should not been saved in DB or no changes would be
+  detected since two equal contents will be compared.
+
+  Args:
+      obj: db.Model instance which last revision would be compared with
+        `new_revision` to detect presence of changes.
+      new_rev_content: Content of newer revision to ckeck for changes.
+      prev_rev_content: Content of older revision. Optional. If is not passed,
+        latest `obj` revision will be taken.
+      obj_meta: MetaInfo instance of `obj`. Optionla. If is not passed, will
+        be constructed manually.
+
+  Returns:
+      Boolean flag indicating whether `new_rev_content` contains any changes
+        in `obj` state comparing to `prev_rev_content`.
+  """
+  if obj_meta is None:
+    obj_meta = meta_info.MetaInfo(obj)
+  if prev_rev_content is None:
+    prev_rev_content = get_latest_revision_content(obj)
+    if prev_rev_content is None:
+      return True
+  diff = prepare_content_full_diff(
+      instance_meta_info=obj_meta,
+      l_content=prev_rev_content,
+      r_content=new_rev_content,
+  )
+  return any(diff.values())
