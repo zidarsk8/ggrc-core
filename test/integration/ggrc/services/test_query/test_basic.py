@@ -857,8 +857,8 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
                                all_models.Market, all_models.Objective]),
       (all_models.Assessment, [all_models.Issue, all_models.Issue,
                                all_models.Issue, all_models.Issue]),
-      (all_models.Issue, [all_models.Assessment, all_models.Control,
-                          all_models.Market, all_models.Objective]),
+      (all_models.Issue, [all_models.Assessment, all_models.Assessment,
+                          all_models.Assessment, all_models.Assessment]),
   )
   @ddt.unpack
   def test_search_relevant_to_type_audit(self, base_type, relevant_types):
