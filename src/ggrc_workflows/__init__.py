@@ -62,7 +62,6 @@ def _inject_workflow_mixins():
 
   for type_ in WORKFLOW_OBJECT_TYPES:
     model = getattr(all_models, type_)
-    model.__bases__ = _INJECTABLE_MIXINS + model.__bases__
     _workaround_mixin_injection(model)
 
 
