@@ -3,20 +3,24 @@
 
 """Mixin for automatic status changes"""
 
+import collections
 import datetime
 
 from sqlalchemy import event
 from sqlalchemy import inspect
 from sqlalchemy.orm import session
 
+from ggrc.access_control import roleable
 from ggrc.models import evidence
 from ggrc.models import mixins
-from ggrc.models.mixins import statusable
 from ggrc.models import relationship
-
+from ggrc.models.mixins import statusable
 from ggrc.services import signals
-
 from ggrc.utils import benchmark
+
+
+Transition = collections.namedtuple('Transition',
+                                    ['before', 'condition', 'after'])
 
 
 class AutoStatusChangeable(object):
@@ -30,6 +34,7 @@ class AutoStatusChangeable(object):
     (Document, Snapshot, Comment)
   CUSTOM_ATTRS_STATUS_MAPPING for tracking changes in the custom attributes
     local and global.
+  ACL_STATUS_TRANSITIONS for tracking changes in access control lists.
   """
 
   __lazy_init__ = True
@@ -95,11 +100,60 @@ class AutoStatusChangeable(object):
       },
   }
 
-  _need_status_reset = False
+  def acl_changed(acr_name):  # pylint: disable=no-self-argument
+    return lambda obj: obj.has_acr_acl_changed(acr_name)
 
-  def move_to_in_progress(self):
-    if self.status != self.PROGRESS_STATE:
-      self.status = self.PROGRESS_STATE
+  ACL_STATUS_TRANSITIONS = {
+      Transition(
+          statusable.Statusable.FINAL_STATE,
+          acl_changed('Creators'),
+          statusable.Statusable.PROGRESS_STATE,
+      ),
+      Transition(
+          statusable.Statusable.FINAL_STATE,
+          acl_changed('Assignees'),
+          statusable.Statusable.PROGRESS_STATE,
+      ),
+      Transition(
+          statusable.Statusable.FINAL_STATE,
+          acl_changed('Verifiers'),
+          statusable.Statusable.PROGRESS_STATE,
+      ),
+      Transition(
+          statusable.Statusable.DONE_STATE,
+          acl_changed('Creators'),
+          statusable.Statusable.PROGRESS_STATE,
+      ),
+      Transition(
+          statusable.Statusable.DONE_STATE,
+          acl_changed('Assignees'),
+          statusable.Statusable.PROGRESS_STATE,
+      ),
+      Transition(
+          statusable.Statusable.DONE_STATE,
+          acl_changed('Verifiers'),
+          statusable.Statusable.PROGRESS_STATE,
+      ),
+  }
+
+  _need_status_reset = False
+  _reset_to_status = None
+
+  def schedule_transition(self, transition):
+    """Schedule object transition if possible."""
+    success = False
+    if self.status == transition.before and transition.condition(self):
+      self._need_status_reset = True
+      self._reset_to_status = transition.after
+      success = True
+    return success
+
+  def change_status(self):
+    """Change object status to obj._reset_to_status value."""
+    # pylint: disable=access-member-before-definition,
+    # pylint: disable=attribute-defined-outside-init
+    if self.status != self._reset_to_status:
+      self.status = self._reset_to_status
 
   @staticmethod
   def _date_has_changes(attr):
@@ -180,6 +234,7 @@ class AutoStatusChangeable(object):
                            for attr in mapping['TRACKED_ATTRIBUTES'])
     if obj.status in mapping['MONITOR_STATES'] and has_attr_changes:
       obj._need_status_reset = True
+      obj._reset_to_status = obj.PROGRESS_STATE
 
   @classmethod
   def handle_custom_attribute_edit(cls, obj):
@@ -209,6 +264,24 @@ class AutoStatusChangeable(object):
       monitor_states.extend(obj.CUSTOM_ATTRS_STATUS_MAPPING['LCA'])
     if obj.status in monitor_states:
       obj._need_status_reset = True
+      obj._reset_to_status = obj.PROGRESS_STATE
+
+  @classmethod
+  def handle_acl_edit(cls, obj):
+    """Handle edit in object's access control lists.
+
+    Performs check whether object has changes in its access control lists that
+    should change object status and sets obj._need_status_reset to True if the
+    state transition is needed.
+
+    Args:
+      obj: `db.Model` instance on which to perform check.
+    """
+    if not isinstance(obj, roleable.Roleable):
+      return
+    for transition in cls.ACL_STATUS_TRANSITIONS:
+      if obj.schedule_transition(transition):
+        break
 
   @classmethod
   def adjust_status_before_flush(cls, alchemy_session,
@@ -222,8 +295,9 @@ class AutoStatusChangeable(object):
     with benchmark("adjust status before flush"):
       for obj in alchemy_session.identity_map.values():
         if isinstance(obj, AutoStatusChangeable) and obj._need_status_reset:
-          obj.move_to_in_progress()
+          obj.change_status()
           obj._need_status_reset = False
+          obj._reset_to_status = None
 
   @staticmethod
   def has_custom_attr_changes(custom_attributes):
@@ -275,6 +349,7 @@ class AutoStatusChangeable(object):
       # pylint: disable=unused-variable,unused-argument
       cls.handle_first_class_edit(obj)
       cls.handle_custom_attribute_edit(obj)
+      cls.handle_acl_edit(obj)
 
     @signals.Restful.model_posted.connect_via(relationship.Relationship)
     @signals.Restful.model_put.connect_via(relationship.Relationship)
@@ -308,6 +383,7 @@ class AutoStatusChangeable(object):
       monitor_states = related_mapping['mappings'].get(key, set())
       if target_object.status in monitor_states:
         target_object._need_status_reset = True
+        target_object._reset_to_status = target_object.PROGRESS_STATE
 
     @signals.Restful.model_put.connect_via(evidence.Evidence)
     @signals.Restful.model_deleted.connect_via(evidence.Evidence)
@@ -322,14 +398,15 @@ class AutoStatusChangeable(object):
         src: The original PUT JSON dictionary.
         service: The instance of Resource handling the PUT request.
       """
-      # pylint: disable=unused-argument,unused-variable
+      # pylint: disable=unused-argument,unused-variable,protected-access
       auto_changeables = obj.related_objects(_types={model.__name__})
       related_settings = cls.RELATED_OBJ_STATUS_MAPPING.get(obj.type)
       key = related_settings['key'](obj)
       monitor_states = related_settings['mappings'].get(key, set())
       for auto_changeable in auto_changeables:
         if auto_changeable.status in monitor_states:
-          auto_changeable.move_to_in_progress()
+          auto_changeable._reset_to_status = auto_changeable.PROGRESS_STATE
+          auto_changeable.change_status()
 
 
 # pylint: disable=fixme

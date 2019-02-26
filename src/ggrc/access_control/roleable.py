@@ -217,6 +217,26 @@ class Roleable(object):
         for acl in self._access_control_list
     )
 
+  def has_acr_acl_changed(self, acr_name):
+    """Check if the object has had any changes in ACL with `acr_name` role.
+
+    Helper function checking access control list with particular access
+    control role `acr_name` for changes in current session. If there is no
+    such role on object, `False` will be returned.
+
+    Args:
+      acr_name: Name of particular access control role to check for changes.
+
+    Returns:
+      Boolean indicating if there are any changes in particular access control
+      list in the current session. If there is not any ACL with `acr_name`
+      ACR, `False` will be returned.
+    """
+    if acr_name not in self.acr_name_acl_map:
+      return False
+    acl = self.acr_name_acl_map[acr_name]
+    return inspect(acl).attrs["access_control_people"].history.has_changes()
+
   def validate_acl(self):
     """Check correctness of access_control_list."""
     for _, acl in self.access_control_list:

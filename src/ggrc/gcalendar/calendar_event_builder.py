@@ -3,6 +3,8 @@
 
 """Module with CalendarEventBuilder class."""
 
+import logging
+
 from sqlalchemy.orm import load_only
 from sqlalchemy import orm
 
@@ -11,6 +13,9 @@ from ggrc import settings
 from ggrc.models import all_models
 from ggrc.gcalendar import utils
 from ggrc.utils import benchmark
+
+
+logger = logging.getLogger(__name__)
 
 
 # pylint: disable=too-few-public-methods
@@ -94,21 +99,25 @@ class CalendarEventBuilder(object):
 
   def _generate_events_for_task(self, task, events_ids):
     """Generates CalendarEvents for CycleTaskGroupObjectTask."""
-    if self._should_create_event_for(task):
-      for person_id in self._get_task_persons_ids_to_notify(task):
-        event = self._get_event_by_date_and_attendee(
-            attendee_id=person_id,
-            end_date=task.end_date
-        )
-        if not event:
-          event = self._create_event_with_relationship(task, person_id)
-          self.events.append(event)
-        else:
-          self._create_event_relationship(task, event)
-          events_ids.discard(event.id)
+    try:
+      if self._should_create_event_for(task):
+        for person_id in self._get_task_persons_ids_to_notify(task):
+          event = self._get_event_by_date_and_attendee(
+              attendee_id=person_id,
+              end_date=task.end_date
+          )
+          if not event:
+            event = self._create_event_with_relationship(task, person_id)
+            self.events.append(event)
+          else:
+            self._create_event_relationship(task, event)
+            events_ids.discard(event.id)
 
-    for event_id in events_ids:
-      self._delete_event_relationship(event_id, task.id)
+      for event_id in events_ids:
+        self._delete_event_relationship(event_id, task.id)
+    except Exception as exp:   # pylint: disable=broad-except
+      logger.exception("Generating of event for task %d has failed with the "
+                       "following error %s.", task.id, exp.message)
 
   def _get_event_by_date_and_attendee(self, attendee_id, end_date):
     """Get calendar events by attendee and due date."""
@@ -142,18 +151,17 @@ class CalendarEventBuilder(object):
 
   def _create_event_with_relationship(self, task, person_id):
     """Creates calendar event and relationship based on task and person id."""
-    with benchmark("Create Calendar event for task {}".format(task.id)):
-      event = all_models.CalendarEvent(
-          due_date=task.end_date,
-          attendee_id=person_id,
-          title=self.TASK_TITLE_TEMPLATE.format(prefix=self.title_prefix),
-          modified_by_id=person_id,
-      )
-      db.session.add(event)
-      db.session.add(all_models.Relationship(
-          source=task,
-          destination=event,
-      ))
+    event = all_models.CalendarEvent(
+        due_date=task.end_date,
+        attendee_id=person_id,
+        title=self.TASK_TITLE_TEMPLATE.format(prefix=self.title_prefix),
+        modified_by_id=person_id,
+    )
+    db.session.add(event)
+    db.session.add(all_models.Relationship(
+        source=task,
+        destination=event,
+    ))
     return event
 
   @staticmethod

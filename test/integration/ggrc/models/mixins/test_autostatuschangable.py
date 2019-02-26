@@ -659,40 +659,79 @@ class TestOther(TestMixinAutoStatusChangeableBase):
     self.assertStatus(response, 200)
     self.assertEqual(from_status, assessment.status)
 
-  @ddt.data("DONE_STATE", "START_STATE")
-  def test_changing_assignees_should_not_change_status(self, test_state):
-    """Adding/changing/removing assignees shouldn't change status
+  @ddt.data(
+      (
+          "Creators",
+          models.Assessment.FINAL_STATE,
+          models.Assessment.PROGRESS_STATE,
+      ),
+      (
+          "Creators",
+          models.Assessment.DONE_STATE,
+          models.Assessment.PROGRESS_STATE,
+      ),
+      (
+          "Assignees",
+          models.Assessment.FINAL_STATE,
+          models.Assessment.PROGRESS_STATE,
+      ),
+      (
+          "Assignees",
+          models.Assessment.DONE_STATE,
+          models.Assessment.PROGRESS_STATE,
+      ),
+      (
+          "Verifiers",
+          models.Assessment.FINAL_STATE,
+          models.Assessment.PROGRESS_STATE,
+      ),
+      (
+          "Verifiers",
+          models.Assessment.DONE_STATE,
+          models.Assessment.PROGRESS_STATE,
+      ),
+  )
+  @ddt.unpack
+  def test_change_acl_status_sw(self, acr_name, start_state, end_state):
+    """Change in ACL switches status from `start_state` to `end_state`."""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(status=start_state)
+      person = factories.PersonFactory()
 
-    Test assessment in FINAL_STATE should not get to PROGRESS_STATE on
-    assignee edit.
-    """
-    people = [
-        ("creator@example.com", "Creators"),
-        ("assessor_1@example.com", "Assignees"),
-        ("assessor_2@example.com", "Assignees"),
-    ]
+    self.modify_assignee(assessment, person.email, [acr_name])
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status, end_state)
 
-    assessment = self.create_assessment(people)
+    assessment = self.change_status(assessment, start_state)
+    self.modify_assignee(assessment, person.email, [])
     assessment = self.refresh_object(assessment)
-    assessment = self.change_status(assessment,
-                                    getattr(assessment, test_state))
-    self.assertEqual(assessment.status,
-                     getattr(models.Assessment, test_state))
-    self.modify_assignee(assessment,
-                         "creator@example.com",
-                         ["Creators", "Assignees"])
+    self.assertEqual(assessment.status, end_state)
+
+  @ddt.data(
+      ("Creators", models.Assessment.START_STATE),
+      ("Creators", models.Assessment.PROGRESS_STATE),
+      ("Creators", models.Assessment.DEPRECATED),
+      ("Assignees", models.Assessment.START_STATE),
+      ("Assignees", models.Assessment.PROGRESS_STATE),
+      ("Assignees", models.Assessment.DEPRECATED),
+      ("Verifiers", models.Assessment.START_STATE),
+      ("Verifiers", models.Assessment.PROGRESS_STATE),
+      ("Verifiers", models.Assessment.DEPRECATED),
+  )
+  @ddt.unpack
+  def test_change_acl_no_status_sw(self, acr_name, start_state):
+    """Change in ACL does not swith status from `start_state`."""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(status=start_state)
+      person = factories.PersonFactory()
+
+    self.modify_assignee(assessment, person.email, [acr_name])
     assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     getattr(models.Assessment, test_state))
-    new_assessors = [("assessor_3_added_later@example.com", "Verifiers")]
-    self.create_assignees_restful(assessment, new_assessors)
+    self.assertEqual(assessment.status, start_state)
+
+    self.modify_assignee(assessment, person.email, [])
     assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     getattr(models.Assessment, test_state))
-    self.delete_assignee(assessment, "assessor_1@example.com")
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     getattr(models.Assessment, test_state))
+    self.assertEqual(assessment.status, start_state)
 
   def test_assessment_verifiers_full_cycle_first_class_edit(self):
     """Test models.Assessment with verifiers full flow

@@ -21,11 +21,4 @@ export default Cacheable.extend({
   attributes: {
     reviewable: Stub,
   },
-}, {
-  setShowLastReviewUpdates(value) {
-    this._showLastReviewUpdates = value;
-  },
-  getShowLastReviewUpdates() {
-    return this._showLastReviewUpdates;
-  },
-});
+}, {});

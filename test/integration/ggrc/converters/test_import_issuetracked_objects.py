@@ -114,7 +114,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("AssessmentTemplate", "Assessment Template", "off"),
   )
   @ddt.unpack
-  def test_import_enabled_update_succeed(self, model, model_name, value):
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_import_enabled_update_succeed(self, model, model_name, value, _):
     """Test {0} integration state {1} set correctly when updated via import."""
     with factories.single_commit():
       factory = factories.get_model_factory(model)
@@ -134,7 +135,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self._assert_integration_state(obj, value)
 
   @ddt.data("on", "off")
-  def test_enabled_state_issue_create_succeed(self, value):
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  def test_enabled_state_issue_create_succeed(self, value, _):
     """Test Issue integration state set correctly during create via import."""
     response = self.import_data(OrderedDict([
         ("object_type", "Issue"),
@@ -149,7 +151,8 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self._assert_integration_state(obj, value)
 
   @ddt.data("on", "off")
-  def test_enabled_state_assmt_create_succeed(self, value):
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  def test_enabled_state_assmt_create_succeed(self, value, _):
     """Test Assessment integration state set correctly during create."""
     audit = factories.AuditFactory()
     response = self.import_data(OrderedDict([
@@ -652,3 +655,127 @@ class TestIssueTrackedImport(ggrc.TestCase):
     obj = all_models.AssessmentTemplate.query.one()
     self.assertEqual(str(obj.issue_tracker[missed_field]),
                      str(default_values[missed_field]))
+
+  @ddt.data("Fixed", "Fixed and Verified", "Deprecated")
+  def test_ticket_generation_disallowed_on_create(self, status):
+    """Test ticket generation disallowed for Issue in {} status on create"""
+    expected_warning = (
+        errors.WRONG_TICKET_STATUS.format(
+            line=3,
+            column_name="Ticket Tracker Integration",
+        )
+    )
+    expected_messages = {
+        "Issue": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", "OBJ-1"),
+        ("Admin", "user@example.com"),
+        ("Title", "Object Title"),
+        ("State", status),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    obj = all_models.Issue.query.one()
+    self.assertFalse(obj.issue_tracker["enabled"])
+
+  @ddt.data("Fixed", "Fixed and Verified", "Deprecated")
+  def test_ticket_generation_disallowed_on_update(self, status):
+    """Test ticket generation disallowed for Issue in {} status on update"""
+    with factories.single_commit():
+      obj = factories.IssueFactory(status=status)
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=obj,
+          enabled=False,
+          issue_id=None,
+      )
+    expected_warning = (
+        errors.WRONG_TICKET_STATUS.format(
+            line=3,
+            column_name="Ticket Tracker Integration",
+        )
+    )
+    expected_messages = {
+        "Issue": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", obj.slug),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    obj = all_models.Issue.query.one()
+    self.assertFalse(obj.issue_tracker["enabled"])
+
+  @ddt.data("Draft", "Active")
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_generation_allowed_on_create(self, status, create_mock):
+    """Test ticket generation allowed for Issue in {} status on create"""
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", "OBJ-1"),
+        ("Admin", "user@example.com"),
+        ("State", status),
+        ("Title", "Object Title"),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, {})
+    obj = all_models.Issue.query.one()
+    self.assertTrue(obj.issue_tracker["enabled"])
+    create_mock.assert_called_once()
+
+  @ddt.data("Draft", "Active")
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_generation_allowed_on_update(self, status, create_mock):
+    """Test ticket generation allowed for Issue in {} status on update"""
+    with factories.single_commit():
+      obj = factories.IssueFactory(status=status)
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=obj,
+          enabled=False,
+          issue_id=None,
+      )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", obj.slug),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, {})
+    obj = all_models.Issue.query.one()
+    self.assertTrue(obj.issue_tracker["enabled"])
+    create_mock.assert_called_once()
+
+  @ddt.data(*all_models.Assessment.VALID_STATES)
+  @mock.patch("ggrc.integrations.issues.Client.create_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_generation_allowed_for_assmts(self, status, create_mock):
+    """Test ticket generation allowed for Assessment in {} status"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assmt = factories.AssessmentFactory(status=status, audit=audit)
+      person = factories.PersonFactory()
+      factories.AccessControlPersonFactory(
+          ac_list=assmt.acr_name_acl_map["Verifiers"],
+          person=person,
+      )
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=assmt,
+          enabled=False,
+          issue_id=None,
+      )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assmt.slug),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, {})
+    assmt = all_models.Assessment.query.one()
+    self.assertTrue(assmt.issue_tracker["enabled"])
+    create_mock.assert_called_once()

@@ -6,7 +6,7 @@
 import ModalsController from './modals_controller';
 import pubsub from '../../pub-sub';
 import {bindXHRToButton} from '../../plugins/utils/modals';
-import {notifier} from '../../plugins/utils/notifiers-utils';
+import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
 export default ModalsController({
   defaults: {
@@ -48,14 +48,8 @@ export default ModalsController({
 
         return new $.Deferred(); // on success, just let the modal be destroyed or navigation happen.
         // Do not re-enable the form elements.
-      }).fail(function (xhr, status) {
-        let message = xhr.responseJSON;
-
-        if (xhr.responseJSON && xhr.responseJSON.message) {
-          message = xhr.responseJSON.message;
-        }
-
-        notifier('error', message);
+      }).fail(function (xhr) {
+        notifierXHR('error', xhr);
       }), el.add(cancelButton).add(modalBackdrop));
   },
 });

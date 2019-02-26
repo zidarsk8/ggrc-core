@@ -72,27 +72,27 @@ PRINT_CHILDREN_MAPPING = {
 }
 
 PRINT_CHILDREN_END_MAPPING = {
-    True: "{}  }},",
+    True: "{}}},",
     False: ""
 }
 
 OBJECT_TYPE_PRINT_MAPPING = {
-    True: '"{}": {{',
+    True: '    "{}": {{',
     False: "{}"
 }
 
 ACR_NAME_PRINT_MAPPING = {
-    True: '    "{}": {{ #{}',
+    True: '        "{}": {{  # {}',
     False: "    {} {}"
 }
 
 ACR_NAME_END_MAPPING = {
-    True: "    },",
+    True: "        },",
     False: ""
 }
 
 PRINT_TREE_END_PRINT_MAPPING = {
-    True: "},",
+    True: "    },",
     False: ""
 }
 
@@ -112,9 +112,10 @@ def print_not_empty(str_to_print):
     print str_to_print
 
 
-def print_children(acr, id_map, parent_map, prefix="        "):
+def print_children(acr, id_map, parent_map, prefix="            "):
   """Print acr children and their sub-trees."""
-  for child in parent_map[acr.id]:
+  for child in sorted(parent_map[acr.id],
+                      key=lambda _child: getattr(_child, "object_type")):
     print_not_empty(PRINT_CHILDREN_MAPPING[AS_DICT].format(
         prefix, child.object_type, get_rud(child)
     ))
@@ -131,7 +132,7 @@ def print_tree():
   acr_dict = get_acr_dict(acrs)
   id_map = get_acr_id_map(acrs)
   parent_map = get_acr_parent_id_map(acrs)
-  for object_type, acrs in acr_dict.items():
+  for object_type, acrs in sorted(acr_dict.items()):
     print_not_empty(OBJECT_TYPE_PRINT_MAPPING[AS_DICT].format(object_type))
     for acr_name in sorted(acrs):
       print_not_empty(ACR_NAME_PRINT_MAPPING[AS_DICT].format(

@@ -15,6 +15,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import childModelsMap from './child-models-map';
 import tracker from '../../tracker';
+import Pagination from '../base-objects/pagination';
 
 const viewModel = can.Map.extend({
   define: {
@@ -60,9 +61,6 @@ const viewModel = can.Map.extend({
       type: Boolean,
       value: false,
     },
-    /**
-     *
-     */
     showMore: {
       type: Boolean,
       value: false,
@@ -82,6 +80,19 @@ const viewModel = can.Map.extend({
         } else {
           setValue(newValue);
         }
+      },
+    },
+    paging: {
+      value() {
+        return new Pagination({
+          pageSize: 25, pageSizeSelect: [25, 50, 100],
+        });
+      },
+    },
+    showPagination: {
+      type: Boolean,
+      get() {
+        return this.attr('parentModel') === 'CycleTaskGroup';
       },
     },
     childModels: {
@@ -156,6 +167,7 @@ const viewModel = can.Map.extend({
       return $.Deferred().resolve();
     }
 
+    const pageInfo = this.attr('showPagination') ? this.attr('paging') : {};
     const stopFn = tracker.start(parentType,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.SUB_TREE_LOADING);
@@ -163,7 +175,7 @@ const viewModel = can.Map.extend({
     this.attr('loading', true);
 
     return TreeViewUtils
-      .loadItemsForSubTier(models, parentType, parentId, filter)
+      .loadItemsForSubTier(models, parentType, parentId, filter, pageInfo)
       .then((result) => {
         stopFn();
         this.attr('loading', false);
@@ -171,6 +183,7 @@ const viewModel = can.Map.extend({
         this.attr('notDirectlyItems', result.notDirectlyItems);
         this.attr('dataIsReady', true);
         this.attr('showMore', result.showMore);
+        this.attr('paging.total', result.total);
 
         if (!result.directlyItems.length && !result.notDirectlyItems.length) {
           this.attr('notResult', true);
@@ -219,6 +232,12 @@ const events = {
     this.viewModel.attr('deepLevel', parents.length);
   },
   [`{viewModel.parent} ${REFRESH_SUB_TREE.type}`]() {
+    this.viewModel.refreshItems();
+  },
+  '{viewModel.paging} current'() {
+    this.viewModel.refreshItems();
+  },
+  '{viewModel.paging} pageSize'() {
     this.viewModel.refreshItems();
   },
 };

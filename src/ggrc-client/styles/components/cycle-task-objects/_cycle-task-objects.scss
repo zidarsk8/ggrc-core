@@ -1,0 +1,19 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.cycle-task-objects {
+  &__content {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+  }
+
+  &__object-link {
+    margin-left: 3px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}

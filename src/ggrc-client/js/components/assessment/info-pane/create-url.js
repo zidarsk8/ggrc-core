@@ -4,6 +4,7 @@
 */
 
 import {notifier} from '../../../plugins/utils/notifiers-utils';
+import {sanitizer} from '../../../plugins/utils/url-utils';
 import Context from '../../../models/service-models/context';
 import Evidence from '../../../models/business-models/evidence';
 
@@ -14,35 +15,33 @@ export default can.Component.extend({
     value: null,
     context: null,
     create: function () {
-      let value = this.attr('value');
-      let self = this;
-      let evidence;
-      let attrs;
+      const url = sanitizer(this.attr('value'));
 
-      if (!value || !value.length) {
-        notifier('error', 'Please enter a URL.');
+      if (!url.isValid) {
         return;
       }
 
-      attrs = {
-        link: value,
-        title: value,
+      let attrs = {
+        link: url.value,
+        title: url.value,
         context: this.attr('context') || new Context({id: null}),
         kind: 'URL',
       };
 
-      evidence = new Evidence(attrs);
+      let evidence = new Evidence(attrs);
+      this.dispatch({type: 'setEditMode'});
       this.dispatch({type: 'beforeCreate', items: [evidence]});
       evidence.save()
-        .fail(function () {
+        .fail(() => {
           notifier('error', 'Unable to create URL.');
         })
-        .done(function (data) {
-          self.dispatch({type: 'created', item: data});
-          self.clear();
+        .done((data) => {
+          this.dispatch({type: 'created', item: data});
+          this.clear();
         });
     },
-    clear: function () {
+    clear() {
+      this.dispatch({type: 'setEditMode'});
       this.attr('value', null);
     },
   },

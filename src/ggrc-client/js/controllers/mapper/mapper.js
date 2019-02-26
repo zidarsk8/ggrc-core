@@ -9,7 +9,7 @@ import '../../components/object-mapper/object-mapper';
 import '../../components/object-generator/object-generator';
 import '../../components/object-search/object-search';
 import {
-  isInScopeModel,
+  isAuditScopeModel,
 } from '../../plugins/utils/snapshot-utils';
 import asmtTemplateCloneTemplate from './assessment-template-clone-modal.stache';
 import objectGeneratorTemplate from './object-generator-modal.stache';
@@ -59,12 +59,11 @@ const ObjectMapper = can.Control.extend({
 
     return $target;
   },
-  isLoading: false,
   openMapper: function (data, disableMapper, btn) {
     let self = this;
     let isSearch = /unified-search/ig.test(data.toggle);
 
-    if (disableMapper || this.isLoading) {
+    if (disableMapper) {
       return;
     }
 
@@ -73,7 +72,7 @@ const ObjectMapper = can.Control.extend({
       throw new Error(OBJECT_REQUIRED_MESSAGE);
     }
 
-    if (isInScopeModel(data.join_object_type) && !isSearch) {
+    if (isAuditScopeModel(data.join_object_type) && !isSearch) {
       openForSnapshots(data);
     } else {
       openForCommonObjects(data, isSearch);
@@ -114,36 +113,31 @@ const ObjectMapper = can.Control.extend({
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
 
-      self.isLoading = true;
-
       let model = businessModels[data.join_object_type];
-      let inScopeObject =
+      let auditScopeObject =
         model.findInCacheById(data.join_object_id);
-      inScopeObject.updateScopeObject().then(function () {
-        let scopeObject = inScopeObject.attr('audit');
+      let audit = auditScopeObject.attr('audit');
 
-        if (!scopeObject.id) {
-          notifier('error', DATA_CORRUPTION_MESSAGE);
-          setTimeout(function () {
-            changeUrl('/dashboard');
-          }, 3000);
-          return;
-        }
+      if (!audit.id) {
+        notifier('error', DATA_CORRUPTION_MESSAGE);
+        setTimeout(function () {
+          changeUrl('/dashboard');
+        }, 3000);
+        return;
+      }
 
-        _.assign(config.general, {
-          object: data.join_object_type,
-          'join-object-id': data.join_object_id,
-          type: data.join_option_type,
-          relevantTo: [{
-            readOnly: true,
-            type: scopeObject.type,
-            id: scopeObject.id,
-            title: scopeObject.title,
-          }],
-        });
-        self.launch(btn, Object.assign(config, data));
-      })
-        .always(() => self.isLoading = false);
+      _.assign(config.general, {
+        object: data.join_object_type,
+        'join-object-id': data.join_object_id,
+        type: data.join_option_type,
+        relevantTo: [{
+          readOnly: true,
+          type: audit.type,
+          id: audit.id,
+          title: audit.title,
+        }],
+      });
+      self.launch(btn, Object.assign(config, data));
     }
 
     function openForCommonObjects(data, isSearch) {

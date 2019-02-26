@@ -120,22 +120,23 @@ describe('ModalsController', function () {
       spyOn(window, 'clearTimeout');
       method = Ctrl.prototype.save_error.bind(ctrlInst);
     });
-    it('calls notifier with responseText' +
+    it('calls notifierXHR with response' +
     ' if error status is not 409', function () {
-      method({}, {status: 400, responseText: 'mockText'});
-      expect(NotifiersUtils.notifier).toHaveBeenCalledWith('error', 'mockText');
+      const response = {status: 400, responseText: 'mockText'};
+      method({}, response);
+      expect(NotifiersUtils.notifierXHR)
+        .toHaveBeenCalledWith('error', response);
     });
     it('clears timeout of error warning if error status is 409', function () {
       method({}, {status: 409, warningId: 999});
       expect(clearTimeout).toHaveBeenCalledWith(999);
     });
-    it('calls notifier with specified text' +
+    it('calls notifierXHR with response' +
     ' if error status is 409', function () {
       let error = {status: 409};
       method({}, error);
       expect(NotifiersUtils.notifierXHR)
-        .toHaveBeenCalledWith('warning');
-      expect(foo).toHaveBeenCalledWith(error);
+        .toHaveBeenCalledWith('warning', error);
     });
 
     it('calls "disableEnableContentUI" method', () => {

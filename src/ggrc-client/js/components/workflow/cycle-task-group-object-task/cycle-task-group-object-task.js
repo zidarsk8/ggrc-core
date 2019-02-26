@@ -28,6 +28,21 @@ let viewModel = can.Map.extend({
         return getPageType() !== 'Workflow';
       },
     },
+    showMapObjectsButton: {
+      get() {
+        const instance = this.attr('instance');
+        const status = instance.attr('status');
+        const hasAllowedStatus = !(
+          status === 'Verified' ||
+          status === 'Finished'
+        );
+
+        return (
+          Permission.is_allowed_for('update', instance) &&
+          hasAllowedStatus
+        );
+      },
+    },
     workflowLink: {
       get() {
         return `/workflows/${this.attr('instance.workflow.id')}`;

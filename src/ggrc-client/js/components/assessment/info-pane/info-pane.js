@@ -240,8 +240,8 @@ export default can.Component.extend({
         pageInstance.attr('id')
       );
     },
-    setUrlEditMode: function (value, type) {
-      this.attr(type + 'EditMode', value);
+    setUrlEditMode: function (value) {
+      this.attr('urlsEditMode', value);
     },
     setInProgressState: function () {
       this.onStateChange({state: 'In Progress', undo: false});
@@ -373,7 +373,9 @@ export default can.Component.extend({
               tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
           }
         })
-        .fail(function () {
+        .fail(function (instance, xhr) {
+          notifierXHR('error', xhr);
+
           if (type === 'comments') {
             tracker.stop(assessment.type,
               tracker.USER_JOURNEY_KEYS.INFO_PANE,
@@ -554,7 +556,7 @@ export default can.Component.extend({
         } else {
           this.afterStatusSave(status);
           this.attr('previousStatus', previousStatus);
-          notifierXHR('error')(xhr);
+          notifierXHR('error', xhr);
         }
       }).always(() => {
         this.attr('isUpdatingState', false);

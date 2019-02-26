@@ -19,7 +19,7 @@ import * as businessModels from '../../models/business-models';
  * Util methods for work with Snapshots.
  */
 
-const inScopeModels = ['Assessment', 'AssessmentTemplate'];
+const auditScopeModels = ['Assessment', 'AssessmentTemplate'];
 
 /**
  * Set extra attrs for snapshoted objects or snapshots
@@ -50,7 +50,7 @@ function isSnapshot(instance) {
 function isSnapshotScope(parentInstance) {
   let instance = parentInstance || getPageInstance();
   return instance ?
-    instance.is_snapshotable || isInScopeModel(instance.type) :
+    instance.is_snapshotable || isAuditScopeModel(instance.type) :
     false;
 }
 
@@ -80,7 +80,7 @@ function isSnapshotModel(modelName) {
  */
 function isSnapshotRelated(parent, child) {
   return isSnapshotParent(parent) && isSnapshotModel(child) ||
-    isInScopeModel(parent) && isSnapshotModel(child);
+    isAuditScopeModel(parent) && isSnapshotModel(child);
 }
 
 /**
@@ -92,8 +92,8 @@ function isSnapshotRelatedType(type) {
   return GGRC.config.snapshot_related.indexOf(type) > -1;
 }
 
-function isInScopeModel(model) {
-  return inScopeModels.indexOf(model) > -1;
+function isAuditScopeModel(model) {
+  return auditScopeModels.indexOf(model) > -1;
 }
 
 /**
@@ -295,7 +295,7 @@ export {
   isSnapshotRelated,
   isSnapshotRelatedType,
   isSnapshotModel,
-  isInScopeModel,
+  isAuditScopeModel,
   toObject,
   toObjects,
   transformQuery,

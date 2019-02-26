@@ -268,7 +268,12 @@ export default can.Model.extend({
         .then((obj) => obj,
           (xhr) => {
             if (xhr.status === 409) {
-              let dfd = resolveConflict(xhr, this.findInCacheById(id));
+              let dfd = $.Deferred();
+              resolveConflict(xhr, this.findInCacheById(id))
+                .then(
+                  (obj) => dfd.resolve(obj),
+                  (obj, xhr) => dfd.reject(xhr)
+                );
               return dfd;
             }
             return xhr;
