@@ -16,6 +16,7 @@ ACCOUNT="$2"
 KEY_FILE="$3"
 
 VERSION="1"
+DEPLOY_ARGS=""
 
 
 write_visible_message () {
