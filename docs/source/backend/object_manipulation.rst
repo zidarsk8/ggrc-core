@@ -804,13 +804,6 @@ Examples
               "created_at":"2016-05-19T12:57:02",
               "workflow_state":null,
               "slug":"Some unique value",
-              "workflow_people":[
-                 {
-                    "href":"/api/workflow_people/1",
-                    "type":"WorkflowPerson",
-                    "id":1
-                 }
-              ],
               "cycles":[
 
               ],
@@ -1214,7 +1207,6 @@ GGRC object Type
 * TaskGroup
 * Vendor
 * Workflow
-* WorkflowPerson
 
 
 .. _recipient:
