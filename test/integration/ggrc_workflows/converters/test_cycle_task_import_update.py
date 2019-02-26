@@ -14,6 +14,7 @@ from freezegun import freeze_time
 
 import ddt
 
+from ggrc.models import all_models
 from ggrc import db
 from ggrc.access_control import role
 from ggrc.converters import errors
@@ -640,3 +641,38 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
     }
 
     self._check_csv_response(response, expected_warnings)
+
+
+@ddt.ddt
+class TestCycleTaskImportComments(TestCase):
+  """Test cases for update comments on import cycle tasks"""
+
+  def setUp(self):
+    with ggrc_factories.single_commit():
+      self.task = factories.CycleTaskGroupObjectTaskFactory()
+
+  @ddt.data(
+      ('comment 1', 1),
+      ('comment 2;;comment 3', 2)
+  )
+  @ddt.unpack
+  def test_update_comments_via_import(self, comment, count):
+    """Test update/add comments via import"""
+    current_comments_count = all_models.Relationship.query.filter_by(
+        source_id=self.task.id,
+        source_type=self.task.type,
+        destination_type='Comment').count()
+
+    self.import_data(OrderedDict([
+        ("object_type", self.task.type),
+        ("Code*", self.task.slug),
+        ("Task Assignees*", 'test@exmple.com'),
+        ("Task Type", "some data"),
+        ("Comments", comment)]))
+
+    new_comments_count = all_models.Relationship.query.filter_by(
+        source_id=self.task.id,
+        source_type=self.task.type,
+        destination_type='Comment').count()
+
+    self.assertEqual(current_comments_count + count, new_comments_count)
