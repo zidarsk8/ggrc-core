@@ -88,6 +88,8 @@ class Control(synchronizable.Synchronizable,
     """Relationship to user referenced by last_verified_by."""
     return utils.person_relationship(cls.__name__, "last_verified_by")
 
+  _title_uniqueness = False
+
   # REST properties
   _api_attrs = reflection.ApiAttributes(
       'active',
