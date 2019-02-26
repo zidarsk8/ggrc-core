@@ -685,12 +685,12 @@ def handle_cycle_task_status_change(sender, objs=None):
       if obj.old_status == obj.new_status:
         continue
       if obj.new_status == obj.instance.VERIFIED:
-        obj.instance.verified_date = datetime.utcnow()
+        obj.instance.verified_date = datetime.utcnow().date()
         if obj.instance.finished_date is None:
           obj.instance.finished_date = obj.instance.verified_date
       elif obj.new_status == obj.instance.FINISHED:
         obj.instance.finished_date = (obj.instance.finished_date or
-                                      datetime.utcnow())
+                                      datetime.utcnow().date())
         obj.instance.verified_date = None
       else:
         obj.instance.finished_date = None
