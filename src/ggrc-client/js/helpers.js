@@ -678,25 +678,6 @@ can.stache.registerHelper('if_config_exist', function (key, options) {
     options.inverse(options.contexts);
 });
 
-can.stache.registerHelper('switch', function (value, options) {
-  let frame = new can.Map({});
-  value = resolveComputed(value);
-  frame.attr(value || 'default', true);
-  frame.attr('default', true);
-  return options.fn(options.contexts.add(frame), {
-    helpers: {
-      'case': function (val, options) {
-        val = resolveComputed(val);
-        if (options.context[val]) {
-          options.context.attr ? options.context.attr('default', false) :
-            (options.context.default = false);
-          return options.fn(options.contexts);
-        }
-      },
-    },
-  });
-});
-
 can.stache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   let options = arguments[arguments.length - 1];
   let _disableCreate = isFunction(disableCreate) ?
