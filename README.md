@@ -378,6 +378,6 @@ make appengine_packages
 
 # Copyright Notice
 
-Copyright (C) 2013-2018 Google Inc.
+Copyright (C) 2013-2019 Google Inc.
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).
