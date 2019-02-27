@@ -18,11 +18,13 @@ from ggrc.models import object_person
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import review
+from ggrc.models.mixins import mega
 from ggrc.models.mixins import rest_handable as rest_handable_mixins
 from ggrc.utils import errors
 
 
-class Program(review.Reviewable,
+class Program(mega.Mega,
+              review.Reviewable,
               mixins.CustomAttributable,
               object_document.PublicDocumentable,
               roleable.Roleable,
