@@ -933,7 +933,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
           title='title',
           component_id=111,
           hotlist_id=222,
-          issue_type="BUG",
+          issue_type="PROCESS",
           issue_priority="P2",
           issue_severity="S2",
       )
@@ -943,7 +943,7 @@ class TestBulkIssuesUpdate(TestBulkIssuesSync):
         'title': u'title',
         'hotlist_ids': [222],
         'priority': u'P2',
-        'type': u'BUG'
+        'type': u'PROCESS'
     }
     updater = issuetracker_bulk_sync.IssueTrackerBulkUpdater()
     # pylint: disable=protected-access

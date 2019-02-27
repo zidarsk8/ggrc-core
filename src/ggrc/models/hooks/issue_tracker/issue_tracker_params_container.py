@@ -35,7 +35,7 @@ class IssueTrackerParamsContainer(object):
   # Available values for Issue Tracker severity and priority.
   AVAILABLE_PRIORITIES = ("P0", "P1", "P2", "P3", "P4", )
   AVAILABLE_SEVERITIES = ("S0", "S1", "S2", "S3", "S4", )
-  AVAILABLE_TYPES = ("PROCESS", "BUG")
+  AVAILABLE_TYPES = ("PROCESS", )
 
   def __init__(self):
     """Basic initialization."""
