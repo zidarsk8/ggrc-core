@@ -11,11 +11,21 @@ class AutomappingRuleConfigError(ValueError):
   pass
 
 
-TYPE_ORDERING = [['Program'],
-                 ['Regulation', 'Policy', 'Standard', 'Contract'],
-                 ['Requirement'], ['Objective'], ['Control']]
-
-TYPE_ORDERING += [["Issue"], ["Assessment"], ["Audit", "Snapshot"]]
+TYPE_ORDERING = [
+    ["Program"],
+    [
+        "Risk", "Threat", "System", "Product", "Process", "Market",
+        "DataAsset", "Facility", "OrgGroup", "Metric", "AccessGroup",
+        "ProductGroup", "Project", "Vendor", "TechnologyEnvironment",
+    ],
+    ["Regulation", "Policy", "Standard", "Contract"],
+    ["Requirement"],
+    ["Objective"],
+    ["Control"],
+    ["Issue"],
+    ["Assessment"],
+    ["Audit", "Snapshot"],
+]
 
 
 def get_type_levels():
@@ -57,6 +67,7 @@ def validate_rules(rule_list):
 
 
 def explode_rules(rule_list):
+  """Generate rules from rule list in both directions"""
   for rule in rule_list:
     for top, mid, bottom in itertools.product(rule.top, rule.mid,
                                               rule.bottom):
@@ -75,7 +86,7 @@ def make_rule_set(rule_list):
   return rule_set
 
 
-def rules_to_str(rules):
+def rules_to_str(_rules):
   """Make rules printable in a pretty format for debugging.
 
   Usage:
@@ -83,9 +94,9 @@ def rules_to_str(rules):
     print rules.rules_to_str(rules.rules)
   """
   lines = []
-  for key in rules:
+  for key in _rules:
     src, dst = key
-    for mapping in rules[key]:
+    for mapping in _rules[key]:
       rule = ("%s <--> %s <--> %s" % (src, dst, mapping))
       lines.append(rule)
   lines.sort()
@@ -94,20 +105,34 @@ def rules_to_str(rules):
 
 class Types(object):
   """Model names and collections to use in Rule initialization."""
-  directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
+  # pylint: disable=too-few-public-methods
+  DIRECTIVES = {"Regulation", "Policy", "Standard", "Contract"}
+  MEGA_MAPPINGS = {
+      "Regulation", "Objective", "Control", "Contract",
+      "Policy", "Risk", "Standard", "Threat", "Requirement",
+      "System", "Product", "Process", "Market", "DataAsset",
+      "Facility", "OrgGroup", "Metric", "TechnologyEnvironment",
+      "ProductGroup", "Project", "Vendor", "AccessGroup"
+  }
 
 
 rules = make_rule_set(rule_list=[  # pylint: disable=invalid-name
     Rule(
         # mapping directive to a program
-        {'Program'},
-        Types.directives,
-        {'Requirement'}
+        {"Program"},
+        Types.DIRECTIVES,
+        {"Requirement"}
     ),
     Rule(
-        # mappings for 'raise an issue' on assessment page
+        # mappings for "raise an issue" on assessment page
         {"Issue"},
         {"Assessment"},
         {"Audit", "Snapshot"},
+    ),
+    Rule(
+        # mappings for Mega Program
+        {"Program"},
+        {"Program"},
+        Types.MEGA_MAPPINGS,
     ),
 ])
