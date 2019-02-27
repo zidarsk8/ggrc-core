@@ -17,6 +17,11 @@ class InfoWidgetThreeBbbs(object):
     """Returns `Edit <Object>` option."""
     return self._three_bbs.option_by_icon_cls("fa-pencil-square-o")
 
+  @property
+  def delete_option(self):
+    """Returns `Delete <Object>` option."""
+    return self._three_bbs.option_by_text("Delete")
+
   def select_edit(self):
     """Selects `Edit <Object>` option."""
     self.edit_option.click()
@@ -35,17 +40,12 @@ class InfoWidgetThreeBbbs(object):
     """Returns `Unmap` option."""
     return self._three_bbs.option_by_text("Unmap")
 
-  @property
-  def delete_option(self):
-    """Returns `Delete` option."""
-    return self._three_bbs.option_by_text("Delete")
-
   def select_delete(self):
     """Selects `Delete` option.
     Return: modal.delete_object.DeleteObjectModal
     """
     self.delete_option.click()
-    return delete_object.DeleteObjectModal(self._root.browser.driver)
+    return delete_object.DeleteObjectModal()
 
   @property
   def exists(self):

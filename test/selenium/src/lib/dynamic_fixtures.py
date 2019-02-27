@@ -225,6 +225,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
       return deleted_objs
 
   for fixture in fixtures:
+
     fixture_params = None
     if isinstance(fixture, tuple):
       fixture, fixture_params = fixture
