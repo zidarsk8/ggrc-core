@@ -2,7 +2,7 @@
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<!-- Objectives and Regulations Grids -->
+<!-- Requirements and Regulations Grids -->
 <collapsible-panel {title-text}="titleText" class="mapped-related-objects">
   <object-list {items}="items">
     <div class="mapped-object-info">

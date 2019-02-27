@@ -6,7 +6,7 @@
 import '../../collapsible-panel/collapsible-panel';
 import '../../object-list-item/business-object-list-item';
 import '../../object-list-item/detailed-business-object-list-item';
-import './mapped-control-related-objects';
+import '../mapped-control-related-objects/mapped-control-related-objects';
 import {
   prepareCustomAttributes,
   convertToFormViewField,
@@ -19,7 +19,7 @@ import {
   toObject,
   transformQuery,
 } from '../../../plugins/utils/snapshot-utils';
-import template from './templates/mapped-controls.stache';
+import template from './mapped-controls.stache';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 const tag = 'assessment-mapped-controls';
@@ -39,8 +39,8 @@ const viewModel = {
       type: '*',
       value: [
         {
-          type: 'objectives',
-          objName: 'Objective',
+          type: 'requirements',
+          objName: 'Requirement',
           fields: ['child_id', 'child_type', 'revision', 'parent'],
         },
         {

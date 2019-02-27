@@ -50,18 +50,18 @@
             </detailed-business-object-list-item>
         {{/if}}
         {{^if withoutDetails}}
-            {{#is assessmentType 'Control'}}
-                <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
-                                                        title-text="Show Related Regulations ({{regulations.length}})"
-                                                        type="Regulation"
-                                                        {items}="regulations">
-                </assessment-mapped-control-related-objects>
-                <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
-                                                        title-text="Show Related Objectives ({{objectives.length}})"
-                                                        type="Objective"
-                                                        {items}="objectives">
-                </assessment-mapped-control-related-objects>
-            {{/is}}
+          {{#is assessmentType 'Control'}}
+            <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
+                                                       title-text="Show Related Requirements ({{requirements.length}})"
+                                                       type="Requirement"
+                                                       {items}="requirements">
+            </assessment-mapped-control-related-objects>
+            <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
+                                                       title-text="Show Related Regulations ({{regulations.length}})"
+                                                       type="Regulation"
+                                                       {items}="regulations">
+            </assessment-mapped-control-related-objects>
+          {{/is}}
         {{/if}}
     </div>
 </simple-modal>
