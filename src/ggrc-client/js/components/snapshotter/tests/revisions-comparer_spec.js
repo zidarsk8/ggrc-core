@@ -304,9 +304,6 @@ describe('revisions-comparer component', function () {
             title: 'person attr',
           },
           attribute_value: 'Person',
-          attribute_object: {
-            id: 3,
-          },
         }];
 
         let ca1s = [{
@@ -320,10 +317,7 @@ describe('revisions-comparer component', function () {
           def: {
             title: 'person attr',
           },
-          attribute_value: 'Person',
-          attribute_object: {
-            id: 4,
-          },
+          attribute_value: 'changed Person',
         }];
 
         let index = 0;
