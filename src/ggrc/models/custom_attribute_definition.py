@@ -11,13 +11,14 @@ from sqlalchemy.orm import validates
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc import db
+from ggrc.utils import errors
 from ggrc.models.mixins import attributevalidator
 from ggrc import builder
 from ggrc.models.mixins import base
 from ggrc.models import mixins
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.access_control import role as acr
-from ggrc.models.exceptions import ValidationError, ReservedNameError
+from ggrc.models.exceptions import ValidationError
 from ggrc.models import reflection
 from ggrc.cache import memcache
 
@@ -291,30 +292,27 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     value = value if value is None else re.sub(r"\s+", " ", value).strip()
 
     if key == "title" and self.definition_type:
-      name = value.lower()
+      orig_name = value
       definition_type = self.definition_type
     elif key == "definition_type" and self.title:
-      name = self.title.lower()
+      orig_name = self.title
       definition_type = value.lower()
     else:
       return value
 
+    name = orig_name.lower()
     if name in self._get_reserved_names(definition_type):
-      raise ReservedNameError(
-          u"Attribute '{}' is reserved for this object type."
-          .format(name)
+      raise ValueError(
+          errors.DUPLICATE_RESERVED_NAME.format(attr_name=orig_name)
       )
 
     if (self._get_global_cad_names(definition_type).get(name) is not None and
             self._get_global_cad_names(definition_type).get(name) != self.id):
-      raise ValueError(u"Global custom attribute '{}' "
-                       u"already exists for this object type"
-                       .format(name))
-    model_name = get_inflector_model_name_dict()[definition_type]
-    acrs = {i.lower() for i in acr.get_custom_roles_for(model_name).values()}
-    if name in acrs:
-      raise ValueError(u"Custom Role with a name of '{}' "
-                       u"already exists for this object type".format(name))
+      raise ValueError(errors.DUPLICATE_GCAD_NAME.format(attr_name=orig_name))
+
+    self.assert_acr_exist(orig_name, definition_type)
+    if definition_type == "assessment_template":
+      self.assert_acr_exist(orig_name, "assessment")
 
     if definition_type == "assessment":
       self.validate_assessment_title(name)
@@ -329,6 +327,16 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     results = super(CustomAttributeDefinition, self).log_json()
     results["default_value"] = self.default_value
     return results
+
+  @staticmethod
+  def assert_acr_exist(name, definition_type):
+    """Validate that there is no ACR with provided name."""
+    model_name = get_inflector_model_name_dict()[definition_type]
+    acrs = {i.lower() for i in acr.get_custom_roles_for(model_name).values()}
+    if name.lower() in acrs:
+      raise ValueError(
+          errors.DUPLICATE_CUSTOM_ROLE.format(role_name=name)
+      )
 
 
 @memcache.cached
