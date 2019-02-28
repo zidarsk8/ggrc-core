@@ -801,3 +801,25 @@ class TestIssueTrackedImport(ggrc.TestCase):
     assmt = all_models.Assessment.query.one()
     self.assertTrue(assmt.issue_tracker["enabled"])
     create_mock.assert_called_once()
+
+  def test_assmt_generation_disallowed_wo_audit(self):
+    """Test we can't turn integration On for Assessment w/o audit"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          enabled=False,
+          issue_id=None,
+      )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Audit", audit.slug),
+        ("Assignees*", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Object Title"),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, {})
+    assmt = all_models.Assessment.query.one()
+    self.assertFalse(assmt.issue_tracker["enabled"])
