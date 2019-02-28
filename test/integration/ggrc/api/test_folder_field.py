@@ -87,7 +87,9 @@ class TestFolderField(TestCase):
         self.api.put(obj, {"folder": update_test_folder_name})
     else:
       if isinstance(obj, Synchronizable):
-        self.api.login_as_external()
+        # Currently external user can't modify folder field
+        # because of WithProtectedAttributes mixin
+        return
 
       self.api.put(obj, {"folder": update_test_folder_name})
       self.assertEqual(
