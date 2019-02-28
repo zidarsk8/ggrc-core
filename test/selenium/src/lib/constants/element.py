@@ -152,7 +152,6 @@ class Common(object):
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   OTHERS = "Others"
   OBJECT_REVIEW = "Object review"
-  OBJECT_REVIEW_FULL = "object_review_txt"
   APPROVED_DATE_REGEX = r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M " \
                         r"(\+|\-)\d{2}:\d{2}"
 

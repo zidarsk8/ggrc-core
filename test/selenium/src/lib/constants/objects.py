@@ -52,6 +52,7 @@ TECHNOLOGY_ENVIRONMENTS = "technology_environments"
 PRODUCT_GROUPS = "product_groups"
 PROPOSALS = "proposals"
 EVIDENCE = 'evidence'
+REVIEWS = "reviews"
 
 ALL_SNAPSHOTABLE_OBJS = (
     ACCESS_GROUPS, CONTRACTS, CONTROLS, DATA_ASSETS, FACILITIES,
