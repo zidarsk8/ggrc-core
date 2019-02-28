@@ -20,7 +20,8 @@ import ggrc.builder
 import ggrc.models
 import ggrc.services
 from ggrc import db
-from ggrc.login import get_current_user_id
+from ggrc.login import get_current_user_id, is_external_app_user
+from ggrc.models.mixins import WithProtectedAttributes
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import SerializableAttribute
@@ -759,6 +760,10 @@ class Builder(AttributeInfo):
     if isinstance(obj, Synchronizable):
       sync_attrs = obj.get_sync_attrs()
       attrs.update(sync_attrs)
+
+    if all((isinstance(obj, WithProtectedAttributes),
+            is_external_app_user())):
+      attrs.difference_update(obj.get_protected_attributes())
 
     self.do_update_attrs(obj, json_obj, attrs)
 
