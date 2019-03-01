@@ -100,8 +100,10 @@
   {{/case}}
 
   {{#case 'external_review_status'}}
-    {{#if review_status}}
-      <span class="state-value-dot review-status {{addclass 'state' review_status}}">{{review_status_display_name}}</span>
+    {{#if instance.review_status}}
+      <span class="state-value-dot review-status {{addclass 'state' instance.review_status}}">
+        {{instance.review_status_display_name}}
+      </span>
     {{/if}}
   {{/case}}
 
