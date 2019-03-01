@@ -5,7 +5,6 @@
 
 import flask.views
 from flask import request
-import sqlalchemy.orm.exc
 from werkzeug import exceptions
 
 from ggrc import login
@@ -109,9 +108,8 @@ class AddRemoveFolderView(flask.views.MethodView):
     if model is None or not issubclass(model, mixins.Folderable):
       raise exceptions.BadRequest("Model {} not found".format(object_type))
 
-    try:
-      obj = model.query.get(object_id)
-    except sqlalchemy.orm.exc.NoResultFound:
+    obj = model.query.get(object_id)
+    if obj is None:
       raise exceptions.NotFound(
           "{} with id {} not found".format(model.__name__, object_id))
 
