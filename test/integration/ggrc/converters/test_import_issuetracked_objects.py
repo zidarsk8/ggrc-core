@@ -106,8 +106,6 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.data(
       ("Issue", "Issue", "on"),
       ("Issue", "Issue", "off"),
-      ("Assessment", "Assessment", "on"),
-      ("Assessment", "Assessment", "off"),
       ("Audit", "Audit", "on"),
       ("Audit", "Audit", "off"),
       ("AssessmentTemplate", "Assessment Template", "on"),
@@ -116,7 +114,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_import_enabled_update_succeed(self, model, model_name, value, _):
-    """Test {0} integration state {1} set correctly when updated via import."""
+    """Test {0} integration state set correctly when updated via import."""
     with factories.single_commit():
       factory = factories.get_model_factory(model)
       obj = factory()
@@ -131,6 +129,31 @@ class TestIssueTrackedImport(ggrc.TestCase):
     ]))
 
     obj = models.get_model(model).query.one()
+    self._check_csv_response(response, {})
+    self._assert_integration_state(obj, value)
+
+  @ddt.data("on", "off")
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_assmt_import_enabled_update_succeed(self, value, _):
+    """Test Assmt integration state set correctly when updated via import."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          enabled=True,
+      )
+      assmt = factories.AssessmentFactory(audit=audit)
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=assmt,
+      )
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assmt.slug),
+        ("Ticket Tracker Integration", value),
+    ]))
+
+    obj = all_models.Assessment.query.one()
     self._check_csv_response(response, {})
     self._assert_integration_state(obj, value)
 
@@ -155,6 +178,10 @@ class TestIssueTrackedImport(ggrc.TestCase):
   def test_enabled_state_assmt_create_succeed(self, value, _):
     """Test Assessment integration state set correctly during create."""
     audit = factories.AuditFactory()
+    factories.IssueTrackerIssueFactory(
+        issue_tracked_obj=audit,
+        enabled=True,
+    )
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", "OBJ-1"),
@@ -781,6 +808,10 @@ class TestIssueTrackedImport(ggrc.TestCase):
     """Test ticket generation allowed for Assessment in {} status"""
     with factories.single_commit():
       audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          enabled=True,
+      )
       assmt = factories.AssessmentFactory(status=status, audit=audit)
       person = factories.PersonFactory()
       factories.AccessControlPersonFactory(
