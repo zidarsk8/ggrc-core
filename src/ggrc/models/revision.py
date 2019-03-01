@@ -10,19 +10,22 @@ from ggrc import builder
 from ggrc import db
 from ggrc.access_control import role
 from ggrc.models import automapping
+from ggrc.models import mixins
 from ggrc.models import reflection
-from ggrc.models.mixins import Base
+from ggrc.models import types
 from ggrc.models.mixins import base
-from ggrc.models.mixins.filterable import Filterable
-from ggrc.models.mixins.synchronizable import ChangesSynchronized
-from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
-from ggrc.models.types import LongJsonType
+from ggrc.models.mixins import filterable
+from ggrc.models.mixins import synchronizable
+from ggrc.models.mixins import with_readonly_access as wroa
 from ggrc.utils import referenced_objects
 from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils.revisions_diff import meta_info
 
 
-class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
+class Revision(synchronizable.ChangesSynchronized,
+               filterable.Filterable,
+               base.ContextRBAC,
+               mixins.Base,
                db.Model):
   """Revision object holds a JSON snapshot of the object at a time."""
 
@@ -33,13 +36,15 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
   event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
   action = db.Column(db.Enum(u'created', u'modified', u'deleted'),
                      nullable=False)
-  _content = db.Column('content', LongJsonType, nullable=False)
+  _content = db.Column('content', types.LongJsonType, nullable=False)
 
   resource_slug = db.Column(db.String, nullable=True)
   source_type = db.Column(db.String, nullable=True)
   source_id = db.Column(db.Integer, nullable=True)
   destination_type = db.Column(db.String, nullable=True)
   destination_id = db.Column(db.Integer, nullable=True)
+
+  is_empty = db.Column(db.Boolean, nullable=False, default=False)
 
   @staticmethod
   def _extra_table_args(_):
@@ -410,7 +415,7 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     from ggrc.models import all_models
 
     model = getattr(all_models, self.resource_type, None)
-    if not model or not issubclass(model, WithReadOnlyAccess):
+    if not model or not issubclass(model, wroa.WithReadOnlyAccess):
       return dict()
 
     if "readonly" in self._content:
