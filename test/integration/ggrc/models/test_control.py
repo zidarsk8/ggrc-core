@@ -863,3 +863,30 @@ class TestSyncServiceControl(TestCase):
     ]
     self.assertEqual(len(tgo_ids), 1)
     self.assertEqual([tgo.id for tgo in control.task_group_objects], tgo_ids)
+
+  @staticmethod
+  def generate_minimal_control_body():
+    """Generate minimal control body"""
+    return {
+        "title": factories.random_str(),
+        "external_id": factories.SynchronizableExternalId.next(),
+        "external_slug": factories.random_str(),
+        "context": None,
+        "review_status": all_models.Review.STATES.UNREVIEWED,
+        "review_status_display_name": "some status",
+    }
+
+  def test_control_with_duplicated_title(self):
+    """Test control with duplicated title."""
+    control_1 = self.generate_minimal_control_body()
+    response = self.api.post(all_models.Control, {
+        "control": control_1
+    })
+    self.assertEqual(response.status_code, 201)
+
+    control_2 = self.generate_minimal_control_body()
+    control_2["title"] = control_1["title"]
+    response = self.api.post(all_models.Control, {
+        "control": control_2
+    })
+    self.assertEqual(response.status_code, 201)
