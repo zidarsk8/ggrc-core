@@ -103,7 +103,7 @@ function getQuestionsUrl(instance) {
 function getInfoUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
-    path: instance.constructor.table_singular,
+    path: instance.constructor.table_plural,
     slug: instance.slug,
     view: 'info',
   });
@@ -117,7 +117,7 @@ function getInfoUrl(instance) {
 function getCommentFormUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
-    path: instance.constructor.table_singular,
+    path: instance.constructor.table_plural,
     slug: instance.slug,
     view: 'info',
     params: 'comments=open',
@@ -132,7 +132,7 @@ function getCommentFormUrl(instance) {
 function getReviewUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
-    path: instance.constructor.table_singular,
+    path: instance.constructor.table_plural,
     slug: instance.slug,
     view: 'review',
   });
@@ -156,7 +156,7 @@ function getImportUrl() {
 function getProposalsUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
-    path: instance.constructor.table_singular,
+    path: instance.constructor.table_plural,
     slug: instance.slug,
     view: 'proposals',
   });
@@ -170,7 +170,7 @@ function getProposalsUrl(instance) {
 function getChangeLogUrl(instance) {
   return getUrl({
     model: instance.constructor.table_singular,
-    path: instance.constructor.table_singular,
+    path: instance.constructor.table_plural,
     slug: instance.slug,
     view: 'change-log',
   });
@@ -231,7 +231,7 @@ function getMapObjectToControlUrl(instance, destinationModel, statuses) {
   let params = `mappingStatus=${statuses}&types=${destinationType}`;
 
   return getUrl({
-    path: 'control',
+    path: 'controls',
     model: instance.constructor.table_singular,
     slug: instance.slug,
     view,
@@ -284,7 +284,7 @@ function getCreateObjectUrl(model) {
 function getProposalAttrUrl(instance, attributeName) {
   return getUrl({
     model: instance.constructor.table_singular,
-    path: instance.constructor.table_singular,
+    path: instance.constructor.table_plural,
     slug: instance.slug,
     view: 'info',
     params: `proposal=${attributeName}`,
