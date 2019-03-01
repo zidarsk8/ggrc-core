@@ -58,7 +58,7 @@ const ModelRefreshQueue = can.Construct({}, {
         this.trigger();
       } else {
         setTimeout(
-          this.proxy('trigger_with_debounce', delay, manager), msToWait);
+          () => this.trigger_with_debounce(delay, manager), msToWait);
       }
     }
 

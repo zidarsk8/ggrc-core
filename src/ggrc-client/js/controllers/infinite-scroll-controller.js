@@ -99,7 +99,7 @@ const LhnTooltipsControl = can.Control.extend({
         delay = 0;
       }
       this.fade_in_timeout = setTimeout(
-        this.proxy('on_fade_in_timeout', el, instance), delay);
+        () => this.on_fade_in_timeout(el, instance), delay);
       clearTimeout(this.fade_out_timeout);
       this.fade_out_timeout = null;
     } else if (this.fade_out_timeout) {
@@ -186,7 +186,7 @@ const LhnTooltipsControl = can.Control.extend({
     clearTimeout(this.fade_out_timeout);
     this.fade_out_timeout =
       setTimeout(
-        this.proxy('on_fade_out_timeout'),
+        () => this.on_fade_out_timeout(),
         this.options.fade_out_delay);
   },
   destroy: function () {

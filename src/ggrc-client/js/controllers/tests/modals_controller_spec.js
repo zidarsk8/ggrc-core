@@ -263,7 +263,9 @@ describe('ModalsController', function () {
           .returnValue(newInstance),
         reset_form: jasmine.createSpy('reset_form').and
           .returnValue(resetFormDfd),
-        proxy: jasmine.createSpy('proxy'),
+        apply_object_params: jasmine.createSpy('apply_object_params'),
+        serialize_form: jasmine.createSpy('serialize_form'),
+        autocomplete: jasmine.createSpy('autocomplete'),
         restore_ui_status: jasmine.createSpy('restore_ui_status'),
         options: new can.Map(),
       };
@@ -292,27 +294,27 @@ describe('ModalsController', function () {
       resetFormDfd.resolve();
     });
 
-    it('calls proxy() with "apply_object_params"', (done) => {
+    it('calls apply_object_params()', (done) => {
       resetFormDfd.resolve();
       method();
 
-      expect(ctrlInst.proxy).toHaveBeenCalledWith('apply_object_params');
+      expect(ctrlInst.apply_object_params).toHaveBeenCalled();
       done();
     });
 
-    it('calls proxy() with "serialize_form"', (done) => {
+    it('calls serialize_form()', (done) => {
       resetFormDfd.resolve();
       method();
 
-      expect(ctrlInst.proxy).toHaveBeenCalledWith('serialize_form');
+      expect(ctrlInst.serialize_form).toHaveBeenCalled();
       done();
     });
 
-    it('calls proxy() with "autocomplete"', (done) => {
+    it('calls autocomplete()', (done) => {
       resetFormDfd.resolve();
       method();
 
-      expect(ctrlInst.proxy).toHaveBeenCalledWith('autocomplete');
+      expect(ctrlInst.autocomplete).toHaveBeenCalled();
       done();
     });
   });
