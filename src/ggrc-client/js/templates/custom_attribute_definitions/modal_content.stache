@@ -12,7 +12,7 @@
       <label class="form-label">
         Attribute title
         <i class="fa fa-asterisk"></i>
-        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_plural}} a name."></i>
       </label>
       <input-filter
         {name}="'title'"
