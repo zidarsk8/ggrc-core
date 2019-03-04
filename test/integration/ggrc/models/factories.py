@@ -12,6 +12,7 @@ use the object generator in the ggrc.generator module.
 # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
 # pylint: disable=no-init
 
+import sys
 import random
 import string
 from contextlib import contextmanager
@@ -43,6 +44,15 @@ def single_commit():
     db.session.commit()
   finally:
     db.session.single_commit = True
+
+
+class SynchronizableExternalId:
+
+  _value_iterator = iter(xrange(sys.maxint))
+
+  @classmethod
+  def next(cls):
+    return next(cls._value_iterator)
 
 
 class TitledFactory(ModelFactory):
@@ -125,9 +135,13 @@ class ControlFactory(TitledFactory):
   class Meta:
     model = all_models.Control
 
-  assertions = factory.LazyAttribute(lambda m: [ControlAssertionFactory(), ])
+  assertions = factory.LazyAttribute(lambda _: '["{}"]'.format(random_str()))
   directive = factory.LazyAttribute(lambda m: RegulationFactory())
-  recipients = ""
+  external_id = factory.LazyAttribute(lambda m:
+                                      SynchronizableExternalId.next())
+  external_slug = factory.LazyAttribute(lambda m: random_str())
+  review_status = all_models.Review.STATES.UNREVIEWED
+  review_status_display_name = "some status"
 
 
 class IssueFactory(TitledFactory):
@@ -151,40 +165,6 @@ class AssessmentFactory(TitledFactory):
     model = all_models.Assessment
 
   audit = factory.LazyAttribute(lambda m: AuditFactory())
-
-
-class ControlAssertionFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.ControlAssertion
-
-  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
-  lft = None
-  rgt = None
-  depth = None
-  required = None
-
-
-class ControlCategoryFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.ControlCategory
-
-  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
-  lft = None
-  rgt = None
-  depth = None
-  required = None
-
-
-class CategorizationFactory(ModelFactory):
-
-  class Meta:
-    model = all_models.Categorization
-
-  category_id = None
-  categorizable_id = None
-  categorizable_type = None
 
 
 class ContextFactory(ModelFactory):
@@ -291,6 +271,12 @@ class CommentFactory(ModelFactory):
 
   class Meta:
     model = all_models.Comment
+
+
+class ExternalCommentFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.ExternalComment
 
 
 class DocumentFactory(ModelFactory):
@@ -520,7 +506,7 @@ class ReviewFactory(ModelFactory):
   class Meta:
     model = all_models.Review
 
-  reviewable = factory.LazyAttribute(lambda _: ControlFactory())
+  reviewable = factory.LazyAttribute(lambda _: RiskFactory())
   notification_type = all_models.Review.NotificationTypes.EMAIL_TYPE
 
 
@@ -626,6 +612,8 @@ def get_model_factory(model_name):
       "AssessmentTemplate": AssessmentTemplateFactory,
       "Audit": AuditFactory,
       "CalendarEvent": CalendarEventFactory,
+      "Comment": CommentFactory,
+      "ExternalComment": ExternalCommentFactory,
       "Contract": ContractFactory,
       "Control": ControlFactory,
       "Cycle": wf_factories.CycleFactory,

@@ -12,6 +12,8 @@ import names
 from ggrc import db
 from ggrc import models
 from ggrc.app import app
+from ggrc.models import all_models
+from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.services import common
 from ggrc_basic_permissions import models as permissions_models
 from integration.ggrc import api_helper
@@ -36,6 +38,7 @@ class Generator(object):
 
   @staticmethod
   def get_header():
+    """Get base GGRC headers."""
     return {
         "Content-Type": "application/json",
         "X-Requested-By": "GGRC",
@@ -122,11 +125,21 @@ class ObjectGenerator(Generator):
 
   @staticmethod
   def create_stub(obj):
+    """Create object stub (dict with id and type information)."""
     # pylint: disable=protected-access
     return {
         "id": obj.id,
         "href": "/api/{}/{}".format(obj._inflector.table_name, obj.id),
         "type": obj.type,
+    }
+
+  @staticmethod
+  def _get_synchronizable_obj_dict():
+    """Return dict with fileds which extend Synchronizable object"""
+
+    return {
+        'external_id': factories.SynchronizableExternalId.next(),
+        'external_slug': factories.random_str(),
     }
 
   @_singledispatchmethod
@@ -161,6 +174,9 @@ class ObjectGenerator(Generator):
           "owners": [self.create_stub(models.Person.query.first())],
           "title": factories.random_str(),
       })
+      if issubclass(obj_class, Synchronizable):
+        obj_dict[obj_name].update(self._get_synchronizable_obj_dict())
+
     obj_dict[obj_name].update(data[obj_name] if obj_name in data else data)
     return self.generate(obj_class, obj_name=obj_name, data=obj_dict,
                          with_background_tasks=with_background_tasks)
@@ -181,13 +197,17 @@ class ObjectGenerator(Generator):
             "context": None,
             "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
-            "assertions": [{
-                "id": factories.ControlAssertionFactory().id
-            }]
+            "assertions": '["test assertion"]',
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
         }
     }
 
     obj_dict[obj_name].update(defaults[obj_name])
+
+    if issubclass(obj_class, Synchronizable):
+      obj_dict[obj_name].update(self._get_synchronizable_obj_dict())
+
     obj_dict[obj_name].update(data[obj_name] if obj_name in data else data)
     return self.generate(models.Control, obj_name=obj_name, data=obj_dict,
                          with_background_tasks=with_background_tasks)
@@ -289,7 +309,6 @@ class ObjectGenerator(Generator):
     """Generate `count` objects of random types."""
     random_objects = []
     classes = [
-        models.Control,
         models.Objective,
         models.Standard,
         models.System,

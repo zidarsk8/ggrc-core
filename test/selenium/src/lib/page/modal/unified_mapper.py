@@ -159,7 +159,7 @@ class CommonUnifiedMapperModal(base.Modal):
 
   def click_create_and_map_obj(self):
     """Clicks `Create and map new object` link."""
-    self._browser.element(class_name="modal-header").link(
+    self._browser.element(class_name="modal-header").button(
         text="Create and map new object").click()
 
   def close_modal(self):

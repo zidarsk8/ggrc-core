@@ -3,12 +3,11 @@
 """Decorators."""
 # pylint: disable=protected-access
 
-import functools
 import logging
 import time
 from functools import wraps
 
-from lib import constants, environment, exception, file_ops
+from lib import constants, environment, exception, file_ops, users
 from lib.utils import selenium_utils
 
 LOGGER = logging.getLogger(__name__)
@@ -21,8 +20,8 @@ def take_screenshot_on_error(fun):
     "Wrapper."
     try:
       return fun(self, *args)
-    except Exception as exception:
-      LOGGER.error(exception)
+    except Exception as exc:
+      LOGGER.error(exc)
       file_path = (environment.LOG_PATH + self.__class__.__name__ + "." +
                    self._driver.title)
       unique_file_path = file_ops.get_unique_postfix(file_path, ".png")
@@ -77,7 +76,7 @@ def memoize(func):
   """Decorator for memoization of function results"""
   cache = func.cache = {}
 
-  @functools.wraps(func)
+  @wraps(func)
   def memoizer(*args, **kwargs):
     """Call a function and put its result into the cache"""
     key = str(args) + str(kwargs)
@@ -91,10 +90,26 @@ def track_time(fun):
   """Time tracking decorator which defines how long 'fun' was executing."""
   @wraps(fun)
   def wrapper(*args, **kwargs):
+    "Wrapper."
     start_time = time.time()
     result = fun(*args, **kwargs)
     elapsed_time = time.time() - start_time
     print "Execution of '{0:s}' function took {1:.3f} s".format(
         fun.func_name, elapsed_time)
+    return result
+  return wrapper
+
+
+def work_by_external_user(fun):
+  """Decorator to work by external user and return to previous user."""
+  from lib.entities import entities_factory
+
+  def wrapper(*args, **kwargs):
+    "Wrapper."
+    user = users.current_user()
+    users.set_current_user(users.EXTERNAL_APP_USER)
+    users.set_current_user(entities_factory.PeopleFactory.external_app_user)
+    result = fun(*args, **kwargs)
+    users.set_current_user(user)
     return result
   return wrapper

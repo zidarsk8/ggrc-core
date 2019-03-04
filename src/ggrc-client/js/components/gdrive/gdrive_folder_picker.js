@@ -3,7 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../action-toolbar/action-toolbar';
 import {
   uploadFiles,
   getGDriveItemId,
@@ -54,10 +53,19 @@ export default can.Component.extend({
      *   folder has been successfully unlinked from it
      */
     unlinkFolder: function () {
-      return this.instance.refresh().then(function () {
-        this.instance.attr('folder', null);
-        return this.instance.save();
-      }.bind(this));
+      let instance = this.attr('instance');
+
+      return $.ajax({
+        url: '/api/remove_folder',
+        type: 'POST',
+        data: {
+          object_type: instance.attr('type'),
+          object_id: instance.attr('id'),
+          folder: instance.attr('folder'),
+        },
+      }).then(() => {
+        return instance.refresh();
+      });
     },
     /**
      * Helper method for linking new folder to the given instance
@@ -67,10 +75,19 @@ export default can.Component.extend({
      *   folder has been successfully linked to it
      */
     linkFolder: function (folderId) {
-      return this.instance.refresh().then(function () {
-        this.instance.attr('folder', folderId);
-        return this.instance.save();
-      }.bind(this));
+      let instance = this.attr('instance');
+
+      return $.ajax({
+        url: '/api/add_folder',
+        type: 'POST',
+        data: {
+          object_type: instance.attr('type'),
+          object_id: instance.attr('id'),
+          folder: folderId,
+        },
+      }).then(() => {
+        return instance.refresh();
+      });
     },
     setCurrent: function (folderId) {
       this.attr('_folder_change_pending', true);

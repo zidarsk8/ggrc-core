@@ -11,6 +11,7 @@ import accessControlList from '../mixins/access-control-list';
 import proposable from '../mixins/proposable';
 import assertionsCategories from '../mixins/assertions-categories';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
+import changeableExternally from '../mixins/changeable-externally';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -30,15 +31,13 @@ export default Cacheable.extend({
     proposable,
     assertionsCategories,
     relatedAssessmentsLoader,
+    changeableExternally,
   ],
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
     context: Stub,
     modified_by: Stub,
-    kind: Stub,
-    means: Stub,
-    verify_frequency: Stub,
   },
   defaults: {
     selected: false,
@@ -78,8 +77,7 @@ export default Cacheable.extend({
       },
       {
         attr_title: 'Frequency',
-        attr_name: 'frequency',
-        attr_sort_field: 'verify_frequency',
+        attr_name: 'verify_frequency',
       },
       {attr_title: 'Assertions', attr_name: 'assertions'},
       {attr_title: 'Categories', attr_name: 'categories'},
@@ -96,8 +94,9 @@ export default Cacheable.extend({
         attr_name: 'test_plan',
         disable_sorting: true,
       }, {
-        attr_title: 'Review State',
-        attr_name: 'review_status',
+        attr_title: 'Review Status',
+        attr_name: 'external_review_status',
+        attr_sort_field: 'review_status_display_name',
         order: 80,
       }]),
     display_attr_names: ['title', 'status', 'last_assessment_date',

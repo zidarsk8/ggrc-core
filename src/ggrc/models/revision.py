@@ -2,12 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Defines a Revision model for storing snapshots."""
+import json
 
 from ggrc import builder
 from ggrc import db
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base
 from ggrc.models.mixins.filterable import Filterable
+from ggrc.models.mixins.synchronizable import ChangesSynchronized
 from ggrc.models import reflection
 from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
@@ -16,7 +18,8 @@ from ggrc.utils import referenced_objects
 from ggrc.utils.revisions_diff import meta_info
 
 
-class Revision(Filterable, base.ContextRBAC, Base, db.Model):
+class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
+               db.Model):
   """Revision object holds a JSON snapshot of the object at a time."""
 
   __tablename__ = 'revisions'
@@ -243,6 +246,7 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
 
   def populate_acl(self):
     """Add access_control_list info for older revisions."""
+    # pylint: disable=too-many-locals
     roles_dict = role.get_custom_roles_for(self.resource_type)
     reverted_roles_dict = {n: i for i, n in roles_dict.iteritems()}
     access_control_list = self._content.get("access_control_list") or []
@@ -382,6 +386,19 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
         result["review_status"] = review.Review.STATES.UNREVIEWED
     return result
 
+  def populate_review_status_display_name(self, result):
+    """Get review_status if review_status_display_name is not found"""
+    # pylint: disable=invalid-name
+
+    if self.resource_type != "Control":
+      return
+
+    if "review_status_display_name" in self._content:
+      result["review_status_display_name"] = self._content[
+          "review_status_display_name"]
+    elif "review_status" in result:
+      result["review_status_display_name"] = result["review_status"]
+
   def _document_evidence_hack(self):
     """Update display_name on evideces
 
@@ -409,22 +426,20 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
     return {u"documents_file": document_evidence}
 
   def populate_categoies(self, key_name):
-    """Fix revision logger.
-
-    On controls in category field was loged categorization instances."""
+    """Return names of categories."""
     if self.resource_type != "Control":
       return {}
     result = []
-    for categorization in self._content.get(key_name) or []:
-      if "category_id" in categorization:
-        result.append({
-            "id": categorization["category_id"],
-            "type": categorization["category_type"],
-            "name": categorization["display_name"],
-            "display_name": categorization["display_name"],
-        })
-      else:
-        result.append(categorization)
+    categories = self._content.get(key_name)
+    if isinstance(categories, (str, unicode)) and categories:
+      result = json.loads(categories)
+    elif isinstance(categories, list):
+      for category in categories:
+        if isinstance(category, dict):
+          result.append(category.get("name"))
+        elif isinstance(category, (str, unicode)):
+          result.append(category)
+
     return {key_name: result}
 
   def _get_cavs(self):
@@ -555,6 +570,18 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
             cav["attributable_type"] = "Requirement"
         populated_content["custom_attribute_values"] = cavs
 
+  def populate_options(self, populated_content):
+    """Update revisions for Sync models to have Option fields as string."""
+    if self.resource_type == "Control":
+      for attr in ["kind", "means", "verify_frequency"]:
+        attr_value = populated_content.get(attr)
+        if isinstance(attr_value, dict):
+          populated_content[attr] = attr_value.get("title")
+        elif isinstance(attr_value, (str, unicode)):
+          populated_content[attr] = attr_value
+        else:
+          populated_content[attr] = None
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -575,6 +602,8 @@ class Revision(Filterable, base.ContextRBAC, Base, db.Model):
     populated_content.update(self.populate_cavs())
 
     self.populate_requirements(populated_content)
+    self.populate_options(populated_content)
+    self.populate_review_status_display_name(populated_content)
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)

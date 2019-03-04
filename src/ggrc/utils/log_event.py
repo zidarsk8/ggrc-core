@@ -11,14 +11,22 @@ from flask import request
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
+from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.login import get_current_user_id
 
 logger = getLogger(__name__)
 
 
 def _revision_generator(user_id, action, objects):
+  """Geberate and return revisions for objects."""
   for obj in objects:
-    yield Revision(obj, user_id, action, obj.log_json())
+    revision = Revision(obj, user_id, action, obj.log_json())
+
+    if isinstance(obj, Synchronizable):
+      revision.created_at = obj.updated_at
+      revision.updated_at = obj.updated_at
+
+    yield revision
 
 
 def _get_log_revisions(current_user_id, obj=None, force_obj=False):
@@ -35,7 +43,8 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
                            if o.type == "Relationship")
   for rel in relationships_changes:
     documentable = rel.get_related_for("Document")
-    if documentable and documentable.type != "Comment":
+    if documentable and \
+       documentable.type not in ("Comment", "ExternalComment"):
       document = rel.get_related_for(documentable.type)
       if rel in new_objects and document not in documentable.documents:
         documentable.documents.append(document)

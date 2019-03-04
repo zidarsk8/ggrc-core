@@ -629,7 +629,7 @@ p {
 
 .hidden-widgets-list {
   .dropdown-menu {
-    width: 400px;
+    width: 420px;
     column-count: 2;
     column-gap: 0;
 
@@ -641,6 +641,32 @@ p {
     &.one-item {
       column-count: 1;
       width: 160px;
+    }
+
+    .external-link {
+      &__content {
+        color: $link;
+        display: inline-flex;
+        align-items: center;
+
+        .fa {
+          margin-left: 5px;
+          margin-top: 0;
+          opacity: 1;
+          font-size: 14px;
+          color: $link;
+        }
+      }
+
+      &:hover {
+        .external-link__content {
+          color: $darkBlue;
+
+          .fa {
+            color: $darkBlue;
+          }
+        }
+      } 
     }
   }
 }
@@ -704,7 +730,7 @@ p {
   }
   .pane-header & {
     display: inline-block;
-    margin: 4px 6px 0 0;
+    margin: 4px 0 0 0;
     padding-top: 2px;
   }
   &.state-unreviewed {
@@ -754,18 +780,14 @@ p {
   }
 }
 .state-value-dot {
-  position: relative;
-  padding-left: 12px;
-
   &:before {
     content: '';
-    position: absolute;
     width: 8px;
     height: 8px;
     display: inline-block;
-    left: 0;
-    top: 3px;
     border-radius: 50%;
+    margin-bottom: 1px;
+    margin-right: 1px;
   }
 
   .grid-data-row & {
@@ -776,10 +798,26 @@ p {
     }
   }
 
+  tree-item-attr & {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.review-status {
+    color: $status-draft;
+
+    &:before {
+      background: $status-draft;
+    }
+  }
+
   &.state-notstarted,
   &.state-draft,
   &.state-assigned,
-  &.state-planned {
+  &.state-planned,
+  &.state-review_needed {
     color: $status-draft;
 
     &:before {
@@ -787,7 +825,8 @@ p {
     }
   }
   &.state-inprogress,
-  &.state-active {
+  &.state-active,
+  &.state-reviewed_by_owner {
     color: $status-inprogress;
 
     &:before {
@@ -803,8 +842,10 @@ p {
     }
   }
   &.state-verified,
+  &.state-reviewed,
   &.state-readyforexternalreview,
-  &.state-fixedandverified {
+  &.state-fixedandverified,
+  &.state-reviewed_by_compliance {
     color: $status-verified;
 
     &:before {
@@ -828,7 +869,8 @@ p {
     }
   }
   &.state-declined,
-  &.state-reworkneeded {
+  &.state-reworkneeded,
+  &.state-re_review_needed {
     color: $status-declined;
 
     &:before {

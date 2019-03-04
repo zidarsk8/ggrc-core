@@ -3,6 +3,8 @@
 
 """Tests for snapshot export."""
 import collections
+import json
+import unittest
 
 from ggrc import models, db
 from ggrc.utils import QueryCounter, DATE_FORMAT_US
@@ -74,6 +76,7 @@ class TestExportSnapshots(TestCase):
               multi_choice_options="one,two,three,four,five"),
       ]
 
+  @unittest.skip("Skip until import for controls will be deprecated")
   def test_full_control_export(self):
     """Test exporting of a single full control snapshot."""
     self._create_cads("control")
@@ -96,20 +99,18 @@ class TestExportSnapshots(TestCase):
             "Description": control.description,
             "Effective Date": control.start_date.strftime(DATE_FORMAT_US),
             "Fraud Related": u"yes" if control.fraud_related else u"no",
-            "Frequency": control.verify_frequency.display_name,
-            "Kind/Nature": control.kind.display_name,
+            "Frequency": control.verify_frequency,
+            "Kind/Nature": control.kind,
             "Notes": control.notes,
             "Review State": control.review_status,
+            "Review Status": control.review_status_display_name,
             "Reviewers": u"",
             "Significance": u"key" if control.key_control else u"non-key",
             "State": control.status,
             "Last Deprecated Date": u"",
             "Assessment Procedure": control.test_plan,
             "Title": control.title,
-            "Type/Means": control.means.display_name,
-            "Recipients": control.recipients,
-            "Send by default": u"yes",
-            "Comments": u"",
+            "Type/Means": control.means,
             # Custom attributes
             "RT": self._get_cav(control, "RT"),
             "checkbox": self._get_cav(control, "checkbox"),
@@ -122,8 +123,8 @@ class TestExportSnapshots(TestCase):
                                         control.documents_file),
             "Reference URL": u"\n".join(c.link for c in
                                         control.documents_reference_url),
-            "Assertions": u"\n".join(c.name for c in control.assertions),
-            "Categories": u"\n".join(c.name for c in control.categories),
+            "Assertions": u",".join(json.loads(control.assertions)),
+            "Categories": u",".join(json.loads(control.categories)),
             "Folder": u"",
             "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
@@ -223,8 +224,7 @@ class TestExportSnapshots(TestCase):
             "Frequency": u"",
             "Kind/Nature": u"",
             "Notes": u"",
-            "Review State": u"Unreviewed",
-            "Reviewers": u"",
+            "Review Status": u"some status",
             "Significance": u"",
             "State": u"Draft",
             "Last Deprecated Date": u"",
@@ -236,9 +236,6 @@ class TestExportSnapshots(TestCase):
             "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
-            "Recipients": "",
-            "Send by default": u"yes",
-            "Comments": "",
 
             # Custom attributes
             "RT": u"",
@@ -249,7 +246,7 @@ class TestExportSnapshots(TestCase):
             "person": u"",
 
             # Fields that are not included in snapshots - Known bugs.
-            "Assertions": u",".join(a.name for a in control.assertions),
+            "Assertions": u",".join(json.loads(control.assertions)),
             "Categories": u"",
             "Document File": u"",
             "Admin": u"",
@@ -322,16 +319,16 @@ class TestExportSnapshots(TestCase):
     that is being exported.
     """
     # pylint: disable=too-many-locals
-    self._create_cads("control")
-    self.import_file("control_snapshot_data_multiple.csv")
+    self._create_cads("risk")
+    self.import_file("risk_snapshot_data_multiple.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
-    self.import_file("control_snapshot_data_multiple.csv")
+    self.import_file("risk_snapshot_data_multiple.csv")
 
-    controls = models.Control.query.all()
+    risks = models.Risk.query.all()
     with factories.single_commit():
       audit = factories.AuditFactory()
-      snapshots = self._create_snapshots(audit, controls)
+      snapshots = self._create_snapshots(audit, risks)
       count = len(snapshots)
       assessments = [factories.AssessmentFactory() for _ in range(count)]
       issues = [factories.IssueFactory() for _ in range(count)]
@@ -348,20 +345,20 @@ class TestExportSnapshots(TestCase):
                   "left": {
                       "left": "child_type",
                       "op": {"name": "="},
-                      "right": "Control",
+                      "right": "Risk",
                   },
                   "op": {"name": "AND"},
                   "right": {
                       "left": "Code",
                       "op": {"name": "="},
-                      "right": "Control 1",
+                      "right": "Risk 1",
                   },
               },
           },
           "fields": ["mappings"],
       }]
       self.assertEqual(
-          len(self.export_parsed_csv(search_request)["Control Snapshot"]),
+          len(self.export_parsed_csv(search_request)["Risk Snapshot"]),
           1,
       )
       single_query_count = counter.get
@@ -373,13 +370,13 @@ class TestExportSnapshots(TestCase):
               "expression": {
                   "left": "child_type",
                   "op": {"name": "="},
-                  "right": "Control",
+                  "right": "Risk",
               },
           },
           "fields": ["mappings"],
       }]
       self.assertEqual(
-          len(self.export_parsed_csv(search_request)["Control Snapshot"]),
+          len(self.export_parsed_csv(search_request)["Risk Snapshot"]),
           5,
       )
       multiple_query_count = counter.get
@@ -436,11 +433,7 @@ class TestExportSnapshots(TestCase):
           "Kind/Nature": u"",
           "Notes": u"",
           "Reference URL": u"",
-          "Review State": u"Unreviewed",
-          "Reviewers": u"",
-          "Recipients": u"",
-          "Send by default": u"yes",
-          "Comments": "",
+          "Review Status": u"some status",
           "Significance": u"",
           "State": u"Draft",
           "Last Assessment Date": u"",
@@ -449,7 +442,7 @@ class TestExportSnapshots(TestCase):
           "Title": control.title,
           "Type/Means": u"",
           "Audit": audit.slug,
-          "Assertions": u",".join(a.name for a in control.assertions),
+          "Assertions": u",".join(json.loads(control.assertions)),
           "Categories": u"",
           "Document File": u"",
           'Created Date': control.created_at.strftime(DATE_FORMAT_US),
