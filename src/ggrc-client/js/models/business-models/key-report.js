@@ -64,7 +64,7 @@ export default Cacheable.extend({
       }]),
   },
   sub_tree_view_options: {
-    default_filter: ['Product'],
+    default_filter: ['Control'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   orderOfRoles: ['Admin', 'Assignee', 'Verifier'],
