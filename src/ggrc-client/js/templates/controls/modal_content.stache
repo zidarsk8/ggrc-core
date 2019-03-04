@@ -43,7 +43,7 @@
     <div data-test-id="control_test_plan_d8b5a2f4" data-id="test_plan_hidden" class="span6 hidable">
       <label data-test-id="control_test_plan-label_d8b5a2f4">
         Assessment Procedure
-        <i class="fa fa-question-circle" rel="tooltip" title="Provide an assessment procedure for this {{model.model_singular}}."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide an assessment procedure for this {{model.title_singular}}."></i>
         <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="rich-text">
