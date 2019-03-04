@@ -47,7 +47,8 @@
     <div class="span12 hide-wrap hidable">
       <access-control-list-roles-helper
         {instance}="{.}"
-        {is-new-instance}="{new_object_form}">
+        {is-new-instance}="{new_object_form}"
+        {order-of-roles}="{instance.constructor.orderOfRoles}">
       </access-control-list-roles-helper>
     </div>
   </div>

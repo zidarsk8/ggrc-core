@@ -67,6 +67,7 @@ export default Cacheable.extend({
     default_filter: ['Product'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
+  orderOfRoles: ['Admin', 'Assignee', 'Verifier'],
   init: function () {
     if (this._super) {
       this._super(...arguments);
