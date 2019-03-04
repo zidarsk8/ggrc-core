@@ -9,7 +9,7 @@ import template from './base-inline-control-title.stache';
 export default can.Component.extend({
   tag: 'base-inline-control-title',
   template,
-  leakScope: true,
+  leakScope: false,
   viewModel: {
     define: {
       isEditIconAllowed: {
@@ -25,6 +25,7 @@ export default can.Component.extend({
         },
       },
     },
+    instance: null,
     title: '',
     isLoading: false,
     editMode: false,
