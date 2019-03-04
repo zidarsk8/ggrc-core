@@ -13,6 +13,7 @@
       {destination}="instance"
       class="unmap-link">
         <issue-unmap-item
+          class="issue-unmap-item"
           (unmap-issue)="unmapInstance()"
           {source}="page_instance"
           {destination}="instance">
