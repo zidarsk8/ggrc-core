@@ -31,7 +31,7 @@ from ggrc.services import common as services_common, signals
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
 from ggrc.views import converters, cron, filters, notifications, registry, \
-    utils, serializers
+    utils, serializers, folder
 
 logger = logging.getLogger(__name__)
 REINDEX_CHUNK_SIZE = 100
@@ -882,6 +882,7 @@ def init_extra_views(app_):
   notifications.init_notification_views(app_)
   query_views.init_query_views(app_)
   query_views.init_clone_views(app_)
+  folder.init_folder_views(app_)
 
 
 def init_all_views(app_):

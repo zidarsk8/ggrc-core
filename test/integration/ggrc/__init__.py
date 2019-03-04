@@ -13,11 +13,11 @@ import itertools
 from StringIO import StringIO
 from mock import patch
 
+from flask_testing import TestCase as BaseTestCase
 import sqlalchemy as sa
 from sqlalchemy import exc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
-from flask.ext.testing import TestCase as BaseTestCase
 from google.appengine.ext import testbed
 
 from ggrc import db
