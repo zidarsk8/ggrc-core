@@ -47,7 +47,7 @@ let DEFAULT_OBJECT_MAP = {
   Contract: 'Requirement',
   Control: 'Objective',
   System: 'Product',
-  KeyReport: 'Product',
+  KeyReport: 'Control',
   Metric: 'Product',
   Process: 'Risk',
   AccessGroup: 'System',
