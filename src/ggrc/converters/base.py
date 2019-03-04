@@ -213,7 +213,7 @@ class ExportConverter(BaseConverter):
 
       for line in block_converter.generate_row_data():
         ie_status = self.get_ie_status_from_cache()
-        if ie_status == all_models.ImportExport.STOPPED_STATUS:
+        if ie_status and ie_status == all_models.ImportExport.STOPPED_STATUS:
           raise exceptions.ExportStoppedException()
         line.insert(0, "")
         csv_string_builder.append_line(line)
@@ -231,6 +231,8 @@ class ExportConverter(BaseConverter):
 
   def get_ie_status_from_cache(self):
     """Get export job status from memcahe if exists, from DB otherwise."""
+    if not self.ie_job:
+      return None
     cache_key = cache_utils.get_ie_cache_key(self.ie_job)
     ie_status = self.cache_manager.cache_object.memcache_client.get(cache_key)
     if not ie_status:
