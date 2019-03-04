@@ -102,6 +102,12 @@ class _ObjectWidgetBar(_WidgetBar):
     """
     return self._get_widget(element.WidgetBar.ISSUES)
 
+  def select_objectives(self):
+    """
+    Return: lib.page.widget.generic_widget.Issues
+    """
+    return self._get_widget(element.WidgetBar.OBJECTIVES)
+
   def select_processes(self):
     """
     Return: lib.page.widget.generic_widget.Processes
