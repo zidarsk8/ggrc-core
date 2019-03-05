@@ -63,4 +63,5 @@
       {{/add_to_current_scope}}
     {{/if_equals}}
   </section>
+  
 {{/switch}}
