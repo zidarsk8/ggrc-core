@@ -6,17 +6,66 @@
 {{#instance}}
   <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
     <div class="tier-content">
-      {{> /static/templates/base_objects/general-page-header.stache}}
+      <general-page-header {instance}="instance"></general-page-header>
 
       <tab-container {instance}="instance">
-        <tab-panel {(panels)}="panels" title-text="Attributes">
+        <tab-panel {(panels)}="panels" {title-text}="'Attributes'">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-              <object-review {instance}="instance"></object-review>
-              {{> /static/templates/base_objects/description.stache}}
-              {{> /static/templates/base_objects/test_plan.stache}}
-              {{> /static/templates/base_objects/notes.stache}}
-              {{> /static/templates/controls/contacts.stache}}
+              {{#if review_status}}
+                <div class="row-fluid wrap-row">
+                  <div class="span12">
+                    <h6>Review Status</h6>
+                    <span class="state-value-dot review-status {{addclass 'state' review_status}}">
+                      {{review_status_display_name}}
+                    </span>
+                  </div>
+                </div>
+              {{/if}}
+
+              <div class="row-fluid wrap-row">
+                <div data-test-id="title_description_7a906d2e" class="span12">
+                  <proposable-attribute
+                    {instance}="instance"
+                    {title}="'Description'"
+                    {attr-name}="'description'"
+                  >
+                    <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
+                      <read-more {text}="description"></read-more>
+                    </div>
+                  </proposable-attribute>
+                </div>
+              </div>
+
+              <div class="row-fluid wrap-row">
+                <div class="span12">
+                  <proposable-attribute
+                    {instance}="instance"
+                    {title}="'Assessment Procedure'"
+                    {attr-name}="'test_plan'"
+                  >
+                    <div class="rtf-block">
+                      <read-more {text}="test_plan"></read-more>
+                    </div>
+                  </proposable-attribute>
+                </div>
+              </div>
+
+              <div class="row-fluid wrap-row">
+                <div data-test-id="title_notes_ef5bc3a71e88" class="span12">
+                  <proposable-attribute
+                    {instance}="instance"
+                    {title}="'Notes'"
+                    {attr-name}="'notes'"
+                  >
+                    <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
+                      <read-more {text}="notes"></read-more>
+                    </div>
+                  </proposable-attribute>
+                </div>
+              </div>
+
+              {{> /static/templates/base_objects/contacts.stache}}
               {{> /static/templates/base_objects/reference-urls.stache}}
               <div class="row-fluid wrap-row">
                 <folder-attachments-list {title}="'Attachment'"
@@ -46,151 +95,175 @@
                 <div class="hidden-fields-area">
                   <div class="row-fluid wrap-row">
                     <div class="span4">
-                      <h6>Code</h6>
-                      <p>
-                        {{slug}}
-                      </p>
-                    </div>
-                    <div class="span4">
-                      <h6>Kind/Nature</h6>
-                      {{#if kind}}
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Code
+                          </h6>
+                        </div>
                         <p>
-                          {{#using kind=kind}}
-                            {{kind.title}}
-                          {{/using}}
+                          {{slug}}
                         </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      </div>
                     </div>
                     <div class="span4">
-                      <h6>Fraud Related</h6>
-                      <p>
-                        {{#if fraud_related}}
-                          Yes
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Kind/Nature'"
+                        {attr-name}="'kind'"
+                      >
+                        {{#if kind}}
+                          <p>
+                            {{kind}}
+                          </p>
                         {{else}}
-                          {{#if_equals fraud_related false}}
-                            No
-                          {{else}}
-                            <span class="empty-message">None</span>
-                          {{/if_equals}}
+                          <span class="empty-message">None</span>
                         {{/if}}
-                      </p>
+                      </proposable-attribute>
+                    </div>
+                    <div class="span4">
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Fraud Related'"
+                        {attr-name}="'is_fraud_related'"
+                      >
+                        <p>
+                          {{#if fraud_related}}
+                            Yes
+                          {{else}}
+                            {{#if_equals fraud_related false}}
+                              No
+                            {{else}}
+                              <span class="empty-message">None</span>
+                            {{/if_equals}}
+                          {{/if}}
+                        </p>
+                      </proposable-attribute>
                     </div>
                   </div>
                   <div class="row-fluid wrap-row">
                     <div class="span8">
-                      <h6>Significance</h6>
-                      <p>
-                        {{#if key_control}}
-                          Key
-                        {{else}}
-                          {{#if_equals key_control false}}
-                            Non-Key
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Significance'"
+                        {attr-name}="'is_key_control'"
+                      >
+                        <p>
+                          {{#if key_control}}
+                            Key
                           {{else}}
-                            <span class="empty-message">None</span>
-                          {{/if_equals}}
-                        {{/if}}
-                      </p>
+                            {{#if_equals key_control false}}
+                              Non-Key
+                            {{else}}
+                              <span class="empty-message">None</span>
+                            {{/if_equals}}
+                          {{/if}}
+                        </p>
+                      </proposable-attribute>
                     </div>
                     <div class="span4">
-                      <h6>Type/Means</h6>
-                      {{#if means}}
-                        <p>
-                          {{#using means=means}}
-                            {{means.title}}
-                          {{/using}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Type/Means'"
+                        {attr-name}="'means'"
+                      >
+                        {{#if means}}
+                          <p>
+                            {{means}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </proposable-attribute>
                     </div>
                   </div>
                   <div class="row-fluid wrap-row">
                     <div class="span4">
-                      <h6>Effective Date</h6>
-                      {{#if start_date}}
-                        <p>
-                          {{localize_date start_date}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Effective Date'"
+                        {attr-name}="'start_date'"
+                      >
+                        {{#if start_date}}
+                          <p>
+                            {{localize_date start_date}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </proposable-attribute>
                     </div>
                     <div class="span4">
-                      <h6>Last Deprecated Date</h6>
-                      {{#if end_date}}
-                        <p>
-                          {{localize_date end_date}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      <div class="action-toolbar-container">
+                        <div class="action-toolbar">
+                          <h6 class="action-toolbar__header">
+                            Last Deprecated Date
+                          </h6>
+                        </div>
+                        {{#if end_date}}
+                          <p>
+                            {{localize_date end_date}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </div>
                     </div>
                     <div class="span4">
-                      <h6>Frequency</h6>
-                      {{#if verify_frequency}}
-                        <p>
-                          {{#using verify_frequency=verify_frequency}}
-                            {{verify_frequency.title}}
-                          {{/using}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Frequency'"
+                        {attr-name}="'verify_frequency'"
+                      >
+                        {{#if verify_frequency}}
+                          <p>
+                            {{verify_frequency}}
+                          </p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </proposable-attribute>
                     </div>
                   </div>
                   <div class="row-fluid wrap-row">
                     <div class="span8">
-                      <h6 class="form-header">
-                        Assertions
-                        <i class="fa fa-asterisk"></i>
-                      </h6>
-                      {{#if assertions}}
-                        {{#if_helpers '\n #if' instance.snapshot '\n or #if' instance.isRevision}}
-                            <ul>
-                              <sort-by is-snapshot="true" {items}="assertions">
-                                {{#sortedItems}}
-                                  <li>{{name}}</li>
-                                {{/sortedItems}}
-                              </sort-by>
-                            </ul>
-                          {{else}}
-                            <ul>
-                              <sort-by {items}="assertions">
-                                {{#sortedItems}}
-                                  <li>{{name}}</li>
-                                {{/sortedItems}}
-                              </sort-by>
-                            </ul>
-                          {{/if_helpers}}
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Assertions'"
+                        {attr-name}="'control_assertions'"
+                        {mandatory}="'true'"
+                      >
+                        {{#if assertions.length}}
+                          <ul>
+                            <sort {items}="assertions">
+                              {{#sortedItems}}
+                                <li>{{.}}</li>
+                              {{/sortedItems}}
+                            </sort>
+                          </ul>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </proposable-attribute>
                     </div>
                     <div class="span4">
-                      <h6>Categories</h6>
-                      {{#if categories}}
-                        {{#if_helpers '\n #if' instance.snapshot '\n or #if' instance.isRevision}}
-                            <ul>
-                              <sort-by is-snapshot="true" {items}="categories">
-                                {{#sortedItems}}
-                                  <li>{{name}}</li>
-                                {{/sortedItems}}
-                              </sort-by>
-                            </ul>
-                          {{else}}
-                            <ul>
-                              <sort-by {items}="categories">
-                                {{#sortedItems}}
-                                  <li>{{name}}</li>
-                                {{/sortedItems}}
-                              </sort-by>
-                            </ul>
-                          {{/if_helpers}}
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
+                      <proposable-attribute
+                        {instance}="instance"
+                        {title}="'Categories'"
+                        {attr-name}="'control_categories'"
+                      >
+                        {{#if categories.length}}
+                          <ul>
+                            <sort {items}="categories">
+                              {{#sortedItems}}
+                                <li>{{.}}</li>
+                              {{/sortedItems}}
+                            </sort>
+                          </ul>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </proposable-attribute>
                     </div>
                   </div>
                 </div>
@@ -209,26 +282,24 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
-          <tab-panel
-            warning-text="Some proposals are pending approval"
-            title-text="Change Proposals"
-            extra-classes="proposal proposal__tab-warning"
-            tab-id="tab-related-proposals"
+          <tab-link
+            {instance}="instance"
             {(panels)}="panels"
-            {parent-instance}="instance"
-            {can-display-warning}="true"
-            {pre-render-content}="true">
-            <related-proposals
-              (update-proposals-warning)="updateWarningState(%event)"
-              {base-instance}="instance">
-            </related-proposals>
-          </tab-panel>
-          <tab-panel {(panels)}="panels" title-text="Version History">
-              <related-revisions {instance}="instance"></related-revisions>
-          </tab-panel>
-          <tab-panel tab-id="change-log" {(panels)}="panels" title-text="Change Log">
-              <revision-log {instance}="instance" {options}="tabOptions"></revision-log>
-          </tab-panel>
+            {title-text}="'Change Proposals'"
+            {link-type}="'proposals'"
+          ></tab-link>
+          <tab-link
+            {instance}="instance"
+            {(panels)}="panels"
+            {title-text}="'Version History'"
+            {link-type}="'change-log'"
+          ></tab-link>
+          <tab-link
+            {instance}="instance"
+            {(panels)}="panels"
+            {title-text}="'Change Log'"
+            {link-type}="'change-log'"
+          ></tab-link>
         {{/if}}
       </tab-container>
     </div><!-- tier-content end -->

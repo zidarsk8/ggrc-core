@@ -82,7 +82,7 @@ def handle_role_acls(role):
   Because this is called after the commit on the role, we can not have new
   role creation and people assignment to that role in the same request.
   """
-  with utils.benchmark("Generating ACL entries on {} for role {}".format(
+  with utils.benchmark(u"Generating ACL entries on {} for role {}".format(
           role.object_type, role.name)):
     query = _get_missing_models_query(role)
     if not query:

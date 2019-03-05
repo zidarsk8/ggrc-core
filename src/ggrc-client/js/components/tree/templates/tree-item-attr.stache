@@ -23,76 +23,66 @@
 
   {{#case 'network_zone'}}
     <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.network_zone" {type}="loadedModel"/>
+      <tree-field-wrapper {source}="instance.network_zone" {type}="loadedModel">
+        <tree-field {source}="items"/>
+      </tree-field-wrapper>
     </model-loader>
   {{/case}}
 
   {{#case 'kind'}}
-    {{#if_instance_of instance 'Document|Evidence'}}
-      {{instance.kindTitle}}
-    {{else}}
-      <model-loader {path}="'service-models/option'">
-        <tree-field {source}="instance.kind" {type}="loadedModel" {show-tooltip}="false"/>
-      </model-loader>
-    {{/if_instance_of}}
+    {{firstnonempty instance.kindTitle instance.kind}}
   {{/case}}
 
   {{#case 'type'}}
     <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.kind" {type}="loadedModel"/>
+      <tree-field-wrapper {source}="instance.kind" {type}="loadedModel">
+        <tree-field {source}="items"/>
+      </tree-field-wrapper>
     </model-loader>
   {{/case}}
 
   {{#case 'modified_by'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.modified_by" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.modified_by" {type}="loadedModel" {field}="'email'">
+        <tree-field {source}="items"/>
+      </tree-field-wrapper>
     </model-loader>
   {{/case}}
 
   {{#case 'ra_manager'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.ra_manager" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.ra_manager" {type}="loadedModel" {field}="'email'">
+        <tree-field {source}="items"/>
+      </tree-field-wrapper>
     </model-loader>
   {{/case}}
 
   {{#case 'ra_counsel'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.ra_counsel" {type}="loadedModel" {field}="'email'"/>
+      <tree-field-wrapper {source}="instance.ra_counsel" {type}="loadedModel" {field}="'email'">
+        <tree-field {source}="items"/>
+      </tree-field-wrapper>
     </model-loader>
   {{/case}}
 
   {{#case 'assignee'}}
     <model-loader {path}="'business-models/person'">
-      <tree-field {source}="instance.contact" {type}="loadedModel" {field}="'email'"/>
-    </model-loader>
-  {{/case}}
-
-  {{#case 'means'}}
-    <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.means" {type}="loadedModel" {show-tooltip}="false"/>
-    </model-loader>
-  {{/case}}
-
-  {{#case 'frequency'}}
-    <model-loader {path}="'service-models/option'">
-      <tree-field {source}="instance.verify_frequency" {type}="loadedModel" {show-tooltip}="false"/>
+      <tree-field-wrapper {source}="instance.contact" {type}="loadedModel" {field}="'email'">
+        <tree-field {source}="items"/>
+      </tree-field-wrapper>
     </model-loader>
   {{/case}}
 
   {{#case 'assertions'}}
-    <sort-by {items}="instance.assertions" {is-snapshot}="instance.snapshot">
-      <model-loader {path}="'service-models/control-assertion'">
-        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
-      </model-loader>
-    </sort-by>
+    <sort {items}="instance.assertions">
+      <tree-field {source}="sortedItems"/>
+    </sort>
   {{/case}}
 
   {{#case 'categories'}}
-    <sort-by {items}="instance.categories" {is-snapshot}="instance.snapshot">
-      <model-loader {path}="'service-models/control-category'">
-        <tree-field {source}="sortedItems" {type}="loadedModel" {field}="'name'"/>
-      </model-loader>
-    </sort-by>
+    <sort {items}="instance.categories">
+      <tree-field {source}="sortedItems"/>
+    </sort>
   {{/case}}
 
   {{#case 'status'}}
@@ -107,6 +97,14 @@
     <review-state {instance}="instance">
       <span>{{reviewState}}</span>
     </review-state>
+  {{/case}}
+
+  {{#case 'external_review_status'}}
+    {{#if instance.review_status}}
+      <span class="state-value-dot review-status {{addclass 'state' instance.review_status}}">
+        {{instance.review_status_display_name}}
+      </span>
+    {{/if}}
   {{/case}}
 
   {{#case 'issue_url'}}

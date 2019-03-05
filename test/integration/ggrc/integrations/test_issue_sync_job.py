@@ -9,7 +9,6 @@
 
 import ddt
 import mock
-import flask
 
 from ggrc.models import all_models
 from ggrc.integrations.synchronization_jobs import issue_sync_job
@@ -28,10 +27,12 @@ class TestIssueIntegration(ggrc.TestCase):
     self.verifier = factories.PersonFactory(name="a")
     self.assignee = factories.PersonFactory(name="b")
     self.admin_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Issue.__name__, name="Admin"
+        object_type=all_models.Issue.__name__,
+        name="Admin",
     ).first()
     self.primary_contact_role = all_models.AccessControlRole.query.filter_by(
-        object_type=all_models.Issue.__name__, name="Primary Contacts"
+        object_type=all_models.Issue.__name__,
+        name="Primary Contacts",
     ).first()
 
   @ddt.data(
@@ -44,36 +45,30 @@ class TestIssueIntegration(ggrc.TestCase):
       ("intended_behavior", "Deprecated"),
       ("obsolete", "Deprecated"),
       ("infeasible", "Deprecated"),
-      ("duplicate", "Deprecated",)
+      ("duplicate", "Deprecated"),
   )
   @ddt.unpack
   def test_sync_issue_statuses(self, issuetracker_status, issue_status):
     """Test updating issue statuses in GGRC."""
-    # Arrange test data.
-    issue_tracker_issue_id = "1"
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
-        issue_id=issue_tracker_issue_id,
-        issue_tracked_obj=factories.IssueFactory(status="Draft")
+        issue_tracked_obj=factories.IssueFactory(status="Draft"),
     )
-
     batches = [
         {
-            issue_tracker_issue_id: {
+            iti.issue_id: {
                 "status": issuetracker_status,
-                "type": "BUG",
+                "type": "PROCESS",
                 "priority": "P2",
                 "severity": "S2",
             }
         }
     ]
 
-    # Perform action.
     with mock.patch.object(sync_utils, "iter_issue_batches",
                            return_value=batches):
       issue_sync_job.sync_issue_attributes()
 
-    # Assert results.
     issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
     self.assertEquals(issue.status, issue_status)
 
@@ -81,31 +76,28 @@ class TestIssueIntegration(ggrc.TestCase):
     """Create Issue with admin and primary contact"""
     iti = factories.IssueTrackerIssueFactory(
         enabled=True,
-        issue_id="1",
-        issue_tracked_obj=factories.IssueFactory(status="Draft")
+        issue_tracked_obj=factories.IssueFactory(status="Draft"),
     )
 
     iti.issue_tracked_obj.add_person_with_role(
         self.verifier,
-        self.admin_role
+        self.admin_role,
     )
     iti.issue_tracked_obj.add_person_with_role(
         self.assignee,
-        self.primary_contact_role
+        self.primary_contact_role,
     )
     return iti
 
   def test_sync_verifier_email(self):
     """Test adding new verifier email into Issue ACL."""
-    # Arrange test data.
-    new_verifier = factories.PersonFactory(name="c")
+    new_verifier = factories.PersonFactory()
     iti = self.initialize_test_issuetracker_info()
-
     batches = [
         {
-            "1": {
+            iti.issue_id: {
                 "status": "NEW",
-                "type": "BUG",
+                "type": "PROCESS",
                 "priority": "P2",
                 "severity": "S2",
                 "verifier": new_verifier.email,
@@ -114,39 +106,34 @@ class TestIssueIntegration(ggrc.TestCase):
         }
     ]
 
-    # Perform action.
-    with mock.patch.object(flask.g, "global_role_names", None):
-      with mock.patch.object(sync_utils, "iter_issue_batches",
-                             return_value=batches):
-        issue_sync_job.sync_issue_attributes()
+    with mock.patch.object(sync_utils, "iter_issue_batches",
+                           return_value=batches):
+      issue_sync_job.sync_issue_attributes()
 
-      # Assert results.
-      issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
-      admin_emails = [
-          person.email for person in issue.get_persons_for_rolename("Admin")
-      ]
-      self.assertItemsEqual(
-          admin_emails,
-          [new_verifier.email, ]
-      )
+    issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
+    admin_emails = [
+        person.email for person in issue.get_persons_for_rolename("Admin")
+    ]
+    self.assertItemsEqual(
+        admin_emails,
+        [new_verifier.email, ],
+    )
 
-      primary_contacts_emails = [
-          person.email
-          for person in issue.get_persons_for_rolename("Primary Contacts")
-      ]
-      self.assertItemsEqual(primary_contacts_emails, [self.assignee.email])
+    primary_contacts_emails = [
+        person.email
+        for person in issue.get_persons_for_rolename("Primary Contacts")
+    ]
+    self.assertItemsEqual(primary_contacts_emails, [self.assignee.email])
 
   def test_sync_assignee_email(self):
     """Test adding new assignee email into Issue ACL."""
-    # Arrange test data.
-    new_assignee = factories.PersonFactory(name="d")
+    new_assignee = factories.PersonFactory()
     iti = self.initialize_test_issuetracker_info()
-
     batches = [
         {
-            "1": {
+            iti.issue_id: {
                 "status": "NEW",
-                "type": "BUG",
+                "type": "PROCESS",
                 "priority": "P2",
                 "severity": "S2",
                 "verifier": self.verifier.email,
@@ -155,73 +142,63 @@ class TestIssueIntegration(ggrc.TestCase):
         }
     ]
 
-    # Perform action.
-    with mock.patch.object(flask.g, "global_role_names", None):
-      with mock.patch.object(sync_utils, "iter_issue_batches",
-                             return_value=batches):
-        issue_sync_job.sync_issue_attributes()
+    with mock.patch.object(sync_utils, "iter_issue_batches",
+                           return_value=batches):
+      issue_sync_job.sync_issue_attributes()
 
-      issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
-
-      # Check unchanged admins
-      admin_emails = [
-          person.email for person in issue.get_persons_for_rolename("Admin")
-      ]
-      self.assertItemsEqual(admin_emails, [self.verifier.email, ])
-
-      # Check changed primary contacts
-      primary_contacts_emails = [
-          person.email
-          for person in issue.get_persons_for_rolename("Primary Contacts")
-      ]
-      self.assertItemsEqual(
-          primary_contacts_emails,
-          [new_assignee.email, ]
-      )
+    issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
+    # Check unchanged admins
+    admin_emails = [
+        person.email for person in issue.get_persons_for_rolename("Admin")
+    ]
+    self.assertItemsEqual(admin_emails, [self.verifier.email, ])
+    # Check changed primary contacts
+    primary_contacts_emails = [
+        person.email
+        for person in issue.get_persons_for_rolename("Primary Contacts")
+    ]
+    self.assertItemsEqual(
+        primary_contacts_emails,
+        [new_assignee.email, ],
+    )
 
   def test_sync_due_date(self):
     """Test adding due_date in Issue"""
-
     due_date = "2018-09-13"
     date_format = "%Y-%m-%d"
     iti1 = factories.IssueTrackerIssueFactory(
         enabled=True,
-        issue_id="1",
-        issue_tracked_obj=factories.IssueFactory(status="Draft")
+        issue_tracked_obj=factories.IssueFactory(status="Draft"),
     )
     iti2 = factories.IssueTrackerIssueFactory(
         enabled=True,
-        issue_id="2",
-        issue_tracked_obj=factories.IssueFactory(status="Draft")
+        issue_tracked_obj=factories.IssueFactory(status="Draft"),
     )
-
     batches = [
         {
-            "1": {
+            iti1.issue_id: {
                 "status": "new",
-                "type": "BUG",
+                "type": "PROCESS",
                 "priority": "P2",
                 "severity": "S2",
                 "custom_fields": [{
                     constants.CustomFields.DUE_DATE: due_date
                 }],
             },
-            "2": {
+            iti2.issue_id: {
                 "status": "new",
-                "type": "BUG",
+                "type": "PROCESS",
                 "priority": "P2",
                 "severity": "S2",
                 "custom_fields": [],
-            }
+            },
         }
     ]
 
-    # Perform action.
     with mock.patch.object(sync_utils, "iter_issue_batches",
                            return_value=batches):
       issue_sync_job.sync_issue_attributes()
 
-    # Assert results.
     issue1 = all_models.Issue.query.get(iti1.issue_tracked_obj.id)
     self.assertEquals(issue1.due_date.strftime(date_format), due_date)
 
@@ -237,7 +214,6 @@ class TestIssueIntegration(ggrc.TestCase):
 
     Other Admins and Primary Contacts shouldn't be removed.
     """
-    # Arrange test data.
     new_assignee = factories.PersonFactory(name="e")
     new_verifier = factories.PersonFactory(name="f")
     iti = self.initialize_test_issuetracker_info()
@@ -258,7 +234,6 @@ class TestIssueIntegration(ggrc.TestCase):
     # Change names to be sure that names in alphabetical order.
     self.assignee.name = "A" + self.assignee.name
     second_assignee.name = "B" + second_assignee.name
-
     iti.issue_tracked_obj.add_person_with_role(
         second_assignee,
         self.primary_contact_role,
@@ -266,9 +241,9 @@ class TestIssueIntegration(ggrc.TestCase):
 
     batches = [
         {
-            "1": {
+            iti.issue_id: {
                 "status": "NEW",
-                "type": "BUG",
+                "type": "PROCESS",
                 "priority": "P2",
                 "severity": "S2",
                 "verifier": new_verifier.email,
@@ -277,29 +252,27 @@ class TestIssueIntegration(ggrc.TestCase):
         }
     ]
 
-    # Perform action.
-    with mock.patch.object(flask.g, "global_role_names", None):
-      with mock.patch.object(sync_utils, "iter_issue_batches",
-                             return_value=batches):
-        issue_sync_job.sync_issue_attributes()
+    with mock.patch.object(sync_utils, "iter_issue_batches",
+                           return_value=batches):
+      issue_sync_job.sync_issue_attributes()
 
-      issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
+    issue = all_models.Issue.query.get(iti.issue_tracked_obj.id)
 
-      # Check changed admins.
-      admin_emails = [
-          person.email for person in issue.get_persons_for_rolename("Admin")
-      ]
-      self.assertItemsEqual(
-          admin_emails,
-          [second_verifier.email, new_verifier.email, ]
-      )
+    # Check changed admins.
+    admin_emails = [
+        person.email for person in issue.get_persons_for_rolename("Admin")
+    ]
+    self.assertItemsEqual(
+        admin_emails,
+        [second_verifier.email, new_verifier.email, ],
+    )
 
-      # Check changed primary contacts.
-      primary_contacts_emails = [
-          person.email
-          for person in issue.get_persons_for_rolename("Primary Contacts")
-      ]
-      self.assertItemsEqual(
-          primary_contacts_emails,
-          [second_assignee.email, new_assignee.email, ]
-      )
+    # Check changed primary contacts.
+    primary_contacts_emails = [
+        person.email
+        for person in issue.get_persons_for_rolename("Primary Contacts")
+    ]
+    self.assertItemsEqual(
+        primary_contacts_emails,
+        [second_assignee.email, new_assignee.email, ],
+    )

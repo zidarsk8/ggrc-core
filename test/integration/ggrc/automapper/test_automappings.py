@@ -42,6 +42,7 @@ class TestAutomappings(TestCase):
   def setUp(self):
     super(TestAutomappings, self).setUp()
     self.api = self.gen.api
+    self.api.login_as_normal()
 
   @classmethod
   def create_ac_roles(cls, obj, person_id, role_name="Admin"):
@@ -197,9 +198,11 @@ class TestAutomappings(TestCase):
         'title': make_name('Test requirement'),
         'directive': {'id': regulation.id},
     })
-    control = self.create_object(models.Control, {
-        'title': make_name('Test control')
-    })
+    with self.api.as_external():
+      control = self.create_object(models.Control, {
+          'title': make_name('Test control')
+      })
+
     objective = self.create_object(models.Objective, {
         'title': make_name('Test control')
     })
@@ -246,15 +249,16 @@ class TestAutomappings(TestCase):
     objective = self.create_object(models.Objective, data={
         'title': make_name('Test Objective')
     })
-    control_p = self.create_object(models.Control, {
-        'title': make_name('Test control')
-    })
-    control1 = self.create_object(models.Control, {
-        'title': make_name('Test control')
-    })
-    control2 = self.create_object(models.Control, {
-        'title': make_name('Test control')
-    })
+    with self.api.as_external():
+      control_p = self.create_object(models.Control, {
+          'title': make_name('Test control')
+      })
+      control1 = self.create_object(models.Control, {
+          'title': make_name('Test control')
+      })
+      control2 = self.create_object(models.Control, {
+          'title': make_name('Test control')
+      })
     self.assert_mapping_implication(
         to_create=[(objective, control_p),
                    (control_p, control1),
@@ -412,7 +416,7 @@ class TestIssueAutomappings(TestCase):
     from ggrc.login import noop
     noop.login()  # this is needed to pass the permission checks in automapper
 
-    snapshottable = factories.ControlFactory()
+    snapshottable = factories.ObjectiveFactory()
     with factories.single_commit():
       self.audit, self.asmt, self.snapshot = self._make_audit_asmt_snapshot(
           snapshottable,

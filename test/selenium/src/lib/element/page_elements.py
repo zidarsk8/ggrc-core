@@ -170,13 +170,19 @@ class CommentArea(object):
   """Represents comment area (form and mapped comments) on info widget"""
 
   def __init__(self, container):
-    self.add_section = container.element(
-        class_name="comment-add-form__section")
+    self._container = container
+    self.add_section = container.element(text="Responses/Comments")
 
   @property
   def exists(self):
     """Returns whether comment area exists."""
     return self.add_section.exists
+
+  @property
+  def control_add_section(self):
+    """Returns controls Add Comment button."""
+    return self._container.element(tag_name="comments-section").element(
+        tag_name="questionnaire-link").link(class_name="questionnaire-link")
 
 
 class CustomAttributeManager(object):

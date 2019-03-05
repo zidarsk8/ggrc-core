@@ -6,17 +6,19 @@
 # pylint: disable=too-many-lines
 
 """Tests for /query api endpoint."""
-
+import random
 import unittest
-
 from datetime import datetime
 from operator import itemgetter
+import mock
+
 import ddt
 from flask import json
 from ggrc import app
 from ggrc import db
 from ggrc import models
 from ggrc.models import CustomAttributeDefinition as CAD, all_models
+from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.snapshotter.rules import Types
 from ggrc.fulltext.attributes import DateValue
 
@@ -443,92 +445,55 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         self._sort_sublists(expected),
     )
 
-  def test_filter_control_by_frequency(self):
-    """Test correct filtering by frequency"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["frequency", "=", "yearly"]),
-        "Control",
-    )
-    self.assertEqual(controls["count"], 4)
-
-  @ddt.data(
-      ("Frequency", "verify_frequency"),
-      ("kind/nature", "kind"),
-      ("type/means", "means"),
-  )
-  @ddt.unpack
-  def test_order_control_by_option(self, order_key, val_key):
+  def test_order_control_by_option(self):
     """Test correct ordering and by option."""
-    controls_unordered = self._get_first_result_set(
-        self._make_query_dict("Control",),
-        "Control", "values"
+    options = all_models.Option.query.filter_by(role="network_zone").all()
+    self.assertEqual(len(options), 5)
+    random.shuffle(options)
+    with factories.single_commit():
+      for option in options:
+        factories.SystemFactory(network_zone=option)
+
+    systems_unordered = self._get_first_result_set(
+        self._make_query_dict("System",),
+        "System", "values"
     )
-    controls_ordered_1 = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": order_key},
+    systems_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("System",
+                              order_by=[{"name": "Network Zone"},
                                         {"name": "id"}]),
-        "Control", "values"
+        "System", "values"
     )
     options_map = {o.id: o.title for o in models.Option.query}
 
     def sort_key(val):
       """sorting key getter function"""
-      option = val[val_key]
+      option = val["network_zone"]
       if not option:
         return None
       return options_map[option["id"]]
 
-    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    systems_ordered_2 = sorted(systems_unordered, key=sort_key)
     self.assertListEqual(
-        self._sort_sublists(controls_ordered_1),
-        self._sort_sublists(controls_ordered_2),
+        self._sort_sublists(systems_ordered_1),
+        self._sort_sublists(systems_ordered_2),
     )
 
-  def test_filter_control_by_kind(self):
-    """Test correct filtering by kind/nature"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["kind/nature", "=", "Corrective"]),
-        "Control",
-    )
-    self.assertEqual(controls["count"], 3)
+  def test_filter_system_by_zone(self):
+    """Test correct filtering by Network Zone"""
+    options = all_models.Option.query.filter_by(role="network_zone")
+    with factories.single_commit():
+      for option in options:
+        factories.SystemFactory(network_zone=option)
 
-  def test_filter_control_by_means(self):
-    """Test correct filtering by means"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["type/means", "=", "Physical"]),
-        "Control",
+    systems = self._get_first_result_set(
+        self._make_query_dict(
+            "System",
+            expression=["Network Zone", "=", "Corp"]
+        ),
+        "System",
     )
-    self.assertEqual(controls["count"], 3)
-
-  def test_order_control_by_means(self):
-    """Test correct ordering and by means"""
-    controls_unordered = self._get_first_result_set(
-        self._make_query_dict("Control",),
-        "Control", "values"
-    )
-    controls_ordered_1 = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": "type/means"},
-                                        {"name": "id"}]),
-        "Control", "values"
-    )
-    options_map = {o.id: o.title for o in models.Option.query}
-
-    def sort_key(val):
-      """sorting key getter function"""
-      kind = val["means"]
-      if not kind:
-        return None
-      return options_map[kind["id"]]
-
-    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(
-        self._sort_sublists(controls_ordered_1),
-        self._sort_sublists(controls_ordered_2),
-    )
+    self.assertEqual(systems["count"], 1)
 
   def test_query_related_people_for_program(self):
     """Test correct querying of the related people to Program"""
@@ -554,14 +519,14 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     ref_list = [u'smotko@example.com', u'sec.con@example.com']
     self.assertItemsEqual(user_list, ref_list)
 
-  def test_filter_control_by_key_control(self):
-    """Test correct filtering by SIGNIFICANCE field"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["significance", "=", "non-key"]),
-        "Control",
+  def test_filter_risk_by_vulnerability(self):
+    """Test correct filtering by vulnerability field"""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk",
+                              expression=["vulnerability", "=", "non-key"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 2)
+    self.assertEqual(risks["count"], 2)
 
   def test_order_control_by_key_control(self):
     """Test correct ordering and by SIGNIFICANCE field"""
@@ -584,14 +549,14 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         self._sort_sublists(controls_ordered_2),
     )
 
-  def test_filter_control_by_fraud_related(self):
-    """Test correct filtering by fraud_related field"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["fraud related", "=", "yes"]),
-        "Control",
+  def test_filter_risk_by_threat_event(self):
+    """Test correct filtering by threat_event field"""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk",
+                              expression=["threat_event", "=", "yes"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 2)
+    self.assertEqual(risks["count"], 2)
 
   def test_order_control_by_fraud_related(self):
     """Test correct ordering and by fraud_related field"""
@@ -613,53 +578,47 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
         self._sort_sublists(controls_ordered_2),
     )
 
-  def test_filter_control_by_assertions(self):
-    """Test correct filtering by assertions field"""
-    controls = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              expression=["assertions", "=", "privacy"]),
-        "Control",
+  def test_filter_risk_by_risk_type(self):
+    """Test correct filtering by risk_type field"""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk",
+                              expression=["risk_type", "=", "privacy"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 3)
+    self.assertEqual(risks["count"], 3)
 
   @ddt.data("assertions", "categories")
   def test_order_control_by_category(self, key):
-    """Test correct ordering and by category."""
+    """Test correct ordering by {}."""
+    with factories.single_commit():
+      for val in ("a", "b", "c"):
+        factories.ControlFactory(**{key: '["{}"]'.format(val)})
+
     controls_unordered = self._get_first_result_set(
         self._make_query_dict("Control",),
-        "Control", "values"
+        "Control",
+        "values"
     )
-
     controls_ordered_1 = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": key},
-                                        {"name": "id"}]),
-        "Control", "values"
+        self._make_query_dict("Control", order_by=[{"name": key}]),
+        "Control",
+        "values"
     )
-    categories = {c.id: c.name for c in models.CategoryBase.query}
-
-    def sort_key(val):
-      """Util sort key function."""
-      ctrl_key = val.get(key)
-      if isinstance(ctrl_key, list) and ctrl_key:
-        return (categories.get(ctrl_key[0]["id"]), val["id"])
-      return (None, val["id"])
-
-    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    controls_ordered_2 = sorted(controls_unordered, key=lambda c: c.get(key))
     self.assertListEqual(
         self._sort_sublists(controls_ordered_1),
         self._sort_sublists(controls_ordered_2),
     )
 
-  def test_filter_control_by_categories(self):
-    """Test correct filtering by categories field"""
-    controls = self._get_first_result_set(
+  def test_filter_risk_by_threat_source(self):
+    """Test correct filtering by threat_source field"""
+    risks = self._get_first_result_set(
         self._make_query_dict(
-            "Control",
-            expression=["categories", "=", "Physical Security"]),
-        "Control",
+            "Risk",
+            expression=["threat_source", "=", "Corrective"]),
+        "Risk",
     )
-    self.assertEqual(controls["count"], 3)
+    self.assertEqual(risks["count"], 3)
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
@@ -794,17 +753,35 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
   @ddt.unpack
   def test_search_relevant_to_type(self, base_type, relevant_types):
     """Test filter with 'relevant to' conditions."""
-    _, base_obj = self.generator.generate_object(base_type)
-    relevant_objects = [
-        self.generator.generate_object(type_)[1]
-        for type_ in relevant_types
-    ]
+    if issubclass(base_type, Synchronizable):
+      with self.generator.api.as_external():
+        _, base_obj = self.generator.generate_object(base_type)
+    else:
+      _, base_obj = self.generator.generate_object(base_type)
+
+    relevant_objects = []
+    for type_ in relevant_types:
+      if issubclass(type_, Synchronizable):
+        with self.generator.api.as_external():
+          obj = self.generator.generate_object(type_)[1]
+      else:
+        obj = self.generator.generate_object(type_)[1]
+
+      relevant_objects.append(obj)
 
     with factories.single_commit():
       query_data = []
       for relevant_obj in relevant_objects:
-        factories.RelationshipFactory(source=base_obj,
-                                      destination=relevant_obj)
+        if base_type is all_models.Control and isinstance(relevant_obj,
+                                                          all_models.Market):
+          with mock.patch('ggrc.models.relationship.is_external_app_user',
+                          return_value=True):
+            factories.RelationshipFactory(source=base_obj,
+                                          destination=relevant_obj,
+                                          is_external=True)
+        else:
+          factories.RelationshipFactory(source=base_obj,
+                                        destination=relevant_obj)
 
         query_data.append(self._make_query_dict(
             relevant_obj.type,
@@ -867,10 +844,15 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     audit_data = {"audit": {"id": audit.id}}
 
     _, base_obj = self.generator.generate_object(base_type, audit_data)
-    relevant_objects = [
-        self.generator.generate_object(type_, audit_data)[1]
-        for type_ in relevant_types
-    ]
+    relevant_objects = []
+    for type_ in relevant_types:
+      if issubclass(type_, Synchronizable):
+        with self.generator.api.as_external():
+          obj = self.generator.generate_object(type_, audit_data)[1]
+      else:
+        obj = self.generator.generate_object(type_, audit_data)[1]
+
+      relevant_objects.append(obj)
 
     with factories.single_commit():
       query_data = []
@@ -943,14 +925,11 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     self._generate_special_assessments()
-    self.import_file("sorting_assessment_with_ca_setup.csv")
     self.client.get("/login")
 
   @staticmethod
   def _generate_special_assessments():
     """Generate two Assessments for two local CADs with same name."""
-    assessment_with_date = None
-    assessment_with_text = None
     audit = factories.AuditFactory(
         slug="audit"
     )
@@ -964,20 +943,42 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
         slug="ASMT-SPECIAL-TEXT",
         audit=audit,
     )
-    # local CADs for the Assessments
-    for title in ["Date or arbitrary text", "Date or text styled as date"]:
-      factories.CustomAttributeDefinitionFactory(
-          title=title,
-          definition_type="assessment",
-          definition_id=assessment_with_date.id,
-          attribute_type="Date",
-      )
-      factories.CustomAttributeDefinitionFactory(
-          title=title,
-          definition_type="assessment",
-          definition_id=assessment_with_text.id,
-          attribute_type="Text",
-      )
+    cad_with_date_1 = factories.CustomAttributeDefinitionFactory(
+        title="Date or arbitrary text",
+        definition_type="assessment",
+        definition_id=assessment_with_date.id,
+        attribute_type="Date",
+    )
+    cad_with_text_1 = factories.CustomAttributeDefinitionFactory(
+        title="Date or arbitrary text",
+        definition_type="assessment",
+        definition_id=assessment_with_text.id,
+        attribute_type="Text",
+    )
+    cad_with_date_2 = factories.CustomAttributeDefinitionFactory(
+        title="Date or text styled as date",
+        definition_type="assessment",
+        definition_id=assessment_with_date.id,
+        attribute_type="Date",
+    )
+    cad_with_text_2 = factories.CustomAttributeDefinitionFactory(
+        title="Date or text styled as date",
+        definition_type="assessment",
+        definition_id=assessment_with_text.id,
+        attribute_type="Text",
+    )
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_date_1,
+                                          attributable=assessment_with_date,
+                                          attribute_value="10/31/2016")
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_text_1,
+                                          attributable=assessment_with_text,
+                                          attribute_value="Some text 2016")
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_date_2,
+                                          attributable=assessment_with_date,
+                                          attribute_value="11/09/2016")
+    factories.CustomAttributeValueFactory(custom_attribute=cad_with_text_2,
+                                          attributable=assessment_with_text,
+                                          attribute_value="11/09/2016")
 
   # pylint: disable=invalid-name
   def test_ca_query_different_types_local_ca(self):
@@ -1208,6 +1209,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
     return data
 
+  # pylint: disable=arguments-differ
   def _get_first_result_set(self, *args, **kwargs):
     """Call this method from super and flatten CAVs additionally."""
     return self._flatten_cav(

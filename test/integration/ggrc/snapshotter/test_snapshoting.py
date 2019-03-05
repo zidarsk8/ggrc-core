@@ -4,6 +4,7 @@
 """Test for snapshoter"""
 
 import collections
+import mock
 
 import sqlalchemy as sa
 
@@ -96,9 +97,10 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     control = self.refresh_object(control)
 
-    self.api.modify_object(control, {
-        "title": "Test Control Snapshot 1 EDIT 1"
-    })
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 EDIT 1"
+      })
 
     self.create_object(models.Audit, {
         "title": "Snapshotable audit",
@@ -160,9 +162,10 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     control = self.refresh_object(control)
 
-    self.api.modify_object(control, {
-        "title": "Test Control Snapshot 1 EDIT 1"
-    })
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 EDIT 1"
+      })
 
     self.create_audit(program)
 
@@ -190,9 +193,10 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self.create_mapping(objective, control)
 
     control = self.refresh_object(control)
-    self.api.modify_object(control, {
-        "title": "Test Control Snapshot 1 Edit 2 AFTER initial snapshot"
-    })
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 Edit 2 AFTER initial snapshot"
+      })
 
     audit = self.refresh_object(audit)
     # Initiate update operation
@@ -271,9 +275,10 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     control = self.refresh_object(control)
     for x in xrange(1, 4):
-      self.api.modify_object(control, {
-          "title": "Test Control Snapshot 1 EDIT {}".format(x)
-      })
+      with self.api.as_external():
+        self.api.put(control, {
+            "title": "Test Control Snapshot 1 EDIT {}".format(x)
+        })
 
     self.create_object(models.Audit, {
         "title": "Snapshotable audit",
@@ -358,15 +363,18 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     ).one()
     val2 = models.CustomAttributeValue(attribute_value="CA value 1",
                                        custom_attribute=cad2)
-    self.api.modify_object(control, {
-        "custom_attribute_values": [{
-            "attributable_id": control.id,
-            "attributable_type": "Assessment",
-            "id": val2.id,
-            "custom_attribute_id": cad2.id,
-            "attribute_value": "CA value 1 EDIT 1",
-        }]
-    })
+
+    with self.api.as_external():
+      self.api.put(control, {
+          "custom_attribute_values": [{
+              "attributable_id": control.id,
+              "attributable_type": "Assessment",
+              "id": val2.id,
+              "custom_attribute_id": cad2.id,
+              "attribute_value": "CA value 1 EDIT 1",
+          }]
+      })
+
     control_snapshot = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_type == "Control",
         models.Snapshot.child_id == control.id
@@ -435,9 +443,10 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         2)
 
     control = self.refresh_object(control)
-    self.api.modify_object(control, {
-        "title": "Test Control Snapshot 1 EDIT 1"
-    })
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 EDIT 1"
+      })
 
     data_asset = self.refresh_object(data_asset)
     self.api.modify_object(data_asset, {
@@ -500,9 +509,11 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self.create_audit(program)
 
     control = self.refresh_object(control)
-    self.api.modify_object(control, {
-        "title": "Test Control Snapshot 1 EDIT 1"
-    })
+
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 EDIT 1"
+      })
 
     control_snapshot = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_type == "Control",
@@ -547,7 +558,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     # Verify that all objects got imported correctly.
-    for _type in Types.all:
+    for _type in Types.all - Types.external:
       self.assertEqual(
           db.session.query(getattr(models.all_models, _type)).count(),
           3)
@@ -566,14 +577,15 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Snapshot.parent_id == audit.id,
     )
 
-    self.assertEqual(snapshots.count(), len(Types.all) * 3)
+    self.assertEqual(snapshots.count(),
+                     (len(Types.all - Types.external)) * 3)
 
     type_count = collections.defaultdict(int)
     for snapshot in snapshots:
       type_count[snapshot.child_type] += 1
 
     missing_types = set()
-    for snapshottable_type in Types.all:
+    for snapshottable_type in Types.all - Types.external:
       if type_count[snapshottable_type] != 3:
         missing_types.add(snapshottable_type)
 
@@ -597,7 +609,8 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Snapshot.parent_id == audit.id,
     )
 
-    self.assertEqual(snapshots.count(), len(Types.all) * 3)
+    self.assertEqual(snapshots.count(),
+                     (len(Types.all) - len(Types.external)) * 3)
 
     audit = self.refresh_object(audit)
     self.api.modify_object(audit, {
@@ -623,13 +636,18 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     total_reg_count = 5
     unmapped_reg_count = 2
     with factories.single_commit():
-      program = factories.ProgramFactory()
-      control = factories.ControlFactory()
-      factories.RelationshipFactory(source=control, destination=program)
-      for _ in xrange(total_reg_count):
-        regulation = factories.RegulationFactory()
-        factories.RelationshipFactory(source=control, destination=regulation)
-        factories.RelationshipFactory(source=regulation, destination=program)
+      with mock.patch('ggrc.models.relationship.is_external_app_user',
+                      return_value=True):
+        program = factories.ProgramFactory()
+        control = factories.ControlFactory()
+        factories.RelationshipFactory(source=control, destination=program,
+                                      is_external=True)
+        for _ in xrange(total_reg_count):
+          regulation = factories.RegulationFactory()
+          factories.RelationshipFactory(source=control, destination=regulation,
+                                        is_external=True)
+          factories.RelationshipFactory(source=regulation, destination=program,
+                                        is_external=True)
 
     audit = self.create_audit(program)
 
@@ -639,15 +657,17 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     ).all()
     removed_reg_rels = []
     keep_reg_rels = []
-    for num, rel in enumerate(rels):
-      if num < unmapped_reg_count:
-        # We know that source is the same Control
-        removed_reg_rels.append((rel.destination_type, rel.destination_id))
-        # Unmap Regulation object from Control
-        db.session.delete(rel)
-      else:
-        keep_reg_rels.append((rel.destination_type, rel.destination_id))
-    db.session.commit()
+    with mock.patch('ggrc.models.relationship.is_external_app_user',
+                    return_value=True):
+      for num, rel in enumerate(rels):
+        if num < unmapped_reg_count:
+          # We know that source is the same Control
+          removed_reg_rels.append((rel.destination_type, rel.destination_id))
+          # Unmap Regulation object from Control
+          db.session.delete(rel)
+        else:
+          keep_reg_rels.append((rel.destination_type, rel.destination_id))
+      db.session.commit()
 
     snap_mappings = self.collect_snapshot_mappings(removed_reg_rels)
     self.assertEqual(snap_mappings.count(), unmapped_reg_count)
