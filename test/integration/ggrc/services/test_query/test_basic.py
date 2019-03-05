@@ -1494,3 +1494,33 @@ class TestFilteringAttributes(WithQueryApi, TestCase):
     )
 
     self.assertEqual(len(revisions), 1)
+
+
+@ddt.ddt
+class TestQueryWithSpecialChars(TestCase, WithQueryApi):
+  """Test query API with _ and % chars."""
+
+  @classmethod
+  def setUpClass(cls):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    cls.response = cls._import_file("risk_special_chars_in_description.csv")
+
+  def setUp(self):
+    self.client.get("/login")
+    self._check_csv_response(self.response, {})
+
+  @ddt.data(
+      ("description", "5_", 1),
+      ("description", "5%", 1),
+      ("description", "5", 3),
+  )
+  @ddt.unpack
+  def test_query(self, param, text, count):
+    """Test query by unicode value."""
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk", expression=[param, "~", text]),
+        "Risk",
+    )
+
+    self.assertEqual(risks["count"], count)
