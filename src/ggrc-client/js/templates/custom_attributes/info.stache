@@ -24,6 +24,7 @@
             with-read-more="true">
               <base-inline-control-title
                 {title}="title"
+                {instance}="instance"
                 {edit-mode}="editMode"
                 {redirection-enabled}="redirectionEnabled"
                 {is-edit-icon-denied}="isEditIconDenied"
