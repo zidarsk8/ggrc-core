@@ -28,11 +28,18 @@ class IssueTracked(object):
 
   def __init__(self, *args, **kwargs):
     super(IssueTracked, self).__init__(*args, **kwargs)
-    self._warnings = []
+    self.init_on_load()
 
   @orm.reconstructor
   def init_on_load(self):
+    """Init object when it is fetched from DB
+
+    SQLAlchemy doesn't call __init__() for objects from DB
+    """
+
     self._warnings = []
+    self.is_import = False
+    self.issue_tracker_to_import = dict()
 
   @declared_attr
   def issuetracker_issue(cls):  # pylint: disable=no-self-argument
