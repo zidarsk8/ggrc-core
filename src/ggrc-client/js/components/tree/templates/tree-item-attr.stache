@@ -30,7 +30,11 @@
   {{/case}}
 
   {{#case 'kind'}}
-    {{firstnonempty instance.kindTitle instance.kind}}
+    {{#if_instance_of instance 'Document|Evidence'}}
+      {{instance.kindTitle}}
+    {{else}}
+      {{instance.kind}}
+    {{/if_instance_of}}
   {{/case}}
 
   {{#case 'type'}}
