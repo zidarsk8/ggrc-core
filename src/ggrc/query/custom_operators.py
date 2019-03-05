@@ -94,6 +94,7 @@ def build_op_shortcut(predicate):
 def like(left, right):
   """Handle ~ operator with SQL LIKE."""
   def escape(like_str):
+    # pylint: disable=anomalous-backslash-in-string
     """Escape special characters in LIKE string content"""
     return like_str.replace(u'_', u'\_').replace(u'%', u'\%')
   return left.ilike(u"%{}%".format(escape(right)))
