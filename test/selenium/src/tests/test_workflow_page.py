@@ -159,6 +159,7 @@ class TestWorkflowSetupTab(base.Test):
     actual_tasks = workflow_ui_facade.get_task_group_tasks_objs()
     test_utils.list_obj_assert(actual_tasks, [task])
 
+  @pytest.mark.xfail(raises=AssertionError)
   def test_add_obj_to_task_group(
       self, app_workflow, app_task_group, app_control, selenium
   ):
@@ -330,6 +331,7 @@ class TestActivateWorkflow(base.Test):
 class TestActiveCyclesTab(base.Test):
   """Test Active Cycles tab."""
 
+  @pytest.mark.xfail(raises=AttributeError)
   def test_map_obj_to_cycle_task(
       self, activated_workflow, app_control, selenium
   ):

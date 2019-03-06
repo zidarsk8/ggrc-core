@@ -11,9 +11,6 @@ from lib.constants import roles, object_states
 from lib.service import rest_facade, proposal_ui_facade, proposal_rest_service
 
 
-pytestmark = pytest.mark.skip("Need controls to turn to risks.")
-
-
 class TestProposals(base.Test):
   """Tests for Proposals"""
   _data = None
