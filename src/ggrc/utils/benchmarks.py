@@ -13,11 +13,12 @@ in ``DEBUG`` level within ``settings`` module:
     }
 
 """
-
+import collections
+import contextlib
+import heapq
 import inspect
 import logging
 import time
-from collections import defaultdict
 
 from ggrc import settings
 
@@ -75,8 +76,8 @@ class DebugBenchmark(object):
   PRINT_FORM = ("sum: {sum:>9.5f}  - count: {count:>10.5f}  - avg {avg:8.5f}"
                 " - max: {max:8.5f}  - min: {min:8.5f}  - {message}")
 
-  _stats = defaultdict(lambda: defaultdict(float))
-  _all_stats = defaultdict(lambda: defaultdict(float))
+  _stats = collections.defaultdict(lambda: collections.defaultdict(float))
+  _all_stats = collections.defaultdict(lambda: collections.defaultdict(float))
 
   STATS = {
       "all": _all_stats,
@@ -205,3 +206,29 @@ def get_benchmark():
     return DebugBenchmark
   else:
     return BenchmarkContextManager
+
+
+class BenchmarkLongestManager(object):
+  """This class allows to get top N longest operations."""
+
+  def __init__(self, max_operation_count=10):
+    self.max_operation_count = max_operation_count
+    self.operations = []
+
+  @contextlib.contextmanager
+  def benchmark(self, message):
+    """Context manager for measuring execution time of some functions."""
+    start = time.time()
+    try:
+      yield
+    finally:
+      exec_time = time.time() - start
+      if len(self.operations) < self.max_operation_count:
+        heapq.heappush(self.operations, (exec_time, message))
+      else:
+        heapq.heappushpop(self.operations, (exec_time, message))
+
+  def print_benchmaks(self):
+    """Print collected benchmark information."""
+    for exec_time, message in self.operations:
+      logger.debug("%.4f %s", exec_time, message)
