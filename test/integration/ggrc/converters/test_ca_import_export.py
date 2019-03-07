@@ -54,9 +54,6 @@ class TestCustomAttributeImportExport(TestCase):
         options=u"a,b,c,\u017e", helptext="Your favorite number.")
     gen("product", attribute_type="Dropdown", title="man select",
         options="e,f,g", mandatory=True)
-    gen("product", attribute_type="Map:Person", title="normal person")
-    gen("product", attribute_type="Map:Person", title="man person",
-        mandatory=True)
 
     gen("access_group", attribute_type="Text",
         title="access group test custom", mandatory=True)
@@ -112,22 +109,14 @@ class TestCustomAttributeImportExport(TestCase):
         "Line 16: Field 'man Date' is required. The line will be ignored.",
         "Line 18: Field 'man RT' is required. The line will be ignored.",
         "Line 20: Field 'man text' is required. The line will be ignored.",
-        "Line 21: Field 'man person' is required. The line will be ignored.",
         "Line 28: Field 'Title' is required. The line will be ignored."
     }
 
     self.assertEqual(expected_warnings, set(response["row_warnings"]))
     self.assertEqual(expected_errors, set(response["row_errors"]))
-    self.assertEqual(17, response["created"])
-    self.assertEqual(9, response["ignored"])
-    self.assertEqual(17, Product.query.count())
-
-    product10 = Product.query.filter_by(slug="prod10").first()
-    people_emails = {cav.attribute_object.email
-                     for cav in product10.custom_attribute_values
-                     if cav.custom_attribute.attribute_type == "Map:Person"}
-
-    self.assertEqual(people_emails, {"user1@ggrc.com", "user@example.com"})
+    self.assertEqual(18, response["created"])
+    self.assertEqual(8, response["ignored"])
+    self.assertEqual(18, Product.query.count())
 
   def test_product_ca_import_update(self):
     """Test updating of product with all custom attributes.
@@ -151,18 +140,10 @@ class TestCustomAttributeImportExport(TestCase):
         u"man CH": u"0",
         u"normal select": u"\u017e",
         u"man select": u"f",
-        u"normal person": u"Person",
-        u"man person": u"Person",
     }
     prod_0_new = {c.custom_attribute.title: c.attribute_value
                   for c in prod_0.custom_attribute_values}
     self.assertEqual(prod_0_expected, prod_0_new)
-
-    people_emails = {cav.attribute_object.email
-                     for cav in prod_0.custom_attribute_values
-                     if cav.custom_attribute.attribute_type == "Map:Person"}
-
-    self.assertEqual(people_emails, {"user@example.com", "user@example.com"})
 
   def tests_ca_export(self):
     """Test exporting products with custom attributes
@@ -193,11 +174,9 @@ class TestCustomAttributeImportExport(TestCase):
         "man CH*",
         "normal select",
         "man select*",
-        "normal person",
-        "man person*",
     }
     result = self.export_parsed_csv(data)["Product"]
-    self.assertEqual(len(result), 17)
+    self.assertEqual(len(result), 18)
     for res in result:
       self.assertTrue(
           expected_custom_attributes.issubset(set(res.iterkeys()))
