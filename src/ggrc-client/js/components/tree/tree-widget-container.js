@@ -730,5 +730,14 @@ export default can.Component.extend({
       this.viewModel.closeInfoPane();
       this.viewModel.loadItems();
     },
+    '{viewModel.parent_instance} displayTree'(scope, event) {
+      const {viewModel} = this;
+      const currentModelName = viewModel.attr('model').model_singular;
+
+      if (currentModelName === event.destinationType) {
+        const forceRefresh = true;
+        viewModel.display(forceRefresh);
+      }
+    },
   },
 });
