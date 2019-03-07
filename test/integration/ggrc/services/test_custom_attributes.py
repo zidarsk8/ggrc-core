@@ -315,7 +315,6 @@ class TestGlobalCustomAttributes(ProductTestCase):
       (all_models.CustomAttributeDefinition.ValidTypes.DROPDOWN, ""),
       (all_models.CustomAttributeDefinition.ValidTypes.CHECKBOX, "0"),
       (all_models.CustomAttributeDefinition.ValidTypes.DATE, ""),
-      ("Map:Person", None),
   )
   @ddt.unpack
   def test_get_cad_default(self, cad_type, default_value):
