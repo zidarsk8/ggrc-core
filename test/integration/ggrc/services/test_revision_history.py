@@ -180,9 +180,9 @@ class TestRevisionHistory(TestCase):
     person = factories.PersonFactory()
     cad = factories.CustomAttributeDefinitionFactory(
         definition_type="control",
-        definition_id=None,
+        definition_id=self.control.id,
         attribute_type="Map:Person",
-        title="Global Person CA",
+        title="Local Person CA",
     )
     factories.CustomAttributeValueFactory(
         attributable=self.control,
