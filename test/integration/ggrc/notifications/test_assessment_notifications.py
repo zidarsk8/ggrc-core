@@ -69,17 +69,6 @@ class TestAssessmentNotification(TestCase):
         attributable=self.assessment
     )
 
-    self.cad2 = factories.CustomAttributeDefinitionFactory(
-        definition_type="assessment",
-        attribute_type="Map:Person",
-        title="ca2",
-    )
-    factories.CustomAttributeValueFactory(
-        custom_attribute=self.cad2,
-        attributable=self.assessment,
-        attribute_value='Person'
-    )
-
     self.cad3 = factories.CustomAttributeDefinitionFactory(
         definition_type="assessment",
         attribute_type="Checkbox",
@@ -158,23 +147,6 @@ class TestAssessmentNotification(TestCase):
         title="Test GCAD").first()
     self.assertEqual(
         [i.attribute_value for i in cad.attribute_values], ["test value"])
-
-  def test_person_attr_change(self):
-    """Test notification when person attribute value is changed"""
-    custom_attribute_values = [{
-        "custom_attribute_id": self.cad2.id,
-        "attribute_value": "Person:" + str(self.auditor.id),
-    }]
-    response = self.api.put(self.assessment, {
-        "custom_attribute_values": custom_attribute_values
-    })
-    self.assert200(response)
-
-    notifs, notif_data = common.get_daily_notifications()
-    updated = notif_data["user@example.com"]["assessment_updated"]
-    self.assertEqual(len(notifs), 1)
-    self.assertEqual(
-        updated[self.assessment.id]["updated_fields"], ["CA2"])
 
   def test_checkbox_attr_change(self):
     """Test notification when person attribute value is changed"""
