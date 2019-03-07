@@ -20,6 +20,7 @@ from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
+from ggrc.models.mixins import after_flush_handleable
 from ggrc import utils
 from ggrc.utils import errors
 from ggrc.utils import referenced_objects
@@ -30,7 +31,7 @@ logger = logging.getLogger(__name__)
 AclRecord = namedtuple("AclRecord", "person, acl_item")
 
 
-class Roleable(object):
+class Roleable(after_flush_handleable.AfterFlushHandleable):
   """Roleable Mixin
 
   Mixin that adds access_control_list property to the parent object. Access
@@ -250,6 +251,19 @@ class Roleable(object):
         )
     self.validate_role_limit()
 
+  def _check_mandatory_roles(self, _import=False):
+    validation_errors = []
+    for acl in self._access_control_list:
+      if acl.ac_role.mandatory and not acl.access_control_people:
+        message = "{} role must have at least one person assigned".format(
+            acl.ac_role.name
+        )
+        if _import:
+          validation_errors.append((_role, message))
+        else:
+          raise ValueError(message)
+    return validation_errors
+
   def validate_role_limit(self, _import=False):
     """Validate the number of roles assigned to object
 
@@ -258,7 +272,7 @@ class Roleable(object):
     """
     # This can now be fully refactored due to ACP, I am leaving this for the
     # end though.
-    validation_errors = []
+    validation_errors = self._check_mandatory_roles(_import=_import)
     count_roles = defaultdict(int)
     for _, acl in self.access_control_list:
       count_roles[acl.ac_role.name] += 1
@@ -316,3 +330,6 @@ class Roleable(object):
       )
       return
     acl.add_person(person)
+
+  def handle_after_flush(self):
+    pass
