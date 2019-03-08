@@ -265,13 +265,17 @@ class TestCustomAttributableMixin(TestCase):
   def test_adding_mapping_ca_dict(self):
     """Test adding mapping custom attribute values with a dict."""
     with factories.single_commit():
+      person = factories.PersonFactory()
+      prog = factories.ProgramFactory()
       cad1 = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
+          definition_id=prog.id,
           attribute_type="Map:Person",
           title="CA 1",
       )
       cad2 = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
+          definition_id=prog.id,
           attribute_type="Map:Person",
           title="CA 2",
       )
@@ -304,11 +308,12 @@ class TestCustomAttributableMixin(TestCase):
   def test_validate_ca_with_wrong_id(self):
     """Test adding custom "Map:Person" attribute with not existing Person."""
     with factories.single_commit():
+      program = factories.ProgramFactory()
       attribute_definition = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
+          definition_id=program.id,
           attribute_type="Map:Person"
       )
-      program = factories.ProgramFactory()
 
     program.custom_attribute_values = [
         {
@@ -323,39 +328,16 @@ class TestCustomAttributableMixin(TestCase):
       self.assertEqual(exception.exception.message,
                        'Person with 0 id not exists')
 
-  def test_validate_ca_with_empty_id(self):
-    """Test adding empty id to mandatory custom "Map:Person" attribute."""
-    with factories.single_commit():
-      attribute_definition = factories.CustomAttributeDefinitionFactory(
-          definition_type="program",
-          attribute_type="Map:Person",
-          title='Person',
-          mandatory=True
-      )
-      program = factories.ProgramFactory()
-
-    program.custom_attribute_values = [
-        {
-            "attribute_value": "Person",
-            "custom_attribute_id": attribute_definition.id,
-        }
-    ]
-
-    with self.assertRaises(ValueError) as exception:
-      program.validate_custom_attributes()
-
-      self.assertEqual(exception.exception.message,
-                       'Missing mandatory attribute: Person')
-
   def test_validate_empty_mapping_ca(self):
     """Test adding empty id non-mandatory custom "Map:Person" attribute."""
     with factories.single_commit():
+      program = factories.ProgramFactory()
       attribute_definition = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
+          definition_id=program.id,
           attribute_type="Map:Person",
           title='Person'
       )
-      program = factories.ProgramFactory()
 
     program.custom_attribute_values = [
         {
@@ -372,12 +354,13 @@ class TestCustomAttributableMixin(TestCase):
   def test_validate_invalid_type_ca(self):
     """Test adding invalid attribute type to custom "Map:Person" attribute."""
     with factories.single_commit():
+      program = factories.ProgramFactory()
       attribute_definition = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
+          definition_id=program.id,
           attribute_type="Map:Person",
           mandatory=True
       )
-      program = factories.ProgramFactory()
 
     program.custom_attribute_values = [
         {
