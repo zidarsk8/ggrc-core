@@ -122,7 +122,6 @@ class TestSnapshotQueryApi(TestCase):
         {"title": "CA rich text", "attribute_type": "Rich Text"},
         {"title": "CA date", "attribute_type": "Date"},
         {"title": "CA checkbox", "attribute_type": "Checkbox"},
-        {"title": "CA person", "attribute_type": "Map:Person"},
         {"title": "CA dropdown", "attribute_type": "Dropdown",
          "multi_choice_options": "one,two,three,four,five"},
     ]
@@ -152,7 +151,6 @@ class TestSnapshotQueryApi(TestCase):
               "CA rich text",
               "CA date",
               "CA checkbox",
-              "CA person",
               "CA dropdown"
           ])
       }
@@ -161,7 +159,6 @@ class TestSnapshotQueryApi(TestCase):
           "CA rich text": "control<br><br>\nrich text",
           "CA date": "22/02/2022",
           "CA checkbox": "yes",
-          "CA person": ca_person,
           "CA dropdown": "one"
       }
 
