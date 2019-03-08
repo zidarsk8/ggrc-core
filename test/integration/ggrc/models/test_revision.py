@@ -297,7 +297,6 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
       ("Dropdown", ""),
       ("Checkbox", "0"),
       ("Date", ""),
-      ("Map:Person", "Person"),
   )
   @ddt.unpack
   def test_revisions_with_empty_gcads(self, attribute_type, attribute_value):
@@ -310,7 +309,6 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
       ("Dropdown", ""),
       ("Checkbox", "0"),
       ("Date", ""),
-      ("Map:Person", "Person"),
   )
   @ddt.unpack
   def test_revisions_with_empty_lcads(self, attribute_type, attribute_value):
