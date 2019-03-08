@@ -131,6 +131,7 @@ class TestCADProposalsApi(base.BaseTestProposalApi):
       risk = factories.RiskFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
           definition_type="risk",
+          definition_id=risk.id,
           attribute_type="Map:Person"
       )
       person = factories.PersonFactory()
