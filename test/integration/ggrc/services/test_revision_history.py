@@ -40,7 +40,7 @@ class TestRevisionHistory(TestCase):
       factories.AccessControlRoleFactory(
           name="ACL_Editor",
           object_type="Control"
-      ),
+      )
 
     with factories.single_commit():
       self.control = factories.ControlFactory()

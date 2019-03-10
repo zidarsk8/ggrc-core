@@ -137,7 +137,6 @@ class TestSnapshotQueryApi(TestCase):
   def _create_external_object():
     """Populate external model object that could not be imported."""
     with factories.single_commit():
-      ca_person = factories.PersonFactory(email="user4@example.com")
       objects = [
           factories.ControlFactory(directive=None),
           factories.RiskFactory()
