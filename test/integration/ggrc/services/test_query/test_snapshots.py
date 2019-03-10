@@ -478,7 +478,8 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
                           for snap in order_by_nz_result["values"]],
                          [process_nz_core_id, process_nz_prod_id])
 
-  def _add_owner(self, ownable, person_id):
+  @classmethod
+  def _add_owner(cls, ownable, person_id):
     """Create ACL for provided object and person."""
     factories.AccessControlPersonFactory(
         ac_list=ownable.acr_name_acl_map["Admin"],

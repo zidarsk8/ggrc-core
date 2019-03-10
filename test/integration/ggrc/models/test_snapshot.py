@@ -134,10 +134,10 @@ class TestSnapshotQueryApi(TestCase):
               **args
           )
 
-  def _create_external_object(self):
+  @classmethod
+  def _create_external_object(cls):
     """Populate external model object that could not be imported."""
     with factories.single_commit():
-      ca_person = factories.PersonFactory(email="user4@example.com")
       control = factories.ControlFactory(
           slug="Control code",
           directive=None
