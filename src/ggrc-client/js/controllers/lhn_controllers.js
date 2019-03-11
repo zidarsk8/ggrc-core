@@ -442,7 +442,7 @@ const LhnSearchControl = can.Control.extend({
         this.options._hasPendingRefresh = true;
         return;
       }
-      modelNames = can.map(
+      modelNames = _.filteredMap(
         this.get_visible_lists(), this.proxy('get_list_model'));
       modelName = instance.constructor.model_singular;
 
@@ -829,8 +829,8 @@ const LhnSearchControl = can.Control.extend({
     }
 
 
-    models = can.map(this.get_lists(), this.proxy('get_list_model'));
-    extraModels = can.map(
+    models = _.filteredMap(this.get_lists(), this.proxy('get_list_model'));
+    extraModels = _.filteredMap(
       this.get_lists(), this.proxy('get_extra_list_model'));
 
     this.options._hasPendingRefresh = false;
@@ -848,14 +848,14 @@ const LhnSearchControl = can.Control.extend({
     let self = this;
     let searchId = this.search_id;
     let lists = this.get_visible_lists();
-    let models = can.map(lists, this.proxy('get_list_model'));
+    let models = _.filteredMap(lists, this.proxy('get_list_model'));
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
       return $.Deferred().resolve();
     }
 
-    models = can.map(models, function (modelName) {
+    models = _.filteredMap(models, (modelName) => {
       if (self.options.loaded_lists.indexOf(modelName) === -1) {
         return modelName;
       }
@@ -933,7 +933,7 @@ const LhnSearchControl = can.Control.extend({
   },
   get_visible_lists: function () {
     let self = this;
-    return can.map(this.get_lists(), function ($list) {
+    return _.filteredMap(this.get_lists(), ($list) => {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
         self.options.list_mid_level_selector].join(',')).hasClass('in')) {

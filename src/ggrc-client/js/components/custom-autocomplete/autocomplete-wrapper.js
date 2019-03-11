@@ -55,9 +55,8 @@ export default can.Map.extend({
     let ids = responseArr[objName].ids;
     let modelConstructor = this.attr('modelConstructor');
 
-    let res = can.map(ids, function (id) {
-      return getInstance(modelConstructor.model_singular, id);
-    });
+    let res = _.filteredMap(ids,
+      (id) => getInstance(modelConstructor.model_singular, id));
 
     return new $.Deferred().resolve(res);
   },

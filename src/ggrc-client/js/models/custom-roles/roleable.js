@@ -21,7 +21,7 @@ export default Cacheable.extend({
     // a list of objects in the Custom Roles widget.
     let types = _.orderBy(getRoleableModels(), 'category', false);
 
-    let instances = can.map(types, (type, i) => {
+    let instances = _.filteredMap(types, (type, i) => {
       let withId = Object.assign({}, type, {id: i});
       return new this(withId);
     });
