@@ -930,7 +930,12 @@ class Resource(ModelView):
           root_attribute))
 
     if 'context' not in src:
-      raise BadRequest('context MUST be specified.')
+      # context is obsolete functionality which is covered by ACL now.
+      # However, this functionality cannot be completely removed because
+      # it is deeply integrated into the code and requires too much effort
+      # to be removed for now. FE not always adds this field,
+      # but it is required by BE source code. So we add it with None value
+      src['context'] = None
 
     return src
 
