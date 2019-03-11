@@ -156,7 +156,7 @@ class ACLRolesIDsMetaClass(type):
 
   @property
   def REVIEWERS(cls):
-    return cls.id_of_role(object_type="Review", name="Reviewer")
+    return cls.id_of_role(object_type="Review", name="Reviewers")
 
 
 class ACLRolesIDs(object):
