@@ -1,9 +1,0 @@
-Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,
-Risk,code*,title*,description*,Risk Type*,admin*
-,risk-1,Special char _ in description,5_123,AAA,user@example.com
-Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,
-Risk,code*,title*,description*,Risk Type*,admin*
-,risk-2,No special chars in description,5123,AAA,user@example.com
-Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",,,
-Risk,code*,title*,description*,Risk Type*,admin*
-,risk-3,Special char % in description,5%123,AAA,user@example.com
