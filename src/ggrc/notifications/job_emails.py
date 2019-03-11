@@ -39,13 +39,6 @@ EXPORT_COMPLETED = {
     "url": u"export"
 }
 
-EXPORT_FAILED = {
-    "title": (u"[WARNING] Your GGRC export request did not finish due "
-              u"to errors"),
-    "body": u"Please follow the link to write to sheets or download .csv",
-    "url": u"export"
-}
-
 EXPORT_CRASHED = {
     "title": (u"[WARNING] Your GGRC export request did not finish due "
               u"to errors"),
