@@ -90,6 +90,7 @@ export default can.Component.extend({
           let instance = this.attr('parentInstance');
           let model = this.attr('model');
           return !this.attr('isSnapshots') &&
+            !model.isChangeableExternally &&
             (Permission.is_allowed(
               'update', model.model_singular, instance.context)
               || isAuditor(instance, GGRC.current_user));

@@ -128,6 +128,16 @@ describe('tree-actions component', () => {
       expect(vm.attr('showImport')).toBeFalsy();
     });
 
+    it('returns false for model_singular: Control', () => {
+      vm.attr('model', {
+        model_singular: 'Control',
+        isChangeableExternally: true,
+      });
+      spyOn(Permission, 'is_allowed').and.returnValue(true);
+
+      expect(vm.attr('showImport')).toBeFalsy();
+    });
+
     it(`returns false when user does not have update permissions
       and is not auditor`, () => {
       spyOn(Permission, 'is_allowed').and.returnValue(false);
