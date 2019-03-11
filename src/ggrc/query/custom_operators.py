@@ -96,7 +96,7 @@ def like(left, right):
   def escape(like_str):
     # pylint: disable=anomalous-backslash-in-string
     """Escape special characters in LIKE string content"""
-    return like_str.replace(u'_', u'\_').replace(u'%', u'\%')
+    return like_str.replace(u'\\', u'\\\\').replace(u'_', u'\_').replace(u'%', u'\%')
   return left.ilike(u"%{}%".format(escape(right)))
 
 
