@@ -15,6 +15,7 @@ import Person from '../../models/business-models/person';
 import Snapshot from '../../models/service-models/snapshot';
 import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
+import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -211,12 +212,10 @@ export default can.Component.extend({
           return instance.save();
         })
         .then(function () {
-          let forceRefresh = true;
-
-          return $('tree-widget-container:visible')
-            .first()
-            .viewModel()
-            .display(forceRefresh);
+          return getPageInstance().dispatch({
+            type: 'displayTree',
+            destinationType: instance.child_type,
+          });
         })
         .then(function () {
           let message = instance.child_type +
