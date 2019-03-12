@@ -25,4 +25,4 @@ def upgrade():
 
 def downgrade():
     """Downgrade database schema and/or data back to the previous revision."""
-    ${downgrades if downgrades else ""}
+    raise NotImplementedError("Downgrade is not supported")
