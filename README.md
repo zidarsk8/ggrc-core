@@ -149,6 +149,15 @@ need to debug an issue in the Chrome browser. For performance reasons
 `run_karma_chrome` does not automatically build assets, so make sure you do it
 manually by running `build_assets`.
 
+##### Measure test coverage
+
+```sh
+test_coverage run # To measure JavaScript test coverage
+test_coverage clean # To remove coverage report
+```
+
+`test_coverage run` will generate coverage report at `coverage/index.html`
+
 #### For Python tests:
 
 ```sh
