@@ -1496,12 +1496,13 @@ class TestQueryWithSpecialChars(TestCase, WithQueryApi):
   def setUp(self):
     super(TestQueryWithSpecialChars, self).setUp()
     self.client.get("/login")
-    factories.RiskFactory(description=r"1235_123")
-    factories.RiskFactory(description=r"1235123")
-    factories.RiskFactory(description=r"1235%123")
-    factories.RiskFactory(description=r"123\5123")
-    factories.RiskFactory(description=r'1235"123')
-    factories.RiskFactory(description=r"123325\123")
+    with factories.single_commit():
+      factories.RiskFactory(description=r"1235_123")
+      factories.RiskFactory(description=r"1235123")
+      factories.RiskFactory(description=r"1235%123")
+      factories.RiskFactory(description=r"123\5123")
+      factories.RiskFactory(description=r'1235"123')
+      factories.RiskFactory(description=r"123325\123")
 
   @ddt.data(
       ("description", r"\5", 1),
