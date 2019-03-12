@@ -216,7 +216,6 @@ class TestCollectionPost(TestCase):
     self.assert200(response)
     relationships = models.Relationship.eager_query().all()
     self.assertEqual(len(relationships), 3)  # This should be 2
-    rel1 = relationships[0]
 
   def test_post_person_modified_by(self):
     """Test Person POST on modified_by issue.
@@ -248,3 +247,18 @@ class TestCollectionPost(TestCase):
     self.assertEqual(admin.updated_at, old_update_at)
     self.assertIsNone(admin.modified_by)
     self.assertEqual(new_user.modified_by_id, admin.id)
+
+  def test_post_without_context(self):
+    """Test object creation without context key in dict"""
+
+    data = json.dumps(
+        {'services_test_mock_model': {'foo': 'bar'}},
+    )
+    self.client.get("/login")
+    response = self.client.post(
+        self.mock_url(),
+        content_type='application/json',
+        data=data,
+        headers=self.get_headers(),
+    )
+    self.assertStatus(response, 201)
