@@ -77,7 +77,7 @@ export default can.Component.extend({
      * is normalized into "2, 3" (10b, 11b).
      */
     normalizeMandatory: function (attrs) {
-      return can.map(attrs, ddValidationMapToValue).join(',');
+      return _.filteredMap(attrs, ddValidationMapToValue).join(',');
     },
   },
   events: {

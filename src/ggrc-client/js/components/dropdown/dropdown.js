@@ -33,15 +33,17 @@ export default can.Component.extend({
             }];
           let list = [];
           if (!isGroupedDropdown) {
-            list = can.map(this.attr('optionsList') || [], function (option) {
-              if (_.isString(option)) {
-                return {
-                  value: option,
-                  title: option,
-                };
+            list = _.filteredMap(
+              this.attr('optionsList') || [], (option) => {
+                if (_.isString(option)) {
+                  return {
+                    value: option,
+                    title: option,
+                  };
+                }
+                return option;
               }
-              return option;
-            });
+            );
           } else {
             list = can.Map.keys(optionsGroups).map(function (key) {
               let group = optionsGroups.attr(key);
