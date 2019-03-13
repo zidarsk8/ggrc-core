@@ -4,8 +4,9 @@
 import copy
 import re
 
-from lib import users, base, decorator
+from lib import url, users, base, decorator
 from lib.constants import objects, element
+from lib.page import dashboard
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
 from lib.service.webui_service import ControlsService
@@ -23,6 +24,13 @@ def create_control_in_program_scope(selenium, program):
   control = entities_factory.ControlsFactory().create()
   controls_service.submit_obj_modal(control)
   return control
+
+
+def open_create_obj_modal(obj_type):
+  """Opens create object modal for selected type."""
+  selenium_utils.open_url(url.dashboard())
+  obj_modal = dashboard.Dashboard().open_create_obj_modal(obj_type=obj_type)
+  return obj_modal
 
 
 def create_asmt(selenium, audit):
