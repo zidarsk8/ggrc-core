@@ -32,7 +32,6 @@ class TestSnapshotQueryApi(TestCase):
       "kind_id",
 
       "means",
-      "means_id",
 
       "meta_kind",
 
@@ -41,11 +40,6 @@ class TestSnapshotQueryApi(TestCase):
 
       "verify_frequency",
       "verify_frequency_id",
-
-      "assertions",
-      "categories",
-      "categorizations",
-      "categorized_assertions",
 
       # special fields not needed for snapshots.
       "display_name",
@@ -86,9 +80,12 @@ class TestSnapshotQueryApi(TestCase):
       "contact_id",
       "secondary_contact_id",
 
+      "created_by_id",
       "modified_by_id",
 
       "attribute_object_id",
+      "last_submitted_by",
+      "last_verified_by",
 
       # revisions require complete data for documents,
       # while api returns only basic data in stubs
@@ -106,11 +103,12 @@ class TestSnapshotQueryApi(TestCase):
     """Set up test cases for all tests."""
     super(TestSnapshotQueryApi, self).setUp()
     self._create_cas()
+    self._create_external_object()
     self.import_file("all_snapshottable_objects.csv")
 
-  @staticmethod
-  def _create_cas():
+  def _create_cas(self):
     """Create custom attribute definitions."""
+    self._ca_objects = {}
     ca_model_names = [
         "facility",
         "control",
@@ -136,6 +134,42 @@ class TestSnapshotQueryApi(TestCase):
               definition_type=type_,
               **args
           )
+
+  def _create_external_object(self):
+    """Populate external model object that could not be imported."""
+    with factories.single_commit():
+      ca_person = factories.PersonFactory(email="user4@example.com")
+      control = factories.ControlFactory(
+          slug="Control code",
+          directive=None
+      )
+
+      ca_definitions = {
+          cad.title: cad
+          for cad in control.get_custom_attribute_definitions([
+              "CA text",
+              "CA rich text",
+              "CA date",
+              "CA checkbox",
+              "CA person",
+              "CA dropdown"
+          ])
+      }
+      ca_values = {
+          "CA text": "Control ca text",
+          "CA rich text": "control<br><br>\nrich text",
+          "CA date": "22/02/2022",
+          "CA checkbox": "yes",
+          "CA person": ca_person,
+          "CA dropdown": "one"
+      }
+
+      for title, value in ca_values.items():
+        factories.CustomAttributeValueFactory(
+            custom_attribute=ca_definitions[title],
+            attributable=control,
+            attribute_value=value
+        )
 
   def test_revision_content(self):
     """Test that revision contains all content needed."""
@@ -194,7 +228,8 @@ class TestSnapshotQueryApi(TestCase):
 
     The content in the revision (that is set by log_json) must match closely to
     what the api returns for a get request. This ensures that when a model is
-    created from a snapshot on the fronend, it will have all the needed fields.
+    created from a snapshot on the frontend, it will have all the needed
+    fields.
     """
     self.client.get("/login")
     test_models = get_snapshottable_models()

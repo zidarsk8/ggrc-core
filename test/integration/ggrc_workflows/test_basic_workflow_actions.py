@@ -447,8 +447,8 @@ class TestBasicWorkflowActions(TestCase):
 
     cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
         Cycle).join(Workflow).filter(Workflow.id == wflow.id).all()
-    with freeze_time("2015-6-9 13:00:00"):
-      today = dtm.datetime.now()
+    with freeze_time("2015-6-9"):
+      today = dtm.date.today()
       transitions = [
           ("In Progress", None, None),
           ("Finished", today, None),

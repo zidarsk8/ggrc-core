@@ -13,19 +13,18 @@
 
 .action-toolbar-container {
   @include action-toolbar-controls;
-
-  .read-more__controls {
-    position: absolute;
-    bottom: -30px;
-  }
 }
 
 .action-toolbar {
   position: relative;
   display: flex;
-  min-width: 0;
 
   @include action-toolbar-controls;
+
+  & &__header {
+    padding: 0;
+    line-height: 28px;
+  }
 
   &__controls {
     display: none;
@@ -39,40 +38,7 @@
   }
 
   &__controls-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-    width: 28px;
-    border-radius: 50%;
-    background: #444;
-    cursor: pointer;
+    @extend %editable-control-item;
     margin: 0 0 0 8px;
-
-    &:hover {
-      background: darken(#444, 10%);
-    }
-
-    &-disabled {
-      opacity: 0.25;
-
-      &:hover {
-        background: #444;
-        box-shadow: none;
-      }
-    }
-
-    .fa {
-      color: $white;
-      font-size: 18px;
-      height: 28px;
-      line-height: 28px;
-      width: 28px;
-      display: inline-flex;
-      justify-content: center;
-      align-self: center;
-      align-items: center;
-      text-align: center;
-    }
   }
 }

@@ -14,7 +14,7 @@ from ggrc import db
 from ggrc.models.hooks import assessment
 from ggrc.services import signals
 from ggrc.models import all_models
-from ggrc.models.comment import Commentable
+from ggrc.models.comment import Commentable, ExternalCommentable
 from ggrc.models.mixins.base import ChangeTracked
 from ggrc.models import exceptions
 
@@ -300,6 +300,14 @@ def copy_snapshot_test_plan(objects):
         assessment.copy_snapshot_plan(asmnt, snapshot)
 
 
+def delete_comment_notification(comment):
+  """Remove notification for external model comments."""
+  all_models.Notification.query.filter(
+      all_models.Notification.object_type == "Comment",
+      all_models.Notification.object_id == comment.id
+  ).delete()
+
+
 def init_hook():  # noqa
   """Initialize Relationship-related hooks."""
   # pylint: disable=unused-variable
@@ -309,14 +317,15 @@ def init_hook():  # noqa
     """Update Commentable.updated_at when Comment mapped."""
     # pylint: disable=unused-argument
     for obj in objects:
-      if obj.source_type != u"Comment" and obj.destination_type != u"Comment":
+      if obj.source_type not in ("Comment", "ExternalComment") and \
+         obj.destination_type not in ("Comment", "ExternalComment"):
         continue
 
       comment, other = obj.source, obj.destination
-      if comment.type != u"Comment":
+      if comment.type not in ("Comment", "ExternalComment"):
         comment, other = other, comment
 
-      if isinstance(other, (Commentable, ChangeTracked)):
+      if isinstance(other, (Commentable, ExternalCommentable, ChangeTracked)):
         other.updated_at = datetime.utcnow()
 
   sa.event.listen(sa.orm.session.Session, "before_flush",

@@ -62,7 +62,3 @@ class ValidationError(ValueError):
 
 class StatusValidationError(ValidationError):
   pass
-
-
-class ReservedNameError(ValueError):
-  pass

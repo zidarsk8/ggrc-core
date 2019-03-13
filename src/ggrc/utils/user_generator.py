@@ -3,7 +3,7 @@
 
 """Collection of utils for login and user generation.
 """
-
+import datetime
 import json
 from email.utils import parseaddr
 import flask
@@ -11,7 +11,7 @@ from werkzeug import exceptions
 
 from sqlalchemy import orm
 
-from ggrc import db, settings
+from ggrc import db, settings, login
 from ggrc.integrations import client
 from ggrc.login import get_current_user_id
 from ggrc.models.person import Person
@@ -76,6 +76,76 @@ def create_user(email, **kwargs):
   return user
 
 
+def create_users_with_role(email_names, role_name="Creator"):
+  """Create Person objects.
+
+  Args:
+      email_names(dict): Dictionary containing email and name of users.
+        Format: {<email>:<name>}
+
+  Returns:
+      Set with created Person objects.
+  """
+  if not email_names:
+    return {}
+
+  now = datetime.datetime.now()
+  current_user = login.get_current_user()
+  from ggrc.models import all_models
+  person_inserter = all_models.Person.__table__.insert().prefix_with("IGNORE")
+  db.session.execute(
+      person_inserter.values([
+          {
+              "modified_by_id": current_user.id,
+              "created_at": now,
+              "updated_at": now,
+              "email": email,
+              "name": name,
+          }
+          for email, name in email_names.items()
+      ])
+  )
+
+  created_people = set(load_people_with_emails(email_names.keys()))
+
+  role_id = basic_roles.find_basic(role_name).id
+  ur_inserter = all_models.UserRole.__table__.insert().prefix_with("IGNORE")
+  db.session.execute(
+      ur_inserter.values([
+          {
+              "modified_by_id": current_user.id,
+              "created_at": now,
+              "updated_at": now,
+              "role_id": role_id,
+              "person_id": person.id,
+          }
+          for person in created_people
+      ])
+  )
+  return created_people
+
+
+def load_people_with_emails(emails):
+  """Load people with provided emails from db.
+
+  Args:
+      emails(list): Collection of user emails.
+
+  Returns:
+      Set of Person objects.
+  """
+  if not emails:
+    return {}
+
+  from ggrc.models import all_models
+  result = db.session.query(
+      all_models.Person
+  ).filter(
+      all_models.Person.email.in_(emails)
+  ).options(orm.load_only("id", "name", "email"))
+  return set(result.all())
+
+
 def is_authorized_domain(email):
   """Check whether user's email belongs to authorized domain"""
   # Email can have multiple @, but last one separates local and domain part
@@ -87,7 +157,9 @@ def find_or_create_user_by_email(email, name, modifier=None):
   """Generates or find user for selected email."""
   user = find_user_by_email(email)
   if not user:
-    if not modifier:
+    _, app_email = parseaddr(settings.EXTERNAL_APP_USER)
+
+    if not modifier and email != app_email:
       modifier = get_current_user_id()
     user = create_user(email, name=name, modified_by_id=modifier)
   if is_authorized_domain(email) and \
@@ -194,6 +266,7 @@ def find_users(emails):
   If Integration Server is specified not found in DB user is generated
   with Creator role.
   """
+  # pylint: disable=too-many-locals
   if not settings.INTEGRATION_SERVICE_URL:
     return Person.query.filter(Person.email.in_(emails)).options(
         orm.undefer_group('Person_complete')).all()

@@ -54,7 +54,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
 
   IMPORTABLE_FIELDS = (
       'slug', 'title', 'description', 'start_date',
-      'end_date', 'finished_date', 'verified_date',
+      'end_date', 'finished_date', 'verified_date', 'comments',
       'status', '__acl__:Task Assignees', '__acl__:Task Secondary Assignees',
   )
 
@@ -146,8 +146,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
 
   sort_index = db.Column(db.String(length=250), default="", nullable=False)
 
-  finished_date = db.Column(db.DateTime)
-  verified_date = db.Column(db.DateTime)
+  finished_date = db.Column(db.Date)
+  verified_date = db.Column(db.Date)
 
   # This parameter is overridden by cycle task group backref, but is here to
   # ensure pylint does not complain

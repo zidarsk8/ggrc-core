@@ -38,6 +38,8 @@ have Docker up and running. Here are the steps:
 
 **NOTE for Windows/OSX users:** Make sure `docker` is up and running by following the [windows guide](https://docs.docker.com/engine/installation/windows/#using-docker-from-windows-command-prompt-cmd-exe) / [osx guide](https://docs.docker.com/engine/installation/mac/#from-your-shell).
 
+**NOTE:** Navigate to [main](https://github.com/google/ggrc-core/tree/main) branch to retrieve complete control functionality (such as create/edit/deprecate controls). Control functionality to create, edit & deprecate is unavailable on other branches.
+
 * clone the repo
 * cd to the project directory
 * Set up the necessary keys:
@@ -378,6 +380,6 @@ make appengine_packages
 
 # Copyright Notice
 
-Copyright (C) 2013-2018 Google Inc.
+Copyright (C) 2013-2019 Google Inc.
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).

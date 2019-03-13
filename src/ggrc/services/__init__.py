@@ -16,6 +16,7 @@ def contributed_services():
   from ggrc.models import review
   from ggrc.services.resources import assessment
   from ggrc.services.resources import audit
+  from ggrc.services.resources import external
   from ggrc.services.resources import issue
   from ggrc.services.resources import person
   from ggrc.services.resources import related_assessments
@@ -27,15 +28,12 @@ def contributed_services():
       service('access_groups', models.AccessGroup),
       service('audits', models.Audit, audit.AuditResource),
       service('calendar_events', models.CalendarEvent),
-      service('categorizations', models.Categorization),
-      service('category_bases', models.CategoryBase),
-      service('control_categories', models.ControlCategory),
-      service('control_assertions', models.ControlAssertion),
       service('contexts', models.Context),
-      service('controls', models.Control),
+      service('controls', models.Control, external.ExternalResource),
       service('assessments', models.Assessment, assessment.AssessmentResource),
       service('assessment_templates', models.AssessmentTemplate),
       service('comments', models.Comment),
+      service('external_comments', models.ExternalComment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition),
       service('custom_attribute_values', models.CustomAttributeValue),

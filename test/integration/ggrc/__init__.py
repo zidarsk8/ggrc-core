@@ -9,14 +9,15 @@ import logging
 import os
 import tempfile
 import csv
+import itertools
 from StringIO import StringIO
 from mock import patch
 
+from flask_testing import TestCase as BaseTestCase
 import sqlalchemy as sa
 from sqlalchemy import exc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
-from flask.ext.testing import TestCase as BaseTestCase
 from google.appengine.ext import testbed
 
 from ggrc import db
@@ -35,6 +36,21 @@ logging.disable(logging.CRITICAL)
 
 
 THIS_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+
+# Test relationship between Standard/Regulation and scope objects
+_SCOPING_MODELS = all_models.get_scope_models()
+READONLY_MAPPING_PAIRS = list(
+    # make a list of object combinations from 1st and 2nd iterables
+    # itertools.product("AB", "CD") is ["AC", "AD", "BC", "BD"]
+    itertools.product(_SCOPING_MODELS, (all_models.Standard,
+                                        all_models.Regulation))
+)
+# Test relationship for Control and Scope objects, Standard and Regulation
+READONLY_MAPPING_PAIRS.extend(
+    (all_models.Control, m) for m in itertools.chain(_SCOPING_MODELS,
+                                                     (all_models.Standard,
+                                                      all_models.Regulation))
+)
 
 
 def read_imported_file(file_data):  # pylint: disable=unused-argument
@@ -130,7 +146,6 @@ class TestCase(BaseTestCase, object):
       order in then incorrect.
     """
     ignore_tables = (
-        "categories",
         "notification_types",
         "object_types",
         "options",

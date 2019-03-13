@@ -644,8 +644,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Categories",
         "State",
         "Last Assessment Date",
-        "Review State",
-        "Reviewers",
+        "Review Status",
         "Document File",
         "Delete",
         "Control Operators",
@@ -653,9 +652,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Other Contacts",
         "Principal Assignees",
         "Secondary Assignees",
-        "Recipients",
-        "Send by default",
-        "Comments",
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
@@ -664,7 +660,7 @@ class TestGetObjectColumnDefinitions(TestCase):
 
     # Control has additional mandatory field - Assertions
     control_expected = deepcopy(self.COMMON_EXPECTED)
-    control_expected["mandatory"].add("Assertions")
+    control_expected["unique"].remove("Title")
     self._test_single_object(all_models.Control, names, control_expected)
 
   def test_objective_definitions(self):

@@ -675,7 +675,26 @@ class TestPlanned(object):
     )
 
 
-class Folderable(object):
+# pylint: disable=too-few-public-methods
+class WithProtectedAttributes(object):
+  """Mixin that check if attributes can be setted by external user."""
+
+  # Set of protected attributes
+  PROTECTED_ATTRIBUTES = set()
+
+  @classmethod
+  def get_protected_attributes(cls):
+    """Get set of protected attributes for external user."""
+    protected_attributes = set()
+
+    for base in cls.mro():
+      if hasattr(base, "PROTECTED_ATTRIBUTES"):
+        protected_attributes.update(base.PROTECTED_ATTRIBUTES)
+
+    return protected_attributes
+
+
+class Folderable(WithProtectedAttributes):
   """Mixin adding the ability to attach folders to an object"""
 
   @declared_attr
@@ -692,6 +711,8 @@ class Folderable(object):
   _api_attrs = reflection.ApiAttributes('folder')
   _fulltext_attrs = ['folder']
   _aliases = {"folder": "Folder"}
+
+  PROTECTED_ATTRIBUTES = {"folder"}
 
 
 class WithNetworkZone(object):

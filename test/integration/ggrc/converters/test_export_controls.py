@@ -1,14 +1,19 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-
 """Tests for task group task specific export."""
+import json
+
+import ddt
+
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
+from integration.ggrc.utils import helpers
 
 
+@ddt.ddt
 class TestExportControls(TestCase):
   """Test imports for basic control objects."""
 
@@ -70,3 +75,69 @@ class TestExportControls(TestCase):
     db.session.commit()
     self.assert_slugs("owners", self.basic_owner.email, [])
     self.assert_slugs("owners", self.basic_owner.name, [])
+
+  @ddt.data(
+      ("kind", "Kind/Nature"),
+      ("means", "Type/Means"),
+      ("verify_frequency", "Frequency"),
+  )
+  @ddt.unpack
+  def test_option_fields_export(self, field, alias):
+    """Test export several controls with option fields."""
+    with factories.single_commit():
+      expected_values = []
+      for _ in range(3):
+        obj = factories.ControlFactory()
+        field_val = factories.random_str(prefix=field).title()
+        setattr(obj, field, field_val)
+        expected_values.append(field_val)
+
+    data = [{
+        "object_name": "Control",
+        "filters": {
+            "expression": {
+                "left": field,
+                "op": {"name": "~"},
+                "right": field,
+            }
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+    self.assert200(response)
+    self.assertIn(alias, response.data)
+
+    exported_values = helpers.parse_export_data(response.data)
+    self.assertEqual(exported_values[alias], expected_values)
+
+  @ddt.data(
+      ("assertions", "Assertions"),
+      ("categories", "Categories"),
+  )
+  @ddt.unpack
+  def test_category_fields_export(self, field, alias):
+    """Test export several controls with category fields."""
+    with factories.single_commit():
+      expected_values = []
+      for _ in range(3):
+        field_vals = [factories.random_str(prefix=field) for _ in range(3)]
+        factories.ControlFactory(**{field: json.dumps(field_vals)})
+        expected_values.append("\n".join(field_vals))
+
+    data = [{
+        "object_name": "Control",
+        "filters": {
+            "expression": {
+                "left": field,
+                "op": {"name": "~"},
+                "right": field,
+            }
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+    self.assert200(response)
+    self.assertIn(alias, response.data)
+
+    exported_values = helpers.parse_export_data(response.data)
+    self.assertEqual(exported_values[alias], expected_values)

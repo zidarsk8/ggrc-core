@@ -15,8 +15,10 @@ from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import Workflow
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc_workflows.models import factories
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models.factories import single_commit
 
 
 class TestWorkflowCycleStatePropagation(TestCase):
@@ -355,6 +357,76 @@ class TestWorkflowCycleStatePropagation(TestCase):
       tg = self._get_obj(CycleTaskGroup, "test group")
       self.assertIsNone(tg.next_due_date)
       self.assertEqual(tg.status, "Verified")
+
+  def test_cycle_state_after_put(self):
+    """Test cycle status after starting a task."""
+    with single_commit():
+      ct1 = factories.CycleTaskGroupObjectTaskFactory()
+
+    self.assertEqual(
+        db.session.query(Cycle).filter(Cycle.id == ct1.cycle.id).one().status,
+        "Assigned"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroup).filter(
+            CycleTaskGroup.id == ct1.cycle_task_group.id).one().status,
+        "Assigned"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroupObjectTask).filter(
+            CycleTaskGroupObjectTask.id == ct1.id).one().status,
+        "Assigned"
+    )
+
+    self.api.put(ct1, {"status": "In Progress"})
+
+    self.assertEqual(
+        db.session.query(Cycle).filter(Cycle.id == ct1.cycle.id).one().status,
+        "In Progress"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroup).filter(
+            CycleTaskGroup.id == ct1.cycle_task_group.id).one().status,
+        "In Progress"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroupObjectTask).filter(
+            CycleTaskGroupObjectTask.id == ct1.id).one().status,
+        "In Progress"
+    )
+
+  def test_cycle_state_after_post(self):
+    """Test cycle status after adding a task."""
+    with single_commit():
+      ctg = factories.CycleTaskGroupFactory()
+      ct1 = factories.CycleTaskGroupObjectTaskFactory()
+      ct1.cycle_task_group = ctg
+
+    self.api.put(ct1, {"status": "In Progress"})
+
+    with single_commit():
+      ct2 = factories.CycleTaskGroupObjectTaskFactory()
+      ct2.cycle_task_group = ctg
+
+    self.assertEqual(
+        db.session.query(Cycle).filter(Cycle.id == ctg.cycle.id).one().status,
+        "In Progress"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroup).filter(
+            CycleTaskGroup.id == ctg.id).one().status,
+        "In Progress"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroupObjectTask).filter(
+            CycleTaskGroupObjectTask.id == ct1.id).one().status,
+        "In Progress"
+    )
+    self.assertEqual(
+        db.session.query(CycleTaskGroupObjectTask).filter(
+            CycleTaskGroupObjectTask.id == ct2.id).one().status,
+        "Assigned"
+    )
 
   def test_empty_group_status(self):
     """Test status and dates when task group is empty """

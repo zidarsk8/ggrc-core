@@ -131,7 +131,7 @@ def update_issue(cli, issue_id, params):
     except integrations_errors.HttpError as error:
       last_error = error
       if error.status == 429:
-        logger.warning(
+        logger.info(
             'The request updating ticket ID=%s was '
             'rate limited and will be re-tried: %s', issue_id, error)
         time.sleep(constants.REQUEST_TIMEOUT)

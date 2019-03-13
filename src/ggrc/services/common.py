@@ -605,9 +605,9 @@ class Resource(ModelView):
       self._check_put_permissions(obj, new_context)
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
-    obj.modified_by_id = get_current_user_id()
-    obj.updated_at = datetime.datetime.utcnow()
-    db.session.add(obj)
+
+    self.add_modified_object_to_session(obj)
+
     with benchmark("Process actions"):
       self.process_actions(obj)
     with benchmark("Validate custom attributes"):
@@ -664,6 +664,13 @@ class Resource(ModelView):
       return self.json_success_response(
           object_for_json, self.modified_at(obj),
           obj_etag=etag(self.modified_at(obj), get_info(obj)))
+
+  def add_modified_object_to_session(self, obj):
+    """Update modification metadata and add object to session."""
+    obj.modified_by_id = get_current_user_id()
+    obj.updated_at = datetime.datetime.utcnow()
+
+    db.session.add(obj)
 
   @classmethod
   def _mark_delete_object_permissions(cls, obj):
@@ -1078,6 +1085,11 @@ class Resource(ModelView):
         # relationships are set, so need to commit the changes
       db.session.commit()
     with benchmark("Send event job"):
+      # global_ac_roles may save a set of ACR objects in the session. If
+      # session state is changed, all ACRs will be rerequested one by one.
+      # To avoid such behavior link to ACRs objects should be removed manually.
+      if hasattr(flask.g, "global_ac_roles"):
+        del flask.g.global_ac_roles
       send_event_job(event)
 
   @staticmethod

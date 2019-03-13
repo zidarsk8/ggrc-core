@@ -17,7 +17,7 @@ from integration.ggrc.generator import ObjectGenerator
 
 ROLE_NAME = "ACR for mandatory test"
 MANDATORY_ROLE_RESPONSE = {
-    "Control": {"row_warnings": {errors.OWNER_MISSING.format(
+    "Risk": {"row_warnings": {errors.OWNER_MISSING.format(
         line=3, column_name=ROLE_NAME)}}}
 NON_MANDATORY_ROLE_RESPONSE = {}
 
@@ -37,14 +37,14 @@ class TestAccessControlRole(TestCase):
           data={"name": name}, user_role=name)
       self.people[name] = user
 
-  def _post_role(self, name=None):
+  def _post_role(self, name=None, object_type="Control"):
     """Helper function for POSTing roles"""
     if name is None:
       name = random_str(prefix="Access Control Role - ")
     return self.api.post(AccessControlRole, {
         "access_control_role": {
             "name": name,
-            "object_type": "Control",
+            "object_type": object_type,
             "context": None,
             "read": True
         },
@@ -52,16 +52,16 @@ class TestAccessControlRole(TestCase):
 
   def test_create_after_objects(self):
     """Test eager creation of ACLs on existing objects with new ACR."""
-    control_id = factories.ControlFactory().id
+    risk_id = factories.RiskFactory().id
     role_name = "New Custom Role"
-    self._post_role(name=role_name)
-    control = all_models.Control.query.get(control_id)
-    self.assertIn(role_name, control.acr_name_acl_map.keys())
-    self.assertIsNotNone(control.acr_name_acl_map[role_name])
+    self._post_role(name=role_name, object_type="Risk")
+    risk = all_models.Risk.query.get(risk_id)
+    self.assertIn(role_name, risk.acr_name_acl_map.keys())
+    self.assertIsNotNone(risk.acr_name_acl_map[role_name])
 
   def test_create(self):
     """Test Access Control Role creation"""
-    response = self._post_role()
+    response = self._post_role(object_type="Risk")
     assert response.status_code == 201, \
         "Failed to create a new access control role, response was {}".format(
             response.status)
@@ -84,26 +84,26 @@ class TestAccessControlRole(TestCase):
     """Test set empty field via import if acr mandatory is {mandatory}"""
     role = factories.AccessControlRoleFactory(
         name=ROLE_NAME,
-        object_type="Control",
+        object_type="Risk",
         mandatory=mandatory,
     )
     with factories.single_commit():
       user = factories.PersonFactory()
-      control = factories.ControlFactory()
+      risk = factories.RiskFactory()
       role_id = role.id
       factories.AccessControlPersonFactory(
-          ac_list=control.acr_name_acl_map[ROLE_NAME],
+          ac_list=risk.acr_name_acl_map[ROLE_NAME],
           person=user,
       )
     response = self.import_data(OrderedDict([
-        ("object_type", "Control"),
-        ("Code*", control.slug),
+        ("object_type", "Risk"),
+        ("Code*", risk.slug),
         (ROLE_NAME, "--"),
     ]))
     self._check_csv_response(response, exp_response)
     db_data = defaultdict(set)
-    control = all_models.Control.query.get(control.id)
-    for person, acl in control.access_control_list:
+    risk = all_models.Risk.query.get(risk.id)
+    for person, acl in risk.access_control_list:
       db_data[acl.ac_role_id].add(person.id)
     if mandatory:
       cur_user = all_models.Person.query.filter_by(
@@ -154,3 +154,16 @@ class TestAccessControlRole(TestCase):
     assert response.status_code == 403, \
         "Forbidden error should be thrown when non-editable " \
         "role {} deleted.".format(ac_role.name)
+
+  @ddt.data("Control")
+  def test_create_from_ggrcq(self, object_type):
+    """Test that create action only for GGRCQ."""
+    with self.api.as_external():
+      response = self._post_role(object_type=object_type)
+      self.assertEqual(response.status_code, 201)
+
+  @ddt.data("Control")
+  def test_create_from_ggrc(self, object_type):
+    """Test create action not allowed for GGRC."""
+    response = self._post_role(object_type=object_type)
+    self.assertEqual(response.status_code, 405)
