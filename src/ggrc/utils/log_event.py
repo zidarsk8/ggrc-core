@@ -5,9 +5,9 @@
 
 import itertools
 
+from datetime import datetime
 from logging import getLogger
 from flask import request
-from sqlalchemy.sql.expression import func
 
 from ggrc import db
 from ggrc.models.cache import Cache
@@ -20,13 +20,21 @@ logger = getLogger(__name__)
 
 
 def _revision_generator(user_id, action, objects):
-  """Generate and return revisions for objects."""
+  """Generate and return revisions bodies for objects."""
   from ggrc.utils import revisions
   for obj in objects:
+    content = obj.log_json()
+    if "access_control_list" in content and content["access_control_list"]:
+      for acl in content["access_control_list"]:
+        acl["person"] = {
+            "id": acl["person_id"],
+            "type": "Person",
+            "href": "/api/people/{}".format(acl["person_id"]),
+        }
     rev = revisions.build_revision_body(
         obj.id,
         obj.__class__.__name__,
-        obj.log_json(),
+        content,
         None,
         action,
         user_id
@@ -34,6 +42,14 @@ def _revision_generator(user_id, action, objects):
     if isinstance(obj, Synchronizable):
       rev["created_at"] = obj.updated_at
       rev["updated_at"] = obj.updated_at
+    else:
+      rev["created_at"] = datetime.utcnow().replace(microsecond=0).isoformat()
+      rev["updated_at"] = datetime.utcnow().replace(microsecond=0).isoformat()
+    for attr in ["source_type",
+                 "source_id",
+                 "destination_type",
+                 "destination_id"]:
+      rev[attr] = getattr(obj, attr, None)
     yield rev
 
 
@@ -74,42 +90,12 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
     # been changed, then this object will not be added into
     # ``cache.dirty set``. So that its revision will not be created.
     # The ``force_obj`` flag solves the issue, but in a bit dirty way.
-    from ggrc.utils import revisions as rev_utils
-    revision = rev_utils.build_revision_body(
-        obj.id,
-        obj.__class__.__name__,
-        obj.log_json(),
-        None,
-        'modified',
-        current_user_id
-    )
-    revisions.append(revision)
+    rev = _revision_generator(current_user_id, "modified", (obj,))
+    revisions.extend(rev)
   revisions.extend(_revision_generator(
       current_user_id, "deleted", cache.deleted
   ))
   return revisions
-
-
-def _get_latest_revisions(revisions):
-  """Get latest revision objects
-
-  Args:
-    revisions: dict with revisions' bodies
-  Returns:
-    Latest Revision objects for objects from event
-  """
-  queries = []
-  for rev in revisions:
-    queries.append(
-        db.session.query(
-            func.max(Revision.id)
-        ).filter(
-            Revision.resource_id == rev["resource_id"],
-            Revision.resource_type == rev["resource_type"]
-        )
-    )
-  rev_ids = queries[0].union_all(*queries[1:])
-  return Revision.query.filter(Revision.id.in_(rev_ids)).all()
 
 
 # pylint: disable-msg=too-many-arguments
@@ -160,8 +146,6 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
   for rev in revisions:
     rev["event_id"] = event.id
   db.session.execute(Revision.__table__.insert(), revisions)
-  rev_objects = _get_latest_revisions(revisions)
-  event.revisions.extend(rev_objects)
   return event
 
 
