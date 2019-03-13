@@ -120,15 +120,23 @@ class AssessmentTrackerHandler(object):
           issue_info: dictionary with issue payload information
     """
     self._validate_generic_fields(issue_info)
+    self._validate_assessment_title(issue_info)
 
-    # Title
+  @staticmethod
+  def _validate_assessment_title(issue_info):
+    """Validate assessment fields for issue
+
+      Args:
+          issue_info: dictionary with issue payload information
+    """
+
     try:
       title = issue_info["title"]
     except KeyError:
       raise exceptions.ValidationError("Title is mandatory.")
-    else:
-      if not title.strip():
-        raise exceptions.ValidationError("Title can not be blank.")
+
+    if title is None or not title.strip():
+      raise exceptions.ValidationError("Title can not be blank.")
 
   @classmethod
   def prepare_issue_json(cls, assessment, issue_tracker_info=None,
@@ -214,17 +222,26 @@ class AssessmentTrackerHandler(object):
     Returns:
         default information for Issue Tracker
     """
+
+    # get from API dict if available
     issue_tracker_info_default = assessment_src.get("issue_tracker", {})
-    if not issue_tracker_info_default:
-      issue_tracker_info_default = self._get_issue_from_assmt_template(
-          assessment_src.get("template", {})
-      )
+    if issue_tracker_info_default:
+      return issue_tracker_info_default
+
+    # get from template dict if available
+    issue_tracker_info_default = self._get_issue_from_assmt_template(
+        assessment_src.get("template", {})
+    )
+    if issue_tracker_info_default:
       issue_tracker_info_default["title"] = assessment.title
+      return issue_tracker_info_default
+
+    # get from audit
     if not issue_tracker_info_default:
       issue_tracker_info_default = self._get_issue_info_from_audit(
-          issue_tracker_info_default.get("audit", {})
+          assessment_src.get("audit", {})
       )
-
+      issue_tracker_info_default["title"] = assessment.title
     return issue_tracker_info_default
 
   @staticmethod
@@ -259,8 +276,7 @@ class AssessmentTrackerHandler(object):
         assessment: object from Assessment model
         assessment_src: dictionary with issue information
     """
-    if self._is_tracker_enabled(assessment.audit) and \
-            self._is_issue_on_create_enabled(assessment_src):
+    if self._is_issue_on_create_enabled(assessment, assessment_src):
       if assessment_src.get("issue_tracker", {}).get("issue_id"):
         issue_id = assessment_src["issue_tracker"]["issue_id"]
         if not self._is_already_linked(assessment, issue_id):
@@ -2229,16 +2245,22 @@ class AssessmentTrackerHandler(object):
         "enabled", False
     )
 
-  @classmethod
-  def _is_issue_on_create_enabled(cls, assessment_src):
+  def _is_issue_on_create_enabled(self, assessment, assessment_src):
     """Check that issue tracker on create enabled.
 
     Args:
+      assessment: assessment instance
       assessment_src: dictionary with issue information
 
     Returns:
       Boolean indicator that issue enabled
     """
+
+    # Ensure that Issue Tracker in Audit is enabled
+    if not self._is_tracker_enabled(assessment.audit):
+      return False
+
+    # Get enable flag from API request if available
     issue_tracker_info = assessment_src.get(
         "issue_tracker", {}
     )
@@ -2246,9 +2268,16 @@ class AssessmentTrackerHandler(object):
     if issue_tracker_info:
       return issue_tracker_info.get("enabled", False)
 
+    # Get enable flag from assessment template if available
     template_info = assessment_src.get("template", {})
-    template_issue_info = cls._get_issue_from_assmt_template(template_info)
-    return template_issue_info.get("enabled", False)
+    template_issue_info = self._get_issue_from_assmt_template(template_info)
+
+    if template_issue_info:
+      return template_issue_info.get("enabled", False)
+
+    # enable flag was not found. Allow to use issue tracker,
+    # as it is enabled in audit
+    return True
 
   @staticmethod
   def _is_ccs_same(ccs_payload, ccs_tracker):
