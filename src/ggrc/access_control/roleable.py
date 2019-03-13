@@ -6,10 +6,8 @@
 import logging
 from collections import defaultdict
 from collections import namedtuple
-from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy import inspect
-from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
 from cached_property import cached_property
 from werkzeug.exceptions import BadRequest
@@ -63,16 +61,35 @@ class Roleable(object):
   @declared_attr
   def _access_control_list(cls):  # pylint: disable=no-self-argument
     """access_control_list"""
+    current_type = cls.__name__
+
+    joinstr = (
+        'and_('
+        'foreign(remote(AccessControlList.object_id)) == {type}.id,'
+        'AccessControlList.object_type == "{type}",'
+        'AccessControlList.parent_id_nn == 0'
+        ')'
+        .format(type=current_type)
+    )
+
+    # Since we have some kind of generic relationship here, it is needed
+    # to provide custom joinstr for backref. If default, all models having
+    # this mixin will be queried, which in turn produce large number of
+    # queries returning nothing and one query returning object.
+    backref_joinstr = (
+        'remote({type}.id) == foreign(AccessControlList.object_id)'
+        .format(type=current_type)
+    )
+
     return db.relationship(
         'AccessControlList',
-        primaryjoin=lambda: and_(
-            remote(AccessControlList.object_id) == cls.id,
-            remote(AccessControlList.object_type) == cls.__name__,
-            remote(AccessControlList.parent_id_nn) == 0
+        primaryjoin=joinstr,
+        backref=orm.backref(
+            '{}_object'.format(current_type),
+            primaryjoin=backref_joinstr,
         ),
-        foreign_keys='AccessControlList.object_id',
-        backref='{0}_object'.format(cls.__name__),
-        cascade='all, delete-orphan')
+        cascade='all, delete-orphan'
+    )
 
   @property
   def access_control_list(self):
