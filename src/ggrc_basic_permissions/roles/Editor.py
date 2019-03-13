@@ -208,6 +208,7 @@ permissions = {
         "AssessmentTemplate",
         "Issue",
         "DataAsset",
+        "Evidence",
         "AccessGroup",
         "Directive",
         "Contract",
