@@ -19,7 +19,7 @@ export default can.Component.extend({
   tag: 'comment-add-form',
   template: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       notificationsInfo: {
         set(newValue) {
@@ -94,5 +94,5 @@ export default can.Component.extend({
           self.afterCreation(comment, false);
         });
     },
-  },
+  }),
 });
