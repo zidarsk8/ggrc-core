@@ -922,8 +922,7 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
   """Test filtering assessments by CAs"""
 
   def setUp(self):
-    """Set up test cases for all tests."""
-    TestCase.clear_data()
+    super(TestQueryAssessmentCA, self).setUp()
     self._generate_special_assessments()
     self.client.get("/login")
 
@@ -1035,7 +1034,6 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
 class TestSortingQuery(TestCase, WithQueryApi):
   """Test sorting is correct requested with query API"""
   def setUp(self):
-    TestCase.clear_data()
     super(TestSortingQuery, self).setUp()
     self.client.get("/login")
 
@@ -1132,8 +1130,7 @@ class TestSortingQuery(TestCase, WithQueryApi):
 class TestQueryAssessmentByEvidenceURL(TestCase, WithQueryApi):
   """Test assessments filtering by Evidence and/or URL"""
   def setUp(self):
-    """Set up test cases for all tests."""
-    TestCase.clear_data()
+    super(TestQueryAssessmentByEvidenceURL, self).setUp()
     response = self._import_file("assessment_full_no_warnings.csv")
     self._check_csv_response(response, {})
     self.client.get("/login")
@@ -1171,8 +1168,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
   """Test query API with custom attributes."""
 
   def setUp(self):
-    """Set up test cases for all tests."""
-    TestCase.clear_data()
+    super(TestQueryWithCA, self).setUp()
     self._generate_cad()
     self.import_file("sorting_with_ca_setup.csv")
     self.client.get("/login")
@@ -1417,11 +1413,8 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
 class TestFilteringAttributes(WithQueryApi, TestCase):
   """Test query API filtering by attributes."""
 
-  @classmethod
-  def setUpClass(cls):
-    cls.clear_data()
-
   def setUp(self):
+    super(TestFilteringAttributes, self).setUp()
     self.client.get("/login")
 
     generator_ = generator.ObjectGenerator()
@@ -1496,3 +1489,36 @@ class TestFilteringAttributes(WithQueryApi, TestCase):
     )
 
     self.assertEqual(len(revisions), 1)
+
+
+@ddt.ddt
+class TestQueryWithSpecialChars(TestCase, WithQueryApi):
+  """Test query API with '\', '_' and '%' chars."""
+
+  def setUp(self):
+    super(TestQueryWithSpecialChars, self).setUp()
+    self.client.get("/login")
+    with factories.single_commit():
+      factories.RiskFactory(description=r"1235_123")
+      factories.RiskFactory(description=r"1235123")
+      factories.RiskFactory(description=r"1235%123")
+      factories.RiskFactory(description=r"123\5123")
+      factories.RiskFactory(description=r'1235"123')
+      factories.RiskFactory(description=r"123325\123")
+
+  @ddt.data(
+      ("description", r"\5", 1),
+      ("description", "5_", 1),
+      ("description", "5%", 1),
+      ("description", '5"', 1),
+      ("description", "5", 6),
+  )
+  @ddt.unpack
+  def test_query(self, param, text, count):
+    """Test query by unicode value."""
+
+    risks = self._get_first_result_set(
+        self._make_query_dict("Risk", expression=[param, "~", text]),
+        "Risk",
+    )
+    self.assertEqual(risks["count"], count)
