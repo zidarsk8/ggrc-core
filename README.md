@@ -160,11 +160,31 @@ test_coverage clean # To remove coverage report
 
 #### For Python tests:
 
+To run all python integration and unit tests use:
 ```sh
 run_pytests
 ```
 
-The script will run unit tests and integration tests.
+To run just integration tests use:
+
+```sh
+run_integration  # for full test suite
+
+# or in smaller chunks
+run_integration_ggrc  # everything inside integration/ggrc without ACL 
+run_integration_acl  # everything inside integration/ggrc/access_control
+run_integration_non_ggrc  # everything else (or other modules than ggrc)
+```
+
+Note:
+To run individual python tests without the run\_integration script you must
+initiate test environment, otherwise external users will fail to generate.
+
+```sh
+source bin/init_test_env 
+nosetests /vagrant/test/integration/ggrc/test_my_test_file.py
+```
+
 
 For better usage of unit tests, you can use sniffer inside the test/unit folder.
 This will run the tests on each file update.
