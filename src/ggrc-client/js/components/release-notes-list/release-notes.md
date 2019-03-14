@@ -201,7 +201,7 @@ You can use labels, to easily categorize and search for assessments. You can add
 
 ### Improvements to surfacing ‘related assessments’ (v0.10.37, 12/20/2017)
 
-The system will consider assessments as related between each other, if they are mapped to the same assessed objects or other mapped versions of it. For example two assessments mapped to control A (or any versions of it) will be considered related.   If an assessment is mapped to control B it will be also considered related if control A and B are related.
+The system will consider assessments as related between each other, if they are mapped to the same assessed objects or other mapped versions of it. For example two assessments mapped to control A (or any versions of it) will be considered related. If an assessment is mapped to control B it will be also considered related if control A and B are related.
 
 ### Extend assessment assignees rights (v0.10.37, 12/20/2017)
 
