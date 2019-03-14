@@ -8,10 +8,8 @@ import '../custom-roles/custom-roles';
 import '../custom-roles/custom-roles-modal';
 import template from './templates/assessment-people.stache';
 
-const tag = 'assessment-people';
-
 export default can.Component.extend({
-  tag,
+  tag: 'assessment-people',
   template: can.stache(template),
   leakScope: true,
   viewModel: {

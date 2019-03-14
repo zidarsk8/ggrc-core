@@ -11,10 +11,9 @@ import {
 import Revision from '../../models/service-models/revision';
 
 import template from './templates/review-proposal.stache';
-const tag = 'review-proposal';
 
 export default can.Component.extend({
-  tag,
+  tag: 'review-proposal',
   template: can.stache(template),
   leakScope: true,
   viewModel: {

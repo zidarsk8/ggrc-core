@@ -5,12 +5,11 @@
 
 import template from './collapsible-panel-body.stache';
 
-const tag = 'collapsible-panel-body';
 /**
  * Collapsible Panel component to add collapsing behavior
  */
 export default can.Component.extend({
-  tag,
+  tag: 'collapsible-panel-body',
   template: can.stache(template),
   leakScope: true,
   viewModel: {

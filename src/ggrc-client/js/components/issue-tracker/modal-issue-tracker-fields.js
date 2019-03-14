@@ -7,10 +7,8 @@ import '../dropdown/dropdown';
 import '../numberbox/numberbox';
 import template from './templates/modal-issue-tracker-fields.stache';
 
-const tag = 'modal-issue-tracker-fields';
-
 export default can.Component.extend({
-  tag,
+  tag: 'modal-issue-tracker-fields',
   template: can.stache(template),
   leakScope: true,
   viewModel: {

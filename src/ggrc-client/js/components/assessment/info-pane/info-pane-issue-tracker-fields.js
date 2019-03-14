@@ -6,10 +6,8 @@
 import '../../assessment/info-pane/confirm-edit-action';
 import template from './templates/info-pane-issue-tracker-fields.stache';
 
-const tag = 'info-pane-issue-tracker-fields';
-
 export default can.Component.extend({
-  tag,
+  tag: 'info-pane-issue-tracker-fields',
   template: can.stache(template),
   leakScope: true,
   viewModel: {
