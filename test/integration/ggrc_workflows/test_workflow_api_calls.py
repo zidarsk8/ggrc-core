@@ -400,15 +400,11 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
 
-  def test_incorrect_id_in_payload(self):
-    """Test that 400 is raised for payload
-     which contains the following structure:
-      ..."workflow":{
-        "id":{
-          "id":1
-        },
-        "type":"Workflow"}
-    """
+  def test_incorrect_wf_id_on_tg_post(self):
+    """Tests incorrect id in tg post payload.
+
+    Tests that 400 is raised on tg post if id in
+    payload has incorrect type."""
     wf_data = self.get_workflow_dict()
     wf_response = self.api.post(all_models.Workflow, wf_data)
     data = {

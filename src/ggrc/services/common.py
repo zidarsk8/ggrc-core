@@ -1001,22 +1001,22 @@ class Resource(ModelView):
         db.session.expunge_all()
         raise Forbidden()
 
-  def _gather_referenced_objects(self, data, accomulator=None):
-    if accomulator is None:
-      accomulator = collections.defaultdict(set)
+  def _gather_referenced_objects(self, data, accumulator=None):
+    if accumulator is None:
+      accumulator = collections.defaultdict(set)
     if isinstance(data, list):
       for value in data:
-        self._gather_referenced_objects(value, accomulator)
+        self._gather_referenced_objects(value, accumulator)
     elif isinstance(data, dict):
       if "type" in data and data.get("id"):
         try:
-          accomulator[data["type"]].add(data["id"])
+          accumulator[data["type"]].add(data["id"])
         except TypeError:
           raise BadRequest("Either type or id are specified "
                            "incorrectly in the request payload.")
       for value in data.values():
-        self._gather_referenced_objects(value, accomulator)
-    return accomulator
+        self._gather_referenced_objects(value, accumulator)
+    return accumulator
 
   def _build_request_stub_cache(self, data):
     objects = self._gather_referenced_objects(data)
