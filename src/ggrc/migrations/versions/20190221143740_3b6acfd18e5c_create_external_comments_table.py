@@ -66,18 +66,16 @@ def create_external_comments_table():
 def move_old_comments():
   """Move comments for Control to external comments table."""
   connection = op.get_bind()
-  migrator_id = utils.get_migration_user_id(connection)
-
   connection.execute(
       sa.text("""
           INSERT INTO external_comments(
               id, description, assignee_type, created_at, updated_at,
               modified_by_id
           )
-          SELECT id, description, assignee_type, NOW(), NOW(), :migrator_id
+          SELECT id, description, assignee_type, NOW(), NOW(), modified_by_id
           FROM
           (
-              SELECT c.id, c.description, c.assignee_type
+              SELECT c.id, c.description, c.assignee_type, c.modified_by_id
               FROM comments c
               JOIN relationships r ON r.source_type = 'Comment' AND
                   r.source_id = c.id AND
@@ -85,14 +83,13 @@ def move_old_comments():
 
               UNION
 
-              SELECT c.id, c.description, c.assignee_type
+              SELECT c.id, c.description, c.assignee_type, c.modified_by_id
               FROM comments c
               JOIN relationships r ON r.destination_type = 'Comment' AND
                   r.destination_id = c.id AND
                   r.source_type = 'Control'
           ) tmp;
       """),
-      migrator_id=migrator_id
   )
 
 
@@ -207,6 +204,37 @@ def create_comments_revisions():
     )
 
 
+def update_comments_acl():
+  """Update object_type in ACR and ACL for ExternalComments."""
+  connection = op.get_bind()
+  migrator_id = utils.get_migration_user_id(connection)
+  connection.execute(
+      sa.text("""
+          INSERT INTO access_control_roles(
+              `name`, `object_type`, `read`, `update`, `delete`, `my_work`,
+              `mandatory`, `default_to_current_user`, `non_editable`,
+              `created_at`, `updated_at`, `modified_by_id`
+          )
+          VALUES(
+              'Admin', 'ExternalComment', 1, 1, 1, 1,
+              1, 1, 1, NOW(), NOW(), :migrator_id
+          )
+      """),
+      migrator_id=migrator_id
+  )
+  connection.execute(
+      sa.text("""
+          UPDATE access_control_list
+          SET object_type = 'ExternalComment',
+              ac_role_id = :acr_id
+          WHERE object_type = 'Comment' AND
+                object_id IN (SELECT id FROM external_comments) AND
+                parent_id IS NULL;
+      """),
+      acr_id=utils.last_insert_id(connection)
+  )
+
+
 def propagate_acr():
   """Create propagation system ACRs for KeyReport model"""
   acr_propagation.propagate_roles(
@@ -223,6 +251,7 @@ def upgrade():
   update_comment_relationships()
   create_comments_revisions()
   create_external_comments_revisions()
+  update_comments_acl()
   propagate_acr()
 
 
