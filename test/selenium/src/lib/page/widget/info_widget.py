@@ -296,7 +296,7 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     if self.has_review():
       scope.update(review_status=self.get_review_status(),
                    review_status_display_name=self.get_review_status())
-    if self.reviewers.is_element_exists():
+    if self.reviewers.exists():
       scope["reviewers"] = self.reviewers.get_people_emails()
     self.update_obj_scope(scope)
     return scope
@@ -770,9 +770,8 @@ class Controls(WithAssignFolder, InfoWidget):
   _locators = locator.WidgetInfoControl
   _elements = element.ControlInfoWidget
 
-  def __init__(self, driver, root_elem=None):
+  def __init__(self, driver):
     super(Controls, self).__init__(driver)
-    self.root_element = root_elem if root_elem else self._browser
     self.admin_text = roles.ADMIN.upper()
     self.admin_entered_text = self.admins.get_people_emails()
     self.control_operator_text = roles.CONTROL_OPERATORS.upper()
@@ -790,16 +789,6 @@ class Controls(WithAssignFolder, InfoWidget):
         [self.admin_entered_text, self.control_operator_entered_text,
          self.assertions_entered_text])
     self._add_obj_review_to_lsopes()
-    self.proposals_tab = "Change Proposals"
-
-  @property
-  def _root(self):
-    """Returns root element (including title, 3bbs)."""
-    if self.is_info_page:
-      return self._browser.element(class_name="widget", id="info")
-    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
-      return self.root_element
-    return self._browser.element(class_name="sticky-info-panel")
 
   @property
   def control_review_status(self):
@@ -836,10 +825,6 @@ class Controls(WithAssignFolder, InfoWidget):
         WidgetInfoControl.DATE_PICKER_LOCATOR)
     date_picker.select_month_start()
 
-  def click_propose_changes(self):
-    """Click on Propose Changes button."""
-    self._browser.element(tag_name="create-proposal-button").link().click()
-
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
     return [self.comment_area.control_add_section,
@@ -847,12 +832,6 @@ class Controls(WithAssignFolder, InfoWidget):
             self.three_bbs.edit_option,
             self.reference_urls.add_button,
             self.assign_folder_button] + list(self.inline_edit_controls)
-
-  def related_proposals(self):
-    """Open related proposals tab."""
-    self.tabs.ensure_tab(self.proposals_tab)
-    selenium_utils.wait_for_js_to_load(self._driver)
-    return related_proposals.RelatedProposals()
 
 
 class Objectives(InfoWidget):
@@ -959,8 +938,19 @@ class Risks(InfoWidget):
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
 
-  def __init__(self, driver):
+  def __init__(self, driver, root_elem=None):
     super(Risks, self).__init__(driver)
+    self.root_element = root_elem if root_elem else self._browser
+    self.proposals_tab = "Change Proposals"
+
+  @property
+  def _root(self):
+    """Returns root element (including title, 3bbs)."""
+    if self.is_info_page:
+      return self._browser.element(class_name="widget", id="info")
+    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
+      return self.root_element
+    return self._browser.element(class_name="sticky-info-panel")
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""
@@ -972,6 +962,16 @@ class Risks(InfoWidget):
   def risk_type(self):
     """Returns the text of risk type."""
     return self._simple_field("Risk Type").text
+
+  def click_propose_changes(self):
+    """Click on Propose Changes button."""
+    self._browser.link(text="Propose Changes").click()
+
+  def related_proposals(self):
+    """Open related proposals tab."""
+    self.tabs.ensure_tab(self.proposals_tab)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return related_proposals.RelatedProposals()
 
 
 class Threats(InfoWidget):
