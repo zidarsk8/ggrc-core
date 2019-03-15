@@ -36,7 +36,7 @@
               data-placement="bottom"
             {{/showGroupTooltip}}
             >
-              <div>
+              <div {{^required}}class="hidable"{{/required}}>
                 <deletable-people-group
                   show-empty-message="false"
                   {required}="required"
