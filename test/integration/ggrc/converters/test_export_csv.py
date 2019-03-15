@@ -21,6 +21,11 @@ CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
 class TestExportEmptyTemplate(TestCase):
   """Tests for export of import templates."""
 
+  TICKET_TRACKER_FIELDS = ["Ticket Tracker", "Component ID",
+                           "Ticket Tracker Integration", "Hotlist ID",
+                           "Priority", "Severity", "Ticket Title",
+                           "Issue Type"]
+
   def setUp(self):
     self.client.get("/login")
     self.headers = {
@@ -65,7 +70,7 @@ class TestExportEmptyTemplate(TestCase):
 
   @ddt.data("Assessment", "Issue")
   def test_ticket_tracker_field_order(self, model):
-    """Tests if Ticket Tracker fields come before mapped objects."""
+    """Tests if Ticket Tracker fields come before mapped objects for {}."""
 
     data = {
         "export_to": "csv",
@@ -76,15 +81,26 @@ class TestExportEmptyTemplate(TestCase):
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
 
-    ticket_tracker_fields = ["Ticket Tracker", "Component ID",
-                             "Integration Enabled", "Hotlist ID",
-                             "Priority", "Severity", "Issue Title",
-                             "Issue Type"]
     first_mapping_field_pos = response.data.find("map:")
 
-    for field in ticket_tracker_fields:
-      self.assertEquals(response.data.find(field) < first_mapping_field_pos,
-                        True)
+    for field in self.TICKET_TRACKER_FIELDS:
+      self.assertLess(response.data.find(field), first_mapping_field_pos)
+
+  @ddt.data("Assessment", "Issue")
+  def test_ticket_tracker_fields(self, model):
+    """Tests if Ticket Tracker fields are in export file for {}"""
+
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": model, "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+
+    for field in self.TICKET_TRACKER_FIELDS:
+      self.assertIn(field, response.data)
 
 
 class TestExportSingleObject(TestCase):
