@@ -264,21 +264,11 @@ def relevant(exp, object_class, target_class, query):
     exp = query[exp['ids'][0]]
   object_name = exp['object_name']
   ids = exp['ids']
-  check_snapshots = (
-      object_class.__name__ in rules.Types.scoped | rules.Types.trans_scope and
-      object_name in rules.Types.all
-  )
-  check_direct = (not check_snapshots or
-                  object_class.__name__ in rules.Types.trans_scope)
+
+  check_snapshots = (object_class.__name__ in rules.Types.scoped and
+                     object_name in rules.Types.all)
 
   result = set()
-
-  if check_direct:
-    result.update(*relationship_helper.get_ids_related_to(
-        object_class.__name__,
-        object_name,
-        ids,
-    ))
 
   if check_snapshots:
     snapshot_qs = all_models.Snapshot.query.filter(
@@ -306,6 +296,12 @@ def relevant(exp, object_class, target_class, query):
     )
     ids_qs = dest_qs.union(source_qs)
     result.update(*ids_qs.all())
+  else:
+    result.update(*relationship_helper.get_ids_related_to(
+        object_class.__name__,
+        object_name,
+        ids,
+    ))
 
   if not result:
     return sqlalchemy.sql.false()
