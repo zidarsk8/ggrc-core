@@ -379,14 +379,15 @@ defined, `DEV_PREFIX` defaults to the value of `PREFIX`. (In the VM,
 it is defined to `/vagrant-dev` to avoid slowdown caused by the shared
 filesystem at `/vagrant`.)
 
-### Changes to Requirements Files
+### Changes python requirements
 
 The first thing to try to resolve issues due to missing prerequisites is to
 run the following command from within the project directory in the host
 operating system:
 
 ```sh
-docker-compose build
+./bin/containers setup
+./bin/containers run
 ```
 
 command *should* be an update Python virtualenv containing the Python packages
@@ -405,6 +406,26 @@ Note that if you're using `launch_gae_ggrc`, then changes to
 
 ```
 make appengine_packages
+```
+
+### Changes JS requirements
+
+Same as with python files we can first try to rebuild the entire container with
+
+```sh
+./bin/containers setup
+./bin/containers run
+```
+
+command *should* update npm packages and install the required node modules.
+
+On every change of front-end packages you can manually update the requirements.
+To do that you can log in to docker container and run
+
+```sh
+rm -rf node_modules/*
+npm i --unsafe-perm
+build_assets
 ```
 
 # Copyright Notice
