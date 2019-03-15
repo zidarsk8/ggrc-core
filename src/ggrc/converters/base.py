@@ -212,7 +212,7 @@ class ExportConverter(BaseConverter):
         csv_string_builder.append_line(csv_header[1])
 
       for line in block_converter.generate_row_data():
-        ie_status = self.get_ie_status_from_cache()
+        ie_status = self.get_job_status()
         if ie_status and ie_status == all_models.ImportExport.STOPPED_STATUS:
           raise exceptions.ExportStoppedException()
         line.insert(0, "")
@@ -223,20 +223,27 @@ class ExportConverter(BaseConverter):
 
     return csv_string_builder.get_csv_string()
 
-  def add_ie_status_to_cache(self):
+  def add_ie_status_to_cache(self, status):
     """Add export job status to memcache"""
     cache_key = cache_utils.get_ie_cache_key(self.ie_job)
-    self.cache_manager.cache_object.memcache_client.add(cache_key,
-                                                        "In Progress")
+    self.cache_manager.cache_object.memcache_client.add(cache_key, status)
 
-  def get_ie_status_from_cache(self):
-    """Get export job status from memcahe if exists, from DB otherwise."""
+  def get_job_status(self):
+    """Get export job status from cache if exists and from DB otherwise"""
+    if not self.ie_job:
+      return None
+    status = self._get_ie_status_from_cache()
+    if not status:
+      status = self._get_ie_status_from_db()
+      self.add_ie_status_to_cache(status)
+    return status
+
+  def _get_ie_status_from_cache(self):
+    """Get export job status from memcache if exists, from DB otherwise."""
     if not self.ie_job:
       return None
     cache_key = cache_utils.get_ie_cache_key(self.ie_job)
     ie_status = self.cache_manager.cache_object.memcache_client.get(cache_key)
-    if not ie_status:
-      ie_status = self._get_job_status()
     return ie_status
 
   def _get_exportable_queries(self):
@@ -260,7 +267,7 @@ class ExportConverter(BaseConverter):
       queries = self.ids_by_type
     return queries
 
-  def _get_job_status(self):
+  def _get_ie_status_from_db(self):
     """Get status of current ImportExport job."""
     if not self.ie_job:
       return None

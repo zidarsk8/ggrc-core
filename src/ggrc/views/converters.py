@@ -678,13 +678,17 @@ def handle_export_stop(**kwargs):
       db.session.commit()
       expire_ie_cache(ie_job)
       return make_import_export_response(ie_job.log_json())
+    if ie_job.status == "Stopped":
+      raise models_exceptions.ExportStoppedException()
   except wzg_exceptions.Forbidden:
     raise
+  except models_exceptions.ExportStoppedException:
+    raise wzg_exceptions.BadRequest(app_errors.STOPPED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
         app_errors.INCORRECT_REQUEST_DATA.format(job_type="Export"))
-  raise wzg_exceptions.BadRequest(app_errors.STOPPED_WARNING)
+  raise wzg_exceptions.BadRequest(app_errors.WRONG_STATUS)
 
 
 def expire_ie_cache(ie_job):
