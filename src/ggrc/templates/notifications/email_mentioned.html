@@ -10,24 +10,22 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 <html xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
 <head>
 
-<meta name="viewport" content="width=device-width" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<title>Google GRC Email</title>
+  <title>Google GRC Email</title>
 
 </head>
 
 <body {{ style.body_style() }}>
   <div {{ style.notification_container() }} >
     <div {{ style.notification_block() }}>
-      <h1 {{ style.bulk_sync_title() }}>
-        There were some errors in generating tickets for "{{ sync_data.title }}"
-      </h1>
-
-      <hr>
-      <p {{ style.header_color() }}>
-        Something went wrong, we are looking into it
+      {% for comment in person_mention.comments %}
+      <p {{ style.notification_body() }}>
+        {{ comment }}
       </p>
+      {% endfor %}
+      <a href="{{ person_mention.url }}" {{ style.notification_btn() }}>Open</a>
     </div>
     <div {{ style.notification_footer() }}>Google GRC</div>
   </div>
