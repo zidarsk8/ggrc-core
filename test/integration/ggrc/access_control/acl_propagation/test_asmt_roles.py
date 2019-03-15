@@ -255,7 +255,7 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
                   "create_and_map": True,
                   "read": True,
                   "update": True,
-                  "delete": False,
+                  "delete": True,
                   "read_comments": True,
                   "add_comment": True,
               },
@@ -297,6 +297,7 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
     return rbac_factory(self.people[role].id, acr, parent)
 
   @helpers.unwrap(PERMISSIONS, unwrap_keys=True)
+  # pylint: disable=too-many-arguments
   def test_access(self, role, model, acr_name, action_name, expected_result):
     """{0:<7}: On {1:<20} as {2:<9} test {3:<20} - Expected {4:<2} """
     self.runtest(role, model, action_name, expected_result, acr_name=acr_name)
