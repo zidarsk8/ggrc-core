@@ -6,9 +6,7 @@
 import logging
 from collections import defaultdict
 from collections import namedtuple
-from sqlalchemy import and_
-from sqlalchemy import orm
-from sqlalchemy import inspect
+import sqlalchemy as sa
 from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
 from cached_property import cached_property
@@ -16,6 +14,7 @@ from werkzeug.exceptions import BadRequest
 
 
 from ggrc import db
+from ggrc import login
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
@@ -44,12 +43,15 @@ class Roleable(object):
   _update_raw = ['access_control_list', ]
   _fulltext_attrs = [CustomRoleAttr('access_control_list'), ]
   _api_attrs = reflection.ApiAttributes(
-      reflection.Attribute('access_control_list', True, True, True))
+      reflection.Attribute('access_control_list', True, True, True),
+      reflection.Attribute('actions', False, False, True),
+  )
   MAX_ASSIGNEE_NUM = 1
   MAX_VERIFIER_NUM = 1
 
   _custom_publish = {
       'access_control_list': lambda obj: obj.acl_json,
+      'actions': lambda obj: obj.actions,
   }
 
   def __init__(self, *args, **kwargs):
@@ -65,7 +67,7 @@ class Roleable(object):
     """access_control_list"""
     return db.relationship(
         'AccessControlList',
-        primaryjoin=lambda: and_(
+        primaryjoin=lambda: sa.and_(
             remote(AccessControlList.object_id) == cls.id,
             remote(AccessControlList.object_type) == cls.__name__,
             remote(AccessControlList.parent_id_nn) == 0
@@ -121,14 +123,14 @@ class Roleable(object):
     """Eager Query"""
     query = super(Roleable, cls).eager_query()
     return query.options(
-        orm.subqueryload(
+        sa.orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "ac_role"
         ).undefer_group(
             'AccessControlRole_complete'
         ),
-        orm.subqueryload(
+        sa.orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "access_control_people"
@@ -144,14 +146,14 @@ class Roleable(object):
     """Query used by the indexer"""
     query = super(Roleable, cls).indexed_query()
     return query.options(
-        orm.subqueryload(
+        sa.orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "ac_role"
         ).load_only(
             "id", "name", "object_type", "internal"
         ),
-        orm.subqueryload(
+        sa.orm.subqueryload(
             '_access_control_list'
         ).joinedload(
             "access_control_people"
@@ -161,6 +163,38 @@ class Roleable(object):
             "id", "name", "email"
         ),
     )
+
+  @property
+  def actions(self):
+    perms = db.session.execute(
+        """
+        Select 
+          max(acr.read) as `read`,
+          max(acr.update) as `update`,
+          max(acr.delete) as `delete`
+        from access_control_people as acp
+        left join access_control_list as acl on
+          acp.ac_list_id = acl.base_id
+        left join access_control_roles as acr on
+          acl.ac_role_id = acr.id
+        where
+          acp.person_id = {} and
+          acl.object_type = '{}' and
+          acl.object_id = {}
+        group by
+          acl.object_type,
+          acl.object_id
+        """.format(
+            login.get_current_user_id(),
+            self.type,
+            self.id,
+        )
+    ).fetchone()
+    return {
+        "read": perms.read,
+        "update": perms.update,
+        "delete": perms.delete,
+    }
 
   @property
   def acl_json(self):
@@ -213,7 +247,7 @@ class Roleable(object):
       in the current session.
     """
     return any(
-        inspect(acl).attrs["access_control_people"].history.has_changes()
+        sa.inspect(acl).attrs["access_control_people"].history.has_changes()
         for acl in self._access_control_list
     )
 
@@ -235,7 +269,7 @@ class Roleable(object):
     if acr_name not in self.acr_name_acl_map:
       return False
     acl = self.acr_name_acl_map[acr_name]
-    return inspect(acl).attrs["access_control_people"].history.has_changes()
+    return sa.inspect(acl).attrs["access_control_people"].history.has_changes()
 
   def validate_acl(self):
     """Check correctness of access_control_list."""
