@@ -192,9 +192,9 @@ class Roleable(object):
     ).fetchone()
     return {
         "create": True,
-        "read": bool(perms.read),
-        "update": bool(perms.update),
-        "delete": bool(perms.delete),
+        "read": bool(perms and perms.read),
+        "update": bool(perms and perms.update),
+        "delete": bool(perms and perms.delete),
     }
 
   @property
