@@ -118,82 +118,13 @@ const Permission = can.Construct({
     return value;
   },
 
-  _is_allowed_for: function (permissions, instance, action) {
-    // Check for admin permission
-    let checkAdmin = function (contextId) {
-      let permission = this._admin_permission_for_context(contextId);
-      let conditions;
-      let i;
-      let condition;
-      if (this._permission_match(permissions, permission)) {
-        conditions = _.toArray(_.exists(permissions,
-          permission.action,
-          permission.resource_type,
-          'conditions',
-          contextId));
-        if (!conditions.length) {
-          return true;
-        }
-        for (i = 0; i < conditions.length; i++) {
-          condition = conditions[i];
-          if (_CONDITIONS_MAP[condition.condition](
-            instance, condition.terms, action)) {
-            return true;
-          }
-        }
-        return false;
-      }
-      return false;
-    }.bind(this);
-
-    let actionObj = permissions[action] || {};
-    let shortName = instance.constructor && instance.constructor.model_singular;
-    let instanceType = instance.type || shortName;
-    let typeObj = actionObj[instanceType] || {};
-    let conditionsByContext = typeObj.conditions || {};
-    let resources = typeObj.resources || [];
-    let context = instance.context || {id: null};
-    let conditions = conditionsByContext[context.id] || [];
-    let condition;
-    let i;
-
-    conditions = conditions.concat(conditionsByContext.null || []);
-
-    if (checkAdmin(0) || checkAdmin(null)) {
-      return true;
-    }
-    if (~resources.indexOf(instance.id)) {
-      return true;
-    }
-    if (conditions.length === 0 && (this._is_allowed(permissions,
-      new Permission(action, instanceType, null)) ||
-      this._is_allowed(permissions,
-        new Permission(action, instanceType, context.id)))) {
-      return true;
-    }
-    // Check any conditions applied per instance
-    // If there are no conditions, the user has unconditional access to
-    // the current instance. We can safely return true in this case.
-    if (conditions.length === 0) {
-      return false;
-    }
-    for (i = 0; i < conditions.length; i++) {
-      condition = conditions[i];
-      if (_CONDITIONS_MAP[condition.condition](
-        instance, condition.terms, action)) {
-        return true;
-      }
-    }
-    return false;
-  },
-
   is_allowed: function (action, resourceType, contextId) {
     return this._is_allowed(
       permissionsCompute(), new this(action, resourceType, contextId));
   },
 
   is_allowed_for: function (action, resource) {
-    return this._is_allowed_for(permissionsCompute(), resource, action);
+    return !!resource.actions[action]
   },
 
   is_allowed_any: function (action, resourceType) {
