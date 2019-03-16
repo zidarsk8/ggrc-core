@@ -9,6 +9,7 @@ from sqlalchemy.orm import validates
 from ggrc import builder
 from ggrc import db
 from ggrc import settings
+from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
@@ -25,7 +26,7 @@ from ggrc.fulltext import attributes
 
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
-             Relatable, base.ContextRBAC, Base, Indexed, db.Model):
+             Roleable, Relatable, base.ContextRBAC, Base, Indexed, db.Model):
   """Person model definition."""
 
   def __init__(self, *args, **kwargs):
