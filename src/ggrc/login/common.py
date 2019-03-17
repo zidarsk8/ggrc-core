@@ -77,7 +77,7 @@ def get_ggrc_user(request, mandatory):
     # External Application User should be created if doesn't exist.
     user = get_external_app_user(request)
   else:
-    user = all_models.Person.query.filter_by(email=email).one()
+    user = all_models.Person.query.filter_by(email=email).first()
 
   if not user:
     raise exceptions.BadRequest("No user with such email: %s" % email)
@@ -90,7 +90,7 @@ def get_external_app_user(request):
   app_user = find_or_create_ext_app_user()
 
   if app_user.id is None:
-    db.session.commit()
+    db.session.flush()
 
   external_user_email = parse_user_email(
       request, "X-external-user", mandatory=False
