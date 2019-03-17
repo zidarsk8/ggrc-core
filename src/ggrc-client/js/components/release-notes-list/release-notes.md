@@ -155,7 +155,7 @@ To prevent unnecessary automated mappings, the system won’t create automatic m
 
 ### Evidences for Assessments and Audits (v1.11.0, 05/30/2018)
 
-The system will now track each evidence file/ URL as a separate object type which is searchable. For audits, the system will ensure evidence integrity for making a separate Audit specific copy. The object containing the file metadata will be archived along with the audit.
+The system will now track each evidence file/ URL as a separate object type which is searchable.For audits, the system will ensure evidence integrity for making a separate Audit specific copy. The object containing the file metadata will be archived along with the audit.
 
 ### Offline mode for Import and export (v1.9.0, 04/25/2018)
 
@@ -201,7 +201,7 @@ You can use labels, to easily categorize and search for assessments. You can add
 
 ### Improvements to surfacing ‘related assessments’ (v0.10.37, 12/20/2017)
 
-The system will consider assessments as related between each other, if they are mapped to the same assessed objects or other mapped versions of it.    For example two assessments mapped to control A (or any versions of it) will be considered related.   If an assessment is mapped to control B it will be also considered related if control A and B are related.
+The system will consider assessments as related between each other, if they are mapped to the same assessed objects or other mapped versions of it. For example two assessments mapped to control A (or any versions of it) will be considered related. If an assessment is mapped to control B it will be also considered related if control A and B are related.
 
 ### Extend assessment assignees rights (v0.10.37, 12/20/2017)
 
