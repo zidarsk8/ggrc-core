@@ -3,7 +3,20 @@
 
 """Module with common validators for GGRC."""
 
+from ggrc import db
 from werkzeug import exceptions
+
+
+def modified_only(func):
+  """Decorator that checks if target object is changed in session."""
+  def wrapper(mapper, content, target):
+    """Skip listener if target object is not modified."""
+    if db.session.is_modified(target):
+      return func(mapper, content, target)
+
+    return None
+
+  return wrapper
 
 
 # pylint: disable=unused-argument
