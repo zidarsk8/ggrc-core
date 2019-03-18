@@ -9,6 +9,7 @@ import caUpdate from '../mixins/ca-update';
 import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/notifications/base-notifications';
 import proposable from '../mixins/proposable';
+import changeableExternally from '../mixins/changeable-externally';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -26,6 +27,7 @@ export default Cacheable.extend({
     accessControlList,
     baseNotifications,
     proposable,
+    changeableExternally,
   ],
   is_custom_attributable: true,
   isRoleable: true,
