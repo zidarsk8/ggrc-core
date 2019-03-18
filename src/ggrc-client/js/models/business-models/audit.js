@@ -51,7 +51,7 @@ export default Cacheable.extend({
       'Issues', 'Assessments', 'Evidence'],
   },
   tree_view_options: {
-    add_item_view: GGRC.templates_path + '/audits/tree_add_item.stache',
+    add_item_view: 'audits/tree_add_item',
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',

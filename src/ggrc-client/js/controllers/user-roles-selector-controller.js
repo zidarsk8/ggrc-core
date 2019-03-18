@@ -12,10 +12,8 @@ const userRolesModalSelector = can.Control.extend({
   defaults: {
     base_modal_view:
       GGRC.templates_path + '/people_roles/base_modal.stache',
-    option_column_view:
-      GGRC.templates_path + '/people_roles/option_column.stache',
-    object_detail_view:
-      GGRC.templates_path + '/people_roles/object_detail.stache',
+    option_column_view: 'people_roles/option_column',
+    object_detail_view: 'people_roles/object_detail',
 
     personId: null,
   },
@@ -51,7 +49,7 @@ const userRolesModalSelector = can.Control.extend({
     }).then((view) => {
       let frag = can.stache(view)(this.context);
       $(this.element).html(frag);
-      this.element.trigger('loaded');
+      $(this.element).trigger('loaded');
       deferred.resolve();
     });
 

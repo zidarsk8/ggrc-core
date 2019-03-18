@@ -195,7 +195,8 @@ can.stache.registerHelper('renderLive', function (template, context, options) {
     options.contexts = options.contexts.add(options.hash);
   }
 
-  return can.view.render(template, options.contexts);
+  let view = GGRC.Templates[template];
+  return can.stache(view)(options.contexts);
 });
 
 /**

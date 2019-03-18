@@ -47,7 +47,7 @@ export default Cacheable.extend({
   statuses: ['Not Started', 'In Progress', 'In Review',
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
   tree_view_options: {
-    add_item_view: GGRC.templates_path + '/assessments/tree_add_item.stache',
+    add_item_view: 'assessments/tree_add_item',
     attr_list: [{
       attr_title: 'Title',
       attr_name: 'title',
