@@ -11,7 +11,7 @@ class UrlHTMLParser(HTMLParser, object):
   """Class for parsing and wrapping urls."""
   LINK_TAG = "a"
   URL_REGEX = r"https?:\/\/[^\s]+"
-  HTML_LINK_FORMAT = '<a href="{link}">{text}</a>'
+  HTML_LINK_FORMAT = u'<a href="{link}">{text}</a>'
 
   def __init__(self):
     super(UrlHTMLParser, self).__init__()
