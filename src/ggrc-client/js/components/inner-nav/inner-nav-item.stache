@@ -5,7 +5,7 @@
 
 {{#widget}}
   {{#displayTab}}
-    <li class="{{icon}} {{type}} {{#isActive}} active {{/isActive}}">
+    <span class="{{icon}} {{type}} {{#isActive}} active {{/isActive}}">
       <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
         <i class="fa fa-{{ icon }} color"></i>
         {{#showTitle}} {{title}} {{/showTitle}}
@@ -20,6 +20,6 @@
           <span class="closed" ($click)="closeTab()"><i class="fa fa-times"></i></span>
         {{/showCloseButton}}
       </a>
-    </li>
+    </span>
   {{/displayTab}}
 {{/widget}}

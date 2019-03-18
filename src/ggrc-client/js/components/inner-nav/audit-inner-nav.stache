@@ -4,7 +4,7 @@
 }}
 <div class="nav internav audit">
 <div class="tabs priority">
-  <ul class="internav">
+  <nav class="internav">
     {{#if showTabs}}
       {{#priorityTabs}}
         <inner-nav-item {widget}="." 
@@ -14,13 +14,13 @@
           (close)="closeTab(%event)"></inner-nav-item>
       {{/priorityTabs}}
     {{/if}}
-  </ul>
+  </nav>
 </div>
 
 {{#if showTabs}}
   <div class="tabs not-priority">
     <inner-nav-collapse {title}="'Show Audit Scope'">
-      <ul class="internav">
+      <nav class="internav">
         {{#notPriorityTabs}}
           <inner-nav-item {widget}="."
             {active-widget}="activeWidget" 
@@ -34,7 +34,7 @@
           {widget-list}="hiddenWidgets"
           {add-tab-title}="'Add Scope'">
         </add-tab-button>
-      </ul>
+      </nav>
     </inner-nav-collapse>
   </div>
 {{/if}}
