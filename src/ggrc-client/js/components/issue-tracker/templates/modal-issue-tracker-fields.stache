@@ -17,9 +17,20 @@
       {{/if}}
     </div>
     <div class="ggrc-form-item__multiple-row">
-      <dropdown-component {options-list}="{instance.class.issue_tracker_enable_options}"
-                {name}="'isIntegrationEnabled'">
-      </dropdown-component>
+      <dropdown-component class="issue-tracker__dropdown"
+          {options-list}="{instance.class.issue_tracker_enable_options}"
+          {name}="'isIntegrationEnabled'"
+      ></dropdown-component>
+      {{#if_instance_of instance 'Audit'}}
+        {{#if instance.issue_tracker.enabled}}
+          <div class="ggrc-form-item__note">
+            <input class="people-sync-checkbox" type="checkbox" can-value="instance.issue_tracker.people_sync_enabled">
+            Sync people with ticket tracker
+            <i class="fa fa-question-circle" rel="tooltip"
+              title="Check the box to enable sync between Audit roles and Ticket Tracker. Uncheck the box to disable the sync."></i>
+          </div>
+        {{/if}}
+      {{/if_instance_of}}
     </div>
   </div>
 </div>

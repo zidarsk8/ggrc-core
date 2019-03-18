@@ -1,0 +1,16 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+modal-issue-tracker-fields {
+  .issue-tracker__dropdown {
+    .input-block-level {
+      margin-bottom: 8px !important;
+    }
+  }
+
+  .people-sync-checkbox {
+    margin: 5px 5px 0 0;
+  }
+}
