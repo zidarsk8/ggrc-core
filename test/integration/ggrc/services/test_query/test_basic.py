@@ -3,7 +3,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-# pylint: disable=too-many-lines
+# pylint: disable=too-many-lines,too-many-locals
 
 """Tests for /query api endpoint."""
 import random

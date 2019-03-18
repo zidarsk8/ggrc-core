@@ -74,7 +74,9 @@ class TestSyncServiceControl(TestCase):
     self.generator = generator.ObjectGenerator()
 
     self.app_user_email = "external_app@example.com"
-    self.ext_user_email = 'external@example.com'
+    self.ext_user_email = "external@example.com"
+    self.ext_owner_email = "owner@example.com"
+    self.ext_compliance_email = "compliance@example.com"
 
     settings.EXTERNAL_APP_USER = self.app_user_email
 
@@ -111,12 +113,12 @@ class TestSyncServiceControl(TestCase):
             "name": "External Creator",
         },
         "last_submitted_at": datetime(2018, 1, 4),
-        "last_owner_reviewer": {
+        "last_submitted_by": {
             "email": "owner@example.com",
             "name": "External Owner",
         },
         "last_verified_at": datetime(2018, 1, 5),
-        "last_compliance_reviewer": {
+        "last_verified_by": {
             "email": "compliance@example.com",
             "name": "External Compliance",
         }
@@ -213,9 +215,16 @@ class TestSyncServiceControl(TestCase):
         all_models.Person.email == self.app_user_email).one()
     ext_user = db.session.query(all_models.Person).filter(
         all_models.Person.email == self.ext_user_email).one()
+    ext_owner_user = db.session.query(all_models.Person).filter(
+        all_models.Person.email == self.ext_owner_email).one()
+    ext_compliance_user = db.session.query(all_models.Person).filter(
+        all_models.Person.email == self.ext_compliance_email).one()
 
     self.assertEqual(ext_user.modified_by_id, app_user.id)
     self.assertEqual(control.modified_by_id, ext_user.id)
+
+    self.assertEqual(control.last_submitted_by_id, ext_owner_user.id)
+    self.assertEqual(control.last_verified_by_id, ext_compliance_user.id)
 
     expected_assertions = control_body.pop("assertions")
     expected_categories = control_body.pop("categories")
@@ -295,6 +304,49 @@ class TestSyncServiceControl(TestCase):
         all_models.Revision.modified_by_id == control.modified_by_id,
     ).one()
     self.assertIsNotNone(revision)
+
+  @ddt.data((" http://www.some.url", " http://www.some.url"),
+            ("<a>http://www.some.url</a>",
+             "<a>http://www.some.url</a>"))
+  @ddt.unpack
+  def test_control_rich_text_validate(self, initial_value, expected_value):
+    """Test rich text validation for control."""
+    response = self.api.post(all_models.Control, {
+        "control": {
+            "id": 11111,
+            "title": "Some title",
+            "context": None,
+            "external_id": factories.SynchronizableExternalId.next(),
+            "external_slug": factories.random_str(),
+            "assertions": '["any assertion"]',
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "any status",
+        },
+    })
+    self.assertEqual(response.status_code, 201)
+    control = all_models.Control.query.filter_by(title="Some title").first()
+
+    cad = factories.CustomAttributeDefinitionFactory(
+        definition_type="control",
+        definition_id=control.id,
+        attribute_type="Rich Text",
+        title="CA",
+    )
+
+    response = self.api.post(all_models.CustomAttributeValue, {
+        "custom_attribute_value": {
+            "custom_attribute_id": cad.id,
+            "attributable_type": "control",
+            "attributable_id": control.id,
+            "attribute_value": initial_value,
+            "context": {"id": None},
+        }
+    })
+    self.assertEqual(response.status_code, 201)
+
+    control = all_models.Control.query.filter_by(title="Some title").first()
+    self.assertEqual(control.custom_attribute_values[0].attribute_value,
+                     expected_value)
 
   def test_create_with_assertions(self):
     """Check control creation with assertions pass"""

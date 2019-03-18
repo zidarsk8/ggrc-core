@@ -68,6 +68,7 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       "Map:Person": lambda self: self._validate_map_object(),
       "Checkbox": lambda self: self._validate_checkbox(),
   }
+  TYPES_NO_RICHTEXT_VALIDATE = ["Control"]
 
   @property
   def latest_revision(self):
@@ -359,7 +360,8 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
 
   def _validate_rich_text(self):
     """Add tags for links."""
-    self.attribute_value = url_parser.parse(self.attribute_value)
+    if self.attributable_type not in self.TYPES_NO_RICHTEXT_VALIDATE:
+      self.attribute_value = url_parser.parse(self.attribute_value)
 
   def _validate_checkbox(self):
     """Set falsy value to zero."""
