@@ -80,7 +80,7 @@ class BaseIssueTrackerParamsBuilder(object):
     default_values = constants.DEFAULT_ISSUETRACKER_VALUES
     issue_component_id = issue_tracker_info.get("component_id")
     self.params.component_id = issue_component_id or \
-        default_values["component_id"]
+        default_values["issue_component_id"]
 
     issue_hotlist_id = issue_tracker_info.get("hotlist_id")
     self.params.hotlist_id = issue_hotlist_id or \
