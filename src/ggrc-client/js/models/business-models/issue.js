@@ -72,7 +72,7 @@ export default Cacheable.extend({
   buildIssueTrackerConfig(instance) {
     return {
       hotlist_id: '864697',
-      component_id: '188208',
+      component_id: '398781',
       issue_severity: 'S2',
       issue_priority: 'P2',
       issue_type: 'PROCESS',
