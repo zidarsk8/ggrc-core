@@ -6,6 +6,7 @@ import template from './inner-nav-item.stache';
 
 export default can.Component.extend({
   tag: 'inner-nav-item',
+  leakScope: false,
   template,
   viewModel: {
     define: {
