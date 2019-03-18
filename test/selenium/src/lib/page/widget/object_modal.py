@@ -110,6 +110,7 @@ class BaseObjectModal(base.WithBrowser):
 
   def set_description(self, description):
     """Sets description."""
+    self.description_field.clear()
     self.description_field.send_keys(description)
 
   def set_state(self, state):
