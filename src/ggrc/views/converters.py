@@ -269,7 +269,7 @@ def run_export(task):
       ie.status = "Failed"
       ie.end_at = datetime.utcnow()
       db.session.commit()
-      job_emails.send_email(job_emails.EXPORT_FAILED, user.email)
+      job_emails.send_email(job_emails.EXPORT_CRASHED, user.email)
       return utils.make_simple_response(e.message)
     except Exception as e:  # pylint: disable=broad-except
       logger.exception("%s: %s", app_errors.STATUS_SET_FAILED, e.message)
