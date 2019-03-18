@@ -35,11 +35,7 @@
           <i class="fa fa-asterisk"></i>
           <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
         </label>
-        {{#if new_object_form}}
-          <input data-id="title_txtbx" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2" autofocus {{default_audit_title instance}}>
-        {{else}}
-          <input data-id="title_2_txtbx" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2" autofocus>
-        {{/if}}
+        <input data-id="title_2_txtbx" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" tabindex="2" autofocus>
         {{#instance.computed_errors.title}}
           <label class="help-inline warning">
               {{this}}

@@ -12,6 +12,9 @@ import timeboxed from '../mixins/timeboxed';
 import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 import Program from './program';
+import Search from '../service-models/search';
+import {reify} from '../../plugins/utils/reify-utils';
+import RefreshQueue from '../refresh_queue';
 
 export default Cacheable.extend({
   root_object: 'audit',
@@ -166,5 +169,44 @@ export default Cacheable.extend({
     return new can.List(this.access_control_list.filter((item) => {
       return item.ac_role_id === auditRole.id;
     }));
+  },
+  setDefaultAuditTitle: function () {
+    let index;
+    let program;
+    let title;
+
+    program = this.attr('program');
+
+    if (!this._transient) {
+      this.attr('_transient', new can.Map());
+    }
+
+    if (!program) {
+      // Mark the title to be populated when computed_program is defined,
+      // returning an empty string here would disable the save button.
+      this.attr('title', '');
+      this.attr('_transient.default_title', this.title);
+      return;
+    }
+    if (this._transient.default_title !== this.title) {
+      return;
+    }
+
+    program = reify(program);
+    new RefreshQueue().enqueue(program).trigger().then(() => {
+      title = (new Date()).getFullYear() + ': ' + program.title + ' - Audit';
+
+      Search.counts_for_types(title, ['Audit'])
+        .then((result) => {
+          // Next audit index should be bigger by one than previous, we have unique name policy
+          index = result.getCountFor('Audit') + 1;
+          title = title + ' ' + index;
+          this.attr('title', title);
+          // this needs to be different than above, otherwise CanJS throws a strange error
+          if (this._transient) {
+            this.attr('_transient.default_title', this.title);
+          }
+        });
+    });
   },
 });
