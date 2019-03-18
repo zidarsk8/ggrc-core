@@ -11,6 +11,7 @@ DEFAULT_ISSUETRACKER_VALUES = {
     'issue_type': 'PROCESS',
     'component_id': 188208,
     'issue_hotlist_id': 864697,
+    'issue_component_id': 398781,
     'hotlist_id': 766459,
 }
 
