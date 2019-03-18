@@ -179,7 +179,7 @@ export default TreeLoader({
   },
 
   update_count: function () {
-    if (this.element && this.options.pager) {
+    if (this.element) {
       getCounts()
         .attr(this.options.model.model_singular, this.options.pager.total);
     }
