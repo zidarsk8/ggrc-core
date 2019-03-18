@@ -154,7 +154,11 @@ describe('inner-nav view model', () => {
     });
 
     it('should set id', () => {
-      let result = viewModel.createWidget({widget_id: 'id', model: {}});
+      let result = viewModel.createWidget({
+        widget_id: 'id',
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.id).toBe('id');
     });
 
@@ -162,6 +166,7 @@ describe('inner-nav view model', () => {
       let result = viewModel.createWidget({
         widget_name: () => 'title',
         model: {},
+        content_controller_options: {},
       });
       expect(result.title).toBe('title');
     });
@@ -170,60 +175,98 @@ describe('inner-nav view model', () => {
       let result = viewModel.createWidget({
         widget_name: 'title',
         model: {},
+        content_controller_options: {},
       });
       expect(result.title).toBe('title');
     });
 
     it('should set empty type for not object version widgets', () => {
       spyOn(ObjectVersionsUtils, 'isObjectVersion').and.returnValue(false);
-      let result = viewModel.createWidget({widget_id: 'id', model: {}});
+      let result = viewModel.createWidget({
+        widget_id: 'id',
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.type).toBe('');
     });
 
     it('should set version type for object versions widgets', () => {
       spyOn(ObjectVersionsUtils, 'isObjectVersion').and.returnValue(true);
-      let result = viewModel.createWidget({widget_id: 'id', model: {}});
+      let result = viewModel.createWidget({
+        widget_id: 'id',
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.type).toBe('version');
     });
 
     it('should set icon', () => {
-      let result = viewModel.createWidget({widget_icon: 'icon', model: {}});
+      let result = viewModel.createWidget({
+        widget_icon: 'icon',
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.icon).toBe('icon');
     });
 
     it('should set href', () => {
       spyOn(RouterUtils, 'buildUrl').and.returnValue('href');
-      let result = viewModel.createWidget({widget_id: 'id', model: {}});
+      let result = viewModel.createWidget({
+        widget_id: 'id',
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.href).toBe('href');
     });
 
     it('should set model', () => {
-      let result = viewModel.createWidget({model: 'model'});
+      let result = viewModel.createWidget({
+        model: 'model',
+        content_controller_options: {},
+      });
       expect(result.model).toBe('model');
     });
 
     it('should set order', () => {
-      let result = viewModel.createWidget({order: 'order', model: {}});
+      let result = viewModel.createWidget({
+        order: 'order',
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.order).toBe('order');
     });
 
     it('should set uncountable', () => {
-      let result = viewModel.createWidget({uncountable: true, model: {}});
+      let result = viewModel.createWidget({
+        uncountable: true,
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.uncountable).toBe(true);
     });
 
     it('should set forceRefetch', () => {
-      let result = viewModel.createWidget({forceRefetch: true, model: {}});
+      let result = viewModel.createWidget({
+        forceRefetch: true,
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.forceRefetch).toBe(true);
     });
 
     it('should set default count', () => {
-      let result = viewModel.createWidget({model: {}});
+      let result = viewModel.createWidget({
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.count).toBe(0);
     });
 
     it('should set countsName from descriptor if exists', () => {
-      let result = viewModel.createWidget({countsName: 'name'});
+      let result = viewModel.createWidget({
+        countsName: 'name',
+        content_controller_options: {},
+      });
       expect(result.countsName).toBe('name');
     });
 
@@ -243,6 +286,7 @@ describe('inner-nav view model', () => {
           model: {
             model_singular: 'name',
           },
+          content_controller_options: {},
         });
         expect(result.countsName).toBe('name');
       });
@@ -253,12 +297,16 @@ describe('inner-nav view model', () => {
         model: {
           shortName: 'name',
         },
+        content_controller_options: {},
       });
       expect(result.countsName).toBe('');
     });
 
     it('should set default forceShow', () => {
-      let result = viewModel.createWidget({model: {}});
+      let result = viewModel.createWidget({
+        model: {},
+        content_controller_options: {},
+      });
       expect(result.forceShow).toBe(false);
     });
 
@@ -267,6 +315,7 @@ describe('inner-nav view model', () => {
       let result = viewModel.createWidget({
         widget_name: 'force show widget title',
         model: {},
+        content_controller_options: {},
       });
       expect(result.inForceShowList).toBe(true);
     });
@@ -276,6 +325,7 @@ describe('inner-nav view model', () => {
       let result = viewModel.createWidget({
         widget_name: 'not in force show list widget title',
         model: {},
+        content_controller_options: {},
       });
       expect(result.inForceShowList).toBe(false);
     });

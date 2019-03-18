@@ -80,8 +80,7 @@ export default can.Map.extend({
     let title = typeof widgetName === 'function'
       ? widgetName() : widgetName;
     let countsName = descriptor.countsName ||
-        (descriptor.content_controller_options &&
-          descriptor.content_controller_options.countsName) ||
+        descriptor.content_controller_options.countsName ||
         descriptor.model.model_singular;
     let model = this.attr('instance').constructor;
     let forceShowList = model.obj_nav_options.force_show_list || [];
