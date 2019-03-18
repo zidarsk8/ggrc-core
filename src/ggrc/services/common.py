@@ -558,6 +558,7 @@ class Resource(ModelView):
 
   @staticmethod
   def json_update(obj, src):
+    """Update object `obj` with data from JSON `src`."""
     ggrc.builder.json.update(obj, src)
 
   def patch(self):
@@ -1407,6 +1408,7 @@ class Resource(ModelView):
     return resource
 
   def object_for_json(self, obj, model_name=None, properties_to_include=None):
+    """Serialize obj in JSON format."""
     model_name = model_name or self.model._inflector.table_singular
     json_obj = ggrc.builder.json.publish(
         obj, properties_to_include or [], inclusion_filter)
@@ -1429,6 +1431,8 @@ class Resource(ModelView):
   def json_success_response(self, response_object, last_modified=None,
                             status=200, id=None, cache_op=None,
                             obj_etag=None):
+    """Prepare success JSON response and set required headers."""
+    # pylint: disable=redefined-builtin
     headers = [('Content-Type', 'application/json')]
     if last_modified:
       headers.append(('Last-Modified', self.http_timestamp(last_modified)))
