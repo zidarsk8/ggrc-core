@@ -45,6 +45,11 @@ tree-pagination {
         margin: 0 16px;
       }
 
+      // to get consistency with .pagination-item
+      .dropdown-container__wrapper {
+        line-height: 26px;
+      }
+
       .dropdown-container__items-list {
         margin: 10px 0;
       }
@@ -75,16 +80,28 @@ tree-pagination {
       .pagination-item {
         line-height: 26px;
         border: 1px solid $widgetBorder;
-        border-left-width: 0;
         background: $white;
 
-        &:first-child {
-          border-left-width: 1px;
+        &:nth-child(1) {
           border-radius: 2px 0 0 2px;
+          border-right: none;
         }
 
-         &:last-child {
+        &:nth-child(2) {
+          border-right: none;
+        }
+
+        &:nth-child(3) {
+          border: none;
+        }
+
+        &:nth-child(4) {
+          border-left: none;
+        }
+
+        &:nth-child(5) {
           border-radius: 0 2px 2px 0;
+          border-left: none;
         }
 
         &.disabled {
@@ -108,14 +125,6 @@ tree-pagination {
               color: $gray;
             }
           }
-        }
-
-        &:nth-child(2) {
-          border-right: 0;
-        }
-
-        &:nth-child(3) {
-          border-color: transparent;
         }
 
         .pagination-item__popover-item {
