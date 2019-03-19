@@ -18,12 +18,21 @@
           Off
         {{/if}}
       </div>
+      {{#if_instance_of instance 'Audit'}}
+        {{#if instance.issue_tracker.enabled}}
+          <div class="people-sync">
+            <input disabled type="checkbox"
+              can-value="instance.issue_tracker.people_sync_enabled">
+            Sync people with ticket tracker
+          </div>
+        {{/if}}
+      {{/if_instance_of}}
   </div>
 </div>
 {{#if instance.issue_tracker.enabled}}
-  
+
   <content></content>
-  
+
   {{#if showId}}
   <div class="row-fluid wrap-row">
     <div class="span8">
