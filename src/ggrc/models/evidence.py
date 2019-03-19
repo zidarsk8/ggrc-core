@@ -230,32 +230,25 @@ class Evidence(Roleable, Relatable, mixins.Titled,
   def _get_folder(parent):
     return parent.folder if hasattr(parent, 'folder') else ''
 
-  def _map_parent(self):
-    """Maps evidence to parent object
-
-    If Document.FILE and source_gdrive_id => copy file
-    """
-    if self.is_with_parent_obj():
-      parent = self._get_parent_obj()
-      if self.kind == Evidence.FILE and self.source_gdrive_id:
-        self.exec_gdrive_file_copy_flow(parent)
-      self._build_relationship(parent)
-      self._parent_obj = None  # pylint: disable=attribute-defined-outside-init
-
-  def exec_gdrive_file_copy_flow(self, parent):
+  def exec_gdrive_file_copy_flow(self):
     """Execute google gdrive file copy flow
 
     Build file name, destination folder and copy file to that folder.
     After coping fills evidence object fields with new gdrive URL
     """
-    postfix = self._build_file_name_postfix(parent)
-    folder_id = self._get_folder(parent)
-    file_id = self.source_gdrive_id
-    from ggrc.gdrive.file_actions import process_gdrive_file
-    response = process_gdrive_file(file_id, folder_id, postfix,
-                                   separator=Evidence.FILE_NAME_SEPARATOR,
-                                   is_uploaded=self.is_uploaded)
-    self._update_fields(response)
+    if self.is_with_parent_obj() and \
+       self.kind == Evidence.FILE and \
+       self.source_gdrive_id:
+
+      parent = self._get_parent_obj()
+      postfix = self._build_file_name_postfix(parent)
+      folder_id = self._get_folder(parent)
+      file_id = self.source_gdrive_id
+      from ggrc.gdrive.file_actions import process_gdrive_file
+      response = process_gdrive_file(file_id, folder_id, postfix,
+                                     separator=Evidence.FILE_NAME_SEPARATOR,
+                                     is_uploaded=self.is_uploaded)
+      self._update_fields(response)
 
   def is_with_parent_obj(self):
     return bool(hasattr(self, '_parent_obj') and self._parent_obj)
@@ -266,4 +259,4 @@ class Evidence(Roleable, Relatable, mixins.Titled,
 
   def handle_before_flush(self):
     """Handler that called  before SQLAlchemy flush event"""
-    self._map_parent()
+    self.exec_gdrive_file_copy_flow()
