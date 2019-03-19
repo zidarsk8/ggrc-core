@@ -9,31 +9,6 @@ tree-pagination {
     line-height: 28px;
     font-size: 12px;
 
-    &__count {
-      margin: 0 16px;
-      line-height: 28px;
-
-      button {
-        line-height: 28px;
-        padding-top: 0;
-        padding-bottom: 0;
-      }
-      .tree-view-pagination__count__title {
-        font-weight: normal;
-        text-transform: none;
-        font-size: 12px;
-        color: $textGray;
-        line-height: 28px;
-        text-align: right;
-        margin: 0;
-        padding: 0;
-      }
-    }
-
-    .per-page {
-      margin-left: 10px;
-    }
-
     .pagination {
       display: inline-flex;
       flex-direction: row;
@@ -121,9 +96,6 @@ tree-pagination {
 
           i {
             color: $black;
-            &:hover {
-              color: $gray;
-            }
           }
         }
 
