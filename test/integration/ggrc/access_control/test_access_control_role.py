@@ -167,3 +167,43 @@ class TestAccessControlRole(TestCase):
     """Test create action not allowed for GGRC."""
     response = self._post_role(object_type=object_type)
     self.assertEqual(response.status_code, 405)
+
+  @ddt.data("Control")
+  def test_modify_from_ggrcq(self, object_type):
+    """Test that modify action only for GGRCQ."""
+    with factories.single_commit():
+      acr_id = factories.AccessControlRoleFactory(object_type=object_type).id
+
+    with self.api.as_external():
+      acr = all_models.AccessControlRole.query.get(acr_id)
+      response = self.api.put(acr, {"name": "new acr"})
+      self.assertEqual(response.status_code, 200)
+
+  @ddt.data("Control")
+  def test_modify_from_ggrc(self, object_type):
+    """Test modify action not allowed for GGRC."""
+    with factories.single_commit():
+      acr = factories.AccessControlRoleFactory(object_type=object_type)
+
+    response = self.api.put(acr, {"name": "new acr"})
+    self.assertEqual(response.status_code, 405)
+
+  @ddt.data("Control")
+  def test_delete_from_ggrcq(self, object_type):
+    """Test that modify action only for GGRCQ."""
+    with factories.single_commit():
+      acr_id = factories.AccessControlRoleFactory(object_type=object_type).id
+
+    with self.api.as_external():
+      acr = all_models.AccessControlRole.query.get(acr_id)
+      response = self.api.delete(acr)
+      self.assertEqual(response.status_code, 200)
+
+  @ddt.data("Control")
+  def test_delete_from_ggrc(self, object_type):
+    """Test modify action not allowed for GGRC."""
+    with factories.single_commit():
+      acr = factories.AccessControlRoleFactory(object_type=object_type)
+
+    response = self.api.delete(acr)
+    self.assertEqual(response.status_code, 405)
