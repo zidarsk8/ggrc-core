@@ -9,12 +9,14 @@ Create Date: 2018-10-18 16:29:40.409113
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
+import pickle
+import zlib
 import sqlalchemy as sa
 
 from sqlalchemy.dialects import mysql
+import sqlalchemy.types as types
 from alembic import op
 
-from ggrc.models.types import CompressedType
 from ggrc.migrations.utils import acr_propagation
 
 
@@ -24,6 +26,27 @@ down_revision = "05b0a3e7b4ed"
 
 ROLE_NAME = "Admin"
 OBJECT_TYPE = "BackgroundTask"
+
+
+class CompressedType(types.TypeDecorator):
+  # pylint: disable=W0223
+  """ Custom Compresed data type
+
+  Custom type for storing any python object in our database as serialized text.
+  """
+  MAX_BINARY_LENGTH = 16777215
+  impl = types.LargeBinary(length=MAX_BINARY_LENGTH)
+
+  def process_result_value(self, value, dialect):
+    if value is not None:
+      value = pickle.loads(zlib.decompress(value))
+    return value
+
+  def process_bind_param(self, value, dialect):
+    value = zlib.compress(pickle.dumps(value))
+    if len(value) > self.MAX_BINARY_LENGTH:
+      raise ValueError("Log record content too long")
+    return value
 
 
 def remove_acp_acl_acr_of_bg_tasks():

@@ -9,16 +9,39 @@ Create Date: 2019-02-04 11:07:57.982626
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
+import pickle
 import zlib
+
 import sqlalchemy as sa
+import sqlalchemy.types as types
 from sqlalchemy.dialects import mysql
 
 from alembic import op
-from ggrc.models import types
 
 # revision identifiers, used by Alembic.
 revision = '25a1b9502690'
 down_revision = '0d7a3a0aa3da'
+
+
+class CompressedType(types.TypeDecorator):
+  # pylint: disable=W0223
+  """ Custom Compresed data type
+
+  Custom type for storing any python object in our database as serialized text.
+  """
+  MAX_BINARY_LENGTH = 16777215
+  impl = types.BLOB(length=MAX_BINARY_LENGTH)
+
+  def process_result_value(self, value, dialect):
+    if value is not None:
+      value = pickle.loads(zlib.decompress(value))
+    return value
+
+  def process_bind_param(self, value, dialect):
+    value = zlib.compress(pickle.dumps(value))
+    if len(value) > self.MAX_BINARY_LENGTH:
+      raise ValueError("Log record content too long")
+    return value
 
 
 def _compress_bg_tasks_payload():
@@ -46,7 +69,7 @@ def _alter_import_export_table():
       'import_exports',
       'content',
       existing_type=mysql.LONGTEXT,
-      type_=types.CompressedType(length=16777215)
+    type_=CompressedType(length=16777215)
   )
 
 
