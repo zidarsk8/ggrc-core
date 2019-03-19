@@ -9,6 +9,7 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import Mappings from '../../models/mappers/mappings';
 import {REFRESH_MAPPED_COUNTER} from '../../events/eventTypes';
+import template from './mapped-counter.stache';
 
 let titlesMap = {
   Total: {
@@ -42,6 +43,9 @@ let viewModel = can.Map.extend({
     },
   },
   instance: null,
+  isSpinnerVisible: false,
+  isTitleVisible: true,
+  extraCssClass: '',
   type: '@',
   count: 0,
   /**
@@ -68,6 +72,7 @@ let viewModel = can.Map.extend({
         return count + counts[ind][type].total;
       }, 0);
 
+      this.attr('isSpinnerVisible', false);
       this.attr('count', total);
     }.bind(this));
   },
@@ -94,7 +99,7 @@ let viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'mapped-counter',
-  template: '<i class="fa fa-{{icon}}"></i> {{title}}: {{count}}',
+  template: template,
   leakScope: true,
   viewModel,
   events: {
