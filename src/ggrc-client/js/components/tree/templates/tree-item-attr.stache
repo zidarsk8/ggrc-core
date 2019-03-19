@@ -90,11 +90,9 @@
   {{/case}}
 
   {{#case 'status'}}
-    {{#using status=instance.status}}
-      <span class="state-value-dot {{addclass 'state' status}} {{#if instance.verified}}verified{{/if}}">
-        {{status}}
-      </span>
-    {{/using}}
+    <span class="state-value-dot {{addclass 'state' instance.status}} {{#if instance.verified}}verified{{/if}}">
+      {{instance.status}}
+    </span>
   {{/case}}
 
   {{#case 'review_status'}}

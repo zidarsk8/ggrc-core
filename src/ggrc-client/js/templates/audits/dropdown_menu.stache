@@ -29,24 +29,22 @@
     {{/is_allowed}}
   {{/if}}
 
-  {{#using program=instance.program}}
   {{#is_allowed 'update' program context='for'}}
     {{#if instance.class.is_clonable}}
-        {{#is_allowed 'update' instance context='for'}}
-          <li>
-              <object-cloner
-                    instance="instance"
-                    modal-title="Clone {{ instance.type }}"
-                    modal-description="Select all that you would like to clone as well?">
-                <a href="javascript://" can-click="cloneObject">
-                    <i class="fa fa-clone"></i>
-                    Clone {{ instance.type }}</a>
-              </object-cloner>
-          </li>
+      {{#is_allowed 'update' instance context='for'}}
+        <li>
+          <object-cloner instance="instance"
+                         modal-title="Clone {{ instance.type }}"
+                         modal-description="Select all that you would like to clone as well?">
+            <a href="javascript://" can-click="cloneObject">
+              <i class="fa fa-clone"></i>
+              Clone {{ instance.type }}
+            </a>
+          </object-cloner>
+        </li>
       {{/is_allowed}}
     {{/if}}
   {{/is_allowed}}
-  {{/using}}
 
   <li>
     {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}

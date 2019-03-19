@@ -28,22 +28,18 @@
             {{/is_info_pin}}
 
             <div class="info-pane-utility">
-              {{#using workflow=instance.workflow}}
               <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
-                <three-dots-menu>
-                    {{#if workflow.viewLink}}
-                      <li>
-                        <a href="{{workflow.viewLink}}">
-                          <i class="fa fa-long-arrow-right"></i>
-                          Open {{workflow.class.title_singular}}
-                        </a>
-                      </li>
-                    {{/if}}
-                    <li>
-                      <permalink {instance}="instance"/>
-                    </li>
-                </three-dots-menu>
-              {{/using}}
+              <three-dots-menu>
+                <li>
+                  <a href="/workflows/{{instance.workflow.id}}">
+                    <i class="fa fa-long-arrow-right"></i>
+                    Open Workflow
+                  </a>
+                </li>
+                <li>
+                  <permalink {instance}="instance"/>
+                </li>
+              </three-dots-menu>
             </div>
           </div>
         </div>
