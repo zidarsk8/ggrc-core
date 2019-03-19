@@ -10,7 +10,6 @@ Create Date: 2018-10-18 16:29:40.409113
 # pylint: disable=invalid-name
 
 import pickle
-import zlib
 import sqlalchemy as sa
 
 from sqlalchemy.dialects import mysql
@@ -39,11 +38,11 @@ class CompressedType(types.TypeDecorator):
 
   def process_result_value(self, value, dialect):
     if value is not None:
-      value = pickle.loads(zlib.decompress(value))
+      value = pickle.loads(value)
     return value
 
   def process_bind_param(self, value, dialect):
-    value = zlib.compress(pickle.dumps(value))
+    value = pickle.dumps(value)
     if len(value) > self.MAX_BINARY_LENGTH:
       raise ValueError("Log record content too long")
     return value

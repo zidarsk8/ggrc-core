@@ -92,11 +92,11 @@ class SnapshotBlockConverter(object):
     for key in self.SNAPSHOT_MAPPING_ALIASES:
       model_name = key.split(":")[1]
       content[key] = [
-                       {"type": rel.destination_type, "id": rel.destination_id}
+          {"type": rel.destination_type, "id": rel.destination_id}
           for rel in snapshot.related_destinations
           if rel.destination_type == model_name
       ] + [
-                       {"type": rel.source_type, "id": rel.source_id}
+          {"type": rel.source_type, "id": rel.source_id}
           for rel in snapshot.related_sources
           if rel.source_type == model_name
       ]

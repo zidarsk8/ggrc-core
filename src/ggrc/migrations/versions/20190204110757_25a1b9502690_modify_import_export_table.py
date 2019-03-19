@@ -20,7 +20,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '25a1b9502690'
-down_revision = '0d7a3a0aa3da'
+down_revision = '42afbc0e6c09'
 
 
 class CompressedType(types.TypeDecorator):
@@ -69,7 +69,7 @@ def _alter_import_export_table():
       'import_exports',
       'content',
       existing_type=mysql.LONGTEXT,
-    type_=CompressedType(length=16777215)
+      type_=CompressedType(length=16777215)
   )
 
 
