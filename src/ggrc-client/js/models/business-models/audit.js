@@ -169,20 +169,18 @@ export default Cacheable.extend({
       return item.ac_role_id === auditRole.id;
     }));
   },
-  setDefaultAuditTitle: function () {
-    let program = this.attr('program');
-    if (!program) return;
-    program = reify(program);
+  initTitle: async function () {
+    if (!this.program) return;
+    const program = reify(this.program);
 
     const currentYear = (new Date()).getFullYear();
     let title = `${currentYear}: ${program.title} - Audit`;
 
-    Search.counts_for_types(title, ['Audit'])
-      .then((result) => {
-        // Next audit index should be bigger by one than previous, we have unique name policy
-        const newAuditId = result.getCountFor('Audit') + 1;
-        title = `${title} ${newAuditId}`;
-        this.attr('title', title);
-      });
+    const result = await Search.counts_for_types(title, ['Audit']);
+    // Next audit index should be bigger by one than previous, we have unique name policy
+    const newAuditId = result.getCountFor('Audit') + 1;
+    if (!this.title) {
+      this.attr('title', `${title} ${newAuditId}`);
+    }
   },
 });

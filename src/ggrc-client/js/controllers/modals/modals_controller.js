@@ -153,7 +153,7 @@ export default can.Control.extend({
           this.options.afterFetch(this.element);
           this.restore_ui_status_from_storage();
           if (this.is_audit_modal()) {
-            this.set_default_audit_title();
+            this.init_audit_title();
           }
         }
       })
@@ -169,10 +169,10 @@ export default can.Control.extend({
       && instance.constructor.model_singular === 'Audit';
   },
 
-  set_default_audit_title: async function () {
+  init_audit_title: function () {
     const {instance, new_object_form: isNewObjectForm} = this.options;
     if (isNewObjectForm) {
-      instance.setDefaultAuditTitle();
+      instance.initTitle();
     }
   },
 
@@ -267,7 +267,7 @@ export default can.Control.extend({
 
       instance.attr(path, null).attr(path, ui.item);
       if (this.is_audit_modal()) {
-        this.set_default_audit_title();
+        this.init_audit_title();
       }
       if (!instance._transient) {
         instance.attr('_transient', can.Map());
@@ -896,7 +896,7 @@ export default can.Control.extend({
       ajd.always(() => {
         this.options.attr('isSaving', false);
         if (this.is_audit_modal()) {
-          this.set_default_audit_title();
+          this.init_audit_title();
         }
       });
       if (this.options.add_more) {
