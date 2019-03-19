@@ -8,7 +8,6 @@ import logging
 from collections import defaultdict
 from collections import OrderedDict
 
-import copy
 from cached_property import cached_property
 from flask import _app_ctx_stack
 
@@ -93,12 +92,11 @@ class SnapshotBlockConverter(object):
     for key in self.SNAPSHOT_MAPPING_ALIASES:
       model_name = key.split(":")[1]
       content[key] = [
-          {"type": unicode(rel.destination_type),
-           "id": int(rel.destination_id)}
+                       {"type": rel.destination_type, "id": rel.destination_id}
           for rel in snapshot.related_destinations
           if rel.destination_type == model_name
       ] + [
-          {"type": unicode(rel.source_type), "id": int(rel.source_id)}
+                       {"type": rel.source_type, "id": rel.source_id}
           for rel in snapshot.related_sources
           if rel.source_type == model_name
       ]
@@ -111,8 +109,8 @@ class SnapshotBlockConverter(object):
     object belongs to.
     """
     content = {}
-    content.update(copy.deepcopy(snapshot.revision.content))
-    content["audit"] = {"type": "Audit", "id": int(snapshot.parent_id)}
+    content.update(snapshot.revision.content)
+    content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
     content["slug"] = u"*{}".format(content["slug"])
     content["revision_date"] = unicode(snapshot.revision.created_at)
     content["archived"] = snapshot.archived
@@ -128,11 +126,9 @@ class SnapshotBlockConverter(object):
 
     The content of the given snapshots also contains the mapped audit field.
     """
-    snapshots = models.Snapshot.query.filter(
-        models.Snapshot.id.in_(self.ids)
-    ).count()
-    if not snapshots:
+    if not self.ids:
       yield {}
+      return
     for ids_pool in list_chunks(self.ids, self.ROW_CHUNK_SIZE):
       # sqlalchemy caches all queries and it takes a lot of memory.
       # This line clears query cache
@@ -151,7 +147,7 @@ class SnapshotBlockConverter(object):
     ).distinct().all()
 
     assert len(child_types) <= 1
-    return unicode(child_types.pop()[0]) if child_types else ""
+    return child_types.pop()[0] if child_types else ""
 
   @cached_property
   def _cad_map(self):
