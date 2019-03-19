@@ -74,7 +74,7 @@ class CompressedType(types.TypeDecorator):
   Custom type for storing any python object in our database as serialized text.
   """
   MAX_BINARY_LENGTH = 16777215
-  impl = types.LargeBinary(length=MAX_BINARY_LENGTH)
+  impl = types.BLOB(length=MAX_BINARY_LENGTH)
 
   def process_result_value(self, value, dialect):
     if value is not None:
