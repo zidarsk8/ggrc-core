@@ -23,7 +23,7 @@ from ggrc.migrations.utils\
 
 # revision identifiers, used by Alembic.
 revision = 'f53a6dc80a57'
-down_revision = 'e6f8ba2075a4'
+down_revision = '7d10655e87f9'
 
 
 def load_data(conn):
@@ -38,8 +38,7 @@ def load_data(conn):
           tgo.modified_by_id AS tgo_modified_by_id,
           tgo.updated_at AS tgo_updated_at,
           tgo.context_id AS tgo_context_id,
-          rel_union.id AS tgo_rel_id,
-          acl.role_id as tgo_acr_id
+          rel_union.id AS tgo_rel_id
       FROM
           task_group_objects tgo
       JOIN(
@@ -51,19 +50,6 @@ def load_data(conn):
       ) as rel_union
       ON
           rel_union.destination_id=tgo.id
-      LEFT OUTER JOIN(
-          SELECT
-              acl.id,
-              acl.object_id,
-              acr.parent_id as role_id
-          FROM
-              access_control_list acl
-          JOIN access_control_roles acr ON acr.id = acl.ac_role_id
-          WHERE
-              acl.object_type = 'TaskGroupObject'
-      ) AS acl
-      ON
-          acl.object_id = tgo.object_id
       GROUP BY tgo.id
   """
   return conn.execute(sa.text(sql)).fetchall()
@@ -105,70 +91,6 @@ def create_relationship(conn, task_group_id, destination_id, destination_type,
   rel_id = utils.last_insert_id(conn)
   utils.add_to_objects_without_revisions(conn, rel_id, "Relationship")
   return rel_id
-
-
-def add_relationship_acl(conn, object_id, user_id, acr_id):
-  """Create Admin ACL user_id -> Relationship.modified_by_id"""
-  sql = """
-      INSERT INTO access_control_list(
-          ac_role_id,
-          object_id,
-          object_type,
-          created_at,
-          updated_at,
-          modified_by_id,
-          parent_id_nn
-      )VALUES(
-          :ac_role_id,
-          :object_id,
-          "Relationship",
-          NOW(),
-          NOW(),
-          :modified_by_id,
-          0
-      )
-    """
-  conn.execute(
-      sa.text(sql),
-      ac_role_id=acr_id,
-      object_id=object_id,
-      modified_by_id=user_id,
-  )
-  acl_id = utils.last_insert_id(conn)
-  utils.add_to_objects_without_revisions(conn, acl_id, "AccessControlList")
-  create_acp(conn, user_id, acl_id)
-
-
-def create_acp(conn, person_id, ac_list_id):
-  """Create acp entry"""
-  sql = """
-    INSERT INTO access_control_people(
-        person_id,
-        ac_list_id,
-        updated_at,
-        created_at
-    )VALUES(
-        :person_id,
-        :ac_list_id,
-        NOW(),
-        NOW()
-    )
-  """
-  conn.execute(
-      sa.text(sql),
-      person_id=person_id,
-      ac_list_id=ac_list_id
-  )
-
-
-def get_relationship_role_ids(conn):
-  """Return Relationship role ids for Admin and Workflow Member"""
-  sql = """
-      SELECT parent_id from access_control_roles
-      WHERE object_type='TaskGroupTask' AND
-      parent_id IS NOT NULL
-  """
-  return conn.execute(sa.text(sql)).fetchall()
 
 
 def remove_old_relationship(conn, data):
@@ -217,9 +139,8 @@ def run_data_migration():
       acr_propagation_constants.CURRENT_PROPAGATION,
       new_tree=acr_propagation_constants.WORKFLOW_PROPAGATION
   )
-  role_ids = get_relationship_role_ids(conn)
   for tgo in data:
-    rel_id = create_relationship(
+    create_relationship(
         conn,
         tgo.tgo_task_group_id,
         tgo.tgo_object_id,
@@ -227,13 +148,6 @@ def run_data_migration():
         migrator_id,
         tgo.tgo_context_id
     )
-    for role_id in role_ids:
-      add_relationship_acl(
-          conn,
-          rel_id,
-          tgo.tgo_modified_by_id if tgo.tgo_modified_by_id else migrator_id,
-          role_id.parent_id
-      )
 
   remove_old_rel_revisions(conn, data)
   remove_old_relationship(conn, data)
