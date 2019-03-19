@@ -7,6 +7,13 @@
   <div class="ggrc-form-item__row">
     <label class="ggrc-form-item__label">
       Ticket Tracker
+      {{#if_instance_of instance 'Assessment'}}
+        {{#if instance.issue_tracker.enabled}}
+          {{^if instance.issue_tracker.people_sync_enabled}}
+            <span class="people-sync-state">People Sync: Disabled</span>
+          {{/if}}
+        {{/if}}
+      {{/if_instance_of}}
     </label>
     <div class="ggrc-form-item__note">
       {{{note}}}

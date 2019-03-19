@@ -4,6 +4,16 @@
 */
 
 modal-issue-tracker-fields {
+  .people-sync-state {
+    display: inline-block;
+    background-color: $status-draft;
+    color: $white;
+    font-weight: normal;
+    text-transform: none;
+    padding: 0px 3px;
+    margin: 0 0 0 3px;
+  }
+
   .issue-tracker__dropdown {
     .input-block-level {
       margin-bottom: 8px !important;
