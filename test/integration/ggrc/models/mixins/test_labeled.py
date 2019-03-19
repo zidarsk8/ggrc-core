@@ -6,13 +6,11 @@
 import collections
 import ddt
 
-from integration.ggrc import api_helper
-from integration.ggrc.query_helper import WithQueryApi
-
-from integration.ggrc import TestCase
-from integration.ggrc.models import factories
 from ggrc import db
 from ggrc.models import all_models
+from integration.ggrc import api_helper, TestCase
+from integration.ggrc.query_helper import WithQueryApi
+from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 
