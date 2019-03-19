@@ -15,10 +15,6 @@ import {
 import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 import _ from 'lodash';
-import {
-  buildCountParams,
-  batchRequests,
-} from './plugins/utils/query-api-utils';
 import Search from './models/service-models/search';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
@@ -790,31 +786,6 @@ Mustache.registerHelper('switch', function (value, options) {
     },
   });
 });
-
-Mustache.registerHelper('with_mapping_count',
-  function (instance, mappingName, options) {
-    let relevant;
-    let dfd;
-
-    mappingName = Mustache.resolve(mappingName);
-    instance = Mustache.resolve(instance);
-
-    relevant = {
-      id: instance.id,
-      type: instance.type,
-    };
-    dfd = batchRequests(buildCountParams([mappingName], relevant)[0]);
-    return deferRender('span', {
-      done: function (count) {
-        return options.fn(options.contexts.add({
-          count: count[mappingName].count}));
-      },
-      progress: function () {
-        return options.inverse(options.contexts);
-      },
-    },
-    dfd);
-  });
 
 Mustache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   let options = arguments[arguments.length - 1];
