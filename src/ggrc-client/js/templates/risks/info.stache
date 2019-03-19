@@ -216,27 +216,24 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
-          <tab-panel
-            warningText:from="'Some proposals are pending approval'"
-            titleText:from="'Change Proposals'"
-            extraClasses:from="'proposal proposal__tab-warning'"
-            tabId:from="'tab-related-proposals'"
+          <tab-link
+            instance:from="instance"
             panels:bind="panels"
-            parentInstance:from="instance"
-            canDisplayWarning:from="true"
-            preRenderContent:from="true">
-              <related-proposals
-                on:updateProposalsWarning="updateWarningState(scope.event)"
-                baseInstance:from="instance">
-              </related-proposals>
-          </tab-panel>
-          <tab-panel panels:bind="panels" titleText:from="'Version History'">
-            <related-revisions instance:from="instance"></related-revisions>
-          </tab-panel>
-
-          <tab-panel tabId:from="'change-log'" panels:bind="panels" titleText:from="'Change Log'">
-            <revision-log instance:from="instance" options:from="tabOptions"></revision-log>
-          </tab-panel>
+            titleText:from="'Change Proposals'"
+            linkType:from="'proposals'"
+          ></tab-link>
+          <tab-link
+            instance:from="instance"
+            panels:bind="panels"
+            titleText:from="'Version History'"
+            linkType:from="'change-log'"
+          ></tab-link>
+          <tab-link
+            instance:from="instance"
+            panels:bind="panels"
+            titleText:from="'Change Log'"
+            linkType:from="'change-log'"
+          ></tab-link>
         {{/if}}
       </tab-container>
 
