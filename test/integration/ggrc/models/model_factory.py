@@ -16,6 +16,7 @@ import factory
 
 from ggrc import db
 from ggrc import models
+from ggrc.access_control import roleable
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext import mixin
 from ggrc.login import noop
@@ -24,9 +25,20 @@ from ggrc.login import noop
 class ModelFactory(factory.Factory, object):
 
   @classmethod
+  def _add_mandatory_people(cls, instance):
+    person = None
+    for acl in instance._access_control_list:
+      if acl.ac_role.mandatory and not acl.access_control_people:
+        person = person or cls._get_random_user()
+        instance.add_person_with_role(person, acl.ac_role)
+
+  @classmethod
   def _create(cls, target_class, *args, **kwargs):
     instance = target_class(*args, **kwargs)
     db.session.add(instance)
+    if isinstance(instance, roleable.Roleable):
+      cls._add_mandatory_people(instance)
+
     if isinstance(instance, models.CustomAttributeValue):
       cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
@@ -75,4 +87,15 @@ class ModelFactory(factory.Factory, object):
       )
       db.session.add(user)
       db.session.flush()
+    return user
+
+  @classmethod
+  def _get_random_user(cls):
+    count = models.Person.query.count() + 1
+    user = models.Person(
+        name="Random User {}".format(count),
+        email="random_user_{}@example.com".format(count),
+    )
+    db.session.add(user)
+    db.session.flush()
     return user
