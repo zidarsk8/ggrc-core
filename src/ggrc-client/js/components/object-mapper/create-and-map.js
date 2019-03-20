@@ -22,6 +22,8 @@ import {
   getMappingUrl,
 } from '../../plugins/utils/ggrcq-utils';
 import {isMegaMapping} from '../../plugins/utils/mega-object-utils';
+import * as businessModels from '../../models/business-models';
+import {externalBusinessObjects} from '../../plugins/models-types-collections';
 
 export default can.Component.extend({
   tag: 'create-and-map',
@@ -85,11 +87,19 @@ export default can.Component.extend({
     destinationModel: null,
     newEntries: [],
     getCreateAndMapExternallyText() {
-      let destinationModel = this.attr('destinationModel');
+      const destinationModel = this.attr('destinationModel');
+      const objects = externalBusinessObjects
+        .filter((externalObjectName) =>
+          destinationModel.model_singular !== externalObjectName
+        )
+        .map((externalObjectName) =>
+          businessModels[externalObjectName].table_plural)
+        .join(', ');
+      const listOfObjects = `scope, ${objects}, standards and regulations`;
 
       return `${destinationModel.title_singular} creation and mapping
-        ${destinationModel.title_plural.toLowerCase()} to scope, standards and
-        regulations flows are currently disabled. </br> </br> Please click
+        ${destinationModel.title_plural.toLowerCase()} to ${listOfObjects}
+        flows are currently disabled. </br> </br> Please click
         “Proceed in the new tab” button to go to the new interface and complete
         these actions there.`;
     },
@@ -97,8 +107,10 @@ export default can.Component.extend({
       let sourceModel = this.attr('source').constructor;
       let destinationModel = this.attr('destinationModel');
 
-      return `Redirecting to Controls Library in the new interface to
-        create a ${destinationModel.title_singular.toLowerCase()}. </br> </br>
+      return `Redirecting to ${destinationModel.title_plural} Library in the
+        new interface to
+        create a ${destinationModel.title_singular.toLowerCase()}.
+        </br> </br>
         Until transition to the new UI is complete, you will need to come back
         here after creation and reopen this window to complete mapping to this
         ${sourceModel.title_singular.toLowerCase()}.`;
