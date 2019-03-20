@@ -92,7 +92,7 @@ export default can.Component.extend({
       que.enqueue(list).trigger().then(function (items) {
         let results = _.map(items, function (item) {
           let id = options.assessmentTemplate.split('-')[0];
-          return this.generateModel(item, id, options.type);
+          return this.generateModel(item, id);
         }.bind(this));
         this._results = results;
         $.when(...results)
@@ -113,7 +113,7 @@ export default can.Component.extend({
           }.bind(this));
       }.bind(this));
     },
-    generateModel: function (object, template, type) {
+    generateModel: function (object, template) {
       let assessmentModel;
       let audit = this.viewModel.attr('audit');
       let title = 'Generated Assessment for ' + audit.title;
@@ -128,7 +128,7 @@ export default can.Component.extend({
         },
         context: audit.context,
         title: title,
-        assessment_type: type,
+        assessment_type: object.child_type,
       };
       data.run_in_background = true;
 
