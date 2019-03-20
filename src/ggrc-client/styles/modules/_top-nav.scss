@@ -135,8 +135,6 @@ nav.internav {
     @include opacity(.7);
     position: relative;
     &:hover {
-      color: $black;
-      background: none;
       text-decoration: none;
       @include opacity(1);
       .closed {
