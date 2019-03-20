@@ -257,7 +257,8 @@ class TestExport(TestCase):
           link="https://d.go.com/d/18YJavJlv8YvIoCy/edit",
           description="mega description"
       )
-      factories.RelationshipFactory(source=self.assessment, destination=evid_file)
+      factories.RelationshipFactory(source=self.assessment,
+                                    destination=evid_file)
       evid_file_link = evid_file.link
       evid_file_title = evid_file.title
 
@@ -267,7 +268,8 @@ class TestExport(TestCase):
           link="google.com",
           description="mega description"
       )
-      factories.RelationshipFactory(source=self.assessment, destination=evid_url)
+      factories.RelationshipFactory(source=self.assessment,
+                                    destination=evid_url)
       evid_url_link = evid_url.link
 
     search_request = [{
