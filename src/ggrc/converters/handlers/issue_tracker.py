@@ -35,8 +35,9 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
     We have some rules for default values.
     - Assessment and Assessment Template should take their missing values
       from audit if there, otherwise from default values.
-    - Issues should have Issue specific hotlist_id and it's stored in separate
-      'issue_hotlist_id' key.
+    - Issues should have Issue specific hotlist_id and component_id. They are
+      stored separately in default_values dict ('issue_hotlist_id' and
+      'issue_component_id' keys).
     """
     value = None
     default_values = constants.DEFAULT_ISSUETRACKER_VALUES
@@ -48,8 +49,8 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
     if is_assmt or is_assmt_template:
       value = self.row_converter.obj.audit.issue_tracker.get(self.key)
 
-    if is_issue and (self.key == "hotlist_id"):
-      value = default_values.get("issue_hotlist_id")
+    if is_issue and (self.key in ["hotlist_id", "component_id"]):
+      value = default_values.get("issue_" + self.key)
 
     default_value = value or default_values.get(self.key)
     return default_value
