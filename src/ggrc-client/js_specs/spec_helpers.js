@@ -48,9 +48,30 @@ function makeFakeInstance({
   return (...instanceArgs) => new fakeModel(...instanceArgs);
 }
 
+/**
+ * Returns spy for get/set of passed 'property' in 'viewModel'.
+ * This spy will be called on getting or setting value of this property e.g.
+ * viewModel.attr(property), viewModel.attr(property, someValue).
+ * get/set of this 'property' should be defined in viewModel through define plugin.
+
+ * @param {can.Component.viewModel} viewModel
+ * @param {string} property
+ *
+ * @returns {jasmine.Spy}
+ */
+
+function spyProp(viewModel, property) {
+  const spy = jasmine.createSpy(`compute of ${property}`);
+
+  viewModel._computedAttrs[property].compute = spy;
+
+  return spy;
+}
+
 export {
   failAll,
   getComponentVM,
   makeFakeModel,
   makeFakeInstance,
+  spyProp,
 };
