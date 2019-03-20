@@ -20,10 +20,15 @@
     <div class="simple-modal__body">
         <div class="simple-modal__section simple-modal__sub-header-section">
             <p>
-                Provide the existing Ticket ID if don't want to create a new one.
+                Provide the existing Ticket ID{{^if mandatory}} if don't want to create a new one {{/if}}.
             </p>
         </div>
-        <div class="simple-modal__section {{^isValid}} field-failure {{/isValid}}">    
+        <div class="simple-modal__section {{^isValid}} field-failure {{/isValid}}">
+          {{#if mandatory}}
+            <p class="simple-modal__note">
+              You are not allowed to generate new ticket for Issues at statuses &quot;In Review&quot;, &quot;Completed (no verification)&quot;, &quot;Completed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform.
+            </p>
+          {{/if}}
           <numberbox-component
             placeholder:from="'Enter Ticket ID'"
             value:bind="ticketId">
@@ -37,10 +42,12 @@
                     on:el:click="linkWithExistingTicket">
                 Link with existing Ticket
             </button>
-            <button type="button" class="btn btn-small btn-link simple-modal__toolbar-item"
-                    on:el:click="generateNewTicket">
-                Generate new Ticket
-            </button>
+            {{^if mandatory}}
+              <button type="button" class="btn btn-small btn-link simple-modal__toolbar-item"
+                      on:el:click="generateNewTicket">
+                  Generate new Ticket
+              </button>
+            {{/if}}
         </div>
     </div>
 </simple-modal>
