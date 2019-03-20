@@ -17,6 +17,7 @@ from ggrc.models.mixins import (
 from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import all_models
+from ggrc.models.hooks import common
 from ggrc.models.mixins import base
 
 
@@ -114,8 +115,22 @@ class TaskGroup(roleable.Roleable,
 
     target.ensure_assignee_is_workflow_member()
 
+    if kwargs.get('clone_objects', False):
+      self.copy_objects(target, **kwargs)
+
     if kwargs.get('clone_tasks', False):
       self.copy_tasks(target, **kwargs)
+
+    return target
+
+  def copy_objects(self, target, **kwargs):
+    # pylint: disable=unused-argument
+    for rel in self.related_destinations:
+      if rel.destination_type != 'TaskGroupTask':
+        common.map_objects(target, {
+            "id": rel.destination_id,
+            "type": rel.destination_type
+        })
 
     return target
 
