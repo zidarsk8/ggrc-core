@@ -62,19 +62,28 @@
                   </questionnaire-mapping-link>
                 </a>
               {{else}}
-                <a href="{{urlPath}}{{ href }}"
-                  {{#canMapObject model.model_singular}}
-                    data-clickable="true"
-                    data-toggle="unified-mapper"
-                    data-join-option-type="{{model.model_singular}}"
-                    data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.class.model_singular}}"
-                  {{/canMapObject}}>
-                  <div class="oneline">
-                    <i class="fa fa-fw fa-{{ icon }} color"></i>
-                    {{title}}
-                  </div>
-                </a>
+
+                {{#canMapObject model.model_singular}}
+                  <a href="{{urlPath}}{{ href }}"
+                      data-clickable="true"
+                      data-toggle="unified-mapper"
+                      data-join-option-type="{{model.model_singular}}"
+                      data-join-object-id="{{instance.id}}"
+                      data-join-object-type="{{instance.class.model_singular}}">
+                    <div class="oneline">
+                      <i class="fa fa-fw fa-{{ icon }} color"></i>
+                      {{title}}
+                    </div>
+                  </a>
+                {{else}} 
+                  <a href="{{urlPath}}{{ href }}">
+                    <div class="oneline">
+                      <i class="fa fa-fw fa-{{ icon }} color"></i>
+                      {{title}}
+                    </div>
+                  </a>
+                {{/canMapObject}}
+                
               {{/isMappableExternally}}
             {{/shouldCreateObject}}
           </div>
