@@ -34,7 +34,7 @@ owner_read = owner_base + [
         "terms": {
             "property_name": "instance",
             "action": "read",
-        }
+        },
     },
     {
         "type": "CycleTaskEntry",
@@ -42,7 +42,7 @@ owner_read = owner_base + [
         "terms": {
             "property_name": "cycle_task_group_object_task",
             "action": "update",
-        }
+        },
     },
     "Role",
     "Comment",
@@ -50,6 +50,8 @@ owner_read = owner_base + [
     "Context",
     "Person",
     "PersonProfile",
+    "Label",
+    "ObjectLabel",
 ]
 
 owner_delete = owner_base + [
@@ -75,7 +77,7 @@ owner_delete = owner_base + [
         "terms": {
             "property_name": "instance",
             "action": "update",
-        }
+        },
     },
 ]
 
@@ -92,7 +94,7 @@ permissions = {
             "terms": {
                 "property_name": "program",
                 "action": "update",
-            }
+            },
         },
         {
             "type": "Snapshot",
@@ -100,7 +102,7 @@ permissions = {
             "terms": {
                 "property_name": "parent",
                 "action": "update",
-            }
+            },
         },
         "AssessmentTemplate",
         "BackgroundTask",
@@ -125,7 +127,7 @@ permissions = {
             "terms": {
                 "property_name": "cycle_task_group_object_task",
                 "action": "update",
-            }
+            },
         },
         {
             "type": "TaskGroupObject",
@@ -166,7 +168,7 @@ permissions = {
             "terms": {
                 "property_name": "instance",
                 "action": "read",
-            }
+            },
         },
         "Project",
         {
