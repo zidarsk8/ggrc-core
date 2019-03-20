@@ -21,13 +21,13 @@ describe('attach-button component', function () {
     );
   });
 
-  describe('finish() method', function () {
-    it('dispatches "finish" event', function () {
+  describe('created() method', function () {
+    it('dispatches "created" event', function () {
       spyOn(viewModel, 'dispatch');
-      viewModel.finish();
+      viewModel.created();
 
       expect(viewModel.dispatch)
-        .toHaveBeenCalledWith('finish');
+        .toHaveBeenCalledWith(jasmine.objectContaining({type: 'created'}));
     });
   });
 
