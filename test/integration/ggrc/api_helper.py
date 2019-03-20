@@ -22,8 +22,11 @@ from ggrc import db
 from ggrc import builder
 from ggrc import utils
 from ggrc import settings
+from ggrc import models
+from ggrc.access_control import roleable
 from ggrc.app import app
 from ggrc.services.common import Resource
+from integration.ggrc.models import factories
 
 
 def wrap_client_calls(client):
@@ -169,7 +172,35 @@ class Api(object):
     return self.send_request(
         self.client.put, obj, data, headers=headers, api_link=api_link)
 
+  def _fill_missing_acls(self, model_singular, acl_list):
+    model = models.get_model(model_singular)
+    mandatory_roles = models.AccessControlRole.query.filter(
+        models.AccessControlRole.object_type == model.__name__, 
+        models.AccessControlRole.mandatory == True
+    )
+    user = factories.PersonFactory()
+    existing_role_ids = {acl["ac_role_id"] for acl in acl_list}
+    for role in mandatory_roles:
+      if role.id not in existing_role_ids:
+        acl_list.append({
+            "ac_role_id": role.id,
+            "person": {"type": "Person", "id": user.id},
+        })
+  
+  def _fill_mandatory_acl(self, data):
+    data_list = data
+    if not isinstance(data_list, list):
+      data_list = [data]
+
+    for object_data in data_list:
+      for model_singular, object_content in object_data.items():
+        acl_list = object_content.get("access_control_list", [])
+        self._fill_missing_acls(model_singular, acl_list)
+        object_content["access_control_list"] = acl_list
+
   def post(self, obj, data):
+    if isinstance(obj, roleable.Roleable) or issubclass(obj, roleable.Roleable):
+      self._fill_mandatory_acl(data)  
     return self.send_request(self.client.post, obj, data)
 
   def patch(self, model, data):
