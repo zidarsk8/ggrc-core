@@ -13,7 +13,7 @@
 
   <h2 class="logo-wrap ">
     <a class="to-my-work" href="/dashboard">
-        <img src="{{logo}}" alt="GRC" title="GRC">
+        <img src="{{logo}}" alt="GGRC" title="GGRC">
     </a>
   </h2>
 
