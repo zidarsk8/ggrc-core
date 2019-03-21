@@ -305,7 +305,7 @@ class SnapshotBlockConverter(object):
     cav_value = value.get("attribute_value") or u""
     if cad["attribute_type"] == "Map:Person":
       attribute_object_id = value.get("attribute_object")["id"] \
-        if value.get("attribute_object") else u""
+          if value.get("attribute_object") else u""
       return self._stub_cache.get(cav_value, {}).get(attribute_object_id, u"")
     if cad["attribute_type"] == "Checkbox":
       return self.BOOLEAN_ALIASES.get(cav_value, u"")
