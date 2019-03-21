@@ -26,8 +26,8 @@ IMPORT_BLOCKED = {
 
 IMPORT_FAILED = {
     "title": u"[WARNING] Could not import {filename} due to errors",
-    "body": u"Go to import page to check details or submit new import "
-            u"request.",
+    "body": u"Your Import job failed due to a server error. Please "
+            u"retry import/export.",
     "url": u"import"
 }
 
