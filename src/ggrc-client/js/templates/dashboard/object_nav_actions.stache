@@ -4,7 +4,7 @@
 }}
 
 
-<li class="inner-nav__actions">
+<span class="inner-nav__actions">
   <nav-actions {instance}="instance">
     {{#if showSetupRequirement}}
       <p class="tiny-help-text">
@@ -40,4 +40,4 @@
       </workflow-activate>
     {{/if}}
   </nav-actions>
-</li>
+</span>

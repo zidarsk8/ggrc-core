@@ -61,8 +61,6 @@ export default can.Control.extend({
       if (!this.element) {
         return;
       }
-      can.trigger(this.element, 'updateCount',
-        [0, this.options.update_count]);
       this.init_count();
     }.bind(this));
 
