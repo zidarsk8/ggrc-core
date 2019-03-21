@@ -72,11 +72,11 @@
       {{/if_config_exist}}
     {{/if_instance_of}}
     {{#is_info_pin}}
-      <issue-unmap-dropdown-item
+      <unmap-dropdown-item
         {page_instance}="page_instance"
         {instance}="instance"
         {options}="options">
-      </issue-unmap-dropdown-item>
+      </unmap-dropdown-item>
       {{#if instance.viewLink}}
         <li>
           <a href="{{instance.viewLink}}">
