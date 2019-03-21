@@ -496,7 +496,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Severity",
         "Priority",
         "Issue Type",
-        "Issue Title",
+        "Ticket Title",
         "Ticket Tracker Integration",
     }
     expected_fields = {
@@ -548,7 +548,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Severity",
         "Priority",
         "Issue Type",
-        "Issue Title",
+        "Ticket Title",
         "Ticket Tracker Integration",
     }
     expected_fields = {

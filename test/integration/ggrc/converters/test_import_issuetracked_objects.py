@@ -51,13 +51,13 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("Issue", "Issue", "issue_priority", "Priority", "P1"),
       ("Issue", "Issue", "issue_severity", "Severity", "S1"),
       ("Issue", "Issue", "issue_type", "Issue Type", "PROCESS"),
-      ("Issue", "Issue", "title", "Issue Title", "iti_title"),
+      ("Issue", "Issue", "title", "Ticket Title", "iti_title"),
       ("Assessment", "Assessment", "component_id", "Component ID", 123),
       ("Assessment", "Assessment", "hotlist_id", "Hotlist ID", 321),
       ("Assessment", "Assessment", "issue_priority", "Priority", "P1"),
       ("Assessment", "Assessment", "issue_severity", "Severity", "S1"),
       ("Assessment", "Assessment", "issue_type", "Issue Type", "PROCESS"),
-      ("Assessment", "Assessment", "title", "Issue Title", "iti_title"),
+      ("Assessment", "Assessment", "title", "Ticket Title", "iti_title"),
       ("Audit", "Audit", "component_id", "Component ID", 123),
       ("Audit", "Audit", "hotlist_id", "Hotlist ID", 321),
       ("Audit", "Audit", "issue_priority", "Priority", "P1"),
@@ -252,7 +252,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
       ("issue_type", "Issue Type", "PROCESS"),
-      ("title", "Issue Title", "iti_title"),
+      ("title", "Ticket Title", "iti_title"),
   )
   @ddt.unpack
   def test_issue_import_create_succeed(self, field, alias, value):
@@ -275,7 +275,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_priority", "Priority", "P2"),
       ("issue_severity", "Severity", "S2"),
       ("issue_type", "Issue Type", "PROCESS"),
-      ("title", "Issue Title", "iti_title"),
+      ("title", "Ticket Title", "iti_title"),
   )
   @ddt.unpack
   def test_assmt_import_create_succeed(self, field, alias, value):
@@ -482,11 +482,11 @@ class TestIssueTrackedImport(ggrc.TestCase):
 
   @ddt.data("Issue", "Assessment")
   def test_default_value_title(self, model):
-    """Test correct default value was set to {0} Issue Title during import."""
+    """Test correct default value was set to {0} Ticket Title during import."""
     factory = factories.get_model_factory(model)
     obj = factory(title="Object Title")
     expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Issue Title")
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Ticket Title")
     )
     expected_messages = {
         model: {
@@ -496,7 +496,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", model),
         ("Code*", obj.slug),
-        ("Issue Title", ""),
+        ("Ticket Title", ""),
     ]))
     self._check_csv_response(response, expected_messages)
     obj = models.get_model(model).query.one()
