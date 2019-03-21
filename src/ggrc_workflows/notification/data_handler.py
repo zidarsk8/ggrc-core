@@ -14,10 +14,12 @@ from datetime import date
 from logging import getLogger
 from urlparse import urljoin
 
-from sqlalchemy import orm
+import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import utils
+from ggrc import models
+from ggrc.models.relationship import Relationship
 from ggrc.models.revision import Revision
 from ggrc.notifications import data_handlers
 from ggrc.utils import merge_dicts, get_url_root
@@ -350,14 +352,9 @@ def cycle_tasks_cache(notifications):
   if not task_ids:
     return {}
 
-  results = db.session\
-      .query(CycleTaskGroupObjectTask)\
-      .options(
-          orm.joinedload("related_sources"),
-          orm.joinedload("related_destinations")
-      )\
-      .filter(CycleTaskGroupObjectTask.id.in_(task_ids))
-
+  results = CycleTaskGroupObjectTask.eager_query().filter(
+      CycleTaskGroupObjectTask.id.in_(task_ids)
+  )
   return {task.id: task for task in results}
 
 
@@ -541,18 +538,61 @@ def _get_object_info_from_revision(revision, known_type):
   return object_type, object_id
 
 
-def get_cycle_task_dict(cycle_task, del_rels_cache=None):
-
+def get_cycle_task_related_objects(cycle_task):
+  """Fetches names and titles of related objects to cycle task."""
   object_titles = []
-  # every object should have a title or at least a name like person object
-  for related_object in cycle_task.related_objects():
-    if related_object.type in ("CycleTaskGroup", "CycleTaskEntry"):
-      # We can skip cycle task groups in notifications because they are
-      # irrelevant for the completion of a given cycle task.
-      continue
-    object_titles.append(getattr(related_object, "title", "") or
-                         getattr(related_object, "name", "") or
-                         u"Untitled object")
+
+  relationships = db.session.query(
+      Relationship.source_id,
+      Relationship.source_type,
+      Relationship.destination_id,
+      Relationship.destination_type,
+  ).filter(
+      sa.or_(
+          sa.and_(
+              Relationship.source_type == 'CycleTaskGroupObjectTask',
+              Relationship.source_id == cycle_task.id,
+          ),
+          sa.and_(
+              Relationship.destination_id == cycle_task.id,
+              Relationship.destination_type == 'CycleTaskGroupObjectTask',
+          )
+      )
+  ).all()
+  type_relations = defaultdict(list)
+  ignored_mappings = frozenset(['CycleTaskGroupObjectTask', 'CycleTaskGroup',
+                                'CycleTaskEntry', 'CalendarEvent'])
+
+  for rel in relationships:
+    src_id, src_type, dst_id, dst_type = rel
+    if src_type not in ignored_mappings:
+      type_relations[src_type].append(src_id)
+    if dst_type not in ignored_mappings:
+      type_relations[dst_type].append(dst_id)
+
+  for rel_type, rel_ids in type_relations.iteritems():
+    related_model = models.get_model(rel_type)
+    if issubclass(type(related_model), models.mixins.Titled):
+      titles = db.session.query(related_model.title).filter(
+          related_model.id.in_(rel_ids)
+      ).all()
+      object_titles.extend(titles)
+    else:
+      try:
+        names = db.session.query(related_model.name).filter(
+            related_model.id.in_(rel_ids)
+        ).all()
+        object_titles.extend(names)
+      except AttributeError:
+        # we don't have name column
+        object_titles.extend([u"Untitled object"] * len(rel_ids))
+
+  return object_titles
+
+
+def get_cycle_task_dict(cycle_task, del_rels_cache=None):
+  """Get dict representation for cycle task."""
+  object_titles = get_cycle_task_related_objects(cycle_task)
 
   # related objects might have been deleted or unmapped,
   # check the revision history

@@ -31,6 +31,7 @@ from ggrc.models import background_task
 from ggrc.notifications.unsubscribe import unsubscribe_url
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
+from ggrc.utils import generate_query_chunks
 from ggrc.notifications.notification_handlers import SEND_TIME
 
 from ggrc_workflows.models import CycleTaskGroupObjectTask
@@ -216,6 +217,23 @@ def get_pending_notifications():
   return notifications, data
 
 
+def generate_daily_notifications():
+  notifications = db.session.query(Notification).options(
+      joinedload("notification_type")
+  ).filter(
+      (Notification.runner == Notification.RUNNER_DAILY) &
+      (Notification.send_on <= datetime.today()) &
+      ((Notification.sent_at.is_(None)) | (Notification.repeating == true()))
+  ).order_by(Notification.id)
+  all_count = notifications.count()
+  handled = 0
+  for data_chunk in generate_query_chunks(notifications, chunk_size=500,
+                                          needs_ordering=False):
+    handled += data_chunk.count()
+    logger.info("Processing notifications: %s/%s", handled, all_count)
+    yield data_chunk, get_notification_data(data_chunk)
+
+
 def get_daily_notifications():
   """Get notification data for all future notifications.
 
@@ -223,7 +241,9 @@ def get_daily_notifications():
     list of Notifications, data: a tuple of notifications that were handled
       and corresponding data for those notifications.
   """
-  notifications = db.session.query(Notification).filter(
+  notifications = db.session.query(Notification).options(
+      joinedload("notification_type")
+  ).filter(
       (Notification.runner == Notification.RUNNER_DAILY) &
       (Notification.send_on <= datetime.today()) &
       ((Notification.sent_at.is_(None)) | (Notification.repeating == true()))
@@ -293,19 +313,21 @@ def send_daily_digest_notifications():
   """
   # pylint: disable=invalid-name
   with benchmark("contributed cron job send_daily_digest_notifications"):
-    notif_list, notif_data = get_daily_notifications()
     sent_emails = []
-    subject = "GGRC daily digest for {}".format(date.today().strftime("%b %d"))
+    for notif_list, notif_data in generate_daily_notifications():
+      subject = "GGRC daily digest for {}".format(
+          date.today().strftime("%b %d")
+      )
 
-    with benchmark("sending daily emails"):
-      for user_email, data in notif_data.iteritems():
-        data = modify_data(data)
-        email_body = settings.EMAIL_DIGEST.render(digest=data)
-        send_email(user_email, subject, email_body)
-        sent_emails.append(user_email)
+      with benchmark("sending daily emails"):
+        for user_email, data in notif_data.iteritems():
+          data = modify_data(data)
+          email_body = settings.EMAIL_DIGEST.render(digest=data)
+          send_email(user_email, subject, email_body)
+          sent_emails.append(user_email)
 
-    with benchmark("processing sent notifications"):
-      process_sent_notifications(notif_list)
+      with benchmark("processing sent notifications"):
+        process_sent_notifications(notif_list)
 
     return "emails sent to: <br> {}".format("<br>".join(sent_emails))
 
