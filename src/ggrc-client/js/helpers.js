@@ -18,7 +18,7 @@ import _ from 'lodash';
 import Search from './models/service-models/search';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
-import {reify, isReifiable} from './plugins/utils/reify-utils';
+import {reify} from './plugins/utils/reify-utils';
 import Mappings from './models/mappers/mappings';
 import {
   getFormattedLocalDate,
@@ -196,88 +196,6 @@ Mustache.registerHelper('renderLive', function (template, context, options) {
   }
 
   return can.view.render(template, options.contexts);
-});
-
-function deferRender(tagPrefix, funcs, deferred) {
-  let hook;
-  let tagName = tagPrefix.split(' ')[0];
-
-  tagName = tagName || 'span';
-
-  if (typeof funcs === 'function') {
-    funcs = {done: funcs};
-  }
-
-  function hookup(element, parent) {
-    let $element = $(element);
-    let func = function () {
-      let callback = deferred && deferred.state() === 'rejected' ?
-        funcs.fail : funcs.done;
-      let args = arguments;
-      let compute = can.compute(function () {
-        return callback.apply(this, args) || '';
-      }, this);
-
-      if (element.parentNode) {
-        can.view.live.html(element, compute, parent);
-      } else {
-        $element.after(compute());
-        if ($element.next().get(0)) {
-          can.view.nodeLists.update($element.get(), $element.nextAll().get());
-          $element.remove();
-        }
-      }
-    };
-    if (deferred) {
-      deferred.done(func);
-      if (funcs.fail) {
-        deferred.fail(func);
-      }
-    } else {
-      setTimeout(func, 13);
-    }
-
-    if (funcs.progress) {
-      // You would think that we could just do $element.append(funcs.progress()) here
-      //  but for some reason we have to hookup our own fragment.
-      $element.append(can.view.hookup($('<div>')
-        .html(funcs.progress())).html());
-    }
-  }
-
-  hook = can.view.hook(hookup);
-  return ['<', tagPrefix, ' ', hook, '>', '</', tagName, '>'].join('');
-}
-
-Mustache.registerHelper('using', function (options) {
-  let refreshQueue = new RefreshQueue();
-  let frame = new can.Map();
-  let args = can.makeArray(arguments);
-  let i;
-  let arg;
-
-  options = args.pop();
-
-  if (options.hash) {
-    for (i in options.hash) {
-      if (options.hash.hasOwnProperty(i)) {
-        arg = options.hash[i];
-        arg = Mustache.resolve(arg);
-        if (arg && isReifiable(arg)) {
-          refreshQueue.enqueue(reify(arg));
-          frame.attr(i, reify(arg));
-        } else {
-          frame.attr(i, arg);
-        }
-      }
-    }
-  }
-
-  function finish() {
-    return options.fn(options.contexts.add(frame));
-  }
-
-  return deferRender('span', finish, refreshQueue.trigger());
 });
 
 /**
