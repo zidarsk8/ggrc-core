@@ -15,7 +15,7 @@ from lib.entities.entities_factory import (
     AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
-from lib.utils import help_utils, test_utils
+from lib.utils import help_utils, test_utils, string_utils
 
 
 class BaseRestService(object):
@@ -273,7 +273,11 @@ class AccessControlRolesService(BaseRestService):
   def create_acl_role(self, **attrs):
     """Create ACL role."""
     acl_factory = AccessControlRolesFactory()
-    acr_name = acl_factory.generate_string(attrs["object_type"])
+    allowed_name_chars = string_utils.Symbols(additional_exclude='*')
+    acr_name = acl_factory.generate_string(
+        attrs["object_type"],
+        allowed_chars=allowed_name_chars.standard_chars
+    )
     return self.create_obj(
         acl_factory.create(name=acr_name, **attrs).__dict__)
 
