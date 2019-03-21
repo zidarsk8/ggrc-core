@@ -41,7 +41,7 @@
                 </object-list>
                 <attach-button
                     (before-create)="addItems(%event, 'files')"
-                    (finish)="verifyObjects('files', 'Evidence')"
+                    (created)="addRelatedItem(%event, 'files')" 
                     {is-attach-action-disabled}="isUpdatingEvidences"
                     {instance}="instance">
                 </attach-button>

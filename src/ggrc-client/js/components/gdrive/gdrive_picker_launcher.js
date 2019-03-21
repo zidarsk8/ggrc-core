@@ -88,7 +88,6 @@ export default can.Component.extend({
         .then(stopFn)
         .always(() => {
           this.attr('isUploading', false);
-          this.dispatch('finish');
         })
         .fail((err) => {
           stopFn(true);
@@ -187,11 +186,16 @@ export default can.Component.extend({
       let dfdDocs = models.map((model) => {
         return backendGdriveClient.withAuth(() => {
           return model.save();
-        });
+        })
+          .then((doc) => {
+            this.dispatch({
+              type: 'created',
+              item: doc,
+            });
+          });
       });
       // waiting for all docs promises
       return $.when(...dfdDocs).then(() => {
-        this.attr('instance').refresh();
         return can.makeArray(arguments);
       }, (xhr) => {
         notifierXHR('error', xhr);

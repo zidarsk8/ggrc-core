@@ -19,12 +19,8 @@ class TestEvidenceAutoDeprecation(TestCase):
     """Unmap Evidence from Audit -> evidence.DEPRECATED"""
     with factories.single_commit():
       audit = factories.AuditFactory()
-      evidence = factories.EvidenceUrlFactory(
-          parent_obj={
-              'id': audit.id,
-              'type': 'Audit'
-          }
-      )
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=audit, destination=evidence)
     self.assertEquals(evidence.START_STATE, evidence.status)
     relationship = all_models.Relationship.query.filter(
         all_models.Relationship.destination_id == evidence.id,
@@ -38,12 +34,8 @@ class TestEvidenceAutoDeprecation(TestCase):
     """Unmap Evidence from Assessment -> evidence.DEPRECATED"""
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
-      evidence = factories.EvidenceUrlFactory(
-          parent_obj={
-              'id': assessment.id,
-              'type': 'Assessment'
-          }
-      )
+      evidence = factories.EvidenceUrlFactory()
+      factories.RelationshipFactory(source=assessment, destination=evidence)
     self.assertEquals(evidence.START_STATE, evidence.status)
     relationship = all_models.Relationship.query.filter(
         all_models.Relationship.destination_id == evidence.id,
