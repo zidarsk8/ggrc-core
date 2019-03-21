@@ -90,44 +90,46 @@
       </div>
     </div>
     <div class="span4">
-        <access-control-list-roles-helper
-                {instance}="instance"
-                {is-new-instance}="new_object_form">
-        </access-control-list-roles-helper>
-        {{#using task_group=instance.task_group}}
-        {{#using workflow=task_group.workflow}}
-            <div class="frequency-wrap">
-                <label class="form-label">
-                    Repeat
-                    <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
-                </label>
-                <repeat-on-summary {unit}="workflow.unit" {repeat-every}="workflow.repeat_every"
-                {hide-repeat-off}="false">
-                </repeat-on-summary>
-                <label class="smaller">
-                    <label class="form-label">
-                        Start Date
-                        <i class="fa fa-asterisk"></i>
-                    </label>
-                    <datepicker date="instance.start_date"
-                                required="true"
-                                no-weekends="true"
-                                readonly="true"></datepicker>
-                </label>
-                <label class="smaller">
-                    <label class="form-label">
-                        Due Date
-                        <i class="fa fa-asterisk"></i>
-                    </label>
-                    <datepicker set-min-date="instance.start_date"
-                                date="instance.end_date"
-                                required="true"
-                                no-weekends="true"
-                                readonly="true"></datepicker>
-                </label>
-            </div>
-        {{/using}}
-        {{/using}}
+      <access-control-list-roles-helper {instance}="instance"
+                                        {is-new-instance}="new_object_form">
+      </access-control-list-roles-helper>
+      <object-loader {path}="instance.task_group">
+        <object-loader {path}="loadedObject.workflow">
+          <div class="frequency-wrap">
+            <label class="form-label">
+                Repeat
+                <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
+            </label>
+            <repeat-on-summary {unit}="loadedObject.unit" 
+                               {repeat-every}="loadedObject.repeat_every"
+                               {hide-repeat-off}="false">
+            </repeat-on-summary> 
+            <label class="smaller">
+              <label class="form-label">
+                  Start Date
+                  <i class="fa fa-asterisk"></i>
+              </label>
+              <datepicker date="instance.start_date"
+                          required="true"
+                          no-weekends="true"
+                          readonly="true">
+              </datepicker>
+            </label>
+            <label class="smaller">
+              <label class="form-label">
+                  Due Date
+                  <i class="fa fa-asterisk"></i>
+              </label>
+              <datepicker set-min-date="instance.start_date"
+                          date="instance.end_date"
+                          required="true"
+                          no-weekends="true"
+                          readonly="true">
+              </datepicker>
+            </label>
+          </div>
+        </object-loader>
+      </object-loader>
     </div>
   </div>
 </form>

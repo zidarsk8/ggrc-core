@@ -91,23 +91,22 @@
     {{/if}}
   {{/is_info_pin}}
 
-  {{#using program=instance.program}}
-  {{^if instance.archived}}
-    {{#if_helpers '\n #current_user_is_admin' '\n or #has_role' 'Program Managers' program}}
-       <li>
+  <object-loader {path}="instance.program">
+    {{^if instance.archived}}
+      {{#if_helpers '\n #current_user_is_admin' '\n or #has_role' 'Program Managers' loadedObject}}
+        <li>
           <a data-toggle="modal-ajax-archiveform"
-             data-object-plural="{{model.table_plural}}"
-             data-object-singular="{{model.model_singular}}"
-             data-modal-reset="reset" data-modal-class="modal"
-             data-object-id="{{instance.id}}" href="javascript://">
-             <i class="fa fa-archive"></i>
-                Archive Audit
+            data-object-plural="{{model.table_plural}}"
+            data-object-singular="{{model.model_singular}}"
+            data-modal-reset="reset" data-modal-class="modal"
+            data-object-id="{{instance.id}}" href="javascript://">
+            <i class="fa fa-archive"></i>
+              Archive Audit
           </a>
-       </li>
-    {{/if_helpers}}
-  {{/if}}
-  {{/using}}
-
+        </li>
+      {{/if_helpers}}
+    {{/if}}
+  </object-loader>
   {{^if instance.archived}}
     {{#is_allowed 'delete' instance}}
         <li>

@@ -118,9 +118,13 @@
                 </div>
                 <div class="span4">
                   <h6>Audit Firm</h6>
-                  {{#using firm=instance.audit_firm}}
-                    {{{firstnonempty firm.title '<span class="empty-message">None</span>'}}}
-                  {{/using}}
+                  <object-loader {path}="instance.audit_firm">
+                    {{#if loadedObject}}
+                      <p>{{loadedObject.title}}</p>
+                    {{else}}
+                      <span class="empty-message">None</span>
+                    {{/if}}
+                  </object-loader>
                 </div>
               </div>
               <div class="row-fluid wrap-row">
