@@ -23,7 +23,7 @@ export default can.Component.extend({
       },
       extendInstanceData(instance) {
         instance = instance().serialize();
-        let audit = _.pick(instance, ['id', 'type', 'issue_tracker']);
+        let audit = _.pick(instance, ['id', 'type', 'title', 'issue_tracker']);
         let context = {
           id: instance.context.id,
           type: instance.context.type,
