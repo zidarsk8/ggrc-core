@@ -9,8 +9,10 @@ import ddt
 import mock
 
 from ggrc.integrations.client import PersonClient
+
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
+from integration.ggrc.models import factories
 
 
 @ddt.ddt
@@ -28,8 +30,8 @@ class TestSuggest(TestCase):
   @ddt.unpack
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
-  def test_sugggest(self, prefix, expected):
-    """Test suggest."""
+  def test_suggest(self, prefix, expected):
+    """Test suggest logic."""
     query = '/people/suggest?prefix={}'.format(prefix)
     with mock.patch.multiple(
         PersonClient,
@@ -62,6 +64,19 @@ class TestSuggest(TestCase):
           '/api/persons:suggest',
           payload={'tokens': expected, }
       )
+
+  @ddt.data(1, 2)
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='mock')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_mock_suggest_limit(self, limit):
+    """Test limit count of results returned by suggest."""
+    with factories.single_commit():
+      factories.PersonFactory(email='qwerty1@example.com')
+      factories.PersonFactory(email='qwerty2@example.com')
+    query = '/people/suggest?prefix={}&limit={}'.format('qw', limit)
+    response = self.api.client.get(query)
+    self.assert200(response)
+    self.assertEqual(len(response.json), limit)
 
   @ddt.data('', '  ')
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
