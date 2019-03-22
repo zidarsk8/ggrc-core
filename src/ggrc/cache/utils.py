@@ -146,7 +146,7 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
                      ret)
 
 
-def update_memcache_after_commit(context):
+def update_memcache_after_commit(context):  # noqa: C901
   """
   The memccache entries is updated after DB commit
   Logs error if there are errors in updating entries in cache
@@ -193,7 +193,8 @@ def update_memcache_after_commit(context):
     if delete_result is not True:
       logger.error("CACHE: Failed to remove status entries from cache")
 
-  clear_permission_cache()
+  if getattr(context, "operation", "") != "import":
+    clear_permission_cache()
   cache_manager.clear_cache()
 
 
@@ -221,7 +222,7 @@ def clear_permission_cache():
 
   # We delete all the cached user permissions as well as
   # the permissions:list value itself
-  keys_to_delete = list('permissions:list')
+  keys_to_delete = ['permissions:list']
   for user_key in client.get('permissions:list') or set():
     keys_to_delete.append(user_key)
     keys_to_delete.extend(blob_get_chunk_keys(client, user_key))
