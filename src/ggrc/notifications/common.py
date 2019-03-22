@@ -228,7 +228,7 @@ def generate_daily_notifications():
       (Notification.runner == Notification.RUNNER_DAILY) &
       (Notification.send_on <= datetime.today()) &
       ((Notification.sent_at.is_(None)) | (Notification.repeating == true()))
-  ).order_by(Notification.id)
+  ).order_by(Notification.repeating, Notification.id)
   all_count = notifications.count()
   handled = 0
   chunk_size = settings.DAILY_DIGEST_BATCH_SIZE
@@ -247,15 +247,14 @@ def get_daily_notifications():
     list of Notifications, data: a tuple of notifications that were handled
       and corresponding data for those notifications.
   """
-  notifications = db.session.query(Notification).options(
-      joinedload("notification_type")
-  ).filter(
-      (Notification.runner == Notification.RUNNER_DAILY) &
-      (Notification.send_on <= datetime.today()) &
-      ((Notification.sent_at.is_(None)) | (Notification.repeating == true()))
-  ).all()
 
-  return notifications, get_notification_data(notifications)
+  notifications = []
+  notifications_data = {}
+  for notif_list, notif_data in generate_daily_notifications():
+    notifications.extend(notif_list.all())
+    notifications_data.update(notif_data)
+
+  return notifications, notifications_data
 
 
 def should_receive(notif, user_data, people_cache):
@@ -311,46 +310,51 @@ def should_receive(notif, user_data, people_cache):
   return has_digest
 
 
-def send_daily_digest_bg():
-  """Send daily digest in background task."""
+def create_daily_digest_bg():
+  """Create daily digest background task."""
   models.background_task.create_task(
-      name="send_daily_digest_notifications",
-      url=flask.url_for("send_daily_digest_notifications"),
-      queued_callback=send_daily_digest_notifications,
+      name="send_daily_digest_bg",
+      url=flask.url_for("send_daily_digest_bg"),
+      queued_callback=send_daily_digest_bg,
   )
   db.session.commit()
   return utils.make_simple_response()
 
 
-@app.route("/_background_tasks/send_daily_digest_notifications",
+@app.route("/_background_tasks/send_daily_digest_bg",
            methods=["POST"])
 @background_task.queued_task
-def send_daily_digest_notifications(task):  # pylint: disable=unused-argument
+def send_daily_digest_bg(task):  # pylint: disable=unused-argument
   """Send emails for today's or overdue notifications."""
   error_msg = None
   try:
-    with benchmark("contributed cron job send_daily_digest_notifications"):
-      for notif_list, notif_data in generate_daily_notifications():
-        with benchmark("processing notification data chunk"):
-          subject = "GGRC daily digest for {}".format(
-              date.today().strftime("%b %d")
-          )
-          sent_emails = []
-          with benchmark("sending daily emails"):
-            for user_email, data in notif_data.iteritems():
-              data = modify_data(data)
-              email_body = settings.EMAIL_DIGEST.render(digest=data)
-              send_email(user_email, subject, email_body)
-              sent_emails.append(user_email)
-
-          with benchmark("processing sent notifications"):
-            process_sent_notifications(notif_list)
-          logger.info("emails sent to: %s", ",".join(sent_emails))
+    send_daily_digest_notifications()
   except Exception as exp:  # pylint: disable=broad-except
     error_msg = ("Sending of daily digest has failed "
                  "with the following error {}".format(exp.message))
     logger.exception(error_msg)
   return utils.make_simple_response(error_msg)
+
+
+def send_daily_digest_notifications():
+  """Send emails for today's or overdue notifications."""
+  with benchmark("contributed cron job send_daily_digest_notifications"):
+    for notif_list, notif_data in generate_daily_notifications():
+      with benchmark("processing notification data chunk"):
+        subject = "GGRC daily digest for {}".format(
+            date.today().strftime("%b %d")
+        )
+        sent_emails = []
+        with benchmark("sending daily emails"):
+          for user_email, data in notif_data.iteritems():
+            data = modify_data(data)
+            email_body = settings.EMAIL_DIGEST.render(digest=data)
+            send_email(user_email, subject, email_body)
+            sent_emails.append(user_email)
+
+        with benchmark("processing sent notifications"):
+          process_sent_notifications(notif_list)
+        logger.info("emails sent to: %s", ",".join(sent_emails))
 
 
 def generate_cycle_tasks_notifs():
