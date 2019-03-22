@@ -34,6 +34,7 @@ exports = [
     "CREATE_ISSUE_BUTTON_NAME",
     "ASSESSMENT_SHORT_URL_PREFIX",
     "NOTIFICATION_PREFIX",
+    "DAILY_DIGEST_BATCH_SIZE",
     "CHANGE_REQUEST_URL",
 ]  # pylint: disable=invalid-name
 
@@ -231,6 +232,9 @@ NOTIFICATION_PREFIX = os.environ.get(
     'GGRC_NOTIFICATION_PREFIX',
     ''
 )
+DAILY_DIGEST_BATCH_SIZE = int(os.environ.get(
+    'GGRC_DAILY_DIGEST_BATCH_SIZE', 5000
+))
 
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")

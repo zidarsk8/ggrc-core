@@ -231,8 +231,10 @@ def generate_daily_notifications():
   ).order_by(Notification.id)
   all_count = notifications.count()
   handled = 0
-  for data_chunk in generate_query_chunks(notifications, chunk_size=500,
-                                          needs_ordering=False):
+  chunk_size = settings.DAILY_DIGEST_BATCH_SIZE
+  for data_chunk in generate_query_chunks(
+      notifications, chunk_size=chunk_size, needs_ordering=False
+  ):
     handled += data_chunk.count()
     logger.info("Processing notifications: %s/%s", handled, all_count)
     yield data_chunk, get_notification_data(data_chunk)
