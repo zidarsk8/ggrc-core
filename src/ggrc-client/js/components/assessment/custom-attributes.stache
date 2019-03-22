@@ -30,6 +30,13 @@
                               <div class="ggrc-form__title">{{title}}</div>
                             </base-inline-control-title>
                       </confirm-edit-action>
+                      {{#if helptext}}
+                        <div class="ggrc-form-item__small-text">
+                            <small>
+                              <em>{{helptext}}</em>
+                            </small>
+                        </div>
+                      {{/if}}
             </inline-edit-control>
         </div>
     </div>
