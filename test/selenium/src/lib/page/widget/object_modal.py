@@ -126,6 +126,11 @@ class BaseObjectModal(base.WithBrowser):
     self._root.link(text="Propose").click()
     self._wait_for_submit_changes()
 
+  @property
+  def is_present(self):
+    """Checks presence of modal element."""
+    return self._root.exist
+
 
 class DiscardChangesModal(BaseObjectModal):
   """Represents discard changes modal."""
