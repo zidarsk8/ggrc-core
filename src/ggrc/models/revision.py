@@ -472,7 +472,6 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
         value = cad["default_value"]
       cavs[custom_attribute_id] = {
           "attribute_value": value,
-          "attribute_object_id": None,
           "custom_attribute_id": custom_attribute_id,
           "attributable_id": self.resource_id,
           "attributable_type": self.resource_type,
@@ -607,7 +606,9 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)
-
+    # remove attribute_object_id not used by FE anymore
+    for item in populated_content["custom_attribute_values"]:
+      item.pop("attribute_object_id", None)
     return populated_content
 
   @content.setter
