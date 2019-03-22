@@ -15,6 +15,8 @@ from logging import getLogger
 from operator import itemgetter
 from dateutil import relativedelta
 
+import flask
+
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import true
 from sqlalchemy import inspect
@@ -22,6 +24,7 @@ from werkzeug.exceptions import Forbidden
 from google.appengine.api import mail
 
 from ggrc import db, extensions, settings, utils
+from ggrc import models
 from ggrc.app import app
 from ggrc.gcalendar import calendar_event_builder
 from ggrc.gcalendar import calendar_event_sync
@@ -218,6 +221,7 @@ def get_pending_notifications():
 
 
 def generate_daily_notifications():
+  """Generate daily notifications data in chunks."""
   notifications = db.session.query(Notification).options(
       joinedload("notification_type")
   ).filter(
@@ -305,31 +309,46 @@ def should_receive(notif, user_data, people_cache):
   return has_digest
 
 
-def send_daily_digest_notifications():
-  """Send emails for today's or overdue notifications.
+def send_daily_digest_bg():
+  """Send daily digest in background task."""
+  models.background_task.create_task(
+      name="send_daily_digest_notifications",
+      url=flask.url_for("send_daily_digest_notifications"),
+      queued_callback=send_daily_digest_notifications,
+  )
+  db.session.commit()
+  return utils.make_simple_response()
 
-  Returns:
-    str: String containing a simple list of who received the notification.
-  """
-  # pylint: disable=invalid-name
-  with benchmark("contributed cron job send_daily_digest_notifications"):
-    sent_emails = []
-    for notif_list, notif_data in generate_daily_notifications():
-      subject = "GGRC daily digest for {}".format(
-          date.today().strftime("%b %d")
-      )
 
-      with benchmark("sending daily emails"):
-        for user_email, data in notif_data.iteritems():
-          data = modify_data(data)
-          email_body = settings.EMAIL_DIGEST.render(digest=data)
-          send_email(user_email, subject, email_body)
-          sent_emails.append(user_email)
+@app.route("/_background_tasks/send_daily_digest_notifications",
+           methods=["POST"])
+@background_task.queued_task
+def send_daily_digest_notifications(task):  # pylint: disable=unused-argument
+  """Send emails for today's or overdue notifications."""
+  error_msg = None
+  try:
+    with benchmark("contributed cron job send_daily_digest_notifications"):
+      for notif_list, notif_data in generate_daily_notifications():
+        with benchmark("processing notification data chunk"):
+          subject = "GGRC daily digest for {}".format(
+              date.today().strftime("%b %d")
+          )
+          sent_emails = []
+          with benchmark("sending daily emails"):
+            for user_email, data in notif_data.iteritems():
+              data = modify_data(data)
+              email_body = settings.EMAIL_DIGEST.render(digest=data)
+              send_email(user_email, subject, email_body)
+              sent_emails.append(user_email)
 
-      with benchmark("processing sent notifications"):
-        process_sent_notifications(notif_list)
-
-    return "emails sent to: <br> {}".format("<br>".join(sent_emails))
+          with benchmark("processing sent notifications"):
+            process_sent_notifications(notif_list)
+          logger.info("emails sent to: %s", ",".join(sent_emails))
+  except Exception as exp:  # pylint: disable=broad-except
+    error_msg = ("Sending of daily digest has failed "
+                 "with the following error {}".format(exp.message))
+    logger.exception(error_msg)
+  return utils.make_simple_response(error_msg)
 
 
 def generate_cycle_tasks_notifs():
@@ -370,9 +389,10 @@ def process_sent_notifications(notif_list):
       to modify sent_at field.
   """
   from ggrc.models import all_models
+
   for notif in notif_list:
-    if notif.object_type == "CycleTaskGroupObjectTask" and \
-       notif.object.status == all_models.CycleTaskGroupObjectTask.DEPRECATED:
+    if (notif.object and notif.object_type == "CycleTaskGroupObjectTask" and
+       notif.object.status == all_models.CycleTaskGroupObjectTask.DEPRECATED):
       continue
     if notif.repeating:
       notif.sent_at = datetime.utcnow()
