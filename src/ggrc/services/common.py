@@ -595,7 +595,8 @@ class Resource(ModelView):
 
     if obj.readonly:
       raise MethodNotAllowed(
-          "The object is in a read-only mode and is dedicated for SOX needs")
+          description="The object is in a read-only mode and "
+                      "is dedicated for SOX needs")
 
   @utils.validate_mimetype("application/json")
   def put(self, id):  # pylint: disable=redefined-builtin
@@ -623,9 +624,10 @@ class Resource(ModelView):
       new_context = self.get_context_id_from_json(src)
       self._check_put_permissions(obj, new_context)
 
-    # check read-only access AFTER check for permissions to disallow
-    # user obtain value for flag "readonly"
-    self._validate_readonly_access(obj)
+    with benchmark("Validate read-only access"):
+      # check read-only access AFTER check for permissions to disallow
+      # user obtain value for flag "readonly"
+      self._validate_readonly_access(obj)
 
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
@@ -726,9 +728,10 @@ class Resource(ModelView):
     if header_error:
       return header_error
 
-    # check read-only access AFTER check for permissions to disallow
-    # user obtain value for flag "readonly"
-    self._validate_readonly_access(obj)
+    with benchmark("Validate read-only access"):
+      # check read-only access AFTER check for permissions to disallow
+      # user obtain value for flag "readonly"
+      self._validate_readonly_access(obj)
 
     db.session.delete(obj)
     with benchmark("Send DELETEd event"):
@@ -1024,6 +1027,14 @@ class Resource(ModelView):
         db.session.expunge_all()
         raise Forbidden()
 
+  @staticmethod
+  def _validate_readonly_access_on_post(objects):
+    """Validate read-only access on POST
+
+    This method is overridden for relationships
+    """
+    pass
+
   def _gather_referenced_objects(self, data, accomulator=None):
     if accomulator is None:
       accomulator = collections.defaultdict(set)
@@ -1075,6 +1086,8 @@ class Resource(ModelView):
 
     with benchmark("Check create permissions"):
       self._check_post_permissions(objects)
+    with benchmark("Validate read-only access"):
+      self._validate_readonly_access_on_post(objects)
     with benchmark("Send collection POSTed event"):
       signals.Restful.collection_posted.send(
           obj.__class__, objects=objects, sources=sources)

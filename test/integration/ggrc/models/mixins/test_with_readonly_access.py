@@ -160,6 +160,71 @@ class TestWithReadOnlyAccessAPI(TestCase):
     obj = get_model(obj_type).query.get(obj_id)
     self.assertIsNotNone(obj)
 
+  @ddt.data(
+    ('System', False, 'Document', True, 201),
+    ('System', False, 'Document', False, 201),
+    ('System', True, 'Document', True, 405),
+    ('System', True, 'Document', False, 405),
+    ('System', False, 'Comment', True, 201),
+    ('System', False, 'Comment', False, 201),
+    ('System', True, 'Comment', True, 201),
+    ('System', True, 'Comment', False, 201),
+  )
+  @ddt.unpack
+  def test_relationship_post(self, obj_type, readonly, rel_obj_type, swap,
+                            expected_code):
+    """Test PUT relationship {0}.readonly={1}, related object type {2}"""
+
+    factory = factories.get_model_factory(obj_type)
+    rel_factory = factories.get_model_factory(rel_obj_type)
+    with factories.single_commit():
+      obj = factory(title='a', readonly=readonly)
+      rel_obj = rel_factory()
+
+    if swap:
+      source, destination = rel_obj, obj
+    else:
+      source, destination = obj, rel_obj
+
+    resp, rel = self.object_generator.generate_relationship(
+        source=source, destination=destination
+    )
+
+    self.assertStatus(resp, expected_code)
+
+  @ddt.data(
+    ('System', False, 'Document', True, 200),
+    ('System', False, 'Document', False, 200),
+    ('System', True, 'Document', True, 405),
+    ('System', True, 'Document', False, 405),
+    ('System', False, 'Comment', True, 200),
+    ('System', False, 'Comment', False, 200),
+    ('System', True, 'Comment', True, 200),
+    ('System', True, 'Comment', False, 200),
+  )
+  @ddt.unpack
+  def test_relationship_delete(self, obj_type, readonly, rel_obj_type, swap,
+                            expected_code):
+    """Test DELETE relationship {0}.readonly={1}, related object type {2}"""
+
+    factory = factories.get_model_factory(obj_type)
+    rel_factory = factories.get_model_factory(rel_obj_type)
+    with factories.single_commit():
+      obj = factory(title='a', readonly=readonly)
+      rel_obj = rel_factory()
+
+      if swap:
+        source, destination = rel_obj, obj
+      else:
+        source, destination = obj, rel_obj
+
+      robj = factories.RelationshipFactory(source=source,
+                                           destination=destination)
+
+    resp = self.object_generator.api.delete(robj)
+
+    self.assertStatus(resp, expected_code)
+
 
 @ddt.ddt
 class TestWithReadOnlyAccessImport(TestCase):

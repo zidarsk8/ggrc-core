@@ -14,6 +14,10 @@ class WithReadOnlyAccess(object):
   """Mixin for models which can be marked as read-only"""
   # pylint: disable=too-few-public-methods
 
+  _read_only_model_relationships = (
+      'Document'
+  )
+
   readonly = db.Column(db.Boolean, nullable=False, default=False)
 
   _api_attrs = reflection.ApiAttributes(
@@ -27,3 +31,20 @@ class WithReadOnlyAccess(object):
           "hidden": True,
       },
   }
+
+  def can_change_relationship_with(self, obj):
+    """Check whether relationship from self to obj1 can be changed
+
+    This function doesn't expect that another obj also has type
+    WithReadOnlyAccess. In this case can_change_relationship_with() of
+    another object have to be called also to ensure that relationship is
+    not read-only. Final read-only flag can be calculated
+    using the following expression:
+      obj1.can_change_relationship_with(obj2) and \
+      obj2.can_change_relationship_with(obj1)
+    """
+
+    if not self.readonly:
+      return True
+
+    return obj.__class__.__name__ not in self._read_only_model_relationships
