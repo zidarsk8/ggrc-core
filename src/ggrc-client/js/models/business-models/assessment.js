@@ -338,9 +338,7 @@ export default Cacheable.extend({
     }
   },
   refresh: function () {
-    let dfd;
     let href = this.selfLink || this.href;
-    let that = this;
 
     if (!href) {
       return $.Deferred().reject();
@@ -348,35 +346,35 @@ export default Cacheable.extend({
     if (!this._pending_refresh) {
       this._pending_refresh = {
         dfd: $.Deferred(),
-        fn: _.throttle(function () {
-          let dfd = that._pending_refresh.dfd;
+        fn: _.throttle(() => {
+          let dfd = this._pending_refresh.dfd;
           can.ajax({
             url: href,
             type: 'get',
             dataType: 'json',
           })
-            .then($.proxy(that, 'cleanupAcl'))
-            .then(function (model) {
-              delete that._pending_refresh;
+            .then((model) => this.cleanupAcl(model))
+            .then((model) => {
+              delete this._pending_refresh;
               if (model) {
-                model = that.constructor.model(model, that);
-                that.after_refresh && that.after_refresh();
+                model = this.constructor.model(model, this);
+                this.after_refresh && this.after_refresh();
                 model.backup();
                 return model;
               }
             })
-            .done(function () {
-              dfd.resolve(...arguments);
+            .done((...args) => {
+              dfd.resolve(...args);
             })
-            .fail(function () {
-              dfd.reject(...arguments);
+            .fail((...args) => {
+              dfd.reject(...args);
             });
         }, 300, {trailing: false}),
       };
     }
-    dfd = this._pending_refresh.dfd;
+
     this._pending_refresh.fn();
-    return dfd;
+    return this._pending_refresh.dfd;
   },
   getRelatedObjects() {
     const stopFn = tracker.start(
