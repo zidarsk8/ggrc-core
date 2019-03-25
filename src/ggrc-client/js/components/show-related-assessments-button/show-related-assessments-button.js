@@ -17,7 +17,7 @@ export default can.Component.extend({
         type: String,
         get: function () {
           return !this.attr('resetStyles') ?
-            'btn btn-lightBlue ' + this.attr('extraBtnCSS') : '';
+            'btn btn-lightBlue ' + this.attr('extraBtnCss') : '';
         },
       },
       resetStyles: {
@@ -43,7 +43,7 @@ export default can.Component.extend({
     state: {
       open: false,
     },
-    extraBtnCSS: '@',
+    extraBtnCss: '@',
     text: '@',
     modalTitle: 'Related Assessments',
     showRelatedAssessments: function () {
