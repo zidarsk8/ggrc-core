@@ -20,7 +20,7 @@
           <section>
             <h3 class="task-list-title">Number of mapped objects</h3>
             <mapped-counter {instance}="instance"
-                            type="Requirement"
+                            {type}="'Requirement'"
                             {add-content}="@addContent"
             ></mapped-counter>
           </section>
@@ -33,11 +33,11 @@
                             {add-content}="@addContent"
             ></mapped-counter>
             <mapped-counter {instance}="instance"
-                            type="Objective"
+                            {type}="'Objective'"
                             {add-content}="@addContent"
             ></mapped-counter>
             <mapped-counter {instance}="instance"
-                            type="Control"
+                            {type}="'Control'"
                             {add-content}="@addContent"
             ></mapped-counter>
           </section>
@@ -50,7 +50,7 @@
                             {add-content}="@addContent"
             ></mapped-counter>
             <mapped-counter {instance}="instance"
-                            type="Comment"
+                            {type}="'Comment'"
                             {add-content}="@addContent"
                             (deferred-update-counter)="addDeferredContent(%event)"
             ></mapped-counter>
@@ -65,7 +65,7 @@
           <section>
             <h3 class="task-list-title">Number of mapped tasks</h3>
             <mapped-counter {instance}="instance"
-                            type="CycleTaskGroupObjectTask"
+                            {type}="'CycleTaskGroupObjectTask'"
                             {add-content}="@addContent"
             ></mapped-counter>
           </section>

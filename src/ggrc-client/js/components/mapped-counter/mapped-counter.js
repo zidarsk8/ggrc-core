@@ -46,7 +46,7 @@ let viewModel = can.Map.extend({
   isSpinnerVisible: false,
   isTitleVisible: true,
   extraCssClass: '',
-  type: '@',
+  type: '',
   count: 0,
   /**
    * Just to avoid multiple dispatching of deferredUpdateCounter event,
