@@ -3,7 +3,7 @@
 
 """Integration test for TestWithReadOnlyAccess mixin"""
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-arguments
 
 from collections import OrderedDict
 import json
@@ -161,18 +161,18 @@ class TestWithReadOnlyAccessAPI(TestCase):
     self.assertIsNotNone(obj)
 
   @ddt.data(
-    ('System', False, 'Document', True, 201),
-    ('System', False, 'Document', False, 201),
-    ('System', True, 'Document', True, 405),
-    ('System', True, 'Document', False, 405),
-    ('System', False, 'Comment', True, 201),
-    ('System', False, 'Comment', False, 201),
-    ('System', True, 'Comment', True, 201),
-    ('System', True, 'Comment', False, 201),
+      ('System', False, 'Document', True, 201),
+      ('System', False, 'Document', False, 201),
+      ('System', True, 'Document', True, 405),
+      ('System', True, 'Document', False, 405),
+      ('System', False, 'Comment', True, 201),
+      ('System', False, 'Comment', False, 201),
+      ('System', True, 'Comment', True, 201),
+      ('System', True, 'Comment', False, 201),
   )
   @ddt.unpack
   def test_relationship_post(self, obj_type, readonly, rel_obj_type, swap,
-                            expected_code):
+                             expected_code):
     """Test PUT relationship {0}.readonly={1}, related object type {2}"""
 
     factory = factories.get_model_factory(obj_type)
@@ -186,25 +186,25 @@ class TestWithReadOnlyAccessAPI(TestCase):
     else:
       source, destination = obj, rel_obj
 
-    resp, rel = self.object_generator.generate_relationship(
+    resp, _ = self.object_generator.generate_relationship(
         source=source, destination=destination
     )
 
     self.assertStatus(resp, expected_code)
 
   @ddt.data(
-    ('System', False, 'Document', True, 200),
-    ('System', False, 'Document', False, 200),
-    ('System', True, 'Document', True, 405),
-    ('System', True, 'Document', False, 405),
-    ('System', False, 'Comment', True, 200),
-    ('System', False, 'Comment', False, 200),
-    ('System', True, 'Comment', True, 200),
-    ('System', True, 'Comment', False, 200),
+      ('System', False, 'Document', True, 200),
+      ('System', False, 'Document', False, 200),
+      ('System', True, 'Document', True, 405),
+      ('System', True, 'Document', False, 405),
+      ('System', False, 'Comment', True, 200),
+      ('System', False, 'Comment', False, 200),
+      ('System', True, 'Comment', True, 200),
+      ('System', True, 'Comment', False, 200),
   )
   @ddt.unpack
   def test_relationship_delete(self, obj_type, readonly, rel_obj_type, swap,
-                            expected_code):
+                               expected_code):
     """Test DELETE relationship {0}.readonly={1}, related object type {2}"""
 
     factory = factories.get_model_factory(obj_type)
@@ -310,8 +310,14 @@ class TestWithReadOnlyAccessImport(TestCase):
     obj = get_model("System").query.one()
     self.assertEqual(obj.readonly, expected)
 
-  @ddt.data("no", "yes", None, "", True)
-  def test_system_not_updated(self, new):
+  @ddt.data(
+      ("no", "'Read-only', 'Title'"),
+      ("yes", "'Read-only', 'Title'"),
+      (None, "'Title'"),
+      ("", "'Read-only', 'Title'")
+  )
+  @ddt.unpack
+  def test_system_not_updated(self, new, exp_ignored_columns):
     """Test readonly System not updated if new={0}"""
 
     with factories.single_commit():
@@ -328,8 +334,9 @@ class TestWithReadOnlyAccessImport(TestCase):
     response = self.import_data(data)
     self._check_csv_response(response, {
         "System": {
-            "row_errors": {
-                errors.READONLY_ACCESS_ERROR.format(line=3),
+            "row_warnings": {
+                errors.READONLY_ACCESS_WARNING.format(
+                    line=3, columns=exp_ignored_columns),
             },
         }
     })
@@ -418,10 +425,9 @@ class TestWithReadOnlyAccessImport(TestCase):
     response = self.import_data(data)
     self._check_csv_response(response, {
         "System": {
-            "row_errors": {
-                "Line 3: Delete column is temporary disabled, please "
-                "use web interface to delete current object.",
-                errors.READONLY_ACCESS_ERROR.format(line=3),
+            "row_warnings": {
+                errors.READONLY_ACCESS_WARNING.format(line=3,
+                                                      columns="'Delete'"),
             },
         }
     })
@@ -467,6 +473,233 @@ class TestWithReadOnlyAccessImport(TestCase):
     })
     obj = get_model("System").query.get(obj_id)
     self.assertIsNotNone(obj)
+
+  @ddt.data(
+      ("yes", ['c1', 'c2'], ['c1', 'c2']),
+      ("no", ['c1', 'c2'], ['c1', 'c2']),
+  )
+  @ddt.unpack
+  def test_system_add_comments_on_post(self, readonly, comments, exp_comments):
+    """Test Comment creation {1} on post System with readonly={0}"""
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", "CODE"),
+        ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
+        ("Title", "b"),
+        ("Read-only", readonly),
+        ("Comments", ';;'.join(comments)),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
+    obj = get_model("System").query.one()
+    created_comments = set(comment.description
+                           for comment in obj.related_objects(['Comment']))
+    self.assertEqual(created_comments, set(exp_comments))
+
+  @ddt.data(
+      (True, ['c1', 'c2'], ['c1', 'c2']),
+      (False, ['c1', 'c2'], ['c1', 'c2']),
+  )
+  @ddt.unpack
+  def test_system_add_comments_on_update(self, readonly, comments,
+                                         exp_comments):
+    """Test Comment creation {1} on update System with readonly={0}"""
+
+    with factories.single_commit():
+      obj = factories.SystemFactory(title='a', readonly=readonly)
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", obj.slug),
+        ("Comments", ';;'.join(comments)),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
+    obj = get_model("System").query.one()
+    created_comments = set(comment.description
+                           for comment in obj.related_objects(['Comment']))
+    self.assertEqual(created_comments, set(exp_comments))
+
+  @ddt.data(
+      ("yes", True),
+      ("no", True),
+  )
+  @ddt.unpack
+  def test_system_add_document_on_post(self, readonly, exp_set):
+    """Test Reference URL set on post System with readonly={0}"""
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", "CODE"),
+        ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
+        ("Title", "b"),
+        ("Read-only", readonly),
+        ("Reference URL", "aa"),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
+    obj = get_model("System").query.one()
+    docs = obj.documents_reference_url
+
+    if exp_set:
+      self.assertEqual(len(docs), 1)
+      doc = docs[0]
+      self.assertEqual(doc.link, "aa")
+    else:
+      self.assertEqual(len(docs), 0)
+
+  @ddt.data(
+      (True, False),
+      (False, True),
+  )
+  @ddt.unpack
+  def test_system_add_document_on_update(self, readonly, exp_set):
+    """Test Reference URL set on update System with readonly={0}"""
+
+    with factories.single_commit():
+      obj = factories.SystemFactory(title='a', readonly=readonly)
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", obj.slug),
+        ("Reference URL", "aa"),
+    ])
+
+    if exp_set:
+      dct = {}
+    else:
+      dct = {
+          "System": {
+              "row_warnings": {
+                  errors.READONLY_ACCESS_WARNING.format(
+                      line=3, columns="'Reference URL'"),
+              },
+          }
+      }
+
+    response = self.import_data(data)
+    self._check_csv_response(response, dct)
+
+    obj = get_model("System").query.one()
+    docs = obj.documents_reference_url
+
+    if exp_set:
+      self.assertEqual(len(docs), 1)
+      doc = docs[0]
+      self.assertEqual(doc.link, "aa")
+    else:
+      self.assertEqual(len(docs), 0)
+
+  @ddt.data(
+      ("yes", 'Program'),
+      ("no", 'Program'),
+      ("yes", 'System'),
+      ("no", 'System'),
+  )
+  @ddt.unpack
+  def test_system_map_on_post(self, readonly, rel_obj_type):
+    """Test mapping on post System with readonly={0}"""
+
+    rel_factory = factories.get_model_factory(rel_obj_type)
+    with factories.single_commit():
+      rel_obj = rel_factory()
+      rel_obj_id = rel_obj.id
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", "CODE"),
+        ("Admin", "user@example.com"),
+        ("Assignee", "user@example.com"),
+        ("Verifier", "user@example.com"),
+        ("Title", "b"),
+        ("Read-only", readonly),
+        ("map:{}".format(rel_obj_type), rel_obj.slug),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
+    obj = get_model("System").query.filter_by(slug="CODE").one()
+    rel_ids = list(o.id for o in obj.related_objects([rel_obj_type]))
+
+    self.assertIn(rel_obj_id, rel_ids)
+
+  @ddt.data(
+      (True, 'Program'),
+      (False, 'Program'),
+      (True, 'System'),
+      (False, 'System'),
+  )
+  @ddt.unpack
+  def test_system_map_on_update(self, readonly, rel_obj_type):
+    """Test mapping on update System with readonly={0}"""
+
+    rel_factory = factories.get_model_factory(rel_obj_type)
+    with factories.single_commit():
+      obj = factories.SystemFactory(title='a', readonly=readonly)
+      obj_id = obj.id
+
+      rel_obj = rel_factory()
+      rel_obj_id = rel_obj.id
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", obj.slug),
+        ("map:{}".format(rel_obj_type), rel_obj.slug),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
+    obj = get_model("System").query.get(obj_id)
+    rel_obj = get_model(rel_obj_type).query.get(rel_obj_id)
+    rel = all_models.Relationship.find_related(obj, rel_obj)
+    self.assertIsNotNone(rel)
+
+  @ddt.data(
+      (True, 'Program'),
+      (False, 'Program'),
+      (True, 'System'),
+      (False, 'System'),
+  )
+  @ddt.unpack
+  def test_system_unmap_on_update(self, readonly, rel_obj_type):
+    """Test unmapping on update System with readonly={0}"""
+
+    rel_factory = factories.get_model_factory(rel_obj_type)
+    with factories.single_commit():
+      obj = factories.SystemFactory(title='a', readonly=readonly)
+      obj_id = obj.id
+
+      rel_obj = rel_factory()
+      rel_obj_id = rel_obj.id
+
+      factories.RelationshipFactory(source=obj, destination=rel_obj)
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", obj.slug),
+        ("unmap:{}".format(rel_obj_type), rel_obj.slug),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+
+    obj = get_model("System").query.get(obj_id)
+    rel_obj = get_model(rel_obj_type).query.get(rel_obj_id)
+    rel = all_models.Relationship.find_related(obj, rel_obj)
+    self.assertIsNone(rel)
 
 
 @ddt.ddt
