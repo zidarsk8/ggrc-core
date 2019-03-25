@@ -173,7 +173,7 @@ sa.event.listen(
 sa.event.listen(
     AccessControlRole,
     "before_update",
-    validators.validate_object_type_ggrcq
+    validators.modified_only(validators.validate_object_type_ggrcq)
 )
 sa.event.listen(
     AccessControlRole,
