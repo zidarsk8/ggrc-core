@@ -48,7 +48,7 @@ export default can.Control.extend({
 
     this._prepare_deferred =
       can.view(this.options.widget_view, $.when(this.options))
-        .then(this.proxy('draw_widget'));
+        .then((frag) => this.draw_widget(frag));
 
     return this._prepare_deferred;
   },

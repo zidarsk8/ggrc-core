@@ -93,8 +93,8 @@ export default can.Control.extend({
         }
         return $.when(...dfds);
       }))
-      .then(that._ifNotRemoved(that.proxy('draw_list')));
-
+      .then(that._ifNotRemoved((list, forcePrepareChildren) =>
+        this.draw_list(list, forcePrepareChildren)));
     return this._display_deferred;
   },
 
@@ -182,7 +182,7 @@ export default can.Control.extend({
     }
 
     this.insert_items(items, forcePrepareChildren)
-      .then(this._ifNotRemoved(this.proxy('_loading_finished')));
+      .then(this._ifNotRemoved(() => this._loading_finished()));
 
     return this._loading_deferred;
   },

@@ -160,10 +160,11 @@ const proxyListModels = {
         }
 
         return refreshQueue.trigger()
-          .then(this.proxy('filter_for_valid_mappings', binding))
-          .then(this.proxy('insert_instances_from_mappings', binding));
+          .then((mappings) => this.filter_for_valid_mappings(mappings))
+          .then((mappings) => this
+            .insert_instances_from_mappings(binding, mappings));
       },
-      filter_for_valid_mappings: function (binding, mappings) {
+      filter_for_valid_mappings: function (mappings) {
         // Remove incomplete mappings, including those not in our context
         //   (which the server refused to provide).
         let i;
