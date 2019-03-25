@@ -112,12 +112,7 @@ class TestAudit(TestCase):
       )
     response = self.api.delete(audit)
     self.assertStatus(response, 409)
-    self.assertEqual(
-        response.json["message"],
-        "The audit cannot be deleted due to mapped assessment(s) to this "
-        "audit. Please delete assessment(s) mapped to this audit first "
-        "before deleting the audit.",
-    )
+    self.assertEqual(response.json["message"], errors.MAPPED_ASSESSMENT)
 
   def test_delete_audit_proper(self):
     """Check delete audit with assessment template. Remove template first"""
