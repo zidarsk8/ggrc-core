@@ -553,6 +553,20 @@ class TestIssueIntegration(ggrc.TestCase):
     # Check that issue in Issue Tracker hasn't been updated.
     update_issue_mock.assert_not_called()
 
+  @ddt.data("Primary Contacts", "Admin", "Secondary Contacts")
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='mock')
+  def test_create_missed_issue_acl(self, role):
+    """Test create_missed_issue_acl method"""
+    test_email = "newemail@example.com"
+    issue = factories.IssueFactory()
+    issue_integration.create_missed_issue_acl(test_email, role, issue)
+    db.session.commit()
+    person = all_models.Person.query.filter_by(email=test_email).one()
+    role_emails = [
+        p.email for p in issue.get_persons_for_rolename(role)
+    ]
+    self.assertIn(person.email, role_emails)
+
 
 @ddt.ddt
 class TestDisabledIssueIntegration(ggrc.TestCase):
