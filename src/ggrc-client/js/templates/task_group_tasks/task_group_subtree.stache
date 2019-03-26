@@ -5,7 +5,7 @@
 
 {{#instance}}
 <li class="task_group_tasks__list-item">
-  <div class="objective-selector field-wrap task-wrap" data-model="true" {{data "model"}}>
+  <div class="objective-selector field-wrap task-wrap" data-model="true" {{canData "model"}}>
     <div class="task_group_tasks__list-item-column">
       <span class="task-group-task__column-field">{{title}}</span>
     </div>

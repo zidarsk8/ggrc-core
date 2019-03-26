@@ -964,3 +964,14 @@ Mustache.registerHelper('if_recurring_workflow', function (object, options) {
   }
   return options.inverse(this);
 });
+
+// Sets current "can" context into element data
+Mustache.registerHelper('canData',
+  (key, options) => {
+    key = Mustache.resolve(key);
+
+    return (el) => {
+      $(el).data(key, options.context);
+    };
+  }
+);
