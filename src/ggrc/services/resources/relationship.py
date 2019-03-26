@@ -43,6 +43,10 @@ class RelationshipResource(ggrc.services.common.Resource):
   def _validate_readonly_access(obj):
     """Ensure that relationship is allowed for read-only objects"""
 
+    if not isinstance(obj, relationship.Relationship):
+      # skip Snapshot objects
+      return
+
     obj1 = referenced_objects.get(obj.source_type, obj.source_id)
     obj2 = referenced_objects.get(obj.destination_type, obj.destination_id)
 

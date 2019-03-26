@@ -742,7 +742,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Contacts",
         "Line of Defense One Contacts",
         "Vice Presidents",
-        "Read-only",
     }
     names.update(self.SCOPING_ROLES)
     self._test_single_object(all_models.System, names,

@@ -350,6 +350,7 @@ class ModelView(View):
   # Routing helpers
   @classmethod
   def endpoint_name(cls):
+    """Get name of current class"""
     return cls.__name__
 
   @classmethod
@@ -419,6 +420,8 @@ class Resource(ModelView):
 
   def dispatch_request(self, *args, **kwargs):  # noqa
     # pylint: disable=too-many-return-statements,arguments-differ
+    # pylint: disable=too-many-branches
+
     with benchmark("Dispatch request"):
       with benchmark("dispatch_request > Check Headers"):
         method = request.method
@@ -967,6 +970,8 @@ class Resource(ModelView):
     return src
 
   def _get_relationship(self, src):
+    """Get existing relationship if exists, and update updated_at"""
+
     relationship = self.model.query.filter(
         self.model.source_id == src["source"]["id"],
         self.model.source_type == src["source"]["type"],
@@ -1086,8 +1091,10 @@ class Resource(ModelView):
 
     with benchmark("Check create permissions"):
       self._check_post_permissions(objects)
+
     with benchmark("Validate read-only access"):
       self._validate_readonly_access_on_post(objects)
+
     with benchmark("Send collection POSTed event"):
       signals.Restful.collection_posted.send(
           obj.__class__, objects=objects, sources=sources)

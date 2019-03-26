@@ -75,8 +75,8 @@ class ImportRowConverter(RowConverter):
     self.is_new_object_set = False
     self._is_obj_readonly = False
 
-  def _is_attr_allowed_for_readonly_access(self, attr_name, handler):
-    """"""
+  def _is_allowed_for_readonly_obj(self, attr_name, handler):
+    """Return whether attr is allowed for readonly objects"""
     if not self._is_obj_readonly:
       return False
 
@@ -98,7 +98,7 @@ class ImportRowConverter(RowConverter):
     handler_cls = header_dict["handler"]
     item = handler_cls(self, attr_name, raw_value=self.row[idx], **header_dict)
 
-    if not self._is_attr_allowed_for_readonly_access(attr_name, item):
+    if not self._is_allowed_for_readonly_obj(attr_name, item):
       item.set_value()
     else:
       item.ignore = True
@@ -290,6 +290,7 @@ class ImportRowConverter(RowConverter):
       self.add_error(errors.UNKNOWN_ERROR)
 
   def _check_ignored_columns(self):
+    """Add warning if some columns were ignored"""
     ignored_names = list(handler.display_name
                          for handler in self.attrs.values()
                          if handler.ignore)

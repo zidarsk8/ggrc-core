@@ -139,7 +139,6 @@ class AddRemoveFolderView(flask.views.MethodView):
   @staticmethod
   def _validate_readonly_access(obj):
     """Return 405 MethodNotAllowed if object is marked as read-only"""
-
     if not isinstance(obj, WithReadOnlyAccess):
       return
 
