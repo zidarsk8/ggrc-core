@@ -52,6 +52,7 @@ import {REFRESH_TAB_CONTENT,
   RELATED_ITEMS_LOADED,
   REFRESH_MAPPING,
   REFRESH_RELATED,
+  REFRESHED,
 } from '../../../events/eventTypes';
 import Permission from '../../../permission';
 import {
@@ -631,6 +632,10 @@ export default can.Component.extend({
         ...REFRESH_RELATED,
         model: event.destinationType,
       });
+    },
+    [`{viewModel.instance} ${REFRESHED.type}`]() {
+      const status = this.viewModel.attr('instance.status');
+      this.viewModel.setCurrentState(status);
     },
     '{viewModel.instance} updated'(instance) {
       const vm = this.viewModel;

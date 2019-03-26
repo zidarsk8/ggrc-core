@@ -18,7 +18,7 @@ import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import {getInstance} from '../../plugins/utils/models-utils';
-import {REFRESH_MAPPING} from '../../events/eventTypes';
+import {REFRESH_MAPPING, REFRESHED} from '../../events/eventTypes';
 
 export default Cacheable.extend({
   root_object: 'assessment',
@@ -371,6 +371,7 @@ export default Cacheable.extend({
             })
             .done((...args) => {
               dfd.resolve(...args);
+              this.dispatch(REFRESHED);
             })
             .fail((...args) => {
               dfd.reject(...args);
