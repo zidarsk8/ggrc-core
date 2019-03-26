@@ -223,7 +223,7 @@ class ExportConverter(BaseConverter):
 
     return csv_string_builder.get_csv_string()
 
-  def add_ie_status_to_cache(self, status):
+  def _add_ie_status_to_cache(self, status):
     """Add export job status to memcache"""
     cache_key = cache_utils.get_ie_cache_key(self.ie_job)
     self.cache_manager.cache_object.memcache_client.add(cache_key, status)
@@ -235,7 +235,7 @@ class ExportConverter(BaseConverter):
     status = self._get_ie_status_from_cache()
     if not status:
       status = self._get_ie_status_from_db()
-      self.add_ie_status_to_cache(status)
+      self._add_ie_status_to_cache(status)
     return status
 
   def _get_ie_status_from_cache(self):
