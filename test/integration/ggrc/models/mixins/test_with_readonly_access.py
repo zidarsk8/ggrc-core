@@ -232,6 +232,7 @@ class TestWithReadOnlyAccessImport(TestCase):
 
   def setUp(self):
     super(TestWithReadOnlyAccessImport, self).setUp()
+    self.api = api_helper.Api()
     self.client.get("/login")
 
   @ddt.data(
@@ -700,6 +701,94 @@ class TestWithReadOnlyAccessImport(TestCase):
     rel_obj = get_model(rel_obj_type).query.get(rel_obj_id)
     rel = all_models.Relationship.find_related(obj, rel_obj)
     self.assertIsNone(rel)
+
+  @ddt.data(
+      ("Creator", False),
+      ("Reader", False),
+      ("Editor", False),
+      ("Administrator", True),
+  )
+  @ddt.unpack
+  def test_readonly_set_by_role(self, role_name, expected_readonly):
+    """Test setting Read-only to true under {}."""
+    role_obj = all_models.Role.query.filter(
+        all_models.Role.name == role_name
+    ).one()
+
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      rbac_factories.UserRoleFactory(role=role_obj, person=user)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "System"),
+        ("Code*", "System-1"),
+        ("Admin", user.email),
+        ("Assignee", user.email),
+        ("Verifier", user.email),
+        ("Title", "New System"),
+        ("Read-only", True),
+    ]), person=user)
+
+    expected_warning = {
+        "System": {
+            "row_warnings": {
+                errors.NON_ADMIN_ACCESS_ERROR.format(
+                    line=3,
+                    object_type="System",
+                    column_name="Read-only"
+                )
+            }
+        }
+    } if role_name != "Administrator" else {}
+    self._check_csv_response(response, expected_warning)
+
+    obj = all_models.System.query.filter_by(slug="System-1").first()
+    self.assertEqual(obj.readonly, expected_readonly)
+
+  @ddt.data(
+      ("Creator", False, True),
+      ("Reader", False, True),
+      ("Editor", False, True),
+      ("Administrator", False, True),
+  )
+  @ddt.unpack
+  def test_readonly_update_by_role(self, role, old_readonly, new_readonly):
+    """Test updating readonly attribute from {1} to {2}."""
+    role_obj = all_models.Role.query.filter(
+        all_models.Role.name == role
+    ).one()
+
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      system = factories.SystemFactory(readonly=old_readonly)
+      rbac_factories.UserRoleFactory(role=role_obj, person=user)
+      system.add_person_with_role_name(user, "Admin")
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "System"),
+        ("Code*", system.slug),
+        ("Admin", user.email),
+        ("Read-only", new_readonly),
+    ]), person=user)
+
+    expected_message = {
+        "System": {
+            "row_warnings": {
+                errors.NON_ADMIN_ACCESS_ERROR.format(
+                    line=3,
+                    column_name="Read-only",
+                    object_type="System",
+                )
+            }
+        }
+    } if role != "Administrator" else {}
+    self._check_csv_response(response, expected_message)
+
+    obj = all_models.System.query.get(system.id)
+    self.assertEqual(
+        obj.readonly,
+        new_readonly if role == "Administrator" else old_readonly
+    )
 
 
 @ddt.ddt
