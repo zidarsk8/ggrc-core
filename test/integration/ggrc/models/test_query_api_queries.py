@@ -27,7 +27,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Assessment': 16,
       'AssessmentTemplate': 10,
       'AccessGroup': 17,
-      'AccountBalance': 13,
+      'AccountBalance': 14,
       'Audit': 14,
       'Comment': 8,
       'Contract': 15,
