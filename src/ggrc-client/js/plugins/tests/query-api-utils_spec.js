@@ -277,7 +277,6 @@ describe('QueryAPI utils', function () {
       const generateQueryApiResponse = ({
         object_name: type,
         fields,
-        filters: {expression},
       }) => ({
         [type]: {
           values: [generateObject(type, fields)],
