@@ -178,8 +178,10 @@ export default can.Construct.extend({
     let allowedToMap = this.getAllowedToMapModels(type);
     let related = this.getIndirectlyMappedModels(type);
     let externalMap = this.getExternalMapModels(type);
+    let allowedToCreate = this.getAllowedToCreateModels(type);
 
-    return Object.assign({}, allowedToMap, related, externalMap);
+    return Object.assign({},
+      allowedToMap, related, externalMap, allowedToCreate);
   },
   /**
    * Return grouped types.
@@ -261,6 +263,14 @@ export default can.Construct.extend({
    */
   getAllowedToUnmapModels(object) {
     return this._getModelsFromConfig(object, 'unmap');
+  },
+  /**
+   * Returns collection of models allowed for creating and mapping
+   * @param {String} object - the object type's short name
+   * @return {Object} - a keyed object of allowed for creating and mapping models
+   */
+  getAllowedToCreateModels(object) {
+    return this._getModelsFromConfig(object, 'create');
   },
   _getModelsFromConfig(object, prop) {
     let mappings = {};
