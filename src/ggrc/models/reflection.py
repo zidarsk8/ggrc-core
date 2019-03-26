@@ -207,6 +207,7 @@ class AttributeInfo(object):
       "delete",
       "repeat_every",
       "unit",
+      "readonly",
       ALIASES_PREFIX,
       "comments",
       "last_comment",
@@ -526,7 +527,8 @@ class AttributeInfo(object):
   def get_attr_definitions_array(cls, object_class, ca_cache=None):
     """ get all column definitions containing only json serializable data """
     definitions = cls.get_object_attr_definitions(object_class,
-                                                  ca_cache=ca_cache)
+                                                  ca_cache=ca_cache,
+                                                  include_hidden=True)
     order = cls.get_column_order(definitions.keys())
     result = []
     for key in order:
