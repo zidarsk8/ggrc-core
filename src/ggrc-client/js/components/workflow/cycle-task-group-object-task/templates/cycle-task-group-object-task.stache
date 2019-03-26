@@ -39,9 +39,6 @@
                     </a>
                   </li>
                   <li>
-                    <permalink {instance}="{instance}"/>
-                  </li>
-                  <li>
                     {{#is(instance.status, "Deprecated")}}
                       <object-change-state {to-state}="{initialState}"
                                            (on-state-change)="{onStateChange(%event)}">
