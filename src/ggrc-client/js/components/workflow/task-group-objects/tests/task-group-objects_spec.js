@@ -10,7 +10,8 @@ import Mappings from '../../../../models/mappers/mappings';
 import * as QueryApiUtils from '../../../../plugins/utils/query-api-utils';
 import * as MapperUtils from '../../../../plugins/utils/mapper-utils';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
-import {DEFERRED_MAP_OBJECTS} from '../../../../events/eventTypes';
+import * as ErrorUtils from '../../../../plugins/utils/errors-utils';
+import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../../events/eventTypes';
 
 describe('task-group-objects component', function () {
   let viewModel;
@@ -27,20 +28,18 @@ describe('task-group-objects component', function () {
         {id: 3, type: 'Type3'},
         {id: 4, type: 'Type4'},
       ];
-      const convertedObjects = objects.map(({id, type}) => ({
-        data: `Converted ${type} ${id}`,
-      }));
-      spyOn(viewModel, 'convertToListItem').and.returnValues(convertedObjects);
+      const fakeConverter = (object) => ({data: object});
+      const expected = objects.map(fakeConverter);
+      spyOn(viewModel, 'convertToListItem').and.callFake(fakeConverter);
 
       viewModel.addToList(objects);
 
-      expect(viewModel.convertToListItem.calls.allArgs())
-        .toEqual(objects.map((object) => [object]));
+      expect(viewModel.attr('items').serialize()).toEqual(expected);
     });
   });
 
   describe('convertToListItem() method', () => {
-    it('returns converted passed object to list item', () => {
+    it('returns converted object', () => {
       const object = {
         id: 12345,
         type: 'ObjectType',
@@ -114,13 +113,16 @@ describe('task-group-objects component', function () {
     });
   });
 
-  describe('map() method', () => {
+  describe('addPreloadedObjectsToList() method', () => {
     beforeEach(() => {
-      spyOn(MapperUtils, 'mapObjects')
-        .and.returnValue(new Promise(() => {}));
+      spyOn(QueryApiUtils, 'loadObjectsByStubs')
+        .and.returnValue(Promise.resolve([]));
+      spyOn(viewModel, 'addToList');
     });
 
-    it('maps passed stubs to task group', () => {
+    it('loads objects before adding them to the list which ' +
+    'should contain id, title and type fields based on ' +
+    'passed stubs', async (done) => {
       const stubs = [{
         id: 1,
         type: 'Type1',
@@ -131,77 +133,43 @@ describe('task-group-objects component', function () {
         id: 300,
         type: 'Type300',
       }];
-      const taskGroup = new can.Map({
-        id: '12345',
-        type: 'TaskGroup',
-      });
-      viewModel.attr('taskGroup', taskGroup);
 
-      viewModel.map(stubs);
+      await viewModel.addPreloadedObjectsToList(stubs);
 
-      expect(MapperUtils.mapObjects).toHaveBeenCalledWith(taskGroup, stubs);
+      expect(QueryApiUtils.loadObjectsByStubs).toHaveBeenCalledWith(
+        stubs, ['id', 'type', 'title']
+      );
+      expect(QueryApiUtils.loadObjectsByStubs)
+        .toHaveBeenCalledBefore(viewModel.addToList);
+      done();
     });
 
-    describe('after mapping of objects', () => {
-      beforeEach(() => {
-        MapperUtils.mapObjects
-          .and.returnValue(Promise.resolve());
-        spyOn(QueryApiUtils, 'loadObjectsByStubs')
-          .and.returnValue(Promise.resolve([]));
-        spyOn(viewModel, 'addToList');
-      });
+    it('adds loaded objects to the list', async (done) => {
+      const stubs = [{
+        id: 1,
+        type: 'Type1',
+      }, {
+        id: 20,
+        type: 'Type20',
+      }, {
+        id: 300,
+        type: 'Type300',
+      }];
+      const expectedResult = [
+        {data: '1 Type1'},
+        {data: '20 Type20'},
+        {data: '300 Type300'},
+      ];
+      QueryApiUtils.loadObjectsByStubs.and.callFake((stubs) =>
+        Promise.resolve(
+          stubs.map(({id, type}) => ({data: `${id} ${type}`}))
+        )
+      );
 
-      it('loads objects which should contain id, title and type fields ' +
-      'based on passed stubs', async (done) => {
-        const stubs = [{
-          id: 1,
-          type: 'Type1',
-        }, {
-          id: 20,
-          type: 'Type20',
-        }, {
-          id: 300,
-          type: 'Type300',
-        }];
+      await viewModel.addPreloadedObjectsToList(stubs);
 
-        await viewModel.map(stubs);
-
-        expect(QueryApiUtils.loadObjectsByStubs).toHaveBeenCalledWith(
-          stubs, ['id', 'type', 'title']
-        );
-        expect(MapperUtils.mapObjects).toHaveBeenCalledBefore(
-          QueryApiUtils.loadObjectsByStubs
-        );
-        done();
-      });
-
-      it('adds loaded objects to the list', async (done) => {
-        const stubs = [{
-          id: 1,
-          type: 'Type1',
-        }, {
-          id: 20,
-          type: 'Type20',
-        }, {
-          id: 300,
-          type: 'Type300',
-        }];
-        const expectedResult = [
-          {data: '1 Type1'},
-          {data: '20 Type20'},
-          {data: '300 Type300'},
-        ];
-        QueryApiUtils.loadObjectsByStubs.and.callFake((stubs) =>
-          Promise.resolve(
-            stubs.map(({id, type}) => ({data: `${id} ${type}`}))
-          )
-        );
-
-        await viewModel.map(stubs);
-
-        expect(viewModel.addToList).toHaveBeenCalledWith(expectedResult);
-        done();
-      });
+      expect(viewModel.addToList).toHaveBeenCalledWith(expectedResult);
+      done();
     });
   });
 
@@ -250,14 +218,14 @@ describe('task-group-objects component', function () {
         );
       });
 
-    describe('after unmapping of object from taskGroup', () => {
+    describe('after successful unmapping of object from taskGroup', () => {
       beforeEach(() => {
         MapperUtils.unmapObjects.and.returnValue(Promise.resolve());
         spyOn(NotifiersUtils, 'notifier');
       });
 
-      it('sets "disabled" flag to true for certain item based on passed ' +
-      'itemIndex before unmapping object from task group', async (done) => {
+      it('sets "disabled" flag to false for certain item based on passed ' +
+      'itemIndex', async (done) => {
         const item = new can.Map({id: 2});
         viewModel.attr('items').push(item);
         const itemIndex = 1;
@@ -295,6 +263,52 @@ describe('task-group-objects component', function () {
           done();
         });
     });
+
+    describe('if some ajax-related error was occurred', () => {
+      let fakeXhr;
+      let fakeErrorInfo;
+
+      beforeEach(() => {
+        fakeXhr = {};
+        fakeErrorInfo = {};
+        MapperUtils.unmapObjects.and.returnValue(Promise.reject(fakeXhr));
+        spyOn(NotifiersUtils, 'notifier');
+        spyOn(ErrorUtils, 'getAjaxErrorInfo').and.returnValue(fakeErrorInfo);
+      });
+
+      it('shows error message', async (done) => {
+        fakeErrorInfo.details = 'Fake details';
+
+        await viewModel.unmapByItemIndex(0);
+
+        expect(ErrorUtils.getAjaxErrorInfo).toHaveBeenCalledWith(fakeXhr);
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('error', 'Fake details');
+        done();
+      });
+
+      it('does not remove item by itemIndex', async (done) => {
+        viewModel.attr('items', [{}]);
+
+        await viewModel.unmapByItemIndex(0);
+
+        expect(viewModel.attr('items').length).toBe(1);
+        done();
+      });
+
+      it('sets "disabled" flag to false for certain item based on passed ' +
+      'itemIndex', async (done) => {
+        const item = new can.Map({id: 2});
+        viewModel.attr('items').push(item);
+        const itemIndex = 1;
+        item.attr('disabled', true);
+
+        await viewModel.unmapByItemIndex(itemIndex);
+
+        expect(item.attr('disabled')).toBe(false);
+        done();
+      });
+    });
   });
 
   describe('component\'s init() handler', () => {
@@ -312,57 +326,26 @@ describe('task-group-objects component', function () {
     });
   });
 
-  describe('"inserted"() event handler', () => {
-    let handler;
-    let element;
-
-    beforeEach(() => {
-      element = $('<div><div>');
-      handler = Component.prototype.events.inserted.bind({
-        viewModel,
-        element,
-      });
-    });
-
-    it('sets "deferred_to" attribute to the value of taskGroup field for ' +
-    'the element which opens unified mapper', () => {
-      const button = element.find('div')
-        .html('<button></button>');
-
-      button.attr('data-toggle', 'unified-mapper');
-      button.data('deferred_to', {});
-
-      const taskGroup = new can.Map({
-        id: 12345,
-        type: 'FakeTaskGroupType',
-      });
-      viewModel.attr('taskGroup', taskGroup);
-
-      handler();
-
-      expect(button.data('deferred_to').instance).toBe(taskGroup);
-    });
-  });
-
-  describe('{viewModel.taskGroup} ${DEFERRED_MAP_OBJECTS.type}]"() event ' +
-  'handler', () => {
+  describe('{viewModel.taskGroup} ${OBJECTS_MAPPED_VIA_MAPPER.type}]"()' +
+  'event handler', () => {
     let handler;
 
     beforeEach(() => {
-      const handlerName = `{viewModel.taskGroup} ${DEFERRED_MAP_OBJECTS.type}`;
+      const handlerName =
+        `{viewModel.taskGroup} ${OBJECTS_MAPPED_VIA_MAPPER.type}`;
       handler = Component.prototype.events[handlerName].bind({viewModel});
     });
 
-    it('maps passed objects to task group', () => {
+    it('adds passed objects to task group', () => {
       const objects = [
         {id: 123, type: 'Type123'},
         {id: 321, type: 'Type321'},
       ];
-      spyOn(viewModel, 'map');
+      spyOn(viewModel, 'addPreloadedObjectsToList');
 
       handler({}, {objects});
 
-      expect(viewModel.map).toHaveBeenCalledWith(objects);
+      expect(viewModel.addPreloadedObjectsToList).toHaveBeenCalledWith(objects);
     });
   });
 
