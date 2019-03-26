@@ -8,12 +8,15 @@
 
 import logging
 
+from werkzeug import exceptions as wzg_exceptions
+
 from ggrc import db
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder
 from ggrc.models.hooks.issue_tracker import integration_utils
+from ggrc.utils import user_generator
 from ggrc.utils.custom_dict import MissingKeyDict
 from ggrc.integrations.synchronization_jobs.issue_sync_job import \
     ISSUE_STATUS_MAPPING
@@ -52,7 +55,9 @@ def _is_already_linked(ticket_id):
 
 def create_missed_issue_acl(email, role_name, obj):
   """Create missed acl for emails from IssueTracker"""
-  person = all_models.Person.query.filter_by(email=email).first()
+  person = user_generator.find_user(email)
+  if not person:
+    raise wzg_exceptions.Forbidden()
   obj.add_person_with_role_name(person, role_name)
 
 
