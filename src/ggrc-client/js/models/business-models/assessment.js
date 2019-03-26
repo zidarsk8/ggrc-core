@@ -18,6 +18,7 @@ import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import {getInstance} from '../../plugins/utils/models-utils';
+import {REFRESH_MAPPING} from '../../events/eventTypes';
 
 export default Cacheable.extend({
   root_object: 'assessment',
@@ -250,6 +251,11 @@ export default Cacheable.extend({
       this._super(...arguments);
     }
     this.bind('refreshInstance', this.refresh.bind(this));
+    this.bind(REFRESH_MAPPING.type, () => {
+      if (['Completed', 'Verified', 'In Review'].includes(this.status)) {
+        this.refresh();
+      }
+    });
   },
   before_create: function () {
     if (!this.audit) {
