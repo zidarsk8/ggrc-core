@@ -527,8 +527,7 @@ class AttributeInfo(object):
   def get_attr_definitions_array(cls, object_class, ca_cache=None):
     """ get all column definitions containing only json serializable data """
     definitions = cls.get_object_attr_definitions(object_class,
-                                                  ca_cache=ca_cache,
-                                                  include_hidden=True)
+                                                  ca_cache=ca_cache,)
     order = cls.get_column_order(definitions.keys())
     result = []
     for key in order:
