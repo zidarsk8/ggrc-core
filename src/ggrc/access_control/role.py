@@ -127,7 +127,7 @@ class AccessControlRole(attributevalidator.AttributeValidator,
                        u"already exists for this object type"
                        .format(name))
 
-    if key == "name" and "*" in name:
+    if "*" in name:
       raise ValueError(u"Attribute name contains unsupported symbol '*'")
 
     return value

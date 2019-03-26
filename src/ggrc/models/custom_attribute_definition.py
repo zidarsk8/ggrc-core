@@ -332,13 +332,12 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     if definition_type == "assessment":
       self.validate_assessment_title(name)
 
-    if key == "title" and "*" in name:
+    if "*" in name:
       raise ValueError(u"Attribute title contains unsupported symbol '*'")
 
-    if key == "title" and (name.startswith("map:") or
-                           name.startswith("unmap:")):
-      raise ValueError(u"Custom attribute title should not starts with 'map:' "
-                       u"or 'unmap:'")
+    if name.startswith("map:") or name.startswith("unmap:"):
+      raise ValueError(u"Custom attribute title should not starts "
+                       u"with 'map:' or 'unmap:'")
 
     return value
 
