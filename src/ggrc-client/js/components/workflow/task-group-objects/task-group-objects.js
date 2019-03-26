@@ -4,11 +4,8 @@
 */
 
 import template from './templates/task-group-objects.stache';
-import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
-import {
-  mapObjects,
-  unmapObjects,
-} from '../../../plugins/utils/mapper-utils';
+import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../events/eventTypes';
+import {unmapObjects} from '../../../plugins/utils/mapper-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import {
   loadObjectsByStubs,
@@ -17,6 +14,7 @@ import {
 
 import Stub from '../../../models/stub';
 import Mappings from '../../../models/mappers/mappings';
+import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const requiredObjectsFields = ['id', 'type', 'title'];
 
@@ -45,8 +43,7 @@ const viewModel = can.Map.extend({
     );
     this.addToList(mappedObjects);
   },
-  async map(stubs) {
-    await mapObjects(this.attr('taskGroup'), stubs);
+  async addPreloadedObjectsToList(stubs) {
     const loadedObjects = await loadObjectsByStubs(
       stubs,
       requiredObjectsFields
@@ -58,8 +55,15 @@ const viewModel = can.Map.extend({
     const item = items[itemIndex];
 
     item.attr('disabled', true);
-    await unmapObjects(this.attr('taskGroup'), [item.attr('stub')]);
-    item.attr('disabled', false);
+
+    try {
+      await unmapObjects(this.attr('taskGroup'), [item.attr('stub')]);
+    } catch (xhr) {
+      notifier('error', getAjaxErrorInfo(xhr).details);
+      return;
+    } finally {
+      item.attr('disabled', false);
+    }
 
     // remove unmapped object from the list
     // Need to get updated index because
@@ -72,16 +76,8 @@ const viewModel = can.Map.extend({
 });
 
 const events = {
-  inserted() {
-    // Pass taskGroup into object-mapper via "deferred_to"
-    // data attribute
-    this.element.find('[data-toggle="unified-mapper"]')
-      .data('deferred_to', {
-        instance: this.viewModel.attr('taskGroup'),
-      });
-  },
-  [`{viewModel.taskGroup} ${DEFERRED_MAP_OBJECTS.type}`](el, {objects}) {
-    this.viewModel.map(objects);
+  [`{viewModel.taskGroup} ${OBJECTS_MAPPED_VIA_MAPPER.type}`](el, {objects}) {
+    this.viewModel.addPreloadedObjectsToList(objects);
   },
   '.task-group-objects__unmap click'(el) {
     this.viewModel.unmapByItemIndex(el.attr('data-item-index'));

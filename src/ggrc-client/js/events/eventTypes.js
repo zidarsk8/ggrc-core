@@ -212,6 +212,16 @@ const REFRESH_MAPPED_COUNTER = {
   type: 'refreshMappedCounter',
 };
 
+/**
+ * Objects were mapped via object-mapper functionality.
+ * @event objectsMappedViaMapper
+ * @type {object}
+ * @property {(Stub[]|Cacheable[])=} objects - Mapped objects.
+ */
+const OBJECTS_MAPPED_VIA_MAPPER = {
+  type: 'objectsMappedViaMapper',
+};
+
 export {
   REFRESHED,
   REFRESH_SUB_TREE,
@@ -233,4 +243,5 @@ export {
   MAP_OBJECTS,
   DEFERRED_MAP_OBJECTS,
   REFRESH_MAPPED_COUNTER,
+  OBJECTS_MAPPED_VIA_MAPPER,
 };
