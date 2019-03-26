@@ -368,7 +368,7 @@ class TestCase(BaseTestCase, object):
       self._check_csv_response(response, {})
     return response
 
-  def export_csv(self, data, exportable_objects=None, headers=None):
+  def export_csv(self, data, exportable_objects=None):
     """Export csv handle
 
     return post action response to export_csv service with data argument as
@@ -379,13 +379,9 @@ class TestCase(BaseTestCase, object):
         "objects": data,
         "exportable_objects": exportable_objects or []
     }
-    if not headers or not isinstance(headers, dict):
-      headers = self.headers
-    else:
-      headers.update(self.headers)
     return self.client.post("/_service/export_csv",
                             data=json.dumps(request_body),
-                            headers=headers)
+                            headers=self.headers)
 
   def export_csv_template(self, objects):
     """Export csv template handle
@@ -401,7 +397,7 @@ class TestCase(BaseTestCase, object):
                             data=json.dumps(request_body),
                             headers=self.headers)
 
-  def export_parsed_csv(self, data, headers=None):
+  def export_parsed_csv(self, data):
     """returns the dict of list of dict
 
     keys are humanreadable model name
@@ -410,7 +406,7 @@ class TestCase(BaseTestCase, object):
         keys of that dicts are the exportable field names
         values are the values of this field for current instance
     """
-    resp = self.export_csv(data, headers=headers)
+    resp = self.export_csv(data)
     self.assert200(resp)
     rows = csv.reader(StringIO(resp.data))
 

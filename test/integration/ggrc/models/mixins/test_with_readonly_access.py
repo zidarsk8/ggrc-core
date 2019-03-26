@@ -896,23 +896,11 @@ class TestWithReadOnlyAccessExport(TestCase):
     """setUp"""
     super(TestWithReadOnlyAccessExport, self).setUp()
     self.api = api_helper.Api()
+    self.client.get("/login")
 
-  @ddt.data(
-      'Creator', 'Reader', 'Editor', 'Administrator'
-  )
-  def test_export_system(self, role_name):
+  def test_export_system(self):
     """Test exporting of System objects."""
-    role_obj = all_models.Role.query.filter(
-        all_models.Role.name == role_name
-    ).one()
-
-    with factories.single_commit():
-      system = factories.SystemFactory()
-      user = factories.PersonFactory()
-      rbac_factories.UserRoleFactory(role=role_obj, person=user)
-      system.add_person_with_role_name(user, "Admin")
-
-    self.api.set_user(user)
+    factories.SystemFactory()
 
     search_request = [{
         "object_name": "System",
@@ -922,13 +910,13 @@ class TestWithReadOnlyAccessExport(TestCase):
         }
     }]
 
-    response = self.export_parsed_csv(search_request, self.api.user_headers)
+    response = self.export_parsed_csv(search_request)
     self.assertEqual(len(response["System"]), 1)
     self.assertNotIn("Read-only", response["System"][0])
+    self.assertNotIn("readonly", response["System"][0])
 
   def test_export_system_template(self):
     """Test exporting of System import template."""
-    self.client.get("/login")
     response = self.export_csv_template([{"object_name": "System"}])
     self.assertNotIn("Read-only", response.data)
     self.assertNotIn("readonly", response.data)
