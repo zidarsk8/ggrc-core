@@ -23,7 +23,6 @@ const viewModel = can.Map.extend({
   },
   instance: null,
   workflow: null,
-  options: null,
   async loadWorkflow() {
     const instance = this.attr('instance');
     const workflow = await instance.refresh_all('workflow');
