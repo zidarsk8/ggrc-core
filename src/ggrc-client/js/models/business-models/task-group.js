@@ -19,8 +19,6 @@ export default Cacheable.extend({
   mixins: [contactable],
   attributes: {
     workflow: Stub,
-    task_group_tasks: Stub.List,
-    tasks: Stub.List,
     modified_by: Stub,
     context: Stub,
     end_date: 'date',
