@@ -210,3 +210,8 @@ READONLY_ACCESS_WARNING = (u"Line {line}: The system is in a "
                            u"read-only mode and is dedicated for SOX needs. "
                            u"The following columns will be ignored: "
                            u"{columns}.")
+
+NON_ADMIN_ACCESS_ERROR = (u"Line {line}: You don't have permissions to make "
+                          u"the {object_type} read-only. Please contact your "
+                          u"administrator if you have any questions. "
+                          u"Column '{column_name}' will be ignored.")
