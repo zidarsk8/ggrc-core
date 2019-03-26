@@ -277,7 +277,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     """Validate CAD title/name uniqueness.
 
     Note: title field is used for storing CAD names.
-    CAD names need to follow 6 uniqueness rules:
+    CAD names need to follow 7 uniqueness rules:
       1) Names must not match any attribute name on any existing object.
       2) Object level CAD names must not match any global CAD name.
       3) Object level CAD names can clash, but not for the same Object
@@ -286,6 +286,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       4) Names must not match any existing custom attribute role name
       5) Names should not contains "*" symbol
       6) Names should be stripped
+      7) Names should not start with 'map:' or 'unmap:'
 
     Third rule is handled by the database with unique key uq_custom_attribute
     (`definition_type`,`definition_id`,`title`).
@@ -333,6 +334,11 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
 
     if key == "title" and "*" in name:
       raise ValueError(u"Attribute title contains unsupported symbol '*'")
+
+    if key == "title" and (name.startswith("map:") or
+                           name.startswith("unmap:")):
+      raise ValueError(u"Custom attribute title should not starts with 'map:' "
+                       u"or 'unmap:'")
 
     return value
 
