@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -25,7 +27,11 @@ class TestUrlParser(unittest.TestCase):
       [
           "http://www.google.com",
           '<a href="http://www.google.com">http://www.google.com</a>'
-      ]
+      ],
+      [
+          u"http://www.тест.com",
+          u'<a href="http://www.тест.com">http://www.тест.com</a>'
+      ],
   )
   @ddt.unpack
   def test_wrap_raw_url(self, test_data, expected_result):
@@ -44,6 +50,11 @@ class TestUrlParser(unittest.TestCase):
       ('test <a href="https://www.google.com/">'
        'https://www.google.com/</a> link '
        '<a href="http://www.google.com/">http://www.google.com/</a>')
+  ], [
+      (u'тест <a href="https://www.тест.com/">тест</a> '
+       u'тест http://тест.com/'),
+      (u'тест <a href="https://www.тест.com/">тест</a> '
+       u'тест <a href="http://тест.com/">http://тест.com/</a>')
   ])
   @ddt.unpack
   def test_parse_mixed_urls(self, test_data, expected_result):

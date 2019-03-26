@@ -22,7 +22,8 @@ from lib.page.widget.page_mixins import (
 from lib.utils import selenium_utils, help_utils, ui_utils
 
 
-class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
+class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
+                 object_page.ObjectPage):
   """Abstract class of common info for Info pages and Info panels."""
   # pylint: disable=too-many-public-methods
   # pylint: disable=too-many-instance-attributes
@@ -53,7 +54,6 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
          Policies, Risks, Standards, Threats, Requirements]):
       if self.is_info_page:
         self.tabs.ensure_tab(self._attributes_tab_name)
-      self._extend_list_all_scopes_by_review_state()
     self.comment_area = self._comment_area()
     self.edit_popup = object_modal.get_modal_obj(self.obj_name, self._driver)
 
@@ -285,7 +285,7 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
         "state": self.status(),
         "title": self.title()
     }
-    if self.is_comments_panel_present:
+    if self.is_comments_panel_present and self.obj_name != "control":
       scope["comments"] = self.comments_panel.scopes
     if self.is_info_page:
       scope.update(
@@ -293,7 +293,10 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
           last_updated_by=self.modified_by(),
           updated_at=self.updated_at()
       )
-    if self.reviewers.is_element_exists():
+    if self.has_review():
+      scope.update(review_status=self.get_review_status(),
+                   review_status_display_name=self.get_review_status())
+    if self.reviewers.exists():
       scope["reviewers"] = self.reviewers.get_people_emails()
     self.update_obj_scope(scope)
     return scope
@@ -314,17 +317,6 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     """Extend 'list all scopes' by headers' text and values' text."""
     self.list_all_headers_txt.extend(help_utils.convert_to_list(headers))
     self.list_all_values_txt.extend(help_utils.convert_to_list(values))
-
-  def _extend_list_all_scopes_by_review_state(self):
-    """Set attributes related to 'review state' and extend
-    'list all scopes' accordingly.
-    """
-    # pylint: disable=invalid-name
-    self.review_state_lbl = self._browser.element(
-        class_name="object-review__header-title")
-    self.review_state_txt = self.get_review_state_txt()
-    self._extend_list_all_scopes(
-        self.review_state_lbl.text, self.review_state_txt)
 
   def changelog_validation_result(self):
     """Returns changelog validation result."""
@@ -355,13 +347,13 @@ class InfoWidget(WithPageElements, base.Widget, object_page.ObjectPage):
     return self._comment_area().exists
 
 
-class Programs(WithObjectReview, InfoWidget):
+class Programs(InfoWidget):
   """Model for program object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoProgram
   _elements = element.ProgramInfoWidget
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(Programs, self).__init__(driver)
     self.manager, self.manager_entered = (
         self.get_header_and_value_txt_from_people_scopes(
@@ -373,7 +365,7 @@ class Programs(WithObjectReview, InfoWidget):
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
     return [self.request_review_btn,
-            self.three_bbs,
+            self.three_bbs.edit_option,
             self.comment_area.add_section,
             self.reference_urls.add_button] + list(self.inline_edit_controls)
 
@@ -772,15 +764,14 @@ class Requirements(InfoWidget):
     super(Requirements, self).__init__(driver)
 
 
-class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
+class Controls(WithAssignFolder, InfoWidget):
   """Model for Control object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoControl
   _elements = element.ControlInfoWidget
 
-  def __init__(self, driver, root_elem=None):
+  def __init__(self, driver):
     super(Controls, self).__init__(driver)
-    self.root_element = root_elem if root_elem else self._browser
     self.admin_text = roles.ADMIN.upper()
     self.admin_entered_text = self.admins.get_people_emails()
     self.control_operator_text = roles.CONTROL_OPERATORS.upper()
@@ -798,16 +789,20 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
         [self.admin_entered_text, self.control_operator_entered_text,
          self.assertions_entered_text])
     self._add_obj_review_to_lsopes()
-    self.proposals_tab = "Change Proposals"
 
   @property
-  def _root(self):
-    """Returns root element (including title, 3bbs)."""
-    if self.is_info_page:
-      return self._browser.element(class_name="widget", id="info")
-    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
-      return self.root_element
-    return self._browser.element(class_name="sticky-info-panel")
+  def control_review_status(self):
+    """Get control review status. As controls have different flow
+    WithObjectReview class does not suit here."""
+    return self._root.element(
+        class_name="state-value-dot review-status").text.title()
+
+  def update_obj_scope(self, scope):
+    """Updates obj scope."""
+    scope.update(review_status=self.control_review_status,
+                 review_status_display_name=self.control_review_status)
+    if self.is_comments_panel_present and self.obj_name != "control":
+      scope["comments"] = self.comments_panel.scopes
 
   @property
   def control_operators(self):
@@ -830,23 +825,13 @@ class Controls(WithAssignFolder, WithObjectReview, InfoWidget):
         WidgetInfoControl.DATE_PICKER_LOCATOR)
     date_picker.select_month_start()
 
-  def click_propose_changes(self):
-    """Click on Propose Changes button."""
-    self._browser.element(tag_name="create-proposal-button").link().click()
-
   def els_shown_for_editor(self):
     """Elements shown for user with edit permissions"""
-    return [self.request_review_btn,
-            self.three_bbs,
-            self.comment_area.add_section,
+    return [self.comment_area.control_add_section,
+            self.request_review_btn,
+            self.three_bbs.edit_option,
             self.reference_urls.add_button,
             self.assign_folder_button] + list(self.inline_edit_controls)
-
-  def related_proposals(self):
-    """Open related proposals tab."""
-    self.tabs.ensure_tab(self.proposals_tab)
-    selenium_utils.wait_for_js_to_load(self._driver)
-    return related_proposals.RelatedProposals()
 
 
 class Objectives(InfoWidget):
@@ -953,8 +938,19 @@ class Risks(InfoWidget):
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
 
-  def __init__(self, driver):
+  def __init__(self, driver, root_elem=None):
     super(Risks, self).__init__(driver)
+    self.root_element = root_elem if root_elem else self._browser
+    self.proposals_tab = "Change Proposals"
+
+  @property
+  def _root(self):
+    """Returns root element (including title, 3bbs)."""
+    if self.is_info_page:
+      return self._browser.element(class_name="widget", id="info")
+    if apply_decline_proposal.CompareApplyDeclineModal().modal.exists:
+      return self.root_element
+    return self._browser.element(class_name="sticky-info-panel")
 
   def update_obj_scope(self, scope):
     """Updates obj scope."""
@@ -966,6 +962,16 @@ class Risks(InfoWidget):
   def risk_type(self):
     """Returns the text of risk type."""
     return self._simple_field("Risk Type").text
+
+  def click_propose_changes(self):
+    """Click on Propose Changes button."""
+    self._browser.link(text="Propose Changes").click()
+
+  def related_proposals(self):
+    """Open related proposals tab."""
+    self.tabs.ensure_tab(self.proposals_tab)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return related_proposals.RelatedProposals()
 
 
 class Threats(InfoWidget):

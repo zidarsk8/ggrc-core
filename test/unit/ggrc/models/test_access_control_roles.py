@@ -1,13 +1,16 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Test Access Control Role validation"""
 
 import unittest
+from collections import namedtuple
 from mock import MagicMock
 
 import ggrc.app  # noqa pylint: disable=unused-import
 from ggrc.models import all_models
+from ggrc.models.hooks.access_control_role import handle_role_acls
 
 
 class TestAccessControlRoles(unittest.TestCase):
@@ -40,9 +43,33 @@ class TestAccessControlRoles(unittest.TestCase):
       self.acr.name = name
       self.acr.object_type = object_type
 
+  def test_name_with_asterisk_throws(self):
+    """Test if raises if name contains * symbol"""
+
+    with self.assertRaises(ValueError):
+      name, object_type = "With asterisk *", "Control"
+      self.acr.object_type = object_type
+      self.acr.validates_name("name", name)
+
   def test_if_invalid_ca_check(self):
     """Test if raises on collision with custom attributes attributes"""
     with self.assertRaises(ValueError):
       name, object_type = "reg url", "Regulation"
       self.acr.name = name
       self.acr.object_type = object_type
+
+
+class TestAccessControlRolesHooks(unittest.TestCase):
+  """Test access control role creation hooks"""
+
+  def setUp(self):
+    self.acr = namedtuple("AccessControlRole", ["name", "object_type"])(
+        u"兄貴", "Fake Object Type"
+    )
+
+  def test_support_of_non_ascii_name(self):
+    """Check if handle_role_acls supports non ascii names"""
+    try:
+      handle_role_acls(self.acr)
+    except UnicodeEncodeError as unicode_encode_error:
+      self.fail(unicode_encode_error)

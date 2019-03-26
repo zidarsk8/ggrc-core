@@ -100,7 +100,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "create_and_map": True,
               "read": True,
               "update": True,
-              "delete": False,
+              "delete": True,
               "add_comment": True,
               "read_comments": True
           }
@@ -189,7 +189,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "create_and_map": True,
               "read": True,
               "update": True,
-              "delete": False,
+              "delete": True,
               "add_comment": True,
               "read_comments": True
           }
@@ -271,7 +271,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "create_and_map": True,
               "read": True,
               "update": True,
-              "delete": False,
+              "delete": True,
               "add_comment": True,
               "read_comments": True
           },
@@ -279,7 +279,7 @@ class TestAuditorsPropagation(base.TestACLPropagation):
               "create_and_map": True,
               "read": True,
               "update": True,
-              "delete": False,
+              "delete": True,
               "add_comment": True,
               "read_comments": True
           }

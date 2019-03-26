@@ -86,8 +86,8 @@ class People(dashboard.AdminDashboard):
 
   def click_create_button(self):
     """Click on the Create button on People widget"""
-    add_button = selenium_utils.get_when_clickable(
-        self._driver, self._locators.CREATE_PERSON_BUTTON_SELECTOR)
+    add_button = self._browser.link(text="Create").wait_until(
+        lambda e: e.enabled)
     add_button.click()
 
   def filter_by_name_email_company(self, str_to_filter_by):

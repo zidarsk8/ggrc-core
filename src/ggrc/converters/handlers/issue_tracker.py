@@ -30,15 +30,28 @@ class IssueTrackerColumnHandler(handlers.ColumnHandler):
     self.row_converter.issue_tracker[self.key] = self.value
 
   def _get_default_value(self):
-    """Get default value for missed value in Issue Tracker attribute column."""
+    """Get default value for missed value in Issue Tracker attribute column.
+
+    We have some rules for default values.
+    - Assessment and Assessment Template should take their missing values
+      from audit if there, otherwise from default values.
+    - Issues should have Issue specific hotlist_id and component_id. They are
+      stored separately in default_values dict ('issue_hotlist_id' and
+      'issue_component_id' keys).
+    """
     value = None
     default_values = constants.DEFAULT_ISSUETRACKER_VALUES
     is_assmt = isinstance(self.row_converter.obj,
                           all_models.Assessment)
     is_assmt_template = isinstance(self.row_converter.obj,
                                    all_models.AssessmentTemplate)
+    is_issue = isinstance(self.row_converter.obj, all_models.Issue)
     if is_assmt or is_assmt_template:
       value = self.row_converter.obj.audit.issue_tracker.get(self.key)
+
+    if is_issue and (self.key in ["hotlist_id", "component_id"]):
+      value = default_values.get("issue_" + self.key)
+
     default_value = value or default_values.get(self.key)
     return default_value
 

@@ -558,6 +558,7 @@ class Resource(ModelView):
 
   @staticmethod
   def json_update(obj, src):
+    """Update object `obj` with data from JSON `src`."""
     ggrc.builder.json.update(obj, src)
 
   def patch(self):
@@ -605,9 +606,9 @@ class Resource(ModelView):
       self._check_put_permissions(obj, new_context)
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
-    obj.modified_by_id = get_current_user_id()
-    obj.updated_at = datetime.datetime.utcnow()
-    db.session.add(obj)
+
+    self.add_modified_object_to_session(obj)
+
     with benchmark("Process actions"):
       self.process_actions(obj)
     with benchmark("Validate custom attributes"):
@@ -664,6 +665,13 @@ class Resource(ModelView):
       return self.json_success_response(
           object_for_json, self.modified_at(obj),
           obj_etag=etag(self.modified_at(obj), get_info(obj)))
+
+  def add_modified_object_to_session(self, obj):
+    """Update modification metadata and add object to session."""
+    obj.modified_by_id = get_current_user_id()
+    obj.updated_at = datetime.datetime.utcnow()
+
+    db.session.add(obj)
 
   @classmethod
   def _mark_delete_object_permissions(cls, obj):
@@ -1078,6 +1086,11 @@ class Resource(ModelView):
         # relationships are set, so need to commit the changes
       db.session.commit()
     with benchmark("Send event job"):
+      # global_ac_roles may save a set of ACR objects in the session. If
+      # session state is changed, all ACRs will be rerequested one by one.
+      # To avoid such behavior link to ACRs objects should be removed manually.
+      if hasattr(flask.g, "global_ac_roles"):
+        del flask.g.global_ac_roles
       send_event_job(event)
 
   @staticmethod
@@ -1395,6 +1408,7 @@ class Resource(ModelView):
     return resource
 
   def object_for_json(self, obj, model_name=None, properties_to_include=None):
+    """Serialize obj in JSON format."""
     model_name = model_name or self.model._inflector.table_singular
     json_obj = ggrc.builder.json.publish(
         obj, properties_to_include or [], inclusion_filter)
@@ -1417,6 +1431,8 @@ class Resource(ModelView):
   def json_success_response(self, response_object, last_modified=None,
                             status=200, id=None, cache_op=None,
                             obj_etag=None):
+    """Prepare success JSON response and set required headers."""
+    # pylint: disable=redefined-builtin
     headers = [('Content-Type', 'application/json')]
     if last_modified:
       headers.append(('Last-Modified', self.http_timestamp(last_modified)))

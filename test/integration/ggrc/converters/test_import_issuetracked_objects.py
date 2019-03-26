@@ -50,19 +50,19 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("Issue", "Issue", "hotlist_id", "Hotlist ID", 321),
       ("Issue", "Issue", "issue_priority", "Priority", "P1"),
       ("Issue", "Issue", "issue_severity", "Severity", "S1"),
-      ("Issue", "Issue", "issue_type", "Issue Type", "BUG"),
+      ("Issue", "Issue", "issue_type", "Issue Type", "PROCESS"),
       ("Issue", "Issue", "title", "Issue Title", "iti_title"),
       ("Assessment", "Assessment", "component_id", "Component ID", 123),
       ("Assessment", "Assessment", "hotlist_id", "Hotlist ID", 321),
       ("Assessment", "Assessment", "issue_priority", "Priority", "P1"),
       ("Assessment", "Assessment", "issue_severity", "Severity", "S1"),
-      ("Assessment", "Assessment", "issue_type", "Issue Type", "BUG"),
+      ("Assessment", "Assessment", "issue_type", "Issue Type", "PROCESS"),
       ("Assessment", "Assessment", "title", "Issue Title", "iti_title"),
       ("Audit", "Audit", "component_id", "Component ID", 123),
       ("Audit", "Audit", "hotlist_id", "Hotlist ID", 321),
       ("Audit", "Audit", "issue_priority", "Priority", "P1"),
       ("Audit", "Audit", "issue_severity", "Severity", "S1"),
-      ("Audit", "Audit", "issue_type", "Issue Type", "BUG"),
+      ("Audit", "Audit", "issue_type", "Issue Type", "PROCESS"),
       ("AssessmentTemplate", "Assessment Template", "component_id",
        "Component ID", 123),
       ("AssessmentTemplate", "Assessment Template", "hotlist_id",
@@ -72,7 +72,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("AssessmentTemplate", "Assessment Template", "issue_severity",
        "Severity", "S1"),
       ("AssessmentTemplate", "Assessment Template", "issue_type",
-       "Issue Type", "BUG"),
+       "Issue Type", "PROCESS"),
   )
   @ddt.unpack
   def test_import_update_succeed(self, model, model_name, field, alias, value):
@@ -224,7 +224,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("hotlist_id", "Hotlist ID", 321),
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
-      ("issue_type", "Issue Type", "BUG"),
+      ("issue_type", "Issue Type", "PROCESS"),
       ("title", "Issue Title", "iti_title"),
   )
   @ddt.unpack
@@ -295,16 +295,13 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.assertEqual(str(obj.issue_tracker[field]), str(value))
 
   @ddt.data(
-      ("component_id", "Component ID", ""),
-      ("component_id", "Component ID", "sss"),
-      ("hotlist_id", "Hotlist ID", ""),
-      ("hotlist_id", "Hotlist ID", "aaa"),
       ("issue_priority", "Priority", ""),
       ("issue_priority", "Priority", "P6"),
       ("issue_severity", "Severity", ""),
       ("issue_severity", "Severity", "aa"),
       ("issue_type", "Issue Type", ""),
       ("issue_type", "Issue Type", "PARABOLA"),
+      ("issue_type", "Issue Type", "BUG"),
   )
   @ddt.unpack
   def test_default_value_set_correctly(self, missed_field, alias, value):
@@ -328,6 +325,52 @@ class TestIssueTrackedImport(ggrc.TestCase):
     issue = all_models.Issue.query.one()
     self.assertEqual(str(issue.issue_tracker[missed_field]),
                      str(default_values[missed_field]))
+
+  @ddt.data("", "aaa")
+  def test_default_hotlist_for_issue(self, value):
+    """Test correct default hotlist was set to Issue during import."""
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Hotlist ID")
+    )
+    expected_messages = {
+        "Issue": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", "ISSUE-1"),
+        ("Admin", "user@example.com"),
+        ("Title", "Issue Title"),
+        ("Hotlist ID", value),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    issue = all_models.Issue.query.one()
+    self.assertEqual(str(issue.issue_tracker["hotlist_id"]),
+                     str(default_values["issue_hotlist_id"]))
+
+  @ddt.data("", "aaa")
+  def test_default_component_for_issue(self, value):
+    """Test correct default component was set to Issue during import."""
+    expected_warning = (
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Component ID")
+    )
+    expected_messages = {
+        "Issue": {
+            "row_warnings": {expected_warning},
+        }
+    }
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", "ISSUE-1"),
+        ("Admin", "user@example.com"),
+        ("Title", "Issue Title"),
+        ("Component ID", value),
+    ]))
+    self._check_csv_response(response, expected_messages)
+    issue = all_models.Issue.query.one()
+    self.assertEqual(str(issue.issue_tracker["component_id"]),
+                     str(default_values["issue_component_id"]))
 
   @ddt.data(
       ("component_id", "Component ID", ""),
@@ -372,7 +415,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("hotlist_id", "Hotlist ID", 321),
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
-      ("issue_type", "Issue Type", "BUG"),
+      ("issue_type", "Issue Type", "PROCESS"),
   )
   @ddt.unpack
   def test_audit_import_create_succeed(self, field, alias, value):

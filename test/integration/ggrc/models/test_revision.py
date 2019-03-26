@@ -156,6 +156,7 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
           title="test_name",
           definition_type="control",
       )
+      cad_id = cad.id
       if is_add_cav:
         factories.CustomAttributeValueFactory(
             custom_attribute=cad,
@@ -168,7 +169,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
           ggrc.models.Revision.resource_type == control.type,
       ).order_by(ggrc.models.Revision.id.desc()).first().id
 
-    self.api_helper.delete(cad)
+    with self.api_helper.as_external():
+      self.api_helper.delete(cad, cad_id)
 
     control = ggrc.models.Control.query.first()
 
@@ -201,7 +203,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
             attribute_value="test")
 
     user = self.gen.generate_person(
-        data={"name": "test_admin"}, user_role="Administrator")[1]
+        data={"name": "test_admin", "email": "external_app@example.com"},
+        user_role="Administrator")[1]
     self.api_helper.set_user(user)
     self.client.get("/login")
 
@@ -350,8 +353,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
 
   def test_revision_review_stub(self):
     """ Test proper review stub population in revision content """
-    control = factories.ControlFactory()
-    revisions = _get_revisions(control)
+    risk = factories.RiskFactory()
+    revisions = _get_revisions(risk)
     self.assertEqual(len(revisions), 1)
     self.assertEqual(revisions[0].action, "created")
 
@@ -360,8 +363,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
         {
             "review": {
                 "reviewable": {
-                    "type": control.type,
-                    "id": control.id,
+                    "type": risk.type,
+                    "id": risk.id,
                 },
                 "context": None,
                 "notification_type": "email",
@@ -376,7 +379,7 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     self.assertEqual(all_models.Review.STATES.REVIEWED,
                      resp_review["status"])
 
-    revisions = _get_revisions(control)
+    revisions = _get_revisions(risk)
     self.assertEqual(len(revisions), 2)
     self.assertEqual(revisions[0].action, "created")
     self.assertEqual(revisions[1].action, "modified")

@@ -348,22 +348,29 @@ def _update_parent_status(parent, child_statuses):
 
   New status based on sent object status and sent child_statuses"""
   old_status = parent.status
+  if isinstance(parent, models.CycleTaskGroup):
+    tasks = parent.cycle_task_group_tasks
+  elif isinstance(parent, models.Cycle):
+    tasks = parent.cycle_task_group_object_tasks
+  else:
+    logger.warning("Invalid parent object '%s'.", parent.__class__.__name__)
+    return
   # Deprecated status is not counted
-  if child_statuses:
-    child_statuses.discard("Deprecated")
+  child_statuses.discard("Deprecated")
   if not child_statuses:
     new_status = "Deprecated"
   elif len(child_statuses) == 1:
     new_status = child_statuses.pop()
-    if new_status == "Declined":
+    if (new_status == "Declined" or
+            new_status == "Assigned" and
+            any(t.status != "Assigned" for t in tasks)):
       new_status = parent.IN_PROGRESS
   elif {parent.IN_PROGRESS, "Declined", "Assigned"} & child_statuses:
     new_status = parent.IN_PROGRESS
   else:
     new_status = "Finished"
-  if old_status == new_status:
-    return
-  parent.status = new_status
+  if old_status != new_status:
+    parent.status = new_status
 
 
 def update_cycle_task_tree(objs):
@@ -678,12 +685,12 @@ def handle_cycle_task_status_change(sender, objs=None):
       if obj.old_status == obj.new_status:
         continue
       if obj.new_status == obj.instance.VERIFIED:
-        obj.instance.verified_date = datetime.utcnow()
+        obj.instance.verified_date = datetime.utcnow().date()
         if obj.instance.finished_date is None:
           obj.instance.finished_date = obj.instance.verified_date
       elif obj.new_status == obj.instance.FINISHED:
         obj.instance.finished_date = (obj.instance.finished_date or
-                                      datetime.utcnow())
+                                      datetime.utcnow().date())
         obj.instance.verified_date = None
       else:
         obj.instance.finished_date = None

@@ -49,7 +49,7 @@ class TestCreator(TestCase):
     audit_id = factories.AuditFactory().id
     all_errors = []
     base_models = {
-        "Control", "DataAsset", "Contract", "Requirement",
+        "DataAsset", "Contract", "Requirement",
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
         "System", "Process", "Project", "AccessGroup",
@@ -296,15 +296,3 @@ class TestCreator(TestCase):
         len(response.json.get("revisions_collection", {}).get("revisions")),
         revision_count
     )
-
-  @ddt.data(all_models.ControlCategory, all_models.ControlAssertion)
-  def test_permissions_for_categories(self, category_model):
-    """Test get collection for {0}."""
-    self.api.set_user(self.users["creator"])
-    resp = self.api.get_collection(category_model, None)
-    plural_name = category_model._inflector.table_plural
-    key_name = "{}_collection".format(plural_name)
-    self.assertIn(key_name, resp.json)
-    self.assertIn(plural_name, resp.json[key_name])
-    collection = resp.json[key_name][plural_name]
-    self.assertTrue(collection, "Collection shouldn't be empty")

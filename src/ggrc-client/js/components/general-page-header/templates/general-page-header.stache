@@ -1,0 +1,103 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+  <div class="general-page-header pane-header {{#if snapshot}}snapshot{{/if}}" >
+    <div class="pane-header__container">
+      <div class="pane-header__title" data-test-id="title_0ad9fbaf">
+        {{#is_info_pin}}
+          <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
+        {{/is_info_pin}}
+        <div class="general-page-header__title-details">
+          <div class="action-toolbar general-page-header__title-wrapper">
+            <h3 class="action-toolbar__header general-page-header__title-value">{{title}}</h3>
+            {{#if redirectionEnabled}}
+            <div class="action-toolbar__controls">
+              <div class="action-toolbar__controls-item">
+                <proposable-control
+                  {instance}="instance"
+                  {attr-name}="'title'"
+                ></proposable-control>
+              </div>
+            </div>
+            {{/if}}
+          </div>
+          {{#if snapshot}}
+            <span class="pane-header__title-item">
+              <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{dateTime instance.updated_at}}</span>
+            </span>
+          {{/if}}
+          {{#if status}}
+            <div class="action-toolbar">
+              <span class="pane-header__title-item">
+                <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
+              </span>
+              {{#if redirectionEnabled}}
+              <div class="action-toolbar__controls">
+                <div class="action-toolbar__controls-item">
+                  <proposable-control
+                    {instance}="instance"
+                    {attr-name}="'status'"
+                  ></proposable-control>
+                </div>
+              </div>
+              {{/if}}
+            </div>
+          {{/if}}
+          {{#if_helpers '\n #if' instance.archived '\n or #if' snapshot.archived}}
+            <span class="pane-header__title-item">
+              <span class="state-value state-archived">Archived</span>
+            </span>
+          {{/if_helpers}}
+          {{#if showProposalButton}}
+            <span class="pane-header__title-item proposal">
+                <a href="javascript://"
+                  class="btn btn-white btn-small proposal__open-modal-button"
+                  data-link-purpose="open-edit-modal"
+                  data-is-proposal="true"
+                  data-toggle="modal-ajax-form"
+                  data-modal-reset="reset"
+                  data-modal-class="modal-wide"
+                  data-object-singular="{{instance.class.model_singular}}"
+                  data-object-plural="{{instance.class.table_plural}}"
+                  data-object-id="{{instance.id}}">
+                    Propose Changes
+                </a>
+            </span>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="pane-header__toolbar">
+        {{#is_info_pin}}
+          <info-pin-buttons maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
+        {{/is_info_pin}}
+
+        {{> /static/templates/base_objects/info-pane-utility.stache}}
+      </div>
+    </div>
+      {{#if snapshot}}
+      {{#if canGetLatestRevision}}
+          <div class="pane-header__snapshot-info">
+            <hr class="snapshot">
+              <snapshot-comparer-config
+                {instance}="instance"
+                {left-revision-id}="instance.snapshot.revision_id"
+                {right-revisions}="instance.snapshot.revisions">
+                  <revisions-comparer
+                    {modal-title}="modalTitle"
+                    {modal-confirm}="modalConfirm"
+                    {button-view}="buttonView"
+                    {instance}="instance"
+                    {left-revision-id}="leftRevisionId"
+                    {right-revision}="rightRevision">
+                      <a href="javascript://" can-click="compareIt">Get the latest version</a>
+                  </revisions-comparer>
+              </snapshot-comparer-config>
+          </div>
+      {{/if}}
+      {{/if}}
+  </div>
+{{/instance}}

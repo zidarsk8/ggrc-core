@@ -77,8 +77,8 @@ class TestBaseIssueTrackerParamsBuilder(unittest.TestCase):
         "title": "test_title",
     }
     expected_result = {
-        "component_id": DEFAULT_ISSUETRACKER_VALUES["component_id"],
-        "hotlist_ids": [DEFAULT_ISSUETRACKER_VALUES["hotlist_id"], ],
+        "component_id": DEFAULT_ISSUETRACKER_VALUES["issue_component_id"],
+        "hotlist_ids": [DEFAULT_ISSUETRACKER_VALUES["issue_hotlist_id"], ],
         "title": "test_title",
         "type": DEFAULT_ISSUETRACKER_VALUES["issue_type"],
         "priority": DEFAULT_ISSUETRACKER_VALUES["issue_priority"],

@@ -13,16 +13,10 @@
               <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
             {{/is_info_pin}}
             <div class="pane-header__title-details">
-              <h3>{{title}}</h3>
+              <h3 class="pane-header__title-name">{{title}}</h3>
               {{#if status}}
-                <span>
+                <span class="pane-header__title-item">
                   <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
-                </span>
-              {{/if}}
-              {{^if isSnapshot}}
-                <span class="proposal">
-                  <create-proposal-button {instance}="instance">
-                  </create-proposal-button>
                 </span>
               {{/if}}
             </div>
@@ -36,13 +30,7 @@
             <div class="info-pane-utility">
               {{#using workflow=instance.workflow}}
               <!-- This should have only view link, shouldn't edit cycle instance of workflow while active -->
-                <div class="details-wrap">
-                  <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                    <span class="bubble"></span>
-                  </a>
-                  <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
+                <three-dots-menu>
                     {{#if workflow.viewLink}}
                       <li>
                         <a href="{{workflow.viewLink}}">
@@ -54,8 +42,7 @@
                     <li>
                       <permalink {instance}="instance"/>
                     </li>
-                  </ul>
-                </div>
+                </three-dots-menu>
               {{/using}}
             </div>
           </div>
@@ -68,7 +55,10 @@
       <div class="span12">
         <h6>Description</h6>
         <div class="rtf-block">
-          <read-more {text}="instance.description"></read-more>
+          <read-more
+            {text}="instance.description"
+            {handle-markdown}="instance.class.isChangeableExternally">
+          </read-more>
         </div>
       </div>
     </div>
