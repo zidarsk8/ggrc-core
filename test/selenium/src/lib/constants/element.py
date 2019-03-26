@@ -28,6 +28,7 @@ class Lhn(object):
           cls.PEOPLE,)
       cls.SCOPE_MEMBERS = (
           cls.ACCESS_GROUPS,
+          cls.ACCOUNT_BALANCES,
           cls.ORG_GROUPS,
           cls.SYSTEMS,
           cls.PROCESSES,
