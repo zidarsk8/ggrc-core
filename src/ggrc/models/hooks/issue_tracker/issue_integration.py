@@ -8,8 +8,6 @@
 
 import logging
 
-from werkzeug import exceptions as wzg_exceptions
-
 from ggrc import db
 from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
@@ -57,7 +55,7 @@ def create_missed_issue_acl(email, role_name, obj):
   """Create missed acl for emails from IssueTracker"""
   person = user_generator.find_user(email)
   if not person:
-    raise wzg_exceptions.Forbidden()
+    return
   obj.add_person_with_role_name(person, role_name)
 
 

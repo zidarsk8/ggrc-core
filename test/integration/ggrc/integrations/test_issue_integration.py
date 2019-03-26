@@ -567,6 +567,18 @@ class TestIssueIntegration(ggrc.TestCase):
     ]
     self.assertIn(person.email, role_emails)
 
+  @ddt.data("Primary Contacts", "Admin", "Secondary Contacts")
+  @mock.patch('ggrc.utils.user_generator.find_user', return_value=None)
+  def test_invalid_person_was_skipped(self, role, find_mock):
+    """Invalid users should be skipped"""
+    test_email = "newemail@example.com"
+    issue = factories.IssueFactory()
+    issue_integration.create_missed_issue_acl(test_email, role, issue)
+    db.session.commit()
+    people = all_models.Person.query.filter_by(email=test_email).all()
+    self.assertFalse(people)
+    find_mock.assert_called_once()
+
 
 @ddt.ddt
 class TestDisabledIssueIntegration(ggrc.TestCase):
