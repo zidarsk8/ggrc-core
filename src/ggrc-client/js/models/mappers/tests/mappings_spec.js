@@ -16,6 +16,7 @@ describe('Mappings', function () {
     core: {
       models: [
         'AccessGroup',
+        'AccountBalance',
         'Assessment',
         'AssessmentTemplate',
         'Audit',
@@ -51,7 +52,7 @@ describe('Mappings', function () {
       scope: [
         'Metric', 'TechnologyEnvironment', 'AccessGroup', 'DataAsset',
         'Facility', 'KeyReport', 'Market', 'OrgGroup', 'Vendor', 'Process',
-        'Product', 'ProductGroup', 'Project', 'System',
+        'Product', 'ProductGroup', 'Project', 'System', 'AccountBalance',
       ],
     },
     risk_assessments: {
@@ -100,6 +101,7 @@ describe('Mappings', function () {
   mappingRules = {
     AccessGroup: _.difference(filtered, ['AccessGroup', 'Standard',
       'Regulation']),
+    AccountBalance: _.difference(filtered, ['Standard', 'Regulation']),
     Assessment: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
       'Workflow', 'Assessment', 'Document']),
     AssessmentTemplate: [],

@@ -185,6 +185,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
 
   @ddt.data(
       [{"status": "Active"}, {"status": "Active"}, "AccessGroup"],
+      [{"status": "Not Launched"}, {"status": "Draft"}, "AccountBalance"],
       [{"status": "Deprecated"}, {"status": "Deprecated"}, "Requirement"],
       [{"status": "Draft"}, {"status": "Draft"}, "Control"],
       [{"status": "Effective"}, {"status": "Active"}, "DataAsset"],
