@@ -79,8 +79,9 @@ export default Cacheable.extend({
         disable_sorting: true,
         order: 105,
       }, {
-        attr_title: 'Review State',
-        attr_name: 'review_status',
+        attr_title: 'Review Status',
+        attr_name: 'external_review_status',
+        attr_sort_field: 'review_status_display_name',
         order: 80,
       }]),
   },
