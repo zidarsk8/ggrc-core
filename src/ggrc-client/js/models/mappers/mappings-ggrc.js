@@ -154,11 +154,7 @@ new Mappings({
       'TaskGroup', 'Workflow'],
   },
   AccountBalance: {
-    map: _.difference(businessObjects,
-      ['Assessment', 'Control', 'Standard', 'Regulation']),
-    externalMap: ['Control'],
-    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
-      'TaskGroup', 'Workflow'],
+    ...scopingObjectConfig,
   },
   DataAsset: {
     ...scopingObjectConfig,
