@@ -47,6 +47,11 @@ DUPLICATE_GCAD_NAME = u"Global custom attribute '{attr_name}' already " \
 DUPLICATE_CUSTOM_ROLE = u"Custom Role with a name of '{role_name}' already " \
                         u"exists for this object type"
 
+MAPPED_AUDITS = (u"The program cannot be deleted due to mapped "
+                 u"audit(s) to this program. "
+                 u"Please delete audit(s) mapped to this program first "
+                 u"before deleting the program.")
+
 MAPPED_ASSESSMENT = (u"The following Audit cannot be deleted due to existing "
                      u"assessment(s) or  assessment template(s) mappings. "
                      u"Please delete assessment(s) or assessment template(s) "
