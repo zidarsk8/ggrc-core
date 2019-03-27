@@ -12,6 +12,7 @@ import * as ObjectVersionsUtils
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import Cacheable from '../../../models/cacheable';
+import Mappings from '../../../models/mappers/mappings';
 
 describe('inner-nav view model', () => {
   let viewModel;
@@ -332,12 +333,10 @@ describe('inner-nav view model', () => {
   });
 
   describe('updateHiddenWidgets(widget) method', () => {
-    let isInProhibitedMapSpy;
-
     beforeEach(() => {
       spyOn(viewModel, 'addToHiddenWidgets');
       spyOn(viewModel, 'removeFromHiddenWidgets');
-      isInProhibitedMapSpy = spyOn(viewModel, 'isInProhibitedMap');
+      spyOn(Mappings, 'allowedToCreateOrMap').and.returnValue(true);
     });
 
     function showAllTabs(value) {
@@ -352,7 +351,7 @@ describe('inner-nav view model', () => {
     it('should do nothing if should be shown all widgets', () => {
       showAllTabs(true);
 
-      viewModel.updateHiddenWidgets({});
+      viewModel.updateHiddenWidgets({model: {}});
 
       expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
       expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
@@ -363,6 +362,7 @@ describe('inner-nav view model', () => {
 
       let widget = new can.Map({
         inForceShowList: true,
+        model: {},
       });
 
       viewModel.updateHiddenWidgets(widget);
@@ -376,6 +376,7 @@ describe('inner-nav view model', () => {
 
       let widget = new can.Map({
         type: 'version',
+        model: {},
       });
 
       viewModel.updateHiddenWidgets(widget);
@@ -389,6 +390,7 @@ describe('inner-nav view model', () => {
 
       let widget = new can.Map({
         uncountable: true,
+        model: {},
       });
 
       viewModel.updateHiddenWidgets(widget);
@@ -397,22 +399,24 @@ describe('inner-nav view model', () => {
       expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
     });
 
-    it('should do nothing if widget is in prohibited map list', () => {
-      showAllTabs(false);
+    it('should do nothing if widget is not allowed to be mappped or created',
+      () => {
+        showAllTabs(false);
 
-      isInProhibitedMapSpy.and.returnValue(true);
+        let widget = new can.Map({
+          uncountable: false,
+          type: '',
+          inForceShowList: false,
+          model: {},
+        });
 
-      let widget = new can.Map({
-        uncountable: false,
-        type: '',
-        inForceShowList: false,
+        Mappings.allowedToCreateOrMap.and.returnValue(false);
+
+        viewModel.updateHiddenWidgets(widget);
+
+        expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
+        expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
       });
-
-      viewModel.updateHiddenWidgets(widget);
-
-      expect(viewModel.addToHiddenWidgets).not.toHaveBeenCalled();
-      expect(viewModel.removeFromHiddenWidgets).not.toHaveBeenCalled();
-    });
 
     it('should remove from hiddenWidgets when widget has count',
       () => {
@@ -421,6 +425,7 @@ describe('inner-nav view model', () => {
         let widget = new can.Map({
           count: 5,
           forceShow: false,
+          model: {},
         });
 
         viewModel.updateHiddenWidgets(widget);
@@ -436,6 +441,7 @@ describe('inner-nav view model', () => {
         let widget = new can.Map({
           count: 0,
           forceShow: true,
+          model: {},
         });
 
         viewModel.updateHiddenWidgets(widget);
@@ -451,6 +457,7 @@ describe('inner-nav view model', () => {
       let widget = new can.Map({
         count: 0,
         forceShow: false,
+        model: {},
       });
 
       viewModel.updateHiddenWidgets(widget);
