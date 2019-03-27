@@ -608,9 +608,14 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
           populated_content[attr] = None
 
   def populate_automappings(self):
-    """Add automapping info in revisions."""
+    """Add automapping info in revisions.
+
+    Populate Relationship revisions with automapping info to help FE
+    show Change Log, but we should not show automapping info
+    in case of deleted relationship"""
     if ("automapping_id" not in self._content or
-            not self._content["automapping_id"]):
+            not self._content["automapping_id"] or
+            self.action != "created"):
       return {}
     automapping_id = self._content["automapping_id"]
     if not hasattr(flask.g, "automappings_cache"):
