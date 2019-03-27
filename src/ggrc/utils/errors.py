@@ -48,6 +48,6 @@ DUPLICATE_CUSTOM_ROLE = u"Custom Role with a name of '{role_name}' already " \
                         u"exists for this object type"
 
 MAPPED_ASSESSMENT = (u"The following Audit cannot be deleted due to existing "
-                     u"assessment(s) or  assessment template(s) mappings."
-                     u"Please delete assessment(s) or assessment template(s)"
+                     u"assessment(s) or  assessment template(s) mappings. "
+                     u"Please delete assessment(s) or assessment template(s) "
                      u"mapped to this Audit to continue")
