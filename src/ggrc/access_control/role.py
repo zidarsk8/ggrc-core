@@ -109,6 +109,10 @@ class AccessControlRole(attributevalidator.AttributeValidator,
       value if the name passes all uniqueness checks.
     """
     value = value.strip()
+
+    if key == "name":
+      self._validate_name_correct(value)
+
     if key == "name" and self.object_type:
       name = value
       object_type = self.object_type
@@ -127,10 +131,13 @@ class AccessControlRole(attributevalidator.AttributeValidator,
                        u"already exists for this object type"
                        .format(name))
 
+    return value
+
+  @staticmethod
+  def _validate_name_correct(name):
+    """Validate name does not contain "*" symbol"""
     if "*" in name:
       raise ValueError(u"Attribute name contains unsupported symbol '*'")
-
-    return value
 
 
 def invalidate_acr_caches(mapper, content, target):

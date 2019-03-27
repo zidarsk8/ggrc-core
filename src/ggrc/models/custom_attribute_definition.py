@@ -306,6 +306,9 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
 
     value = value if value is None else re.sub(r"\s+", " ", value).strip()
 
+    if key == "title":
+      self._validate_title_correct(value)
+
     if key == "title" and self.definition_type:
       orig_name = value
       definition_type = self.definition_type
@@ -332,14 +335,21 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     if definition_type == "assessment":
       self.validate_assessment_title(name)
 
-    if "*" in name:
+    return value
+
+  @staticmethod
+  def _validate_title_correct(title):
+    """Validate title is correct
+
+    1) Title does not contain "*" symbol
+    2) Title does not start with "map:" or "unmap:"
+    """
+    if "*" in title:
       raise ValueError(u"Attribute title contains unsupported symbol '*'")
 
-    if name.startswith("map:") or name.startswith("unmap:"):
+    if title.startswith("map:") or title.startswith("unmap:"):
       raise ValueError(u"Custom attribute title should not starts "
                        u"with 'map:' or 'unmap:'")
-
-    return value
 
   def log_json(self):
     """Add extra fields to be logged in CADs."""

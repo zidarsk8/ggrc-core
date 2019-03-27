@@ -24,19 +24,16 @@ class TestCustomAttributeDefinition(unittest.TestCase):
     """Test if raises if title contains * symbol"""
     with self.assertRaises(ValueError):
       title = "Title with asterisk *"
-      self.cad.definition_type = "assessment_template"
       self.cad.validate_title("title", title)
 
   def test_map_in_title_throws(self):
     """Test if raises if title starts with 'map:'"""
     with self.assertRaises(ValueError):
       title = "map:person"
-      self.cad.definition_type = "assessment_template"
       self.cad.validate_title("title", title)
 
   def test_unmap_in_title_throws(self):
     """Test if raises if title starts with 'unmap:'"""
     with self.assertRaises(ValueError):
       title = "unmap:assessment"
-      self.cad.definition_type = "assessment_template"
       self.cad.validate_title("title", title)

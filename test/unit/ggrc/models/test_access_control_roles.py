@@ -47,8 +47,7 @@ class TestAccessControlRoles(unittest.TestCase):
     """Test if raises if name contains * symbol"""
 
     with self.assertRaises(ValueError):
-      name, object_type = "With asterisk *", "Control"
-      self.acr.object_type = object_type
+      name = "With asterisk *"
       self.acr.validates_name("name", name)
 
   def test_if_invalid_ca_check(self):
