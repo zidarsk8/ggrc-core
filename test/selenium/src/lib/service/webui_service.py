@@ -469,6 +469,10 @@ class BaseWebUiService(object):
     self.open_info_page_of_obj(obj).click_approve_review()
     ui_utils.wait_for_alert("Review is complete.")
 
+  def get_obj_review_txt(self, obj):
+    """Return review message on info pane."""
+    return self.open_info_page_of_obj(obj).get_object_review_txt()
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""

@@ -52,6 +52,7 @@ TECHNOLOGY_ENVIRONMENTS = "technology_environments"
 PRODUCT_GROUPS = "product_groups"
 PROPOSALS = "proposals"
 EVIDENCE = 'evidence'
+REVIEWS = "reviews"
 
 EDITABLE_GGRC_OBJ = (
     ACCESS_GROUPS, CONTRACTS, DATA_ASSETS, FACILITIES,
