@@ -370,7 +370,7 @@ def _remove_dead_reindex_objects(indexed_models):
 
 
 @helpers.without_sqlalchemy_cache
-def do_reindex(with_reindex_snapshots=False):
+def do_reindex(with_reindex_snapshots=False, delete=False):
   """Update the full text search index."""
 
   indexer = fulltext.get_indexer()
@@ -390,6 +390,10 @@ def do_reindex(with_reindex_snapshots=False):
   ))
   _remove_dead_reindex_objects(indexed_models)
   for model_name in sorted(indexed_models.keys()):
+    if delete:
+      with benchmark("Deleting records for %s" % model_name):
+        pass
+
     logger.info("Updating index for: %s", model_name)
     with benchmark("Create records for %s" % model_name):
       model = indexed_models[model_name]
