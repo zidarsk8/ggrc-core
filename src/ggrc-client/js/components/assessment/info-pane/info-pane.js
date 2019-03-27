@@ -67,8 +67,6 @@ import {notifier, notifierXHR} from '../../../plugins/utils/notifiers-utils';
 import Evidence from '../../../models/business-models/evidence';
 import * as businessModels from '../../../models/business-models';
 
-const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
-
 /**
  * Assessment Specific Info Pane View Component
  */
@@ -179,8 +177,9 @@ export default can.Component.extend({
           if (currentState !== instanceStatus) {
             return false;
           }
-
-          return editableStatuses.includes(instanceStatus);
+          const editModeStatuses = this.attr('instance')
+            .constructor.editModeStatuses;
+          return editModeStatuses.includes(instanceStatus);
         },
         set: function () {
           this.onStateChange({state: 'In Progress', undo: false});
