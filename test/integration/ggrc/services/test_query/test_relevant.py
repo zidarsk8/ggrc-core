@@ -20,68 +20,65 @@ class TestRelevant(TestCase, WithQueryApi):
   it also includes special mappings not just the relationships table.
   """
 
-  PEOPLE = [
-      # Role name, email, expected count
-      ("auditor", "auditor@example.com", 0),
-      ("program_editor", "program_editor@example.com", 0),
-      ("assignee", "assignee@example.com", 1),
-  ]
-
   def setUp(self):
     super(TestRelevant, self).setUp()
     self.client.get("/login")
 
+  @staticmethod
+  def _make_relevant_filter(target_type, relevant_obj):
+    return {
+        "object_name": target_type,
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "op": {"name": "relevant"},
+                "object_name": relevant_obj.type,
+                "ids": [relevant_obj.id],
+            },
+        },
+    }
+
+  @ddt.data(
+      ("Assignees", lambda obj: obj, "assignee@example.com", 1),
+      ("Auditors", lambda obj: obj.audit, "auditor@example.com", 0),
+      (
+          "Program Editors",
+          lambda obj: obj.audit.program,
+          "program_editor@example.com",
+          0
+      ),
+  )
+  @ddt.unpack
+  def test_person_relevant(self, acr_name, acr_obj_resolver, email,
+                           expected_count):
+    """Check that only assessment roles can see relevant assessments"""
     with factories.single_commit():
       assessment = factories.AssessmentFactory()
       factories.RelationshipFactory(
           source=assessment.audit,
           destination=assessment,
       )
-      people = {}
-      for person in self.PEOPLE:
-        people[person[0]] = factories.PersonFactory(email=person[1])
-      # Correct roles and propagation for a given assessment
+      person = factories.PersonFactory(email=email)
       factories.AccessControlPersonFactory(
-          ac_list=assessment.acr_name_acl_map["Assignees"],
-          person=people["assignee"],
+          ac_list=acr_obj_resolver(assessment).acr_name_acl_map[acr_name],
+          person=person,
       )
-      factories.AccessControlPersonFactory(
-          ac_list=assessment.audit.acr_name_acl_map["Auditors"],
-          person=people["auditor"],
-      )
-      factories.AccessControlPersonFactory(
-          ac_list=assessment.audit.program.acr_name_acl_map["Program Editors"],
-          person=people["program_editor"],
-      )
-
-  @ddt.data(*PEOPLE)
-  @ddt.unpack
-  def test_person_relevant(self, role, email, expected_count):
-    """Check that only assessment roles can see relevant assessments"""
-    person = all_models.Person.query.filter(
-        all_models.Person.email == email
-    ).one()
 
     ids = self._get_first_result_set(
-        {
-            "object_name": "Assessment",
-            "type": "ids",
-            "filters": {
-                "expression": {
-                    "object_name": "Person",
-                    "op": {"name": "relevant"},
-                    "ids": [person.id]
-                }
-            }
-        },
-        "Assessment", "ids"
+        self._make_relevant_filter(
+            target_type="Assessment",
+            relevant_obj=person,
+        ),
+        "Assessment",
+        "ids",
     )
+
     self.assertEqual(
         len(ids), expected_count,
         "Invalid relevant assessments count ({} instead of {}) for {}.".format(
             len(ids),
             expected_count,
-            role,
+            acr_name,
         )
     )
 
@@ -128,3 +125,47 @@ class TestRelevant(TestCase, WithQueryApi):
     self.assertIn(evidence1_id, ids)
     self.assertIn(evidence2_id, ids)
     self.assertNotIn(evidence3_id, ids)
+
+  @ddt.data(
+      (all_models.Control, all_models.Issue, True),
+      (all_models.Control, all_models.Issue, False),
+  )
+  @ddt.unpack
+  def test_issue_relevant_direct(self, target_cls, relevant_cls,
+                                 mapped_directly):
+    """Relevant op with Issue as `relevant` returns only direct mappings."""
+    with factories.single_commit():
+      target = factories.get_model_factory(target_cls.__name__)()
+      relevant = factories.get_model_factory(relevant_cls.__name__)()
+      if mapped_directly:
+        factories.RelationshipFactory(
+            source=target,
+            destination=relevant,
+        )
+      else:
+        revision = all_models.Revision.query.filter_by(
+            resource_id=target.id,
+            resource_type=target.type,
+        ).first()
+        snapshot = factories.SnapshotFactory(
+            child_id=target.id,
+            child_type=target.type,
+            revision_id=revision.id,
+        )
+        factories.RelationshipFactory(
+            source=snapshot,
+            destination=relevant,
+        )
+
+    target_id = target.id
+    result = self._get_first_result_set(
+        self._make_relevant_filter(
+            target_type=target.type,
+            relevant_obj=relevant,
+        ),
+        target.type,
+        "ids",
+    )
+
+    self.assertEqual(result,
+                     [target_id] if mapped_directly else [])

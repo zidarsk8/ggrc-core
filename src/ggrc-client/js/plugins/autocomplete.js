@@ -60,7 +60,7 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
             if (objs.length || isNextPage) {
               // Envelope the object to not break model instance due to
               // shallow copy done by jQuery in `response()`
-              objs = can.map(objs, function (obj) {
+              objs = _.filteredMap(objs, (obj) => {
                 return {
                   item: obj,
                 };
@@ -203,9 +203,8 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
       if (baseSearch) {
         searchtypes = baseSearch.trim().split(',');
 
-        this.options.searchtypes = can.map(searchtypes, function (typeName) {
-          return businessModels[typeName].model_singular;
-        });
+        this.options.searchtypes = _.filteredMap(searchtypes,
+          (typeName) => businessModels[typeName].model_singular);
       }
     },
 
@@ -218,9 +217,7 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
         model_class: modelClass,
         model: model,
         // Reverse the enveloping we did 25 lines up
-        items: can.map(items, function (item) {
-          return item.item;
-        }),
+        items: _.filteredMap(items, (item) => item.item),
       };
     },
 
@@ -260,9 +257,7 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
             try {
               listItems = context.attr('items');
               context.attr('oldLen', listItems.length);
-              listItems.push(...can.map(items, function (item) {
-                return item.item;
-              }));
+              listItems.push(..._.filteredMap(items, (item) => item.item));
             } catch (error) {
               // Really ugly way to hide canjs exception during scrolling.
               // Please note that it occurs in really rear cases.
@@ -324,9 +319,8 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
             let ids = responseArr[objName].ids;
             let model = businessModels[objName];
 
-            let res = can.map(ids, (id) => {
-              return getInstance(model.model_singular, id);
-            });
+            let res = _.filteredMap(ids, (id) =>
+              getInstance(model.model_singular, id));
             dfd.resolve(res);
           });
 

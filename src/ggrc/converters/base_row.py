@@ -24,7 +24,7 @@ from ggrc.models.mixins import synchronizable
 from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.snapshotter import create_snapshots
-from ggrc.utils import dump_attrs
+from ggrc.utils import dump_attrs, benchmarks
 
 from ggrc.models.reflection import AttributeInfo
 from ggrc.services.common import get_modified_objects
@@ -47,6 +47,7 @@ class RowConverter(object):
     self.objects = collections.OrderedDict()
     self.old_values = {}
     self.issue_tracker = {}
+    self.comments = []
 
 
 class ImportRowConverter(RowConverter):
@@ -362,6 +363,7 @@ class ImportRowConverter(RowConverter):
       self.block_converter.add_errors(errors.UNKNOWN_ERROR,
                                       line=self.offset + 2)
     else:
+      self.send_comment_notifications()
       self.send_post_commit_signals(event=import_event)
 
   def _setup_object(self):
@@ -377,6 +379,14 @@ class ImportRowConverter(RowConverter):
     for item_handler in self.attrs.values():
       if not item_handler.view_only:
         item_handler.set_obj_attr()
+
+  def send_comment_notifications(self):
+    """Send comment people mentions notifications."""
+    from ggrc.notifications import people_mentions
+
+    if self.comments:
+      people_mentions.handle_comment_mapped(obj=self.obj,
+                                            comments=self.comments)
 
   def send_post_commit_signals(self, event=None):
     """Send after commit signals for all objects
@@ -504,13 +514,16 @@ class ExportRowConverter(RowConverter):
       list of strings where each cell contains a string value of the
       corresponding field.
     """
+    benchmark_manager = benchmarks.BenchmarkLongestManager(5)
     row = []
     for field in fields:
-      field_type = self.headers.get(field, {}).get("type")
-      if field_type == AttributeInfo.Type.PROPERTY:
-        field_handler = self.attrs.get(field)
-      else:
-        field_handler = self.objects.get(field)
-      value = field_handler.get_value() if field_handler else ""
-      row.append(value or "")
+      with benchmark_manager.benchmark(u"Process '{}' field".format(field)):
+        field_type = self.headers.get(field, {}).get("type")
+        if field_type == AttributeInfo.Type.PROPERTY:
+          field_handler = self.attrs.get(field)
+        else:
+          field_handler = self.objects.get(field)
+        value = field_handler.get_value() if field_handler else ""
+        row.append(value or "")
+    benchmark_manager.print_benchmaks()
     return row

@@ -21,6 +21,7 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 from ggrc.rbac import SystemWideRoles
 from ggrc.models.person_profile import PersonProfile
+from ggrc.fulltext import attributes
 
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
@@ -78,6 +79,10 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'company',
       'email',
       'name',
+      attributes.FullTextAttr(
+          "Authorizations",
+          "system_wide_role"
+      ),
   ]
   _api_attrs = reflection.ApiAttributes(
       'company',
@@ -186,6 +191,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
         orm.Load(cls).undefer_group(
             "Person_complete",
         ),
+        orm.Load(cls).joinedload('user_roles'),
     )
 
   def _display_name(self):

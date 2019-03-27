@@ -72,7 +72,8 @@ class EntitiesFactory(object):
         is_allow_none=False, **attrs)
 
   @classmethod
-  def generate_string(cls, first_part,
+  def generate_string(cls,
+                      first_part,
                       allowed_chars=StringMethods.ALLOWED_CHARS):
     """Generate random string in unicode format according to object type.
     Symbols allowed in random part may be specified by

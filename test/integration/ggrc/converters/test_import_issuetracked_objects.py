@@ -51,13 +51,13 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("Issue", "Issue", "issue_priority", "Priority", "P1"),
       ("Issue", "Issue", "issue_severity", "Severity", "S1"),
       ("Issue", "Issue", "issue_type", "Issue Type", "PROCESS"),
-      ("Issue", "Issue", "title", "Issue Title", "iti_title"),
+      ("Issue", "Issue", "title", "Ticket Title", "iti_title"),
       ("Assessment", "Assessment", "component_id", "Component ID", 123),
       ("Assessment", "Assessment", "hotlist_id", "Hotlist ID", 321),
       ("Assessment", "Assessment", "issue_priority", "Priority", "P1"),
       ("Assessment", "Assessment", "issue_severity", "Severity", "S1"),
       ("Assessment", "Assessment", "issue_type", "Issue Type", "PROCESS"),
-      ("Assessment", "Assessment", "title", "Issue Title", "iti_title"),
+      ("Assessment", "Assessment", "title", "Ticket Title", "iti_title"),
       ("Audit", "Audit", "component_id", "Component ID", 123),
       ("Audit", "Audit", "hotlist_id", "Hotlist ID", 321),
       ("Audit", "Audit", "issue_priority", "Priority", "P1"),
@@ -106,8 +106,6 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.data(
       ("Issue", "Issue", "on"),
       ("Issue", "Issue", "off"),
-      ("Assessment", "Assessment", "on"),
-      ("Assessment", "Assessment", "off"),
       ("Audit", "Audit", "on"),
       ("Audit", "Audit", "off"),
       ("AssessmentTemplate", "Assessment Template", "on"),
@@ -116,7 +114,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.unpack
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   def test_import_enabled_update_succeed(self, model, model_name, value, _):
-    """Test {0} integration state {1} set correctly when updated via import."""
+    """Test {0} integration state set correctly when updated via import."""
     with factories.single_commit():
       factory = factories.get_model_factory(model)
       obj = factory()
@@ -131,6 +129,31 @@ class TestIssueTrackedImport(ggrc.TestCase):
     ]))
 
     obj = models.get_model(model).query.one()
+    self._check_csv_response(response, {})
+    self._assert_integration_state(obj, value)
+
+  @ddt.data("on", "off")
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_assmt_import_enabled_update_succeed(self, value, _):
+    """Test Assmt integration state set correctly when updated via import."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          enabled=True,
+      )
+      assmt = factories.AssessmentFactory(audit=audit)
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=assmt,
+      )
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assmt.slug),
+        ("Ticket Tracker Integration", value),
+    ]))
+
+    obj = all_models.Assessment.query.one()
     self._check_csv_response(response, {})
     self._assert_integration_state(obj, value)
 
@@ -155,6 +178,10 @@ class TestIssueTrackedImport(ggrc.TestCase):
   def test_enabled_state_assmt_create_succeed(self, value, _):
     """Test Assessment integration state set correctly during create."""
     audit = factories.AuditFactory()
+    factories.IssueTrackerIssueFactory(
+        issue_tracked_obj=audit,
+        enabled=True,
+    )
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", "OBJ-1"),
@@ -225,7 +252,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_priority", "Priority", "P1"),
       ("issue_severity", "Severity", "S1"),
       ("issue_type", "Issue Type", "PROCESS"),
-      ("title", "Issue Title", "iti_title"),
+      ("title", "Ticket Title", "iti_title"),
   )
   @ddt.unpack
   def test_issue_import_create_succeed(self, field, alias, value):
@@ -248,7 +275,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
       ("issue_priority", "Priority", "P2"),
       ("issue_severity", "Severity", "S2"),
       ("issue_type", "Issue Type", "PROCESS"),
-      ("title", "Issue Title", "iti_title"),
+      ("title", "Ticket Title", "iti_title"),
   )
   @ddt.unpack
   def test_assmt_import_create_succeed(self, field, alias, value):
@@ -455,11 +482,11 @@ class TestIssueTrackedImport(ggrc.TestCase):
 
   @ddt.data("Issue", "Assessment")
   def test_default_value_title(self, model):
-    """Test correct default value was set to {0} Issue Title during import."""
+    """Test correct default value was set to {0} Ticket Title during import."""
     factory = factories.get_model_factory(model)
     obj = factory(title="Object Title")
     expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Issue Title")
+        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name="Ticket Title")
     )
     expected_messages = {
         model: {
@@ -469,7 +496,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", model),
         ("Code*", obj.slug),
-        ("Issue Title", ""),
+        ("Ticket Title", ""),
     ]))
     self._check_csv_response(response, expected_messages)
     obj = models.get_model(model).query.one()
@@ -802,6 +829,10 @@ class TestIssueTrackedImport(ggrc.TestCase):
     """Test ticket generation allowed for Assessment in {} status"""
     with factories.single_commit():
       audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          enabled=True,
+      )
       assmt = factories.AssessmentFactory(status=status, audit=audit)
       person = factories.PersonFactory()
       factories.AccessControlPersonFactory(
@@ -822,3 +853,25 @@ class TestIssueTrackedImport(ggrc.TestCase):
     assmt = all_models.Assessment.query.one()
     self.assertTrue(assmt.issue_tracker["enabled"])
     create_mock.assert_called_once()
+
+  def test_assmt_generation_disallowed_wo_audit(self):
+    """Test we can't turn integration On for Assessment w/o audit"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          enabled=False,
+          issue_id=None,
+      )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Audit", audit.slug),
+        ("Assignees*", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Object Title"),
+        ("Ticket Tracker Integration", "On"),
+    ]))
+    self._check_csv_response(response, {})
+    assmt = all_models.Assessment.query.one()
+    self.assertFalse(assmt.issue_tracker["enabled"])

@@ -169,7 +169,7 @@
             {{#is_allowed "read" instance.audit context="for"}}
               <div class="objective-selector">
                 <map-button-using-assessment-type
-                  {{data "deferred_to"}}
+                  {{canData "deferred_to"}}
                   {instance}="instance">
                       <a class="btn btn-small btn-white assessment-map-btn"
                         href="javascript://"

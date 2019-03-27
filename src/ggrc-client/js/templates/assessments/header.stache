@@ -79,10 +79,11 @@ Copyright (C) 2019 Google Inc.
                     </li>
                   {{/if_config_exist}}
                   {{#is_info_pin}}
-                  <issue-unmap-dropdown-item
+                  <unmap-dropdown-item
                       {page_instance}="page_instance"
-                      {instance}="instance">
-                  </issue-unmap-dropdown-item>
+                      {instance}="instance"
+                      {options}="options">
+                  </unmap-dropdown-item>
                   {{#if instance.viewLink}}
                       <li>
                           <a href="{{instance.viewLink}}">

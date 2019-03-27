@@ -169,8 +169,7 @@
           @include transition(opacity 0.2s ease);
           margin: 7px 4px 0 0;
         }
-        &:hover,
-        &.clipboard-is-hover {
+        &:hover {
           background: $headerBgnd;
           color: $black;
           cursor: pointer;
@@ -195,6 +194,10 @@
         border-bottom: 1px solid $headerBgnd;
         padding-bottom: 5px;
         margin-bottom: 5px;
+      }
+
+      .issue-unmap-item {
+        display: block;
       }
     }
   }

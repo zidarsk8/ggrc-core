@@ -28,7 +28,7 @@ class TestWithEvidence(TestCase):
     """Test related evidences"""
 
     audit = factories.AuditFactory()
-    factories.EvidenceFactory(
+    evidence = factories.EvidenceFactory(
         title='Simple title',
         kind=all_models.Evidence.FILE,
         source_gdrive_id='123',
@@ -37,7 +37,7 @@ class TestWithEvidence(TestCase):
             'type': audit.type
         }
     )
-
+    factories.RelationshipFactory(source=audit, destination=evidence)
     self.assertEqual(len(audit.evidences), 1)
     self.assertEqual(audit.evidences[0].title, COPIED_TITLE)
 
@@ -47,7 +47,7 @@ class TestWithEvidence(TestCase):
     """Test related evidences"""
 
     audit = factories.AuditFactory()
-    factories.EvidenceFactory(
+    evidence1 = factories.EvidenceFactory(
         title='Simple title1',
         kind=all_models.Evidence.FILE,
         source_gdrive_id='123',
@@ -56,8 +56,9 @@ class TestWithEvidence(TestCase):
             'type': audit.type
         }
     )
+    factories.RelationshipFactory(source=audit, destination=evidence1)
 
-    factories.EvidenceFactory(
+    evidence2 = factories.EvidenceFactory(
         title='Simple title2',
         kind=all_models.Evidence.URL,
         source_gdrive_id='123',
@@ -66,6 +67,7 @@ class TestWithEvidence(TestCase):
             'type': audit.type
         }
     )
+    factories.RelationshipFactory(source=audit, destination=evidence2)
 
     self.assertEqual(len(audit.evidences), 2)
     self.assertEqual(len(audit.evidences_url), 1)

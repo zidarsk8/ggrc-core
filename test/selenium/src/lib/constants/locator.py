@@ -586,7 +586,7 @@ class WidgetBar(object):
     @staticmethod
     def get_widget(object_name):
       return (By.CSS_SELECTOR,
-              '.object-nav [href$="#!{}"]'.format(object_name))
+              '#inner-nav [href$="#!{}"]'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -596,7 +596,7 @@ class WidgetBar(object):
         setattr(cls, object_plural, cls._Locator.get_widget(name))
   BUTTON_ADD = (
       By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"]')
-  TAB_WIDGET = (By.CSS_SELECTOR, ".object-nav .active")
+  TAB_WIDGET = (By.CSS_SELECTOR, "#inner-nav .active")
   ADMIN_PEOPLE = _Locator.get_widget("people_list")
   ADMIN_ROLES = _Locator.get_widget("roles_list")
   ADMIN_EVENTS = _Locator.get_widget("events_list")
@@ -620,7 +620,7 @@ class WidgetBarButtonAddDropdown(object):
       return (
           By.CSS_SELECTOR,
           '[data-test-id="button_widget_add_2c925d94"] '
-          '.object-nav [href$="#{}"]'.format(object_name))
+          '#inner-nav [href$="#{}"]'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):

@@ -84,23 +84,22 @@ const proxyListModels = {
           reify(mapping[this.option_attr]) instanceof optionModel)));
       },
       filter_and_insert_instances_from_mappings: function (binding, mappings) {
-        let self = this;
         let matchingMappings;
 
-        matchingMappings = can.map(can.makeArray(mappings), function (mapping) {
-          if (self.is_valid_mapping(binding, mapping)) {
-            return mapping;
+        matchingMappings = _.filteredMap(
+          can.makeArray(mappings), (mapping) => {
+            if (this.is_valid_mapping(binding, mapping)) {
+              return mapping;
+            }
           }
-        });
+        );
         return this.insert_instances_from_mappings(binding, matchingMappings);
       },
       insert_instances_from_mappings: function (binding, mappings) {
-        let self = this;
         let newResults;
 
-        newResults = can.map(can.makeArray(mappings), function (mapping) {
-          return self.get_result_from_mapping(binding, mapping);
-        });
+        newResults = _.filteredMap(can.makeArray(mappings),
+          (mapping) => this.get_result_from_mapping(binding, mapping));
         this.insert_results(binding, newResults);
       },
       remove_instance_from_mapping: function (binding, mapping) {
@@ -161,10 +160,11 @@ const proxyListModels = {
         }
 
         return refreshQueue.trigger()
-          .then(this.proxy('filter_for_valid_mappings', binding))
-          .then(this.proxy('insert_instances_from_mappings', binding));
+          .then((mappings) => this.filter_for_valid_mappings(mappings))
+          .then((mappings) => this
+            .insert_instances_from_mappings(binding, mappings));
       },
-      filter_for_valid_mappings: function (binding, mappings) {
+      filter_for_valid_mappings: function (mappings) {
         // Remove incomplete mappings, including those not in our context
         //   (which the server refused to provide).
         let i;

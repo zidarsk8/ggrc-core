@@ -3,7 +3,26 @@
 
 """Module with common validators for GGRC."""
 
+from ggrc import db
 from werkzeug import exceptions
+
+
+def modified_only(func):
+  """Decorator for "before_update" handler that checks if object is changed."""
+  def wrapper(mapper, connection, target):
+    """Skip listener if target object is not modified.
+
+    Args:
+      mapper: the Mapper which is the target of this event
+      connection: the Connection being used to emit UPDATE statements
+      target: the mapped instance being persisted
+    """
+    if db.session.is_modified(target):
+      return func(mapper, connection, target)
+
+    return None
+
+  return wrapper
 
 
 # pylint: disable=unused-argument

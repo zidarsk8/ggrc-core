@@ -15,6 +15,7 @@ import Person from '../../models/business-models/person';
 import Snapshot from '../../models/service-models/snapshot';
 import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
+import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -211,12 +212,10 @@ export default can.Component.extend({
           return instance.save();
         })
         .then(function () {
-          let forceRefresh = true;
-
-          return $('tree-widget-container:visible')
-            .first()
-            .viewModel()
-            .display(forceRefresh);
+          return getPageInstance().dispatch({
+            type: 'displayTree',
+            destinationType: instance.child_type,
+          });
         })
         .then(function () {
           let message = instance.child_type +
@@ -428,9 +427,13 @@ export default can.Component.extend({
        */
       function highlightValue($ca0, ca0, $ca1, ca1) {
         let value0 = ca0.attribute_value;
-        let objectId0 = ca0.attribute_object_id; // for Person attr type
+        let objectId0 = (ca0 && ca0.attribute_object) ?
+          ca0.attribute_object.id : null; // for Person attr type
+
         let value1 = ca1 ? ca1.attribute_value : null;
-        let objectId1 = ca1 ? ca1.attribute_object_id : null;
+        let objectId1 = (ca1 && ca1.attribute_object) ?
+          ca1.attribute_object.id : null;
+
         if (value0 !== value1 || objectId0 !== objectId1) {
           $ca0.find(valueSelector).addClass(highlightClass);
 

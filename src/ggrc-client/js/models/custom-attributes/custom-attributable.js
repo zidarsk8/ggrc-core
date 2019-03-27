@@ -20,7 +20,7 @@ export default Cacheable.extend({
     let types = _.orderBy(getCustomAttributableModels(),
       'category', false);
 
-    return $.when(can.map(types, (type, i) => {
+    return $.when(_.filteredMap(types, (type, i) => {
       return new this(Object.assign({}, type, {
         id: i,
       }));

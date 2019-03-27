@@ -46,7 +46,6 @@ export default can.Component.extend({
       } else {
         // fill in mandatory fields
         this.attr('modalState.open', true);
-        this.closeDiff(element);
       }
     },
     isInstanceValid(instance) {
@@ -107,6 +106,7 @@ export default can.Component.extend({
     },
     revertChanges() {
       this.attr('instance').restore(true);
+      this.attr('loading', false);
     },
   },
 });

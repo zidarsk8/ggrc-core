@@ -82,6 +82,7 @@ describe('SnapshotUtils', function () {
           id: 1,
           type: 'Audit',
         },
+        updated_at: '10/10/2010',
         revision: {
           content: {
             access_control_list: [
@@ -110,6 +111,12 @@ describe('SnapshotUtils', function () {
       let result = toObject(snapshot);
 
       expect(result.attr('originalLink')).toEqual('/controls/42');
+    });
+
+    it('returns object with updated_at of snapshot', () => {
+      let result = toObject(snapshot);
+
+      expect(result.attr('updated_at')).toBe(snapshot.updated_at);
     });
   });
 });

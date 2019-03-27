@@ -27,7 +27,7 @@ import '../../components/modal_wrappers/assessment_template_form';
 import '../../components/autocomplete/autocomplete';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/person/person-data';
-import '../../components/rich_text/rich_text';
+import '../../components/rich-text/rich-text';
 import '../../components/modal_wrappers/checkboxes_to_list';
 import '../../components/deferred-mapper';
 import '../../components/modal_wrappers/assessment-modal';
@@ -94,7 +94,9 @@ export default can.Control.extend({
     }
 
     if (!this.element.find('.modal-body').length) {
-      can.view(this.options.preload_view, {}, this.proxy('after_preload'));
+      can.view(this.options.preload_view,
+        {},
+        (content) => this.after_preload(content));
       return;
     }
 
@@ -135,14 +137,14 @@ export default can.Control.extend({
     this.options.attr('$footer', this.element.find('.modal-footer'));
     this.on();
     this.fetch_all()
-      .then(this.proxy('apply_object_params'))
-      .then(this.proxy('serialize_form'))
+      .then(() => this.apply_object_params())
+      .then(() => this.serialize_form())
       .then(() => {
         if (!this.wasDestroyed()) {
           this.element.trigger('preload');
         }
       })
-      .then(this.proxy('autocomplete'))
+      .then((el) => this.autocomplete(el))
       .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
@@ -262,7 +264,8 @@ export default can.Control.extend({
       can.view(this.options.header_view, dfd),
       can.view(this.options.button_view, dfd),
       can.view(this.options.custom_attributes_view, dfd)
-    ).done(this.proxy('draw'));
+    ).done((content, header, footer, customAttributes) =>
+      this.draw(content, header, footer, customAttributes));
   },
 
   fetch_data: function (params) {
@@ -470,7 +473,7 @@ export default can.Control.extend({
     let $elements = $form
       .find(':input');
 
-    $elements.toArray().forEach(this.proxy('set_value_from_element'));
+    $elements.toArray().forEach((el) => this.set_value_from_element(el));
   },
   set_value_from_element: function (el) {
     let name;
@@ -525,9 +528,7 @@ export default can.Control.extend({
 
     if (model) {
       if (item.value instanceof Array) {
-        value = can.map(item.value, function (id) {
-          return getInstance(model, id);
-        });
+        value = _.filteredMap(item.value, (id) => getInstance(model, id));
       } else if (item.value instanceof Object) {
         value = getInstance(model, item.value.id);
       } else {
@@ -545,9 +546,8 @@ export default can.Control.extend({
 
     if (name.length > 1) {
       if (can.isArray(value)) {
-        value = new can.List(can.map(value, function (v) {
-          return new can.Map({}).attr(name.slice(1).join('.'), v);
-        }));
+        value = new can.List(_.filteredMap(value,
+          (v) => new can.Map({}).attr(name.slice(1).join('.'), v)));
       } else if ($elem.is('[data-lookup]')) {
         if (!value) {
           value = null;
@@ -899,9 +899,9 @@ export default can.Control.extend({
       $form.trigger('reset');
     }).done(() => {
       $.when(this.options.attr('instance', newInstance))
-        .then(this.proxy('apply_object_params'))
-        .then(this.proxy('serialize_form'))
-        .then(this.proxy('autocomplete'));
+        .then(() => this.apply_object_params())
+        .then(() => this.serialize_form())
+        .then((el) => this.autocomplete(el));
     });
 
     this.restore_ui_status();

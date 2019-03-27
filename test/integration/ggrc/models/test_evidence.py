@@ -118,6 +118,7 @@ class TestEvidence(TestCase):
             'type': 'Audit'
         }
     )
+    factories.RelationshipFactory(source=audit, destination=evidence)
     rel_asses = evidence.related_objects(_types=[audit.type])
     self.assertEqual(audit, rel_asses.pop())
 
@@ -235,6 +236,7 @@ class TestEvidence(TestCase):
             'type': 'Audit'
         }
     )
+    factories.RelationshipFactory(source=audit, destination=evidence)
     self.assertEquals(archived, evidence.archived)
 
   @ddt.data(True, False)
@@ -255,6 +257,7 @@ class TestEvidence(TestCase):
             'id': assessment.id,
             'type': 'Assessment'
         })
+    factories.RelationshipFactory(source=assessment, destination=evidence)
     self.assertEquals(archived, evidence.archived)
 
   def test_evidence_url_type_with_parent(self):
@@ -270,5 +273,6 @@ class TestEvidence(TestCase):
             'type': 'Audit'
         }
     )
+    factories.RelationshipFactory(source=audit, destination=evidence)
     rel_evidences = audit.related_objects(_types=[evidence.type])
     self.assertEqual(evidence, rel_evidences.pop())

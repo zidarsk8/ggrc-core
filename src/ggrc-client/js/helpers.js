@@ -911,32 +911,6 @@ Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
   return titlesMap[type] ? titlesMap[type] + field : field;
 });
 
-Mustache.registerHelper('displayWidgetTab',
-  function (widget, instance, options) {
-    let displayTab;
-    let inForceShowList;
-    widget = Mustache.resolve(widget);
-    instance = Mustache.resolve(instance);
-
-    inForceShowList = _.includes(
-      instance.constructor.obj_nav_options.force_show_list,
-      widget.attr('internav_display'));
-
-    displayTab = widget.attr('has_count') &&
-        widget.attr('count') ||
-        widget.attr('uncountable') ||
-        widget.attr('force_show') ||
-        instance.constructor.obj_nav_options.show_all_tabs ||
-        inForceShowList;
-
-    if (!displayTab) {
-      return options.inverse(options.contexts);
-    }
-
-    return options.fn(options.contexts);
-  }
-);
-
 Mustache.registerHelper('is_auditor', function (options) {
   const audit = getPageInstance();
   if (audit.type !== 'Audit') {
@@ -990,3 +964,14 @@ Mustache.registerHelper('if_recurring_workflow', function (object, options) {
   }
   return options.inverse(this);
 });
+
+// Sets current "can" context into element data
+Mustache.registerHelper('canData',
+  (key, options) => {
+    key = Mustache.resolve(key);
+
+    return (el) => {
+      $(el).data(key, options.context);
+    };
+  }
+);

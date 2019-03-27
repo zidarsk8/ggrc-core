@@ -138,10 +138,23 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
 
   NOT_ALLOWED_STATUSES = {"Fixed", "Fixed and Verified", "Deprecated"}
 
+  def _get_populated_enabled(self):
+    """We have some rules for turning integration On for assessments.
+
+    We should turn integration On only if assessment's audit integration
+    enabled. We should turn it Off otherwise.
+    """
+    is_assmt = isinstance(self.row_converter.obj, all_models.Assessment)
+    if is_assmt:
+      audit_enabled = self.row_converter.obj.audit.issue_tracker.get(self.key)
+      return audit_enabled and self.value
+    return self.value
+
   def set_obj_attr(self):
     if self.dry_run:
       return
-    self.row_converter.issue_tracker[self.key] = self.value
+    value = self._get_populated_enabled()
+    self.row_converter.issue_tracker[self.key] = value
 
   def get_value(self):
     if self.row_converter.issue_tracker.get(self.key, ""):

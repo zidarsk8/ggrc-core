@@ -3,9 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if canUnmap}}
-  <content></content>
-{{/if}}
+<content></content>
 
 <simple-modal modal-title="modalTitle" state="modalState" replace-content="true" extra-css-class="related-snapshots">
   <div class="simple-modal__header flex-box flex-row">

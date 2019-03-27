@@ -16,6 +16,7 @@ ACCOUNT="$2"
 KEY_FILE="$3"
 
 VERSION="1"
+DEPLOY_ARGS=""
 
 
 write_visible_message () {
@@ -104,11 +105,13 @@ then
     sed 's/[^a-z0-9]*$//' | \
     cut -c 1-30 \
   )
+else
+  DEPLOY_ARGS="--no-promote"
 fi
 
 write_visible_message "Deploying src/app.yaml into version $VERSION"
 
-gcloud app deploy src/app.yaml --version="$VERSION" --quiet
+gcloud app deploy src/app.yaml --version="$VERSION" --quiet $DEPLOY_ARGS
 
 if [[ ! "${APPENGINE_INSTANCE}" == *"google.com:"* ]]
 then

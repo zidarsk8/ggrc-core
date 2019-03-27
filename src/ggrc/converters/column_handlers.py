@@ -75,7 +75,6 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "documents_file": document.DocumentFileHandler,
     "documents_reference_url": document.DocumentReferenceUrlHandler,
     "due_date": handlers.DateColumnHandler,
-    "due_on": handlers.DateColumnHandler,
     "email": handlers.EmailColumnHandler,
     "end_date": handlers.DateColumnHandler,
     "evidences_file": evidence.EvidenceFileHandler,

@@ -89,7 +89,7 @@ class IssueTrackedWithUrl(IssueTracked):
       "hotlist_id": "Hotlist ID",
       "issue_priority": "Priority",
       "issue_severity": "Severity",
-      "issue_title": "Issue Title",
+      "issue_title": "Ticket Title",
       "issue_type": "Issue Type",
       "enabled": {
           "display_name": "Ticket Tracker Integration",

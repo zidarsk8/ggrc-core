@@ -22,7 +22,6 @@ import 'bootstrap/js/bootstrap-popover.js';
 import 'clipboard';
 import 'canjs/amd/can';
 import 'can/construct/super';
-import 'can/construct/proxy';
 import 'can/control/plugin';
 import 'can/list/sort';
 import 'can/map/attributes';

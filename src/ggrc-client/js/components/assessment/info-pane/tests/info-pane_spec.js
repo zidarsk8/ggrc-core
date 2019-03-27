@@ -1942,47 +1942,4 @@ describe('assessment-info-pane component', () => {
       expect(formFields.length).toBe(currentFormFields.length);
     });
   });
-
-  describe('verifyObjects() method', () => {
-    it('removes new objects', () => {
-      let obj1 = new Evidence({id: 1});
-      let obj2 = new Evidence({id: 2});
-      let obj3 = new Evidence();
-
-      vm.attr('files', [obj1, obj3, obj2]);
-
-      vm.verifyObjects('files');
-
-      expect(vm.attr('files').serialize()).toEqual(new can.List([
-        obj1, obj2,
-      ]).serialize());
-    });
-
-    it('turns off "isUpdating" flag for requested type', () => {
-      vm.attr('urls', []);
-      vm.attr('isUpdatingUrls', true);
-
-      vm.verifyObjects('urls');
-
-      expect(vm.attr('isUpdatingUrls')).toBe(false);
-    });
-
-    it('does not refresh counts if count key is not provided', () => {
-      vm.attr('urls', []);
-      spyOn(vm, 'refreshCounts');
-
-      vm.verifyObjects('urls');
-
-      expect(vm.refreshCounts).not.toHaveBeenCalled();
-    });
-
-    it('refreshes counts if count key is provided', () => {
-      vm.attr('urls', []);
-      spyOn(vm, 'refreshCounts');
-
-      vm.verifyObjects('urls', 'Evidence');
-
-      expect(vm.refreshCounts).toHaveBeenCalledWith(['Evidence']);
-    });
-  });
 });

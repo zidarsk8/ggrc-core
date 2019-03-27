@@ -71,13 +71,10 @@ export default can.Component.extend({
         this.viewModel.instance
           .attr(el.attr('name'))
           .replace(
-            can.map(
+            _.filteredMap(
               this.element.find(
                 'input[name="' + el.attr('name') + '"]:checked'),
-              function (el) {
-                return $(el).val();
-              }
-            )
+              (el) => $(el).val())
           );
         this.element.find('input:checkbox').prop('disabled', true);
       } else {

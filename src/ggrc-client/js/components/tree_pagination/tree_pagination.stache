@@ -5,19 +5,21 @@
 
 <div class="tree-pagination flex-box">
   <div class="pagination dropdown-container">
-    <simple-popover {button-text}="paging.pageSize" extra-css-class="simple-popover_pagination_items" placement="{{placement}}">
-      <div>Items per page:</div>
-      <div class="dropdown-container__items-list flex-box flex-row">
-        {{#paging.pageSizeSelect}}
-        <div
-          class="
-            dropdown-container__item
-            {{#if_equals paging.pageSize .}} dropdown-container__item_selected{{/if_equals}}
-            flex-size-1"
-          ($click)="setPageSize(.)">{{.}}</div>
-        {{/paging.pageSizeSelect}}
-      </div>
-    </simple-popover>
+    <div class="dropdown-container__wrapper">
+      <simple-popover {button-text}="paging.pageSize" extra-css-class="simple-popover_pagination_items" placement="{{placement}}">
+        <div>Items per page:</div>
+        <div class="dropdown-container__items-list flex-box flex-row">
+          {{#paging.pageSizeSelect}}
+          <div
+            class="
+              dropdown-container__item
+              {{#if_equals paging.pageSize .}} dropdown-container__item_selected{{/if_equals}}
+              flex-size-1"
+            ($click)="setPageSize(.)">{{.}}</div>
+          {{/paging.pageSizeSelect}}
+        </div>
+      </simple-popover>
+    </div>
   </div>
   <div class="pagination">
     <div class="pagination-item {{#if_equals paging.current 1}} disabled{{/if_equals}}">

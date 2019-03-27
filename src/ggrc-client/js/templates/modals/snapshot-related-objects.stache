@@ -7,7 +7,7 @@
   {{#if relatedToSnapshot.length}}
   <div class="related-to-snapshot">
     <p>
-      The snapshot you are trying delete has dependent object(s).
+      The snapshot you are trying to delete has dependent object(s).
       Please unmap the below object(s) to continue:
     </p>
     {{#each relatedToSnapshot}}
@@ -21,8 +21,8 @@
   {{#if relatedToOriginal.length}}
   <div class="related-to-original">
     <p>
-      The snapshot you are trying to delete has mapped snapshots.
-      Please unmap their original objects from <a target="_blank" href="{{originalObject.originalLink}}">{{originalObject.title}}</a> to continue:
+      The snapshot you are trying to delete has mapped snapshot(s).
+      Please unmap their original object(s) from <a target="_blank" href="{{originalObject.originalLink}}">{{originalObject.title}}</a> to continue:
     </p>
     {{#each relatedToOriginal}}
       <p>

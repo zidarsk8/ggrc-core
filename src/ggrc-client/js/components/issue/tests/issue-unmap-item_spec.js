@@ -345,16 +345,18 @@ describe('issue-unmap-item component', () => {
     });
   });
 
-  describe('showNoRelationhipError() method', () => {
+  describe('showNoRelationshipError() method', () => {
     const issueTitle = 'TEST_ISSUE_TITLE';
     const targetType = 'TEST_TARGET_TYPE';
     const targetTitle = 'TEST_TARGET_TITLE';
 
     beforeEach(() => {
-      viewModel.attr('issueInstance', {
+      viewModel.attr('source', {
+        type: 'Issue',
         title: issueTitle,
       });
-      viewModel.attr('target', {
+      viewModel.attr('destination', {
+        type: targetType,
         title: targetTitle,
         'class': {
           title_singular: targetType,
@@ -364,7 +366,7 @@ describe('issue-unmap-item component', () => {
     });
 
     it('shows correct message', () => {
-      viewModel.showNoRelationhipError();
+      viewModel.showNoRelationshipError();
 
       expect(NotifiersUtils.notifier).toHaveBeenCalledWith('error',
         `Unmapping cannot be performed.
@@ -381,7 +383,7 @@ describe('issue-unmap-item component', () => {
       handler = events.click.bind({viewModel: viewModel});
       event = jasmine.createSpyObj(['preventDefault']);
       spyOn(viewModel, 'processRelatedSnapshots');
-      spyOn(viewModel, 'showNoRelationhipError');
+      spyOn(viewModel, 'showNoRelationshipError');
       spyOn(viewModel, 'dispatch');
     });
 
@@ -399,7 +401,7 @@ describe('issue-unmap-item component', () => {
       spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve(false));
       await handler(null, event);
-      expect(viewModel.showNoRelationhipError).toHaveBeenCalled();
+      expect(viewModel.showNoRelationshipError).toHaveBeenCalled();
       done();
     });
 
