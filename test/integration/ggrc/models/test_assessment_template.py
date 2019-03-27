@@ -72,7 +72,8 @@ class TestAssessmentTemplate(TestCase):
                 u"issue_priority": None,
                 u"issue_type": default_issue_type,
                 u"issue_url": None,
-                u"title": "some title"
+                u"title": "some title",
+                u"people_sync_enabled": True,
             }
         }
     )
