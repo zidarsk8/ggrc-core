@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Program model."""
+
+from sqlalchemy import orm
+
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.access_control.roleable import Roleable
@@ -53,8 +56,6 @@ class Program(review.Reviewable,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Program, cls).eager_query()
     return cls.eager_inclusions(query, Program._include_links).options(
         orm.subqueryload('audits'),
