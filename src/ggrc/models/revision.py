@@ -343,6 +343,7 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     pop_models = {
         # ggrc
         "AccessGroup",
+        "AccountBalance",
         "Control",
         "DataAsset",
         "Directive",

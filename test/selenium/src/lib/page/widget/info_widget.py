@@ -856,6 +856,14 @@ class AccessGroup(InfoWidget):
     super(AccessGroup, self).__init__(driver)
 
 
+class AccountBalance(InfoWidget):
+  """Model for Account Balance object Info pages and Info panels."""
+  _locators = locator.WidgetInfoAccessGroup
+
+  def __init__(self, driver):
+    super(AccountBalance, self).__init__(driver)
+
+
 class Systems(InfoWidget):
   """Model for System object Info pages and Info panels."""
   _locators = locator.WidgetInfoSystem
