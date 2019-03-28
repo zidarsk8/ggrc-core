@@ -119,20 +119,12 @@ export default can.Construct.extend({
       return false;
     }
 
-    let targetContext = _.exists(target, 'context.id');
-    let sourceContext = _.exists(source, 'context.id');
-    let createContexts = _.exists(
-      GGRC, 'permissions.create.Relationship.contexts');
-
     let canMap = Permission.is_allowed_for('update', source) ||
-      _.includes(createContexts, sourceContext) ||
       // Also allow mapping to source if the source is about to be created.
       _.isUndefined(source.created_at);
 
     if (target instanceof can.Map && targetType) {
-      canMap = canMap &&
-        (Permission.is_allowed_for('update', target) ||
-          _.includes(createContexts, targetContext));
+      canMap = canMap && Permission.is_allowed_for('update', target);
     }
     return canMap;
   },
