@@ -471,13 +471,19 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
       return self._content["custom_attributes"]
     return []
 
+  def _get_cads(self):
+    """Return cads definitions from content."""
+    if "custom_attribute_definitions" in self._content:
+      return self._content["custom_attribute_definitions"]
+    from ggrc.models import custom_attribute_definition
+    return custom_attribute_definition.get_custom_attributes_for(
+        self.resource_type, self.resource_id)
+
   def populate_cavs(self):
     """Setup cads in cav list if they are not presented in content
 
     but now they are associated to instance."""
-    from ggrc.models import custom_attribute_definition
-    cads = custom_attribute_definition.get_custom_attributes_for(
-        self.resource_type, self.resource_id)
+    cads = self._get_cads()
     cavs = {int(i["custom_attribute_id"]): i for i in self._get_cavs()}
     cads_ids = set()
     for cad in cads:
