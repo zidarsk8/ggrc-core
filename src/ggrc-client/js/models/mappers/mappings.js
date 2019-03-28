@@ -67,6 +67,42 @@ export default can.Construct.extend({
     let result = this.getMappingList(target);
     return _.includes(result, source);
   },
+
+  /**
+   * Checks user permissions for mappings
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
+   *
+   * @return {Boolean} whether user has permissions for mappings
+   */
+  userHasPermissions(source, target) {
+    let hasPermissions = Permission.is_allowed_for('update', source)
+      || source.isNew();
+
+    if (target instanceof can.Map) {
+      hasPermissions = hasPermissions
+        && Permission.is_allowed_for('update', target);
+    }
+
+    return hasPermissions;
+  },
+  /**
+   * Determine if `target` is allowed to be created and mapped to `source`.
+   *
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
+   *
+   * @return {Boolean} - true if mapping is allowed, false otherwise
+   */
+  allowedToCreate(source, target) {
+    let targetType = this._getType(target);
+    let sourceType = this._getType(source);
+
+    let allowedTypes = _.keys(this.getAllowedToCreateModels(sourceType));
+    let canCreate = _.includes(allowedTypes, targetType);
+
+    return canCreate && this.userHasPermissions(source, target);
+  },
   /**
    * Determine if `target` is allowed to be mapped to `source`.
    *
@@ -112,7 +148,7 @@ export default can.Construct.extend({
     return canMap;
   },
   /**
-   * Determine if `target` is allowed to be mapped to `source` or created and 
+   * Determine if `target` is allowed to be mapped to `source` or created and
    * mapped to 'source'.
    *
    * @param {Object} source - the source object the mapping
@@ -127,20 +163,10 @@ export default can.Construct.extend({
     let mappableTypes = _.keys(this.getAllowedToMapModels(sourceType));
     let createTypes = _.keys(this.getAllowedToCreateModels(sourceType));
 
-    if (!_.includes(mappableTypes, targetType)
-      && !_.includes(createTypes, targetType)) {
-      return false;
-    }
+    let canCreateOrMap = _.includes(mappableTypes, targetType) ||
+      _.includes(createTypes, targetType);
 
-    let canCreateOrMap = Permission.is_allowed_for('update', source)
-      || source.isNew();
-
-    if (target instanceof can.Map && targetType) {
-      canCreateOrMap = canCreateOrMap
-        && Permission.is_allowed_for('update', target);
-    }
-
-    return canCreateOrMap;
+    return canCreateOrMap && this.userHasPermissions(source, target);
   },
   /**
    * Determine if `target` is allowed to be unmapped from `source`.
@@ -155,16 +181,9 @@ export default can.Construct.extend({
     let targetType = this._getType(target);
 
     let unmappableTypes = _.keys(this.getAllowedToUnmapModels(sourceType));
-    if (!_.includes(unmappableTypes, targetType)) {
-      return false;
-    }
+    let canUnmap = _.includes(unmappableTypes, targetType);
 
-    let canUnmap = Permission.is_allowed_for('update', source);
-
-    if (target instanceof can.Map && targetType) {
-      canUnmap = canUnmap && Permission.is_allowed_for('update', target);
-    }
-    return canUnmap;
+    return canUnmap && this.userHasPermissions(source, target);
   },
   _getType: function (object) {
     let type;

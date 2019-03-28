@@ -303,7 +303,7 @@ can.stache.registerHelper('is_allowed_to_create', (source, target, options) => {
 
   source = resolveComputed(source);
   target = resolveComputed(target);
-  canCreate = Mappings.getAllowedToCreateModels(source, target);
+  canCreate = Mappings.allowedToCreate(source, target);
 
   if (canCreate) {
     return options.fn(options.contexts);

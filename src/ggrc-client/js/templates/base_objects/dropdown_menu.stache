@@ -21,36 +21,38 @@
           {{/if}}
         {{/if}}
       {{/if}}
-
-      <li>
-        {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
-          {{#is_allowed_to_create instance.type 'CycleTaskGroupObjectTask'}}
-            <a
-              rel="tooltip"
-              data-placement="left"
-              data-original-title="Create Cycle Task for object"
-              data-object-plural="cycle_task_group_object_tasks"
-              data-modal-class="modal-wide" href="javascript://"
-              data-object-singular="CycleTaskGroupObjectTask"
-              data-toggle="modal-ajax-form"
-              data-modal-reset="reset"
-              data-object-params='{
-                "pre_mapped_objects": [{
-                  "type": "{{ instance.type }}",
-                  "id": {{ instance.id }}
-                }],
-                "modal_title": "Create New Task"}'>
-              <i class="fa fa-calendar-check-o"></i> Create task
-            </a>
-          {{/is_allowed_to_create}}
-        {{/is_allowed}}
-      </li>
     {{/is_allowed}}
+
+    {{#is_allowed 'create' 'CycleTaskGroupObjectTask' context=null}}
+      {{#is_allowed_to_create instance 'CycleTaskGroupObjectTask'}}
+        <li>
+          <a
+            rel="tooltip"
+            data-placement="left"
+            data-original-title="Create Cycle Task for object"
+            data-object-plural="cycle_task_group_object_tasks"
+            data-modal-class="modal-wide" href="javascript://"
+            data-object-singular="CycleTaskGroupObjectTask"
+            data-toggle="modal-ajax-form"
+            data-modal-reset="reset"
+            data-object-params='{
+              "pre_mapped_objects": [{
+                "type": "{{ instance.type }}",
+                "id": {{ instance.id }}
+              }],
+              "modal_title": "Create New Task"}'>
+            <i class="fa fa-calendar-check-o"></i> Create task
+          </a>
+        </li>
+      {{/is_allowed_to_create}}
+    {{/is_allowed}}
+    
     {{^if_instance_of instance "TaskGroup|TaskGroupTask"}}
     <li>
       <permalink-component {instance}="{instance}"/>
     </li>
     {{/if_instance_of}}
+
     {{#if_instance_of instance "Assessment"}}
       {{#if_config_exist 'ASSESSMENT_SHORT_URL_PREFIX'}}
         <li>
@@ -58,6 +60,7 @@
         </li>
       {{/if_config_exist}}
     {{/if_instance_of}}
+
     {{#is_info_pin}}
       <unmap-dropdown-item
         {page_instance}="{page_instance}"
