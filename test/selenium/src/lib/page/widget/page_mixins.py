@@ -95,19 +95,22 @@ class WithObjectReview(base.WithBrowser):
 
   def get_object_review_txt(self):
     """Return review message on info pane."""
-    return self.object_review_txt.text if self.object_review_txt.exist else ""
+    return (self.object_review_txt.text if self.object_review_txt.exists
+            else None)
 
   def get_reviewers_emails(self):
     """Return reviewers emails if reviewers assigned."""
-    return self.reviewers.get_people_emails() \
-        if self.reviewers.exists() else []
+    return (self.reviewers.get_people_emails()
+            if self.reviewers.exists() else None)
 
   def get_review_dict(self):
-    """Return Review as dict if reviewers assigned."""
+    """Return Review as dict."""
     return {"status": self.get_review_state_txt(),
             "reviewers": self.get_reviewers_emails(),
-            "last_reviewed_by": self.get_object_review_txt()[:-7]} if\
-        self.get_reviewers_emails() != [] else None
+            # Last 7 symbols are the UTC offset. Can not convert to UI
+            # format date due to %z directive doesn't work in Python 2.7.
+            "last_reviewed_by": self.get_object_review_txt()[:-7] if
+            self.get_object_review_txt() else None}
 
   def has_review(self):
     """Check if review section exists."""
