@@ -22,7 +22,7 @@ from ggrc.migrations import utils
 from ggrc.migrations.utils import migrator
 
 revision = '048e54271df8'
-down_revision = '53e115488aec'
+down_revision = '0d7a3a0aa3da'
 
 ACCOUNT_BALANCE_ACRS = [
     ('Admin', '1', '1', '1', '1'),

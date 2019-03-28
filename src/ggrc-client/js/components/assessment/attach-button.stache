@@ -15,7 +15,7 @@
                                        {tooltip}="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.'"
                                        {disabled}="isAttachActionDisabled"
                                        {confirmation-callback}="@confirmationCallback"
-                                       (finish)="finish"
+                                       (created)="created(%event)"
                                        (before-attach)="onBeforeCreate(%event)">Attach
           </ggrc-gdrive-picker-launcher>
         {{else}}
@@ -26,7 +26,7 @@
                                        {tooltip}="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.'"
                                        {disabled}="isAttachActionDisabled"
                                        {confirmation-callback}="@confirmationCallback"
-                                       (finish)="finish"
+                                       (created)="created(%event)"
                                        (before-attach)="onBeforeCreate(%event)">Attach
           </ggrc-gdrive-picker-launcher>
           <div class="attachment-upload-control__icon attachment-upload-control__icon__error">

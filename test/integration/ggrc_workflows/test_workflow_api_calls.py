@@ -337,11 +337,11 @@ class TestWorkflowsApiPost(TestCase):
                for person, acl in workflow.access_control_list}
     self.assertDictEqual(exp_res, act_res)
 
+  @unittest.skip("enable after GGRC-6923 is fixed")
   def test_send_invalid_data(self):
     """Test send invalid data on Workflow post."""
     data = self.get_workflow_dict()
     del data["workflow"]["title"]
-    del data["workflow"]["context"]
     response = self.api.post(all_models.Workflow, data)
     self.assert400(response)
     # TODO: check why response.json["message"] is empty
@@ -399,6 +399,27 @@ class TestWorkflowsApiPost(TestCase):
 
     response = self.api.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
+
+  def test_incorrect_wf_id_on_tg_post(self):
+    """Tests incorrect id in tg post payload.
+
+    Tests that 400 is raised on tg post if id in
+    payload has incorrect type."""
+    wf_data = self.get_workflow_dict()
+    wf_response = self.api.post(all_models.Workflow, wf_data)
+    data = {
+        "workflow": {
+            "id": {
+                "id": wf_response.json["workflow"]["id"]
+            },
+            "type": "Workflow"
+        }
+    }
+    tg_response = self.api.post(all_models.TaskGroup, data)
+    self.assertEqual(tg_response.status_code, 400)
+    self.assertEqual(tg_response.json["message"],
+                     ("Either type or id are specified "
+                      "incorrectly in the request payload."))
 
   @staticmethod
   def get_workflow_dict():

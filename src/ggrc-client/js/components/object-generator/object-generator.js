@@ -14,6 +14,7 @@ import '../../components/mapping-controls/mapping-type-selector';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import * as businessModels from '../../models/business-models';
 import template from './object-generator.stache';
+import Mappings from '../../models/mappers/mappings';
 
 /**
  * A component implementing a modal for mapping objects to other objects,
@@ -38,6 +39,9 @@ export default can.Component.extend({
         //  disable changing of object type while loading
         //  to prevent errors while speedily selecting different types
         this.attr('is_loading');
+      },
+      availableTypes() {
+        return Mappings.groupTypes(GGRC.config.snapshotable_objects);
       },
     });
   },

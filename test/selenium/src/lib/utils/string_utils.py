@@ -24,11 +24,24 @@ class Symbols(object):
   BACKSLASH = "\\"
   PIPE = "|"
 
-  def __init__(self):
+  def __init__(self, additional_exclude=''):
+    """Create symbols sets.
+
+    Provide next symbol sets:
+      exclude_char: Chars that shouldn't participate in string generation. We
+        should exclude some symbols i.e. to prevent raising coding/encoding
+        issues.
+      special_chars: set of allowable special symbols.
+      standard_chars = set of allowable symbols.
+    Args:
+      additional_exclude: symbols that should be additionally excluded from
+        generation.
+    """
     # need exclude to prevent raising coding (encoding) issues
     self.exclude_chars = self.BLANK.join(
         (self.COMMA, self.LESS, self.MORE, self.DOUBLE_QUOTES,
          self.SINGLE_QUOTE, self.BACK_QUOTE, self.BACKSLASH, self.PIPE))
+    self.exclude_chars += additional_exclude
     self.special_chars = self.BLANK.join(
         symbol for symbol in string.punctuation.encode("string-escape")
         if symbol not in self.exclude_chars)

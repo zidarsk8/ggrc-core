@@ -24,3 +24,9 @@
     </span>
   </div>
 </div>
+
+{{#if withMentions}}
+  <people-mention
+    {editor}="editor">
+  </people-mention>
+{{/if}}

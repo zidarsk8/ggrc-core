@@ -6,13 +6,13 @@
 import collections
 import ddt
 
-from integration.ggrc import api_helper
-from integration.ggrc.query_helper import WithQueryApi
-
-from integration.ggrc import TestCase
-from integration.ggrc.models import factories
 from ggrc import db
 from ggrc.models import all_models
+from integration.ggrc import api_helper, TestCase
+from integration.ggrc.query_helper import WithQueryApi
+from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -260,3 +260,39 @@ class TestLabeledMixin(WithQueryApi, TestCase):
     self.assertEqual(labels['count'], 10)
     response_ids = {label['id'] for label in labels['values']}
     self.assertSetEqual(response_ids, expected_ids)
+
+  def test_label_in_new_tab(self):
+    """Test labels created by global creator in new tab"""
+
+    with factories.single_commit():
+      role = "Creator"
+      role_name = "Creators"
+      person = factories.PersonFactory()
+      creator_role = all_models.Role.query.filter(
+          all_models.Role.name == role
+      ).one()
+      rbac_factories.UserRoleFactory(role=creator_role, person=person)
+    self.api.set_user(person)
+
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      factories.AccessControlPersonFactory(
+          ac_list=assessment.acr_name_acl_map[role_name],
+          person=person,
+      )
+
+    label_name = "Test Label"
+    response = self.api.put(assessment, {
+        'labels': [{
+            'name': label_name,
+            'id': None,
+            'type': 'Label'
+        }]
+    })
+    self.assert200(response)
+    response = self.api.get(assessment, assessment.id)
+    self.assert200(response)
+    labels = response.json['assessment']['labels']
+
+    self.assertEqual(len(labels), 1)
+    self.assertEqual(labels[0]['name'], label_name)

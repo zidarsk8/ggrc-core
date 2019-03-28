@@ -6,6 +6,9 @@
 import '../../inline/base-inline-control-title';
 import {confirm} from '../../../plugins/utils/modals';
 
+const EDITABLE_STATES = [
+  'In Progress', 'Not Started', 'Rework Needed', 'Deprecated'];
+
 export default can.Component.extend({
   tag: 'confirm-edit-action',
   leakScope: true,
@@ -24,8 +27,7 @@ export default can.Component.extend({
       }.bind(this));
     },
     isInEditableState: function () {
-      let editableStates = ['In Progress', 'Not Started', 'Rework Needed'];
-      return _.includes(editableStates, this.attr('instance.status'));
+      return _.includes(EDITABLE_STATES, this.attr('instance.status'));
     },
     showConfirm: function () {
       let self = this;

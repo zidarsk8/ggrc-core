@@ -26,8 +26,8 @@ const sortByNameEmail = (list) => {
   return new list.constructor(can.makeArray(list).sort(function (a, b) {
     a = a.person || a;
     b = b.person || b;
-    a = (can.trim(a.name) || can.trim(a.email)).toLowerCase();
-    b = (can.trim(b.name) || can.trim(b.email)).toLowerCase();
+    a = (_.trim(a.name) || _.trim(a.email)).toLowerCase();
+    b = (_.trim(b.name) || _.trim(b.email)).toLowerCase();
     if (a > b) {
       return 1;
     }
@@ -196,6 +196,7 @@ new DashboardControl('#pageContent', {
   widget_descriptors: WidgetList.get_widget_list_for('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
   header_view: `${GGRC.templates_path}/base_objects/page_header.stache`,
+  innernav_view: `${GGRC.templates_path}/base_objects/inner-nav.stache`,
   default_widgets: [
     'people', 'roles', 'events', 'custom_attributes', 'custom_roles',
   ],

@@ -1,0 +1,18 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if showResults}}
+  <div class="autocomplete-result-wrapper">
+  <div class="autocomplete-result">
+    <ul>
+      {{#each _items}}
+        <li class="autocomplete-item {{extraCls}}" ($click)="selectItem({{_index}})">
+          {{email}}
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+  <div>
+{{/if}}

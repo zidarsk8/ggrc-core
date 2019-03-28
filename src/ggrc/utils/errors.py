@@ -8,6 +8,8 @@ BAD_REQUEST_MESSAGE = (u"Server error occurred. Please contact your "
 
 WRONG_STATUS = u"Wrong status."
 
+STOPPED_WARNING = u"Export already canceled. Please wait."
+
 BAD_PARAMS = u"Bad request parameters."
 
 INCORRECT_REQUEST_DATA = u"{job_type} failed due incorrect request data."
@@ -44,3 +46,8 @@ DUPLICATE_GCAD_NAME = u"Global custom attribute '{attr_name}' already " \
 
 DUPLICATE_CUSTOM_ROLE = u"Custom Role with a name of '{role_name}' already " \
                         u"exists for this object type"
+
+MAPPED_ASSESSMENT = (u"The following Audit cannot be deleted due to existing "
+                     u"assessment(s) or  assessment template(s) mappings."
+                     u"Please delete assessment(s) or assessment template(s)"
+                     u"mapped to this Audit to continue")

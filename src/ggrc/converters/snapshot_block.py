@@ -302,15 +302,16 @@ class SnapshotBlockConverter(object):
     if value is None:
       return u""
     cad = self._cad_map[value["custom_attribute_id"]]
-    val = value.get("attribute_value") or u""
+    cav_value = value.get("attribute_value") or u""
     if cad["attribute_type"] == "Map:Person":
-      return self._stub_cache.get(val, {}).get(
-          value.get("attribute_object_id"), u"")
+      attribute_object_id = value.get("attribute_object")["id"] \
+          if value.get("attribute_object") else u""
+      return self._stub_cache.get(cav_value, {}).get(attribute_object_id, u"")
     if cad["attribute_type"] == "Checkbox":
-      return self.BOOLEAN_ALIASES.get(val, u"")
-    if cad["attribute_type"] == "Date" and val:
-      return utils.iso_to_us_date(val)
-    return val
+      return self.BOOLEAN_ALIASES.get(cav_value, u"")
+    if cad["attribute_type"] == "Date" and cav_value:
+      return utils.iso_to_us_date(cav_value)
+    return cav_value
 
   @property
   def _header_list(self):

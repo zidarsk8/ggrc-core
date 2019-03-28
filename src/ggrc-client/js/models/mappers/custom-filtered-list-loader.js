@@ -63,11 +63,9 @@ import Mappings from './mappings';
         binding.source_binding.list.bind('add', function (ev, results) {
           binding.refresh_instances().done(function () {
             new RefreshQueue().enqueue(
-              can.map(results, function (res) {
-                return res.instance;
-              })
+              _.filteredMap(results, (res) => res.instance)
             ).trigger().done(function () {
-              can.map(can.makeArray(results), function (result) {
+              _.filteredMap(can.makeArray(results), (result) => {
                 let newResult =
                   self.make_result(result.instance, [result], binding);
                 newResult.compute = resultCompute(result);
@@ -93,11 +91,9 @@ import Mappings from './mappings';
         return binding.source_binding.refresh_instances()
           .then(function (results) {
             new RefreshQueue().enqueue(
-              can.map(results, function (res) {
-                return res.instance;
-              })
+              _.filteredMap(results, (res) => res.instance)
             ).trigger().done(function () {
-              can.map(can.makeArray(results), function (result) {
+              _.filteredMap(can.makeArray(results), (result) => {
                 let newResult =
                   self.make_result(result.instance, [result], binding);
                 newResult.compute = can.compute(function () {

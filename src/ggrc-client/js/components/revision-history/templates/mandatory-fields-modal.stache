@@ -37,8 +37,8 @@
   </div>
   <div class="simple-modal__footer">
     <div class="simple-modal__toolbar">
-      <button class="btn btn-small btn-green simple-modal__toolbar-item"
-              type="button" ($click)="save()" {{#if isDisabled}}disabled{{/if}}>
+      <button class="btn btn-small btn-green simple-modal__toolbar-item {{#if isApplyButtonDisabled}}disabled{{/if}}"
+              type="button" ($click)="save()" {{#if isApplyButtonDisabled}}disabled{{/if}}>
         Apply
       </button>
       <button class="btn btn-small btn-white simple-modal__toolbar-item"

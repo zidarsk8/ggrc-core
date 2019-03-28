@@ -201,7 +201,7 @@ const LhnControl = can.Control.extend({}, {
   // it ain't pretty, but it works
   initial_lhn_render: function () {
     let self = this;
-    if (!$('.lhs-holder').size() || !$('.lhn-trigger').size()) {
+    if (!$('.lhs-holder').length || !$('.lhn-trigger').length) {
       window.requestAnimationFrame(this.initial_lhn_render.bind(this));
       return;
     }
@@ -442,8 +442,8 @@ const LhnSearchControl = can.Control.extend({
         this.options._hasPendingRefresh = true;
         return;
       }
-      modelNames = can.map(
-        this.get_visible_lists(), this.proxy('get_list_model'));
+      modelNames = _.filteredMap(
+        this.get_visible_lists(), ($list) => this.get_list_model($list));
       modelName = instance.constructor.model_singular;
 
       if (modelNames.indexOf(modelName) > -1) {
@@ -465,7 +465,7 @@ const LhnSearchControl = can.Control.extend({
       .find('a.list-toggle.top');
     let $ul = $toggle.parent('li').find(this.options.list_mid_level_selector);
 
-    if ($toggle.size() && !$toggle.hasClass('active')) {
+    if ($toggle.length && !$toggle.hasClass('active')) {
       this.open_list($toggle, $ul, null, true);
     }
   },
@@ -476,7 +476,7 @@ const LhnSearchControl = can.Control.extend({
     let $parent = el.parent('li');
     let selector;
 
-    if ($parent.find(midSelector).size()) {
+    if ($parent.find(midSelector).length) {
       selector = midSelector;
     } else {
       selector = subSelector;
@@ -829,9 +829,10 @@ const LhnSearchControl = can.Control.extend({
     }
 
 
-    models = can.map(this.get_lists(), this.proxy('get_list_model'));
-    extraModels = can.map(
-      this.get_lists(), this.proxy('get_extra_list_model'));
+    models = _.filteredMap(this.get_lists(),
+      ($list) => this.get_list_model($list));
+    extraModels = _.filteredMap(
+      this.get_lists(), ($list) => this.get_extra_list_model($list));
 
     this.options._hasPendingRefresh = false;
     // Retrieve and display counts
@@ -848,14 +849,14 @@ const LhnSearchControl = can.Control.extend({
     let self = this;
     let searchId = this.search_id;
     let lists = this.get_visible_lists();
-    let models = can.map(lists, this.proxy('get_list_model'));
+    let models = _.filteredMap(lists, ($list) => this.get_list_model($list));
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
       return $.Deferred().resolve();
     }
 
-    models = can.map(models, function (modelName) {
+    models = _.filteredMap(models, (modelName) => {
       if (self.options.loaded_lists.indexOf(modelName) === -1) {
         return modelName;
       }
@@ -933,7 +934,7 @@ const LhnSearchControl = can.Control.extend({
   },
   get_visible_lists: function () {
     let self = this;
-    return can.map(this.get_lists(), function ($list) {
+    return _.filteredMap(this.get_lists(), ($list) => {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
         self.options.list_mid_level_selector].join(',')).hasClass('in')) {

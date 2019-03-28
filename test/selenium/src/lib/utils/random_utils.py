@@ -7,6 +7,7 @@ import random
 import string
 
 from lib import users
+from lib.utils.string_utils import Symbols
 
 
 def get_title(obj_type):
@@ -23,12 +24,6 @@ def get_email(domain=users.DEFAULT_EMAIL_DOMAIN):
   return "{}@{}".format(email_local_part, domain)
 
 
-# STANDARD_CHARS = string.ascii_letters + string.punctuation + string.digits
-STANDARD_CHARS = string.punctuation
-# Part of string after `<` is removed (GGRC-6037)
-STANDARD_CHARS = STANDARD_CHARS.replace("<", "").replace("'", "")
-
-
 def _current_time():
   """Returns current time, to be included into strings in order to check when
   they were created.
@@ -36,7 +31,7 @@ def _current_time():
   return datetime.datetime.now().strftime("%H%M%S.%f")[:-3]
 
 
-def get_string(size=15, chars=STANDARD_CHARS):
+def get_string(size=15, chars=Symbols().special_chars):
   """Returns string of size `size` that consists of characters `chars`.
   """
   chars_copy = copy.deepcopy(chars)

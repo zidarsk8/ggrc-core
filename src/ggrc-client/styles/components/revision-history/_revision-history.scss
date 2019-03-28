@@ -37,6 +37,15 @@
       padding: 5px 15px;
       line-height: 16px;
       overflow: inherit;
+
+      person-data {
+        font-size: 0px;
+
+        .person-data {
+          display: inline-block;
+          font-size: 15px
+        }
+      }
     }
 
     &__footer {

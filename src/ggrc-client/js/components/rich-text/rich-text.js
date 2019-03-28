@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './rich_text.stache';
+import './people-mention/people-mention';
+
+import template from './rich-text.stache';
 
 const URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
 const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
@@ -48,6 +50,7 @@ export default can.Component.extend('richText', {
     maxLength: null,
     showAlert: false,
     length: 0,
+    withMentions: false,
     initEditor(container, toolbarContainer, countContainer) {
       import(/* webpackChunkName: "quill" */'quill')
         .then(({'default': Quill}) => {

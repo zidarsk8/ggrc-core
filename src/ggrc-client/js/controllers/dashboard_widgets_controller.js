@@ -3,9 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {
-  getCounts,
-} from '../plugins/utils/widgets-utils';
 import {getPageModel} from '../plugins/utils/current-page-utils';
 
 export default can.Control.extend({
@@ -38,28 +35,11 @@ export default can.Control.extend({
       this.options.object_category = this.options.model.category;
     }
 
-    this.options.widget_count = new can.Map();
-
     this.element
       .addClass('widget')
       .addClass(this.options.object_category)
       .addClass(this.options.widgetType)
       .attr('id', this.options.widget_id);
-
-    if (this.options.widgetType && this.options.widgetType === 'treeview') {
-      let counts = getCounts();
-
-      let countsName = this.options.countsName ||
-        (this.options.content_controller_options &&
-          this.options.content_controller_options.countsName) ||
-        this.options.model.model_singular;
-
-      this.options.widget_count.attr('count', counts.attr(countsName));
-
-      counts.on(countsName, function (ev, newVal, oldVal) {
-        can.trigger(this.element, 'updateCount', [newVal]);
-      }.bind(this));
-    }
   },
   prepare: function () {
     if (this._prepare_deferred) {
@@ -68,7 +48,7 @@ export default can.Control.extend({
 
     this._prepare_deferred =
       can.view(this.options.widget_view, $.when(this.options))
-        .then(this.proxy('draw_widget'));
+        .then((frag) => this.draw_widget(frag));
 
     return this._prepare_deferred;
   },
@@ -121,8 +101,5 @@ export default can.Control.extend({
     });
 
     return this._display_deferred;
-  },
-  updateCount: function (el, ev, count, updateCount) {
-    this.options.widget_count.attr('count', count);
   },
 });

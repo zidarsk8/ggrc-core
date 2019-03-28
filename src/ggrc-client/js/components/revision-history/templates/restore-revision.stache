@@ -18,6 +18,6 @@
     {instance}="instance"
     {revision-modified-by}="restoredRevision.modified_by"
     {revision-updated-at}="restoredRevision.updated_at"
-    (save)="saveInstance"
+    (save)="saveInstance($element)"
     (cancel)="revertChanges">
 </mandatory-fields-modal>

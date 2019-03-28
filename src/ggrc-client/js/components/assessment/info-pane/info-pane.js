@@ -606,15 +606,6 @@ export default can.Component.extend({
       let verifierRoleId = verifierRole ? verifierRole.id : null;
       this.attr('_verifierRoleId', verifierRoleId);
     },
-    verifyObjects(type, countKey) {
-      let objects = this.attr(type).filter((item) => !item.isNew());
-      this.attr(type, objects);
-      this.attr(`isUpdating${can.capitalize(type)}`, false);
-
-      if (countKey) {
-        this.refreshCounts([countKey]);
-      }
-    },
     resetCurrentState() {
       this.setCurrentState(this.attr('instance.status'));
       this.attr('previousStatus', undefined);

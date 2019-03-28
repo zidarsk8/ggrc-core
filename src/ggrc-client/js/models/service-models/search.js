@@ -65,7 +65,7 @@ export default can.Model.extend({
       this.entries instanceof can.List)) {
       entries = this.entries[modelName] || [];
     } else {
-      entries = can.map(this.entries, function (v) {
+      entries = _.filteredMap(this.entries, (v) => {
         if (v.type === modelName) {
           return v;
         }

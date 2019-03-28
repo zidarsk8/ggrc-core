@@ -15,7 +15,7 @@ from lib.entities.entities_factory import (
     AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
-from lib.utils import help_utils, test_utils
+from lib.utils import help_utils, test_utils, string_utils
 
 
 class BaseRestService(object):
@@ -273,7 +273,11 @@ class AccessControlRolesService(BaseRestService):
   def create_acl_role(self, **attrs):
     """Create ACL role."""
     acl_factory = AccessControlRolesFactory()
-    acr_name = acl_factory.generate_string(attrs["object_type"])
+    allowed_name_chars = string_utils.Symbols(additional_exclude='*')
+    acr_name = acl_factory.generate_string(
+        attrs["object_type"],
+        allowed_chars=allowed_name_chars.standard_chars
+    )
     return self.create_obj(
         acl_factory.create(name=acr_name, **attrs).__dict__)
 
@@ -293,8 +297,27 @@ class RelationshipsService(HelpRestService):
         dest_obj in help_utils.convert_to_list(dest_objs)]
 
 
+class ReviewService(BaseRestService):
+  """Service for working with entities reviews."""
+  def __init__(self):
+    super(ReviewService, self).__init__(url.REVIEWS)
+
+  def request_review(self, obj, person):
+    """Add reviewer to object.
+    Returns obj with added review."""
+    review_attrs = {
+        "reviewers": person, "reviewable": obj.repr_min_dict()}
+    review = self.create_obj(factory_params=review_attrs)
+    # reviewers field contains list of reviewer emails
+    obj.review = {
+        "status": review.status,
+        "reviewers": review.reviewers,
+        "last_reviewed_by": ""}
+    return obj
+
+
 class AssessmentsFromTemplateService(HelpRestService):
-  """Service for creating asessments from templates"""
+  """Service for creating assessments from templates."""
   def __init__(self):
     super(AssessmentsFromTemplateService, self).__init__(url.ASSESSMENTS)
 

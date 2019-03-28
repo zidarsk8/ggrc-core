@@ -77,6 +77,7 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
         content_controller_options: {
           parent_instance: object,
           model: TaskGroup,
+          countsName: countsMap.taskGroup,
         },
       },
     }
