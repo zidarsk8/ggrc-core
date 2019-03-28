@@ -121,7 +121,7 @@ export default can.Construct.extend({
 
     let canMap = Permission.is_allowed_for('update', source) ||
       // Also allow mapping to source if the source is about to be created.
-      _.isUndefined(source.created_at);
+      source.isNew();
 
     if (target instanceof can.Map && targetType) {
       canMap = canMap && Permission.is_allowed_for('update', target);
