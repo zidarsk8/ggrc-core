@@ -18,12 +18,12 @@
         <div class="mapping-container__criteria">
           <advanced-search-mapping-criteria
             {(criteria)}="{value}"
-            (remove)="{removeItem(../)}"
+            (remove)="{removeItem(.)}"
             {is-clone}="{isClone}"
             {model-name}="{modelName}"
             {root}="{true}"
             {extendable}="{true}"
-            (createGroup)="{createGroup(../)}">
+            (createGroup)="{createGroup(.)}">
           </advanced-search-mapping-criteria>
         </div>
         {{/case}}
@@ -31,7 +31,7 @@
         <div class="mapping-container__group">
           <advanced-search-mapping-group
             {(items)}="{value}"
-            (remove)="{removeItem(../)}"
+            (remove)="{removeItem(.)}"
             {model-name}="{modelName}"
             {root}="{true}">
           </advanced-search-mapping-group>

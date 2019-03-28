@@ -26,10 +26,10 @@
         <div class="filter-container__attribute">
           <advanced-search-filter-attribute
             {(attribute)}="{value}"
-            (remove)="{removeItem(../)}"
+            (remove)="{removeItem(.)}"
             {available-attributes}="{availableAttributes}"
             {extendable}="{true}"
-            (createGroup)="{createGroup(../)}">
+            (createGroup)="{createGroup(.)}">
           </advanced-search-filter-attribute>
         </div>
         {{/case}}
@@ -37,7 +37,7 @@
         <div class="filter-container__group">
           <advanced-search-filter-group
             {(items)}="{value}"
-            (remove)="{removeItem(../)}"
+            (remove)="{removeItem(.)}"
             {available-attributes}="{availableAttributes}">
           </advanced-search-filter-group>
         </div>
