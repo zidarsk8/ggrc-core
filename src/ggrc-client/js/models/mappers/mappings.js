@@ -53,22 +53,6 @@ export default can.Construct.extend({
     return _.keys(Object.assign({}, allowedToMap, externalMap));
   },
   /**
-   * Determine if two types of models can be mapped
-   *
-   * @param {String} target - the target type of model
-   * @param {String} source - the source type of model
-   *
-   * @return {Boolean} - true if mapping is allowed, false otherwise
-   */
-  isMappableType: function (target, source) {
-    if (!target || !source) {
-      return false;
-    }
-    let result = this.getMappingList(target);
-    return _.includes(result, source);
-  },
-
-  /**
    * Checks user permissions for mappings
    * @param {Object} source - the source object the mapping
    * @param {Object} target - the target object of the mapping
