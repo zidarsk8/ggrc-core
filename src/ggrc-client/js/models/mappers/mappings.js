@@ -108,23 +108,12 @@ export default can.Construct.extend({
    *
    * @param {Object} source - the source object the mapping
    * @param {Object} target - the target object of the mapping
-   * @param {Object} options - the options objects, similar to the one that is
-   *   passed as an argument to helpers
    *
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
-  allowedToMap: function (source, target, options) {
+  allowedToMap: function (source, target) {
     let targetType = this._getType(target);
     let sourceType = this._getType(source);
-
-    // special check for snapshot:
-    if (options &&
-      options.context &&
-      options.context.parent_instance &&
-      options.context.parent_instance.snapshot) {
-      // Avoid add mapping for snapshot
-      return false;
-    }
 
     if (!this.isMappableType(sourceType, targetType)) {
       return false;
