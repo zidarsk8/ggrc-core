@@ -94,7 +94,7 @@ class AccessControlRole(attributevalidator.AttributeValidator,
     Custom Role names need to follow 3 uniqueness rules:
       1) Names must not match any attribute name on any existing object.
       2) Object level CAD names must not match any global CAD name.
-      3) Names should not contains "*" symbol
+      3) Names should not contains special values (.validate_name_correct)
 
     This validator should check for name collisions for 1st and 2nd rule.
 
@@ -111,7 +111,7 @@ class AccessControlRole(attributevalidator.AttributeValidator,
     value = value.strip()
 
     if key == "name":
-      self._validate_name_correct(value)
+      validators.validate_name_correctness(value)
 
     if key == "name" and self.object_type:
       name = value
@@ -132,13 +132,6 @@ class AccessControlRole(attributevalidator.AttributeValidator,
                        .format(name))
 
     return value
-
-  @staticmethod
-  def _validate_name_correct(name):
-    """Validate name does not contain "*" symbol"""
-    if "*" in name:
-      raise ValueError(u"Attribute name contains unsupported symbol '*'")
-
 
 def invalidate_acr_caches(mapper, content, target):
   # pylint: disable=unused-argument

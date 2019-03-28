@@ -5,6 +5,7 @@
 """Test Access Control Role validation"""
 
 import unittest
+import ddt
 from collections import namedtuple
 from mock import MagicMock
 
@@ -13,6 +14,7 @@ from ggrc.models import all_models
 from ggrc.models.hooks.access_control_role import handle_role_acls
 
 
+@ddt.ddt
 class TestAccessControlRoles(unittest.TestCase):
   """Test Access Control Role validation"""
 
@@ -43,11 +45,20 @@ class TestAccessControlRoles(unittest.TestCase):
       self.acr.name = name
       self.acr.object_type = object_type
 
-  def test_name_with_asterisk_throws(self):
+  @ddt.data(
+    "title with asterisk*",
+    "map:person",
+    "unmap:person",
+    "delete",
+    "  map:    Market",
+    "mAP:    CONTROL",
+    "UNMAP:  NOTHING",
+    "delete",
+    "DeLeTe",
+  )
+  def test_name_with_asterisk_throws(self, name):
     """Test if raises if name contains * symbol"""
-
     with self.assertRaises(ValueError):
-      name = "With asterisk *"
       self.acr.validates_name("name", name)
 
   def test_if_invalid_ca_check(self):

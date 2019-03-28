@@ -4,12 +4,13 @@
 """Test Custom Attribute Definition validation"""
 
 import unittest
+import ddt
 from mock import MagicMock
 
 from ggrc.models import all_models
 from ggrc.access_control import role as acr
 
-
+@ddt.ddt
 class TestCustomAttributeDefinition(unittest.TestCase):
   """Test Custom Attribute Definition validation"""
 
@@ -20,20 +21,18 @@ class TestCustomAttributeDefinition(unittest.TestCase):
     self.cad._get_global_cad_names = MagicMock(return_value={'reg url': 1})
     acr.get_custom_roles_for = MagicMock(return_value=dict())
 
-  def test_title_with_asterisk_throws(self):
-    """Test if raises if title contains * symbol"""
+  @ddt.data(
+    "title with asterisk*",
+    "map:person",
+    "unmap:person",
+    "delete",
+    "  map:    Market",
+    "mAP:    CONTROL",
+    "UNMAP:  NOTHING",
+    "delete",
+    "DeLeTe",
+  )
+  def test_title_with_asterisk_throws(self, title):
+    """Test if raises if title invalid"""
     with self.assertRaises(ValueError):
-      title = "Title with asterisk *"
-      self.cad.validate_title("title", title)
-
-  def test_map_in_title_throws(self):
-    """Test if raises if title starts with 'map:'"""
-    with self.assertRaises(ValueError):
-      title = "map:person"
-      self.cad.validate_title("title", title)
-
-  def test_unmap_in_title_throws(self):
-    """Test if raises if title starts with 'unmap:'"""
-    with self.assertRaises(ValueError):
-      title = "unmap:assessment"
       self.cad.validate_title("title", title)

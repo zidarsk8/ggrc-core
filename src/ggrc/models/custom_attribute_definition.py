@@ -277,16 +277,15 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     """Validate CAD title/name uniqueness.
 
     Note: title field is used for storing CAD names.
-    CAD names need to follow 7 uniqueness rules:
+    CAD names need to follow 6 uniqueness rules:
       1) Names must not match any attribute name on any existing object.
       2) Object level CAD names must not match any global CAD name.
       3) Object level CAD names can clash, but not for the same Object
          instance. This means we can have two CAD with a name "my cad", with
          different attributable_id fields.
       4) Names must not match any existing custom attribute role name
-      5) Names should not contains "*" symbol
+      5) Names should not contains special values (.validate_name_correct)
       6) Names should be stripped
-      7) Names should not start with 'map:' or 'unmap:'
 
     Third rule is handled by the database with unique key uq_custom_attribute
     (`definition_type`,`definition_id`,`title`).
@@ -307,7 +306,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     value = value if value is None else re.sub(r"\s+", " ", value).strip()
 
     if key == "title":
-      self._validate_title_correct(value)
+      validators.validate_name_correctness(value)
 
     if key == "title" and self.definition_type:
       orig_name = value
@@ -336,20 +335,6 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       self.validate_assessment_title(name)
 
     return value
-
-  @staticmethod
-  def _validate_title_correct(title):
-    """Validate title is correct
-
-    1) Title does not contain "*" symbol
-    2) Title does not start with "map:" or "unmap:"
-    """
-    if "*" in title:
-      raise ValueError(u"Attribute title contains unsupported symbol '*'")
-
-    if title.startswith("map:") or title.startswith("unmap:"):
-      raise ValueError(u"Custom attribute title should not starts "
-                       u"with 'map:' or 'unmap:'")
 
   def log_json(self):
     """Add extra fields to be logged in CADs."""
