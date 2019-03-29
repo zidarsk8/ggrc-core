@@ -70,3 +70,7 @@ class ReservedNameError(ValueError):
 
 class ExportStoppedException(RuntimeError):
   pass
+
+
+class ImportStoppedException(RuntimeError):
+  pass
