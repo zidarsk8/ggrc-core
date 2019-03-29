@@ -8,7 +8,9 @@ BAD_REQUEST_MESSAGE = (u"Server error occurred. Please contact your "
 
 WRONG_STATUS = u"Wrong status."
 
-STOPPED_WARNING = u"Export already canceled. Please wait."
+EXPORT_STOPPED_WARNING = u"Export already canceled. Please wait."
+
+IMPORT_STOPPED_WARNING = u"Import already canceled. Please wait."
 
 BAD_PARAMS = u"Bad request parameters."
 

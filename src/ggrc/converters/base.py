@@ -214,7 +214,8 @@ class ExportConverter(BaseConverter):
 
       for line in block_converter.generate_row_data():
         ie_status = self.get_job_status()
-        if ie_status and ie_status == all_models.ImportExport.STOPPED_STATUS:
+        if ie_status and ie_status == \
+           all_models.ImportExport.EXPORT_STOPPED_STATUS:
           raise exceptions.ExportStoppedException()
         line.insert(0, "")
         csv_string_builder.append_line(line)
