@@ -124,31 +124,17 @@ const TreeViewControl = TreeLoader.extend({
   },
 
   init_view: function () {
-    let self = this;
     let dfds = [];
     let optionsDfd;
-    let statusControl;
-
     if (this.options.header_view && this.options.show_header) {
       optionsDfd = $.when(this.options);
       dfds.push(
         can.view(this.options.header_view, optionsDfd).then(
-          this._ifNotRemoved(function (frag) {
+          this._ifNotRemoved((frag) => {
             this.element.before(frag);
-
-            statusControl = this.element.parent()
-              .find('.tree-filter__status-wrap');
-            // set state filter (checkboxes)
-            can.bind.call(statusControl.ready(function () {
-              let selectStateList = self.options.attr('selectStateList');
-
-              self.options.attr('filter_states').forEach(function (item) {
-                if (selectStateList.indexOf(item.value) > -1) {
-                  item.attr('checked', true);
-                }
-              });
-            }));
-          }.bind(this))));
+          })
+        )
+      );
     }
 
     this.init_count();
