@@ -36,7 +36,7 @@ class AutomapperGenerator(object):
   inserted mappings since we only queue ordered pairs (see `order`).
   """
 
-  COUNT_LIMIT = 10000
+  COUNT_LIMIT = 50000
 
   _AUTOMAP_WITHOUT_PERMISSION = [
       {"Audit", "Issue"},
@@ -102,6 +102,7 @@ class AutomapperGenerator(object):
       self._step(dst, src)
 
     if len(self.auto_mappings) <= self.COUNT_LIMIT:
+      logger.info("Automapping count: count=%s", len(self.auto_mappings))
       self._flush(relationship)
     else:
       logger.error("Automapping limit exceeded: limit=%s, count=%s",
@@ -221,7 +222,7 @@ class AutomapperGenerator(object):
     )
     # In case we mapped Program to Program we should skip mappings of
     # dst related object to src, if src is not parent of dst
-    from_not_parent_program = (  # for case when Program mapped to another Program
+    from_not_parent_program = (
         src.type == "Program" and not self._is_parent_for(src, dst)
     )
     if to_not_parent_programs or from_not_parent_program:
