@@ -5,15 +5,6 @@
 
 <three-dots-menu>
     {{#is_allowed 'update' instance context='for'}}
-      {{#if instance.is_snapshotable}}
-        <li>
-          <snapshot-scope-update {instance}="{instance}">
-            <a href="javascript://" can-click="upsertIt">
-              <i class="fa fa-refresh"></i>
-              Update objects to latest version</a>
-          </snapshot-scope-update>
-        </li>
-      {{/if}}
       {{^if instance.archived}}
         {{^if instance.class.isChangeableExternally}}
           {{^if instance.readonly}}
