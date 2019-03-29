@@ -69,37 +69,44 @@ class TestImportExportBase(TestCase):
     )
 
 
+@ddt.ddt
 @base.with_memcache
 class TestImportExportExceptions(TestImportExportBase):
   """Test exceptions Import Export jobs produce"""
 
-  def test_handle_stop_raises_warning(self):
-    """Test handle_export_stop method raises STOPPED_WARNING"""
+  @ddt.data(("Export", "exports", app_errors.EXPORT_STOPPED_WARNING),
+            ("Import", "imports", app_errors.IMPORT_STOPPED_WARNING))
+  @ddt.unpack
+  def test_handle_stop_raises_warning(self, job, url, error):
+    """Test handle_export_stop method raises EXPORT_STOPPED_WARNING"""
     user = all_models.Person.query.first()
     ie_job = factories.ImportExportFactory(
-        job_type="Export",
+        job_type=job,
         created_at=datetime.now(),
         created_by=user,
         status="Stopped",
     )
     response = self.client.put(
-        "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+        "/api/people/{}/{}/{}/stop".format(user.id, url, ie_job.id),
         headers=self.headers
     )
     self.assert400(response)
-    self.assertEqual(response.json['message'], app_errors.STOPPED_WARNING)
+    self.assertEqual(response.json['message'], error)
 
-  def test_handle_stop_raises_wrong(self):
+  @ddt.data(("Export", "exports"),
+            ("Import", "imports"))
+  @ddt.unpack
+  def test_handle_stop_raises_wrong(self, job, url):
     """Test handle_export_stop method raises wrong status exception"""
     user = all_models.Person.query.first()
     ie_job = factories.ImportExportFactory(
-        job_type="Export",
+        job_type=job,
         created_at=datetime.now(),
         created_by=user,
         status="Finished",
     )
     response = self.client.put(
-        "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+        "/api/people/{}/{}/{}/stop".format(user.id, url, ie_job.id),
         headers=self.headers
     )
     self.assert400(response)
