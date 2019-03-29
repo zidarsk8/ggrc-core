@@ -268,6 +268,8 @@ def run_export(task):
                           ie_job.title, ie_id)
   except models_exceptions.ExportStoppedException:
     logger.info("Export was stopped by user.")
+  except models_exceptions.ImportStoppedException:
+    logger.info("Import was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Export failed: %s", e.message)
     ie_job = import_export.get(ie_id)
@@ -647,8 +649,12 @@ def handle_import_stop(**kwargs):
         stop_ie_bg_tasks(ie_job)
       db.session.commit()
       return make_import_export_response(ie_job.log_json())
+    if ie_job.status == "Stopped":
+      raise models_exceptions.ImportStoppedException()
   except wzg_exceptions.Forbidden:
     raise
+  except models_exceptions.ImportStoppedException:
+    raise wzg_exceptions.BadRequest(app_errors.IMPORT_STOPPED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
@@ -675,7 +681,7 @@ def handle_export_stop(**kwargs):
   except wzg_exceptions.Forbidden:
     raise
   except models_exceptions.ExportStoppedException:
-    raise wzg_exceptions.BadRequest(app_errors.STOPPED_WARNING)
+    raise wzg_exceptions.BadRequest(app_errors.EXPORT_STOPPED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
