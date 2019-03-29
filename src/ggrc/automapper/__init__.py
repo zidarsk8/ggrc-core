@@ -48,7 +48,7 @@ class AutomapperGenerator(object):
     self.queue = set()
     self.auto_mappings = set()
     self.automapping_ids = set()
-    self.program_children_cache = dict()
+    self.program_parents_cache = dict()
     self.related_cache = RelationshipsCache()
 
   def related(self, obj):
@@ -200,30 +200,31 @@ class AutomapperGenerator(object):
         )
     )
 
-  def _is_child_for(self, child, parent):
-    """Check that child program is in parent's children
-    Cache children ids for parent program"""
-    if parent.id in self.program_children_cache:
-      children_ids = self.program_children_cache[parent.id]
+  def _is_parent_for(self, _parent, _program):
+    """Check that _parent program is parent for _program
+    Cache parents ids for _program"""
+    if _program.id in self.program_parents_cache:
+      parents_ids = self.program_parents_cache[_program.id]
     else:
-      _program = program.Program.query.get(parent.id)
-      children_ids = _program.relatives_ids("children", all_generations=True)
-      self.program_children_cache[parent.id] = children_ids
-    return child.id in children_ids
+      _prog = program.Program.query.get(_program.id)
+      parents_ids = _prog.relatives_ids("parents", all_generations=True)
+      self.program_parents_cache[_program.id] = parents_ids
+    return _parent.id in parents_ids
 
   def _skip_mapping(self, src, dst, related):
     """Skip mappings from Mega program to child program"""
-    # In case we mapped object to Program we should skip
-    # mapping of object to child programs
-    to_child_programs = (
-        related.type == "Program" and self._is_child_for(related, dst)
+    # In case we mapped an object to Program we should skip
+    # mapping of the object to not parent programs
+    # In case of cycle programs mapping, one program could be parent and child
+    to_not_parent_programs = (
+        related.type == "Program" and not self._is_parent_for(related, dst)
     )
     # In case we mapped Program to Program we should skip mappings of
-    # dst related object to src, if src is child for dst
-    from_parent_program = (  # for case when Program mapped to another Program
-        src.type == "Program" and self._is_child_for(src, dst)
+    # dst related object to src, if src is not parent of dst
+    from_not_parent_program = (  # for case when Program mapped to another Program
+        src.type == "Program" and not self._is_parent_for(src, dst)
     )
-    if to_child_programs or from_parent_program:
+    if to_not_parent_programs or from_not_parent_program:
       return True
     return False
 
