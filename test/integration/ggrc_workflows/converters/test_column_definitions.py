@@ -136,7 +136,8 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         'map:facility',
         'unmap:facility',
         'unmap:risk',
-
+        'map:account balance',
+        'unmap:account balance',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
