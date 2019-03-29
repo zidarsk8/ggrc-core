@@ -248,11 +248,13 @@ export default can.Component.extend({
       if (state === jobStatuses.IN_PROGRESS) {
         confirm({
           modal_title: 'Warning',
-          modal_description: `The import is still in progress and part of your 
-            data was already saved. Please click 'Stop Import' in order to stop 
-            this process.`,
+          modal_description: `The import is still in progress and only part of 
+            data is saved. To stop the import process, please click 
+            &quot;Stop Import&quot;. </br>
+            <b>Warning:</b> only partial data will be saved, if import 
+            is stopped when in progress.`,
           button_view:
-            `${GGRC.mustache_path}/modals/confirm_cancel_buttons.mustache`,
+            `${GGRC.templates_path}/modals/confirm_cancel_buttons.stache`,
           modal_confirm: 'Proceed Import',
           modal_cancel: 'Stop Import',
         },
