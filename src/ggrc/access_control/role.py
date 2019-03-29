@@ -133,6 +133,7 @@ class AccessControlRole(attributevalidator.AttributeValidator,
 
     return value
 
+
 def invalidate_acr_caches(mapper, content, target):
   # pylint: disable=unused-argument
   """Clear `global_role_names` if ACR created or update or deleted."""

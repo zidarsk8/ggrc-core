@@ -10,6 +10,7 @@ from mock import MagicMock
 from ggrc.models import all_models
 from ggrc.access_control import role as acr
 
+
 @ddt.ddt
 class TestCustomAttributeDefinition(unittest.TestCase):
   """Test Custom Attribute Definition validation"""
@@ -21,17 +22,16 @@ class TestCustomAttributeDefinition(unittest.TestCase):
     self.cad._get_global_cad_names = MagicMock(return_value={'reg url': 1})
     acr.get_custom_roles_for = MagicMock(return_value=dict())
 
-  @ddt.data(
-    "title with asterisk*",
-    "map:person",
-    "unmap:person",
-    "delete",
-    "  map:    Market",
-    "mAP:    CONTROL",
-    "UNMAP:  NOTHING",
-    "delete",
-    "DeLeTe",
-  )
+  @ddt.data("title with asterisk*",
+            "map:person",
+            "unmap:person",
+            "delete",
+            "  map:    Market",
+            "mAP:    CONTROL",
+            "UNMAP:  NOTHING",
+            "delete",
+            "DeLeTe",
+            )
   def test_title_with_asterisk_throws(self, title):
     """Test if raises if title invalid"""
     with self.assertRaises(ValueError):

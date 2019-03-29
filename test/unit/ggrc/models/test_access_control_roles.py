@@ -5,8 +5,8 @@
 """Test Access Control Role validation"""
 
 import unittest
-import ddt
 from collections import namedtuple
+import ddt
 from mock import MagicMock
 
 import ggrc.app  # noqa pylint: disable=unused-import
@@ -45,17 +45,14 @@ class TestAccessControlRoles(unittest.TestCase):
       self.acr.name = name
       self.acr.object_type = object_type
 
-  @ddt.data(
-    "title with asterisk*",
-    "map:person",
-    "unmap:person",
-    "delete",
-    "  map:    Market",
-    "mAP:    CONTROL",
-    "UNMAP:  NOTHING",
-    "delete",
-    "DeLeTe",
-  )
+  @ddt.data("role title with asterisk*",
+            "map:object",
+            "unmap:object",
+            "delete",
+            "  map:  Market  ",
+            "UNmAP:  CONTROL ",
+            "DeLeTe",
+            )
   def test_name_with_asterisk_throws(self, name):
     """Test if raises if name contains * symbol"""
     with self.assertRaises(ValueError):
