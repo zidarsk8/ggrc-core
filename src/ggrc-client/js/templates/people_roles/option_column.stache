@@ -20,7 +20,7 @@
 <div class="selector-list people-selector">
   <ul>
     {{#rolesList}}
-    <li {{ data 'option' }} data-id="{{ id }}">
+    <li {{canData 'option' }} data-id="{{ id }}">
       <label>
         {{#if_equals selectedOption id}}
           <input type="radio" checked="checked" name="map" rel="tooltip" title="map">
