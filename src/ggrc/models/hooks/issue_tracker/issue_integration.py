@@ -7,6 +7,7 @@
 # pylint: disable=no-else-return
 
 import logging
+import itertools
 
 from ggrc import db
 from ggrc.integrations import issues
@@ -18,6 +19,8 @@ from ggrc.utils import user_generator
 from ggrc.utils.custom_dict import MissingKeyDict
 from ggrc.integrations.synchronization_jobs.issue_sync_job import \
     ISSUE_STATUS_MAPPING
+from ggrc.services import signals
+
 
 logger = logging.getLogger(__name__)
 
@@ -181,6 +184,7 @@ def create_ticket_for_new_issue(obj, issue_tracker_info):
 
 def create_issue_handler(obj, issue_tracker_info):
   """Event handler for issue object creation."""
+
   if not issue_tracker_info or not issue_tracker_info.get("enabled"):
     return
 
@@ -369,3 +373,20 @@ def prepare_comment_update_json(object_, comment, author):
   builder = issue_tracker_params_builder.IssueParamsBuilder()
   params = builder.build_params_for_comment(object_, comment, author)
   return params.get_issue_tracker_params()
+
+
+def _hook_issue_post(sender, objects=None, sources=None):
+  """Handle creating issue related info."""
+  del sender
+
+  for issue, _ in itertools.izip(objects, sources):
+    integration_utils.update_issue_tracker_for_import(issue)
+
+
+def init_hook():
+  """Initializes hooks."""
+
+  signals.Restful.collection_posted.connect(
+      _hook_issue_post,
+      sender=all_models.Issue
+  )
