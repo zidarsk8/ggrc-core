@@ -115,11 +115,13 @@ def create_risk(**attrs):
   return _create_obj_in_program_scope("Risks", None, **attrs)
 
 
+@decorator.check_that_obj_is_created
 def create_user():
   """Create a user"""
   return rest_service.PeopleService().create_obj()
 
 
+@decorator.check_that_obj_is_created
 def create_user_with_role(role_name):
   """Create user a role `role_name`"""
   user = create_user()
