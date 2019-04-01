@@ -48,7 +48,6 @@ import {
   checkPreconditions,
   becameDeprecated,
 } from '../../plugins/utils/controllers';
-import {REFRESH_MAPPING} from '../../events/eventTypes';
 import {
   notifierXHR,
 } from '../../plugins/utils/notifiers-utils';
@@ -1023,7 +1022,6 @@ export default can.Control.extend({
       instance.notifier.onEmpty(() => {
         instance.refresh();
       });
-      instance.dispatch(REFRESH_MAPPING);
     }
   },
 
