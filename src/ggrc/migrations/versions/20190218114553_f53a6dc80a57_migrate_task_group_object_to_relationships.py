@@ -23,7 +23,7 @@ from ggrc.migrations.utils\
 
 # revision identifiers, used by Alembic.
 revision = 'f53a6dc80a57'
-down_revision = 'd082b0964ab4'
+down_revision = '42afbc0e6c09'
 
 
 def load_data(conn):
@@ -42,14 +42,20 @@ def load_data(conn):
       FROM
           task_group_objects tgo
       JOIN(
-          SELECT id, destination_id
+          SELECT id, destination_id as tgo_id
           FROM relationships
           WHERE
               source_type='TaskGroup' AND
               destination_type='TaskGroupObject'
+          UNION ALL
+          SELECT id, source_id as tgo_id
+          FROM relationships
+          WHERE
+              source_type='TaskGroupObject' AND
+              destination_type = 'TaskGroup'
       ) as rel_union
       ON
-          rel_union.destination_id=tgo.id
+          rel_union.tgo_id=tgo.id
       GROUP BY tgo.id
   """
   return conn.execute(sa.text(sql)).fetchall()
@@ -103,18 +109,14 @@ def remove_old_relationship(conn, data):
     )
 
 
-def remove_old_rel_revisions(conn, data):
+def create_old_rel_del_revisions(conn, data):
   """Remove old relationship revisions."""
   old_rel_ids = [d.tgo_rel_id for d in data]
   if old_rel_ids:
-    conn.execute(
-        sa.text("""
-            DELETE FROM revisions
-            WHERE resource_type = :rel_type AND resource_id IN :rel_ids
-        """),
-        rel_type="Relationship",
-        rel_ids=old_rel_ids
-    )
+    for rel_id in old_rel_ids:
+      utils.add_to_objects_without_revisions(
+          conn, rel_id, "Relationship", "deleted"
+      )
 
 
 def remove_task_group_objects(conn, data):
@@ -149,7 +151,7 @@ def run_data_migration():
         tgo.tgo_context_id
     )
 
-  remove_old_rel_revisions(conn, data)
+  create_old_rel_del_revisions(conn, data)
   remove_old_relationship(conn, data)
   remove_task_group_objects(conn, data)
 
