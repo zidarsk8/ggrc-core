@@ -96,43 +96,6 @@ can.stache.registerHelper('addclass', function (prefix, compute, options = {}) {
   return [prefix, classSegment].join(separator);
 });
 
-can.stache.registerHelper('if_equals', function (val1, val2, options) {
-  let _val1;
-  let _val2;
-  function exec() {
-    if (_val1 && val2 && options.hash && options.hash.insensitive) {
-      _val1 = _val1.toLowerCase();
-      _val2 = _val2.toLowerCase();
-    }
-    if (_val1 === _val2) return options.fn(options.contexts);
-    else return options.inverse(options.contexts);
-  }
-  if (typeof val1 === 'function') {
-    if (val1.isComputed) {
-      val1.bind('change', function (ev, newVal) {
-        _val1 = newVal;
-        return exec();
-      });
-    }
-    _val1 = val1.call(this);
-  } else {
-    _val1 = val1;
-  }
-  if (typeof val2 === 'function') {
-    if (val2.isComputed) {
-      val2.bind('change', function (ev, newVal) {
-        _val2 = newVal;
-        exec();
-      });
-    }
-    _val2 = val2.call(this);
-  } else {
-    _val2 = val2;
-  }
-
-  return exec();
-});
-
 can.stache.registerHelper('in_array', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack);
@@ -509,10 +472,7 @@ can.stache.registerHelper('urlPath', function () {
     HELPER_NAME = some_helper_name
 
   Example:
-    {{#if_helpers '\
-      #if_equals' instance.status 'Assigned' '\
-      and ^if_equals' instance.type 'Audit|Program|Person' '\
-    ' _1_hash_arg_for_second_statement=something}}
+    {{#if_helpers '\n ^if' instance.archived '\n and ^if' instance.deleted}}
       matched all conditions
     {{else}}
       failed
