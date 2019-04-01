@@ -135,11 +135,11 @@
                           {{#if fraud_related}}
                             Yes
                           {{else}}
-                            {{#if_equals fraud_related false}}
+                            {{#is(fraud_related, false)}}
                               No
                             {{else}}
                               <span class="empty-message">None</span>
-                            {{/if_equals}}
+                            {{/is}}
                           {{/if}}
                         </p>
                       </proposable-attribute>
@@ -156,11 +156,11 @@
                           {{#if key_control}}
                             Key
                           {{else}}
-                            {{#if_equals key_control false}}
+                            {{#is(key_control, false)}}
                               Non-Key
                             {{else}}
                               <span class="empty-message">None</span>
-                            {{/if_equals}}
+                            {{/is}}
                           {{/if}}
                         </p>
                       </proposable-attribute>

@@ -25,7 +25,7 @@
         <spinner {toggle}="{waiting}"></spinner>
 
         {{^if waiting}}
-          {{#if_equals instance.status "Draft"}}
+          {{#is(instance.status, "Draft")}}
             <button
               type="submit"
               href="#workflowActivate"
@@ -34,7 +34,7 @@
               {{^if instance.can_start_cycle}}disabled="disabled"{{/if}}>
               Activate Workflow
             </button>
-          {{/if_equals}}
+          {{/is}}
         {{/if}}
       </workflow-activate>
     {{/if}}

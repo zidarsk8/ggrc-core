@@ -36,7 +36,7 @@
       {{/menu}}
     </select>
     {{#filter}}
-      {{^if_equals model_name '__previous__'}}
+      {{^is(model_name, "__previous__")}}
         {{#model_name}}
           <div class="modal-search objective-selector">
             <input
@@ -48,12 +48,12 @@
                 name="filter_list.{{@index}}.filter"
                 value="{{firstnonempty filter.name filter.email filter.title}}"
                 data-lookup="{{this}}"
-                data-template="/{{#if_equals model_name 'Person'}}people{{else}}base_objects{{/if_equals}}/autocomplete_result.stache"
+                data-template="/{{#is(model_name, 'Person')}}people{{else}}base_objects{{/is}}/autocomplete_result.stache"
               {{ autocomplete_select true }}
             >
           </div>
         {{/model_name}}
-      {{/if_equals}}
+      {{/is}}
     {{/filter}}
   </div>
 {{/each}}

@@ -101,12 +101,12 @@
       </label>
       <select data-id="kind_type_dd" class="input-block-level" name="kind" tabindex="9">
         <option {{^kind}}selected="selected"{{/kind}} {{^if kind}}selected="selected"{{/if}} value="">---</option>
-        <option {{#if_equals kind 'Company Policy'}}selected="selected"{{/if_equals}} value="Company Policy">Company Policy</option>
-        <option {{#if_equals kind 'Org Group Policy'}}selected="selected"{{/if_equals}} value="Org Group Policy">Org Group Policy</option>
-        <option {{#if_equals kind 'Data Asset Policy'}}selected="selected"{{/if_equals}} value="Data Asset Policy">Data Asset Policy</option>
-        <option {{#if_equals kind 'Product Policy'}}selected="selected"{{/if_equals}} value="Product Policy">Product Policy</option>
-        <option {{#if_equals kind 'Contract-Related Policy'}}selected="selected"{{/if_equals}} value="Contract-Related Policy">Contract-Related Policy</option>
-        <option {{#if_equals kind 'Company Controls Policy'}}selected="selected"{{/if_equals}} value="Company Controls Policy">Company Controls Policy</option>
+        <option {{#is(kind, "Company Policy")}}selected="selected"{{/is}} value="Company Policy">Company Policy</option>
+        <option {{#is(kind, "Org Group Policy")}}selected="selected"{{/is}} value="Org Group Policy">Org Group Policy</option>
+        <option {{#is(kind, "Data Asset Policy")}}selected="selected"{{/is}} value="Data Asset Policy">Data Asset Policy</option>
+        <option {{#is(kind, "Product Policy")}}selected="selected"{{/is}} value="Product Policy">Product Policy</option>
+        <option {{#is(kind, "Contract-Related Policy")}}selected="selected"{{/is}} value="Contract-Related Policy">Contract-Related Policy</option>
+        <option {{#is(kind, "Company Controls Policy")}}selected="selected"{{/is}} value="Company Controls Policy">Company Controls Policy</option>
       </select>
     </div>
   </div>

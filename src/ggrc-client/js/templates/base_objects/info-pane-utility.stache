@@ -22,10 +22,10 @@
     {{#if instance.snapshot}}
         {{> /static/templates/snapshots/dropdown_menu.stache}}
     {{else}}
-        {{#if_equals instance.type 'Audit'}}
-            {{> /static/templates/audits/dropdown_menu.stache}}
+        {{#is(instance.type, "Audit")}}
+          {{> /static/templates/audits/dropdown_menu.stache}}
         {{else}}
-            {{> /static/templates/base_objects/dropdown_menu.stache}}
-        {{/if_equals}}
+          {{> /static/templates/base_objects/dropdown_menu.stache}}
+        {{/is}}
      {{/if}}
 </div>

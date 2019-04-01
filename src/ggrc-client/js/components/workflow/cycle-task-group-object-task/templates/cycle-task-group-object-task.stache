@@ -42,7 +42,7 @@
                     <permalink {instance}="{instance}"/>
                   </li>
                   <li>
-                    {{#if_equals instance.status 'Deprecated'}}
+                    {{#is(instance.status, "Deprecated")}}
                       <object-change-state {to-state}="{initialState}"
                                            (on-state-change)="{onStateChange(%event)}">
                         <a href="#">
@@ -57,7 +57,7 @@
                           <i class="fa fa-times-circle"></i> Deprecate
                         </a>
                       </object-change-state>
-                    {{/if_equals}}
+                    {{/is}}
                   </li>
                   {{#is_allowed 'delete' instance context='for'}}
                     <li>
@@ -162,7 +162,7 @@
 
           <div class="row-fluid wrap-row">
             <div class="span12">
-              {{#if_equals instance.task_type 'text'}}
+              {{#is(instance.task_type, "text")}}
                 <h6>Task details</h6>
                 <div class="rtf-block">
                   <read-more
@@ -170,8 +170,8 @@
                     {handle-markdown}="{instance.class.isChangeableExternally}">
                   </read-more>
                 </div>
-              {{/if_equals}}
-              {{#if_equals instance.task_type 'menu'}}
+              {{/is}}
+              {{#is(instance.task_type, "menu")}}
                 <h6>Response Options</h6>
                 {{! here we need to start a quick form or other component}}
                 <ggrc-quick-update {instance}="{instance}">
@@ -181,8 +181,8 @@
                             {options-list}="{instance.response_options}">
                   </dropdown>
                 </ggrc-quick-update>
-              {{/if_equals}}
-              {{#if_equals instance.task_type 'checkbox'}}
+              {{/is}}
+              {{#is(instance.task_type, "checkbox")}}
                 <h6>Response Options</h6>
                 <ggrc-quick-update {instance}="{instance}">
                   {{#each instance.response_options}}
@@ -205,7 +205,7 @@
                     </div>
                   {{/each}}
                 </ggrc-quick-update>
-              {{/if_equals}}
+              {{/is}}
               <br>
             </div>
           </div>

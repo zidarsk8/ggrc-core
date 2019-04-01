@@ -17,11 +17,11 @@
                   <h6>Name</h6>
                   {{#if name}}
                     <h3 class="pane-header__title-name">{{name}}
-                      {{#if_equals system_wide_role 'No Access'}}
+                      {{#is(system_wide_role, 'No Access')}}
                         <span class="user-disabled">
                           (Inactive user)
                         </span>
-                      {{/if_equals}}
+                      {{/is}}
                     </h3>
                   {{else}}
                     <span class="empty-message">None</span>
@@ -70,11 +70,11 @@
               <div class="span12">
                 <h6>Authorizations</h6>
                 <span>
-                  {{#if_equals instance.system_wide_role 'No Access'}}
+                  {{#is(instance.system_wide_role, "No Access")}}
                     No Role
                   {{else}}
                     {{instance.system_wide_role}}
-                  {{/if_equals}}
+                  {{/is}}
                 </span>
               </div>
             </div>

@@ -15,7 +15,7 @@
       <i class="fa fa-plus-circle"></i>
       {{addTabTitle}}
     </a>
-    <div class="dropdown-menu {{#if_equals widgetList.length 1}} one-item {{/if}}" role="menu">
+    <div class="dropdown-menu {{#is(widgetList.length, 1)}}one-item{{/is}}" role="menu">
       {{#widgetList}}
           <div class="inner-nav-item">
             {{#shouldCreateObject instance model.model_singular}}

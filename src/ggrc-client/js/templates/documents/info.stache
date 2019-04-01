@@ -14,11 +14,11 @@
             <div class="info-pane__main-content info-pane__main-content-with-sidebar">
               <div class="row-fluid wrap-row">
                 <h6>
-                  {{#if_equals instance.kind "FILE"}}
-                  Attachment
+                  {{#is(instance.kind, "FILE")}}
+                    Attachment
                   {{else}}
-                  Url
-                  {{/if_equals}}
+                    Url
+                  {{/is}}
                 </h6>
                 <document-object-list-item
                   {instance}="{instance}">

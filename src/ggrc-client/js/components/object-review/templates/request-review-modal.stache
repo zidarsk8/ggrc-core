@@ -54,12 +54,12 @@
         ($click)="save()">
           Request
       </button>
-      {{#if_equals review.status 'Reviewed'}}
+      {{#is(review.status, "Reviewed")}}
         <div class="request-review-modal__status-note">
           <i class="fa fa-exclamation-triangle"></i>
           By clicking 'Request' the object status will be reverted to an 'Unreviewed'
         </div>
-      {{/if_equals}}
+      {{/is}}
     </div>
   </div>
 </simple-modal>

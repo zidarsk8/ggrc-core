@@ -31,7 +31,7 @@
     </select>
   </div>
 
-  {{#if_equals type "Snapshot"}}
+  {{#is(type, "Snapshot")}}
    <h6>Select snapshot object type</h6>
    <div class="single-line-filter">
      <select {($value)}="{item.snapshot_type}" class="input-block-level option-type-selector">
@@ -40,7 +40,7 @@
        {{/snapshotable_objects}}
      </select>
    </div>
-  {{/if_equals}}
+  {{/is}}
 
   {{> /static/templates/import_export/export/attribute_selector.stache}}
 

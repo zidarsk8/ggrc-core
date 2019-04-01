@@ -30,7 +30,7 @@
     </a>
   {{/is}}
 {{else}}
-  {{#if_equals singular "Assessment"}}
+  {{#is(singular, "Assessment")}}
       {{#is_auditor}}
         <a href="javascript://" class="{{linkclass}}"
             {{#if text}}
@@ -47,5 +47,5 @@
                 {{content}}
         </a>
       {{/is_auditor}}
-  {{/if_equals}}
+  {{/is}}
 {{/is_allowed}}

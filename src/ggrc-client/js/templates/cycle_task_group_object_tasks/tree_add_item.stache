@@ -24,9 +24,9 @@
             "id": {{ parent_instance.id }}
           }]
         {{/if_instance_of}}
-        {{#if_equals parent_instance.type 'Workflow'}}
+        {{#is(parent_instance.type, "Workflow")}}
           , "workflow": {"id": {{parent_instance.id}}, "type": "Workflow"}
-        {{/if_equals}}
+        {{/is}}
         }'>
       Create
     </a>

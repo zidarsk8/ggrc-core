@@ -14,11 +14,11 @@
   {{/inProgress}}
   {{#exports}}
     <div class="flex-box flex-col current-exports__item {{#isDisabled id}}disabled{{/isDisabled}}">
-      {{#if_equals status 'Failed'}}
+      {{#is(status, "Failed")}}
         <span class="status-failed">
           Export failed due to server error. Please try again or contact our support team.
         </span>
-      {{/if_equals}}
+      {{/is}}
       <h4>
         {{firstnonempty title 'export_objects.csv'}}
         {{#canRemove status}}

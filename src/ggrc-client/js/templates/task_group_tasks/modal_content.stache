@@ -27,9 +27,9 @@
             <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </div>
           <select name="task_type" tabindex="2">
-            <option value="text" {{#if_equals instance.task_type 'text'}}selected="selected"{{/if_equals}}>Rich text</option>
-            <option value="menu" {{#if_equals instance.task_type 'menu'}}selected="selected"{{/if_equals}}>Dropdown</option>
-            <option value="checkbox" {{#if_equals instance.task_type 'checkbox'}}selected="selected"{{/if_equals}}>Checkbox</option>
+            <option value="text" {{#is(instance.task_type, "text")}}selected="selected"{{/is}}>Rich text</option>
+            <option value="menu" {{#is(instance.task_type, "menu")}}selected="selected"{{/is}}>Dropdown</option>
+            <option value="checkbox" {{#is(instance.task_type, "checkbox")}}selected="selected"{{/is}}>Checkbox</option>
           </select>
         </div>
       </div>
@@ -53,7 +53,7 @@
             </div>
           </div>
         {{/if_in}}
-        {{#if_equals instance.task_type 'menu'}}
+        {{#is(instance.task_type, "menu")}}
           <div class="span12">
             <label class="form-label">
               Dropdown Options (Comma Separated)
@@ -65,8 +65,8 @@
                             {class-name}="'span12 double'">
             </textarea-array>
           </div>
-          {{/if_equals}}
-        {{#if_equals instance.task_type 'checkbox'}}
+        {{/is}}
+        {{#is(instance.task_type, "checkbox")}}
           <div class="span12">
             <label class="form-label">
               Checkbox Options (Comma Separated)
@@ -78,7 +78,7 @@
                             {class-name}="'span12 double'">
             </textarea-array>
           </div>
-        {{/if_equals}}
+        {{/is}}
         <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
         <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" />
       </div>

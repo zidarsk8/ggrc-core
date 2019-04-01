@@ -21,9 +21,9 @@
             <div class="info-pane-utility">
               {{#is_allowed 'update' instance}}
                 <three-dots-menu>
-                  {{^if_equals workflow.status 'Inactive'}}
+                  {{^is(workflow.status, "Inactive")}}
                     {{> /static/templates/base_objects/edit_object_link.stache}}
-                  {{/if_equals}}
+                  {{/is}}
                   <li>
                     <task-group-clone {task-group}="{instance}">
                       <a href="javascript://">

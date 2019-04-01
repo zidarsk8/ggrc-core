@@ -47,14 +47,14 @@
   {{/is_dashboard}}
 
   <section class="content">
-    {{#if_equals widgetType 'treeview'}}
+    {{#is(widgetType, "treeview")}}
       <tree-widget-container {model}="{model}"
                              {limit-depth-tree}="{treeViewDepth}"
                              {options}="{content_controller_options}">
       </tree-widget-container>
     {{else}}
       {{{widget_initial_content}}}
-    {{/if_equals}}
+    {{/is}}
   </section>
   
 {{/switch}}
