@@ -441,9 +441,9 @@ class ImportBlockConverter(BlockConverter):
     try:
       for row in self.row_converters_from_csv():
         try:
-          ie_status = self.get_job_status()
+          ie_status = self.converter.get_job_status()
           if ie_status and ie_status == \
-             all_models.ImportExport.IMPORT_STOPPED_STATUS:
+             all_models.ImportExport.STOPPED_STATUS:
             raise exceptions.ImportStoppedException()
           row.process_row()
         except ValueError as err:
