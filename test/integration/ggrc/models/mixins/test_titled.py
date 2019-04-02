@@ -28,8 +28,8 @@ class TestTitledMixin(TestCase):
     self.assert400(response)
     self.assertEqual(response.json, "'title' must be specified")
 
-  def test_post_title_is_none(self):
-    """Test object creation request title=None"""
+  def test_post_title_is_null(self):
+    """Test object creation request title=null"""
     response = self.api.post(
         all_models.Product,
         {'product': {"description": "desc", "title": None}}
@@ -38,11 +38,20 @@ class TestTitledMixin(TestCase):
     self.assert400(response)
     self.assertEqual(response.json, "'title' must be specified")
 
-  def test_post_title_is_empty(self):
-    """Test object creation request title=\"\""""
+  @ddt.data(
+      ('a', 'a'),
+      ('  a  ', 'a'),
+      ('', ''),
+      ('  ', ''),
+  )
+  @ddt.unpack
+  def test_post_title_is_valid(self, title, expected):
+    """Test object creation request title={0!r}"""
     response = self.api.post(
         all_models.Product,
-        {'product': {"description": "desc", "title": ""}}
+        {'product': {"description": "desc", "title": title}}
     )
 
     self.assertStatus(response, 201)
+    product = all_models.Product.query.get(response.json['product']['id'])
+    self.assertEqual(product.title, expected)

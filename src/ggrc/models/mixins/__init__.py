@@ -53,6 +53,10 @@ class Titled(object):
     """Validates and cleans Title that has leading/trailing spaces"""
     # pylint: disable=unused-argument,no-self-use
 
+    # ensure that value is not None (value was not specified or set to null)
+    # treat empty string or string with spaces as valid - it looks like
+    # such case is valid - some tests check such cases, so empty title might
+    # be valid in production
     if value is None:
       raise ValueError("'title' must be specified")
 

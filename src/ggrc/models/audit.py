@@ -144,8 +144,21 @@ class Audit(Snapshotable,
     to audit itself (auditors, audit firm, context setting,
     custom attribute values, etc.)
     """
-    from ggrc_basic_permissions import create_audit_context
 
+    # NOTE. Currently this function is called from Restful.collection_posted
+    # hook. The following operations are performed:
+    # 1) create new object, call json_create(), where attributes will be set
+    #    with value validation
+    # 2) current function is called from(Restful.collection_posted
+    #    which overrides some attributes, attribute validator for these
+    #    attributes are called
+    # So, validation for those attrs are called twice!
+    # One corner case of this behavior is validation of field "title".
+    # title cannot be None, and because title validation is performed before
+    # this function, API request MUST contain non-empty title in dict,
+    # however the value will be overridden and re-validated in this function!
+
+    from ggrc_basic_permissions import create_audit_context
     data = {
         "title": source_object.generate_attribute("title"),
         "description": source_object.description,

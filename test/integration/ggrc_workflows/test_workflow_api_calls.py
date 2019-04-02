@@ -552,6 +552,7 @@ class TestWorkflowsApiPost(TestCase):
         "cycle": {
             "autogenerate": True,
             "isOverdue": False,
+            "title": factories.random_str(prefix='cycle - '),
             "workflow": {
                 "id": workflow.id,
                 "type": "Workflow",
