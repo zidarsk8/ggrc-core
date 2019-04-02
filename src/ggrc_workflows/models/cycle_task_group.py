@@ -3,6 +3,7 @@
 
 """Module for cycle task group model.
 """
+import itertools
 
 from sqlalchemy import orm, inspect
 from sqlalchemy.ext import hybrid
@@ -122,9 +123,9 @@ class CycleTaskGroup(roleable.Roleable,
           ["end_date"],
           False),
       attributes.MultipleSubpropertyFullTextAttr(
-          "task comments",
+          "task comment",
           lambda instance: itertools.chain(*[
-              t.cycle_task_entries for t in instance.cycle_task_group_tasks
+              t.comments for t in instance.cycle_task_group_tasks
           ]),
           ["description"],
           False),

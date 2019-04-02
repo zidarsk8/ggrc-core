@@ -186,12 +186,10 @@ class TestExportTasks(ggrc.TestCase):
       task = all_models.CycleTaskGroupObjectTask.query.filter(
           all_models.CycleTaskGroupObjectTask.id == task_id
       ).one()
-      comment = "comment for task # {}".format(task_id)
-      factories.CycleTaskEntryFactory(
-          description=comment,
-          cycle_task_group_object_task=task,
-      )
-      filter_params[comment] = slug
+      comment_text = "comment for task # {}".format(task_id)
+      comment = ggrc_factories.CommentFactory(description=comment_text)
+      ggrc_factories.RelationshipFactory(source=task, destination=comment)
+      filter_params[comment_text] = slug
 
-    for comment, slug in filter_params.iteritems():
-      self.assert_slugs("task comments", comment, [slug])
+    for comment_text, slug in filter_params.iteritems():
+      self.assert_slugs("task comment", comment_text, [slug])

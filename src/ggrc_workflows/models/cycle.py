@@ -3,7 +3,7 @@
 
 """Module contains a workflow Cycle model
 """
-
+import itertools
 from urlparse import urljoin
 
 from sqlalchemy import orm, inspect
@@ -167,11 +167,10 @@ class Cycle(roleable.Roleable,
           ["name", "email"],
           False),
       ft_attributes.MultipleSubpropertyFullTextAttr(
-          "task comments",
-          lambda instance: list(itertools.chain(*[
-              t.cycle_task_entries
-              for t in instance.cycle_task_group_object_tasks
-          ])),
+          "task comment",
+          lambda instance: itertools.chain(*[
+              t.comments for t in instance.cycle_task_group_object_tasks
+          ]),
           ["description"],
           False),
   ]
@@ -240,7 +239,6 @@ class Cycle(roleable.Roleable,
         orm.Load(cls).subqueryload("cycle_task_groups").load_only(
             "id",
             "title",
-            "end_date",
             "next_due_date",
         ),
         orm.Load(cls).subqueryload(
@@ -259,11 +257,6 @@ class Cycle(roleable.Roleable,
         orm.Load(cls).subqueryload("cycle_task_groups").joinedload(
             "contact"
         ).load_only(
-            "name",
-            "email",
-            "id",
-        ),
-        orm.Load(cls).joinedload("contact").load_only(
             "name",
             "email",
             "id",
