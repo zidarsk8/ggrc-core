@@ -47,15 +47,13 @@
                     </div>
                     <div class="span3">
                       <h6>Kind/Type</h6>
-                      {{#using kind=kind}}
-                      {{#if kind}}
-                        <p>
-                          {{kind.title}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
-                      {{/using}}
+                      <object-loader {path}="instance.kind">
+                        {{#if loadedObject}}
+                          <p>{{loadedObject.title}}</p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </object-loader>
                     </div>
                     <div class="span3">
                       <h6>Effective Date</h6>

@@ -85,17 +85,23 @@
           </div>
 
         </div>
+
         <div class="span6 hide-wrap hidable">
           <div class="row-fluid inner-hide">
             <div data-id="audit_firm_hidden" class="span12 hidable">
-              <label>
-                Audit Firm
-                <a data-id="hide_audit_firm_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-              </label>
               <div class="objective-selector {{#instance.computed_errors.audit_firm}}field-failure{{/instance.computed_errors.audit_firm}}">
-                {{#using firm=instance.audit_firm}}
-                <input data-id="audit_firm_txtbx" tabindex="12" type="text" name="audit_firm.email" data-lookup="OrgGroup" class="span8 search-icon" placeholder="Enter text to search for Audit Firm" value="{{firstnonempty firm.title ''}}">
-                {{/using}}
+                <object-loader {path}="instance.audit_firm">
+                  <label>
+                    Audit Firm
+                    <a data-id="hide_audit_firm_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                  </label>
+                  <input type="text" class="span8 search-icon"
+                         name="audit_firm.title"
+                         value="{{loadedObject.title}}"
+                         data-lookup="OrgGroup" 
+                         placeholder="Enter text to search for Audit Firm"
+                         tabindex="12"/>
+                </object-loader>
                 {{#instance.computed_errors.audit_firm}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.audit_firm}}
               </div>
             </div>

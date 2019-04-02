@@ -46,15 +46,13 @@
                     </div>
                     <div class="span3">
                       <h6>Network Zone</h6>
-                      {{#using network_zone=network_zone}}
-                      {{#if network_zone}}
-                        <p>
-                          {{network_zone.title}}
-                        </p>
-                      {{else}}
-                        <span class="empty-message">None</span>
-                      {{/if}}
-                      {{/using}}
+                      <object-loader {path}="instance.network_zone">
+                        {{#if loadedObject}}
+                          <p>{{loadedObject.title}}</p>
+                        {{else}}
+                          <span class="empty-message">None</span>
+                        {{/if}}
+                      </object-loader>
                     </div>
                     <div class="span3">
                       <h6>Effective Date</h6>

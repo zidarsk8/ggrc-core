@@ -90,11 +90,9 @@
   {{/case}}
 
   {{#case 'status'}}
-    {{#using status=instance.status}}
-      <span class="state-value-dot {{addclass 'state' status}} {{#if instance.verified}}verified{{/if}}">
-        {{status}}
-      </span>
-    {{/using}}
+    <span class="state-value-dot {{addclass 'state' instance.status}} {{#if instance.verified}}verified{{/if}}">
+      {{instance.status}}
+    </span>
   {{/case}}
 
   {{#case 'review_status'}}
@@ -186,9 +184,13 @@
   {{/case}}
 
   {{#case 'audit_firm'}}
-    {{#using firm=instance.audit_firm}}
-      {{{firstnonempty firm.title 'None'}}}
-    {{/using}}
+    <object-loader {path}="instance.audit_firm">
+      {{#if loadedObject}}
+        {{loadedObject.title}}
+      {{else}}
+        None
+      {{/if}}
+    </object-loader>
   {{/case}}
 
   {{#case 'report_period'}}
