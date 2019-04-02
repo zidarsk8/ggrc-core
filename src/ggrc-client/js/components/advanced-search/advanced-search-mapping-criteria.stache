@@ -26,7 +26,7 @@
       </div>
       <div class="mapping-criteria__action">
         {{#if showPopover}}
-          <simple-popover {button-text}="'+ Add'" {extra-css-class}="{advanced-search}" {placement}="'top'">
+          <simple-popover {button-text}="'+ Add'" {extra-css-class}="'advanced-search'" {placement}="'top'">
             <button type="button"
                     class="mapping-criteria__action-button"
                     ($click)="addRelevant()">
@@ -42,7 +42,7 @@
           </simple-popover>
         {{else}}
           {{#if canAddMapping}}
-          <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
+            <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
           {{/if}}
           {{#if canBeGrouped}}
             <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
@@ -62,7 +62,7 @@
           {model-name}="{criteria.objectName}"
           {extendable}="{extendable}"
           (createGroup)="{relevantToGroup()}"
-          {^can-be-grouped}="{../childCanBeGrouped}">
+          {^can-be-grouped}="{childCanBeGrouped}">
         </advanced-search-mapping-criteria>
       {{/case}}
       {{#case "group"}}
@@ -70,7 +70,7 @@
           {(items)}="{criteria.mappedTo.value}"
           (remove)="{removeRelevant()}"
           {model-name}="{criteria.objectName}"
-          {^root}="{../childCanBeGrouped}">
+          {^root}="{childCanBeGrouped}">
         </advanced-search-mapping-group>
         {{/case}}
       {{/switch}}
