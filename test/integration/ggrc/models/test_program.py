@@ -70,3 +70,66 @@ class TestMegaProgram(TestCase):
     self.assertEqual(response.json["program"]["is_mega"], False)
     response = self.api.get(all_models.Program, program_parent_id)
     self.assertEqual(response.json["program"]["is_mega"], True)
+
+  def test_program_relatives(self):
+    """Test program children and parents
+               +--C<--+
+               |      |
+               v      |
+        A<-----B<-----E<----F
+                      |
+                      |
+               D<-----+
+    """
+
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      program_c = factories.ProgramFactory()
+      program_d = factories.ProgramFactory()
+      program_e = factories.ProgramFactory()
+      program_f = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      factories.RelationshipFactory(source=program_c,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_e,
+                                    destination=program_d)
+      factories.RelationshipFactory(source=program_e,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_e,
+                                    destination=program_c)
+      factories.RelationshipFactory(source=program_f,
+                                    destination=program_e)
+    parents_b = program_b.relatives_ids("parents", True)
+    children_b = program_b.relatives_ids("children", True)
+    parents_e = program_e.relatives_ids("parents", True)
+    children_e = program_e.relatives_ids("children", True)
+    self.assertEqual(parents_b, {program_c.id, program_e.id, program_f.id})
+    self.assertEqual(children_b, {program_a.id, })
+    self.assertEqual(parents_e, {program_f.id, })
+    self.assertEqual(children_e, {program_c.id, program_b.id,
+                                  program_d.id, program_a.id})
+
+  def test_program_cycle_relatives(self):
+    """Test programs cycle children and parents
+        +-->C--+
+        |      |
+        |      v
+        A<-----B
+    """
+
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      program_c = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      factories.RelationshipFactory(source=program_c,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_a,
+                                    destination=program_c)
+    parents_b = program_b.relatives_ids("parents", True)
+    children_b = program_b.relatives_ids("children", True)
+    self.assertEqual(parents_b, {program_a.id, program_c.id})
+    self.assertEqual(children_b, {program_a.id, program_c.id})
