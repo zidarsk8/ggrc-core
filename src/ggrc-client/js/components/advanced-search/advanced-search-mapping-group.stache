@@ -23,7 +23,7 @@
         <div class="mapping-group__criteria">
           <advanced-search-mapping-criteria
             {(criteria)}="{value}"
-            (remove)="{removeItem(../, true)}"
+            (remove)="{removeItem(., true)}"
             {model-name}="{modelName}"
             {root}="{root}">
           </advanced-search-mapping-criteria>

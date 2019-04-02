@@ -16,7 +16,7 @@
         <div class="filter-group__attribute">
           <advanced-search-filter-attribute
             {(attribute)}="{value}"
-            (remove)="{removeItem(../, true)}"
+            (remove)="{removeItem(., true)}"
             {available-attributes}="{availableAttributes}">
           </advanced-search-filter-attribute>
         </div>
