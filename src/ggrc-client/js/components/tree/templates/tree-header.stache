@@ -6,7 +6,7 @@
 <header class="header tree-header flex-box {{cssClasses}}">
   <tree-header-selector class="tree-header-selector">
     {{^if disableConfiguration}}
-    <a href="#" class="dropdown-toggle tview-dropdown-toggle visible-columns-icon"
+    <a href="javascript:void(0)" class="dropdown-toggle tview-dropdown-toggle visible-columns-icon"
       data-toggle="dropdown" ($click)="initializeColumns()">
       <i class="fa fa-fw fa-bars"></i>
     </a>

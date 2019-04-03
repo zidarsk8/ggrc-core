@@ -4,7 +4,7 @@
 }}
 
 <li class="risk accordion-group">
-  <a data-test-id="risk/threats_66116337" class="risk list-toggle top" href="#">
+  <a data-test-id="risk/threats_66116337" class="risk list-toggle top" href="javascript:void(0)">
     <i class="fa fa-caret-right"></i>
     Risks/Threats
   </a>

@@ -5,7 +5,7 @@
 
 export default can.Component.extend({
   tag: 'unarchive-link',
-  template: can.stache('<a href="#"><content></content></a>'),
+  template: can.stache('<a href="javascript:void(0)"><content></content></a>'),
   leakScope: true,
   viewModel: {
     notify: '@',

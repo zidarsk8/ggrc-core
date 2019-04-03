@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<a href="#" class="dropdown-toggle tview-dropdown-toggle" 
+<a href="javascript:void(0)" class="dropdown-toggle tview-dropdown-toggle" 
    data-toggle="dropdown" ($click)="initializeColumns()">
   <i class="fa fa-fw fa-bars"></i>
 </a>
