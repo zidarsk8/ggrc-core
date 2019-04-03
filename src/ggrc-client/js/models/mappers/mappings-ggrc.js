@@ -17,6 +17,7 @@ import {
   scopingObjects,
   snapshotableObjects,
   externalDirectiveObjects,
+  externalBusinessObjects,
 } from '../../plugins/models-types-collections';
 import {getRoleableModels} from '../../plugins/utils/models-utils';
 
@@ -62,8 +63,8 @@ const coreObjectConfig = {
 const scopingObjectConfig = {
   ...createRule,
   map: _.difference(businessObjects,
-    ['Assessment', 'Control', 'Risk', ...externalDirectiveObjects]),
-  externalMap: ['Control', 'Risk', ...externalDirectiveObjects],
+    ['Assessment', ...externalBusinessObjects, ...externalDirectiveObjects]),
+  externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
   unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
@@ -126,8 +127,9 @@ new Mappings({
   Regulation: {
     ...createRule,
     map: _.difference(businessObjects,
-      [...scopingObjects, 'Assessment', 'Control', 'Regulation', 'Risk']),
-    externalMap: [...scopingObjects, 'Control', 'Risk'],
+      [...scopingObjects, 'Assessment', 'Regulation',
+        ...externalBusinessObjects]),
+    externalMap: [...scopingObjects, ...externalBusinessObjects],
     unmap: _.difference(businessObjects,
       ['Assessment', 'Audit', 'Regulation']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
@@ -144,8 +146,9 @@ new Mappings({
   Standard: {
     ...createRule,
     map: _.difference(businessObjects,
-      [...scopingObjects, 'Assessment', 'Control', 'Standard', 'Risk']),
-    externalMap: [...scopingObjects, 'Control', 'Risk'],
+      [...scopingObjects, 'Assessment', 'Standard',
+        ...externalBusinessObjects]),
+    externalMap: [...scopingObjects, ...externalBusinessObjects],
     unmap: _.difference(businessObjects,
       ['Assessment', 'Audit', 'Standard']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
@@ -158,9 +161,11 @@ new Mappings({
   AccessGroup: {
     ...createRule,
     map: _.difference(businessObjects,
-      ['Assessment', 'AccessGroup', 'Control', 'Risk',
-        ...externalDirectiveObjects]),
-    externalMap: ['Control', 'Risk', ...externalDirectiveObjects],
+      ['Assessment', 'AccessGroup',
+        ...externalBusinessObjects,
+        ...externalDirectiveObjects,
+      ]),
+    externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
     unmap: _.difference(businessObjects,
       ['Assessment', 'AccessGroup', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
