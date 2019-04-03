@@ -99,7 +99,7 @@ let viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'mapped-counter',
-  template: template,
+  template: can.stache(template),
   leakScope: true,
   viewModel,
   events: {

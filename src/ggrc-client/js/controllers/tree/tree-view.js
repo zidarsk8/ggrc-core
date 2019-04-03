@@ -4,9 +4,7 @@
  */
 
 import * as StateUtils from '../../plugins/utils/state-utils';
-import {
-  getCounts,
-} from '../../plugins/utils/widgets-utils';
+import {getCounts} from '../../plugins/utils/widgets-utils';
 import TreeLoader from './tree-loader';
 import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
@@ -118,18 +116,19 @@ const TreeViewControl = TreeLoader.extend({
       this.options.attr('parent_instance', this.options.parent_instance());
     }
   },
-
   ' inserted': function () { // eslint-disable-line quote-props
     this._attached_deferred.resolve();
   },
-
   init_view: function () {
     let dfds = [];
-    let optionsDfd;
     if (this.options.header_view && this.options.show_header) {
-      optionsDfd = $.when(this.options);
       dfds.push(
-        can.view(this.options.header_view, optionsDfd).then(
+        $.when(this.options, $.ajax({
+          url: this.options.header_view,
+          dataType: 'text',
+        })).then((ctx, view) => {
+          return can.stache(view[0])(ctx);
+        }).then(
           this._ifNotRemoved((frag) => {
             this.element.before(frag);
           })

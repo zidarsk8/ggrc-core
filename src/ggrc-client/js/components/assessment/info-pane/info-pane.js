@@ -72,7 +72,7 @@ import * as businessModels from '../../../models/business-models';
  */
 export default can.Component.extend({
   tag: 'assessment-info-pane',
-  template: template,
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     define: {

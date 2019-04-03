@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if_equals workflow.status 'Active'}}
+{{#is(workflow.status, "Active")}}
   <div class="row-fluid wrap-row">
     <div class="span12">
       <div class="alert">
@@ -12,9 +12,9 @@
         </button>
         <strong>Note:</strong> This workflow is active. Changes you make here will not affect active cycles. They will only affect future recurrences.
       </div>
+    </div>
   </div>
-</div>
-{{/if_equals}}
+{{/is}}
 
 {{#instance.description}}
   <div class="info-pane__section">
