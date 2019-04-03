@@ -10,6 +10,13 @@ import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-gr
 
 let viewModel = BaseTreeItemVM.extend({
   define: {
+    // workaround an issue: "instance.is_mega" is not
+    // handled properly in template
+    isMega: {
+      get() {
+        return this.attr('instance.is_mega');
+      },
+    },
     dueDate: {
       type: 'date',
       get: function () {
