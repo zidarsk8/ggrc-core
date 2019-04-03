@@ -77,8 +77,8 @@
     <div class="span6 hidable">
       <label>
         Threat Source
-        <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
+      <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <div class="rich-text">
         <rich-text
           tabindex="5"
@@ -94,8 +94,8 @@
     <div class="span6 hidable">
       <label>
         Threat Event
-        <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
+      <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <div class="rich-text">
         <rich-text
           tabindex="6"
@@ -111,8 +111,8 @@
     <div class="span6 hidable">
       <label>
         Vulnerability
-        <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
+      <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <div class="rich-text">
         <rich-text
           tabindex="7"
@@ -140,9 +140,9 @@
         Notes
         <i class="fa fa-question-circle" rel="tooltip"
            title="Append simple text or html notes here."></i>
-        <a data-id="hide_note_lk" href="javascript://" class="field-hide"
-           tabindex="-1">hide</a>
       </label>
+      <a data-id="hide_note_lk" href="javascript://" class="field-hide"
+                 tabindex="-1">hide</a>
       <div class="rich-text">
         <rich-text
           tabindex="8"
@@ -178,8 +178,8 @@
           Code
           <i class="fa fa-question-circle" rel="tooltip"
             title="The ZenGRC application will automatically provide codes for new objects. If you would like to override this feature you may manually enter a code of your choosing. You should have a specific reason for doing this."></i>
-          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <input data-id="code_txtbx" {{^if new_object_form}} disabled {{/if}} tabindex="10" id="section-code" class="input-block-level" name="slug" placeholder="RISK-XXX" type="text" value="{{slug}}">
       </div>
     {{/if}}
@@ -194,14 +194,14 @@
         State
         <i class="fa fa-question-circle" rel="tooltip"
            title="Indicates the status of this object."></i>
-        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-        <dropdown {options-list}="{model.statuses}"
-                  {no-value}="{true}"
-                  {no-value-label}="'---'"
-                  {name}="'instance.status'"
-                  tabindex="23">
-        </dropdown>
+      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <dropdown {options-list}="{model.statuses}"
+                {no-value}="{true}"
+                {no-value-label}="'---'"
+                {name}="'instance.status'"
+                tabindex="23">
+      </dropdown>
     </div>
   </div>
 
