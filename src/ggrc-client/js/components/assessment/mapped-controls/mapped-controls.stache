@@ -8,7 +8,7 @@
             <read-more
               class="description"
               {text}="{itemData.description}"
-              {handle-markdown}="{instance.class.isChangeableExternally}">
+              {handle-markdown}="{instance.constructor.isChangeableExternally}">
             </read-more>
             <div class="more-information-wrapper">
                 <button type="button" class="btn btn-link more-information-button">More Information</button>
@@ -32,9 +32,16 @@
                 {{instnace.type}} version as on {{dateTime instance.updated_at}}
             </span>
         </div>
-        <a target="_blank" class="btn btn-white btn-small" href="{{instance.originalLink}}">
-            Open Original {{instance.class.title_singular}}
-        </a>
+          {{#if instance.originalObjectDeleted}}
+            <a class="btn btn-white btn-small disabled-original disabled" href="javascript:void(0)">
+              Original {{instance.constructor.title_singular}} is deleted
+            </a>
+          {{else}}
+            <a target="_blank" class="btn btn-white btn-small" href="{{instance.originalLink}}">
+              Open Original {{instance.constructor.title_singular}}
+            </a>
+          {{/if}}
+       
         <button type="button" class="btn btn-small btn-icon" can-click="hide">
             <i class="fa fa-times black"></i>
         </button>
@@ -43,9 +50,11 @@
         <spinner {toggle}="{isLoading}" class="spinner-wrapper active"
                  {extra-css-class}="'grid-spinner'"></spinner>
 
-        <questionnaire-link {instance}="{instance}" {view-type}="'button'">
-            Open {{instance.class.title_singular}} in new frontend
-        </questionnaire-link>
+        {{^if instance.originalObjectDeleted}}
+          <questionnaire-link {instance}="{instance}" {view-type}="'button'">
+            Open {{instance.constructor.title_singular}} in new frontend
+          </questionnaire-link>
+        {{/if}}
 
         {{^if withoutDetails}}
         <collapsible-panel {title-text}="'{{assessmentType}} Info'"
