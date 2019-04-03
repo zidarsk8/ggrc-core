@@ -157,9 +157,11 @@ def prepare_cavs_for_diff(cavs):
   """Build dict with cavs content suitable for comparizon"""
   cavs_dict = {}
   for cav in cavs:
+    attribute_value = cav.get("attribute_value")
+    attribute_object_id = (cav.get("attribute_object") or {}).get("id")
     cavs_dict[int(cav["custom_attribute_id"])] = (
-        cav["attribute_value"],
-        cav["attribute_object"]["id"] if cav.get("attribute_object") else None
+        attribute_value,
+        attribute_object_id
     )
   return cavs_dict
 
