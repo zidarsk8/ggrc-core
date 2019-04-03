@@ -223,7 +223,7 @@ class TestIssueIntegration(ggrc.TestCase):
     payload_attrs = dict(self.DEFAULT_TICKET_ATTRS, **ticket_attrs)
     payload = {"issueState": {
         "component_id": payload_attrs["component_id"],
-        "hotlist_id": payload_attrs["hotlist_id"],
+        "hotlist_ids": [payload_attrs["hotlist_id"], ],
         "issue_id": payload_attrs["issue_id"],
         "status": payload_attrs["status"],
         "issue_type": payload_attrs["issue_type"],
@@ -402,6 +402,23 @@ class TestIssueIntegration(ggrc.TestCase):
     issue_id = response.json.get("issue").get("id")
     issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue", issue_id)
     self.assertFalse(issue_tracker_issue)
+
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  def test_link_issue_without_hotlist(self, update_mock):
+    issue_request_payload = self.request_payload_builder({"hotlist_id": ""})
+    response_payload = self.response_payload_builder({"hotlist_id": 4321})
+    with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                    return_value=response_payload) as get_mock:
+      with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                             return_value={u"user@example.com", }):
+        response = self.api.post(all_models.Issue, issue_request_payload)
+      get_mock.assert_called_once()
+    update_mock.assert_called_once()
+
+    self.assertEqual(response.status_code, 201)
+    issue_id = response.json.get("issue").get("id")
+    issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue", issue_id)
+    self.assertEqual(int(issue_tracker_issue.hotlist_id), 4321)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
