@@ -20,6 +20,16 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
     {value: 'Other Contacts', title: 'Other Contacts'},
     {value: 'other', title: 'Others...'},
   ],
+  Risk: [
+    {value: 'Admin', title: 'Object Admins'},
+    {value: 'Audit Lead', title: 'Audit Captain'},
+    {value: 'Auditors', title: 'Auditors'},
+    {value: 'Principal Assignees', title: 'Principal Assignees'},
+    {value: 'Secondary Assignees', title: 'Secondary Assignees'},
+    {value: 'Risk Owners', title: 'Risk Owners'},
+    {value: 'Other Contacts', title: 'Other Contacts'},
+    {value: 'other', title: 'Others...'},
+  ],
   defaults: [
     {value: 'Admin', title: 'Object Admins'},
     {value: 'Audit Lead', title: 'Audit Captain'},
