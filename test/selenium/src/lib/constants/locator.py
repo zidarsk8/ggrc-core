@@ -3,6 +3,7 @@
 """Locators for all elements."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
+# pylint: disable=invalid-name
 
 from selenium.webdriver.common.by import By
 
@@ -144,6 +145,11 @@ class LhnMenu(object):
 
     @staticmethod
     def get_create_new_button(label):
+      # Controls cannot be created from UI.
+      if label == objects.get_singular(objects.CONTROLS, title=True):
+        return(By.CSS_SELECTOR,
+               ('[data-model-name="{}"] '
+                'ul.sub-actions li.add-new a').format(label))
       return (
           By.CSS_SELECTOR,
           '[data-model-name="{}"] [data-test-id='

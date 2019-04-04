@@ -11,14 +11,12 @@ import copy
 
 import pytest
 
-from lib import base, url, users
+from lib import base, users
 from lib.constants import messages, objects, object_states, roles
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.entities.entity import Representation
 from lib.factory import get_cls_webui_service, get_cls_rest_service
-from lib.page import dashboard
 from lib.service import webui_service, rest_facade
-from lib.utils import selenium_utils
 from lib.utils.filter_utils import FilterUtils
 
 
@@ -50,12 +48,6 @@ class TestSnapshots(base.Test):
     # 'actual_controls': created_at, updated_at, custom_attributes (None)
     cls.general_equal_assert(exp_controls, actual_controls,
                              *Representation.tree_view_attrs_to_exclude)
-
-  @pytest.fixture(scope="function")
-  def lhn_menu(self, selenium):
-    """Open LHN menu and return LHN page objects model."""
-    selenium_utils.open_url(url.Urls().dashboard)
-    return dashboard.Dashboard(selenium).open_lhn_menu()
 
   @pytest.fixture(scope="function")
   def create_audit_and_update_first_of_two_original_controls(
