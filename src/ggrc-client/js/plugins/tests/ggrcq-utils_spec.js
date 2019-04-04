@@ -26,7 +26,8 @@ describe('GGRCQ utils', () => {
 
   beforeAll(() => {
     originalIntegrationUrl = GGRC.GGRC_Q_INTEGRATION_URL;
-    GGRC.GGRC_Q_INTEGRATION_URL = originalIntegrationUrl || 'http://example.com/';
+    GGRC.GGRC_Q_INTEGRATION_URL = originalIntegrationUrl ||
+      'http://example.com/';
   });
 
   afterAll(() => {
@@ -124,7 +125,7 @@ describe('GGRCQ utils', () => {
 
   describe('getMappingUrl util', () => {
     it('should return empty string ' +
-      'if neither source not destination is Control', () => {
+      'if neither source not destination is changeable externally', () => {
       let instance = makeFakeInstance({model: Cacheable})();
       let model = Cacheable;
 
@@ -132,7 +133,7 @@ describe('GGRCQ utils', () => {
       expect(url).toBe('');
     });
 
-    it('should return url to map directive to control', () => {
+    it('should return url to map directive to external object', () => {
       let instance = makeFakeInstance({model: Control, instanceProps: {
         type: 'Control',
         slug: 'CONTROL-1',
@@ -146,7 +147,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to map scope object to control', () => {
+    it('should return url to map scope object to external object', () => {
       let instance = makeFakeInstance({model: Control, instanceProps: {
         type: 'Control',
         slug: 'CONTROL-1',
@@ -162,7 +163,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to map control to directive', () => {
+    it('should return url to map external object to directive', () => {
       let instance = makeFakeInstance({model: Standard})({
         type: 'Standard',
         slug: 'STANDARD-1',
@@ -175,7 +176,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to map control to scope object', () => {
+    it('should return url to map external object to scope object', () => {
       let instance = makeFakeInstance({model: TechnologyEnvironment})({
         type: 'TechnologyEnvironment',
         slug: 'TechnologyEnvironment-1',
@@ -226,7 +227,7 @@ describe('GGRCQ utils', () => {
 
   describe('getUnmappingUrl util', () => {
     it('should return empty string ' +
-      'if neither source not destination is Control', () => {
+      'if neither source not destination is changeable externally', () => {
       let instance = makeFakeInstance({model: Cacheable})();
       let model = Cacheable;
 
@@ -234,7 +235,7 @@ describe('GGRCQ utils', () => {
       expect(url).toBe('');
     });
 
-    it('should return url to unmap control from directive', () => {
+    it('should return url to unmap external object from directive', () => {
       let instance = makeFakeInstance({model: Control, instanceProps: {
         type: 'Control',
         slug: 'CONTROL-1',
@@ -248,7 +249,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to unmap control from scope object', () => {
+    it('should return url to unmap external object from scope object', () => {
       let instance = makeFakeInstance({model: Control, instanceProps: {
         type: 'Control',
         slug: 'CONTROL-1',
@@ -263,7 +264,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to unmap directive from control', () => {
+    it('should return url to unmap directive from external object', () => {
       let instance = makeFakeInstance({model: Standard})({
         type: 'Standard',
         slug: 'STANDARD-1',
