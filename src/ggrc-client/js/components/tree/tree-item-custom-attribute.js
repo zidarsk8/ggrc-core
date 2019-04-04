@@ -64,7 +64,7 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'tree-item-custom-attribute',
-  template: can.stache('{{value}}'),
+  template: can.stache('{{{value}}}'),
   leakScope: true,
   viewModel,
 });
