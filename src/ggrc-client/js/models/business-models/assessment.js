@@ -361,8 +361,8 @@ export default Cacheable.extend({
             type: 'get',
             dataType: 'json',
           })
-            .then((model) => this.cleanupAcl(model))
             .then((model) => {
+              model = this.cleanupAcl(model);
               delete this._pending_refresh;
               if (model) {
                 model = this.constructor.model(model, this);
