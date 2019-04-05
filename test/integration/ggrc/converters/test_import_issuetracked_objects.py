@@ -3,7 +3,7 @@
 
 """Integration tests for IssueTracker updates via import cases."""
 
-# pylint: disable=invalid-name,too-many-public-methods
+# pylint: disable=invalid-name,too-many-public-methods,too-many-lines
 
 from collections import OrderedDict
 
@@ -509,6 +509,107 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self._check_csv_response(response, {})
     obj = all_models.Audit.query.one()
     self._assert_integration_state(obj, value)
+
+  @staticmethod
+  def _prepare_expected_import_resp(model_name, block_errors=(),
+                                    block_warnings=(), row_errors=(),
+                                    row_warnings=()):
+    """Construct expected response message for import of specific model."""
+    if not any([block_errors, block_warnings, row_errors, row_warnings]):
+      return {}
+    return {
+        model_name: {
+            "block_errors": set(block_errors),
+            "block_warnings": set(block_warnings),
+            "row_errors": set(row_errors),
+            "row_warnings": set(row_warnings),
+        }
+    }
+
+  @ddt.data(
+      ("on", True, []),
+      ("off", False, []),
+      (
+          "",
+          True,
+          [
+              errors.WRONG_VALUE_DEFAULT.format(
+                  line=3, column_name="Sync people with Ticket Tracker")
+          ],
+      ),
+  )
+  @ddt.unpack
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_people_sync_audit_create(self, imported_value, expected_obj_value,
+                                    expected_warnings):
+    """Test Audit people sync={0} set during create via import."""
+    program = factories.ProgramFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "slug-1"),
+        ("Program", program.slug),
+        ("Title", "Audit Title"),
+        ("State", "Planned"),
+        ("Audit Captains", "user@example.com"),
+        ("Ticket Tracker Integration", "on"),
+        ("Sync people with Ticket Tracker", imported_value),
+    ]))
+
+    expected_resp = self._prepare_expected_import_resp(
+        "Audit", row_warnings=expected_warnings)
+    self._check_csv_response(response, expected_resp)
+    audit = all_models.Audit.query.one()
+    self.assertEqual(
+        audit.issue_tracker["people_sync_enabled"],
+        expected_obj_value,
+    )
+
+  @ddt.data(
+      (True, "on", True, []),
+      (True, "off", False, []),
+      (False, "on", True, []),
+      (False, "off", False, []),
+      (
+          True, "", True,
+          [
+              errors.WRONG_VALUE_DEFAULT.format(
+                  line=3, column_name="Sync people with Ticket Tracker")
+          ],
+      ),
+      (
+          False, "", True,
+          [
+              errors.WRONG_VALUE_DEFAULT.format(
+                 line=3, column_name="Sync people with Ticket Tracker")
+          ],
+      ),
+  )
+  @ddt.unpack
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_people_sync_audit_update(self, current_obj_value, imported_value,
+                                    expected_obj_value, expected_warnings):
+    """Test Audit people sync={0} set during updated via import."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          people_sync_enabled=current_obj_value,
+      )
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", audit.slug),
+        ("Sync people with Ticket Tracker", imported_value),
+    ]))
+
+    expected_resp = self._prepare_expected_import_resp(
+        "Audit", row_warnings=expected_warnings)
+    self._check_csv_response(response, expected_resp)
+    audit = all_models.Audit.query.one()
+    self.assertEqual(
+        audit.issue_tracker["people_sync_enabled"],
+        expected_obj_value,
+    )
 
   @ddt.data("Issue", "Assessment")
   def test_default_value_title(self, model):
