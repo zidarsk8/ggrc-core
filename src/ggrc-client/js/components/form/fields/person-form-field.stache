@@ -6,7 +6,7 @@
 <div class="input-wrapper">
   {{#if inputValue}}
     <div class="person-info-wrapper">
-      <a class="person-info-wrapper__remove-value" href="#" ($click)="unsetPerson">
+      <a class="person-info-wrapper__remove-value" href="javascript:void(0)" ($click)="unsetPerson">
         <i class="fa fa-times" aria-hidden="true"></i>
       </a>
       <person-data {person-id}="{inputValue}"></person-data>

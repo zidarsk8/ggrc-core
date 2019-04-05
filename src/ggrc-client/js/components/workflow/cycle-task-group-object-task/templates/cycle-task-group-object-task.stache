@@ -45,7 +45,7 @@
                     {{#is(instance.status, "Deprecated")}}
                       <object-change-state {to-state}="{initialState}"
                                            (on-state-change)="{onStateChange(%event)}">
-                        <a href="#">
+                        <a href="javascript:void(0)">
                           <i class="fa fa-reply"></i>
                           Restore
                         </a>
@@ -53,7 +53,7 @@
                     {{else}}
                       <object-change-state {to-state}="'Deprecated'"
                                            (on-state-change)="{onStateChange(%event)}">
-                        <a href="#">
+                        <a href="javascript:void(0)">
                           <i class="fa fa-times-circle"></i> Deprecate
                         </a>
                       </object-change-state>

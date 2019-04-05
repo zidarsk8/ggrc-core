@@ -129,7 +129,8 @@ class Dashboard(object):
   CREATE_TASK_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST +
       ' [data-object-singular="CycleTaskGroupObjectTask"]')
-  CREATE_OBJECT_BTN_CSS = (By.CSS_SELECTOR, _GET_LIST + ' [href="#"]')
+  CREATE_OBJECT_BTN_CSS = (
+      By.CSS_SELECTOR, _GET_LIST + ' [href="javascript:void(0)"]')
   ALL_OBJECTS_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST + ' [href="/objectBrowser"]')
 
