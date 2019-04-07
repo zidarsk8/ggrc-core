@@ -402,7 +402,7 @@ class ObjectsInfoService(HelpRestService):
       # pylint: disable=invalid-name
       filters = query.Query.expression_get_comment_by_desc(
           parent_type=paren_obj.type, parent_id=paren_obj.id,
-          comment_desc=comment_description),
+          comment_desc=comment_description)
       order_by = [{"name": "created_at", "desc": True}]
       return self.get_obj_dict(objects.get_obj_type(objects.COMMENTS),
                                filters=filters, order_by=order_by)
