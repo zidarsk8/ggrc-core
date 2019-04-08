@@ -232,9 +232,13 @@ NOTIFICATION_PREFIX = os.environ.get(
     'GGRC_NOTIFICATION_PREFIX',
     ''
 )
-DAILY_DIGEST_BATCH_SIZE = int(os.environ.get(
-    'GGRC_DAILY_DIGEST_BATCH_SIZE', 5000
-))
+
+if not os.environ.get('GGRC_DAILY_DIGEST_BATCH_SIZE', ''):
+  DAILY_DIGEST_BATCH_SIZE = 5000
+else:
+  DAILY_DIGEST_BATCH_SIZE = int(
+      os.environ.get('GGRC_DAILY_DIGEST_BATCH_SIZE')
+  )
 
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")
