@@ -30,6 +30,7 @@ from ggrc.rbac import permissions
 from ggrc.services import common as services_common, signals
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
+from ggrc.utils import empty_revisions
 from ggrc.views import converters, cron, filters, notifications, registry, \
     utils, serializers, folder
 
@@ -51,6 +52,14 @@ def propagate_acl(_):
 def create_missing_revisions(_):
   """Web hook to create revisions for new objects."""
   revisions.do_missing_revisions()
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/find_empty_revisions", methods=["POST"])
+@background_task.queued_task
+def find_empty_revisions(_):
+  """Web hook to find empty revisions."""
+  empty_revisions.find_empty_revisions()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
@@ -780,6 +789,22 @@ def admin_create_missing_revisions():
       name="create_missing_revisions",
       url=flask.url_for(create_missing_revisions.__name__),
       queued_callback=create_missing_revisions,
+  )
+  db.session.commit()
+  return bg_task.make_response(
+      app.make_response(("scheduled %s" % bg_task.name, 200,
+                        [('Content-Type', 'text/html')])))
+
+
+@app.route("/admin/find_empty_revisions", methods=["POST"])
+@login.login_required
+@login.admin_required
+def admin_find_empty_revisions():
+  """Process all revisions and find empty."""
+  bg_task = background_task.create_task(
+      name="find_empty_revisions",
+      url=flask.url_for(find_empty_revisions.__name__),
+      queued_callback=find_empty_revisions,
   )
   db.session.commit()
   return bg_task.make_response(
