@@ -6,21 +6,21 @@
 import logging
 from collections import defaultdict
 from collections import namedtuple
+
 from sqlalchemy import orm
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from cached_property import cached_property
 from werkzeug.exceptions import BadRequest
 
-
 from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
-from ggrc import utils
 from ggrc.utils import errors
 from ggrc.utils import referenced_objects
+
 
 logger = logging.getLogger(__name__)
 
@@ -122,16 +122,26 @@ class Roleable(object):
     if values is None:
       return
 
-    new_acl_people_map = defaultdict(set)
+    from ggrc.models import person
+
+    for value in values:
+      referenced_objects.mark_to_cache(person.Person, value["person"]["id"])
+    referenced_objects.rewarm_cache(
+        rewarm_type=person.Person,
+        skip_cad=True,
+        undefer=True,
+    )
+
+    persons_by_acl = defaultdict(set)
     for value in values:
       if value["ac_role_id"] not in self.acr_id_acl_map:
         raise BadRequest(errors.BAD_PARAMS)
       person = referenced_objects.get("Person", value["person"]["id"])
       acl = self.acr_id_acl_map[value["ac_role_id"]]
-      new_acl_people_map[acl].add(person)
+      persons_by_acl[acl].add(person)
 
     for acl in self._access_control_list:
-      acl.update_people(new_acl_people_map[acl])
+      acl.update_people(persons_by_acl[acl])
 
   @classmethod
   def eager_query(cls):
@@ -187,17 +197,12 @@ class Roleable(object):
     revision logs.
     """
     acl_json = []
-    for person, acl in self.access_control_list:
-      person_entry = acl.log_json()
-      person_entry["person"] = utils.create_stub(person)
-      person_entry["person_email"] = person.email
-      person_entry["person_id"] = person.id
-      person_entry["person_name"] = person.name
-      acl_json.append(person_entry)
+    for acl in self._access_control_list:
+      acl_json.extend(acl.people_json)
     return acl_json
 
   def log_json(self):
-    """Log custom attribute values."""
+    """Log access control lists values."""
     # pylint: disable=not-an-iterable
     res = super(Roleable, self).log_json()
     res["access_control_list"] = self.acl_json

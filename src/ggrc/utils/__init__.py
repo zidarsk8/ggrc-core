@@ -370,3 +370,18 @@ def make_simple_response(error=None):
         [("Content-Type", "text/html")]
     ))
   return app.make_response(("Success", 200, [("Content-Type", "text/html")]))
+
+
+def is_deferred_loaded(obj):
+  """Check whether deferred fields of `obj` are loaded or not."""
+  unloaded = sqlalchemy.inspect(obj).unloaded
+  for attr_name in unloaded:
+    field = getattr(obj.__class__, attr_name, None)
+    is_deferred = (
+        field is not None and
+        isinstance(field.property, sqlalchemy.orm.ColumnProperty) and
+        field.property.deferred
+    )
+    if is_deferred:
+      return False
+  return True
