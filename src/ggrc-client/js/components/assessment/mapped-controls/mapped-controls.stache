@@ -29,7 +29,7 @@
                 {{instance.title}}
             </div>
             <span class="mapped-controls-info__title-state state-value snapshot">
-                {{instnace.type}} version as on {{dateTime instance.updated_at}}
+                {{instance.type}} version as on {{dateTime instance.updated_at}}
             </span>
         </div>
         <a target="_blank" class="btn btn-white btn-small" href="{{instance.originalLink}}">
