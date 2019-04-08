@@ -8,12 +8,14 @@ import flask
 
 from ggrc import builder
 from ggrc import db
+from ggrc import utils
 from ggrc.access_control import role
 from ggrc.models import automapping
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import types
 from ggrc.models.mixins import base
+from ggrc.models.mixins import before_flush_handleable
 from ggrc.models.mixins import filterable
 from ggrc.models.mixins import synchronizable
 from ggrc.models.mixins import with_readonly_access as wroa
@@ -22,7 +24,8 @@ from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils.revisions_diff import meta_info
 
 
-class Revision(synchronizable.ChangesSynchronized,
+class Revision(before_flush_handleable.BeforeFlushHandleable,
+               synchronizable.ChangesSynchronized,
                filterable.Filterable,
                base.ContextRBAC,
                mixins.Base,
@@ -671,3 +674,21 @@ class Revision(synchronizable.ChangesSynchronized,
   def content(self, value):
     """ Setter for content property."""
     self._content = value
+
+  def _handle_if_empty(self):
+    """Check if revision is empty and update is_empty flag if true."""
+
+    # Check if new revision contains any changes in resource state. Revisions
+    # created with "created" or "deleted" action are not considered empty.
+    if self in db.session.new and self.action == u"modified":
+      obj = referenced_objects.get(self.resource_type, self.resource_id)
+      # Content serialization and deserialization is needed since content of
+      # prev revision stored in DB was serialized before storing and due to
+      # this couldn't be correctly compared to content of revision in hands.
+      content = json.loads(utils.as_json(self.content))
+      self.is_empty = bool(
+          obj and not revisions_diff.changes_present(obj, content))
+
+  def handle_before_flush(self):
+    """Handler that called  before SQLAlchemy flush event."""
+    self._handle_if_empty()
