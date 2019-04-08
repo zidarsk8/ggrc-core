@@ -12,13 +12,10 @@ import {
   getRole,
   isAuditor,
 } from './plugins/utils/acl-utils';
-import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
 import _ from 'lodash';
-import Search from './models/service-models/search';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
-import {reify} from './plugins/utils/reify-utils';
 import Mappings from './models/mappers/mappings';
 import {
   getFormattedLocalDate,
@@ -399,48 +396,6 @@ can.stache.registerHelper('current_user_is_admin', function (options) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
-});
-
-can.stache.registerHelper('default_audit_title', function (instance, options) {
-  let index;
-  let program;
-  let title;
-
-  instance = isFunction(instance) ? instance() : instance;
-  program = instance.attr('program');
-
-  if (!instance._transient) {
-    instance.attr('_transient', new can.Map());
-  }
-
-  if (!program) {
-    // Mark the title to be populated when computed_program is defined,
-    // returning an empty string here would disable the save button.
-    instance.attr('title', '');
-    instance.attr('_transient.default_title', instance.title);
-    return;
-  }
-  if (instance._transient.default_title !== instance.title) {
-    return;
-  }
-
-  program = reify(program);
-  new RefreshQueue().enqueue(program).trigger().then(function () {
-    title = (new Date()).getFullYear() + ': ' + program.title + ' - Audit';
-
-    Search.counts_for_types(title, ['Audit'])
-      .then(function (result) {
-        // Next audit index should be bigger by one than previous, we have unique name policy
-        index = result.getCountFor('Audit') + 1;
-        title = title + ' ' + index;
-        instance.attr('title', title);
-        // this needs to be different than above, otherwise CanJS throws a strange error
-        if (instance._transient) {
-          instance.attr('_transient.default_title',
-            instance.title);
-        }
-      });
-  });
 });
 
 can.stache.registerHelper('urlPath', function () {

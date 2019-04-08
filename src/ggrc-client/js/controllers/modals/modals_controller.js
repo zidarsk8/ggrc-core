@@ -152,12 +152,28 @@ export default can.Control.extend({
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
           this.restore_ui_status_from_storage();
+          if (this.is_audit_modal()) {
+            this.init_audit_title();
+          }
         }
       })
       .fail((error) => {
         notifierXHR('error', error);
         this.element.modal_form('hide');
       });
+  },
+
+  is_audit_modal: function () {
+    const {instance} = this.options;
+    return instance.constructor
+      && instance.constructor.model_singular === 'Audit';
+  },
+
+  init_audit_title: function () {
+    const {instance, new_object_form: isNewObjectForm} = this.options;
+    if (isNewObjectForm) {
+      instance.initTitle();
+    }
   },
 
   apply_object_params: function () {
@@ -250,6 +266,9 @@ export default can.Control.extend({
       }, 0);
 
       instance.attr(path, null).attr(path, ui.item);
+      if (this.is_audit_modal()) {
+        this.init_audit_title();
+      }
       if (!instance._transient) {
         instance.attr('_transient', can.Map());
       }
@@ -876,6 +895,9 @@ export default can.Control.extend({
 
       ajd.always(() => {
         this.options.attr('isSaving', false);
+        if (this.is_audit_modal()) {
+          this.init_audit_title();
+        }
       });
       if (this.options.add_more) {
         bindXHRToButton(ajd, saveCloseBtn);
