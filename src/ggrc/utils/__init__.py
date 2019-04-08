@@ -1,7 +1,8 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""General utils module
+# pylint: disable=redefined-builtin,invalid-name,missing-docstring
+"""
+General utils module
 
 This module should contain only the most general utility function and any
 specific utilities should be in their own module.
@@ -39,7 +40,7 @@ class GrcEncoder(json.JSONEncoder):
   also consider:
      `http://hg.tryton.org/2.4/trytond/file/ade5432ac476/trytond/protocols/jsonrpc.py#l53`_
   """
-
+  # pylint: disable=arguments-differ,method-hidden,too-many-return-statements
   def default(self, obj):
     from ggrc.models import mixins
     if isinstance(obj, datetime.datetime):
@@ -54,6 +55,8 @@ class GrcEncoder(json.JSONEncoder):
       return list(obj)
     elif isinstance(obj, mixins.Base):
       return {"id": obj.id, "type": obj.type}
+    elif isinstance(obj, mixins.base.Dictable):
+      return obj.to_dict()
     elif callable(obj):
       return obj()
     else:
