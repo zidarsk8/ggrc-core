@@ -191,6 +191,10 @@ class CreateObjectDropdown(base.Widget):
     """Click item from list by text."""
     self._browser.element(class_name="inner-nav-item", text=text).click()
 
+  def get_all_hidden_items(self):
+    """Returns a list of hidden items from dropdown."""
+    return self._browser.elements(css=" .external-link__content").to_list
+
 
 class AdminDashboard(widget_bar.AdminDashboard, GenericHeader):
   """Admin Dashboard page model."""
