@@ -36,7 +36,14 @@
                     {{/if}}
                   </div>
               </base-inline-control-title>
-           </inline-edit-control>
+              {{#if helptext}}
+                <div class="ggrc-form-item__small-text">
+                  <small>
+                    <em>{{helptext}}</em>
+                  </small>
+                </div>
+              {{/if}}
+          </inline-edit-control>
         </div>
       </div>
     {{/each}}
