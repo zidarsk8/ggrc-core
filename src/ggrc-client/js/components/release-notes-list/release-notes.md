@@ -1,8 +1,8 @@
-[//]: <> (updated 04/04/2019)
+[//]: <> (updated 04/10/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[New object Account Balance (v.2.1.0, 04/04/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.t02sm9tcam2t)
+[New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.t02sm9tcam2t)
 
 [Introducing new Control Library frontend (v.2.0.0, 03/26/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.oo6v96vy5j1x)
 
@@ -84,7 +84,7 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
-### New object Account Balance (v.2.1.0, 04/04/2019)
+### New object Account Balance (v.2.1.0, 04/10/2019)
 
 Account Balance can be used to sort, store and summarize a company's transactions and processes. Account Balance is categorized as a scoping object and can be mapped to other GRC objects similar to other scoping objects.
 
