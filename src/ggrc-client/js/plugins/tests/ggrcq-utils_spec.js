@@ -17,6 +17,7 @@ import {
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Cacheable from '../../models/cacheable';
 import Control from '../../models/business-models/control';
+import Risk from '../../models/business-models/risk';
 import Standard from '../../models/business-models/standard';
 import TechnologyEnvironment
   from '../../models/business-models/technology-environment';
@@ -121,6 +122,15 @@ describe('GGRCQ utils', () => {
       expect(getUrl(options))
         .toBe(`${GGRC.GGRC_Q_INTEGRATION_URL}control/control=control-1/info`);
     });
+
+    it('should return url with path only', () => {
+      const options = {
+        path: 'import',
+      };
+
+      expect(getUrl(options))
+        .toBe(`${GGRC.GGRC_Q_INTEGRATION_URL}import`);
+    });
   });
 
   describe('getMappingUrl util', () => {
@@ -223,6 +233,22 @@ describe('GGRCQ utils', () => {
       expect(getUrl(options))
         .toBe(`${GGRC.GGRC_Q_INTEGRATION_URL}import`);
     });
+
+    it('should return url to map external object 1 to external object 2',
+      () => {
+        let externalObject1 = makeFakeInstance({model: Control,
+          instanceProps: {
+            type: 'Control',
+            slug: 'CONTROL-1',
+          }})();
+        let externalModel = Risk;
+
+        let result = getMappingUrl(externalObject1, externalModel);
+        let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+          'controls/control=control-1/risks' +
+          '?mappingStatus=in_progress,not_in_scope,reviewed';
+        expect(result).toBe(expected);
+      });
   });
 
   describe('getUnmappingUrl util', () => {
