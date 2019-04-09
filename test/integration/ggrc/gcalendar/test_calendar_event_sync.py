@@ -27,7 +27,10 @@ class TestCalendarEventSync(BaseCalendarEventTest):
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.create_event",
               return_value={
-                  "id": "external_event_id"
+                  "content": {
+                      "id": "external_event_id"
+                  },
+                  "status_code": 200,
               })
   def test_create_event(self, create_event_mock):
     """Test creation of event."""
@@ -35,6 +38,7 @@ class TestCalendarEventSync(BaseCalendarEventTest):
     with freeze_time("2015-01-1 12:00:00"):
       self.sync._create_event(event)
     create_event_mock.assert_called_with(
+        event_id=event.id,
         calendar_id="primary",
         summary=event.title,
         description=event.description,
@@ -50,12 +54,18 @@ class TestCalendarEventSync(BaseCalendarEventTest):
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.get_event",
               return_value={
-                  "description": "old description",
-                  "summary": "summary",
-                  "eventId": "eventId",
+                  "content": {
+                      "description": "old description",
+                      "summary": "summary",
+                      "eventId": "eventId",
+                  },
+                  "status_code": 200,
               })
   @mock.patch("ggrc.gcalendar.calendar_api_service"
-              ".CalendarApiService.update_event")
+              ".CalendarApiService.update_event",
+              return_value={
+                  "status_code": 200,
+              })
   def test_update_event(self, update_event_mock, get_event_mock):
     """Test update of event."""
     with factories.single_commit():
@@ -67,14 +77,17 @@ class TestCalendarEventSync(BaseCalendarEventTest):
           title="summary",
           external_event_id="eventId"
       )
+      event_id = event.id
     with freeze_time("2015-01-1 12:00:00"):
       self.sync._update_event(event)
     get_event_mock.assert_called_with(
         calendar_id="primary",
-        event_id="eventId",
+        external_event_id="eventId",
+        event_id=event_id,
     )
     update_event_mock.assert_called_with(
-        event_id="eventId",
+        event_id=event_id,
+        external_event_id="eventId",
         calendar_id="primary",
         description="new description",
         summary="summary",
@@ -105,7 +118,10 @@ class TestCalendarEventSync(BaseCalendarEventTest):
 
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.create_event",
-              side_effect=Exception("test"))
+              return_value={
+                  "content": "Smth went wrong",
+                  "status_code": 500,
+              })
   def test_fail_to_sync_event(self, create_event_mock):
     """Test that sync job tried to sync the second event after a failure."""
     self.setup_person_task_event(date(2015, 1, 5))

@@ -25,6 +25,7 @@ class TestCalendarApiService(unittest.TestCase):
     """Test creation of an event."""
     self.events_mock.insert = mock.MagicMock()
     self.service.create_event(
+        event_id=1,
         calendar_id="primary",
         summary="test calendar event",
         description="test calendar event description",
@@ -59,10 +60,11 @@ class TestCalendarApiService(unittest.TestCase):
     """Test update of an event."""
     self.events_mock.update = mock.MagicMock()
     self.service.update_event(
+        event_id=1,
         calendar_id="primary",
         summary="test calendar event",
         description="test calendar event description",
-        event_id="SOMEID12345",
+        external_event_id="SOMEID12345",
         start="2018-01-01",
         end="2018-01-01",
         timezone="UTC",
@@ -97,7 +99,8 @@ class TestCalendarApiService(unittest.TestCase):
     self.events_mock.delete = mock.MagicMock()
     self.service.delete_event(
         calendar_id="primary",
-        event_id="SOMEID12345",
+        external_event_id="SOMEID12345",
+        event_id=1,
     )
     self.events_mock.delete.assert_called_with(
         calendarId="primary",
@@ -109,7 +112,8 @@ class TestCalendarApiService(unittest.TestCase):
     self.events_mock.get = mock.MagicMock()
     self.service.get_event(
         calendar_id="primary",
-        event_id="SOMEID12345",
+        external_event_id="SOMEID12345",
+        event_id=1,
     )
     self.events_mock.get.assert_called_with(
         calendarId="primary",
