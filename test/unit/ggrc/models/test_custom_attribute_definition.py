@@ -29,7 +29,6 @@ class TestCustomAttributeDefinition(unittest.TestCase):
             "  map:    Market",
             "mAP:    CONTROL",
             "UNMAP:  NOTHING",
-            "delete",
             "DeLeTe",
             )
   def test_title_with_asterisk_throws(self, title):
