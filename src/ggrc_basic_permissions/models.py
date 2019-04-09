@@ -145,10 +145,10 @@ class UserRole(base.ContextRBAC, Base, db.Model):
     return assignments_by_user
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     from sqlalchemy import orm
 
-    query = super(UserRole, cls).eager_query()
+    query = super(UserRole, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('role'),
         orm.subqueryload('person'),

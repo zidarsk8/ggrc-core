@@ -86,10 +86,10 @@ class WithEvidence(object):
     return self.get_evidences_by_kind(Evidence.FILE)
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager query classmethod."""
     return cls.eager_inclusions(
-        super(WithEvidence, cls).eager_query(),
+        super(WithEvidence, cls).eager_query(**kwargs),
         WithEvidence._include_links,
     ).options(
         sa.orm.subqueryload(

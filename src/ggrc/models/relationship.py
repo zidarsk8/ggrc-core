@@ -234,6 +234,7 @@ class Relatable(object):
 
   @declared_attr
   def related_sources(cls):  # pylint: disable=no-self-argument
+    """List of Relationship where 'source' points to related object"""
     current_type = cls.__name__
 
     joinstr = (
@@ -265,6 +266,7 @@ class Relatable(object):
 
   @declared_attr
   def related_destinations(cls):  # pylint: disable=no-self-argument
+    """List of Relationship where 'destination' points to related object"""
     current_type = cls.__name__
 
     joinstr = (
@@ -318,13 +320,18 @@ class Relatable(object):
   _include_links = []
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     from sqlalchemy import orm
 
-    query = super(Relatable, cls).eager_query()
-    return cls.eager_inclusions(query, Relatable._include_links).options(
-        orm.subqueryload('related_sources'),
-        orm.subqueryload('related_destinations'))
+    query = super(Relatable, cls).eager_query(**kwargs)
+    query = cls.eager_inclusions(query, Relatable._include_links)
+
+    if kwargs.get('load_related', True):
+      return query.options(
+          orm.subqueryload('related_sources'),
+          orm.subqueryload('related_destinations'))
+
+    return query
 
 
 class Stub(collections.namedtuple("Stub", ["type", "id"])):

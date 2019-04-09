@@ -206,7 +206,7 @@ class Cycle(roleable.Roleable,
     ).exists()
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Add cycle task groups to cycle eager query
 
     This function adds cycle_task_groups as a join option when fetching cycles,
@@ -216,7 +216,7 @@ class Cycle(roleable.Roleable,
     Returns:
       a query object with cycle_task_groups added to joined load options.
     """
-    query = super(Cycle, cls).eager_query()
+    query = super(Cycle, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('cycle_task_groups'),
         orm.Load(cls).joinedload("workflow").undefer_group(

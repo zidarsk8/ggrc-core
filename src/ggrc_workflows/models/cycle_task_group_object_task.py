@@ -321,14 +321,14 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     ).exists()
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """
     Add related objects to eager query.
 
     This function makes sure that with one query we fetch all cycle task
     related data needed for generating cycle task json for a response.
     """
-    query = super(CycleTaskGroupObjectTask, cls).eager_query()
+    query = super(CycleTaskGroupObjectTask, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('cycle')
            .undefer_group('Cycle_complete'),
@@ -453,9 +453,9 @@ class CycleTaskable(object):
     return sources + destinations
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager query for objects with cycle tasks."""
-    query = super(CycleTaskable, cls).eager_query()
+    query = super(CycleTaskable, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload('related_sources')
            .joinedload('CycleTaskGroupObjectTask_source')

@@ -101,8 +101,8 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
     )
 
   @classmethod
-  def eager_query(cls):
-    query = super(CustomAttributeValue, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(CustomAttributeValue, cls).eager_query(**kwargs)
     query = query.options(
         orm.subqueryload('_related_revisions'),
         orm.joinedload('custom_attribute'),

@@ -165,8 +165,8 @@ class TaskGroup(roleable.Roleable,
     return target
 
   @classmethod
-  def eager_query(cls):
-    query = super(TaskGroup, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(TaskGroup, cls).eager_query(**kwargs)
     return query.options(
         orm.Load(cls).subqueryload('task_group_objects'),
         orm.Load(cls).subqueryload('task_group_tasks')

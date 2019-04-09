@@ -279,7 +279,7 @@ class QueryHelper(object):
 
     object_name = object_query["object_name"]
     object_class = inflector.get_model(object_name)
-    query = object_class.eager_query()
+    query = object_class.eager_query(load_related=False)
     query = query.filter(object_class.id.in_(ids))
 
     with benchmark("Get objects by ids: _get_objects -> obj in query"):

@@ -141,5 +141,5 @@ class Issue(Roleable,
     )
 
   @classmethod
-  def eager_query(cls):
-    return cls._populate_query(super(Issue, cls).eager_query())
+  def eager_query(cls, **kwargs):
+    return cls._populate_query(super(Issue, cls).eager_query(**kwargs))

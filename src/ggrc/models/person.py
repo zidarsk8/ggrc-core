@@ -171,13 +171,13 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     return email_re.match(val) if val else False
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     from sqlalchemy import orm
 
-    # query = super(Person, cls).eager_query()
+    # query = super(Person, cls).eager_query(**kwargs)
     # Completely overriding eager_query to avoid eager loading of the
     # modified_by relationship
-    return super(Person, cls).eager_query().options(
+    return super(Person, cls).eager_query(**kwargs).options(
         orm.joinedload('language'),
         orm.joinedload('profile'),
         orm.subqueryload('object_people'),

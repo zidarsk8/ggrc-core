@@ -52,10 +52,10 @@ class Program(review.Reviewable,
   }
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     from sqlalchemy import orm
 
-    query = super(Program, cls).eager_query()
+    query = super(Program, cls).eager_query(**kwargs)
     return cls.eager_inclusions(query, Program._include_links).options(
         orm.subqueryload('audits'),
         orm.subqueryload('risk_assessments'),

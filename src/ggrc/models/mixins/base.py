@@ -69,7 +69,7 @@ class Identifiable(object):
     return self.__class__.__name__
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
         db.Load(mapper_class).undefer_group(
@@ -136,10 +136,10 @@ class ContextRBAC(object):
     )
 
   # @classmethod
-  # def eager_query(cls):
+  # def eager_query(cls, **kwargs):
   # from sqlalchemy import orm
 
-  # query = super(ContextRBAC, cls).eager_query()
+  # query = super(ContextRBAC, cls).eager_query(**kwargs)
   # return query.options(
   # orm.subqueryload('context'))
 

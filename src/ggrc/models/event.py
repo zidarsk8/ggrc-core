@@ -42,8 +42,8 @@ class Event(Base, db.Model):
     )
 
   @classmethod
-  def eager_query(cls):
-    query = super(Event, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Event, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload('revisions').undefer_group('Revision_complete'),
     )

@@ -93,8 +93,8 @@ class Reviewable(rest_handable.WithPutHandable,
     )
 
   @classmethod
-  def eager_query(cls):
-    return super(Reviewable, cls).eager_query().options(
+  def eager_query(cls, **kwargs):
+    return super(Reviewable, cls).eager_query(**kwargs).options(
         sa.orm.joinedload("review")
     )
 

@@ -170,8 +170,8 @@ class AssessmentTemplate(assessment.AuditRelationship,
   }
 
   @classmethod
-  def eager_query(cls):
-    query = super(AssessmentTemplate, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(AssessmentTemplate, cls).eager_query(**kwargs)
     return query.options(
         orm.Load(cls).joinedload("audit").undefer_group("Audit_complete"),
         orm.Load(cls).joinedload("audit").joinedload(
