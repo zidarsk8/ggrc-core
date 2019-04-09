@@ -163,7 +163,7 @@
           <div class="row-fluid wrap-row">
             <div class="span12">
               {{#is(instance.task_type, "text")}}
-                <h6>Task details</h6>
+                <h6>Task Description</h6>
                 <div class="rtf-block">
                   <read-more
                     {text}="{instance.description}"

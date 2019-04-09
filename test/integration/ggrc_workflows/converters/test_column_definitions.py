@@ -133,7 +133,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Task Type",
         "Task Assignees",
         "Task Secondary Assignees",
-        "Task Details",
+        "Task Description",
         "Start Date",
         "Due Date",
         "Actual Verified Date",
