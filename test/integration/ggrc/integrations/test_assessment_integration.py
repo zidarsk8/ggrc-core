@@ -221,6 +221,93 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     it_issue = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
     self.check_issuetracker_issue_fields(it_issue, assmt_request_payload)
 
+  @staticmethod
+  def _create_asmt(audit_acl, asmt_acl, people_sync_enabled, issue_id):
+    """Helper function creating assessment and audit."""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=asmt.audit,
+          people_sync_enabled=people_sync_enabled,
+      )
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_id=issue_id,
+          issue_tracked_obj=asmt,
+      )
+
+      for role_name, people in audit_acl.iteritems():
+        for email in people:
+          person = factories.PersonFactory(email=email)
+          asmt.audit.add_person_with_role_name(person, role_name)
+      for role_name, people in asmt_acl.iteritems():
+        for email in people:
+          person = factories.PersonFactory(email=email)
+          asmt.add_person_with_role_name(person, role_name)
+    return asmt
+
+  @ddt.data(
+      (
+          True,
+          {"Audit Captains": {"c@e.com", }},
+          {"Assignees": {"1@e.com", "2@e.com"}},
+          {
+              "reporter": "r@e.com",
+              "assignee": "",
+              "verifier": "",
+              "ccs": {"3@e.com", "4@e.com"},
+          },
+          {
+              "reporter": "r@e.com",
+              "assignee": "1@e.com",
+              "verifier": "1@e.com",
+              "ccs": {"c@e.com", "2@e.com", "3@e.com", "4@e.com"},
+          },
+      ),
+      (
+          False,
+          {"Audit Captains": {"c@e.com", }},
+          {"Assignees": {"1@e.com", "2@e.com"}},
+          {
+              "reporter": "r@e.com",
+              "assignee": "",
+              "verifier": "",
+              "ccs": {"3@e.com", "4@e.com"},
+          },
+          {
+              "reporter": "r@e.com",
+              "assignee": "",
+              "verifier": "",
+              "ccs": {"3@e.com", "4@e.com"},
+          },
+      ),
+  )
+  @ddt.unpack
+  @mock.patch("ggrc.integrations.issues.Client.update_issue")
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_people_sync_during_link(self, sync, audit_acl, asmt_acl,
+                                   new_ticket_data, expected_ticket_data,
+                                   update_mock):
+    """Test people sync works correctly when linking."""
+    asmt = self._create_asmt(audit_acl, asmt_acl, sync, TICKET_ID)
+    new_ticket_data.update({"issue_id": (TICKET_ID + 1)})
+
+    issue_request_payload = self.put_request_payload_builder(new_ticket_data)
+    response_payload = self.response_payload_builder(new_ticket_data)
+    with mock.patch("ggrc.integrations.issues.Client.get_issue",
+                    return_value=response_payload) as get_mock:
+      response = self.api.put(asmt, issue_request_payload)
+
+    get_mock.assert_called_once()
+    self.assert200(response)
+    for key, value in expected_ticket_data.iteritems():
+      data = update_mock.call_args_list[0][0][1][key]
+      if isinstance(data, list):
+        data = set(data)
+      self.assertEqual(data,
+                       expected_ticket_data[key])
+
   def test_fill_missing_values_from_audit(self):
     """Check prepare_json_method get missed values from audit."""
     with factories.single_commit():
