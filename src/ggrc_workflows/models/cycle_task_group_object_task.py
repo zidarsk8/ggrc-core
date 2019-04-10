@@ -235,7 +235,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
 
   _aliases = {
       "title": "Summary",
-      "description": "Task Details",
+      "description": "Task Description",
       "finished_date": {
           "display_name": "Actual Finish Date",
           "description": ("Make sure that 'Actual Finish Date' isn't set, "
