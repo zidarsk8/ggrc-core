@@ -191,12 +191,11 @@ describe('tree-item-custom-attribute component', () => {
         const value = '<strong>some text</strong>';
         fakeInstance.constructor.isChangeableExternally = true;
         fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
 
-        actual = helper(fakeInstance, caId, fakeOptions);
-
+        expect(viewModel.attr('value')).toBe('some markdown');
         expect(MarkdownUtils.convertMarkdownToHtml)
           .toHaveBeenCalledWith(value);
-        expect(actual).toBe('some markdown');
       });
     });
   });
