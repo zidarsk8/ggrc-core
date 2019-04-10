@@ -330,7 +330,7 @@ def start_compute_attributes(revision_ids=None, event_id=None):
 
 def start_update_audit_issues(audit_id, message):
   """Start a background task to update IssueTracker issues related to Audit."""
-  bg_task = background_task.create_task(
+  background_task.create_task(
       name='update_audit_issues',
       url=flask.url_for(update_audit_issues.__name__),
       parameters={
@@ -341,7 +341,6 @@ def start_update_audit_issues(audit_id, message):
       queued_callback=update_audit_issues,
   )
   db.session.commit()
-  bg_task.start()
 
 
 @app.route("/_background_tasks/generate_wf_tasks_notifications",
