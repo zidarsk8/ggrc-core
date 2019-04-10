@@ -28,6 +28,7 @@ from ggrc.integrations.synchronization_jobs.assessment_sync_job import \
 from ggrc.integrations import synchronization_jobs, constants
 from ggrc.access_control.role import AccessControlRole
 
+from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 from integration.ggrc import generator
 from integration.ggrc.access_control import acl_helper
@@ -48,7 +49,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     # pylint seems to get confused, mro chain successfully resolves and returns
     # <type 'object'> as last entry.
     super(TestIssueTrackerIntegration, self).setUp()
-
+    self.api = api_helper.Api()
     self.client.get('/login')
 
   DEFAULT_ASSESSMENT_ATTRS = {
@@ -120,6 +121,23 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         "reporter": payload_attrs["reporter"],
         "ccs": payload_attrs["ccs"],
     }}
+    return payload
+
+  def post_request_payload_builder(self, issue_attrs):
+    """Build payload for POST request to Issue Tracker."""
+    payload_attrs = dict(self.DEFAULT_ASSESSMENT_ATTRS, **issue_attrs)
+    payload = {
+        "issue_tracker": {
+            "enabled": payload_attrs["enabled"],
+            "status": payload_attrs["status"],
+            "component_id": payload_attrs["component_id"],
+            "hotlist_id": payload_attrs["hotlist_id"],
+            "issue_type": payload_attrs["issue_type"],
+            "issue_priority": payload_attrs["issue_priority"],
+            "issue_severity": payload_attrs["issue_severity"],
+            "title": payload_attrs["title"],
+        }
+    }
     return payload
 
   def put_request_payload_builder(self, issue_attrs):
@@ -222,30 +240,22 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     self.check_issuetracker_issue_fields(it_issue, assmt_request_payload)
 
   @staticmethod
-  def _create_asmt(audit_acl, asmt_acl, people_sync_enabled, issue_id):
-    """Helper function creating assessment and audit."""
+  def _create_issuetracked_obj(factory, acl, people_sync_enabled=True,
+                               enabled=True, **issue_tracker_data):
+    """Helper function creating issuetracked object with given parameters."""
     with factories.single_commit():
-      asmt = factories.AssessmentFactory()
+      obj = factory()
       factories.IssueTrackerIssueFactory(
-          enabled=True,
-          issue_tracked_obj=asmt.audit,
+          enabled=enabled,
+          issue_tracked_obj=obj,
           people_sync_enabled=people_sync_enabled,
+          **issue_tracker_data
       )
-      factories.IssueTrackerIssueFactory(
-          enabled=True,
-          issue_id=issue_id,
-          issue_tracked_obj=asmt,
-      )
-
-      for role_name, people in audit_acl.iteritems():
+      for role_name, people in acl.iteritems():
         for email in people:
           person = factories.PersonFactory(email=email)
-          asmt.audit.add_person_with_role_name(person, role_name)
-      for role_name, people in asmt_acl.iteritems():
-        for email in people:
-          person = factories.PersonFactory(email=email)
-          asmt.add_person_with_role_name(person, role_name)
-    return asmt
+          obj.add_person_with_role_name(person, role_name)
+    return obj
 
   @ddt.data(
       (
@@ -290,9 +300,15 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                                    new_ticket_data, expected_ticket_data,
                                    update_mock):
     """Test people sync works correctly when linking."""
-    asmt = self._create_asmt(audit_acl, asmt_acl, sync, TICKET_ID)
-    new_ticket_data.update({"issue_id": (TICKET_ID + 1)})
+    # pylint: disable=too-many-arguments,too-many-locals
+    audit = self._create_issuetracked_obj(
+        factories.AuditFactory, audit_acl, people_sync_enabled=sync)
+    asmt = self._create_issuetracked_obj(
+        factories.AssessmentFactory, asmt_acl, issue_id=TICKET_ID)
+    with factories.single_commit():
+      asmt.audit = audit
 
+    new_ticket_data.update({"issue_id": (TICKET_ID + 1)})
     issue_request_payload = self.put_request_payload_builder(new_ticket_data)
     response_payload = self.response_payload_builder(new_ticket_data)
     with mock.patch("ggrc.integrations.issues.Client.get_issue",
@@ -301,12 +317,81 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     get_mock.assert_called_once()
     self.assert200(response)
-    for key, value in expected_ticket_data.iteritems():
-      data = update_mock.call_args_list[0][0][1][key]
-      if isinstance(data, list):
-        data = set(data)
-      self.assertEqual(data,
-                       expected_ticket_data[key])
+    for argument, expected_value in expected_ticket_data.iteritems():
+      actual_value = update_mock.call_args_list[0][0][1][argument]
+      if isinstance(actual_value, list):
+        actual_value = set(actual_value)
+      self.assertEqual(actual_value, expected_value)
+
+  @staticmethod
+  def _prepare_acl_json(obj_type, rolename_emails_map):
+    """Prepate ACL json for specific object type."""
+    result = []
+    with factories.single_commit():
+      for rolename, emails in rolename_emails_map.iteritems():
+        for email in emails:
+          person_id = factories.PersonFactory(email=email).id
+          role_id = all_models.AccessControlRole.query.filter_by(
+              name=rolename, object_type=obj_type).one().id
+          result.append(acl_helper.get_acl_json(role_id, person_id))
+    return result
+
+  @ddt.data(
+      (
+          True,
+          {"Audit Captains": {"r@e.com", }},
+          {"Assignees": {"1@e.com", "2@e.com"}},
+          {
+              "reporter": "r@e.com",
+              "assignee": "1@e.com",
+              "verifier": "1@e.com",
+              "ccs": {"2@e.com", },
+          },
+      ),
+      (
+          False,
+          {"Audit Captains": {"r@e.com", }},
+          {"Assignees": {"1@e.com", "2@e.com"}},
+          {
+              "reporter": "r@e.com",
+              "assignee": "1@e.com",
+              "verifier": "1@e.com",
+              "ccs": {"2@e.com", },
+          },
+      ),
+  )
+  @ddt.unpack
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              return_value={"issueId": TICKET_ID})
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_new_assessment_people(self, sync, audit_acl, asmt_acl,
+                                 expected_ticket_data, create_mock):
+    """External Issue for new Assessment contains correct people."""
+    # pylint: disable=too-many-arguments
+    audit = self._create_issuetracked_obj(
+        factories.AuditFactory, audit_acl, people_sync_enabled=sync)
+
+    issue_tracker = self.post_request_payload_builder({})
+    asmt_acl_json = self._prepare_acl_json("Assessment", asmt_acl)
+    response = self.api.post(
+        all_models.Assessment,
+        {
+            "assessment": {
+                "title": "asmt",
+                "audit": {"id": audit.id, "type": audit.type},
+                "issue_tracker": issue_tracker["issue_tracker"],
+                "access_control_list": asmt_acl_json,
+            },
+        },
+    )
+
+    self.assertStatus(response, 201)
+    create_mock.assert_called_once()
+    for argument, expected_value in expected_ticket_data.iteritems():
+      actual_value = create_mock.call_args_list[0][0][0][argument]
+      if isinstance(actual_value, list):
+        actual_value = set(actual_value)
+      self.assertEqual(actual_value, expected_value)
 
   def test_fill_missing_values_from_audit(self):
     """Check prepare_json_method get missed values from audit."""
@@ -1308,66 +1393,6 @@ class TestIssueTrackerIntegrationPeople(SnapshotterBaseTestCase):
     )
 
     return asmt
-
-  def test_new_assessment_people(self, client_mock, _):
-    """External Issue for Assessment contains correct people."""
-    client_instance = client_mock.return_value
-    client_instance.create_issue.return_value = {'issueId': 42}
-
-    self.setup_audit_people({
-        role_name: people for role_name, people in self.people.items()
-        if role_name in ('Audit Captains', 'Auditors')
-    })
-
-    component_id = constants.DEFAULT_ISSUETRACKER_VALUES['component_id']
-    hotlist_id = constants.DEFAULT_ISSUETRACKER_VALUES['hotlist_id']
-    issue_type = constants.DEFAULT_ISSUETRACKER_VALUES['issue_type']
-    issue_priority = constants.DEFAULT_ISSUETRACKER_VALUES['issue_priority']
-    issue_severity = constants.DEFAULT_ISSUETRACKER_VALUES['issue_severity']
-    title = 'Issue Title'
-
-    asmt = self.create_asmt_with_issue_tracker(
-        role_name_to_people={
-            role_name: people for role_name, people in self.people.items()
-            if role_name in self.ROLE_NAMES
-        },
-        issue_tracker={
-            'component_id': component_id,
-            'hotlist_id': hotlist_id,
-            'issue_type': issue_type,
-            'issue_priority': issue_priority,
-            'issue_severity': issue_severity,
-            'title': title
-        },
-    )
-
-    expected_cc_list = list(
-        self.EMAILS["Assessment", "Assignees"] -
-        {min(self.EMAILS["Assessment", "Assignees"])}
-    ) + list(
-        self.EMAILS["Audit", "Audit Captains"] -
-        {min(self.EMAILS["Audit", "Audit Captains"])}
-    )
-    tracker_handler = assessment_integration.AssessmentTrackerHandler()
-    # pylint: disable=protected-access; we assert by non-exported constants
-    client_instance.create_issue.assert_called_once_with({
-        # common fields
-        'comment': (constants.INITIAL_COMMENT_TMPL %
-                    tracker_handler._get_assessment_page_url(asmt)),
-        'component_id': component_id,
-        'hotlist_ids': [hotlist_id],
-        'priority': issue_priority,
-        'severity': issue_severity,
-        'status': 'ASSIGNED',
-        'title': title,
-        'type': issue_type,
-
-        # person-related fields
-        'reporter': min(self.EMAILS["Audit", "Audit Captains"]),
-        'assignee': min(self.EMAILS["Assessment", "Assignees"]),
-        'verifier': min(self.EMAILS["Assessment", "Assignees"]),
-        'ccs': expected_cc_list,
-    })
 
   def test_missing_audit_captains(self, client_mock, _):
     """Reporter email is None is no Audit Captains present."""
