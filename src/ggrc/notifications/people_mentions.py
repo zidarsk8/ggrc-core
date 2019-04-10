@@ -9,8 +9,6 @@ from collections import namedtuple
 from logging import getLogger
 from email.utils import parseaddr
 from urlparse import urljoin
-import pytz
-from pytz import timezone
 
 import flask
 from sqlalchemy.orm import load_only
@@ -20,6 +18,7 @@ from ggrc import settings
 from ggrc import utils
 from ggrc.app import db
 from ggrc.notifications.common import send_mentions_bg
+from ggrc.notifications import data_handlers
 from ggrc.utils import user_generator, get_url_root
 
 
@@ -182,16 +181,12 @@ def _generate_mention_email(object_name, comments_data):
       u"{comment_text}\n"
   )
 
-  datetime_format = "%m/%d/%Y %H:%M:%S %Z"
-
   body = []
   for comment in sorted(comments_data):
-    created_at = comment.created_at.replace(
-        tzinfo=pytz.utc).astimezone(timezone("US/Pacific"))
     body.append(body_template.format(
         author=comment.author,
         object_name=object_name,
-        created_at=created_at.strftime(datetime_format),
+        created_at=data_handlers.as_user_time(comment.created_at),
         comment_text=comment.comment_text,
     ))
   return title, body
