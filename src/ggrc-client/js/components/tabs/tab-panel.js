@@ -20,9 +20,6 @@ export default can.Component.extend({
           return this.attr('active') ? 'active' : 'hidden';
         },
       },
-      forceClearContent: {
-        value: false,
-      },
       cacheContent: {
         type: 'boolean',
         value: false,
