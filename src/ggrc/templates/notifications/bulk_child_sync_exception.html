@@ -21,7 +21,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   <div {{ style.notification_container() }} >
     <div {{ style.notification_block() }}>
       <h1 {{ style.bulk_sync_title() }}>
-        There were some errors in generating tickets for "{{ sync_data.title }}"
+        There were some errors in generating tickets for "{{ sync_data.title|e }}"
       </h1>
 
       <hr>
