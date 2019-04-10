@@ -125,6 +125,13 @@ new Mappings({
     indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
       'TaskGroup', 'Workflow'],
   },
+  AccountBalance: {
+    map: _.difference(businessObjects,
+      ['Assessment', 'Control', 'Standard', 'Regulation']),
+    externalMap: ['Control'],
+    indirectMappings: ['Assessment', 'Person', 'Regulation', 'Standard',
+      'TaskGroup', 'Workflow'],
+  },
   DataAsset: {
     map: _.difference(businessObjects,
       ['Assessment', 'Control', 'Standard', 'Regulation']),
@@ -301,8 +308,8 @@ new Mappings({
   },
   MultitypeSearch: {
     map: [
-      'AccessGroup', 'Assessment', 'AssessmentTemplate', 'Audit',
-      'Contract', 'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
+      'AccessGroup', 'AccountBalance', 'Assessment', 'AssessmentTemplate',
+      'Audit', 'Contract', 'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
       'Document', 'Evidence', 'Facility', 'Issue', 'KeyReport', 'Market',
       'Metric', 'Objective', 'OrgGroup', 'Person', 'Process', 'Product',
       'ProductGroup', 'Project', 'Policy', 'Program', 'Regulation',
