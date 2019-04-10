@@ -25,6 +25,7 @@ class TaskGroupInfoPanel(base.WithBrowser):
     """Wait for panel to be initialized."""
     self._create_task_button.wait_until(lambda e: e.present)
     ui_utils.wait_for_spinner_to_disappear()
+    self._create_task_button.wait_until(lambda e: e.enabled)
 
   @property
   def _three_bbs(self):
