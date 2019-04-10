@@ -257,20 +257,19 @@ class TestWorkflowsApiPost(TestCase):
         (all_models.CycleTaskGroupObjectTask.query.one().id,
          all_models.CycleTaskGroupObjectTask.__name__),
     ]
-    # *2 is for relationships roles propagation
-    related_count = roles_count * len(related_objects) * 2
-
     if has_comment:
       related_objects.append(
           (all_models.Comment.query.one().id,
            all_models.Comment.__name__),
       )
-      # *2 is for relationships roles propagation for comment
-      related_count = related_count + roles_count * 2
 
-      # additional acl count for Relationship and Comment propagation of
-      # Task Assignees/Task Secondary Assignees access control roles
-      related_count = related_count + 4
+    # *2 is for relationships
+    related_count = roles_count * len(related_objects) * 2
+
+    # additional acl count for Relationship and Comment propagation of
+    # Task Assignees/Task Secondary Assignees access control roles
+    if has_comment:
+      related_count += roles_count * 2
 
     all_acls = all_models.AccessControlList.query.filter(
         all_models.AccessControlList.parent_id_nn != 0
