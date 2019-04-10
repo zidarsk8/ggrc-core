@@ -453,7 +453,6 @@ def run_background_import(ie_job_id):
       queue="ggrcImport",
       queued_callback=run_import_phases,
       operation_type=all_models.ImportExport.IMPORT_JOB_TYPE.lower(),
-      retry_options={"task_retry_limit": 0},
   )
   db.session.commit()
 
@@ -626,7 +625,6 @@ def run_background_export(ie_job_id, objects, exportable_objects):
       queue="ggrcImport",
       queued_callback=run_export,
       operation_type=all_models.ImportExport.EXPORT_JOB_TYPE.lower(),
-      retry_options={"task_retry_limit": 0},
   )
   db.session.commit()
 
