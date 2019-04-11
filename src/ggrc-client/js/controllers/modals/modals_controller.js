@@ -22,7 +22,6 @@ import '../../components/object-list-item/document-object-list-item';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/effective-dates/effective-dates';
 import '../../components/dropdown/dropdown';
-import '../../components/dropdown/boolean-dropdown-wrapper';
 import '../../components/modal_wrappers/assessment_template_form';
 import '../../components/autocomplete/autocomplete';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
