@@ -60,14 +60,8 @@
     max-width: 450px;
   }
 
-  &__section-title-icon {
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    left: -28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  &__loading-icon {
+    @extend %field-spinnerable;
   }
 
   &__main-content {
