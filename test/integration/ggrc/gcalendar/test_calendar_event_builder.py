@@ -79,9 +79,9 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
     )
     expected_description = (
         u"You have following tasks due today:\n"
-        u"- unicode ascii title\n"
         u"- Â тест\n"
         u"- some ordinary title\n"
+        u"- unicode ascii title\n"
         u"Please click on the link below to review and take action "
         u"on your task(s) due today:\n"
         u"<a href='http://localhost/dashboard#!task&query={link}'>Link</a>"
