@@ -49,6 +49,11 @@ export default can.Component.extend({
           return val;
         },
       },
+      isMegaMapping: {
+        get() {
+          return isMegaMapping(this.attr('object'), this.attr('type'));
+        },
+      },
     },
     columns: {
       selected: [],
@@ -86,8 +91,18 @@ export default can.Component.extend({
     objectGenerator: false,
     deferredList: [],
     disabledIds: [],
+    /**
+     * Stores "id: relation" pairs for mega objects mapping
+     * @type {Object}
+     * @example
+     * {
+     *    1013: 'parent',
+     *    1025: 'child',
+     *    defaultValue: 'child',
+     * }
+     */
     megaRelationObj: {
-      defaultValue: 'parent',
+      defaultValue: 'child',
     },
     init: function () {
       this.attr('submitCbs').add(this.onSearch.bind(this, true));
@@ -119,9 +134,7 @@ export default can.Component.extend({
           this.getDisplayModel().model_singular
         );
 
-      const megaMapping =
-        isMegaMapping(this.attr('object'), this.attr('type'));
-      if (megaMapping) {
+      if (this.attr('isMegaMapping')) {
         this.addMegaColumns(columns);
       }
 
@@ -368,7 +381,7 @@ export default can.Component.extend({
         }
       });
     },
-    disableItself: function (megaMapping, allItems = []) {
+    disableItself: function (megaMapping, allItems) {
       const baseInstance = this.attr('baseInstance');
       if (allItems.length) {
         if (baseInstance.type === allItems[0].type) {
@@ -397,7 +410,7 @@ export default can.Component.extend({
     load: function () {
       const self = this;
       const modelKey = this.getModelKey();
-      const megaMapping = isMegaMapping(this.attr('object'), modelKey);
+      const megaMapping = this.attr('isMegaMapping');
       const dfd = $.Deferred();
       const query = this.getQuery('values', true, megaMapping);
       this.attr('isLoading', true);
