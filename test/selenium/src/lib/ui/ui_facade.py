@@ -1,6 +1,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """General UI facade."""
+# pylint: disable=invalid-name
 from lib import users, browsers
 from lib.entities import entity_operations
 from lib.page.widget import object_page, object_modal
@@ -39,13 +40,17 @@ def active_tab_name():
   return object_page.ObjectPage().top_tabs.active_tab.name
 
 
-def verify_modal_not_present(modal_obj):
+def verify_modal_obj_not_present(modal_obj):
+  """Verifies that object is not present in current window."""
+  assert not modal_obj.is_present, ("Modal object {} should not be "
+                                    "present.".format(modal_obj.__class__))
+
+
+def verify_modal_obj_not_present_in_all_windows(modal_obj):
   """Verifies that object is not present in any window."""
   assert issubclass(modal_obj.__class__,
                     object_modal.BaseObjectModal), ("Object should be derived "
                                                     "from BaseObjectModal.")
   for window in browsers.get_browser().windows():
     window.use()
-    assert not modal_obj.is_present, (
-        "Modal object {} should not be present.".format(
-            modal_obj.__class__.__name__))
+    verify_modal_obj_not_present(modal_obj)

@@ -42,4 +42,4 @@ class TestCreateObject(base.Test):
       pytest.xfail(reason="GGRC-6934 Create object is not present.")
     obj_modal = webui_facade.open_create_obj_modal(
         obj_type=objects.get_singular(objects.CONTROLS, title=True))
-    ui_facade.verify_modal_not_present(obj_modal)
+    ui_facade.verify_modal_obj_not_present_in_all_windows(obj_modal)
