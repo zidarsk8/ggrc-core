@@ -86,10 +86,10 @@ Person._api_attrs.add('user_roles')
 _orig_Person_eager_query = Person.eager_query
 
 
-def _Person_eager_query(cls):
+def _Person_eager_query(cls, **kwargs):
   from sqlalchemy import orm
 
-  return _orig_Person_eager_query().options(
+  return _orig_Person_eager_query(**kwargs).options(
       orm.subqueryload('user_roles'),
       # orm.subqueryload('user_roles').undefer_group('UserRole_complete'),
       # orm.subqueryload('user_roles').joinedload('context'),
@@ -104,10 +104,12 @@ Context._api_attrs.add('user_roles')
 _orig_Context_eager_query = Context.eager_query
 
 
-def _Context_eager_query(cls):
+def _Context_eager_query(cls, **kwargs):
   from sqlalchemy import orm
 
-  return _orig_Context_eager_query().options(orm.subqueryload('user_roles'))
+  return _orig_Context_eager_query(**kwargs).options(
+      orm.subqueryload('user_roles')
+  )
 
 
 Context.eager_query = classmethod(_Context_eager_query)
