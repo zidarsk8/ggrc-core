@@ -277,26 +277,18 @@ describe('related-assessments component', () => {
           });
         });
 
-        it('dispatches "afterObjectReused" event', (done) => {
+        it('dispatches "reusableObjectsCreated" event', (done) => {
           spyOn(viewModel, 'dispatch');
 
           viewModel.reuseSelected();
 
-          saveDfd.resolve().then(() => {
+          let model = {};
+          saveDfd.resolve(model).then(() => {
             expect(viewModel.dispatch)
-              .toHaveBeenCalledWith('afterObjectReused');
-            done();
-          });
-        });
-
-        it('dispatches "refreshAssessment" event on instance', (done) => {
-          spyOn(viewModel, 'dispatch');
-
-          viewModel.reuseSelected();
-
-          saveDfd.resolve().then(() => {
-            expect(viewModel.dispatch)
-              .toHaveBeenCalledWith('refreshAssessment');
+              .toHaveBeenCalledWith({
+                type: 'reusableObjectsCreated',
+                items: [model],
+              });
             done();
           });
         });

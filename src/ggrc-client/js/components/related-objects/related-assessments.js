@@ -92,6 +92,8 @@ export default can.Component.extend({
       return new Evidence(data);
     },
     reuseSelected: function () {
+      this.attr('isSaving', true);
+
       let reusedObjectList = this.attr('selectedEvidences').map((evidence) => {
         let model = this.buildEvidenceModel(evidence);
 
@@ -100,14 +102,17 @@ export default can.Component.extend({
         });
       });
 
-      this.attr('isSaving', true);
-
-      $.when(...reusedObjectList).always(() => {
-        this.attr('selectedEvidences').replace([]);
-        this.attr('isSaving', false);
-        this.dispatch('afterObjectReused');
-        this.dispatch('refreshAssessment');
-      });
+      $.when(...reusedObjectList)
+        .done((...evidence) => {
+          this.dispatch({
+            type: 'reusableObjectsCreated',
+            items: evidence,
+          });
+        })
+        .always(() => {
+          this.attr('selectedEvidences').replace([]);
+          this.attr('isSaving', false);
+        });
     },
     loadRelatedAssessments() {
       const limits = this.attr('paging.limits');

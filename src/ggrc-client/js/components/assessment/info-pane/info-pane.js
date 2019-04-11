@@ -448,6 +448,25 @@ export default can.Component.extend({
             tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
         });
     },
+    addReusableEvidence(event) {
+      this.attr('deferredSave').push(() => {
+        event.items.forEach((item) => {
+          let related = {
+            id: item.attr('id'),
+            type: item.attr('type'),
+          };
+
+          this.addAction('add_related', related);
+        });
+      })
+        .done(() => {
+          this.updateItems('urls', 'files');
+          this.refreshCounts(['Evidence']);
+        })
+        .always(() => {
+          this.attr('instance').removeAttr('actions');
+        });
+    },
     initializeFormFields: function () {
       const cavs =
       getCustomAttributes(
