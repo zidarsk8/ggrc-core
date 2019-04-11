@@ -21,9 +21,9 @@
       {{#if_instance_of instance 'Audit'}}
         {{#if instance.issue_tracker.enabled}}
           <div class="people-sync">
-            <input disabled type="checkbox"
+            <input disabled type="checkbox" id="modal__people-sync"
               can-value="instance.issue_tracker.people_sync_enabled">
-            Sync people with ticket tracker
+            <label for="modal__people-sync">Sync people with ticket tracker</label>
           </div>
         {{/if}}
       {{/if_instance_of}}
