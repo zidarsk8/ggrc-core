@@ -213,6 +213,7 @@ def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
       parameters=parameters,
       payload=payload,
       modified_by=_bg_task_user(),
+      status=BackgroundTask.PENDING_STATUS,
   )
   db.session.add(bg_task)
   return bg_task
