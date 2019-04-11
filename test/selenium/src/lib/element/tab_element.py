@@ -11,16 +11,16 @@ class Tabs(object):
 
   def __init__(self, container, level):
     if level == self.TOP:
-      self._root = container.ul(class_name="internav")
+      self._root = container.nav(class_name="internav")
     elif level == self.INTERNAL:
-      self._root = container.element(class_name="nav-tabs")
+      self._root = container.ul(class_name="nav-tabs")
     else:
       raise NotImplementedError
 
   @property
   def tabs(self):
     """Returns a list of tabs."""
-    return [Tab(tab_el) for tab_el in self._root.lis()]
+    return [Tab(tab_el) for tab_el in self._root.elements()]
 
   @property
   def tab_names(self):
@@ -30,7 +30,7 @@ class Tabs(object):
   @property
   def active_tab(self):
     """Returns active tab."""
-    return Tab(self._root.li(class_name="active"))
+    return Tab(self._root.element(class_name="active"))
 
   def ensure_tab(self, tab_name):
     """Ensure that page tab `tab_name` is opened"""
@@ -39,7 +39,7 @@ class Tabs(object):
 
   def _tab_with_name(self, name):
     """Returns tab with name `name`."""
-    return Tab(self._root.li(text=name))
+    return Tab(self._root.element(text=name))
 
 
 class Tab(object):

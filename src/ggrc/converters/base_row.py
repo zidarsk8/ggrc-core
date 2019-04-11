@@ -26,7 +26,7 @@ from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
 from ggrc.rbac import permissions
 from ggrc.services import signals
 from ggrc.snapshotter import create_snapshots
-from ggrc.utils import dump_attrs
+from ggrc.utils import dump_attrs, benchmarks
 
 from ggrc.models.reflection import AttributeInfo
 from ggrc.services.common import get_modified_objects
@@ -56,6 +56,7 @@ class RowConverter(object):
     self.objects = collections.OrderedDict()
     self.old_values = {}
     self.issue_tracker = {}
+    self.comments = []
 
 
 class ImportRowConverter(RowConverter):
@@ -280,7 +281,7 @@ class ImportRowConverter(RowConverter):
                        column_name=role,
                        message=msg)
     self._check_secondary_objects()
-    if self.block_converter.converter.dry_run:
+    if self.dry_run:
       return
     try:
       self.insert_secondary_objects()
@@ -306,6 +307,45 @@ class ImportRowConverter(RowConverter):
 
     self.add_warning(errors.READONLY_ACCESS_WARNING, columns=columns_str)
 
+  @property
+  def dry_run(self):
+    return self.block_converter.converter.dry_run
+
+  def _get_assessment_template(self):
+    """Get asmt template object which is referenced by current row if exists"""
+    tmpl_handler = self.objects.get("assessment_template")
+    if not tmpl_handler:
+      return None
+
+    items = tmpl_handler.parse_item()
+    if not items:
+      return None
+
+    return items[0]
+
+  def _update_issue_tracker_to_import(self):
+    """Make importable data available in import background task"""
+
+    if self.dry_run:
+      return
+
+    if not isinstance(self.obj, issue_tracker.IssueTracked):
+      return
+
+    self.obj.is_import = True
+
+    if self.is_new and isinstance(self.obj, all_models.Assessment):
+      # Assessment template is available only for new assessment objects
+      asmt_tmpl = self._get_assessment_template()
+      if asmt_tmpl:
+        # Format have to be the same as issue_tracker dict in POST request
+        self.obj.issue_tracker_to_import['template'] = {
+            'type': asmt_tmpl.__class__.__name__,
+            'id': asmt_tmpl.id
+        }
+
+    self.obj.issue_tracker_to_import['issue_tracker'] = self.issue_tracker
+
   def process_row(self):
     """Parse, set, validate and commit data specified in self.row."""
     self._check_object_class()
@@ -325,6 +365,9 @@ class ImportRowConverter(RowConverter):
       return
     if self.block_converter.ignore:
       return
+
+    self._update_issue_tracker_to_import()
+
     self.flush_object()
     self.setup_secondary_objects()
     self.commit_object()
@@ -363,7 +406,7 @@ class ImportRowConverter(RowConverter):
 
   def flush_object(self):
     """Flush dirty data related to the current row."""
-    if self.block_converter.converter.dry_run or self.ignore:
+    if self.dry_run or self.ignore:
       return
     self.send_pre_commit_signals()
     try:
@@ -392,7 +435,7 @@ class ImportRowConverter(RowConverter):
 
     This method also calls pre-and post-commit signals and handles failures.
     """
-    if self.block_converter.converter.dry_run or self.ignore:
+    if self.dry_run or self.ignore:
       return
     try:
       if not self.is_new:
@@ -422,6 +465,7 @@ class ImportRowConverter(RowConverter):
       self.block_converter.add_errors(errors.UNKNOWN_ERROR,
                                       line=self.offset + 2)
     else:
+      self.send_comment_notifications()
       self.send_post_commit_signals(event=import_event)
 
   def _setup_object(self):
@@ -437,6 +481,14 @@ class ImportRowConverter(RowConverter):
     for item_handler in self.attrs.values():
       if not item_handler.view_only and not item_handler.ignore:
         item_handler.set_obj_attr()
+
+  def send_comment_notifications(self):
+    """Send comment people mentions notifications."""
+    from ggrc.notifications import people_mentions
+
+    if self.comments:
+      people_mentions.handle_comment_mapped(obj=self.obj,
+                                            comments=self.comments)
 
   def send_post_commit_signals(self, event=None):
     """Send after commit signals for all objects
@@ -522,9 +574,23 @@ class ImportRowConverter(RowConverter):
     """
     if not self.obj or self.ignore or self.is_delete:
       return
+
     for handler in self.objects.values():
       if not handler.ignore:
         handler.insert_object()
+
+    self._update_issue_tracker_object()
+
+  def _update_issue_tracker_object(self):
+    """Update IssueTrackerIssue for object update requests.
+
+    The functionality to update IssueTrackerIssue for new objects
+    is moved to import background task.
+    """
+
+    if self.is_new:
+      return
+
     if issubclass(self.obj.__class__, issue_tracker.IssueTracked):
       if not self.issue_tracker:
         self.issue_tracker = self.obj.issue_tracker
@@ -566,13 +632,16 @@ class ExportRowConverter(RowConverter):
       list of strings where each cell contains a string value of the
       corresponding field.
     """
+    benchmark_manager = benchmarks.BenchmarkLongestManager(5)
     row = []
     for field in fields:
-      field_type = self.headers.get(field, {}).get("type")
-      if field_type == AttributeInfo.Type.PROPERTY:
-        field_handler = self.attrs.get(field)
-      else:
-        field_handler = self.objects.get(field)
-      value = field_handler.get_value() if field_handler else ""
-      row.append(value or "")
+      with benchmark_manager.benchmark(u"Process '{}' field".format(field)):
+        field_type = self.headers.get(field, {}).get("type")
+        if field_type == AttributeInfo.Type.PROPERTY:
+          field_handler = self.attrs.get(field)
+        else:
+          field_handler = self.objects.get(field)
+        value = field_handler.get_value() if field_handler else ""
+        row.append(value or "")
+    benchmark_manager.print_benchmaks()
     return row

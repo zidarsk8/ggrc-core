@@ -45,7 +45,6 @@
       border: 1px solid $widgetBorder;
       background-color: $white;
       color: $textGray;
-      margin-top: -2px;
       display: inline-block;
       min-width: 36px;
       text-align: start;
@@ -82,10 +81,7 @@
       padding: 0 25px;
       background-color: $white;
       color: $textGray;
-      margin-top: -2px;
       border-radius: 0;
-      box-sizing: content-box;
-      margin-right: -1px;
       border: 1px solid $widgetBorder;
 
       &:hover {

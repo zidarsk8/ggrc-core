@@ -35,56 +35,22 @@ const viewModel = can.Map.extend({
           && !isMyWork()
           && !isAllObjects()
           && !['Person', 'Evidence'].includes(getPageType())
-          && this.attr('hasHiddenWidgets');
-      },
-    },
-    filteredWidgets: {
-      get() {
-        let widgetList = this.attr('widgetList');
-
-        return _.filter(widgetList, (widget) => {
-          return this.isNotObjectVersion(widget.internav_display) &&
-            !this.isNotProhibitedMap(widget.model.model_singular) &&
-            widget.attr('placeInAddTab');
-        });
+          && this.attr('widgetList.length') > 0;
       },
     },
   },
   instance: null,
   widgetList: null,
-  urlPath: '',
   addTabTitle: '',
-  hasHiddenWidgets: true,
-  isNotObjectVersion(internavDisplay) {
-    return internavDisplay.indexOf('Versions') === -1;
-  },
-  isNotProhibitedMap(shortName) {
-    const prohibitedMapList = {
-      Issue: ['Assessment', 'Audit'],
-      Assessment: ['Evidence'],
-    };
-
-    const instanceType = this.attr('instance.type');
-
-    return prohibitedMapList[instanceType] &&
-      prohibitedMapList[instanceType].includes(shortName);
-  },
   isAllowedToMap(target) {
     let source = this.attr('instance');
-    let isMappable = Mappings.isMappableType(source.attr('type'), target);
-    let canMap = Mappings.allowedToMap(source, target);
-
-    return isMappable && canMap;
-  },
-  sortWidgets() {
-    this.attr('widgetList',
-      _.sortBy(this.attr('widgetList'), 'internav_display'));
+    return Mappings.allowedToMap(source, target);
   },
 });
 
 export default can.Component.extend({
   tag: 'add-tab-button',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel,
   events: {
@@ -124,8 +90,5 @@ export default can.Component.extend({
       }
       return options.inverse(options.contexts);
     },
-  },
-  init() {
-    this.viewModel.sortWidgets();
   },
 });

@@ -5,6 +5,8 @@
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=unused-argument
 # pylint: disable=redefined-outer-name
+# pylint: disable=broad-except
+# pylint: disable=inconsistent-return-statements
 import copy
 import logging
 import os
@@ -17,7 +19,7 @@ from selenium.webdriver.remote.remote_connection import (
     LOGGER as SELENIUM_LOGGER)
 
 from lib import dynamic_fixtures, environment, url, users, browsers
-from lib.constants import element, workflow_repeat_units
+from lib.constants import element, roles, workflow_repeat_units
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory
 from lib.page import dashboard
@@ -178,14 +180,6 @@ def set_superuser_as_current_user():
   users.set_current_user(entities_factory.PeopleFactory.superuser)
 
 
-@pytest.fixture()
-def set_external_user_as_current_user():
-  """Set super user as a current user"""
-  # pylint: disable=protected-access
-  users._current_user = users.EXTERNAL_APP_USER
-  users.set_current_user(entities_factory.PeopleFactory.external_app_user)
-
-
 @pytest.fixture(autouse=True)
 def reset_state(request):
   """Reset caches of logged in users and requests sessions.
@@ -340,37 +334,6 @@ def new_assessment_template_rest(request):
   yield _common_fixtures(request.fixturename)
 
 
-# @pytest.fixture(scope="function")
-# def new_assessment_template_with_cas_rest(request):
-#   """Create new Assessment Template with CAs under Audit object via REST API.
-#   Return: lib.entities.entity.AssessmentTemplateEntity
-#   """
-#   yield _common_fixtures(request.fixturename)
-
-
-# @pytest.fixture(scope="function")
-# def new_assessments_from_template_rest(request, new_audit_rest):
-#   """Create new Assessments based on Assessment Template via REST API.
-#   Return: [lib.entities.entity.AssessmentEntity, ...]
-#   """
-#   dict_executed_fixtures = dynamic_fixtures.dict_executed_fixtures
-#   control_snapshots = dynamic_fixtures.get_fixture_from_dict_fixtures(
-#       "new_controls_rest_snapshot")
-#   template = None
-#   for fixture_name in dict_executed_fixtures:
-#     if fixture_name.startswith("new_assessment_template"):
-#       template = dict_executed_fixtures[fixture_name][0]
-#   if not template:
-#     raise ValueError("Assessment template was not created")
-#   assessments_service = rest_service.AssessmentsFromTemplateService()
-#   assessments = assessments_service.create_assessments(
-#       audit=new_audit_rest,
-#       template=template,
-#       snapshots=control_snapshots
-#   )
-#   return assessments
-
-
 @pytest.fixture(scope="function")
 def new_cas_for_assessments_rest(request):
   """New global Custom Attributes for assessments created via REST API.
@@ -390,7 +353,7 @@ def new_cas_for_controls_rest(request):
 
 @pytest.fixture(scope="function")
 def create_audit_with_control(
-    request, program, control_mapped_to_program, audit
+    program, control_mapped_to_program, audit
 ):
   """Create Program and Control, map Control to Program, create Audit
   under Program via REST API and return dictionary of executed fixtures.
@@ -398,12 +361,11 @@ def create_audit_with_control(
   return {"program": program,
           "control": control_mapped_to_program,
           "audit": audit}
-  # yield _snapshots_fixtures(request.fixturename)
 
 
 @pytest.fixture(scope="function")
 def create_audit_with_control_and_update_control(
-    request, program, control_mapped_to_program, audit
+    program, control_mapped_to_program, audit
 ):
   """Create Program and Control, map Control to Program, create Audit
   under Program, update Control via REST API and return dictionary of executed
@@ -418,7 +380,7 @@ def create_audit_with_control_and_update_control(
 
 @pytest.fixture(scope="function")
 def create_audit_with_control_and_delete_control(
-    request, program, control_mapped_to_program, audit
+    program, control_mapped_to_program, audit
 ):
   """Create Program and Control, map Control to Program, create Audit
   under Program, delete Control via REST API and return dictionary of executed
@@ -503,7 +465,7 @@ def map_new_assessment_rest_to_new_issue_rest(request):
 
 @pytest.fixture(scope="function")
 def map_new_assessment_rest_to_new_control_rest_snapshot(
-    request, assessment, control_mapped_to_program
+    assessment, control_mapped_to_program
 ):
   """Map Assessment to Control object via REST API return response from server.
   """
@@ -574,6 +536,18 @@ def dynamic_relationships(request):
 
 
 # New app fixtures
+
+@pytest.fixture()
+def creator():
+  """Create user with role 'Creator'."""
+  return rest_facade.create_user_with_role(roles.CREATOR)
+
+
+@pytest.fixture()
+def login_as_creator(creator):
+  """Login by user with role 'Creator'."""
+  users.set_current_user(creator)
+
 
 @pytest.fixture()
 def program():
@@ -727,6 +701,13 @@ def obj(request):
 
 
 # New fixtures
+
+@pytest.fixture(scope="function")
+def lhn_menu(selenium):
+  """Open LHN menu and return LHN page objects model."""
+  selenium_utils.open_url(url.Urls().dashboard)
+  return dashboard.Dashboard(selenium).open_lhn_menu()
+
 
 @pytest.fixture()
 def app_workflow():

@@ -262,7 +262,7 @@ export default can.Model.extend({
     //  below when the update endpoint isn't set in the model's static config.
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
-    this.update = async function (id, params) {
+    this.update = function (id, params) {
       let ret = _update
         .call(this, id, this.process_args(params))
         .then((obj) => obj,
@@ -281,7 +281,7 @@ export default can.Model.extend({
       delete ret.hasFailCallback;
       return ret;
     };
-    this.create = async function (params) {
+    this.create = function (params) {
       let ret = _create
         .call(this, this.process_args(params));
       delete ret.hasFailCallback;
@@ -593,13 +593,13 @@ export default can.Model.extend({
       GGRC.custom_attr_defs = {};
       console.warn('Missing injected custom attribute definitions');
     }
-    definitions = can.map(GGRC.custom_attr_defs, function (def) {
+    definitions = _.filteredMap(GGRC.custom_attr_defs, (def) => {
       let idCheck = !def.definition_id || def.definition_id === this.id;
       if (idCheck &&
           def.definition_type === this.constructor.table_singular) {
         return def;
       }
-    }.bind(this));
+    });
     this.attr('custom_attribute_definitions', definitions);
   },
   /*
@@ -739,7 +739,7 @@ export default can.Model.extend({
       } else if (val && _.isFunction(val.save)) {
         serial[name] = (new Stub(val)).serialize();
       } else if (typeof val === 'object' && val !== null && val.length) {
-        serial[name] = can.map(val, function (v) {
+        serial[name] = _.filteredMap(val, (v) => {
           let isModel = v && _.isFunction(v.save);
           return isModel ?
             (new Stub(v)).serialize() :
@@ -758,13 +758,13 @@ export default can.Model.extend({
     return serial;
   },
   display_name: function () {
-    let displayName = this.title || this.name;
-
-    if (_.isUndefined(displayName)) {
-      return '"' + this.type + ' ID: ' + this.id + '" (DELETED)';
+    if (this.is_deleted()) {
+      return `"${this.type} ID: ${this.id}" (DELETED)`;
     }
-
-    return displayName;
+    return this.title || this.name || `"${this.type} ID: ${this.id}"`;
+  },
+  is_deleted: function () {
+    return !(this.created_at);
   },
   display_type: function () {
     return this.type;

@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Create and manipulate objects via REST API."""
 # pylint: disable=too-few-public-methods
+# pylint: disable=unsubscriptable-object
 
 import json
 
@@ -15,7 +16,7 @@ from lib.entities.entities_factory import (
     AccessControlRolesFactory)
 from lib.entities.entity import Representation
 from lib.service.rest import client, query
-from lib.utils import help_utils, test_utils
+from lib.utils import help_utils, test_utils, string_utils
 
 
 class BaseRestService(object):
@@ -273,7 +274,11 @@ class AccessControlRolesService(BaseRestService):
   def create_acl_role(self, **attrs):
     """Create ACL role."""
     acl_factory = AccessControlRolesFactory()
-    acr_name = acl_factory.generate_string(attrs["object_type"])
+    allowed_name_chars = string_utils.Symbols(additional_exclude='*')
+    acr_name = acl_factory.generate_string(
+        attrs["object_type"],
+        allowed_chars=allowed_name_chars.standard_chars
+    )
     return self.create_obj(
         acl_factory.create(name=acr_name, **attrs).__dict__)
 
@@ -293,8 +298,27 @@ class RelationshipsService(HelpRestService):
         dest_obj in help_utils.convert_to_list(dest_objs)]
 
 
+class ReviewService(BaseRestService):
+  """Service for working with entities reviews."""
+  def __init__(self):
+    super(ReviewService, self).__init__(url.REVIEWS)
+
+  def request_review(self, obj, person):
+    """Add reviewer to object.
+    Returns obj with added review."""
+    review_attrs = {
+        "reviewers": person, "reviewable": obj.repr_min_dict()}
+    review = self.create_obj(factory_params=review_attrs)
+    # reviewers field contains list of reviewer emails
+    obj.review = {
+        "status": review.status,
+        "reviewers": review.reviewers,
+        "last_reviewed_by": ""}
+    return obj
+
+
 class AssessmentsFromTemplateService(HelpRestService):
-  """Service for creating asessments from templates"""
+  """Service for creating assessments from templates."""
   def __init__(self):
     super(AssessmentsFromTemplateService, self).__init__(url.ASSESSMENTS)
 
@@ -330,40 +354,41 @@ class ObjectsInfoService(HelpRestService):
   def __init__(self):
     super(ObjectsInfoService, self).__init__(url.QUERY)
 
+  def get_obj_dict(self, obj_type, **kwargs):
+    """Get object using object type and appropriate filters."""
+    return json.loads(self.client.create_object(
+        type=self.endpoint, object_name=obj_type,
+        **kwargs).text)[0][obj_type]["values"]
+
   def get_snapshoted_obj(self, origin_obj, paren_obj):
     """Get and return snapshoted object according to 'origin_obj' and
     'paren_obj'.
     """
+    @test_utils.wait_for
+    def get_snapshoted_obj_response_values():
+      """Get values fom response."""
+      # pylint: disable=invalid-name
+      filters = query.Query.expression_get_snapshoted_obj(
+          obj_type=origin_obj.type, obj_id=origin_obj.id,
+          parent_type=paren_obj.type, parent_id=paren_obj.id)
+      return self.get_obj_dict(
+          objects.get_obj_type(objects.SNAPSHOTS), filters=filters)
 
-    def get_response():
-      """Get response from query."""
-      return self.client.create_object(
-          type=self.endpoint,
-          object_name=objects.get_obj_type(objects.SNAPSHOTS),
-          filters=query.Query.expression_get_snapshoted_obj(
-              obj_type=origin_obj.type, obj_id=origin_obj.id,
-              parent_type=paren_obj.type,
-              parent_id=paren_obj.id))
-
-    def get_response_values():
-      """Get values fom responese."""
-      return json.loads(
-          get_response().text, encoding="utf-8")[0]["Snapshot"]["values"]
-
-    test_utils.wait_for(
-        get_response_values,
-        constants.ux.MAX_USER_WAIT_SECONDS * 2)
-    snapshoted_obj_dict = (
-        BaseRestService.get_items_from_resp(get_response()).get("values")[0])
-    return Representation.repr_dict_to_obj(snapshoted_obj_dict)
+    return Representation.repr_dict_to_obj(
+        get_snapshoted_obj_response_values[0])
 
   def get_obj(self, obj):
     """Get and return object according to 'obj.type' and 'obj.id'."""
-    obj_dict = (BaseRestService.get_items_from_resp(self.client.create_object(
-        type=self.endpoint, object_name=unicode(obj.type),
-        filters=query.Query.expression_get_obj_by_id(obj.id))).get(
-        "values")[0])
-    return Representation.repr_dict_to_obj(obj_dict)
+
+    @test_utils.wait_for
+    def get_obj_response_values():
+      """Get values fom response."""
+      obj_type = obj.type if hasattr(obj, "type") else obj.obj_type()
+      obj_id = obj.id if hasattr(obj, "id") else obj.obj_id
+      filters = query.Query.expression_get_obj_by_id(obj_id)
+      return self.get_obj_dict(obj_type, filters=filters)
+
+    return Representation.repr_dict_to_obj(get_obj_response_values[0])
 
   def get_comment_obj(self, paren_obj, comment_description):
     """Get and return comment object according to 'paren_obj' type) and
@@ -371,25 +396,29 @@ class ObjectsInfoService(HelpRestService):
     even comments have the same descriptions query return selection w/ latest
     created datetime.
     """
-    comment_obj_dict = (
-        BaseRestService.get_items_from_resp(self.client.create_object(
-            type=self.endpoint,
-            object_name=objects.get_obj_type(objects.COMMENTS),
-            filters=query.Query.expression_get_comment_by_desc(
-                parent_type=paren_obj.type, parent_id=paren_obj.id,
-                comment_desc=comment_description),
-            order_by=[{"name": "created_at", "desc": True}])).get("values")[0])
-    return Representation.repr_dict_to_obj(comment_obj_dict)
+    @test_utils.wait_for
+    def get_obj_comment_response_values():
+      """Get values fom response."""
+      # pylint: disable=invalid-name
+      filters = query.Query.expression_get_comment_by_desc(
+          parent_type=paren_obj.type, parent_id=paren_obj.id,
+          comment_desc=comment_description)
+      order_by = [{"name": "created_at", "desc": True}]
+      return self.get_obj_dict(objects.get_obj_type(objects.COMMENTS),
+                               filters=filters, order_by=order_by)
+
+    return Representation.repr_dict_to_obj(get_obj_comment_response_values[0])
 
   def get_person(self, email):
     """Get and return person object by email"""
-    attrs = (
-        BaseRestService.get_items_from_resp(self.client.create_object(
-            type=self.endpoint,
-            object_name=objects.get_obj_type(objects.PEOPLE),
-            filters=query.Query.expression_get_person_by_email(
-                email=email))).get("values")[0])
+    @test_utils.wait_for
+    def person_attrs():
+      """Get values fom response."""
+      filters = query.Query.expression_get_person_by_email(email=email)
+      return self.get_obj_dict(
+          objects.get_obj_type(objects.PEOPLE), filters=filters)
+
     person = PeopleFactory().create()
-    person.__dict__.update({k: v for k, v in attrs.iteritems()
+    person.__dict__.update({k: v for k, v in person_attrs[0].iteritems()
                             if v and k not in ["type", ]})
     return person

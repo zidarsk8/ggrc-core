@@ -5,10 +5,11 @@
 
 export default can.Component.extend({
   tag: 'textarea-array',
-  template:
+  template: can.stache(
     '<textarea class="{{className}}" placeholder="{{placeholder}}">' +
     '{{content}}' +
-    '</textarea>',
+    '</textarea>'
+  ),
   leakScope: true,
   viewModel: {
     array: null,

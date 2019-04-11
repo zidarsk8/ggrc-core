@@ -1,0 +1,18 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if isAuditScope}} 
+  <audit-inner-nav
+    {instance}="{instance}"
+    {widget-descriptors}="{innerNavDescriptors}"
+    (active-changed)="{showWidgetArea(%event)}"
+  ></audit-inner-nav>
+{{else}}
+  <inner-nav
+    {instance}="{instance}"
+    {widget-descriptors}="{innerNavDescriptors}"
+    (active-changed)="{showWidgetArea(%event)}"
+  ></inner-nav>
+{{/if}}

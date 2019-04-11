@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+people-mention {
+  people-autocomplete-wrapper {
+    position: relative;
+    display: block;
+  }
+
+  .autocomplete-result-wrapper {
+    position: absolute;
+    background-color: $white;
+    width: 100%;
+    z-index: 1;
+    border: 1px solid $warmGray;
+    border-top: none;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 12px;
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .autocomplete-item {
+      padding: 4px 4px;
+      box-sizing: border-box;
+      border-bottom: 1px solid $warmGray;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.active {
+        color: $white;
+        background-color: #0086d4;
+      }
+    }
+  }
+}
+
+.simple-modal__section:last-child {
+  people-autocomplete-wrapper.shown {
+    height: 100px;
+  }
+}

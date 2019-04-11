@@ -4,9 +4,7 @@
  */
 
 import * as StateUtils from '../../plugins/utils/state-utils';
-import {
-  getCounts,
-} from '../../plugins/utils/widgets-utils';
+import {getCounts} from '../../plugins/utils/widgets-utils';
 import TreeLoader from './tree-loader';
 import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
@@ -91,11 +89,6 @@ const TreeViewControl = TreeLoader.extend({
     this.options.attr('is_subtree',
       this.element && this.element.closest('.inner-tree').length > 0);
 
-    this.options.update_count =
-      _.isBoolean(this.element.data('update-count')) ?
-        this.element.data('update-count') :
-        true;
-
     if (!this.options.scroll_element) {
       this.options.attr('scroll_element', $('.object-area'));
     }
@@ -123,37 +116,24 @@ const TreeViewControl = TreeLoader.extend({
       this.options.attr('parent_instance', this.options.parent_instance());
     }
   },
-
   ' inserted': function () { // eslint-disable-line quote-props
     this._attached_deferred.resolve();
   },
-
   init_view: function () {
-    let self = this;
     let dfds = [];
-    let optionsDfd;
-    let statusControl;
-
     if (this.options.header_view && this.options.show_header) {
-      optionsDfd = $.when(this.options);
       dfds.push(
-        can.view(this.options.header_view, optionsDfd).then(
-          this._ifNotRemoved(function (frag) {
+        $.when(this.options, $.ajax({
+          url: this.options.header_view,
+          dataType: 'text',
+        })).then((ctx, view) => {
+          return can.stache(view[0])(ctx);
+        }).then(
+          this._ifNotRemoved((frag) => {
             this.element.before(frag);
-
-            statusControl = this.element.parent()
-              .find('.tree-filter__status-wrap');
-            // set state filter (checkboxes)
-            can.bind.call(statusControl.ready(function () {
-              let selectStateList = self.options.attr('selectStateList');
-
-              self.options.attr('filter_states').forEach(function (item) {
-                if (selectStateList.indexOf(item.value) > -1) {
-                  item.attr('checked', true);
-                }
-              });
-            }));
-          }.bind(this))));
+          })
+        )
+      );
     }
 
     this.init_count();
@@ -165,22 +145,9 @@ const TreeViewControl = TreeLoader.extend({
   init_count: function () {
     let self = this;
     let options = this.options;
-    let counts;
     let countsName = options.countsName || options.model.model_singular;
 
-    if (this.options.parent_instance && this.options.mapping) {
-      counts = getCounts();
-
-      if (self.element) {
-        can.trigger(self.element, 'updateCount',
-          [counts.attr(countsName), self.options.update_count]);
-      }
-
-      counts.on(countsName, function (ev, newVal, oldVal) {
-        can.trigger(self.element, 'updateCount',
-          [newVal, self.options.update_count]);
-      });
-    } else if (this.options.list_loader) {
+    if (this.options.list_loader) {
       this.options.list_loader(this.options.parent_instance)
         .then(function (list) {
           return can.compute(function () {
@@ -189,12 +156,10 @@ const TreeViewControl = TreeLoader.extend({
         })
         .then(function (count) {
           if (self.element) {
-            can.trigger(self.element, 'updateCount', [count(),
-              self.options.update_count]);
+            getCounts().attr(countsName, count());
           }
           count.bind('change', self._ifNotRemoved(function () {
-            can.trigger(self.element, 'updateCount', [count(),
-              self.options.update_count]);
+            getCounts().attr(countsName, count());
           }));
         });
     }

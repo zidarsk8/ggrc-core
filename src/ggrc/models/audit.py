@@ -9,25 +9,25 @@ from werkzeug import exceptions as wzg_exceptions
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
-from ggrc.login import get_current_user
-from ggrc.models.deferred import deferred
-from ggrc.models import mixins
-from ggrc.models.mixins.with_evidence import WithEvidence
-from ggrc.rbac import SystemWideRoles
-
 from ggrc.fulltext.mixin import Indexed
+from ggrc.login import get_current_user
+from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.context import HasOwnContext
+from ggrc.models.deferred import deferred
+from ggrc.models.evidence import Evidence
 from ggrc.models.mixins import base
 from ggrc.models.mixins import clonable
 from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.models.mixins import rest_handable as rest_handable_mixins
+from ggrc.models.mixins.with_evidence import WithEvidence
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
-from ggrc.models.evidence import Evidence
 from ggrc.models.relationship import Relatable, Relationship
 from ggrc.models.snapshot import Snapshotable
+from ggrc.rbac import SystemWideRoles
+from ggrc.utils import errors
 
 
 class Audit(Snapshotable,
@@ -304,11 +304,7 @@ class Audit(Snapshotable,
     """Check that audit has no assessments before delete."""
     if self.assessments:
       db.session.rollback()
-      raise wzg_exceptions.Conflict(
-          "The audit cannot be deleted due to mapped assessment(s) to this "
-          "audit. Please delete assessment(s) mapped to this audit first "
-          "before deleting the audit.",
-      )
+      raise wzg_exceptions.Conflict(errors.MAPPED_ASSESSMENT)
 
   def handle_delete(self):
     """Handle model_deleted signals."""

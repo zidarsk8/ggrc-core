@@ -10,11 +10,10 @@ import {
 } from '../../plugins/utils/object-history-utils';
 import {caDefTypeName} from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import template from './templates/restore-revision.stache';
-const tag = 'restore-revision';
 
 export default can.Component.extend({
-  tag,
-  template,
+  tag: 'restore-revision',
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     instance: {},
@@ -46,7 +45,6 @@ export default can.Component.extend({
       } else {
         // fill in mandatory fields
         this.attr('modalState.open', true);
-        this.closeDiff(element);
       }
     },
     isInstanceValid(instance) {
@@ -107,6 +105,7 @@ export default can.Component.extend({
     },
     revertChanges() {
       this.attr('instance').restore(true);
+      this.attr('loading', false);
     },
   },
 });

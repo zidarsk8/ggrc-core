@@ -17,9 +17,7 @@
       -block header
 
     -block nav
-      .top-inner-nav
-        .object-nav
-          %div.nav{ 'class': "internav" }
+      #inner-nav.top-inner-nav
 
     %section.content.flex-size-1
       .flash
@@ -29,7 +27,7 @@
               %div{ 'class': "{{category}}" }
                 %p
                   {{message}}
-                %a.close{'href': "#", 'data-dismiss': "alert" }
+                %a.close{'href': "javascript:void(0)", 'data-dismiss': "alert" }
                   %i.fa.fa-times
       -block main
         .object-area.row-fluid.full-width
@@ -44,4 +42,4 @@
       =config.get('VERSION')
 
   #lhn
-    #lhs.lhs.accordion{ 'data-template': '/dashboard/lhn.stache' }
+    #lhs.lhs.accordion{ 'data-template': 'dashboard/lhn' }

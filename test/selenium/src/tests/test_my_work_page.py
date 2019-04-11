@@ -13,8 +13,9 @@ import pytest  # pylint: disable=import-error
 from lib import base, url
 from lib.constants import objects
 from lib.page import dashboard, lhn
-from lib.page.widget import generic_widget
+from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_facade
+from lib.ui import ui_facade
 from lib.utils import selenium_utils
 
 
@@ -105,7 +106,6 @@ class TestMyWorkPage(base.Test):
     webui_facade.check_objects_have_numbers(lhn_menu)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_lhn_objects_expand_collapse(self, header_dashboard):
     """Tests LHN menu objects.
     Check expand/collapse objects"""
@@ -120,7 +120,7 @@ class TestMyWorkPage(base.Test):
     webui_facade.check_user_menu_has_icons(user_menu)
 
   @pytest.mark.smoke_tests
-  def test_lhn_info_popup(self, header_dashboard, program):
+  def test_lhn_info_popup(self, program, header_dashboard):
     """Tests LHN item info popup."""
     programs = (header_dashboard.open_lhn_menu().select_all_objects().
                 select_programs())
@@ -129,8 +129,7 @@ class TestMyWorkPage(base.Test):
         program_title).title.text
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
-  def test_info_panel_close_button(self, my_work_dashboard, program):
+  def test_info_panel_close_button(self, program, my_work_dashboard):
     """Tests My Work Info panel close button."""
     info_panel = (my_work_dashboard.select_programs().tree_view.
                   select_member_by_title(program.title).panel)
@@ -139,8 +138,7 @@ class TestMyWorkPage(base.Test):
     assert info_panel.is_opened is False
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
-  def test_info_panel_minimize_button(self, my_work_dashboard, program):
+  def test_info_panel_minimize_button(self, program, my_work_dashboard):
     """Tests My Work Info panel minimize button."""
     program_info_panel = (my_work_dashboard.select_programs().tree_view.
                           select_member_by_title(program.title).panel)
@@ -149,7 +147,7 @@ class TestMyWorkPage(base.Test):
     assert program_info_panel.is_minimized is True
 
   @pytest.mark.smoke_tests
-  def test_info_panel_maximize_button(self, my_work_dashboard, program):
+  def test_info_panel_maximize_button(self, program, my_work_dashboard):
     """Tests My Work Info panel maximize button."""
     program_info_panel = (my_work_dashboard.select_programs().tree_view.
                           select_member_by_title(program.title).panel)
@@ -159,16 +157,14 @@ class TestMyWorkPage(base.Test):
     assert program_info_panel.is_maximized is True
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
-  def test_info_panel_content(self, my_work_dashboard, program):
+  def test_info_panel_content(self, program, my_work_dashboard):
     """Tests My Work Info panel content."""
     assert program.title == (
         my_work_dashboard.select_programs().tree_view.
         select_member_by_title(program.title).panel.title)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
-  def test_info_panel_3bbs(self, my_work_dashboard, program):
+  def test_info_panel_3bbs(self, program, my_work_dashboard):
     """Tests My Work Info panel."""
     panel_three_bbs = (my_work_dashboard.select_programs().tree_view.
                        select_member_by_title(program.title).
@@ -194,7 +190,6 @@ class TestMyWorkPage(base.Test):
     assert my_work_dashboard.is_add_tab_present is False
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_all_objects(self, my_work_dashboard):
     """Tests number of objects in LHN and in All Objects."""
     lhn_objects = (my_work_dashboard.open_lhn_menu().select_all_objects().
@@ -210,3 +205,9 @@ class TestMyWorkPage(base.Test):
                  str(hnb_objects)
       )
     assert hnb_objects.issubset(lhn_objects) is True
+
+  def test_user_cannot_create_control_from_lhn(self, lhn_menu):
+    """Tests that `New Control` modal object cannot be opened from lhn."""
+    lhn_menu.select_controls_or_objectives().select_controls().create_new()
+    ui_facade.verify_modal_obj_not_present_in_all_windows(
+        object_modal.ControlModal())

@@ -24,10 +24,9 @@ class TestRBAC(base.Test):
             for role in self.ALL_ROLES}
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "role",
-      [roles.CREATOR, roles.READER, roles.EDITOR]
+      [roles.ADMINISTRATOR, roles.CREATOR, roles.READER, roles.EDITOR]
   )
   def test_object_creation(self, role, selenium):
     """Test that users with all global roles can create, then edit and delete
@@ -46,7 +45,6 @@ class TestRBAC(base.Test):
         webui_facade.assert_can_delete(selenium, obj, can_delete=True)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "login_role, can_view, can_edit",
       [
@@ -112,7 +110,7 @@ class TestRBAC(base.Test):
         updated_at=rest_facade.get_obj(asmt).updated_at,
         status=object_states.IN_PROGRESS,
         evidence_urls=[url]).repr_ui()
-    self.general_equal_assert(asmt, actual_asmt, "audit", "custom_attributes")
+    self.general_equal_assert(asmt, actual_asmt, "audit")
 
 
 class TestAuditorRole(base.Test):
@@ -151,7 +149,6 @@ class TestAuditorRole(base.Test):
     }
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_auditor_cannot_edit_audit(
       self, selenium, test_data
   ):

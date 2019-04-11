@@ -15,10 +15,11 @@ import Person from '../../models/business-models/person';
 import Snapshot from '../../models/service-models/snapshot';
 import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
+import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
-  template: '<content/>',
+  template: can.stache('<content/>'),
   leakScope: true,
   viewModel: {
     instance: null,
@@ -58,8 +59,6 @@ export default can.Component.extend({
           that.getRevisions(currentRevisionID, newRevisionID)
             .then(function (data) {
               let revisions = that.prepareInstances(data);
-              let fragLeft = can.view(view, revisions[0]);
-              let fragRight = can.view(view, revisions[1]);
 
               if (displayDescriptions) {
                 const leftRevisionData = that.getRevisionData(
@@ -73,17 +72,24 @@ export default can.Component.extend({
                 confirmSelf.attr('leftRevisionData', leftRevisionData);
                 confirmSelf.attr('rightRevisionData', rightRevisionData);
               }
-
               // people should be preloaded before highlighting differences
               // to avoid breaking UI markup as highlightDifference
               // sets block's height
               that.loadACLPeople(revisions[1].instance)
                 .then(() => {
-                  fragLeft.appendChild(fragRight);
-                  target.find('.modal-body').html(fragLeft);
+                  $.ajax({
+                    url: view, dataType: 'text',
+                  }).then((view) => {
+                    let render = can.stache(view);
+                    let fragLeft = render(revisions[0]);
+                    let fragRight = render(revisions[1]);
 
-                  that.highlightDifference(target);
-                  that.highlightCustomAttributes(target, revisions);
+                    fragLeft.appendChild(fragRight);
+                    target.find('.modal-body').html(fragLeft);
+
+                    that.highlightDifference(target);
+                    that.highlightCustomAttributes(target, revisions);
+                  });
                 });
             });
         },
@@ -211,12 +217,10 @@ export default can.Component.extend({
           return instance.save();
         })
         .then(function () {
-          let forceRefresh = true;
-
-          return $('tree-widget-container:visible')
-            .first()
-            .viewModel()
-            .display(forceRefresh);
+          return getPageInstance().dispatch({
+            type: 'displayTree',
+            destinationType: instance.child_type,
+          });
         })
         .then(function () {
           let message = instance.child_type +
@@ -428,9 +432,13 @@ export default can.Component.extend({
        */
       function highlightValue($ca0, ca0, $ca1, ca1) {
         let value0 = ca0.attribute_value;
-        let objectId0 = ca0.attribute_object_id; // for Person attr type
+        let objectId0 = (ca0 && ca0.attribute_object) ?
+          ca0.attribute_object.id : null; // for Person attr type
+
         let value1 = ca1 ? ca1.attribute_value : null;
-        let objectId1 = ca1 ? ca1.attribute_object_id : null;
+        let objectId1 = (ca1 && ca1.attribute_object) ?
+          ca1.attribute_object.id : null;
+
         if (value0 !== value1 || objectId0 !== objectId1) {
           $ca0.find(valueSelector).addClass(highlightClass);
 

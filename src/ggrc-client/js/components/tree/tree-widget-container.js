@@ -648,7 +648,7 @@ viewModel = can.Map.extend({
  */
 export default can.Component.extend({
   tag: 'tree-widget-container',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel,
   init: function () {
@@ -729,6 +729,15 @@ export default can.Component.extend({
     reloadTree() {
       this.viewModel.closeInfoPane();
       this.viewModel.loadItems();
+    },
+    '{viewModel.parent_instance} displayTree'(scope, event) {
+      const {viewModel} = this;
+      const currentModelName = viewModel.attr('model').model_singular;
+
+      if (currentModelName === event.destinationType) {
+        const forceRefresh = true;
+        viewModel.display(forceRefresh);
+      }
     },
   },
 });

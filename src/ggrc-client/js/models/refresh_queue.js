@@ -58,7 +58,7 @@ const ModelRefreshQueue = can.Construct({}, {
         this.trigger();
       } else {
         setTimeout(
-          this.proxy('trigger_with_debounce', delay, manager), msToWait);
+          () => this.trigger_with_debounce(delay, manager), msToWait);
       }
     }
 
@@ -72,7 +72,7 @@ const RefreshQueueManager = can.Construct({}, {
     this.queues = [];
   },
   triggered_queues: function () {
-    return can.map(this.queues, function (queue) {
+    return _.filteredMap(this.queues, (queue) => {
       if (queue.triggered) {
         return queue;
       }
@@ -236,9 +236,7 @@ const RefreshQueue = can.Construct({
 
     if (deferreds.length) {
       $.when(...deferreds).then(function () {
-        self.deferred.resolve(can.map(self.objects, function (obj) {
-          return reify(obj);
-        }));
+        self.deferred.resolve(_.filteredMap(self.objects, (obj) => reify(obj)));
       }, function () {
         self.deferred.reject(...arguments);
       });

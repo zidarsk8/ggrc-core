@@ -16,11 +16,22 @@ from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
 from lib.page.widget import object_modal
 from lib.service import webui_service, rest_service, rest_facade
-from lib.utils.string_utils import StringMethods
+from lib.utils import string_utils
 
 
 class TestAuditPage(base.Test):
   """Tests for audit functionality."""
+
+  @classmethod
+  def check_ggrc_7048(cls, exp_audit, act_audit):
+    """Check audit title."""
+    title_regexp = r"^\d{4}:\sProgram.*Audit\s\d+$"
+    cls.general_equal_assert(
+        exp_audit, act_audit, "custom_attributes", "title")
+    if (exp_audit.title != act_audit.title and
+        string_utils.parse_str_by_reg_exp(
+            act_audit.title, title_regexp, False) is not None):
+      pytest.xfail(reason="\nGGRC-7048. Incorrect audit title.")
 
   @pytest.fixture(scope="function")
   def create_and_clone_audit_w_params_to_update(
@@ -77,7 +88,7 @@ class TestAuditPage(base.Test):
         updated_at=rest_audit.updated_at,
         modified_by=users.current_user(),
         slug=rest_audit.slug).repr_ui()
-    self.general_equal_assert(audit, actual_audit, "custom_attributes")
+    self.check_ggrc_7048(audit, actual_audit)
 
   @pytest.mark.smoke_tests
   def test_asmt_tmpl_creation(self, program, audit, selenium):
@@ -100,8 +111,7 @@ class TestAuditPage(base.Test):
     # 'actual_asmt_tmpls': assignees, verifiers, template_object_type (None)
     self.general_equal_assert(
         [expected_asmt_tmpl], actual_asmt_tmpls,
-        "modified_by", "assignees", "verifiers", "template_object_type",
-        "slug")
+        "modified_by", "assignees", "verifiers", "template_object_type")
 
   @pytest.mark.smoke_tests
   def test_asmt_creation(self, program, audit, selenium):
@@ -124,7 +134,6 @@ class TestAuditPage(base.Test):
     self.general_equal_assert(asmt, actual_asmt, "custom_attributes")
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   def test_mapped_objs_titles_in_create_modal(
       self, program, control_mapped_to_program, audit, selenium
   ):
@@ -137,7 +146,6 @@ class TestAuditPage(base.Test):
     assert actual_titles == [control_mapped_to_program.title]
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.parametrize(
       "obj",
       ["control_mapped_to_program", "objective_mapped_to_program"],
@@ -204,8 +212,7 @@ class TestAuditPage(base.Test):
     # 'expected_asmt': slug, custom_attributes (None) *factory
     # 'actual_asmt': audit (None)
     self.general_equal_assert(
-        expected_asmts, actual_asmts, "slug", "custom_attributes", "audit",
-        "custom_attributes")
+        expected_asmts, actual_asmts, "slug", "custom_attributes", "audit")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -308,7 +315,6 @@ class TestAuditPage(base.Test):
         expected_asmt_tmpl, actual_asmt_tmpls, *exclude_attrs)
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skip(reason="Will be fixed.")
   @pytest.mark.cloning
   def test_clonable_not_audit_related_objs_move_to_cloned_audit(
       self, create_and_clone_audit_w_params_to_update, selenium
@@ -331,8 +337,7 @@ class TestAuditPage(base.Test):
     # 'actual_controls, actual_programs': created_at, updated_at,
     #                                     custom_attributes (None)
     self.general_equal_assert(
-        [expected_control], actual_controls, "review_status",
-        "review_status_display_name",
+        [expected_control], actual_controls,
         *Representation.tree_view_attrs_to_exclude)
     self.general_equal_assert(
         [expected_program], actual_programs,
@@ -351,7 +356,7 @@ class TestAuditPage(base.Test):
       - Check only GCAs filled with right values displayed on the tab.
     """
     urls = ["https://gmail.by/", "https://www.google.com/",
-            environment.app_url, StringMethods.random_string(),
+            environment.app_url, string_utils.StringMethods.random_string(),
             "ftp://something.com/"]
     cads_rest_service = rest_service.CustomAttributeDefinitionsService()
     gca_defs = (cads_rest_service.create_dashboard_gcas(

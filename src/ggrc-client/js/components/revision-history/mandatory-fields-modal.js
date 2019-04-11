@@ -8,8 +8,8 @@ import '../gca-controls/gca-controls';
 import template from './templates/mandatory-fields-modal.stache';
 
 export default can.Component.extend({
-  template,
   tag: 'mandatory-fields-modal',
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     define: {
@@ -19,7 +19,7 @@ export default can.Component.extend({
           return this.attr('caFields').length;
         },
       },
-      isDisabled: {
+      isApplyButtonDisabled: {
         type: Boolean,
         get() {
           let hasErrors = this.instance.computed_unsuppressed_errors();

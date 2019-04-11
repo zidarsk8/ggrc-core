@@ -3,12 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../rich_text/rich_text';
+import '../../rich-text/rich-text';
 import template from './rich-text-form-field.stache';
 
 export default can.Component.extend({
   tag: 'rich-text-form-field',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     _value: '',
@@ -31,7 +31,7 @@ export default can.Component.extend({
         set(newValue) {
           let oldValue = this.attr('_oldValue');
           if (newValue === oldValue ||
-              newValue.length && !can.trim(newValue).length) {
+              newValue.length && !_.trim(newValue).length) {
             return;
           }
 

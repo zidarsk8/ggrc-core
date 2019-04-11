@@ -31,7 +31,7 @@ let LIST_FIELDS = {
 
 export default can.Component.extend({
   tag: 'revision-page',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     define: {
@@ -457,8 +457,7 @@ export default can.Component.extend({
             if (!value.attribute_object) {
               return;
             }
-            obj = Person
-              .findInCacheById(value.attribute_object_id);
+            obj = Person.findInCacheById(value.attribute_object.id);
             if (obj === undefined) {
               return value.attribute_value;
             }

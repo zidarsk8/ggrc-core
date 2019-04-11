@@ -4,14 +4,14 @@
 import copy
 import re
 
-from lib import users, base, decorator
+from lib import url, users, base, decorator
 from lib.constants import objects, element
+from lib.entities import entities_factory
+from lib.page import dashboard
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
 from lib.service.webui_service import ControlsService
 from lib.utils import selenium_utils, ui_utils, string_utils
-
-from lib.entities import entities_factory
 
 
 @decorator.work_by_external_user
@@ -23,6 +23,13 @@ def create_control_in_program_scope(selenium, program):
   control = entities_factory.ControlsFactory().create()
   controls_service.submit_obj_modal(control)
   return control
+
+
+def open_create_obj_modal(obj_type):
+  """Opens create object modal for selected type."""
+  selenium_utils.open_url(url.dashboard())
+  obj_modal = dashboard.Dashboard().open_create_obj_modal(obj_type=obj_type)
+  return obj_modal
 
 
 def create_asmt(selenium, audit):
@@ -90,7 +97,12 @@ def assert_can_edit_control(selenium, cntrl, can_edit):
   info_page = ControlsService(selenium).open_info_page_of_obj(cntrl)
   els_shown_for_editor = info_page.els_shown_for_editor()
   exp_list = [can_edit] * (len(els_shown_for_editor))
-  exp_list[0] = True  # Add comment btn exists on all control pages
+  # Add comment btn exists on all control pages
+  exp_list[0] = True
+  # Request review button doesn't exist on all control pages
+  exp_list[1] = False
+  # Edit button doesn't exist on all control pages
+  exp_list[2] = False
   assert [item.exists for item in els_shown_for_editor] == exp_list
   if info_page.three_bbs.exists:
     assert info_page.three_bbs.edit_option.exists is False
@@ -182,10 +194,15 @@ def check_user_menu_has_icons(user_menu):
   assert user_menu.email.text == users.current_user().name
 
 
-def submit_obj_for_review(selenium, obj, user):
+def submit_obj_for_review(selenium, obj, user_email):
   """Submit object for review scenario."""
   _get_ui_service(selenium, obj).submit_for_review(
-      obj, user.email, string_utils.StringMethods.random_string())
+      obj, user_email, string_utils.StringMethods.random_string())
+
+
+def approve_obj_review(selenium, obj):
+  """Approve obj review."""
+  _get_ui_service(selenium, obj).approve_review(obj)
 
 
 def get_object(selenium, obj):

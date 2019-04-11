@@ -5,6 +5,7 @@
 import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
 import template from './templates/tree-item-attr.stache';
+import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
 
 // attribute names considered "default" and representing a date
 const DATE_ATTRS = Object.freeze({
@@ -32,7 +33,7 @@ const RICH_TEXT_ATTRS = Object.freeze({
 
 export default can.Component.extend({
   tag: 'tree-item-attr',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     instance: null,
@@ -79,12 +80,18 @@ export default can.Component.extend({
           return formatDate(result, true);
         }
         if (attrName in RICH_TEXT_ATTRS) {
+          if (this.isMarkdown()) {
+            result = convertMarkdownToHtml(result);
+          }
           return result
             .replace(regexNewLines, '\n').replace(regexTags, ' ').trim();
         }
         return String(result);
       }
       return '';
+    },
+    isMarkdown() {
+      return !!this.attr('instance').constructor.isChangeableExternally;
     },
   },
 });

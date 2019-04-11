@@ -100,9 +100,7 @@ def _array_union(queries):
 def _assessment_object_mappings(object_type, related_type, related_ids):
   """Get Object ids for audit scope objects and snapshotted objects."""
 
-  if (object_type in Types.scoped | Types.trans_scope and
-          related_type in Types.all):
-
+  if object_type in Types.scoped and related_type in Types.all:
     source_query = db.session.query(
         Relationship.destination_id.label("result_id"),
     ).join(
@@ -129,8 +127,7 @@ def _assessment_object_mappings(object_type, related_type, related_ids):
         )
     )
 
-  elif (object_type in Types.all and
-        related_type in Types.scoped | Types.trans_scope):
+  elif object_type in Types.all and related_type in Types.scoped:
     source_query = db.session.query(
         Snapshot.child_id.label("result_id"),
     ).join(
@@ -233,10 +230,5 @@ def get_ids_related_to(object_type, related_type, related_ids=None):
       object_type, related_type, related_ids))
   queries.extend(get_special_mappings(
       object_type, related_type, related_ids))
-
-  if (object_type in Types.trans_scope and related_type in Types.all or
-          object_type in Types.all and related_type in Types.trans_scope):
-    queries.append(_assessment_object_mappings(
-        object_type, related_type, related_ids))
 
   return _array_union(queries)

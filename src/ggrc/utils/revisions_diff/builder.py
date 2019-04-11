@@ -152,6 +152,17 @@ def get_validated_value(cad, value, object_id):
   return value, object_id
 
 
+def prepare_cavs_for_diff(cavs):
+  """Build dict with cavs content suitable for comparizon"""
+  cavs_dict = {}
+  for cav in cavs:
+    cavs_dict[int(cav["custom_attribute_id"])] = (
+        cav["attribute_value"],
+        cav["attribute_object"]["id"] if cav["attribute_object"] else None
+    )
+  return cavs_dict
+
+
 def generate_cav_diff(cads, proposed, revisioned):
   """Build diff for custom attributes."""
   if not cads:
@@ -159,14 +170,9 @@ def generate_cav_diff(cads, proposed, revisioned):
   if proposed is None:
     return {}
   diff = {}
-  proposed_cavs = {
-      int(i["custom_attribute_id"]): (i["attribute_value"],
-                                      i["attribute_object_id"])
-      for i in proposed}
-  revisioned_cavs = {
-      int(i["custom_attribute_id"]): (i["attribute_value"],
-                                      i["attribute_object_id"])
-      for i in revisioned}
+  proposed_cavs = prepare_cavs_for_diff(proposed)
+  revisioned_cavs = prepare_cavs_for_diff(revisioned)
+
   for cad in cads:
     if cad.id not in proposed_cavs:
       continue

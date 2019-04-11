@@ -6,6 +6,7 @@
 * Proposal for object
 """
 from lib import base
+from lib.constants import objects
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
@@ -126,6 +127,11 @@ class BaseObjectModal(base.WithBrowser):
     self._root.link(text="Propose").click()
     self._wait_for_submit_changes()
 
+  @property
+  def is_present(self):
+    """Checks presence of modal element."""
+    return self._root.exist
+
 
 class DiscardChangesModal(BaseObjectModal):
   """Represents discard changes modal."""
@@ -151,6 +157,10 @@ class ControlModal(BaseObjectModal):
 
   def __init__(self, _driver=None):
     super(ControlModal, self).__init__()
+    self._root = self._browser.element(
+        class_name="modal-header", text="New {}".format(
+            objects.get_singular(objects.CONTROLS, title=True))).parent(
+                class_name="modal-wide")
     self._fields = ["title", "description", "status", "slug", "assertions"]
 
   def select_assertions(self, assertions):
@@ -234,9 +244,9 @@ class TaskGroupTaskModal(BaseObjectModal):
     super(TaskGroupTaskModal, self).__init__()
     self._fields = ["title", "assignees", "start_date", "due_date"]
     self._start_date_picker = page_elements.Datepicker(
-        self._root.element(date="instance.start_date"))
+        self._root.element(id="repeate-start-date"))
     self._due_date_picker = page_elements.Datepicker(
-        self._root.element(date="instance.end_date"))
+        self._root.element(id="repeate-end-date"))
 
   def set_assignees(self, people):
     """Adds assignees to the list of assignees."""

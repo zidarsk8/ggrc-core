@@ -120,15 +120,23 @@ class AssessmentTrackerHandler(object):
           issue_info: dictionary with issue payload information
     """
     self._validate_generic_fields(issue_info)
+    self._validate_assessment_title(issue_info)
 
-    # Title
+  @staticmethod
+  def _validate_assessment_title(issue_info):
+    """Validate assessment fields for issue
+
+      Args:
+          issue_info: dictionary with issue payload information
+    """
+
     try:
       title = issue_info["title"]
     except KeyError:
       raise exceptions.ValidationError("Title is mandatory.")
-    else:
-      if not title.strip():
-        raise exceptions.ValidationError("Title can not be blank.")
+
+    if title is None or not title.strip():
+      raise exceptions.ValidationError("Title can not be blank.")
 
   @classmethod
   def prepare_issue_json(cls, assessment, issue_tracker_info=None,
@@ -209,22 +217,33 @@ class AssessmentTrackerHandler(object):
   def _get_issuetracker_info(self, assessment, assessment_src):
     """Get default issue information.
 
+    This function MUST NOT be called during import background task.
+
     Args:
         assessment_src: dictionary with issue information
     Returns:
         default information for Issue Tracker
     """
+
+    # get from API dict if available
     issue_tracker_info_default = assessment_src.get("issue_tracker", {})
-    if not issue_tracker_info_default:
-      issue_tracker_info_default = self._get_issue_from_assmt_template(
-          assessment_src.get("template", {})
-      )
+    if issue_tracker_info_default:
+      return issue_tracker_info_default
+
+    # get from template dict if available
+    issue_tracker_info_default = self._get_issue_from_assmt_template(
+        assessment_src.get("template", {})
+    )
+    if issue_tracker_info_default:
       issue_tracker_info_default["title"] = assessment.title
+      return issue_tracker_info_default
+
+    # get from audit
     if not issue_tracker_info_default:
       issue_tracker_info_default = self._get_issue_info_from_audit(
-          issue_tracker_info_default.get("audit", {})
+          assessment_src.get("audit", {})
       )
-
+      issue_tracker_info_default["title"] = assessment.title
     return issue_tracker_info_default
 
   @staticmethod
@@ -255,34 +274,46 @@ class AssessmentTrackerHandler(object):
   def handle_assessment_create(self, assessment, assessment_src):
     """Handle assessment issue create.
 
+    Do not perform any actions if one of the following is true:
+    * this is import background task
+    * this is POST request and integration is disabled on audit or app level
+
+    In case of import the work will be done by bulk_sync background task
+    to speed up import
+
     Args:
         assessment: object from Assessment model
         assessment_src: dictionary with issue information
     """
-    if self._is_tracker_enabled(assessment.audit) and \
-            self._is_issue_on_create_enabled(assessment_src):
-      if assessment_src.get("issue_tracker", {}).get("issue_id"):
-        issue_id = assessment_src["issue_tracker"]["issue_id"]
-        if not self._is_already_linked(assessment, issue_id):
-          issue_info, _ = self._link_ticket(
-              assessment,
-              issue_id,
-              assessment_src
-          )
 
-          all_models.IssuetrackerIssue.create_or_update_from_dict(
-              assessment,
-              issue_info
-          )
-      else:
-        issue_info, _ = self._create_ticket(
+    if assessment.is_import:
+      return
+
+    if not self._is_issue_on_create_enabled(assessment, assessment_src):
+      return
+
+    issue_id = assessment_src.get("issue_tracker", {}).get("issue_id")
+    if issue_id:
+      if not self._is_already_linked(assessment, issue_id):
+        issue_info, _ = self._link_ticket(
             assessment,
+            issue_id,
             assessment_src
         )
+
         all_models.IssuetrackerIssue.create_or_update_from_dict(
             assessment,
             issue_info
         )
+    else:
+      issue_info, _ = self._create_ticket(
+          assessment,
+          assessment_src
+      )
+      all_models.IssuetrackerIssue.create_or_update_from_dict(
+          assessment,
+          issue_info
+      )
 
   def handle_assessment_delete(self, assessment):
     """Handle assessment issue delete.
@@ -400,6 +431,8 @@ class AssessmentTrackerHandler(object):
   def handle_audit_create(self, audit, audit_src):
     """Handle audit create for Issue Tracker.
 
+    This function MUST NOT be called during import background task execution
+
     Args:
         audit: object from Audit model
         audit_src: dictionary with issue information
@@ -416,9 +449,11 @@ class AssessmentTrackerHandler(object):
   def handle_audit_update(self, audit, audit_src):
     """Handle audit update for Issue Tracker.
 
-      Args:
-          audit: object from Audit model
-          audit_src: dictionary with issue information
+    This function MUST NOT be called during import background task execution
+
+    Args:
+        audit: object from Audit model
+        audit_src: dictionary with issue information
     """
     issue_db_info = self._collect_audit_info(
         audit,
@@ -464,6 +499,8 @@ class AssessmentTrackerHandler(object):
   def handle_assmt_template_create(self, assessment_template,
                                    assmt_template_src):
     """Handle assessment template create for Issue Tracker.
+
+    This function MUST NOT be called during import background task execution
 
     Args:
         assessment_template: object from
@@ -2229,16 +2266,22 @@ class AssessmentTrackerHandler(object):
         "enabled", False
     )
 
-  @classmethod
-  def _is_issue_on_create_enabled(cls, assessment_src):
+  def _is_issue_on_create_enabled(self, assessment, assessment_src):
     """Check that issue tracker on create enabled.
 
     Args:
+      assessment: assessment instance
       assessment_src: dictionary with issue information
 
     Returns:
       Boolean indicator that issue enabled
     """
+
+    # Ensure that Issue Tracker in Audit is enabled
+    if not self._is_tracker_enabled(assessment.audit):
+      return False
+
+    # Get enable flag from API request if available
     issue_tracker_info = assessment_src.get(
         "issue_tracker", {}
     )
@@ -2246,9 +2289,16 @@ class AssessmentTrackerHandler(object):
     if issue_tracker_info:
       return issue_tracker_info.get("enabled", False)
 
+    # Get enable flag from assessment template if available
     template_info = assessment_src.get("template", {})
-    template_issue_info = cls._get_issue_from_assmt_template(template_info)
-    return template_issue_info.get("enabled", False)
+    template_issue_info = self._get_issue_from_assmt_template(template_info)
+
+    if template_issue_info:
+      return template_issue_info.get("enabled", False)
+
+    # enable flag was not found. Allow to use issue tracker,
+    # as it is enabled in audit
+    return True
 
   @staticmethod
   def _is_ccs_same(ccs_payload, ccs_tracker):
@@ -2510,8 +2560,10 @@ def _hook_assmt_template_post(sender, objects=None, sources=None):
   tracker_handler = AssessmentTrackerHandler()
   for assessment_template, assmt_template_src in itertools.izip(objects,
                                                                 sources):
+    integration_utils.update_issue_tracker_for_import(assessment_template)
     issue_info = assmt_template_src.get('issue_tracker')
     if issue_info:
+      # this part will be run for API calls only, as src is empty for imports
       tracker_handler.handle_assmt_template_create(
           assessment_template,
           issue_info
@@ -2547,8 +2599,10 @@ def _hook_audit_issue_post(sender, objects=None, sources=None):
 
   tracker_handler = AssessmentTrackerHandler()
   for audit, audit_src in itertools.izip(objects, sources):
+    integration_utils.update_issue_tracker_for_import(audit)
     issue_info = audit_src.get('issue_tracker')
     if issue_info:
+      # this part will be run for API calls only, as src is empty for imports
       tracker_handler.handle_audit_create(audit, issue_info)
 
 
