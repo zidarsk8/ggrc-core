@@ -329,6 +329,12 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     This function makes sure that with one query we fetch all cycle task
     related data needed for generating cycle task json for a response.
     """
+
+    # Ensure that related_destinations and related_sources will be loaded
+    # in subquery. It allows reduce a number of requests to DB when these attrs
+    # are used
+    kwargs['load_related'] = True
+
     query = super(CycleTaskGroupObjectTask, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('cycle')
