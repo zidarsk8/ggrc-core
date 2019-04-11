@@ -220,3 +220,12 @@ class TestCalendarEventSync(BaseCalendarEventTest):
     with freeze_time("2015-01-1 12:00:00"):
       self.sync.sync_cycle_tasks_events()
     self.assertEqual(create_event_mock.call_count, 2)
+
+  @mock.patch("ggrc.gcalendar.calendar_api_service"
+              ".CalendarApiService.create_event")
+  def test_sync_overdue_event(self, create_event_mock):
+    """Test sync of overdue event."""
+    self.setup_person_task_event(date(2015, 1, 5))
+    with freeze_time("2015-01-10 12:00:00"):
+      self.sync.sync_cycle_tasks_events()
+    self.assertEqual(create_event_mock.call_count, 0)

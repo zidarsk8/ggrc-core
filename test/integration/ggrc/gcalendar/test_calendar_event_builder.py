@@ -216,7 +216,7 @@ class TestCalendarEventBuilder(BaseCalendarEventTest):
     self.assertEqual(should_create_mock.call_count, 2)
 
   def test_event_delete_for_overdue_tasks(self):
-      """Test that event is not deleted for overdue tasks."""
+    """Test that event is not deleted for overdue tasks."""
     _, task, event = self.setup_person_task_event(date(2015, 1, 1))
     with freeze_time("2015-01-05 12:00:00"):
       self.builder.build_cycle_tasks()

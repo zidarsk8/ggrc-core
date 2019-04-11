@@ -59,9 +59,16 @@ class CalendarEvent(Relatable, Base, db.Model):
     return self.last_synced_at is not None
 
   @property
+  def is_overdue(self):
+    """Return True if event is overdue."""
+    today = datetime.date.today()
+    return self.due_date < today
+
+  @property
   def needs_sync(self):
     """Indicates should we send this event to user or not."""
-    return self.attendee.profile.send_calendar_events
+    return (self.attendee.profile.send_calendar_events and
+            not self.is_overdue)
 
   def json_equals(self, event_response):
     """Checks if event is equal to json representation."""
