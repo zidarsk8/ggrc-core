@@ -6,13 +6,11 @@
 info-issue-tracker-fields {
   .people-sync {
     margin-top: 8px;
-
-    input {
-      margin: 0 5px 3px 0;
-    }
+    display: flex;
 
     label {
       display: inline-block;
+      margin: 0 0 0 7px;
     }
   }
 }

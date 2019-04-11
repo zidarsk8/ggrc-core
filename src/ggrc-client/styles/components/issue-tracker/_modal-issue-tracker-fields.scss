@@ -20,12 +20,18 @@ modal-issue-tracker-fields {
     }
   }
 
-  .people-sync-checkbox {
-    margin: 5px 5px 0 0;
-  }
+  .people-sync {
+    display: flex;
+    align-items: center;
 
-  .people-sync-label {
-    display: inline-block;
-    font-size: 13px !important;
+    .people-sync-checkbox {
+      margin: 0 !important;
+    }
+
+    .people-sync-label {
+      display: inline-block;
+      margin: 0 0 0 7px !important;
+      font-size: 13px !important;
+    }
   }
 }

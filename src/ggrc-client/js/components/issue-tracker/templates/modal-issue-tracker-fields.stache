@@ -30,7 +30,7 @@
       ></dropdown-component>
       {{#if_instance_of instance 'Audit'}}
         {{#if instance.issue_tracker.enabled}}
-          <div class="ggrc-form-item__note">
+          <div class="ggrc-form-item__note people-sync">
             <input class="people-sync-checkbox" id="people-sync" type="checkbox"
               can-value="instance.issue_tracker.people_sync_enabled">
             <label class="people-sync-label" for="people-sync">Sync people with ticket tracker</label>
