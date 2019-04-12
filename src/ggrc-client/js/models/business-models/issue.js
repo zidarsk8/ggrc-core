@@ -88,6 +88,12 @@ export default Cacheable.extend({
         required: true,
       },
     },
+    due_date: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
     issue_tracker: {
       value: {},
       validate: {
