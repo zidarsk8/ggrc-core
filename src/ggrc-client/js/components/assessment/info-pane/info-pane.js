@@ -48,7 +48,7 @@ import {
 import {getRole} from '../../../plugins/utils/acl-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
-import {REFRESH_TAB_CONTENT,
+import {
   RELATED_ITEMS_LOADED,
   REFRESH_MAPPING,
   REFRESH_RELATED,
@@ -656,8 +656,8 @@ export default can.Component.extend({
     '{viewModel.instance} assessment_type'() {
       const onSave = () => {
         this.viewModel.instance.dispatch({
-          ...REFRESH_TAB_CONTENT,
-          tabId: 'tab-related-assessments',
+          ...REFRESH_RELATED,
+          model: 'Related Assessments',
         });
         this.viewModel.instance.unbind('updated', onSave);
       };
