@@ -135,14 +135,14 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
   if not revisions:
     return event
   if event is None:
-    event = Event(
+    event_id_query = Event.__table__.insert().values(
         modified_by_id=current_user_id,
         action=action,
         resource_id=resource_id,
         resource_type=resource_type,
     )
-    session.add(event)
-    session.flush()
+    event_id = db.session.execute(event_id_query).inserted_primary_key[0]
+    event = Event.query.get(event_id)
   for rev in revisions:
     rev["event_id"] = event.id
   db.session.execute(Revision.__table__.insert(), revisions)
@@ -152,7 +152,7 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
 def sort_relationship_revisions(revisions):
   """Sort revisions of relationships to create automapping relationships
   after original mapping"""
-  other = [rev for rev in revisions if rev.resource_type != "Relationship"]
-  rels = [rev for rev in revisions if rev.resource_type == "Relationship"]
-  rels.sort(key=lambda obj: obj.content["automapping_id"])
+  other = [rev for rev in revisions if rev["resource_type"] != "Relationship"]
+  rels = [rev for rev in revisions if rev["resource_type"] == "Relationship"]
+  rels.sort(key=lambda obj: obj["content"]["automapping_id"])
   return other + rels
