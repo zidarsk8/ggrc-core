@@ -20,7 +20,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '25a1b9502690'
-down_revision = '42afbc0e6c09'
+down_revision = 'cfe397ab518c'
 
 
 class CompressedType(types.TypeDecorator):

@@ -122,12 +122,11 @@ class SnapshotBlockConverter(object):
     return content
 
   def snapshots(self):
-    """List of all snapshots in the current block.
+    """Generator that returns all snapshots in the current block.
 
     The content of the given snapshots also contains the mapped audit field.
     """
     if not self.ids:
-      yield {}
       return
     for ids_pool in list_chunks(self.ids, self.ROW_CHUNK_SIZE):
       # sqlalchemy caches all queries and it takes a lot of memory.
@@ -347,21 +346,11 @@ class SnapshotBlockConverter(object):
     """Get a CSV content line for a single snapshot."""
     return self._obj_attr_line(content) + self._cav_attr_line(content)
 
-  @property
-  def _body_list(self):
-    """Get 2D representation of CSV content."""
-    return [
-        self._content_line_list(snapshot)
-        for snapshot in self.snapshots()
-    ] or [[]]
-
   def generate_csv_header(self):
     return self._header_list
 
   def generate_row_data(self):
     """Get 2D list representing the CSV file."""
-    if not self.snapshots:
-      yield []
     for snapshot in self.snapshots():
       yield self._content_line_list(snapshot)
 

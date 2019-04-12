@@ -366,7 +366,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     )
 
   @ddt.data(
-      ([], [[]]),
+      ([], []),
       ([1, 2, 3], [[], [], []]),
   )
   @ddt.unpack
@@ -374,4 +374,4 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     """Test basic CSV body format."""
     self.block._content_line_list = lambda x: []
     self.block.snapshots = self._mock_snapshot_factory(snapshots)
-    self.assertEqual(self.block._body_list, block_list)
+    self.assertEqual(list(self.block.generate_row_data()), block_list)
