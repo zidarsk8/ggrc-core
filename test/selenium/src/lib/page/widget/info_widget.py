@@ -804,6 +804,11 @@ class Controls(WithAssignFolder, InfoWidget):
     return self._related_people_list(
         roles.CONTROL_OPERATORS, self._root)
 
+  @property
+  def control_owners(self):
+    """Returns Control Owners page element."""
+    return self._related_people_list(roles.CONTROL_OWNERS, self._root)
+
   def select_first_available_date(self):
     """Select first available day on datepicker on submit for review popup."""
     date_picker = base.DatePicker(
