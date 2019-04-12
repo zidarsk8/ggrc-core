@@ -528,6 +528,7 @@ class TestMegaProgramAutomappings(TestCase):
       "System", "Product", "Process", "Market", "DataAsset",
       "Facility", "OrgGroup", "Metric", "TechnologyEnvironment",
       "ProductGroup", "Project", "Vendor", "AccessGroup",
+      "KeyReport", "AccountBalance",
   )
   def test_megaprogram_automapping(self, model_name):
     """Test automapping of {0} to parent programs"""

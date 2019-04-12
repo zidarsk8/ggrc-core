@@ -17,6 +17,7 @@ TYPE_ORDERING = [
         "Risk", "Threat", "System", "Product", "Process", "Market",
         "DataAsset", "Facility", "OrgGroup", "Metric", "AccessGroup",
         "ProductGroup", "Project", "Vendor", "TechnologyEnvironment",
+        "AccountBalance", "KeyReport",
     ],
     ["Regulation", "Policy", "Standard", "Contract"],
     ["Requirement"],
@@ -112,7 +113,8 @@ class Types(object):
       "Policy", "Risk", "Standard", "Threat", "Requirement",
       "System", "Product", "Process", "Market", "DataAsset",
       "Facility", "OrgGroup", "Metric", "TechnologyEnvironment",
-      "ProductGroup", "Project", "Vendor", "AccessGroup"
+      "ProductGroup", "Project", "Vendor", "AccessGroup",
+      "KeyReport", "AccountBalance",
   }
 
 
