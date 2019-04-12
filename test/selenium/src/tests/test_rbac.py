@@ -8,7 +8,6 @@ import pytest
 
 from lib import base, users
 from lib.constants import roles, object_states
-from lib.entities import entities_factory
 from lib.service import rest_facade, webui_facade, webui_service
 from lib.utils import string_utils
 
@@ -115,38 +114,30 @@ class TestRBAC(base.Test):
 
 class TestAuditorRole(base.Test):
   """Tests for auditor role."""
+  _data = None
 
-  @pytest.fixture(autouse=True, scope="class")
-  def set_superuser_as_current_user(self):
-    """Class fixtures are evaluated before function fixtures.
-    This fixture is used by class `test_data` fixture so this one should be
-    class as well.
-    Code is copied from conftest.py.
-    """
-    # pylint: disable=protected-access
-    users._current_user = users.FAKE_SUPER_USER
-    users.set_current_user(entities_factory.PeopleFactory.superuser)
-
-  @pytest.fixture(scope="class")
+  @pytest.fixture()
   def test_data(self):
     """Objects structure:
     Program
     -> Control
     -> Audit (Auditor is a user with global creator role)
     """
-    editor = rest_facade.create_user_with_role(roles.EDITOR)
-    creator = rest_facade.create_user_with_role(roles.CREATOR)
-    users.set_current_user(editor)
-    program = rest_facade.create_program()
-    control = rest_facade.create_control_mapped_to_program(program=program)
-    audit = rest_facade.create_audit(program, auditors=[creator])
-    return {
-        "editor": editor,
-        "creator": creator,
-        "program": program,
-        "audit": audit,
-        "control": control
-    }
+    if not TestAuditorRole._data:
+      editor = rest_facade.create_user_with_role(roles.EDITOR)
+      creator = rest_facade.create_user_with_role(roles.CREATOR)
+      users.set_current_user(editor)
+      program = rest_facade.create_program()
+      control = rest_facade.create_control_mapped_to_program(program=program)
+      audit = rest_facade.create_audit(program, auditors=[creator])
+      TestAuditorRole._data = {
+          "editor": editor,
+          "creator": creator,
+          "program": program,
+          "audit": audit,
+          "control": control
+      }
+    return TestAuditorRole._data
 
   @pytest.mark.smoke_tests
   def test_auditor_cannot_edit_audit(

@@ -9,7 +9,6 @@ its grace time is up, the script will return with an error code of 3. Error
 codes 1 and 2 are reserved by pytest and status 0 is returned only if all the
 tests pass.
 """
-
 import os
 import subprocess
 import sys
@@ -56,6 +55,10 @@ def add_user(url_origin):
   We workaround this issue by creating a user not in parallel as this issue
   is considered not worth to fix by developers.
   """
+  from lib.entities import entities_factory
+  import json
+  from lib.service.rest.template_provider import TemplateProvider
+  from lib.service.rest import session_pool
   environment.app_url = url_origin
   environment.app_url = urlparse.urljoin(environment.app_url, "/")
   session = requests.Session()
@@ -67,6 +70,16 @@ def add_user(url_origin):
           users.FAKE_SUPER_USER)).status_code == OK_CODE)
   test_utils.wait_for(
       lambda: session.get(url_module.Urls().login).status_code == OK_CODE)
+  person_dict = entities_factory.PeopleFactory().create(
+      is_add_rest_attrs=True, **{}).__dict__
+  url = environment.app_url + "api/people"
+  body = json.dumps(
+      [TemplateProvider.generate_template_as_dict(
+          json_tmpl_name='person', **person_dict)]).encode("string-escape")
+  test_utils.wait_for(
+      lambda: session.post(
+          url=url, data=body,
+          headers=session_pool.BASIC_HEADERS).status_code == OK_CODE)
 
 
 def prepare_dev_server(url_origin):
