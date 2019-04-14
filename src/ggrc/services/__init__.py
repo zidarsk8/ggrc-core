@@ -36,7 +36,6 @@ def contributed_services():
       service('external_comments', models.ExternalComment),
       service('custom_attribute_definitions',
               models.CustomAttributeDefinition),
-      service('custom_attribute_values', models.CustomAttributeValue),
       service('data_assets', models.DataAsset),
       service('directives', models.Directive, common.ReadOnlyResource),
       service('contracts', models.Contract),
