@@ -10,9 +10,10 @@ import sqlalchemy as sa
 import flask
 
 from ggrc import db
+from ggrc import models
 from ggrc.automapper import rules
 from ggrc import login
-from ggrc.models import program
+from ggrc.models.mixins import mega
 from ggrc.models.audit import Audit
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship, RelationshipsCache, Stub
@@ -48,7 +49,6 @@ class AutomapperGenerator(object):
     self.queue = set()
     self.auto_mappings = set()
     self.automapping_ids = set()
-    self.program_parents_cache = dict()
     self.related_cache = RelationshipsCache()
 
   def related(self, obj):
@@ -201,44 +201,18 @@ class AutomapperGenerator(object):
         )
     )
 
-  def _is_parent_for(self, _parent, _program):
-    """Check that _parent program is parent for _program
-    Cache parents ids for _program"""
-    if _program.id in self.program_parents_cache:
-      parents_ids = self.program_parents_cache[_program.id]
-    else:
-      _prog = program.Program.query.get(_program.id)
-      parents_ids = _prog.relatives_ids("parents", all_generations=True)
-      self.program_parents_cache[_program.id] = parents_ids
-    return _parent.id in parents_ids
-
-  def _skip_mapping(self, src, dst, related):
-    """Skip mappings from Mega program to child program"""
-    # In case we mapped an object to Program we should skip
-    # mapping of the object to not parent programs
-    # In case of cycle programs mapping, one program could be parent and child
-    to_not_parent_programs = (
-        related.type == "Program" and not self._is_parent_for(related, dst)
-    )
-    # In case we mapped Program to Program we should skip mappings of
-    # dst related object to src, if src is not parent of dst
-    from_not_parent_program = (
-        src.type == "Program" and not self._is_parent_for(src, dst)
-    )
-    if to_not_parent_programs or from_not_parent_program:
-      return True
-    return False
-
   def _step(self, src, dst):
     """Step through the automapping rules tree."""
     mappings = rules.rules[src.type, dst.type]
     if mappings:
       dst_related = (o for o in self.related(dst)
                      if o.type in mappings and o != src)
+      dst_model = models.get_model(dst.type)
       for related in dst_related:
-        if dst.type == "Program" and self._skip_mapping(src, dst, related):
-          # Program-to-Program mapping are directed and objects from child
-          # program should be mapped to parent programs, but not vice versa
+        if (issubclass(dst_model, mega.Mega) and
+           dst_model.skip_automapping(src, dst, related)):
+          # Mega objects mapping are directed and objects from child
+          # object should be mapped to parent objects, but not vice versa
           continue
         entry = self.order(related, src)
         if entry not in self.processed:
