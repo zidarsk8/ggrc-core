@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import Stub from '../stub';
 
-export default Mixin({
+export default Mixin.extend({
   // NB : Because the attributes object
   //  isn't automatically cloned into subclasses by CanJS (this is an intentional
   //  exception), when subclassing a class that uses this mixin, be sure to pull in the

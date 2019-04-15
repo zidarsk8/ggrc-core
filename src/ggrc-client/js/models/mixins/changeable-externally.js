@@ -5,7 +5,7 @@
 
 import Mixin from './mixin';
 
-export default Mixin({
+export default Mixin.extend({
   'after:init'() {
     this.isChangeableExternally = true;
   },

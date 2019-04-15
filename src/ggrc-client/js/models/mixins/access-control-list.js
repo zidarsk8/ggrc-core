@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
-export default Mixin({
+export default Mixin.extend({
   /**
    * This method clears ACL
    * before it's filled with the data from server or backup.

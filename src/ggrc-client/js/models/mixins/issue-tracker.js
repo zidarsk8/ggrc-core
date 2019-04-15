@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 
-export default Mixin(
+export default Mixin.extend(
   issueTrackerUtils.issueTrackerStaticFields,
   {
     'after:init'() {

@@ -144,7 +144,7 @@ const init = function () {
   this.viewModel.initTaskGroupItems();
 };
 
-export default can.Component({
+export default can.Component.extend({
   tag: 'task-group-objects',
   template: can.stache(template),
   leakScope: true,

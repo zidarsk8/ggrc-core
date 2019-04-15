@@ -9,7 +9,7 @@ import {refreshTGRelatedItems} from '../../plugins/utils/workflow-utils';
 import TaskGroup from '../../models/business-models/task-group';
 import ModalsController from '../../controllers/modals/modals_controller';
 
-let CloneTaskGroup = Cacheable({
+let CloneTaskGroup = Cacheable.extend({
   defaults: {
     clone_objects: true,
     clone_tasks: true,

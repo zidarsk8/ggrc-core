@@ -9,7 +9,7 @@ import {
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
 
-export default can.Control({
+export default can.Control.extend({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),

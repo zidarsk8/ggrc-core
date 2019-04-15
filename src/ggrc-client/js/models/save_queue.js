@@ -19,7 +19,7 @@ import tracker from '../tracker';
   *
   *  enqueue(obj: Cacheable, save_args) -> null
   */
-export default can.Construct({
+export default can.Construct.extend({
 
   DELAY: 100, // Number of ms to wait before the first batch is fired
   BATCH: GGRC.config.MAX_INSTANCES || 3, // Maximum number of POST/PUT requests at any given time
