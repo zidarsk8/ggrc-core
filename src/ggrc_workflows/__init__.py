@@ -46,7 +46,6 @@ blueprint = Blueprint(
 
 
 _INJECTABLE_MIXINS = (
-    models.task_group_object.TaskGroupable,
     models.cycle_task_group_object_task.CycleTaskable,
     models.workflow.WorkflowState,
 )
@@ -62,6 +61,7 @@ def _inject_workflow_mixins():
 
   for type_ in WORKFLOW_OBJECT_TYPES:
     model = getattr(all_models, type_)
+    model.__bases__ = _INJECTABLE_MIXINS + model.__bases__
     _workaround_mixin_injection(model)
 
 

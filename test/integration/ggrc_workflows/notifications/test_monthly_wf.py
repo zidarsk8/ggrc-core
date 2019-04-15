@@ -129,6 +129,7 @@ class TestMonthlyWorkflowNotification(TestCase):
                 "start_date": dt.date(2015, 4, 10),
                 "end_date": dt.date(2015, 4, 21),
             }],
+            "task_group_objects": self.random_objects[:2]
         }, {
             "title": "another one time task group",
             "contact": person_dict(self.person_1.id),
@@ -145,5 +146,6 @@ class TestMonthlyWorkflowNotification(TestCase):
                 "start_date": dt.date(2015, 4, 15),
                 "end_date": dt.date(2015, 4, 28),
             }],
+            "task_group_objects": []
         }]
     }

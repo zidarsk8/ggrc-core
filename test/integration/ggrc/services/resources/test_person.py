@@ -329,6 +329,7 @@ class TestPersonResource(TestCase, WithQueryApi):
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 18),
             }],
+            "task_group_objects": []
         }]
     }
 
@@ -348,6 +349,7 @@ class TestPersonResource(TestCase, WithQueryApi):
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }],
+            "task_group_objects": []
         }]
     }
 
@@ -436,6 +438,7 @@ class TestPersonResource(TestCase, WithQueryApi):
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 18),
             }],
+            "task_group_objects": []
         }]
     }
 

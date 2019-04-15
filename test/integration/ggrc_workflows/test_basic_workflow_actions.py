@@ -515,6 +515,7 @@ class TestBasicWorkflowActions(TestCase):
                 "title": "weekend task",
             },
             ],
+            "task_group_objects": self.random_objects
         },
         ]
     }
@@ -531,6 +532,7 @@ class TestBasicWorkflowActions(TestCase):
                 "description": factories.random_str(100)
             }, {}
             ],
+            "task_group_objects": self.random_objects[:2]
         }, {
             "title": "tg_3",
             "task_group_tasks": [{
@@ -544,6 +546,7 @@ class TestBasicWorkflowActions(TestCase):
                 "description": factories.random_str(100)
             }
             ],
+            "task_group_objects": self.random_objects
         }
         ]
     }
@@ -560,6 +563,7 @@ class TestBasicWorkflowActions(TestCase):
                 "task_group_tasks": [{
                     "description": factories.random_str(100)
                 }, {}],
+                "task_group_objects": self.random_objects[:2]
             },
             {
                 "title": "tg_3",
@@ -573,6 +577,7 @@ class TestBasicWorkflowActions(TestCase):
                     "title": factories.random_str(),
                     "description": factories.random_str(100)
                 }],
+                "task_group_objects": []
             }
         ]
     }
@@ -592,6 +597,7 @@ class TestBasicWorkflowActions(TestCase):
                 }, {
                     "title": "weekend task",
                 }],
+                "task_group_objects": self.random_objects
             },
         ]
     }

@@ -54,6 +54,7 @@ class TestRecurringWorkflowRevisions(TestCase):
                 "description": "some task",
                 "contact": person_dict(self.person_1.id),
             }],
+            "task_group_objects": self.random_objects[:2]
         }, {
             "title": "another one time task group",
             "contact": person_dict(self.person_1.id),
@@ -66,6 +67,7 @@ class TestRecurringWorkflowRevisions(TestCase):
                 "description": "some task",
                 "contact": person_dict(self.person_2.id),
             }],
+            "task_group_objects": []
         }]
     }
 

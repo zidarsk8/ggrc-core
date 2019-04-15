@@ -11,7 +11,6 @@ import factory
 from ggrc_workflows import models
 from integration.ggrc.models.factories import ContextFactory
 from integration.ggrc.models.factories import TitledFactory
-from integration.ggrc.models.model_factory import ModelFactory
 
 
 class WorkflowFactory(TitledFactory):

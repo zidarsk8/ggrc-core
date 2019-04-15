@@ -164,6 +164,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "start_date": date(2015, 5, 4),
                 "end_date": date(2015, 5, 7),
             }],
+            "task_group_objects": self.random_objects[:2]
         }, {
             "title": "another one time task group",
             "contact": person_dict(self.random_people[2].id),
@@ -184,6 +185,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
+            "task_group_objects": []
         }]
     }
 
@@ -214,6 +216,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "start_date": date(2015, 5, 4),
                 "end_date": date(2015, 5, 7),
             }],
+            "task_group_objects": self.random_objects[:2]
         }, {
             "title": "another one time task group",
             "contact": person_dict(user),
@@ -234,5 +237,6 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
+            "task_group_objects": []
         }]
     }

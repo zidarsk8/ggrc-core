@@ -62,6 +62,7 @@ class WorkflowsGenerator(Generator):
     data = copy.deepcopy(data)
 
     tgts = data.pop("task_group_tasks", [])
+    tgos = data.pop("task_group_objects", [])
 
     obj_name = "task_group"
     workflow = self._session_add(workflow)
@@ -79,6 +80,8 @@ class WorkflowsGenerator(Generator):
 
     for tgt in tgts:
       self.generate_task_group_task(task_group, tgt)
+    for tgo in tgos:
+      self.generate_task_group_object(task_group, tgo)
 
     return response, task_group
 
@@ -111,6 +114,18 @@ class WorkflowsGenerator(Generator):
           acl_helper.get_acl_json(cycle_task_role_id, wf_admin_id)]
     obj_dict[obj_name].update(data)
     return self.generate(TaskGroupTask, obj_name, obj_dict)
+
+  def generate_task_group_object(self, task_group=None, obj=None):
+    """Generate task group object."""
+    if not task_group:
+      _, task_group = self.generate_task_group()
+    task_group = self._session_add(task_group)
+    obj = self._session_add(obj)
+    tgo = factories.RelationshipFactory(
+        source=task_group,
+        destination=obj
+    )
+    return tgo
 
   def generate_cycle(self, workflow=None):
     """Generate Cycle over api."""

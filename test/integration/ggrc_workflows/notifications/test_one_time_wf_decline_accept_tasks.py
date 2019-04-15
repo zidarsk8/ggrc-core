@@ -329,6 +329,7 @@ class TestCycleTaskStatusChange(TestCase):
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
+            "task_group_objects": self.random_objects
         }]
     }
 
