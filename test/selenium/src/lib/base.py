@@ -872,7 +872,7 @@ class CommentsPanel(Element):
             self._driver, lambda items: len(self.scopes) == count_of_comments)
       except exceptions.TimeoutException as err:
         raise (messages.ExceptionsMessages.err_comments_count.format(
-            count_of_comments, len(self.scopes)) + err)
+            count_of_comments, len(self.scopes)) + str(err))
     return self
 
 

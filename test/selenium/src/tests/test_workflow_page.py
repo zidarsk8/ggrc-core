@@ -9,7 +9,7 @@ import datetime
 import pytest
 from nerodia.wait.wait import TimeoutError
 
-from lib import base, users
+from lib import base, url, users
 from lib.app_entity_factory import (
     entity_factory_common, workflow_entity_factory)
 from lib.constants import messages, roles, workflow_repeat_units
@@ -19,7 +19,7 @@ from lib.rest_facades import (
     object_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.rest_services import workflow_rest_service
 from lib.ui import daily_emails_ui_facade, ui_facade, workflow_ui_facade
-from lib.utils import date_utils, test_utils, ui_utils
+from lib.utils import date_utils, selenium_utils, test_utils, ui_utils
 
 
 @pytest.fixture(params=[roles.CREATOR, roles.READER])
@@ -166,7 +166,8 @@ class TestWorkflowSetupTab(base.Test):
     """Test mapping of object to a task group."""
     workflow_ui_facade.add_obj_to_task_group(
         obj=app_control, task_group=app_task_group)
-    selenium.refresh()  # reload page to check mapping is saved
+    # open another page to check mapping is saved
+    selenium_utils.open_url(url.Urls().dashboard)
     objs = workflow_ui_facade.get_objs_added_to_task_group(app_task_group)
     test_utils.list_obj_assert(objs, [app_control])
 
