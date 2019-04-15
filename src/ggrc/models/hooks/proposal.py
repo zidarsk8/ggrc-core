@@ -7,6 +7,7 @@ import datetime
 
 from sqlalchemy import inspect
 
+from ggrc import db
 from ggrc.services import signals
 from ggrc.models import all_models
 from ggrc.models import comment
@@ -38,6 +39,12 @@ def add_comment_about(proposal, reason, txt):
   all_models.Relationship(
       source=proposal.instance,
       destination=created_comment)
+
+  db.session.flush()
+  from ggrc.notifications import people_mentions
+  people_mentions.handle_comment_mapped(obj=proposal.instance,
+                                        comments=[created_comment])
+
 
 # pylint: disable=unused-argument
 # pylint: disable=too-many-arguments

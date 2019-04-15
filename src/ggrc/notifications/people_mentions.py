@@ -6,6 +6,7 @@
 import re
 from collections import defaultdict
 from collections import namedtuple
+from datetime import datetime
 from logging import getLogger
 from email.utils import parseaddr
 from urlparse import urljoin
@@ -26,6 +27,8 @@ logger = getLogger(__name__)
 
 EMAIL_REGEXP = r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"
 EMAIL_LINK_REGEXP = r"mailto:" + EMAIL_REGEXP
+DEFAULT_PERSON = u"Unknown"
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 
 CommentData = namedtuple("CommentData",
                          ["comment_text", "author", "created_at"])
@@ -81,7 +84,7 @@ def _fetch_comments_data(comments):
   comments_data = [
       CommentData(
           comment_text=comment.description,
-          author=people_dict.get(comment.modified_by_id, "Unknown"),
+          author=people_dict.get(comment.modified_by_id, DEFAULT_PERSON),
           created_at=comment.created_at
       )
       for comment in comments_loaded
@@ -183,10 +186,14 @@ def _generate_mention_email(object_name, comments_data):
 
   body = []
   for comment in sorted(comments_data):
+    if isinstance(comment.created_at, (str, unicode)):
+      created_at = datetime.strptime(comment.created_at, DATETIME_FORMAT)
+    else:
+      created_at = comment.created_at
     body.append(body_template.format(
         author=comment.author,
         object_name=object_name,
-        created_at=data_handlers.as_user_time(comment.created_at),
+        created_at=data_handlers.as_user_time(created_at),
         comment_text=comment.comment_text,
     ))
   return title, body
