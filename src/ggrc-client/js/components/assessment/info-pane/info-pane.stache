@@ -287,8 +287,7 @@
                 <related-assessments
                     {instance}="{instance}"
                     {need-reuse}="{true}"
-                    (refresh-assessment)="{refreshAssessment}"
-                    (after-object-reused)="{updateItems('files', 'urls')}">
+                    (reusable-objects-created)="{addReusableEvidence(%event)}">
                 </related-assessments>
             {{/instance}}
           </tab-panel>
