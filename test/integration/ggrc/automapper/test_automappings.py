@@ -4,6 +4,7 @@
 """Test automappings"""
 
 import itertools
+from collections import OrderedDict
 from contextlib import contextmanager
 
 import ddt
@@ -576,3 +577,23 @@ class TestMegaProgramAutomappings(TestCase):
     self.assertTrue(standard in program_a_related)
     self.assertTrue(standard in program_b_related)
     self.assertTrue(standard in program_c_related)
+
+  def test_automapping_during_import(self):
+    """Test automapping of Standart to parent Program during import"""
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+    program_b_id = program_b.id
+    response = self.import_data(OrderedDict([
+        ("object_type", "Standard"),
+        ("Code*", ""),
+        ("Title*", "Test standard"),
+        ("Admin*", "user@example.com"),
+        ("map:Program", program_a.slug),
+    ]))
+    self._check_csv_response(response, {})
+    program_b = all_models.Program.query.get(program_b_id)
+    program_b_related = program_b.related_objects()
+    self.assertIn("Standard", {obj.type for obj in program_b_related})
