@@ -27,7 +27,6 @@ export default can.Map.extend({
     },
   },
   instance: null,
-  deferredSave: null,
   updatableGroupId: null,
   includeRoles: [],
   excludeRoles: [],
@@ -45,22 +44,13 @@ export default can.Map.extend({
     this.attr('instance.access_control_list').replace(filteredACL);
   },
   save(args) {
-    let saveDfd;
+    this.attr('updatableGroupId', args.groupId);
 
-    if (this.attr('deferredSave')) {
-      saveDfd = this.attr('deferredSave').push(() => {
-        this.attr('updatableGroupId', args.groupId);
+    this.attr('instance').save()
+      .then(() => {
+        this.filterACL();
+      }).always(() => {
+        this.attr('updatableGroupId', null);
       });
-    } else {
-      this.attr('updatableGroupId', args.groupId);
-
-      saveDfd = this.attr('instance').save();
-    }
-
-    saveDfd.then(() => {
-      this.filterACL();
-    }).always(() => {
-      this.attr('updatableGroupId', null);
-    });
   },
 });
