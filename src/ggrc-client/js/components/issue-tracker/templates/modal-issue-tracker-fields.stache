@@ -33,7 +33,7 @@
           <div class="ggrc-form-item__note people-sync">
             <input class="people-sync-checkbox" id="people-sync" type="checkbox"
               can-value="instance.issue_tracker.people_sync_enabled">
-            <label class="people-sync-label" for="people-sync">Sync people with ticket tracker</label>
+            <label class="people-sync-label" for="people-sync">Sync people with Ticket Tracker</label>
             <i class="fa fa-question-circle" rel="tooltip"
               title="Check the box to enable sync between Audit roles and Ticket Tracker. Uncheck the box to disable the sync."></i>
           </div>
