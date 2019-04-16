@@ -203,8 +203,11 @@ NO_VERIFIER_WARNING = (u"Line {line}: Assessment without verifier cannot "
 
 UNEXPECTED_ERROR = u"Unexpected error on import."
 
-EXTERNAL_MODEL_IMPORT_RESTRICTION = (u"Line {line}: Trying to import external "
-                                     u"model entry.")
+EXTERNAL_MODEL_IMPORT_RESTRICTION = (u"Line {line}: Import for "
+                                     u"{external_model_name} object is not "
+                                     u"available in GGRC system anymore. "
+                                     u"Go to new frontend to perform import "
+                                     u"there. The line will be ignored.")
 
 READONLY_ACCESS_WARNING = (u"Line {line}: The system is in a "
                            u"read-only mode and is dedicated for SOX needs. "
