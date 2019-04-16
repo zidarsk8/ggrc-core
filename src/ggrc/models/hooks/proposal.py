@@ -7,7 +7,6 @@ import datetime
 
 from sqlalchemy import inspect
 
-from ggrc import db
 from ggrc.services import signals
 from ggrc.models import all_models
 from ggrc.models import comment
@@ -39,11 +38,6 @@ def add_comment_about(proposal, reason, txt):
   all_models.Relationship(
       source=proposal.instance,
       destination=created_comment)
-
-  db.session.flush()
-  from ggrc.notifications import people_mentions
-  people_mentions.handle_comment_mapped(obj=proposal.instance,
-                                        comments=[created_comment])
 
 
 # pylint: disable=unused-argument
@@ -99,21 +93,48 @@ def create_relationship(
     )
 
 
+def apply_mentions_proposal_comment(
+    sender, obj=None, src=None, service=None,
+    event=None, initial_state=None
+):
+  """Send people mentions in proposal comment."""
+  if not event:
+    return
+  comment_revision = all_models.Revision.query.filter(
+      all_models.Revision.resource_type == all_models.Comment.__name__,
+      all_models.Revision.event_id == event.id,
+  ).first()
+  if not comment_revision:
+    return
+  comment_id = comment_revision.resource_id
+  created_comment = all_models.Comment.query.get(comment_id)
+
+  from ggrc.notifications import people_mentions
+  people_mentions.handle_comment_mapped(obj=obj.instance,
+                                        comments=[created_comment])
+
+
 # pylint: enable=unused-argument
 # pylint: enable=too-many-arguments
 
 
 def init_hook():
   """Init proposal signal handlers."""
-  signals.Restful.model_posted.connect(make_proposal,
-                                       all_models.Proposal,
-                                       weak=False)
-  signals.Restful.model_posted.connect(create_relationship,
-                                       all_models.Proposal,
-                                       weak=False)
-  signals.Restful.model_put.connect(apply_proposal,
-                                    all_models.Proposal,
-                                    weak=False)
-  signals.Restful.model_put.connect(decline_proposal,
-                                    all_models.Proposal,
-                                    weak=False)
+  signals.Restful.model_posted.connect(
+      make_proposal, all_models.Proposal, weak=False
+  )
+  signals.Restful.model_posted.connect(
+      create_relationship, all_models.Proposal, weak=False
+  )
+  signals.Restful.model_put.connect(
+      apply_proposal, all_models.Proposal, weak=False
+  )
+  signals.Restful.model_put.connect(
+      decline_proposal, all_models.Proposal, weak=False
+  )
+  signals.Restful.model_posted_after_commit.connect(
+      apply_mentions_proposal_comment, all_models.Proposal, weak=False
+  )
+  signals.Restful.model_put_after_commit.connect(
+      apply_mentions_proposal_comment, all_models.Proposal, weak=False
+  )
