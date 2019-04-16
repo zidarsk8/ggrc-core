@@ -39,7 +39,6 @@ def add_comment_about(proposal, reason, txt):
       source=proposal.instance,
       destination=created_comment)
 
-
 # pylint: disable=unused-argument
 # pylint: disable=too-many-arguments
 
