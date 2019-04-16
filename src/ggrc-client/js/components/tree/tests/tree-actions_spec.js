@@ -128,7 +128,7 @@ describe('tree-actions component', () => {
       expect(vm.attr('showImport')).toBeFalsy();
     });
 
-    it('returns false for model_singular: Control', () => {
+    it('returns false for changeable externally model', () => {
       vm.attr('model', {
         model_singular: 'Control',
         isChangeableExternally: true,
