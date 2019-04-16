@@ -64,7 +64,7 @@
               <em>If you would like to keep the existing bug linked to this assessment do not edit this attribute. If you would like to link to a different ticket, either clear this attribute to generate new or provide an existing ticket number.</em>
             </small>
           </div>
-        <div>
+        </div>
     </assessment-inline-item>
   </div>
 </div>
