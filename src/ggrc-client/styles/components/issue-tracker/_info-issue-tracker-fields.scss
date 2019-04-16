@@ -7,10 +7,10 @@ info-issue-tracker-fields {
   .people-sync {
     margin-top: 8px;
     display: flex;
+    align-items: center;
 
-    label {
-      display: inline-block;
-      margin: 0 0 0 7px;
+    input {
+      margin: 0 7px 0 0;
     }
   }
 }
