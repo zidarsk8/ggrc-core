@@ -10,7 +10,7 @@
       {{#if_instance_of instance 'Assessment'}}
         {{#if instance.issue_tracker.enabled}}
           {{^if instance.issue_tracker.people_sync_enabled}}
-            <span class="people-sync-state">People Sync: Disabled</span>
+            <span class="people-sync-state">People sync: Disabled</span>
           {{/if}}
         {{/if}}
       {{/if_instance_of}}
