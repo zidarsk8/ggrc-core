@@ -648,6 +648,7 @@ def handle_import_stop(**kwargs):
       if getattr(settings, "APPENGINE_INSTANCE", "local") != "local":
         stop_ie_bg_tasks(ie_job)
       db.session.commit()
+      expire_ie_cache(ie_job)
       return make_import_export_response(ie_job.log_json())
     if ie_job.status == "Stopped":
       raise models_exceptions.ImportStoppedException()
