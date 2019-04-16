@@ -80,13 +80,16 @@
         </rich-text>
       </div>
     </div>
+
     <div class="ggrc-form-item width-100">
       <div class="ggrc-form-item__row">
       <assessment-people {instance}="{instance}"
-                         {info-pane-mode}="{false}">
+                          {info-pane-mode}="{false}"
+                          {is-new-instance}="{new_object_form}">
       </assessment-people>
       </div>
     </div>
+
     <div class="ggrc-form-item">
       <div class="ggrc-form-item__row ggrc-from-item__checkbox-list">
         <checkbox-to-list {property}="{recipients}" {instance}="{instance}" class="flex-box">

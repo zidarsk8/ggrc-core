@@ -222,7 +222,9 @@
                     {{/unless}}
                 </div>
                 <div class="info-pane__section">
-                    <assessment-people {instance}="{instance}">
+                    <assessment-people {instance}="{instance}"
+                      {main-roles}="{assessmentMainRoles}"
+                      {deferred-save}="{deferredSave}">
                     </assessment-people>
                 </div>
             </div>

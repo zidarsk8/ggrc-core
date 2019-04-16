@@ -21,7 +21,7 @@
       <custom-roles {instance}="{instance}"
         {deferred-save}="{deferredSave}"
         {order-of-roles}="{orderOfRoles}"
-        {include-roles}="{assessmentMainRoles}"
+        {include-roles}="{mainRoles}"
         {conflict-roles}="{conflictRoles}">
       </custom-roles>
     {{else}}
@@ -29,7 +29,7 @@
         {instance}="{instance}"
         {order-of-roles}="{orderOfRoles}"
         {conflict-roles}="{conflictRoles}"
-        {is-new-instance}="{new_object_form}">
+        {is-new-instance}="{isNewInstance}">
       </custom-roles-modal>
     {{/if}}
   </div>

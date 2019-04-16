@@ -11,7 +11,7 @@ import template from './templates/assessment-people.stache';
 export default can.Component.extend({
   tag: 'assessment-people',
   template: can.stache(template),
-  leakScope: true,
+  leakScope: false,
   viewModel: {
     define: {
       emptyMessage: {
@@ -22,6 +22,9 @@ export default can.Component.extend({
     rolesConflict: false,
     infoPaneMode: true,
     instance: {},
+    mainRoles: [],
+    deferredSave: null,
+    isNewInstance: false,
     conflictRoles: ['Assignees', 'Verifiers'],
     orderOfRoles: ['Creators', 'Assignees', 'Verifiers'],
   },
