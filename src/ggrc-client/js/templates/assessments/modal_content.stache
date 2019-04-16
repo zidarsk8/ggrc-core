@@ -29,11 +29,11 @@
         <assessment-object-type-dropdown class="input-medium"
                                          {instance}="{instance}"
                                           {(assessment-type)}="{instance.assessment_type}">
-          <dropdown
+          <dropdown-component
             {options-groups}="{objectTypes}"
             {is-grouped-dropdown}="{true}"
             {name}="'assessmentType'">
-          </dropdown>
+          </dropdown-component>
         </assessment-object-type-dropdown>
       </div>
       <div class="ggrc-form-item__multiple-row multi-select-label-container">
@@ -47,13 +47,13 @@
       </div>
     </div>
     <div class="ggrc-form-item">
-<div class="ggrc-form-item__checkbox-item">
-  <label class="inline-check pull-left">
-    <input type="checkbox" class="js-toggle-controlplans"
+  <div class="ggrc-form-item__checkbox-item">
+    <label class="inline-check pull-left">
+      <input type="checkbox" class="js-toggle-controlplans"
            can-value="instance.test_plan_procedure">
-      Copy Assessment Procedure from mapped object
-  </label>
-</div>
+        Copy Assessment Procedure from mapped object
+    </label>
+  </div>
     </div>
     <div class="ggrc-form-item">
       <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
