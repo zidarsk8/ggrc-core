@@ -3,6 +3,7 @@
 
 """Base objects for csv file converters."""
 
+from logging import getLogger
 from collections import defaultdict
 
 import sqlalchemy as sa
@@ -23,6 +24,9 @@ from ggrc.models import exceptions
 from ggrc.models import all_models
 from ggrc.utils import benchmark
 from ggrc.utils import structures
+
+
+logger = getLogger(__name__)
 
 
 class BaseConverter(object):
@@ -130,7 +134,10 @@ class ImportConverter(BaseConverter):
     revision_ids = []
     for converter in self.initialize_block_converters():
       if not converter.ignore:
-        converter.import_csv_data()
+        try:
+          converter.import_csv_data()
+        except exceptions.ImportStoppedException:
+          logger.info("Import was stopped by user.")
         revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
     self._start_compute_attributes_job(revision_ids)

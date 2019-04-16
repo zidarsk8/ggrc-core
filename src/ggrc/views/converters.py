@@ -324,6 +324,8 @@ def run_import_phases(task):
 
     if ie_job.status == "In Progress":
       info = make_import(csv_data, False, ie_job)
+      if ie_job.status == "Stopped":
+        return utils.make_simple_response()
       ie_job.results = json.dumps(info)
       for block_info in info:
         if block_info["block_errors"] or block_info["row_errors"]:
@@ -338,8 +340,6 @@ def run_import_phases(task):
       db.session.commit()
       job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                             ie_job.title)
-  except models_exceptions.ImportStoppedException:
-    logger.info("Import was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception(e.message)
     ie_job = import_export.get(ie_id)
