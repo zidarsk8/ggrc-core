@@ -333,6 +333,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
     # Ensure that related_destinations and related_sources will be loaded
     # in subquery. It allows reduce a number of requests to DB when these attrs
     # are used
+    LOGGER.debug("%s.eager_query(): setting flag to load related_sources "
+                 " and related_destinations", cls.__name__)
     kwargs['load_related'] = True
 
     query = super(CycleTaskGroupObjectTask, cls).eager_query(**kwargs)

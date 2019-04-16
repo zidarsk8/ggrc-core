@@ -326,7 +326,8 @@ class Relatable(object):
     query = super(Relatable, cls).eager_query(**kwargs)
     query = cls.eager_inclusions(query, Relatable._include_links)
 
-    if kwargs.get('load_related', True):
+    if 'load_related' not in kwargs or kwargs.get('load_related'):
+      # load related in subquery by default or if it's explicitly requested
       return query.options(
           orm.subqueryload('related_sources'),
           orm.subqueryload('related_destinations'))

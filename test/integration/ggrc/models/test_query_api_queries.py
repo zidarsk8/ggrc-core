@@ -41,7 +41,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Market': 13,
       'Objective': 14,
       'OrgGroup': 13,
-      'Person': 12,
+      'Person': 10,
       'Policy': 14,
       'Process': 13,
       'System': 13,
@@ -112,11 +112,11 @@ class TestAllModels(WithQueryApi, TestCase):
           "limit": [0, obj_count],
           "order_by": [{"name": "updated_at", "desc": True}]
       }])
-      self.assertLessEqual(
+      self.assertEqual(
           counter.get,
           self.QUERY_API_LIMIT[model.__name__],
-          "Eager query of {model} has too much queries: "
-          "{counted} > {expected} for query "
+          "Eager query of {model} has unexpected number of queries: "
+          "actual={counted}, expected={expected} for query "
           "{obj_count} instances".format(
               model=model,
               expected=self.QUERY_API_LIMIT[model.__name__],

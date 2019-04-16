@@ -135,14 +135,6 @@ class ContextRBAC(object):
         orm.Load(cls).load_only("context_id"),
     )
 
-  # @classmethod
-  # def eager_query(cls, **kwargs):
-  # from sqlalchemy import orm
-
-  # query = super(ContextRBAC, cls).eager_query(**kwargs)
-  # return query.options(
-  # orm.subqueryload('context'))
-
 
 class ChangeTracked(object):
 
