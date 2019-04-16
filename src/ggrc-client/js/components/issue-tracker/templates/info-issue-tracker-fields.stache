@@ -23,7 +23,7 @@
           <div class="people-sync">
             <input disabled type="checkbox" id="modal__people-sync"
               can-value="instance.issue_tracker.people_sync_enabled">
-            <label for="modal__people-sync">Sync people with ticket tracker</label>
+            <label for="modal__people-sync">Sync people with Ticket Tracker</label>
           </div>
         {{/if}}
       {{/if_instance_of}}
