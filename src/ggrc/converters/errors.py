@@ -12,7 +12,7 @@ MISSING_COLUMN = (u"Line {line}: Missing mandatory column{s} {column_names},"
                   u" when adding object.")
 
 MISSING_CUSTOM_ATTRIBUTE_COLUMN = (u"Line {line}: Missing custom column"
-                                   " {column_name}, when adding object.")
+                                   u" {column_name}, when adding object.")
 
 WRONG_OBJECT_TYPE = (u"Line {line}: Object type '{object_name}' doesn't "
                      u"exist or can't be imported.")
@@ -86,7 +86,11 @@ PERMISSION_ERROR = (u"Line {line}: You don't have permission to update/delete"
                     u" this record.")
 
 MAPPING_PERMISSION_ERROR = (u"Line {line}: You don't have permission to update"
-                            " mappings for {object_type}: {slug}.")
+                            u" mappings for {object_type}: {slug}.")
+
+UNSUPPORTED_MAPPING = (u"Line {line}: You are not able to map/unmap "
+                       u"{obj_a} to {obj_b} via import. "
+                       u"The column '{column_name}' will be skipped.")
 
 MAPPING_SCOPING_ERROR = (u"Line {line}: You do not have the necessary "
                          u"permissions to {action} scoping objects to "
@@ -95,10 +99,10 @@ MAPPING_SCOPING_ERROR = (u"Line {line}: You do not have the necessary "
                          u"Column '{action}:{object_type}' will be ignored.")
 
 DELETE_NEW_OBJECT_ERROR = (u"Line {line}: Tried to create and delete the same"
-                           " object {object_type}: {slug} in one import.")
+                           u" object {object_type}: {slug} in one import.")
 
 DELETE_CASCADE_ERROR = (u"Line {line}: Cannot delete object {object_type}:"
-                        " {slug} without deleting other objects")
+                        u" {slug} without deleting other objects")
 
 UNKNOWN_ERROR = u"Line {line}: Import failed due to unknown error."
 
@@ -143,10 +147,10 @@ ONLY_IMPORTABLE_COLUMNS_WARNING = (u"Line {line}: Only the following "
 EXPORT_ONLY_WARNING = (u"Line {line}: Field '{column_name}' "
                        u"can not be imported. The value will be ignored.")
 
-ILLEGAL_APPEND_CONTROL_VALUE = ("Line {line}: "
-                                "You can not map {mapped_type} to "
-                                "{object_type}, because this {mapped_type} is "
-                                "not mapped to the related audit.")
+ILLEGAL_APPEND_CONTROL_VALUE = (u"Line {line}: "
+                                u"You can not map {mapped_type} to "
+                                u"{object_type}, because this {mapped_type} "
+                                u"is not mapped to the related audit.")
 
 UNMODIFIABLE_COLUMN = (u"Line {line}: Column '{column_name}' can not be "
                        u"modified. The value will be ignored.")
