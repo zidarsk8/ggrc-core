@@ -328,7 +328,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   {% for parent_info, comments in digest['comment_created'].iteritems() %}
                     <li {{ style.list_item_no_bullet() }}>
                       Comments on {{ parent_info.object_type }}
-                      {{ parent_info.title }}:
+                      {{ parent_info.title|e }}:
 
                       {% for comment in comments %}
                         <ul {{ style.list_wrap() }}>
