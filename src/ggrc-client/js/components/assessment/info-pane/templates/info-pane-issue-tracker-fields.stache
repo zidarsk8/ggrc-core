@@ -34,7 +34,7 @@
                           rel="tooltip"
                           data-placement="top"
                           data-original-title="You can enable People Sync in Audit Issue Tracker"
-                        >People Sync: Disabled</span>
+                        >People sync: Disabled</span>
                       {{/if}}
                     {{/if}}
                   </span>
