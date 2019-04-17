@@ -48,13 +48,11 @@ class TaskGroup(roleable.Roleable,
   cycle_task_groups = db.relationship(
       'CycleTaskGroup', backref='task_group')
 
-  sort_index = db.Column(
-      db.String(length=250), default="", nullable=False)
-
   _api_attrs = reflection.ApiAttributes(
       'workflow',
       'task_group_tasks',
-      'sort_index',
+      # Intentionally do not include `cycle_task_groups`
+      # 'cycle_task_groups',
   )
 
   _aliases = {
@@ -102,7 +100,7 @@ class TaskGroup(roleable.Roleable,
 
   def copy(self, _other=None, **kwargs):
     columns = [
-        'title', 'description', 'workflow', 'sort_index', 'modified_by',
+        'title', 'description', 'workflow', 'modified_by',
         'context'
     ]
 

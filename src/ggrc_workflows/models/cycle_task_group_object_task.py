@@ -137,8 +137,6 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
                                         nullable=False,
                                         default=[])
 
-  sort_index = db.Column(db.String(length=250), default="", nullable=False)
-
   finished_date = db.Column(db.Date)
   verified_date = db.Column(db.Date)
 
@@ -198,7 +196,6 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       'cycle',
       'cycle_task_group',
       'task_group_task',
-      'sort_index',
       'task_type',
       'response_options',
       'selected_response_options',
