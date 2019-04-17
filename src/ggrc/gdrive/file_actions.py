@@ -153,7 +153,10 @@ def process_gdrive_file(file_id, folder_id, is_uploaded=False):
   try:
     drive_service = discovery.build(
         API_SERVICE_NAME, API_VERSION, http=http_auth)
-    file_meta = drive_service.files().get(fileId=file_id).execute()
+    file_meta = drive_service.files().get(
+        fileId=file_id,
+        fields='id,webViewLink,name'
+    ).execute()
     if is_uploaded:
       response = file_meta
     else:
