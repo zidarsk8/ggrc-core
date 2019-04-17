@@ -27,6 +27,7 @@
 < docs/source/_static/.gitkeep
 < docs/source/support/deployment_and_update.rst
 < docs/source/support/index.rst
+< docs/source/support/local_dbs.rst
 < docs/source/_templates/.gitkeep
 < .editorconfig
 < .eslintignore

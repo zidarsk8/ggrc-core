@@ -223,7 +223,7 @@ export default can.Component.extend({
           });
         })
         .then(function () {
-          let message = instance.child_type +
+          let message = businessModels[instance.child_type].title_singular +
         ' was refreshed successfully.';
           notifier('success', message);
         });

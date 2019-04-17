@@ -39,9 +39,6 @@
                     Open Workflow
                   </a>
                 </li>
-                <li>
-                  <permalink {instance}="{instance}"/>
-                </li>
               </three-dots-menu>
             </div>
           </div>

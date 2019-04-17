@@ -20,7 +20,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 <body {{ style.body_style() }}>
   <div {{ style.notification_container() }} >
     <div {{ style.notification_block() }}>
-    <p {{ style.notification_title() }}>{{ import_export.title }}</p>
+    <p {{ style.notification_title() }}>{{ import_export.title|e }}</p>
     <p {{ style.notification_body() }}>
       {{ import_export.body }}
     </p>

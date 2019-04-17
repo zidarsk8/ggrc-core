@@ -117,6 +117,7 @@ class AssessmentResource(mixins.SnapshotCounts, common.ExtendedResource):
             "revisions": [],
             "revision_id": snapshot.revision_id,
             "type": snapshot.type,
+            "original_object_deleted": snapshot.original_object_deleted,
         })
     return data
 
