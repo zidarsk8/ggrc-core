@@ -51,32 +51,35 @@ class Mega(object):
 
   def relatives_ids(self, direction, all_generations=False):
     """Returns ids of relatives"""
+    if all_generations:
+      visited = set()
+      not_visited = {self.id, }
+      while not_visited:
+        visited.update(not_visited)
+        not_visited = self._get_relatives_for(direction, not_visited, visited)
+      return visited - {self.id}
+    else:
+      return self._get_relatives_for(direction, {self.id}, {self.id})
+
+  def _get_relatives_for(self, direction, nodes, exclude):
     rel = relationship.Relationship
+
     if direction == "children":
       direction_filter = rel.source_id.in_
-      not_visited_attr = "destination_id"
+      next_nodes_attr = "destination_id"
     elif direction == "parents":
       direction_filter = rel.destination_id.in_
-      not_visited_attr = "source_id"
+      next_nodes_attr = "source_id"
     else:
-      raise ValueError
+      raise ValueError("Unknown value for direction attr")
 
-    visited = set()
-    not_visited = {self.id, }
-    while not_visited:
-      child_rels = rel.query.filter(
-          direction_filter(not_visited),
-          rel.source_type == self.__class__.__name__,
-          rel.destination_type == self.__class__.__name__,
-      )
-      visited.update(not_visited)
-      not_visited = set((getattr(r, not_visited_attr) for r in child_rels
-                         if getattr(r, not_visited_attr) not in visited))
-      if not all_generations:
-        visited.update(not_visited)
-        break
-    visited.discard(self.id)
-    return visited
+    relationships = rel.query.filter(
+        direction_filter(nodes),
+        rel.source_type == self.__class__.__name__,
+        rel.destination_type == self.__class__.__name__,
+    )
+    obj_ids = (getattr(r, next_nodes_attr) for r in relationships)
+    return set(obj_id for obj_id in obj_ids if obj_id not in exclude)
 
   @staticmethod
   def _is_parent_for(parent, obj):
