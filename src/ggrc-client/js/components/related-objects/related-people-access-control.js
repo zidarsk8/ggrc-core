@@ -136,33 +136,32 @@ export default can.Component.extend({
       let includeRoles = this.attr('includeRoles');
       let groupId = role.id;
       let title = role.name;
-      let group;
-      let people;
       let singleUserRole = this.singleUserRoles[title] ? true : false;
 
       if (includeRoles.length && includeRoles.indexOf(title) === -1) {
         return;
       }
 
-      group = roleAssignments[groupId];
-      people = group ?
-        group.map((groupItem) => {
+      return {
+        title: title,
+        groupId: groupId,
+        people: this.getPeople(roleAssignments, groupId),
+        required: role.mandatory,
+        singleUserRole: singleUserRole,
+      };
+    },
+    getPeople(roleAssignments, groupId) {
+      let people = roleAssignments[groupId];
+      return people ?
+        people.map((person) => {
           return {
-            id: groupItem.person.id,
-            email: groupItem.person_email,
-            name: groupItem.person_name,
+            id: person.person.id,
+            email: person.person_email,
+            name: person.person_name,
             type: 'Person',
           };
         }) :
         [];
-
-      return {
-        title: title,
-        groupId: groupId,
-        people: people,
-        required: role.mandatory,
-        singleUserRole: singleUserRole,
-      };
     },
     filterByIncludeExclude(includeRoles, excludeRoles) {
       const instance = this.attr('instance');
@@ -265,11 +264,17 @@ export default can.Component.extend({
 
       return groups;
     },
-    refreshGroups() {
-      this.attr('groups', this.getRoleList());
+    refreshPeopleInGroups() {
+      let instance = this.attr('instance');
+      let groups = this.attr('groups');
+      let roleAssignments = _.groupBy(instance
+        .attr('access_control_list'), 'ac_role_id');
+
+      groups.forEach((group) =>
+        group.attr('people', this.getPeople(roleAssignments, group.groupId)));
     },
     setupGroups() {
-      this.refreshGroups();
+      this.attr('groups', this.getRoleList());
       this.checkConflicts();
     },
   },
@@ -278,10 +283,11 @@ export default can.Component.extend({
       this.viewModel.setupGroups();
     },
     '{viewModel.instance} updated'() {
-      this.viewModel.setupGroups();
+      this.viewModel.refreshPeopleInGroups();
+      this.viewModel.checkConflicts();
     },
     '{viewModel} instance'() {
-      this.viewModel.refreshGroups();
+      this.viewModel.setupGroups();
     },
   },
 });
