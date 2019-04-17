@@ -29,7 +29,7 @@
                   <span class="ggrc-form__title">
                     Ticket Tracker
                     {{#if instance.issue_tracker.enabled}}
-                      {{^if instance.issue_tracker.people_sync_enabled}}
+                      {{^if instance.audit.issue_tracker.people_sync_enabled}}
                         <span class="people-sync-state"
                           rel="tooltip"
                           data-placement="top"

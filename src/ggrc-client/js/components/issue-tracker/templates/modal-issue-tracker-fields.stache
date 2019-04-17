@@ -9,7 +9,7 @@
       Ticket Tracker
       {{#if_instance_of instance 'Assessment'}}
         {{#if instance.issue_tracker.enabled}}
-          {{^if instance.issue_tracker.people_sync_enabled}}
+          {{^if instance.audit.issue_tracker.people_sync_enabled}}
             <span class="people-sync-state">People sync: Disabled</span>
           {{/if}}
         {{/if}}
