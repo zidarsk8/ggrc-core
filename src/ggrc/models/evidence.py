@@ -194,9 +194,10 @@ class Evidence(Roleable, Relatable, mixins.Titled,
     return obj
 
   @staticmethod
-  def _build_file_name_postfix(parent_obj):
-    """Build postfix for given parent object"""
-    postfix_parts = [Evidence.FILE_NAME_SEPARATOR, parent_obj.slug]
+  def _build_mapped_to_string(parent_obj):
+    """Build description string with information to what objects this evidence
+    is mapped to for given parent object"""
+    mapped_to = [parent_obj.slug, ]
 
     related_snapshots = parent_obj.related_objects(_types=['Snapshot'])
     related_snapshots = sorted(related_snapshots, key=lambda it: it.id)
@@ -204,10 +205,10 @@ class Evidence(Roleable, Relatable, mixins.Titled,
     slugs = (sn.revision.content['slug'] for sn in related_snapshots if
              sn.child_type == parent_obj.assessment_type)
 
-    postfix_parts.extend(slugs)
-    postfix_sting = '_'.join(postfix_parts).lower()
+    mapped_to.extend(slugs)
+    mapped_to_sting = 'Mapped to: {}'.format(', '.join(mapped_to).lower())
 
-    return postfix_sting
+    return mapped_to_sting
 
   def _build_relationship(self, parent_obj):
     """Build relationship between evidence and parent object"""
@@ -219,8 +220,9 @@ class Evidence(Roleable, Relatable, mixins.Titled,
     db.session.add(rel)
     signals.Restful.model_put.send(rel.__class__, obj=rel, service=self)
 
-  def _update_fields(self, response):
+  def _update_fields(self, response, parent):
     """Update fields of evidence with values of the copied file"""
+    self.description = self._build_mapped_to_string(parent)
     self.gdrive_id = response['id']
     self.link = response['webViewLink']
     self.title = response['name']
@@ -241,14 +243,12 @@ class Evidence(Roleable, Relatable, mixins.Titled,
        self.source_gdrive_id:
 
       parent = self._get_parent_obj()
-      postfix = self._build_file_name_postfix(parent)
       folder_id = self._get_folder(parent)
       file_id = self.source_gdrive_id
       from ggrc.gdrive.file_actions import process_gdrive_file
-      response = process_gdrive_file(file_id, folder_id, postfix,
-                                     separator=Evidence.FILE_NAME_SEPARATOR,
+      response = process_gdrive_file(file_id, folder_id,
                                      is_uploaded=self.is_uploaded)
-      self._update_fields(response)
+      self._update_fields(response, parent)
 
   def is_with_parent_obj(self):
     return bool(hasattr(self, '_parent_obj') and self._parent_obj)
