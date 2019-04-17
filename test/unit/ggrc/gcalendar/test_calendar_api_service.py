@@ -3,12 +3,20 @@
 
 """Test api service for google calendar."""
 
+from collections import namedtuple
 import unittest
+import ddt
 import mock
+import requests
+from googleapiclient.errors import HttpError
 
 from ggrc.gcalendar import calendar_api_service
 
 
+ErrorResp = namedtuple("ERROR_RESP", ["status", "reason"])
+
+
+@ddt.ddt
 class TestCalendarApiService(unittest.TestCase):
   """Test calendar api service methods."""
 
@@ -24,7 +32,8 @@ class TestCalendarApiService(unittest.TestCase):
   def test_create_event(self):
     """Test creation of an event."""
     self.events_mock.insert = mock.MagicMock()
-    self.service.create_event(
+    response = self.service.create_event(
+        event_id=1,
         calendar_id="primary",
         summary="test calendar event",
         description="test calendar event description",
@@ -52,22 +61,48 @@ class TestCalendarApiService(unittest.TestCase):
         "guestsCanInviteOthers": False,
         "transparency": "transparent",
     }
+    self.assertEquals(response['status_code'], 200)
     self.events_mock.insert.assert_called_with(calendarId="primary",
                                                body=expected_body)
+
+  @ddt.data(
+      (HttpError(resp=ErrorResp(status=403, reason="reason"),
+                 content="Test",), 403),
+      (requests.exceptions.RequestException, 500),
+  )
+  @ddt.unpack
+  def test_create_event_error(self, error, code):
+    """Test creation of an event with raised HttpError."""
+    self.events_mock.insert = mock.MagicMock()
+    self.events_mock.insert.side_effect = error
+    response = self.service.create_event(
+        event_id=1,
+        calendar_id="primary",
+        summary="test calendar event with http error",
+        description="test calendar event description",
+        start="2018-02-01",
+        end="2018-02-01",
+        timezone="UTC",
+        attendees=["someuser@example.com"],
+        send_notifications=False
+    )
+    self.assertEquals(response, {"content": None, "status_code": code})
 
   def test_update_event(self):
     """Test update of an event."""
     self.events_mock.update = mock.MagicMock()
-    self.service.update_event(
+    response = self.service.update_event(
+        event_id=1,
         calendar_id="primary",
         summary="test calendar event",
         description="test calendar event description",
-        event_id="SOMEID12345",
+        external_event_id="SOMEID12345",
         start="2018-01-01",
         end="2018-01-01",
         timezone="UTC",
         attendees=["someuser@example.com"],
     )
+    self.assertEquals(response['status_code'], 200)
     expected_body = {
         "summary": "test calendar event",
         "description": "test calendar event description",
@@ -92,13 +127,38 @@ class TestCalendarApiService(unittest.TestCase):
         body=expected_body
     )
 
+  @ddt.data(
+      (HttpError(resp=ErrorResp(status=403, reason="reason"),
+                 content="Test",), 403),
+      (requests.exceptions.RequestException, 500),
+  )
+  @ddt.unpack
+  def test_update_event_error(self, error, code):
+    """Test update of an event with raised HttpError."""
+    self.events_mock.update = mock.MagicMock()
+    self.events_mock.update.side_effect = error
+    response = self.service.update_event(
+        event_id=1,
+        calendar_id="primary",
+        summary="test calendar event with http error",
+        external_event_id="SOMEID12345",
+        description="test calendar event description",
+        start="2018-02-01",
+        end="2018-02-01",
+        timezone="UTC",
+        attendees=["someuser@example.com"],
+    )
+    self.assertEquals(response, {"content": None, "status_code": code})
+
   def test_delete_event(self):
     """Test delete of an event."""
     self.events_mock.delete = mock.MagicMock()
-    self.service.delete_event(
+    response = self.service.delete_event(
         calendar_id="primary",
-        event_id="SOMEID12345",
+        external_event_id="SOMEID12345",
+        event_id=1,
     )
+    self.assertEquals(response['status_code'], 200)
     self.events_mock.delete.assert_called_with(
         calendarId="primary",
         eventId="SOMEID12345",
@@ -107,10 +167,12 @@ class TestCalendarApiService(unittest.TestCase):
   def test_get_event(self):
     """Test get of an event."""
     self.events_mock.get = mock.MagicMock()
-    self.service.get_event(
+    response = self.service.get_event(
         calendar_id="primary",
-        event_id="SOMEID12345",
+        external_event_id="SOMEID12345",
+        event_id=1,
     )
+    self.assertEquals(response['status_code'], 200)
     self.events_mock.get.assert_called_with(
         calendarId="primary",
         eventId="SOMEID12345",

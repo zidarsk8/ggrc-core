@@ -22,6 +22,9 @@ logger = getLogger(__name__)
 class CalendarEventsSync(object):
   """Class with methods for sync CalendarEvents to Calendar API."""
 
+  NOT_FOUND = 404
+  SUCCESS = 200
+
   def __init__(self):
     self.service = calendar_api_service.CalendarApiService()
     self.calendar_id = "primary"
@@ -53,31 +56,35 @@ class CalendarEventsSync(object):
       for event in events:
         if not event.needs_sync:
           continue
-        try:
-          if event.id not in event_mappings or not event_mappings[event.id]:
-            if event.is_synced:
-              self._delete_event(event)
-            db.session.delete(event)
-            continue
+        if event.id not in event_mappings or not event_mappings[event.id]:
           if not event.is_synced:
-            self._create_event(event)
-            continue
-          self._update_event(event)
-        except Exception as exp:   # pylint: disable=broad-except
-          logger.warn("Sync of the event %d has failed "
-                      "with the following error %s.",
-                      event.id, exp.message)
+            db.session.delete(event)
+          else:
+            self._delete_event(event)
+          continue
+        if not event.is_synced:
+          self._create_event(event)
+          continue
+        self._update_event(event)
       db.session.commit()
 
   def _update_event(self, event):
     """Updates the provided event using CalendarApiService."""
     response = self.service.get_event(
         calendar_id=self.calendar_id,
-        event_id=event.external_event_id
+        external_event_id=event.external_event_id,
+        event_id=event.id,
     )
-    if not event.json_equals(response):
-      self.service.update_event(
-          event_id=event.external_event_id,
+    if response["status_code"] == self.NOT_FOUND:
+      db.session.delete(event)
+      return
+    if not response["content"]:
+      return
+    if (response["status_code"] == self.SUCCESS and
+       not event.json_equals(response["content"])):
+      response = self.service.update_event(
+          event_id=event.id,
+          external_event_id=event.external_event_id,
           calendar_id=self.calendar_id,
           description=event.description,
           summary=event.title,
@@ -86,16 +93,29 @@ class CalendarEventsSync(object):
           timezone="UTC",
           attendees=[event.attendee.email],
       )
-      event.last_synced_at = datetime.datetime.utcnow()
+      if response["status_code"] == self.SUCCESS:
+        event.last_synced_at = datetime.datetime.utcnow()
 
   def _delete_event(self, event):
     """Deletes the provided event using CalendarApiService."""
+    response = self.service.get_event(
+        calendar_id=self.calendar_id,
+        external_event_id=event.external_event_id,
+        event_id=event.id,
+    )
+    if response["status_code"] == self.NOT_FOUND:
+      db.session.delete(event)
+      return
     self.service.delete_event(calendar_id=self.calendar_id,
-                              event_id=event.external_event_id)
+                              external_event_id=event.external_event_id,
+                              event_id=event.id)
+    if response["status_code"] == self.SUCCESS:
+      db.session.delete(event)
 
   def _create_event(self, event):
     """Creates new event using CalendarApiService."""
     response = self.service.create_event(
+        event_id=event.id,
         calendar_id=self.calendar_id,
         summary=event.title,
         description=event.description,
@@ -105,5 +125,6 @@ class CalendarEventsSync(object):
         attendees=[event.attendee.email],
         send_notifications=False
     )
-    event.external_event_id = response['id']
-    event.last_synced_at = datetime.datetime.utcnow()
+    if response["status_code"] == self.SUCCESS:
+      event.external_event_id = response["content"]["id"]
+      event.last_synced_at = datetime.datetime.utcnow()
