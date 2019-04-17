@@ -224,7 +224,9 @@
                 <div class="info-pane__section">
                     <assessment-people {instance}="{instance}"
                       {main-roles}="{assessmentMainRoles}"
-                      {deferred-save}="{deferredSave}">
+                      {deferred-save}="{deferredSave}"
+                      {on-state-change-dfd}="{onStateChangeDfd}"
+                      {set-in-progress}="{@setInProgressState}">
                     </assessment-people>
                 </div>
             </div>

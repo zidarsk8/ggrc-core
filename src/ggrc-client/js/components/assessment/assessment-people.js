@@ -4,7 +4,7 @@
  */
 
 import {ROLES_CONFLICT} from '../../events/eventTypes';
-import '../custom-roles/custom-roles';
+import './assessment-custom-roles';
 import '../custom-roles/custom-roles-modal';
 import template from './templates/assessment-people.stache';
 
@@ -25,8 +25,10 @@ export default can.Component.extend({
     mainRoles: [],
     deferredSave: null,
     isNewInstance: false,
+    onStateChangeDfd: $.Deferred().resolve(),
     conflictRoles: ['Assignees', 'Verifiers'],
     orderOfRoles: ['Creators', 'Assignees', 'Verifiers'],
+    setInProgress: $.noop(),
   },
   events: {
     [`{instance} ${ROLES_CONFLICT.type}`]: function (ev, args) {
