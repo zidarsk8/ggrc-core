@@ -23,6 +23,7 @@ from ggrc import db
 from ggrc.login import get_current_user_id, is_external_app_user
 from ggrc.models.mixins import WithProtectedAttributes
 from ggrc.models.mixins.synchronizable import Synchronizable
+from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import SerializableAttribute
 from ggrc.models.types import JsonType
@@ -757,13 +758,22 @@ class Builder(AttributeInfo):
     """
     attrs = set(self._update_attrs)
 
+    is_external = is_external_app_user()
+
     if isinstance(obj, Synchronizable):
       sync_attrs = obj.get_sync_attrs()
       attrs.update(sync_attrs)
 
-    if all((isinstance(obj, WithProtectedAttributes),
-            is_external_app_user())):
+    if is_external and isinstance(obj, WithProtectedAttributes):
       attrs.difference_update(obj.get_protected_attributes())
+
+    if not is_external and isinstance(obj, WithReadOnlyAccess):
+      # attribute 'readonly' have to be ignored for non-external users
+      if 'readonly' in json_obj:
+        logger.debug("'readonly=%r' is specified for non-external user in "
+                     "json. Removing this attribute from json to "
+                     "ensure that default value is used")
+        del json_obj['readonly']
 
     self.do_update_attrs(obj, json_obj, attrs)
 
@@ -776,5 +786,13 @@ class Builder(AttributeInfo):
     if isinstance(obj, Synchronizable):
       sync_attrs = obj.get_sync_attrs()
       attrs.update(sync_attrs)
+
+    if not is_external_app_user() and isinstance(obj, WithReadOnlyAccess):
+      # attribute 'readonly' have to be ignored for non-external users
+      if 'readonly' in json_obj:
+        logger.debug("'readonly=%r' is specified for non-external user in "
+                     "json. Removing this attribute from json to "
+                     "ensure that existing value is used")
+        del json_obj['readonly']
 
     self.do_update_attrs(obj, json_obj, attrs)

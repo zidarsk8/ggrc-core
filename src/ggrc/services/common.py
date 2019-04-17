@@ -44,6 +44,7 @@ from ggrc.utils import as_json, benchmark, dump_attrs
 from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
+from ggrc.login import is_external_app_user
 from ggrc.models.cache import Cache
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
@@ -590,16 +591,37 @@ class Resource(ModelView):
       raise Forbidden()
 
   @staticmethod
-  def _validate_readonly_access(obj):
-    """Return 405 MethodNotAllowed if object is marked as read-only"""
+  def _validate_readonly_access(obj, src):
+    """Ensure that user can perform this request depending on readonly flag
+
+    This method is called for POST, PUT and DELETE requests.
+    It raises 405 NotAllowed if user cannot change object.
+
+    :param obj - object with all attributes set/updated from src (POST, PUT)
+                 or existing unmodified object (DELETE)
+    :param src - dict from request (POST, PUT) or None (DELETE)
+    """
+
+    del src  # unused
 
     if not isinstance(obj, WithReadOnlyAccess):
+      return
+
+    is_external = is_external_app_user()
+
+    if is_external and request.method in ('PUT', 'POST'):
       return
 
     if obj.readonly:
       raise MethodNotAllowed(
           description="The object is in a read-only mode and "
                       "is dedicated for SOX needs")
+
+  def _validate_readonly_access_on_post(self, objects, sources):
+    """Validate read-only access on POST"""
+
+    for obj, src in zip(objects, sources):
+      self._validate_readonly_access(obj, src)
 
   @utils.validate_mimetype("application/json")
   def put(self, id):  # pylint: disable=redefined-builtin
@@ -630,7 +652,7 @@ class Resource(ModelView):
     with benchmark("Validate read-only access"):
       # check read-only access AFTER check for permissions to disallow
       # user obtain value for flag "readonly"
-      self._validate_readonly_access(obj)
+      self._validate_readonly_access(obj, src)
 
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
@@ -734,7 +756,7 @@ class Resource(ModelView):
     with benchmark("Validate read-only access"):
       # check read-only access AFTER check for permissions to disallow
       # user obtain value for flag "readonly"
-      self._validate_readonly_access(obj)
+      self._validate_readonly_access(obj, None)
 
     db.session.delete(obj)
     with benchmark("Send DELETEd event"):
@@ -1037,14 +1059,6 @@ class Resource(ModelView):
         db.session.expunge_all()
         raise Forbidden()
 
-  @staticmethod
-  def _validate_readonly_access_on_post(objects):
-    """Validate read-only access on POST
-
-    This method is overridden for relationships
-    """
-    pass
-
   def _gather_referenced_objects(self, data, accumulator=None):
     if accumulator is None:
       accumulator = collections.defaultdict(set)
@@ -1102,7 +1116,7 @@ class Resource(ModelView):
       self._check_post_permissions(objects)
 
     with benchmark("Validate read-only access"):
-      self._validate_readonly_access_on_post(objects)
+      self._validate_readonly_access_on_post(objects, sources)
 
     with benchmark("Send collection POSTed event"):
       signals.Restful.collection_posted.send(
