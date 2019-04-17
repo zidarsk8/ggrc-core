@@ -193,8 +193,8 @@ class TaskGroupTask(roleable.Roleable,
     )
 
   @classmethod
-  def eager_query(cls):
-    return cls._populate_query(super(TaskGroupTask, cls).eager_query())
+  def eager_query(cls, **kwargs):
+    return cls._populate_query(super(TaskGroupTask, cls).eager_query(**kwargs))
 
   def _display_name(self):
     return self.title + '<->' + self.task_group.display_name

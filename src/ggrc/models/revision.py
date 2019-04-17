@@ -77,10 +77,10 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
   ]
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     from sqlalchemy import orm
 
-    query = super(Revision, cls).eager_query()
+    query = super(Revision, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload('modified_by'),
         orm.subqueryload('event'),  # used in description

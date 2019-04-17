@@ -141,5 +141,10 @@ class Issue(Roleable,
     )
 
   @classmethod
-  def eager_query(cls):
-    return cls._populate_query(super(Issue, cls).eager_query())
+  def eager_query(cls, **kwargs):
+    # Ensure that related_destinations and related_sources will be loaded
+    # in subquery. It allows reduce a number of requests to DB when these attrs
+    # are used
+    kwargs['load_related'] = True
+
+    return cls._populate_query(super(Issue, cls).eager_query(**kwargs))

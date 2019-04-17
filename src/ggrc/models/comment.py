@@ -112,9 +112,9 @@ class Commentable(object):
     )
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager Query"""
-    query = super(Commentable, cls).eager_query()
+    query = super(Commentable, cls).eager_query(**kwargs)
     return query.options(orm.subqueryload('comments'))
 
   @declared_attr
@@ -258,8 +258,8 @@ class Comment(Roleable, Relatable, Described, Notifiable,
     return ""
 
   @classmethod
-  def eager_query(cls):
-    query = super(Comment, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Comment, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('revision'),
         orm.joinedload('custom_attribute_definition')
@@ -385,9 +385,9 @@ class ExternalCommentable(object):
     )
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager query for ExternalCommentable mixin."""
-    query = super(ExternalCommentable, cls).eager_query()
+    query = super(ExternalCommentable, cls).eager_query(**kwargs)
     return query.options(orm.subqueryload("comments"))
 
   @declared_attr

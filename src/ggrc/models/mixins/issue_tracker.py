@@ -75,9 +75,9 @@ class IssueTracked(object):
     )
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Define fields to be loaded eagerly to lower the count of DB queries."""
-    query = super(IssueTracked, cls).eager_query()
+    query = super(IssueTracked, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('issuetracker_issue')
     )

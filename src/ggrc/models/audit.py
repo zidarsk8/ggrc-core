@@ -218,8 +218,8 @@ class Audit(Snapshotable,
     ).exists()
 
   @classmethod
-  def eager_query(cls):
-    query = super(Audit, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Audit, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('program'),
         orm.subqueryload('object_people').joinedload('person'),
