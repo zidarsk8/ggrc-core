@@ -25,24 +25,27 @@ class TestShouldDeleteEventForTask(BaseCalendarEventTest):
     self.client.get("/login")
     self.builder = calendar_event_builder.CalendarEventBuilder()
 
-  @ddt.data((u"Deprecated", False, True),
-            (u"In Progress", False, False),
-            (u"Assigned", False, False),
-            (u"Finished", False, True),
+  @ddt.data((u"Deprecated", False, True, True),
+            (u"In Progress", False, False, True),
+            (u"Assigned", False, False, True),
+            (u"Finished", False, False, True),
 
-            (u"Declined", True, False),
-            (u"Verified", True, True),
-            (u"Deprecated", True, True),
-            (u"In Progress", True, False),
-            (u"Finished", True, False),
-            (u"Assigned", True, False))
+            (u"Declined", True, False, True),
+            (u"Verified", True, True, True),
+            (u"Deprecated", True, True, True),
+            (u"In Progress", True, False, True),
+            (u"Finished", True, False, True),
+            (u"Assigned", True, False, True),
+
+            (u"Finished", False, False, False),
+            (u"Finished", True, False, False))
   @ddt.unpack
-  def test_task_status(
-      self, task_status, is_verification_needed, should_delete_event
-  ):
+  def test_overdue_task_status(self, task_status, is_verification_needed,
+                               should_delete_event, is_overdue):
     """Check that the overdue event should be deleted for
        specified task statuses."""
-    _, task, _ = self.setup_person_task_event(date(2015, 1, 5))
+    start_date = date(2015, 1, 5) if is_overdue else date(2015, 1, 15)
+    _, task, _ = self.setup_person_task_event(start_date)
     task.cycle = wf_factories.CycleFactory(
         is_verification_needed=is_verification_needed,
     )
