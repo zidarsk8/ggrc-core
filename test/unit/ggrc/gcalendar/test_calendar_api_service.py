@@ -5,16 +5,20 @@
 
 from collections import namedtuple
 import unittest
+import ddt
 import mock
+import requests
 from googleapiclient.errors import HttpError
 
 from ggrc.gcalendar import calendar_api_service
 
 
+ErrorResp = namedtuple("ERROR_RESP", ["status", "reason"])
+
+
+@ddt.ddt
 class TestCalendarApiService(unittest.TestCase):
   """Test calendar api service methods."""
-
-  ERROR_RESP = namedtuple("ERROR_RESP", ["status", "reason"])
 
   def setUp(self):
     """Set up mocks for testing."""
@@ -61,12 +65,16 @@ class TestCalendarApiService(unittest.TestCase):
     self.events_mock.insert.assert_called_with(calendarId="primary",
                                                body=expected_body)
 
-  def test_create_event_error(self):
+  @ddt.data(
+      (HttpError(resp=ErrorResp(status=403, reason="reason"),
+                 content="Test",), 403),
+      (requests.exceptions.RequestException, 500),
+  )
+  @ddt.unpack
+  def test_create_event_error(self, error, code):
     """Test creation of an event with raised HttpError."""
     self.events_mock.insert = mock.MagicMock()
-    self.events_mock.insert.side_effect = HttpError(
-        resp=self.ERROR_RESP(status=403, reason="reason"), content="Test",
-    )
+    self.events_mock.insert.side_effect = error
     response = self.service.create_event(
         event_id=1,
         calendar_id="primary",
@@ -78,7 +86,7 @@ class TestCalendarApiService(unittest.TestCase):
         attendees=["someuser@example.com"],
         send_notifications=False
     )
-    self.assertEquals(response, {"content": None, "status_code": 403})
+    self.assertEquals(response, {"content": None, "status_code": code})
 
   def test_update_event(self):
     """Test update of an event."""
@@ -119,12 +127,16 @@ class TestCalendarApiService(unittest.TestCase):
         body=expected_body
     )
 
-  def test_update_event_error(self):
+  @ddt.data(
+      (HttpError(resp=ErrorResp(status=403, reason="reason"),
+                 content="Test",), 403),
+      (requests.exceptions.RequestException, 500),
+  )
+  @ddt.unpack
+  def test_update_event_error(self, error, code):
     """Test update of an event with raised HttpError."""
     self.events_mock.update = mock.MagicMock()
-    self.events_mock.update.side_effect = HttpError(
-        resp=self.ERROR_RESP(status=403, reason="reason"), content="Test",
-    )
+    self.events_mock.update.side_effect = error
     response = self.service.update_event(
         event_id=1,
         calendar_id="primary",
@@ -136,7 +148,7 @@ class TestCalendarApiService(unittest.TestCase):
         timezone="UTC",
         attendees=["someuser@example.com"],
     )
-    self.assertEquals(response, {"content": None, "status_code": 403})
+    self.assertEquals(response, {"content": None, "status_code": code})
 
   def test_delete_event(self):
     """Test delete of an event."""

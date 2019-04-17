@@ -76,9 +76,17 @@ class CalendarApiService(object):
           calendarId=calendar_id, body=event).execute()
       return self._build_response_json(200, event)
     except HttpError as err:
-      logger.warn("Create of the event %d has failed. Error code: %s",
-                  event_id, err.resp.status)
+      logger.warn(
+          "Create of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
       return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Create of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
 
   # pylint: disable=too-many-arguments
   def update_event(self, external_event_id, event_id, calendar_id,
@@ -120,9 +128,17 @@ class CalendarApiService(object):
       ).execute()
       return self._build_response_json(200, event)
     except HttpError as err:
-      logger.warn("Update of the event %d has failed. Error code: %s",
-                  event_id, err.resp.status)
+      logger.warn(
+          "Update of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
       return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Update of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
 
   def delete_event(self, calendar_id, external_event_id, event_id):
     """Deletes an event in a given Google Calendar.
@@ -138,9 +154,17 @@ class CalendarApiService(object):
                                eventId=external_event_id).execute()
       return self._build_response_json(200, None)
     except HttpError as err:
-      logger.warn("Deletion of the event %d has failed. Error code: %s",
-                  event_id, err.resp.status)
+      logger.warn(
+          "Deletion of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
       return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Deletion of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
 
   def get_event(self, calendar_id, external_event_id, event_id):
     """Gets an event in given Google Calendar.
@@ -156,6 +180,14 @@ class CalendarApiService(object):
       ).execute()
       return self._build_response_json(200, event)
     except HttpError as err:
-      logger.warn("Get of the event %d has failed. Error code: %s",
-                  event_id, err.resp.status)
+      logger.warn(
+          "Get of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
       return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Get of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
