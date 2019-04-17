@@ -44,7 +44,6 @@ class TaskGroup(roleable.Roleable,
       db.ForeignKey('workflows.id', ondelete="CASCADE"),
       nullable=False,
   )
-  lock_task_order = db.Column(db.Boolean(), nullable=True)
 
   task_group_objects = db.relationship(
       'TaskGroupObject', backref='_task_group', cascade='all, delete-orphan')
@@ -66,7 +65,6 @@ class TaskGroup(roleable.Roleable,
       'task_group_objects',
       reflection.Attribute('objects', create=False, update=False),
       'task_group_tasks',
-      'lock_task_order',
       'sort_index',
       # Intentionally do not include `cycle_task_groups`
       # 'cycle_task_groups',
