@@ -142,8 +142,8 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
         logger.error('CACHE: Unable to add status for newly created entries '
                      'because of Network/RPC/Server errors')
       else:
-        logger.info('CACHE: Newly created entries already exist in cache: %s',
-                    ret)
+        logger.error('CACHE: Newly created entries already exist in cache: %s',
+                     ret)
 
 
 def update_memcache_after_commit(context):
