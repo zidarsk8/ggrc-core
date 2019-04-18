@@ -152,8 +152,11 @@ class TestTaskGroupImport(WorkflowTestCase):
       self.assertEqual(len(result[0]['block_warnings']), 1)
       self.assertEqual(
           result[0]['block_warnings'][0],
-          errors.INVALID_TASKGROUP_MAPPING_WARNING.format(
-              line=2, header_name=header_name
+          errors.UNSUPPORTED_MAPPING.format(
+              line=2,
+              obj_a="Task Group",
+              obj_b=header_name,
+              column_name="map:{}".format(header_name)
           )
       )
 

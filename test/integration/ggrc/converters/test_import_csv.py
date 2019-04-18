@@ -283,8 +283,12 @@ class TestBasicCsvImport(TestCase):
     self._check_csv_response(response, {
         obj_type: {
             "block_warnings": {
-                "Line 18: Attribute '{}' does not exist. "
-                "Column will be ignored.".format(warn_column)
+                errors.UNSUPPORTED_MAPPING.format(
+                    line=18,
+                    obj_a=obj_type,
+                    obj_b=warn_column.split(":", 1)[1],
+                    column_name=warn_column
+                )
             } for warn_column in warn_columns
         } for obj_type, warn_columns in block_warnings.iteritems()
     })
