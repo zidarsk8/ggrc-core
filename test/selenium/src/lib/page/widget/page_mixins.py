@@ -71,6 +71,14 @@ class WithObjectReview(base.WithBrowser):
     return self._review_root.element(text="Mark Reviewed")
 
   @property
+  def floating_message(self):
+    return self._browser.element(text="Review is complete.")
+
+  @property
+  def undo_button(self):
+    return self._browser.element(class_name="object-review__revert")
+
+  @property
   def review_status(self):
     return self._review_root.element(class_name="state-value")
 

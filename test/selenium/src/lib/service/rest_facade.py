@@ -223,7 +223,7 @@ def get_obj_review(obj):
 
 
 def request_obj_review(obj, reviewer):
-  """Returns obj with assigned review."""
+  """Returns obj with requested review."""
   rest_service.ReviewService().create_obj(
       {"reviewers": reviewer,
        "reviewable": obj.repr_min_dict()})
