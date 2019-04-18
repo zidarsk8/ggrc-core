@@ -97,9 +97,7 @@ class TestAudit(TestCase):
       )
     response = self.api.delete(audit)
     self.assert400(response)
-    self.assertEqual(response.json["message"],
-                     "This request will break a mandatory relationship from "
-                     "assessment_templates to audits.")
+    self.assertEqual(response.json["message"], errors.MAPPED_ASSESSMENT)
 
   def test_delete_audit_asmnt(self):
     """Check inability to delete audit in relation with assessment."""
