@@ -26,20 +26,14 @@ class ProposalsService(rest_service.HelpRestService):
             order_by=[
                 {"name": "status", "desc": True},
                 {"name": "created_at", "desc": True}]),
-        timeout=constants.ux.TWO_MIN_USER_WAIT).get("values")
+        timeout=constants.ux.TWO_MIN_USER_WAIT)
 
   def get_proposal_creation_date(self, obj, proposal):
     """Get proposal creation date."""
     proposals = self.get_obj_proposals(obj)
     prop_value = string_utils.escape_html(
         proposal.changes[0]["proposed_value"])
-    try:
-      actual_proposal = next(
-          prop for prop in proposals
-          if prop_value in prop["content"]["fields"]["description"])
-    except StopIteration as exception:
-      print proposals
-      print prop_value
-      raise exception
+    actual_proposal = proposals if prop_value in proposals["content"][
+        "fields"]["description"] else None
     return parser.parse(actual_proposal["created_at"]).replace(
         tzinfo=tz.tzutc())
