@@ -49,19 +49,34 @@ class Mega(object):
         sa.orm.subqueryload('_child_relationships').load_only("id")
     )
 
-  def relatives_ids(self, direction, all_generations=False):
-    """Returns ids of relatives"""
-    if all_generations:
-      visited = set()
-      not_visited = {self.id, }
-      while not_visited:
-        visited.update(not_visited)
-        not_visited = self._get_relatives_for(direction, not_visited, visited)
-      return visited - {self.id}
-    else:
-      return self._get_relatives_for(direction, {self.id}, {self.id})
+  def all_relatives_ids(self, direction):
+    """Returns ids of relatives for all generations
 
-  def _get_relatives_for(self, direction, nodes, exclude):
+    Args:
+        direction: could be 'parents' or 'children'
+    Returns:
+        set of ids
+    """
+    visited = set()
+    not_visited = {self.id, }
+    while not_visited:
+      visited.update(not_visited)
+      not_visited = self._get_relatives_for(direction, not_visited)
+      not_visited -= visited
+    return visited - {self.id}
+
+  def relatives_ids(self, direction):
+    """Returns ids of relatives for one generation
+
+    Args:
+        direction: could be 'parents' or 'children'
+    Returns:
+        set of ids
+    """
+    return self._get_relatives_for(direction, {self.id}) - {self.id}
+
+  def _get_relatives_for(self, direction, nodes):
+    """Return set of ids of relatives of nodes in selected direction"""
     rel = relationship.Relationship
 
     if direction == "children":
@@ -78,12 +93,11 @@ class Mega(object):
         rel.source_type == self.__class__.__name__,
         rel.destination_type == self.__class__.__name__,
     )
-    obj_ids = (getattr(r, next_nodes_attr) for r in relationships)
-    return set(obj_id for obj_id in obj_ids if obj_id not in exclude)
+    return set(getattr(r, next_nodes_attr) for r in relationships)
 
   @staticmethod
   def _is_parent_for(parent, obj):
-    """Check that parent program is parent for mega
+    """Check that 'parent' is parent for 'obj'
     Cache parents ids for mega"""
     if hasattr(flask.g, "mega_parents_cache"):
       mega_parents_cache = flask.g.mega_parents_cache
@@ -94,7 +108,7 @@ class Mega(object):
       parents_ids = mega_parents_cache[obj.type][obj.id]
     else:
       obj = get_model(obj.type).query.get(obj.id)
-      parents_ids = obj.relatives_ids("parents", all_generations=True)
+      parents_ids = obj.all_relatives_ids("parents")
       mega_parents_cache[obj.type][obj.id] = parents_ids
     return parent.id in parents_ids
 
