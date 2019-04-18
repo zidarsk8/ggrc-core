@@ -22,10 +22,10 @@ class TestSnapshotBlockConverter(TestCase):
     """Test snapshots property for empty ids list."""
     converter = mock.MagicMock()
     block = SnapshotBlockConverter(converter, [])
-    self.assertEqual(block.snapshots, [])
+    self.assertEqual(list(block.snapshots()), [])
 
-  def test_snapshots_property(self):
-    """Test snapshots property and snapshot content."""
+  def test_snapshots_content(self):
+    """Test snapshot content."""
     with factories.single_commit():
       snapshots = self._create_snapshots(
           factories.AuditFactory(),
@@ -35,9 +35,8 @@ class TestSnapshotBlockConverter(TestCase):
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
     block = SnapshotBlockConverter(converter, ids)
-    self.assertEqual(block.snapshots, snapshots)
-    for snapshot in snapshots:
-      self.assertIn("audit", snapshot.content)
+    for snapshot in block.snapshots():
+      self.assertIn("audit", snapshot)
 
   def test_valid_child_types(self):
     """Test child_type property with valid snapshots list."""

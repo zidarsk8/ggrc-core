@@ -27,28 +27,31 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   @staticmethod
   def _mock_snapshot_factory(content_list):
-    return [mock.MagicMock(content=content) for content in content_list]
+    return mock.MagicMock(return_value=content_list)
 
   @classmethod
   def _dummy_cad_snapshots(cls):
-    return cls._mock_snapshot_factory([{
-        "id": 44,
-        "custom_attribute_definitions": [
-            {"id": 1, "title": "CCC"},
-            {"id": 2, "title": "BBB"},
-        ],
-    }, {
-        "id": 45,
-        "custom_attribute_definitions": [
-            {"id": 1, "title": "CCC"},
-            {"id": 3, "title": "AAA"},
-            {"id": 4, "title": "DDD"},
-        ],
-    }])
+    return [
+        {
+            "id": 44,
+            "custom_attribute_definitions": [
+                {"id": 1, "title": "CCC"},
+                {"id": 2, "title": "BBB"},
+            ],
+        },
+        {
+            "id": 45,
+            "custom_attribute_definitions": [
+                {"id": 1, "title": "CCC"},
+                {"id": 3, "title": "AAA"},
+                {"id": 4, "title": "DDD"},
+            ],
+        }
+    ]
 
   def test_gather_stubs(self):
     """Test _gather_stubs method."""
-    self.block.snapshots = self._mock_snapshot_factory([{
+    content_list = [{
         "id": 44,
         "owners": [
             {"type": "person", "id": 1},
@@ -68,7 +71,8 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         "id": 44,
         "type": "other",
         "options": [{"type": "option", "id": 4}],
-    }])
+    }]
+    self.block.snapshots = self._mock_snapshot_factory(content_list)
     stubs = self.block._gather_stubs()
     self.assertEqual(
         stubs,
@@ -82,7 +86,9 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_cad_map(self):
     """Test gathering name map for all custom attribute definitions."""
-    self.block.snapshots = self._dummy_cad_snapshots()
+    self.block.snapshots = self._mock_snapshot_factory(
+        self._dummy_cad_snapshots()
+    )
     self.assertEqual(
         self.block._cad_map.items(),
         [
@@ -95,7 +101,9 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_cad_name_map(self):
     """Test gathering name map for all custom attribute definitions."""
-    self.block.snapshots = self._dummy_cad_snapshots()
+    self.block.snapshots = self._mock_snapshot_factory(
+        self._dummy_cad_snapshots()
+    )
     self.assertEqual(
         self.block._cad_name_map.items(),
         [
@@ -183,6 +191,10 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     self.block.DATE_FIELDS = {
         "dummy_date"
     }
+    self.block.child_type = "Dummy Object"
+    self.block._content_value_map = {
+        "Dummy Object": {}
+    }
     self.assertEqual(
         self.block.get_content_string(content, attr_name),
         expected_value
@@ -224,6 +236,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_invalid_cav_dict(self):
     """Test getting ca value from invalid cav representation."""
+    self.block.snapshots = self._mock_snapshot_factory([])
     with self.assertRaises(TypeError):
       self.block.get_cav_value_string("XX")
     with self.assertRaises(KeyError):
@@ -353,12 +366,12 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     )
 
   @ddt.data(
-      ([], [[]]),
+      ([], []),
       ([1, 2, 3], [[], [], []]),
   )
   @ddt.unpack
   def test_body_list(self, snapshots, block_list):
     """Test basic CSV body format."""
     self.block._content_line_list = lambda x: []
-    self.block.snapshots = snapshots
-    self.assertEqual(self.block._body_list, block_list)
+    self.block.snapshots = self._mock_snapshot_factory(snapshots)
+    self.assertEqual(list(self.block.generate_row_data()), block_list)
