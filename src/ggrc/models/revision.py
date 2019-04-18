@@ -501,9 +501,8 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
           "context_id": None,
       }
 
-    values_wo_definitions = set(cavs.keys()) - cads_ids
-    for cad_id in values_wo_definitions:
-      del cavs[cad_id]
+    cavs = {cad_id: value for cad_id, value in cavs.iteritems()
+            if cad_id in cads_ids}
 
     return {"custom_attribute_values": cavs.values(),
             "custom_attribute_definitions": cads}
