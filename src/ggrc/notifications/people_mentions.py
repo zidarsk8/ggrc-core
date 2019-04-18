@@ -26,6 +26,7 @@ logger = getLogger(__name__)
 
 EMAIL_REGEXP = r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"
 EMAIL_LINK_REGEXP = r"mailto:" + EMAIL_REGEXP
+DEFAULT_PERSON = u"Unknown"
 
 CommentData = namedtuple("CommentData",
                          ["comment_text", "author", "created_at"])
@@ -81,7 +82,7 @@ def _fetch_comments_data(comments):
   comments_data = [
       CommentData(
           comment_text=comment.description,
-          author=people_dict.get(comment.modified_by_id, "Unknown"),
+          author=people_dict.get(comment.modified_by_id, DEFAULT_PERSON),
           created_at=comment.created_at
       )
       for comment in comments_loaded

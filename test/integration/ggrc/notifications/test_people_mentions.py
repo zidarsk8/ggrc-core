@@ -84,12 +84,10 @@ class TestPeopleMentions(TestCase):
     author_person = all_models.Person.query.filter_by(
         email="author@example.com"
     ).one()
-    # pylint: disable=attribute-defined-outside-init
-    self.api = api_helper.Api()
-    # pylint: enable=attribute-defined-outside-init
-    self.api.set_user(author_person)
+    api = api_helper.Api()
+    api.set_user(author_person)
 
-    response = self.api.post(all_models.Relationship, {
+    response = api.post(all_models.Relationship, {
         "relationship": {"source": {
             "id": obj_id,
             "type": obj.type,
@@ -106,6 +104,90 @@ class TestPeopleMentions(TestCase):
         u"author@example.com mentioned you on a comment within Product3 "
         u"at 07/10/2018 01:31:42 PDT:\n"
         u"One <a href=\"mailto:some_user@example.com\"></a>\n"
+    )
+    body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
+        "comments": [expected_body],
+        "url": url,
+    })
+    send_email_mock.assert_called_once_with(u"some_user@example.com",
+                                            expected_title, body)
+
+  @mock.patch("ggrc.notifications.common.send_email")
+  def test_proposal_posted(self, send_email_mock):
+    """Test sending mention email after posting a proposal."""
+    with factories.single_commit():
+      factories.PersonFactory(email="some_user@example.com")
+      obj = factories.RiskFactory(title="Risk1")
+      obj_id = obj.id
+      url = urljoin(get_url_root(), utils.view_url_for(obj))
+
+    obj = all_models.Risk.query.get(obj_id)
+    obj_content = obj.log_json()
+    obj_content["title"] = "Risk2"
+    with freeze_time("2018-01-10 07:31:42"):
+      api = api_helper.Api()
+      response = api.post(all_models.Proposal, {
+          "proposal": {
+              "instance": {
+                  "id": obj_id,
+                  "type": obj.type,
+              },
+              "full_instance_content": obj_content,
+              "agenda": u'<a href=\"mailto:some_user@example.com\"></a',
+              "context": None,
+          }
+      })
+    self.assertEqual(201, response.status_code)
+
+    expected_title = (u"user@example.com mentioned you on "
+                      u"a comment within Risk1")
+    expected_body = (
+        u"user@example.com mentioned you on a comment within Risk1 "
+        u"at 01/09/2018 23:31:42 PST:\n"
+        u"<p>Proposal has been created with comment: "
+        u"<a href=\"mailto:some_user@example.com\"></a></p>\n"
+    )
+    body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
+        "comments": [expected_body],
+        "url": url,
+    })
+    send_email_mock.assert_called_once_with(u"some_user@example.com",
+                                            expected_title, body)
+
+  @mock.patch("ggrc.notifications.common.send_email")
+  def test_proposal_put(self, send_email_mock):
+    """Test sending mention email after a change of proposal."""
+    with factories.single_commit():
+      author_person = factories.PersonFactory(email="author@example.com")
+      factories.PersonFactory(email="some_user@example.com")
+      risk = factories.RiskFactory(title="Risk2")
+      proposal = factories.ProposalFactory(
+          instance=risk,
+          content={"fields": {"title": "Risk3"}},
+          agenda=u'some agenda',
+          proposed_by=author_person,
+      )
+      url = urljoin(get_url_root(), utils.view_url_for(risk))
+      proposal_id = proposal.id
+
+    proposal = all_models.Proposal.query.get(proposal_id)
+    api = api_helper.Api()
+    with freeze_time("2018-01-10 07:31:42"):
+      data = {
+          "status": proposal.STATES.APPLIED,
+          "apply_reason": u'<a href=\"mailto:some_user@example.com\"></a>',
+      }
+      response = api.put(proposal, {"proposal": data})
+    self.assertEqual(200, response.status_code)
+
+    expected_title = (u"user@example.com mentioned you on "
+                      u"a comment within Risk3")
+    expected_body = (
+        u"user@example.com mentioned you on a comment within Risk3 "
+        u"at 01/09/2018 23:31:42 PST:\n"
+        u"<p>Proposal created by author@example.com has been applied"
+        u" with a comment: "
+        u'<a href="mailto:some_user@example.com"></a></p>\n'
     )
     body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
         "comments": [expected_body],
