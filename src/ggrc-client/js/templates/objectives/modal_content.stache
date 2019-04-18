@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{!div class="modal-body"}}
 <div class="ggrc-form">
 <div class="hideable-holder">
 {{#instance}}
@@ -114,4 +113,3 @@
 {{/instance}}
 </div>
 </div>
-{{!/div}}

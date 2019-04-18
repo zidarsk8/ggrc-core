@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{!div class="modal-body"}}
 <div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
@@ -130,4 +129,3 @@
 </form>
 {{/instance}}
 </div>
-{{!/div}}
