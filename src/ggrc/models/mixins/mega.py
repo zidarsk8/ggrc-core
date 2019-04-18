@@ -49,7 +49,7 @@ class Mega(object):
         sa.orm.subqueryload('_child_relationships').load_only("id")
     )
 
-  def all_relatives_ids(self, direction):
+  def get_all_relatives_ids(self, direction):
     """Returns ids of relatives for all generations
 
     Args:
@@ -65,7 +65,7 @@ class Mega(object):
       not_visited -= visited
     return visited - {self.id}
 
-  def relatives_ids(self, direction):
+  def get_relatives_ids(self, direction):
     """Returns ids of relatives for one generation
 
     Args:
@@ -76,7 +76,13 @@ class Mega(object):
     return self._get_relatives_for(direction, {self.id}) - {self.id}
 
   def _get_relatives_for(self, direction, nodes):
-    """Return set of ids of relatives of nodes in selected direction"""
+    """Return set of ids of relatives of nodes in selected direction
+
+    Args:
+        direction: could be 'parents' or 'children'
+        nodes: set of mega objects to find relatives for in selected direction
+    Returns:
+        set of ids"""
     rel = relationship.Relationship
 
     if direction == "children":
@@ -108,7 +114,7 @@ class Mega(object):
       parents_ids = mega_parents_cache[obj.type][obj.id]
     else:
       obj = get_model(obj.type).query.get(obj.id)
-      parents_ids = obj.all_relatives_ids("parents")
+      parents_ids = obj.get_all_relatives_ids("parents")
       mega_parents_cache[obj.type][obj.id] = parents_ids
     return parent.id in parents_ids
 
