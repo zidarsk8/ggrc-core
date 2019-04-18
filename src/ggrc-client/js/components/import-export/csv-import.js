@@ -243,32 +243,32 @@ export default can.Component.extend({
           this.trackStatusOfImport(info.id);
         });
     },
-    stopImport(jobId) {
-      let state = this.attr('state');
-      if (state === jobStatuses.IN_PROGRESS) {
-        confirm({
-          modal_title: 'Warning',
-          modal_description: `The import is still in progress and only part of 
-            data is saved. To stop the import process, please click 
-            &quot;Stop Import&quot;. </br>
-            <b>Warning:</b> only partial data will be saved, if import 
-            is stopped when in progress.`,
-          button_view:
-            `${GGRC.templates_path}/modals/confirm_cancel_buttons.stache`,
-          modal_confirm: 'Proceed Import',
-          modal_cancel: 'Stop Import',
-        },
-        null,
-        () => {
-          let state = this.attr('state');
-          // check if status hasn't changed
-          if (state === jobStatuses.IN_PROGRESS) {
-            this.stop(jobId);
-          }
+    stopAnalysis(jobId) {
+      this.stop(jobId)
+        .then(() => {
+          this.resetFile();
+          deleteImportJob(jobId);
         });
-      } else {
-        this.stop(jobId);
-      }
+    },
+    stopImport(jobId) {
+      confirm({
+        modal_title: 'Warning',
+        modal_description: `The import is still in progress and only part of 
+          data is saved. To stop the import process, please click 
+          &quot;Stop Import&quot;. </br>
+          <b>Warning:</b> only partial data will be saved, if import 
+          is stopped when in progress.`,
+        button_view:
+          `${GGRC.templates_path}/modals/proceed-stop-import-buttons.stache`,
+      },
+      () => {
+        let state = this.attr('state');
+        // check if status hasn't changed
+        if (state === jobStatuses.IN_PROGRESS) {
+          this.stop(jobId)
+            .then(() => this.resetFile());
+        }
+      });
     },
     stop(jobId) {
       clearTimeout(this.attr('trackId'));
@@ -276,8 +276,7 @@ export default can.Component.extend({
         this.resetFile();
         deleteImportJob(jobId);
       };
-      stopImportJob(jobId)
-        .then(deleteJob)
+      return stopImportJob(jobId)
         .fail((xhr) => {
           // Need to implement a better solution in order to identify specific
           // errors like here
