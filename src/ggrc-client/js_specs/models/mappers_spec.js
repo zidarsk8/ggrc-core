@@ -12,7 +12,7 @@ describe('mappers', function () {
   beforeEach(function () {
     LL = GGRC.ListLoaders;
     if (!GGRC.Jasmine || !GGRC.Jasmine.MockModel) {
-      Cacheable('GGRC.Jasmine.MockModel', {}, {});
+      Cacheable.extend('GGRC.Jasmine.MockModel', {}, {});
     }
   });
 

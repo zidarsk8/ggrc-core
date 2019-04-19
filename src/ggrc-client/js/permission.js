@@ -54,7 +54,7 @@ let _CONDITIONS_MAP = {
 };
 let permissionsCompute = can.compute(GGRC.permissions);
 
-const Permission = can.Construct({
+const Permission = can.Construct.extend({
   _admin_permission_for_context: function (contextId) {
     return new Permission(
       ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, contextId);

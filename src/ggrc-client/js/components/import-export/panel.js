@@ -5,7 +5,7 @@
 
 const MAX_COLUMNS_COUNT = 1000;
 
-export default can.Map({
+export default can.Map.extend({
   define: {
     isValidConfiguration: {
       get() {

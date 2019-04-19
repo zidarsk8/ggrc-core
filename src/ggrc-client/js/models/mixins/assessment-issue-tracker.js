@@ -12,7 +12,7 @@ import {
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
-export default Mixin(
+export default Mixin.extend(
   issueTrackerUtils.issueTrackerStaticFields,
   {
     'after:init': function () {

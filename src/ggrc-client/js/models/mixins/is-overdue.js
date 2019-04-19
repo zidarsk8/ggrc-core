@@ -8,7 +8,7 @@ import Mixin from './mixin';
 /**
  * Specific Model mixin to check overdue status
  */
-export default Mixin({
+export default Mixin.extend({
 }, {
   'after:init': function () {
     this.attr('isOverdue', this._isOverdue());
