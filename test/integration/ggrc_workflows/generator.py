@@ -13,7 +13,6 @@ from ggrc.access_control import role
 from ggrc.models import Person
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import TaskGroup
-from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import Workflow
 from integration.ggrc.access_control import acl_helper
@@ -122,18 +121,11 @@ class WorkflowsGenerator(Generator):
       _, task_group = self.generate_task_group()
     task_group = self._session_add(task_group)
     obj = self._session_add(obj)
-
-    obj_name = "task_group_object"
-
-    tgo = TaskGroupObject(
-        object_id=obj.id,
-        object=obj,
-        task_group_id=task_group.id,
-        context_id=task_group.context.id
+    tgo = factories.RelationshipFactory(
+        source=task_group,
+        destination=obj
     )
-    obj_dict = self.obj_to_dict(tgo, obj_name)
-
-    return self.generate(TaskGroupObject, obj_name, obj_dict)
+    return tgo
 
   def generate_cycle(self, workflow=None):
     """Generate Cycle over api."""

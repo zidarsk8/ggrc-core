@@ -148,17 +148,6 @@ viewModel = can.Map.extend({
       },
     },
   },
-  /**
-   * This deferred describes operations which should be executed before
-   * the moment when info pane is loaded. Initial need of this deferred was
-   * for the case when Task Group's info pane is opened - without it
-   * mapped objects might be reloaded before instance.refresh() which is
-   * preformed in selectedItemHandler() method.
-   */
-  infoPaneLoadDfd: $.Deferred(),
-  /**
-   *
-   */
   sortingInfo: {
     sortDirection: null,
     sortBy: null,
@@ -601,7 +590,7 @@ viewModel = can.Map.extend({
 
     pinControl.setLoadingIndicator(componentSelector, true);
 
-    const infoPaneLoadDfd = pageLoadDfd
+    pageLoadDfd
       .then(function () {
         const items = this.attr('showedItems');
         const newInstance = items[relativeIndex];
@@ -637,8 +626,6 @@ viewModel = can.Map.extend({
       .always(function () {
         pinControl.setLoadingIndicator(componentSelector, false);
       });
-
-    this.attr('infoPaneLoadDfd', infoPaneLoadDfd);
   },
 });
 

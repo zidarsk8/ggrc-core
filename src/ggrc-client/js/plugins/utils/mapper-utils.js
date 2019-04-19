@@ -5,7 +5,6 @@
 
 import RefreshQueue from '../../models/refresh_queue';
 import {backendGdriveClient} from '../ggrc-gapi-client';
-import TaskGroupObject from '../../models/service-models/task-group-object';
 import Relationship from '../../models/service-models/relationship';
 
 async function mapObjects(instance, objects, {
@@ -33,29 +32,17 @@ async function mapObjects(instance, objects, {
         return defer.push(modelInstance.save());
       }
 
-      modelInstance = getMapping(instance, destination, context);
+      modelInstance = new Relationship({
+        source: instance,
+        destination,
+        context,
+      });
       defer.push(backendGdriveClient.withAuth(() => {
         return modelInstance.save();
       }));
     });
 
     return $.when(...defer);
-  });
-}
-
-function getMapping(source, destination, context) {
-  if (source.type === 'TaskGroup') {
-    return new TaskGroupObject({
-      task_group: source,
-      object: destination,
-      context,
-    });
-  }
-
-  return new Relationship({
-    source,
-    destination,
-    context,
   });
 }
 

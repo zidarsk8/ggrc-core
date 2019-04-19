@@ -4,28 +4,26 @@
 */
 
 import template from './templates/task-group-objects.stache';
-import TaskGroupObject from '../../../models/service-models/task-group-object';
-import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
-import {mapObjects} from '../../../plugins/utils/mapper-utils';
+import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../events/eventTypes';
+import {unmapObjects} from '../../../plugins/utils/mapper-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import {
-  buildParam,
-  batchRequests,
+  loadObjectsByStubs,
+  loadObjectsByTypes,
 } from '../../../plugins/utils/query-api-utils';
+
 import Stub from '../../../models/stub';
+import Mappings from '../../../models/mappers/mappings';
+import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
+
+const requiredObjectsFields = ['id', 'type', 'title'];
 
 const viewModel = can.Map.extend({
   canEdit: false,
   taskGroup: null,
   items: [],
-  findTGObjectByStub(stub) {
-    return _.find(TaskGroupObject.cache, (tgObject) =>
-      tgObject.attr('object.id') === stub.id &&
-      tgObject.attr('object.type') === stub.type
-    );
-  },
   addToList(objects) {
-    const newItems = objects.map(this.convertToListItem.bind(this));
+    const newItems = objects.map((object) => this.convertToListItem(object));
     this.attr('items').push(...newItems);
   },
   convertToListItem(object) {
@@ -36,73 +34,20 @@ const viewModel = can.Map.extend({
       disabled: false,
     };
   },
-  async getTaskGroupObject(stub) {
-    let tgObject = this.findTGObjectByStub(stub);
-
-    if (!tgObject) {
-      // Load all task_group_objects for taskGroup
-      await this.attr('taskGroup').refresh_all('task_group_objects');
-      tgObject = this.findTGObjectByStub(stub);
-    }
-
-    return tgObject;
-  },
-  async unmapObject(stub) {
-    const tgObject = await this.getTaskGroupObject(stub);
-    // Refresh is needed because witout it BE will return 409 error
-    const refreshedTg = await tgObject.refresh();
-    await refreshedTg.destroy();
-  },
-  buildObjectsFilter(stubs) {
-    return {
-      expression: {
-        left: 'id',
-        op: {name: 'IN'},
-        right: stubs.map((stub) => stub.attr('id')),
-      },
-    };
-  },
-  processObjectsResponse(response) {
-    return response.reduce((result, responseObj) => {
-      const [{values}] = Object.values(responseObj);
-      result.push(...values);
-      return result;
-    }, []);
-  },
-  buildMappedObjectsRequest(stubs) {
-    const sortObject = {};
-    const objectsFields = ['id', 'type', 'title'];
-    const groupedStubsByType = _.groupBy(stubs, 'type');
-
-    return _.map(groupedStubsByType, (stubs, objectsType) =>
-      batchRequests(buildParam(
-        objectsType,
-        sortObject,
-        null,
-        objectsFields,
-        this.buildObjectsFilter(stubs),
-      ))
-    );
-  },
-  async loadMappedObjects(stubs) {
-    const batchedRequest = this.buildMappedObjectsRequest(stubs);
-    const response = await Promise.all(batchedRequest);
-    return this.processObjectsResponse(response);
-  },
   async initTaskGroupItems() {
-    const mappedObjects = await this.loadMappedObjects(
-      this.attr('taskGroup.objects')
+    const mappingTypes = Mappings.getMappingList('TaskGroup');
+    const mappedObjects = await loadObjectsByTypes(
+      this.attr('taskGroup'),
+      mappingTypes,
+      requiredObjectsFields
     );
-    const items = mappedObjects.map(this.convertToListItem.bind(this));
-    this.attr('items').replace(items);
+    this.addToList(mappedObjects);
   },
-  async map(stubs) {
-    const taskGroup = this.attr('taskGroup');
-    await mapObjects(taskGroup, stubs);
-    // Need to update "objects" field in order to  have updated list of mapped
-    // objects
-    taskGroup.refresh();
-    const loadedObjects = await this.loadMappedObjects(stubs);
+  async addPreloadedObjectsToList(stubs) {
+    const loadedObjects = await loadObjectsByStubs(
+      stubs,
+      requiredObjectsFields
+    );
     this.addToList(loadedObjects);
   },
   async unmapByItemIndex(itemIndex) {
@@ -110,8 +55,15 @@ const viewModel = can.Map.extend({
     const item = items[itemIndex];
 
     item.attr('disabled', true);
-    await this.unmapObject(item.attr('stub'));
-    item.attr('disabled', false);
+
+    try {
+      await unmapObjects(this.attr('taskGroup'), [item.attr('stub')]);
+    } catch (xhr) {
+      notifier('error', getAjaxErrorInfo(xhr).details);
+      return;
+    } finally {
+      item.attr('disabled', false);
+    }
 
     // remove unmapped object from the list
     // Need to get updated index because
@@ -124,16 +76,8 @@ const viewModel = can.Map.extend({
 });
 
 const events = {
-  inserted: function () {
-    // Pass taskGroup into object-mapper via "deferred_to"
-    // data attribute
-    this.element.find('[data-toggle="unified-mapper"]')
-      .data('deferred_to', {
-        instance: this.viewModel.attr('taskGroup'),
-      });
-  },
-  [`{viewModel.taskGroup} ${DEFERRED_MAP_OBJECTS.type}`](el, {objects}) {
-    this.viewModel.map(objects);
+  [`{viewModel.taskGroup} ${OBJECTS_MAPPED_VIA_MAPPER.type}`](el, {objects}) {
+    this.viewModel.addPreloadedObjectsToList(objects);
   },
   '.task-group-objects__unmap click'(el) {
     this.viewModel.unmapByItemIndex(el.attr('data-item-index'));

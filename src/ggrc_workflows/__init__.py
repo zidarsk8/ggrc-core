@@ -46,7 +46,6 @@ blueprint = Blueprint(
 
 
 _INJECTABLE_MIXINS = (
-    models.task_group_object.TaskGroupable,
     models.cycle_task_group_object_task.CycleTaskable,
     models.workflow.WorkflowState,
 )
@@ -63,7 +62,6 @@ def _inject_workflow_mixins():
   for type_ in WORKFLOW_OBJECT_TYPES:
     model = getattr(all_models, type_)
     model.__bases__ = _INJECTABLE_MIXINS + model.__bases__
-    model.late_init_task_groupable()
     _workaround_mixin_injection(model)
 
 
@@ -315,11 +313,13 @@ def build_cycle(workflow, cycle=None, current_user=None):
       for task_group_task in task_group.task_group_tasks:
         cycle_task_group_object_task = _create_cycle_task(
             task_group_task, cycle, cycle_task_group, current_user)
-
-        for task_group_object in task_group.task_group_objects:
-          object_ = task_group_object.object
+        related_objs = [obj for obj in task_group.related_objects()
+                        if not isinstance(obj, (
+                            all_models.TaskGroupTask, all_models.Workflow
+                        ))]
+        for obj in related_objs:
           Relationship(source=cycle_task_group_object_task,
-                       destination=object_)
+                       destination=obj)
 
   update_cycle_dates(cycle)
   workflow.repeat_multiplier += 1

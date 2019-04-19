@@ -28,6 +28,7 @@ import {
   REFRESH_MAPPING,
   REFRESH_SUB_TREE,
   BEFORE_MAPPING,
+  OBJECTS_MAPPED_VIA_MAPPER,
   DEFERRED_MAP_OBJECTS,
 } from '../../events/eventTypes';
 import Mappings from '../../models/mappers/mappings';
@@ -281,6 +282,10 @@ export default can.Component.extend({
         .then(() => {
           stopFn();
 
+          instance.dispatch({
+            ...OBJECTS_MAPPED_VIA_MAPPER,
+            objects,
+          });
           instance.dispatch('refreshInstance');
           instance.dispatch({
             ...REFRESH_MAPPING,
@@ -295,7 +300,6 @@ export default can.Component.extend({
           $('body').trigger('ajax:flash', {error: message});
         })
         .finally(() => {
-          viewModel.attr('is_saving', false);
           this.closeModal();
         });
     },
