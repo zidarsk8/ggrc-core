@@ -8,3 +8,4 @@ Contents:
 
     deployment_and_update
     local_dbs
+    aliases
