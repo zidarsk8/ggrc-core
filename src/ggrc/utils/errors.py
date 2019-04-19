@@ -53,6 +53,6 @@ MAPPED_AUDITS = (u"The program cannot be deleted due to mapped "
                  u"before deleting the program.")
 
 MAPPED_ASSESSMENT = (u"The following Audit cannot be deleted due to existing "
-                     u"assessment(s) or  assessment template(s) mappings. "
+                     u"assessment(s) or assessment template(s) mappings. "
                      u"Please delete assessment(s) or assessment template(s) "
                      u"mapped to this Audit to continue.")
