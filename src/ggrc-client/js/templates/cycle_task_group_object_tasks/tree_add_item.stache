@@ -25,7 +25,10 @@
           }]
         {{/if_instance_of}}
         {{#is(parent_instance.type, "Workflow")}}
-          , "workflow": {"id": {{parent_instance.id}}, "type": "Workflow"}
+          , "workflow": {
+              "id": {{parent_instance.id}},
+              "type": "Workflow"
+              }
         {{/is}}
         }'>
       Create
