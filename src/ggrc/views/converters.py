@@ -244,12 +244,6 @@ def make_import(csv_data, dry_run, ie_job=None):
     ))
 
 
-def check_for_previous_run():
-  """Check whether previous run is failed"""
-  if int(request.headers["X-Appengine-Taskexecutioncount"]):
-    raise wzg_exceptions.InternalServerError(app_errors.PREVIOUS_RUN_FAILED)
-
-
 @app.route("/_background_tasks/run_export", methods=["POST"])
 @background_task.queued_task
 def run_export(task):
@@ -261,8 +255,6 @@ def run_export(task):
 
   try:
     ie_job = import_export.get(ie_id)
-    check_for_previous_run()
-
     content, _ = make_export(objects, exportable_objects, ie_job)
     db.session.refresh(ie_job)
     if ie_job.status == "Stopped":
@@ -300,7 +292,6 @@ def run_import_phases(task):
   user = login.get_current_user()
   try:
     ie_job = import_export.get(ie_id)
-    check_for_previous_run()
 
     csv_data = import_helper.read_csv_file(
         StringIO(ie_job.content.encode("utf-8"))
@@ -453,7 +444,6 @@ def run_background_import(ie_job_id):
       queue="ggrcImport",
       queued_callback=run_import_phases,
       operation_type=all_models.ImportExport.IMPORT_JOB_TYPE.lower(),
-      retry_options={"task_retry_limit": 0},
   )
   db.session.commit()
 
@@ -626,7 +616,6 @@ def run_background_export(ie_job_id, objects, exportable_objects):
       queue="ggrcImport",
       queued_callback=run_export,
       operation_type=all_models.ImportExport.EXPORT_JOB_TYPE.lower(),
-      retry_options={"task_retry_limit": 0},
   )
   db.session.commit()
 

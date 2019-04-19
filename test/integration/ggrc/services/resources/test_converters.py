@@ -51,24 +51,22 @@ class TestImportExportBase(TestCase):
         content=data,
     )
 
-    with mock.patch("ggrc.views.converters.check_for_previous_run"):
-      return self.client.put(
-          "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
-          headers=self.headers,
-      )
+    return self.client.put(
+        "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+        headers=self.headers,
+    )
 
   def run_full_export(self, user, obj):
     """Run export of test data through the /api/people/{}/exports endpoint."""
-    with mock.patch("ggrc.views.converters.check_for_previous_run"):
-      return self.client.post(
-          "/api/people/{}/exports".format(user.id),
-          data=json.dumps({
-              "objects": [{
-                  "object_name": obj.type,
-                  "ids": [obj.id]}],
-              "current_time": str(datetime.now())}),
-          headers=self.headers
-      )
+    return self.client.post(
+        "/api/people/{}/exports".format(user.id),
+        data=json.dumps({
+            "objects": [{
+                "object_name": obj.type,
+                "ids": [obj.id]}],
+            "current_time": str(datetime.now())}),
+        headers=self.headers
+    )
 
 
 @base.with_memcache
@@ -253,18 +251,17 @@ class TestImportExports(TestImportExportBase):
         content=data,
     )
 
-    with mock.patch("ggrc.views.converters.check_for_previous_run"):
+    response = self.client.put(
+        "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+        headers=self.headers,
+    )
+    self.assert200(response)
+    with mock.patch("ggrc.models.background_task.BackgroundTask.finish"):
       response = self.client.put(
           "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
           headers=self.headers,
       )
       self.assert200(response)
-      with mock.patch("ggrc.models.background_task.BackgroundTask.finish"):
-        response = self.client.put(
-            "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
-            headers=self.headers,
-        )
-        self.assert200(response)
 
     imp_exp.status = "In Progress"
     db.session.add(imp_exp)
