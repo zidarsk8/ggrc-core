@@ -19,7 +19,7 @@ class Representation(object):
   diff_info = None  # {"equal": {"atr7": val7, ...}, "diff": {"atr3": val3}}
   tree_view_attrs_to_exclude = (
       "created_at", "updated_at", "custom_attributes", "assertions",
-      "external_slug", "external_id")
+      "external_slug", "external_id", "review")
   people_attrs_names = [
       "creators", "assignees", "verifiers", "admins", "primary_contacts",
       "secondary_contacts", "audit_captains", "auditors",
@@ -824,6 +824,15 @@ class ReviewEntity(Entity):
         "custom_attributes")
     self.set_attrs("type", "reviewers", "status", "last_reviewed_at",
                    "last_reviewed_by", "reviewable", **attrs)
+
+  def convert_review_to_dict(self):
+    """Convert review entity' to UI representation."""
+    return {
+        "status": self.status,
+        "reviewers": self.reviewers,
+        "last_reviewed_by": "Last reviewed by\n{}\non {}".format(
+            self.last_reviewed_by, self.last_reviewed_at) if
+        self.last_reviewed_by and self.last_reviewed_at else None}
 
 
 class ProposalEntity(Representation):

@@ -660,6 +660,7 @@ def get_cycle_dict(cycle, manual=False):
       "cycle_title": cycle.title,
       "cycle_url": cycle.cycle_url,
       "cycle_inactive_url": cycle.cycle_inactive_url,
+      "workflow_id": cycle.workflow_id,
   }
 
 

@@ -157,8 +157,8 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
     )
 
   @classmethod
-  def eager_query(cls):
-    return cls._populate_query(super(Assessment, cls).eager_query())
+  def eager_query(cls, **kwargs):
+    return cls._populate_query(super(Assessment, cls).eager_query(**kwargs))
 
   @classmethod
   def indexed_query(cls):

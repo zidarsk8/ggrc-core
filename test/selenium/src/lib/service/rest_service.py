@@ -121,10 +121,9 @@ class BaseRestService(object):
         if isinstance(resp_text, dict) and len(resp_text) == 1:
           # {key: {value}} to {value}
           resp_text = resp_text.itervalues().next()
+          resp_text = resp_text["values"][0] if is_query_resp else resp_text
           try:
-            return (dict(resp_text.items() +
-                         ({}.items() if is_query_resp else
-                          get_extra_items(resp_text).items())))
+            return dict(resp_text.items() + get_extra_items(resp_text).items())
           except AttributeError:
             raise requests.exceptions.RequestException(
                 messages.ExceptionsMessages.err_server_req_resp.format(
@@ -308,19 +307,6 @@ class ReviewService(BaseRestService):
   def __init__(self):
     super(ReviewService, self).__init__(url.REVIEWS)
 
-  def request_review(self, obj, person):
-    """Add reviewer to object.
-    Returns obj with added review."""
-    review_attrs = {
-        "reviewers": person, "reviewable": obj.repr_min_dict()}
-    review = self.create_obj(factory_params=review_attrs)
-    # reviewers field contains list of reviewer emails
-    obj.review = {
-        "status": review.status,
-        "reviewers": review.reviewers,
-        "last_reviewed_by": ""}
-    return obj
-
 
 class AssessmentsFromTemplateService(HelpRestService):
   """Service for creating assessments from templates."""
@@ -391,8 +377,10 @@ class ObjectsInfoService(HelpRestService):
       obj_type = obj.type if hasattr(obj, "type") else obj.obj_type()
       obj_id = obj.id if hasattr(obj, "id") else obj.obj_id
       filters = query.Query.expression_get_obj_by_id(obj_id)
-      return self.get_obj_dict(obj_type, filters=filters)
-
+      obj_resp = self.get_obj_dict(obj_type, filters=filters)
+      # Update object href that used in entities.
+      obj_resp[0]["href"] = obj_resp[0]["selfLink"]
+      return obj_resp
     return Representation.repr_dict_to_obj(get_obj_response_values[0])
 
   def get_comment_obj(self, paren_obj, comment_description):

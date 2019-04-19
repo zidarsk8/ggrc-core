@@ -69,7 +69,7 @@ class Identifiable(object):
     return self.__class__.__name__
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
         db.Load(mapper_class).undefer_group(
@@ -134,14 +134,6 @@ class ContextRBAC(object):
     return super(ContextRBAC, cls).indexed_query().options(
         orm.Load(cls).load_only("context_id"),
     )
-
-  # @classmethod
-  # def eager_query(cls):
-  # from sqlalchemy import orm
-
-  # query = super(ContextRBAC, cls).eager_query()
-  # return query.options(
-  # orm.subqueryload('context'))
 
 
 class ChangeTracked(object):

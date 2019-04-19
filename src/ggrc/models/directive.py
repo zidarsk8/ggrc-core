@@ -135,8 +135,8 @@ class Directive(mixins.LastDeprecatedTimeboxed,
     return validate_option(self.__class__.__name__, key, option, key)
 
   @classmethod
-  def eager_query(cls):
-    query = super(Directive, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Directive, cls).eager_query(**kwargs)
     return cls.eager_inclusions(query, Directive._include_links).options(
         orm.joinedload('audit_frequency'),
         orm.joinedload('audit_duration'),

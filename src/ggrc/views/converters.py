@@ -552,7 +552,7 @@ def handle_file_download(id2):
   try:
     export_to = request.args.get("export_to")
     ie = import_export.get(id2)
-    return export_file(export_to, ie.title, ie.content.encode("utf-8"))
+    return export_file(export_to, ie.title, ie.content)
   except (wzg_exceptions.Forbidden,
           wzg_exceptions.NotFound,
           wzg_exceptions.Unauthorized):

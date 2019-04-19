@@ -5,6 +5,7 @@
 
 import logging
 from apiclient import discovery
+from googleapiclient.errors import HttpError
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,10 @@ class CalendarApiService(object):
     self.calendar_service = self.calendar_auth()
 
   @staticmethod
+  def _build_response_json(status_code, content):
+    return {"status_code": status_code, "content": content}
+
+  @staticmethod
   def calendar_auth(version='v3'):
     """Authentication to Google Calendar.
 
@@ -32,10 +37,13 @@ class CalendarApiService(object):
     """
     return discovery.build('calendar', version)
 
-  def create_event(self, calendar_id, attendees, start, end, **kwargs):
+  # pylint: disable=too-many-arguments
+  def create_event(self, event_id, calendar_id, attendees,
+                   start, end, **kwargs):
     """Creates an event in a given Google Calendar.
 
     Args:
+        event_id: Event database id.
         calendar_id: Calendar ID where event will be created.
         start: event start datetime string.
         end: event start datetime string.
@@ -63,17 +71,32 @@ class CalendarApiService(object):
         'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
         'transparency': kwargs.get('transparency', 'transparent'),
     }
-    return self.calendar_service.events().insert(
-        calendarId=calendar_id, body=event).execute()
+    try:
+      event = self.calendar_service.events().insert(
+          calendarId=calendar_id, body=event).execute()
+      return self._build_response_json(200, event)
+    except HttpError as err:
+      logger.warn(
+          "Create of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
+      return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Create of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
 
   # pylint: disable=too-many-arguments
-  def update_event(self, event_id, calendar_id, attendees,
-                   start, end, **kwargs):
+  def update_event(self, external_event_id, event_id, calendar_id,
+                   attendees, start, end, **kwargs):
     """Updates event in the given Google Calendar.
 
     Args:
         calendar_id: Calendar ID where event will be created.
-        event_id: External event id
+        external_event_id: External event id.
+        event_id: Event database id.
         attendees: attendees of the event.
         start: event start datetime string.
         end: event start datetime string.
@@ -99,26 +122,72 @@ class CalendarApiService(object):
         'guestsCanInviteOthers': kwargs.get('guests_can_invite', False),
         'transparency': kwargs.get('transparency', 'transparent'),
     }
-    return self.calendar_service.events().update(
-        calendarId=calendar_id, body=event, eventId=event_id).execute()
+    try:
+      event = self.calendar_service.events().update(
+          calendarId=calendar_id, body=event, eventId=external_event_id
+      ).execute()
+      return self._build_response_json(200, event)
+    except HttpError as err:
+      logger.warn(
+          "Update of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
+      return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Update of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
 
-  def delete_event(self, calendar_id, event_id):
+  def delete_event(self, calendar_id, external_event_id, event_id):
     """Deletes an event in a given Google Calendar.
 
      Args:
         calendar_id: Calendar ID from which event will be deleted.
-        event_id: Google Calendar Event id.
+        external_event_id: Google Calendar Event id.
+        event_id: Event id in the database
     """
     calendar = self.calendar_auth()
-    calendar.events().delete(calendarId=calendar_id,
-                             eventId=event_id).execute()
+    try:
+      calendar.events().delete(calendarId=calendar_id,
+                               eventId=external_event_id).execute()
+      return self._build_response_json(200, None)
+    except HttpError as err:
+      logger.warn(
+          "Deletion of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
+      return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Deletion of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)
 
-  def get_event(self, calendar_id, event_id):
+  def get_event(self, calendar_id, external_event_id, event_id):
     """Gets an event in given Google Calendar.
 
      Args:
         calendar_id: Calendar ID from which event will be fetched.
+        external_event_id: Google Calendar Event id.
         event_id: Google Calendar Event id.
     """
-    return self.calendar_service.events().get(calendarId=calendar_id,
-                                              eventId=event_id).execute()
+    try:
+      event = self.calendar_service.events().get(
+          calendarId=calendar_id, eventId=external_event_id
+      ).execute()
+      return self._build_response_json(200, event)
+    except HttpError as err:
+      logger.warn(
+          "Get of the event %d has failed with HttpError. "
+          "Error code: %s", event_id, err.resp.status
+      )
+      return self._build_response_json(err.resp.status, None)
+    except Exception as exp:  # pylint: disable=broad-except
+      logger.warn(
+          "Get of the event %d has failed with %s.",
+          event_id, exp.__class__.__name__,
+      )
+      return self._build_response_json(500, None)

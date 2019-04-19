@@ -170,7 +170,7 @@ export default can.Component.extend({
           title: file.title,
           source_gdrive_id: file.id,
           is_uploaded: file.newUpload,
-          parent_obj: {
+          parent_obj: { // parent object is used for renaming evidence
             id: instanceId,
             type: instanceType,
           },

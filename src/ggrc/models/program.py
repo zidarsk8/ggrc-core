@@ -60,8 +60,9 @@ class Program(review.Reviewable,
   }
 
   @classmethod
-  def eager_query(cls):
-    query = super(Program, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Program, cls).eager_query(**kwargs)
+
     return cls.eager_inclusions(query, Program._include_links).options(
         orm.subqueryload('audits'),
         orm.subqueryload('risk_assessments'),

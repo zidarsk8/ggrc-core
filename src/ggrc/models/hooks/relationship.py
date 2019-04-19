@@ -353,8 +353,6 @@ def init_hook():  # noqa
     """Update Commentable.updated_at when Comment mapped."""
     # pylint: disable=unused-argument
 
-    from ggrc.notifications import people_mentions
-
     for obj in objects:
       if (obj.source_type not in ("Comment", "ExternalComment") and
          obj.destination_type not in ("Comment", "ExternalComment")):
@@ -366,4 +364,22 @@ def init_hook():  # noqa
 
       if isinstance(other, (Commentable, ExternalCommentable, ChangeTracked)):
         other.updated_at = datetime.utcnow()
-        people_mentions.handle_comment_mapped(obj=other, comments=[comment])
+
+  @signals.Restful.model_posted_after_commit.connect_via(
+      all_models.Relationship
+  )
+  def handle_posted_after_commit(obj_class, obj, **kwargs):
+    """Send people mentions on comment posted."""
+    # pylint: disable=unused-argument
+    from ggrc.notifications import people_mentions
+
+    if (obj.source_type not in ("Comment", "ExternalComment") and
+       obj.destination_type not in ("Comment", "ExternalComment")):
+      return
+
+    comment, other = obj.source, obj.destination
+    if comment.type not in ("Comment", "ExternalComment"):
+      comment, other = other, comment
+
+    if isinstance(other, (Commentable, ExternalCommentable, ChangeTracked)):
+      people_mentions.handle_comment_mapped(obj=other, comments=[comment])

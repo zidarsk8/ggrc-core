@@ -135,9 +135,9 @@ class Labeled(object):
     return res
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager query classmethod."""
-    return super(Labeled, cls).eager_query().options(
+    return super(Labeled, cls).eager_query(**kwargs).options(
         orm.subqueryload('_object_labels'))
 
   @classmethod

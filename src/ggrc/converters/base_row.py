@@ -248,7 +248,8 @@ class ImportRowConverter(RowConverter):
       # We assume that 'get_importables()' returned value contains
       # names of the objects that cannot be created via import but
       # can be updated.
-      if self.block_converter.class_name.lower() not in get_importables():
+      if self.block_converter.class_name.lower() not in get_importables() and \
+              not self._check_object_is_external():
         self.add_error(errors.CREATE_INSTANCE_ERROR)
       obj = self.object_class()
       self.is_new = True
@@ -373,9 +374,14 @@ class ImportRowConverter(RowConverter):
     self.commit_object()
 
   def _check_object_class(self):
-    """Validate if object class is importable model."""
-    if issubclass(self.object_class, synchronizable.Synchronizable):
-      self.add_error(errors.EXTERNAL_MODEL_IMPORT_RESTRICTION)
+    """Validate if object class is external."""
+    if self._check_object_is_external():
+      self.add_error(errors.EXTERNAL_MODEL_IMPORT_RESTRICTION,
+                     external_model_name=self.object_class.__name__)
+
+  def _check_object_is_external(self):
+    """Check if object class is external."""
+    return issubclass(self.object_class, synchronizable.Synchronizable)
 
   def _check_object(self):
     """Check object if it has any pre commit checks.

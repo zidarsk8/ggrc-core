@@ -5,10 +5,13 @@
 
 Add Json and Compressed type declaration for use in ORM models.
 """
+# pylint: disable=duplicate-code
 
 import json
 import pickle
+import zlib
 import sqlalchemy.types as types
+
 from ggrc import utils
 from ggrc.models import exceptions
 
@@ -66,21 +69,22 @@ class JsonType(types.TypeDecorator):
 
 
 class CompressedType(types.TypeDecorator):
-  # pylint: disable=W0223
   """ Custom Compresed data type
 
-  Custom type for storing any python object in our database as serialized text.
+  Custom type for storing any python object in our database as serialized
+  and compressed text.
   """
+  # pylint: disable=W0223
   MAX_BINARY_LENGTH = 16777215
-  impl = types.LargeBinary(length=MAX_BINARY_LENGTH)
+  impl = types.BLOB(length=MAX_BINARY_LENGTH)
+
+  def process_bind_param(self, value, dialect):
+    value = zlib.compress(pickle.dumps(value))
+    if len(value) > self.MAX_BINARY_LENGTH:
+      raise exceptions.ValidationError("Log record content too long")
+    return value
 
   def process_result_value(self, value, dialect):
     if value is not None:
-      value = pickle.loads(value)
-    return value
-
-  def process_bind_param(self, value, dialect):
-    value = pickle.dumps(value)
-    if len(value) > self.MAX_BINARY_LENGTH:
-      raise exceptions.ValidationError("Log record content too long")
+      value = pickle.loads(zlib.decompress(value))
     return value

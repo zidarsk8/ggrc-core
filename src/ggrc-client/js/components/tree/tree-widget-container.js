@@ -28,7 +28,6 @@ import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
 import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
-import '../dropdown/dropdown-multiselect-wrapper';
 import '../dropdown/dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';

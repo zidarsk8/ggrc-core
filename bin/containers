@@ -25,7 +25,8 @@ Allowed ACTIONs:
   setup           (Re-)build, run and provision the required containers
   stop            Stop the containers
   run             Run the containers
-  connect         Connect to app container  
+  connect         Connect to app container
+  connect_db      Connect to db container
 
 Allowed MODEs:
   dev             (default) Setup application container + db container
@@ -57,7 +58,8 @@ main () {
     "setup") setup "$MODE" "$PROJECT" ;;
     "stop") stop "$MODE" "$PROJECT" ;;
     "run") run "$MODE" "$PROJECT" ;;
-    "connect") connect "$MODE" "$PROJECT" ;;    
+    "connect") connect "$PROJECT" "cleandev" ;;
+    "connect_db") connect "$PROJECT" "db" ;;
     *) fail_invalid_usage ;;
   esac
 }
@@ -114,10 +116,10 @@ stop () {
 }
 
 connect() {
-  MODE="$1"
-  PROJECT="$2"
+  PROJECT="$1"
+  TYPE="$2"
 
-  docker exec -it "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su
+  docker exec -it "$(docker container ls -f name=${PROJECT}_${TYPE}_1 -q -a)" su
 }
 
 run () {
@@ -125,20 +127,19 @@ run () {
   PROJECT="$2"
 
   DOCKERFILE=$(mode_to_docker_compose_yml "$MODE")
-  DOCKERFILE_OVERRIDE=$(get_override_filename "$DOCKERFILE");  
+  DOCKERFILE_OVERRIDE=$(get_override_filename "$DOCKERFILE");
   OVERRIDE=""
-    
+
   if [ -f "$DOCKERFILE_OVERRIDE" ]; then
     OVERRIDE="--file $DOCKERFILE_OVERRIDE"
   fi
-    
+
   docker-compose --file "$DOCKERFILE" $OVERRIDE --project-name "$PROJECT" \
     up --force-recreate -d
-    
+
   if [[ "$MODE" == "dev" ]]; then
     docker exec -it "$(docker container ls -f name=${PROJECT}_cleandev_1 -q -a)" su
   fi
 }
-
 
 main "$@"

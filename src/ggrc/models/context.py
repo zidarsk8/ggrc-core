@@ -119,8 +119,8 @@ class HasOwnContext(object):
     ).exists()
 
   @classmethod
-  def eager_query(cls):
-    return super(HasOwnContext, cls).eager_query().options(
+  def eager_query(cls, **kwargs):
+    return super(HasOwnContext, cls).eager_query(**kwargs).options(
         orm.Load(cls).subqueryload(
             "contexts"
         ).undefer_group(
