@@ -19,7 +19,8 @@
                              mappingItems:to="scope.vars.mappingItems"
                              filterItems:to="scope.vars.filterItems"
                              statusItem:to="scope.vars.statusItem"
-                             on:el:enter="onSubmit()">
+                             on:el:enter="onSubmit()"
+                             query:bind="query">
       <div class="object-controls">
         <div class="object-controls__row">
           <div class="object-controls__type">
@@ -58,15 +59,22 @@
           </div>
         {{/if}}
         <div class="object-controls__actions">
-          <div class="object-controls__actions--left">
+          <div class="object-controls__actions-filter">
             {{^if mappingItems.length}}
               <button type="button" class="btn btn-small btn-white" on:el:click="addFilterAttribute">Add Attribute</button>
             {{/if}}
             <button type="button" class="btn btn-small btn-white" on:el:click="addMappingFilter">Add Mapping Filter</button>
           </div>
-          <div class="object-controls__actions--right">
-            <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
-            <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="onSubmit()">Search</button>
+          <div class="object-controls__actions-search">
+            <save-search
+              query:from="query"
+              objectType:from="modelName">
+            </save-search>
+
+            <div class="object-controls__actions--right">
+              <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
+              <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="onSubmit()">Search</button>
+            </div>
           </div>
         </div>
       </div>
@@ -91,7 +99,8 @@
                         filterItems:from="scope.vars.filterItems"
                         mappingItems:from="scope.vars.mappingItems"
                         on:loaded="onLoaded()"
-                        statusItem:from="scope.vars.statusItem">
+                        statusItem:from="scope.vars.statusItem"
+                        query:bind="query">
         </mapper-results>
       {{else}}
         <div class="well well-small">
