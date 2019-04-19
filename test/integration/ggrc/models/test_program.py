@@ -4,6 +4,7 @@
 """Integration tests for Program."""
 
 from ggrc.models import all_models
+from ggrc.utils import errors
 
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
@@ -27,3 +28,23 @@ class TestProgram(TestCase):
     self.assert200(response)
     audit = self.refresh_object(all_models.Audit, id_=self.audit_id)
     self.assertIsNotNone(audit)
+
+  def test_delete_with_audits(self):
+    """Test deletion of a program with a mapped audit"""
+
+    response = self.api.delete(self.program)
+    self.assertEqual(response.status_code, 409)
+    self.assertEqual(
+        response.json,
+        {
+            "message": errors.MAPPED_AUDITS,
+            "code": 409,
+        }
+    )
+
+  def test_delete_without_audits(self):
+    """Test deletion of a program with a mapped audit"""
+    response = self.api.delete(self.program.audits[0])
+    self.assert200(response)
+    response = self.api.delete(self.program)
+    self.assert200(response)
