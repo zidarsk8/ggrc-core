@@ -423,7 +423,7 @@ sub-tree-models {
     position: absolute;
     background-color: $white;
     top: 0;
-    width: 700px;
+    width: 730px;
     border: 1px solid #f1f1f1;
     padding: 15px;
 
@@ -440,7 +440,7 @@ sub-tree-models {
     }
 
     .sub-tree-models_select {
-      margin-bottom: 10px;
+      margin-bottom: 20px;
 
       span {
         margin-left: 15px;
@@ -450,9 +450,17 @@ sub-tree-models {
       }
     }
 
+    .sub-tree-models__options {
+      flex-direction: column;
+      max-height: 320px;
+    }
+
     .sub-models_item {
-      min-width: 140px;
       margin-bottom: 15px;
+      margin-right: 5px;
+      flex: 0 1 20px;
+      min-width: 120px;
+      max-width: 150px;
 
       input {
         margin-right: 5px;
