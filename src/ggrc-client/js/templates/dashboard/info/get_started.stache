@@ -31,7 +31,8 @@
         data-toggle="modal-ajax-form"
         data-modal-reset="reset"
         data-object-params='{
-          "modal_title": "Create New Cycle Task"}'>
+          "modal_title": "Create New Cycle Task"
+        }'>
         <span class="get-started__list__icon-wrap">
           <i class="fa fa-calendar-check-o white"></i>
         </span>

@@ -65,7 +65,10 @@
                         data-object-title="{{instance.title_singular}}"
                         data-object-singular="CustomAttributeDefinition"
                         data-object-plural="custom_attribute_definitions"
-                        data-object-params='{ "definition_type": "{{instance.table_singular}}", "modal_title": "Add Attribute to type {{instance.title_singular}}" }'
+                        data-object-params='{
+                          "definition_type": "{{instance.table_singular}}",
+                          "modal_title": "Add Attribute to type {{instance.title_singular}}"
+                        }'
                         data-original-title="Add Attribute">
                         <i class="fa fa-plus-circle"
                           data-test-id="button_add-86eaf948">
