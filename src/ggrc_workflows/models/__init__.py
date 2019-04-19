@@ -5,6 +5,7 @@
 from ggrc.models.all_models import register_model
 from ggrc.models import all_models
 
+from .task_group_object import TaskGroupObject
 from .task_group_task import TaskGroupTask
 from .task_group import TaskGroup
 from .workflow import Workflow
@@ -15,6 +16,7 @@ from .cycle_task_group_object_task import CycleTaskGroupObjectTask
 
 register_model(TaskGroup)
 register_model(TaskGroupTask)
+register_model(TaskGroupObject)
 register_model(Workflow)
 
 register_model(Cycle)
