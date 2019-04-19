@@ -73,18 +73,35 @@ describe('sub-tree-models component', function () {
       });
   });
 
-  describe('get() of uniqueModelsList', function () {
-    it('sets random stringified number to inputIdPrefix', function () {
+  describe('get() of displayModelsList', function () {
+    it('splits model names', function () {
       let result;
       vm.attr('modelsList', new can.List([
-        {}, {}, {}, {}, {},
+        {name: 'MockName'},
+        {name: 'Singlelinename'},
       ]));
 
-      result = _.uniqBy(vm.attr('uniqueModelsList'), function (el) {
-        return el.attr('inputId');
-      });
+      result = vm.attr('displayModelsList');
 
-      expect(result.length).toEqual(5);
+      expect(result[0].displayName).toEqual('Mock Name');
+      expect(result[1].displayName).toEqual('Singlelinename');
+    });
+
+    it('sorts model names', function () {
+      let result;
+      vm.attr('modelsList', new can.List([
+        {name: 'Metrics'},
+        {name: 'Control'},
+        {name: 'Risk'},
+        {name: 'Audit'},
+      ]));
+
+      result = vm.attr('displayModelsList');
+
+      expect(result[0].displayName).toEqual('Audit');
+      expect(result[1].displayName).toEqual('Control');
+      expect(result[2].displayName).toEqual('Metrics');
+      expect(result[3].displayName).toEqual('Risk');
     });
   });
 
