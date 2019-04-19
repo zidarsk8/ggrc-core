@@ -29,7 +29,7 @@ class TestProgram(TestCase):
     audit = self.refresh_object(all_models.Audit, id_=self.audit_id)
     self.assertIsNotNone(audit)
 
-  def test_delet_with_audits(self):
+  def test_delete_with_audits(self):
     """Test deletion of a program with a mapped audit"""
 
     response = self.api.delete(self.program)

@@ -302,7 +302,7 @@ class Audit(Snapshotable,
 
   def _check_no_assessments(self):
     """Check that audit has no assessments before delete."""
-    if self.assessments:
+    if self.assessments or self.assessment_templates:
       db.session.rollback()
       raise wzg_exceptions.Conflict(errors.MAPPED_ASSESSMENT)
 
