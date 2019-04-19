@@ -21,6 +21,10 @@
 
   &[disabled], &.disabled {
     opacity: 0.25;
+
+    &.disabled-original {
+      opacity: 0.4;
+    }
   }
 
   &:focus {
