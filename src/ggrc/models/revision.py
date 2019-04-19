@@ -476,8 +476,10 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     cads = custom_attribute_definition.get_custom_attributes_for(
         self.resource_type, self.resource_id)
     cavs = {int(i["custom_attribute_id"]): i for i in self._get_cavs()}
+    cads_ids = set()
     for cad in cads:
       custom_attribute_id = int(cad["id"])
+      cads_ids.add(custom_attribute_id)
       if custom_attribute_id in cavs:
         # Old revisions can contain falsy values for a Checkbox
         if cad["attribute_type"] == "Checkbox" \
@@ -498,6 +500,10 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
           "type": "CustomAttributeValue",
           "context_id": None,
       }
+
+    cavs = {cad_id: value for cad_id, value in cavs.iteritems()
+            if cad_id in cads_ids}
+
     return {"custom_attribute_values": cavs.values(),
             "custom_attribute_definitions": cads}
 
