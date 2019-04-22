@@ -533,6 +533,12 @@ mapper-results-columns-configuration {
         font-size: 13px;
         padding: 9px 16px 7px;
       }
+      &.modal-filter {
+        padding-bottom: 0;
+      }
+    }
+    .modal-footer {
+      border-top: 1px solid #E0E0E0;
 
       .search-results {
         margin-top: 20px;

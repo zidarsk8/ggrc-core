@@ -170,9 +170,6 @@
     &.ui-disabled {
       @include disabled(0.5);
     }
-    &.modal-filter {
-      padding-bottom: 0;
-    }
     input,
     textarea,
     select {
