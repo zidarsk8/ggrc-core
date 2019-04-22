@@ -10,13 +10,14 @@
                   {(refresh-selection)}="{refreshItems}"
                   {(all-selected)}="{allSelected}"
                   {mega-relation-obj}="{megaRelationObj}"
-                  {{#if isMegaMapping}}class="object-selection__mega-mapping"{{/if}}>
+                  {{#if serviceColumnsEnabled}}class="object-selection__service-columns"{{/if}}>
   {{#if items.length}}
     <div class="list-header">
       {{^disableColumnsConfiguration}}
         <mapper-results-columns-configuration {model-type}="{getDisplayModel.model_singular}"
                                               {available-columns}="{columns.available}"
                                               {(selected-columns)}="{columns.selected}"
+                                              {service-columns}="{columns.service}"
                                               {is-mega-mapping}="{isMegaMapping}">
         </mapper-results-columns-configuration>
       {{/disableColumnsConfiguration}}

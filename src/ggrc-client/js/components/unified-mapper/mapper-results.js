@@ -54,10 +54,16 @@ export default can.Component.extend({
           return isMegaMapping(this.attr('object'), this.attr('type'));
         },
       },
+      serviceColumnsEnabled: {
+        get() {
+          return this.attr('columns.service').length;
+        },
+      },
     },
     columns: {
       selected: [],
       available: [],
+      service: [],
     },
     sort: {
       key: null,
@@ -141,6 +147,8 @@ export default can.Component.extend({
       if (this.attr('isMegaMapping')) {
         this.attr('columns.service',
           this.getDisplayModel().tree_view_options.mega_attr_list);
+      } else {
+        this.attr('columns.service', []);
       }
     },
     setSortingConfiguration: function () {

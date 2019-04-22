@@ -27,12 +27,16 @@ export default can.Component.extend({
           this.initializeColumns();
         },
       },
+      serviceColumns: {
+        set(newValue, setValue) {
+          setValue(TreeViewUtils.getVisibleColumnsConfig(newValue, newValue));
+        },
+      },
     },
     modelType: '',
     selectedColumns: [],
     availableColumns: [],
     columns: {},
-    isMegaMapping: false,
     init() {
       this.initializeColumns();
     },
@@ -46,16 +50,6 @@ export default can.Component.extend({
         .getVisibleColumnsConfig(availableColumns, selectedColumns);
 
       this.attr('columns', columns);
-
-      if (this.attr('isMegaMapping')) {
-        this.initializeMegaColumns();
-      }
-    },
-    initializeMegaColumns() {
-      const megaColumns = this.getModel().tree_view_options.mega_attr_list;
-      const serviceColumns = TreeViewUtils
-        .getVisibleColumnsConfig(megaColumns, megaColumns);
-      this.attr('serviceColumns', serviceColumns);
     },
     setColumns() {
       const selectedNames = this.attr('columns')
