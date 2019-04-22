@@ -382,6 +382,9 @@ export default can.Component.extend({
           let self = allItems.find((item) => item.id === baseInstance.id);
           if (self) {
             self.isDisabled = true;
+            let disabledIds = this.attr('disabledIds');
+            disabledIds.push(self.id);
+            this.attr('disabledIds', disabledIds);
 
             if (megaMapping) {
               self.mapAsChild = null;
