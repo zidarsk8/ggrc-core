@@ -4,6 +4,7 @@
 # pylint: disable=invalid-name
 # pylint: disable=no-self-use
 # pylint: disable=unused-argument
+# pylint: disable=protected-access
 import pytest
 
 from lib import base, users
@@ -11,7 +12,7 @@ from lib.constants import roles, object_states
 from lib.service import rest_facade, proposal_ui_facade, proposal_rest_service
 
 
-class TestProposals(base.Test):
+class TestProposalsDestructive(base.Test):
   """Tests for Proposals"""
   _data = None
 
@@ -27,7 +28,7 @@ class TestProposals(base.Test):
     """Create 2 GC users.
     GC 1 creates risk and adds GC 2 as a risk reader.
     """
-    if not TestProposals._data:
+    if not self.__class__._data:
       risk_creator = rest_facade.create_user_with_role(roles.CREATOR)
       proposal_creator = rest_facade.create_user_with_role(roles.CREATOR)
       global_reader = rest_facade.create_user_with_role(roles.READER)
@@ -52,14 +53,14 @@ class TestProposals(base.Test):
       proposal_from_gr.datetime = (
           proposal_rest_service.ProposalsService().get_proposal_creation_date(
               risk, proposal_from_gr))
-      TestProposals._data = {"risk_creator": risk_creator,
-                             "proposal_creator": proposal_creator,
-                             "global_reader": global_reader,
-                             "risk": risk,
-                             "proposal_to_apply": proposal_to_apply,
-                             "proposal_to_decline": proposal_to_decline,
-                             "proposal_from_gr": proposal_from_gr}
-    return TestProposals._data
+      self.__class__._data = {"risk_creator": risk_creator,
+                              "proposal_creator": proposal_creator,
+                              "global_reader": global_reader,
+                              "risk": risk,
+                              "proposal_to_apply": proposal_to_apply,
+                              "proposal_to_decline": proposal_to_decline,
+                              "proposal_from_gr": proposal_from_gr}
+    return self.__class__._data
 
   @pytest.fixture()
   def apply_proposal(self, test_data, selenium):
