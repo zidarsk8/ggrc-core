@@ -13,6 +13,7 @@ from ggrc.fulltext import mixin as ft_mixin
 from ggrc.models import comment
 from ggrc.models import context
 from ggrc.models import deferred
+from ggrc.models import proposal
 from ggrc.models import mixins
 from ggrc.models import object_document
 from ggrc.models import object_person
@@ -37,6 +38,7 @@ class Program(mega.Mega,
               rest_handable_mixins.WithDeleteHandable,
               mixins.base.ContextRBAC,
               mixins.BusinessObject,
+              proposal.Proposalable,
               mixins.Folderable,
               ft_mixin.Indexed,
               db.Model):
