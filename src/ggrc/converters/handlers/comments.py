@@ -8,7 +8,7 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import ColumnHandler
 from ggrc.models import all_models
-from ggrc.login import get_current_user_id
+from ggrc.login import get_current_user_id, get_current_user
 
 
 class CommentColumnHandler(ColumnHandler):
@@ -47,8 +47,19 @@ class CommentColumnHandler(ColumnHandler):
       return
     current_obj = self.row_converter.obj
     for description in self.value:
-      comment = all_models.Comment(description=description,
-                                   modified_by_id=get_current_user_id())
+      if current_obj.access_control_list:
+        current_user = get_current_user()
+        assignee_types = [acl.ac_role.name
+                          for person, acl in current_obj.access_control_list
+                          if person == current_user]
+        assignee_type = ','.join(assignee_types)
+        comment = all_models.Comment(description=description,
+                                     modified_by_id=get_current_user_id(),
+                                     assignee_type=assignee_type)
+      else:
+        comment = all_models.Comment(description=description,
+                                     modified_by_id=get_current_user_id())
+
       db.session.add(comment)
       mapping = all_models.Relationship(source=current_obj,
                                         destination=comment)
