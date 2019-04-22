@@ -679,7 +679,7 @@ describe('assessment-info-pane component', () => {
   describe('removeItems() method', () => {
     const itemsType = 'comments';
 
-    let items = new can.List(Array(3)).map((item, index) => {
+    let items = new can.List([...Array(3).keys()]).map((item, index) => {
       return {
         id: index,
         type: itemsType,
@@ -963,7 +963,7 @@ describe('assessment-info-pane component', () => {
       dfd = $.Deferred();
       type = 'type';
       items = new can.List(
-        Array(countOfItems)
+        Array(...Array(countOfItems).keys())
       ).map((item, index) => {
         return {
           id: index,
