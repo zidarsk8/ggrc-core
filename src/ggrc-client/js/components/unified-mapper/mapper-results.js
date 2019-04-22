@@ -358,7 +358,7 @@ export default can.Component.extend({
     },
     setMegaRelations: function (allItems, relatedData, type) {
       const defaultRelation = this.attr('megaRelation') ?
-        this.attr('megaRelation') : 'parent';
+        this.attr('megaRelation') : 'child';
       const childIds = relatedData.child[type].ids;
       const parentIds = relatedData.parent[type].ids;
       const relationsObj = this.attr('megaRelationObj');
