@@ -11,9 +11,9 @@ describe('mappers', function () {
   let LL;
   beforeEach(function () {
     LL = GGRC.ListLoaders;
-    if (!GGRC.Jasmine || !GGRC.Jasmine.MockModel) {
-      Cacheable.extend('GGRC.Jasmine.MockModel', {}, {});
-    }
+    GGRC.Jasmine = GGRC.Jasmine || {};
+    GGRC.Jasmine.MockModel = GGRC.Jasmine.MockModel ||
+      Cacheable({}, {});
   });
 
   describe('ListBinding', function () {
