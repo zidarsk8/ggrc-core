@@ -73,7 +73,7 @@ class CalendarApiService(object):
     }
     try:
       event = self.calendar_service.events().insert(
-          calendarId=calendar_id, body=event).execute()
+          calendarId=calendar_id, body=event).execute(num_retries=3)
       return self._build_response_json(200, event)
     except HttpError as err:
       logger.warn(
@@ -125,7 +125,7 @@ class CalendarApiService(object):
     try:
       event = self.calendar_service.events().update(
           calendarId=calendar_id, body=event, eventId=external_event_id
-      ).execute()
+      ).execute(num_retries=3)
       return self._build_response_json(200, event)
     except HttpError as err:
       logger.warn(
@@ -150,8 +150,10 @@ class CalendarApiService(object):
     """
     calendar = self.calendar_auth()
     try:
-      calendar.events().delete(calendarId=calendar_id,
-                               eventId=external_event_id).execute()
+      calendar.events().delete(
+          calendarId=calendar_id,
+          eventId=external_event_id
+      ).execute(num_retries=3)
       return self._build_response_json(200, None)
     except HttpError as err:
       logger.warn(
@@ -177,7 +179,7 @@ class CalendarApiService(object):
     try:
       event = self.calendar_service.events().get(
           calendarId=calendar_id, eventId=external_event_id
-      ).execute()
+      ).execute(num_retries=3)
       return self._build_response_json(200, event)
     except HttpError as err:
       logger.warn(
