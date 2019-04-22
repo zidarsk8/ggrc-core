@@ -175,6 +175,15 @@ _.assign(CoreExtension, {
           order: 9,
         },
       },
+
+      Program: {
+        Program_parent: {
+          order: 8,
+        },
+        Program_child: {
+          order: 9,
+        },
+      },
     };
 
     _.forEach(farModels, function (modelName) {
@@ -202,11 +211,12 @@ _.assign(CoreExtension, {
         $.extend(descriptor, extraDescriptorOptions.all[modelName]);
       }
 
-      if (extraDescriptorOptions[object.constructor.model_singular] &&
-          extraDescriptorOptions[
-            object.constructor.model_singular][modelName]) {
-        $.extend(descriptor,
+      const customDescriptor =
+        extraDescriptorOptions[object.constructor.model_singular] &&
+        (extraDescriptorOptions[object.constructor.model_singular][widgetId] ||
           extraDescriptorOptions[object.constructor.model_singular][modelName]);
+      if (customDescriptor) {
+        $.extend(descriptor, customDescriptor);
       }
 
       descriptor.widgetType = 'treeview';
