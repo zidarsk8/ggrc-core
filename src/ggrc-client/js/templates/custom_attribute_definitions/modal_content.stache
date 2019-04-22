@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
   <input type="hidden" name="definition_type" value="{{definition_type}}">
