@@ -444,7 +444,6 @@ class TestImportExports(TestImportExportBase):
             stop_url.format(user.id, ie_job.id),
             headers=self.headers
         )
-        # import ipdb; ipdb.set_trace()
         self.assert200(response)
         self.assertEqual(json.loads(response.data)["status"], "Stopped")
         task_name = "projects/{}/locations/{}/queues/{}/tasks/{}".format(

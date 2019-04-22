@@ -3,7 +3,7 @@
 
 """Base objects for csv file converters."""
 
-from logging import getLogger
+import logging
 from collections import defaultdict
 
 import sqlalchemy as sa
@@ -26,7 +26,7 @@ from ggrc.utils import benchmark
 from ggrc.utils import structures
 
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BaseConverter(object):
