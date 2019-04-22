@@ -24,7 +24,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Stateful
 from ggrc.models.types import CompressedType
 from ggrc.models import reflection
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, errors as app_errors
 
 
 logger = getLogger(__name__)
@@ -84,9 +84,15 @@ class BackgroundTask(base.ContextRBAC, Base, Stateful, db.Model):
 
   def start(self):
     """Mark the current task as running."""
-    self.status = "Running"
-    db.session.add(self)
-    db.session.commit()
+    if self.status == self.PENDING_STATUS:
+      self.status = self.RUNNING_STATUS
+      db.session.add(self)
+      db.session.commit()
+    else:
+      self.status = self.FAILURE_STATUS
+      db.session.add(self)
+      db.session.commit()
+      raise exceptions.InternalServerError(app_errors.PREVIOUS_RUN_FAILED)
 
   def finish(self, status, result):
     """Finish the current bg task."""
@@ -207,6 +213,7 @@ def _create_bg_task(name, parameters=None, payload=None, bg_operation=None):
       parameters=parameters,
       payload=payload,
       modified_by=_bg_task_user(),
+      status=BackgroundTask.PENDING_STATUS,
   )
   db.session.add(bg_task)
   return bg_task
@@ -326,8 +333,8 @@ def queued_task(func):
       return app.make_response(('BackgroundTask not found. Retry later.',
                                 503,
                                 [('Content-Type', 'text/html')]))
-    task.start()
     try:
+      task.start()
       result = func(task)
     except:  # pylint: disable=bare-except
       # Bare except is allowed here so that we can respond with the correct
