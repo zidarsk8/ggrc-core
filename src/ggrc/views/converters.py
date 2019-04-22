@@ -235,6 +235,8 @@ def make_import(csv_data, dry_run, ie_job=None):
                                      csv_data=csv_data)
     converter.import_csv_data()
     return converter.get_info()
+  except models_exceptions.ImportStoppedException:
+    raise
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Import failed: %s", e.message)
     if settings.TESTING:
@@ -340,6 +342,8 @@ def run_import_phases(task):
       db.session.commit()
       job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                             ie_job.title)
+  except models_exceptions.ImportStoppedException:
+    logger.info("Import was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception(e.message)
     ie_job = import_export.get(ie_id)

@@ -137,7 +137,7 @@ class ImportConverter(BaseConverter):
         try:
           converter.import_csv_data()
         except exceptions.ImportStoppedException:
-          logger.info("Import was stopped by user.")
+          raise
         revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
     self._start_compute_attributes_job(revision_ids)
