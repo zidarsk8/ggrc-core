@@ -13,6 +13,8 @@ import '../../components/unified-mapper/mapper-results';
 import '../../components/mapping-controls/mapping-type-selector';
 import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/save-search/save-search';
+import '../../components/saved-search-list/saved-search-list';
+
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-search.stache';
 

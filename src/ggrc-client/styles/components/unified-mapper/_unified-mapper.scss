@@ -517,6 +517,14 @@ mapper-results-columns-configuration {
       }
     }
     .modal-body {
+      display: flex;
+      aside {
+        flex: 1;
+      }
+      main {
+        flex: 4;
+      }
+
       .autocomplete-dropdown__input {
         margin: 10px 14px 14px 12px;
       }

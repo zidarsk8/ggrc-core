@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<h3>
+  Saved Searches
+</h3>
+
+<ul>
+  {{#each searches}}
+    <li>
+      <span>{{name}}</span>
+      <i ($click)="removeSearch(.)" class="fa fa-trash"></i>
+    </li>
+  {{/each}}
+</ul>

@@ -13,6 +13,12 @@
 </div>
 
 <div class="modal-filter modal-body">
+  <aside>
+    <saved-search-list
+      objectName:from="model.model_singular"
+    ></saved-search-list>
+  </aside>
+  <main>
   <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
     <advanced-search-wrapper modelName:from="model.model_singular"
                              modelDisplayName:from="model.title_plural"
@@ -80,6 +86,7 @@
       </div>
     </advanced-search-wrapper>
   </collapsible-panel>
+  </main>
 </div>
 
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
