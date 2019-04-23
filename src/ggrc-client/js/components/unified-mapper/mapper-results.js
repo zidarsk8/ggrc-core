@@ -28,7 +28,7 @@ import tracker from '../../tracker';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
-import {isMegaMapping} from '../../plugins/utils/mega-object-utils';
+import {isMegaMapping as isMegaMappingUtil} from '../../plugins/utils/mega-object-utils';
 
 const DEFAULT_PAGE_SIZE = 10;
 
@@ -45,7 +45,7 @@ export default can.Component.extend({
       },
       isMegaMapping: {
         get() {
-          return isMegaMapping(this.attr('object'), this.attr('type'));
+          return isMegaMappingUtil(this.attr('object'), this.attr('type'));
         },
       },
       serviceColumnsEnabled: {
@@ -205,7 +205,7 @@ export default can.Component.extend({
     loadAllItems: function () {
       this.attr('allItems', this.loadAllItemsIds());
     },
-    getQuery: function (queryType, addPaging, megaMapping) {
+    getQuery: function (queryType, addPaging, isMegaMapping) {
       let result = {};
       let paging = {};
       let modelName = this.attr('type');
@@ -275,7 +275,7 @@ export default can.Component.extend({
 
       // mega object needs special query: parent and child op,
       // instead of 'relevant'
-      if (megaMapping) {
+      if (isMegaMapping) {
         const relations = ['parent', 'child'];
 
         relations.forEach((relation) => {
@@ -307,12 +307,12 @@ export default can.Component.extend({
     getDisplayModel: function () {
       return businessModels[this.attr('type')];
     },
-    setDisabledItems: function (megaMapping, allItems, relatedData, type) {
+    setDisabledItems: function (isMegaMapping, allItems, relatedData, type) {
       if (!this.attr('objectGenerator') && relatedData
         && !this.attr('searchOnly')) {
         let disabledIds;
 
-        if (megaMapping) {
+        if (isMegaMapping) {
           disabledIds = _.reduce(relatedData, (result, val) => {
             return result.concat(val[type].ids);
           }, []);
@@ -364,7 +364,7 @@ export default can.Component.extend({
         }
       });
     },
-    disableItself: function (megaMapping, allItems) {
+    disableItself: function (isMegaMapping, allItems) {
       const baseInstance = this.attr('baseInstance');
       // check for baseInstance:
       // baseInstance is undefined in case of Global Search and some other
@@ -378,7 +378,7 @@ export default can.Component.extend({
             disabledIds.push(self.id);
             this.attr('disabledIds', disabledIds);
 
-            if (megaMapping) {
+            if (isMegaMapping) {
               self.mapAsChild = null;
             }
           }
@@ -399,9 +399,9 @@ export default can.Component.extend({
     load: function () {
       const self = this;
       const modelKey = this.getModelKey();
-      const megaMapping = this.attr('isMegaMapping');
+      const isMegaMapping = this.attr('isMegaMapping');
       const dfd = $.Deferred();
-      const query = this.getQuery('values', true, megaMapping);
+      const query = this.getQuery('values', true, isMegaMapping);
       this.attr('isLoading', true);
 
       $.when(...query.request.map((request) => batchRequests(request)))
@@ -409,7 +409,7 @@ export default can.Component.extend({
           const data = responseArr[query.queryIndex];
 
           const relatedData = this.getRelatedData(
-            megaMapping,
+            isMegaMapping,
             responseArr,
             query,
             modelKey,
@@ -424,12 +424,12 @@ export default can.Component.extend({
               };
             });
           this.setSelectedItems(result);
-          this.setDisabledItems(megaMapping, result, relatedData, modelKey);
+          this.setDisabledItems(isMegaMapping, result, relatedData, modelKey);
 
-          if (megaMapping) {
+          if (isMegaMapping) {
             this.setMegaRelations(result, relatedData, modelKey);
           }
-          this.disableItself(megaMapping, result);
+          this.disableItself(isMegaMapping, result);
 
           // Update paging object
           this.paging.attr('total', data[modelKey].total);
@@ -442,8 +442,8 @@ export default can.Component.extend({
         });
       return dfd;
     },
-    getRelatedData: function (megaMapping, responseArr, query, modelKey) {
-      return megaMapping ?
+    getRelatedData: function (isMegaMapping, responseArr, query, modelKey) {
+      return isMegaMapping ?
         this.buildMegaRelatedData(responseArr, query, modelKey) :
         this.buildRelatedData(responseArr, query, modelKey);
     },
