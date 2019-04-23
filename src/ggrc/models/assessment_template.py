@@ -3,6 +3,8 @@
 
 
 """A module containing the implementation of the assessment template entity."""
+from collections import OrderedDict
+
 from sqlalchemy import orm
 from sqlalchemy.orm import validates
 from werkzeug.exceptions import Forbidden
@@ -70,18 +72,16 @@ class AssessmentTemplate(assessment.AuditRelationship,
   audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
 
   # labels to show to the user in the UI for various default people values
-  DEFAULT_PEOPLE_LABELS = {
-      "Admin": "Object Admins",
-      "Audit Lead": "Audit Captain",
-      "Auditors": "Auditors",
-      "Principal Assignees": "Principal Assignees",
-      "Secondary Assignees": "Secondary Assignees",
-      "Primary Contacts": "Primary Contacts",
-      "Secondary Contacts": "Secondary Contacts",
-      "Control Owners": "Control Owners",
-      "Control Operators": "Control Operators",
-      "Other Contacts": "Other Contacts",
-  }
+  DEFAULT_PEOPLE_LABELS = OrderedDict([
+      ("Admin", "Object Admins"),
+      ("Audit Lead", "Audit Captain"),
+      ("Auditors", "Auditors"),
+      ("Principal Assignees", "Principal Assignees"),
+      ("Secondary Assignees", "Secondary Assignees"),
+      ("Control Operators", "Control Operators"),
+      ("Control Owners", "Control Owners"),
+      ("Other Contacts", "Other Contacts"),
+  ])
 
   _title_uniqueness = False
 
@@ -122,11 +122,17 @@ class AssessmentTemplate(assessment.AuditRelationship,
           "display_name": "Default Assignees",
           "mandatory": True,
           "filter_by": "_nop_filter",
+          "description": "Options are:\n{}\nuser@example.com".format(
+              '\n'.join(DEFAULT_PEOPLE_LABELS.values())
+          ),
       },
       "default_verifier": {
           "display_name": "Default Verifiers",
           "mandatory": False,
           "filter_by": "_nop_filter",
+          "description": "Options are:\n{}\nuser@example.com".format(
+              '\n'.join(DEFAULT_PEOPLE_LABELS.values())
+          ),
       },
       "default_test_plan": {
           "display_name": "Default Assessment Procedure",
