@@ -387,7 +387,7 @@ function getModelsForSubTier(modelName) {
  * @param {Object} filter -
  * @param {Object} request - Collection of QueryAPI sub-requests
  * @param {Boolean} transformToSnapshot - Transform query to Snapshot
- * @param {String} operation - Type of operation
+ * @param {String|null} operation - Type of operation
  * @return {Promise} Deferred Object
  */
 function loadFirstTierItems(modelName,
@@ -537,7 +537,7 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
  * @param {String} requestedType - Type of requested object.
  * @param {String} relevantToType - Type of parent object.
  * @param {Number} relevantToId - ID of parent object.
- * @param {String} [operation] - Type of operation
+ * @param {String|null} operation - Type of operation
  * @return {object} Returns expression for load items for 1st level of tree view.
  */
 function makeRelevantExpression(requestedType,
