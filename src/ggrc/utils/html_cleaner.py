@@ -70,10 +70,16 @@ def cleaner(dummy, value, *_):
   # for some reason clean() function converts strings like "&*!;" to "&*;;".
   # if we have such string we are replacing new incorrect values to old ones
   if buggy_strings:
+    backup_value = value
     updated_buggy_strings = re.finditer(BUGGY_STRINGS_PATTERN, value)
     for match in updated_buggy_strings:
-      old_value = buggy_strings.next().group()
-      start, finish = match.span()
-      value = value[:start] + old_value + value[finish:]
+      try:
+        old_value = buggy_strings.next().group()
+        start, finish = match.span()
+        value = value[:start] + old_value + value[finish:]
+      except StopIteration:
+        # If we have different number of string after clean function
+        # we should skip replacing
+        return backup_value
 
   return value
