@@ -156,11 +156,11 @@ const ObjectMapper = can.Control.extend({
     function openForMegaObject(data) {
       const config = getConfigForCommonObjects(data);
 
-      const relation = getMegaObjectRelation(data.mega_object_widget);
+      const {relation} = getMegaObjectRelation(data.mega_object_widget);
 
       _.assign(config.general, {
         isMegaObject: data.mega_object,
-        megaRelation: relation && relation.relation,
+        megaRelation: relation,
       });
 
       self.launch(btn, Object.assign(config, data));

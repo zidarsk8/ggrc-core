@@ -77,22 +77,21 @@ function getMegaObjectRelation(modelName = '') {
  * @return {Object} The transformed query
  */
 function transformQueryForMega(query) {
-  let expression = query.filters.expression;
+  const expression = query.filters.expression;
   const relation = getMegaObjectRelation(query.object_name);
 
-  if (relation) {
-    query.object_name = relation.source;
+  query.object_name = relation.source;
 
-    if (expression) {
-      expression.op = {
-        name: relation.relation,
-      };
-    }
-
-    if (query.fields && (query.fields.indexOf('is_mega') === -1)) {
-      query.fields = query.fields.concat(['is_mega']);
-    }
+  if (expression) {
+    expression.op = {
+      name: relation.relation,
+    };
   }
+
+  if (query.fields && (query.fields.indexOf('is_mega') === -1)) {
+    query.fields = query.fields.concat(['is_mega']);
+  }
+
   return query;
 }
 
