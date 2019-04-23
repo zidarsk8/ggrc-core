@@ -20,12 +20,19 @@
           </div>
         {{/case}}
 
+        {{#case 'map_as'}}
+          <mega-relation-selection-item
+            class="tree-radio-select-area"
+            {is-disabled}="{isDisabled}"
+            {id}="{instance.id}"
+            {map-as-child}="{mapAsChild}">
+          </mega-relation-selection-item>
+        {{/case}}
+
         {{#default}}
           <tree-item-attr
             {instance}="{instance}"
             {name}="{attr_name}"
-            {map-as-child}="{mapAsChild}"
-            {is-disabled}="{isDisabled}"
           ></tree-item-attr>
         {{/default}}
       {{/switch}}

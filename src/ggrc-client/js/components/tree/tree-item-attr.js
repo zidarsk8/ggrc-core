@@ -38,8 +38,6 @@ export default can.Component.extend({
   viewModel: {
     instance: null,
     name: '',
-    mapAsChild: false,
-    isDisabled: false,
     define: {
       // workaround an issue: "instance.is_mega" is not
       // handled properly in template

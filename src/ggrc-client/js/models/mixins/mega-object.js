@@ -15,6 +15,7 @@ export default Mixin({
     this.tree_view_options.mega_attr_list = [{
       attr_title: 'Map as',
       attr_name: 'map_as',
+      attr_type: 'map_as',
       order: 41,
       disable_sorting: true,
       mandatory: true,
