@@ -43,12 +43,6 @@ export default can.Component.extend({
           return new Pagination({pageSizeSelect: [10, 25, 50]});
         },
       },
-      megaRelation: {
-        set(val) {
-          this.attr('megaRelationObj').defaultValue = val;
-          return val;
-        },
-      },
       isMegaMapping: {
         get() {
           return isMegaMapping(this.attr('object'), this.attr('type'));
@@ -97,19 +91,7 @@ export default can.Component.extend({
     objectGenerator: false,
     deferredList: [],
     disabledIds: [],
-    /**
-     * Stores "id: relation" pairs for mega objects mapping
-     * @type {Object}
-     * @example
-     * {
-     *    1013: 'parent',
-     *    1025: 'child',
-     *    defaultValue: 'child',
-     * }
-     */
-    megaRelationObj: {
-      defaultValue: 'child',
-    },
+    megaRelationObj: {},
     init: function () {
       this.attr('submitCbs').add(this.onSearch.bind(this, true));
     },
@@ -365,11 +347,10 @@ export default can.Component.extend({
       });
     },
     setMegaRelations: function (allItems, relatedData, type) {
-      const defaultRelation = this.attr('megaRelation') ?
-        this.attr('megaRelation') : 'child';
       const childIds = relatedData.child[type].ids;
       const parentIds = relatedData.parent[type].ids;
       const relationsObj = this.attr('megaRelationObj');
+      const defaultRelation = this.attr('megaRelationObj.defaultValue');
 
       allItems.forEach((item) => {
         if (childIds.indexOf(item.id) > -1) {

@@ -11,7 +11,6 @@ export default can.Component.extend({
   leakScope: true,
   viewModel: {
     selectedItems: [],
-    megaRelationObj: {},
     items: [],
     // This is an array by default replace with deferred on actual load
     allItems: [],
@@ -115,9 +114,6 @@ export default can.Component.extend({
     },
     'object-selection-item deselectItem': function (el, ev, item) {
       this.viewModel.deselect(item);
-    },
-    'mega-relation-selection-item mapAsChild': function (el, ev, data) {
-      this.viewModel.attr('megaRelationObj')[data.id] = data.val;
     },
     '{viewModel} selectAllCheckboxValue': function (scope, ev, value) {
       if (value) {

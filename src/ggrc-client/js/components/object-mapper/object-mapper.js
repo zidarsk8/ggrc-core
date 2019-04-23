@@ -37,6 +37,7 @@ import * as businessModels from '../../models/business-models';
 import TreeViewConfig from '../../apps/base_widgets';
 import {confirm} from '../../plugins/utils/modals';
 import {isMegaMapping} from '../../plugins/utils/mega-object-utils';
+import pubSub from '../../pub-sub';
 
 let DEFAULT_OBJECT_MAP = {
   AccountBalance: 'Control',
@@ -127,7 +128,20 @@ export default can.Component.extend({
       deferred: false,
       isMappableExternally: false,
       searchModel: null,
-      megaRelationObj: null,
+      /**
+       * Stores "id: relation" pairs for mega objects mapping
+       * @type {Object}
+       * @example
+       * {
+       *    1013: 'parent',
+       *    1025: 'child',
+       *    defaultValue: 'child',
+       * }
+       */
+      megaRelationObj: {
+        defaultValue: config.general.megaRelation || 'child',
+      },
+      pubSub,
       showAsSnapshots: function () {
         if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
           return true;
@@ -190,6 +204,9 @@ export default can.Component.extend({
     // reopen object-mapper if creating was canceled
     'create-and-map canceled'() {
       this.element.trigger('showModal');
+    },
+    '{pubSub} mapAsChild'(el, ev) {
+      this.viewModel.attr('megaRelationObj')[ev.id] = ev.val;
     },
     inserted: function () {
       let self = this;

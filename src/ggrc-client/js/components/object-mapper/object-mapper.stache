@@ -132,8 +132,7 @@
                       {deferred-list}="{deferred_list}"
                       {filter-items}="*filterItems"
                       {mapping-items}="*mappingItems"
-                      {^mega-relation-obj}="megaRelationObj"
-                      {mega-relation}="{config.general.megaRelation}"
+                      {mega-relation-obj}="megaRelationObj"
                       (loaded)="{onLoaded()}"
                       {status-item}="*statusItem">
       </mapper-results>
