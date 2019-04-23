@@ -725,11 +725,12 @@ function _getTreeViewOperation(objectName, relevantToType) {
   }
 }
 
-function startExport(modelName, parent, filter, request, transformToSnapshot) {
+function startExport(
+  modelName, parent, filter, request, transformToSnapshot, operation) {
   let params = buildParam(
     modelName,
     {},
-    makeRelevantExpression(modelName, parent.type, parent.id),
+    makeRelevantExpression(modelName, parent.type, parent.id, operation),
     'all',
     filter
   );

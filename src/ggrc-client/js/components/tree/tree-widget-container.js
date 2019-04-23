@@ -203,15 +203,9 @@ viewModel = can.Map.extend({
     this.attr('loading', true);
 
     let loadSnapshots = this.attr('options.objectVersion');
-    let megaRelated = this.attr('options.megaRelated');
-    let operation;
-    if (megaRelated) {
-      const widget = this.attr('options.widgetId');
-      let relation = getMegaObjectRelation(widget);
-      if (relation) {
-        operation = relation.relation;
-      }
-    }
+    const operation = this.attr('options.megaRelated')
+      ? getMegaObjectRelation(this.attr('options.widgetId')).relation
+      : null;
 
     return TreeViewUtils
       .loadFirstTierItems(
@@ -580,9 +574,18 @@ viewModel = can.Map.extend({
     let filter = this.attr('currentFilter');
     let request = this.attr('advancedSearch.request');
     let loadSnapshots = this.attr('options.objectVersion');
+    const operation = this.attr('options.megaRelated') ?
+      getMegaObjectRelation(this.attr('options.widgetId')).relation :
+      null;
 
-    TreeViewUtils
-      .startExport(modelName, parent, filter, request, loadSnapshots);
+    TreeViewUtils.startExport(
+      modelName,
+      parent,
+      filter,
+      request,
+      loadSnapshots,
+      operation,
+    );
 
     notifier('info', exportMessage, true);
   },
