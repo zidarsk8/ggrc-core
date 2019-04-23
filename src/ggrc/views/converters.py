@@ -290,6 +290,8 @@ def run_export(task):
 @background_task.queued_task
 def run_import_phases(task):
   """Execute import phases"""
+  # pylint: disable=too-many-return-statements
+  # pylint: disable=too-many-branches
   ie_id = task.parameters.get("ie_id")
   user = login.get_current_user()
   try:

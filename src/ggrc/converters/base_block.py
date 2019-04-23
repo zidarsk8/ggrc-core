@@ -436,7 +436,7 @@ class ImportBlockConverter(BlockConverter):
         k for k in self.headers if k not in self.converter.priority_columns
     ]
 
-  def import_csv_data(self):
+  def import_csv_data(self):  # noqa
     """Perform import sequence for the block."""
     try:
       for row in self.row_converters_from_csv():
