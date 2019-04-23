@@ -1451,7 +1451,7 @@ class Resource(ModelView):
         resources = self.get_events_resources(model, ids)
     else:
       with benchmark("Query database for matches"):
-        query = model.eager_query()
+        query = model.eager_query(load_related=False)
         # We force the query here so that we can benchmark it
         objs = query.filter(model.id.in_(ids.keys())).all()
         with benchmark("Publish objects"):
