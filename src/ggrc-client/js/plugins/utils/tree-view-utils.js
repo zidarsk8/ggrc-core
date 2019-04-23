@@ -459,13 +459,6 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
       dfds = loadedModelObjects.map(function (modelObject) {
         let subTreeFields = getSubTreeFields(type, modelObject.name);
 
-        if (!pageInfo && countMap[modelObject.name || modelObject.countsName]) {
-          pageInfo = {
-            current: 1,
-            pageSize: countMap[modelObject.name],
-          };
-        }
-
         let params = buildParam(
           modelObject.name,
           pageInfo,
