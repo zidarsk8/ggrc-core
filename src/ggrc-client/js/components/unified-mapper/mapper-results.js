@@ -366,7 +366,10 @@ export default can.Component.extend({
     },
     disableItself: function (megaMapping, allItems) {
       const baseInstance = this.attr('baseInstance');
-      if (allItems.length) {
+      // check for baseInstance:
+      // baseInstance is undefined in case of Global Search and some other
+      // use cases (e.g. Assessment Snapshots)
+      if (allItems.length && baseInstance) {
         if (baseInstance.type === allItems[0].type) {
           let self = allItems.find((item) => item.id === baseInstance.id);
           if (self) {
