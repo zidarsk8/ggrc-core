@@ -9,6 +9,7 @@ import mock
 
 from ggrc import db
 from ggrc.gcalendar import calendar_event_sync
+from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc.models import factories
 from integration.ggrc.gcalendar import BaseCalendarEventTest
 
@@ -223,9 +224,37 @@ class TestCalendarEventSync(BaseCalendarEventTest):
 
   @mock.patch("ggrc.gcalendar.calendar_api_service"
               ".CalendarApiService.create_event")
-  def test_sync_overdue_event(self, create_event_mock):
-    """Test sync of overdue event."""
+  def test_create_overdue_event(self, create_event_mock):
+    """Test create of overdue event."""
     self.setup_person_task_event(date(2015, 1, 5))
     with freeze_time("2015-01-10 12:00:00"):
       self.sync.sync_cycle_tasks_events()
-    self.assertEqual(create_event_mock.call_count, 0)
+    self.assertEqual(create_event_mock.call_count, 1)
+
+  @mock.patch("ggrc.gcalendar.calendar_api_service"
+              ".CalendarApiService.create_event")
+  @mock.patch("ggrc.gcalendar.calendar_api_service"
+              ".CalendarApiService.update_event")
+  def test_update_overdue_event(self, update_event_mock, _):
+    """Test update of overdue event."""
+    _, task, _ = self.setup_person_task_event(date(2015, 1, 5))
+    with freeze_time("2015-01-10 12:00:00"):
+      self.sync.sync_cycle_tasks_events()
+    task.title = "New title"
+    with freeze_time("2015-01-11 12:00:00"):
+      self.sync.sync_cycle_tasks_events()
+    self.assertEqual(update_event_mock.call_count, 0)
+
+  @mock.patch("ggrc.gcalendar.calendar_api_service"
+              ".CalendarApiService.create_event")
+  @mock.patch("ggrc.gcalendar.calendar_api_service"
+              ".CalendarApiService.delete_event")
+  def test_delete_overdue_event(self, delete_event_mock, _):
+    """Test delete of overdue event."""
+    _, task, _ = self.setup_person_task_event(date(2015, 1, 5))
+    with freeze_time("2015-01-10 12:00:00"):
+      self.sync.sync_cycle_tasks_events()
+    task.status = CycleTaskGroupObjectTask.FINISHED
+    with freeze_time("2015-01-11 12:00:00"):
+      self.sync.sync_cycle_tasks_events()
+    self.assertEqual(delete_event_mock.call_count, 0)

@@ -40,7 +40,7 @@ class TestShouldCreateEventForTask(TestCase):
   def test_task_status(
       self, task_status, is_verification_needed, should_create_event
   ):
-    """Check that the event should be created for specified task statuses."""
+    """Task {}, is verification needed {}, should event be created {}."""
     with factories.single_commit():
       cycle = wf_factories.CycleFactory(
           is_verification_needed=is_verification_needed,

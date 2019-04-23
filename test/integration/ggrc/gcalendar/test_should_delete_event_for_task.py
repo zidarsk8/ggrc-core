@@ -42,8 +42,7 @@ class TestShouldDeleteEventForTask(BaseCalendarEventTest):
   @ddt.unpack
   def test_overdue_task_status(self, task_status, is_verification_needed,
                                should_delete_event, is_overdue):
-    """Check that the overdue event should be deleted for
-       specified task statuses."""
+    """{} task, verification needed {}, should be deleted {}, is overdue {}"""
     start_date = date(2015, 1, 5) if is_overdue else date(2015, 1, 15)
     _, task, _ = self.setup_person_task_event(start_date)
     task.cycle = wf_factories.CycleFactory(

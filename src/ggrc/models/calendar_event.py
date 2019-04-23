@@ -67,8 +67,17 @@ class CalendarEvent(Relatable, Base, db.Model):
   @property
   def needs_sync(self):
     """Indicates should we send this event to user or not."""
-    return (self.attendee.profile.send_calendar_events and
-            not self.is_overdue)
+    return self.attendee.profile.send_calendar_events
+
+  @property
+  def needs_update(self):
+    """Indicates should we update this event or not."""
+    return not self.is_overdue
+
+  @property
+  def needs_delete(self):
+    """Indicates should we delete this event or not."""
+    return not self.is_overdue
 
   def json_equals(self, event_response):
     """Checks if event is equal to json representation."""
