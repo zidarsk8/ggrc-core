@@ -7,6 +7,7 @@
 <div class="flex-box">
   <related-people-access-control
     class="width-100"
+    {deferred-save}="{deferredSave}"
     (save-custom-role)="{save(%event)}"
     {conflict-roles}="{conflictRoles}"
     {order-of-roles}="{orderOfRoles}"
@@ -45,17 +46,23 @@
                     {title}="{title}"
                     {people}="{people}"
                     {updatable-group-id}="{updatableGroupId}">
-                      <editable-people-group-header
-                        {editable-mode}="{editableMode}"
-                        {redirection-enabled}="{redirectionEnabled}"
-                        {is-loading}="{isLoading}"
-                        {can-edit}="{canEdit}"
-                        {title}="{title}"
-                        {required}="{required}"
-                        {people}="{people}"
-                        {single-user-role}="{singleUserRole}"
-                        (edit-people-group)="{changeEditableMode(true)}">
-                      </editable-people-group-header>
+                      <confirm-edit-action
+                        (set-edit-mode)="{changeEditableMode(true)}"
+                        (set-in-progress)="{setInProgress()}"
+                        {instance}="{instance}"
+                        {on-state-change-dfd}="{onStateChangeDfd}">
+                        <editable-people-group-header
+                          {editable-mode}="{editableMode}"
+                          {redirection-enabled}="{redirectionEnabled}"
+                          {is-loading}="{isLoading}"
+                          {can-edit}="{canEdit}"
+                          {title}="{title}"
+                          {required}="{required}"
+                          {people}="{people}"
+                          {single-user-role}="{singleUserRole}"
+                          (edit-people-group)="{confirmEdit()}">
+                        </editable-people-group-header>
+                      </confirm-edit-action>
                   </editable-people-group>
               </div>
           </related-people-access-control-group>

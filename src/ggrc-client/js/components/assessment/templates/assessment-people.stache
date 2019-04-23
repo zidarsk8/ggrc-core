@@ -18,18 +18,20 @@
 
   <div class="width-100">
     {{#if infoPaneMode}}
-      <custom-roles {instance}="{instance}"
+      <assessment-custom-roles {instance}="{instance}"
         {deferred-save}="{deferredSave}"
+        {on-state-change-dfd}="{onStateChangeDfd}"
+        {set-in-progress}="{@setInProgress}"
         {order-of-roles}="{orderOfRoles}"
-        {include-roles}="{assessmentMainRoles}"
+        {include-roles}="{mainRoles}"
         {conflict-roles}="{conflictRoles}">
-      </custom-roles>
+      </assessment-custom-roles>
     {{else}}
       <custom-roles-modal
         {instance}="{instance}"
         {order-of-roles}="{orderOfRoles}"
         {conflict-roles}="{conflictRoles}"
-        {is-new-instance}="{new_object_form}">
+        {is-new-instance}="{isNewInstance}">
       </custom-roles-modal>
     {{/if}}
   </div>
