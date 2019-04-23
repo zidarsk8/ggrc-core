@@ -19,6 +19,7 @@ class CalendarApiService(object):
   def __init__(self):
     """Initializes service object."""
     self.calendar_service = self.calendar_auth()
+    self.num_retries = 3
 
   @staticmethod
   def _build_response_json(status_code, content):
@@ -73,7 +74,8 @@ class CalendarApiService(object):
     }
     try:
       event = self.calendar_service.events().insert(
-          calendarId=calendar_id, body=event).execute(num_retries=3)
+          calendarId=calendar_id, body=event
+      ).execute(num_retries=self.num_retries)
       return self._build_response_json(200, event)
     except HttpError as err:
       logger.warn(
@@ -125,7 +127,7 @@ class CalendarApiService(object):
     try:
       event = self.calendar_service.events().update(
           calendarId=calendar_id, body=event, eventId=external_event_id
-      ).execute(num_retries=3)
+      ).execute(num_retries=self.num_retries)
       return self._build_response_json(200, event)
     except HttpError as err:
       logger.warn(
@@ -153,7 +155,7 @@ class CalendarApiService(object):
       calendar.events().delete(
           calendarId=calendar_id,
           eventId=external_event_id
-      ).execute(num_retries=3)
+      ).execute(num_retries=self.num_retries)
       return self._build_response_json(200, None)
     except HttpError as err:
       logger.warn(
@@ -179,7 +181,7 @@ class CalendarApiService(object):
     try:
       event = self.calendar_service.events().get(
           calendarId=calendar_id, eventId=external_event_id
-      ).execute(num_retries=3)
+      ).execute(num_retries=self.num_retries)
       return self._build_response_json(200, event)
     except HttpError as err:
       logger.warn(
