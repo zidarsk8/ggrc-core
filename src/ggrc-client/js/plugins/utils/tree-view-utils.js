@@ -33,7 +33,6 @@ import {
 import {
   isMegaObjectRelated,
   transformQueryForMega,
-  getMegaObjectRelation,
 } from './mega-object-utils';
 import {getRolesForType} from './acl-utils';
 import Mappings from '../../models/mappers/mappings';
@@ -651,12 +650,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
       .then((...response) => {
         let total = 0;
         let showMore = models.some(function (model, index) {
-          let modelName = isMegaObjectRelated(model) ?
-            getMegaObjectRelation(model).source : model;
-
-          let count = response[index][modelName] ?
-            response[index][modelName].total :
-            response[index].Snapshot.total;
+          const count = Object.values(response[index])[0].total;
 
           if (!count) {
             return false;
