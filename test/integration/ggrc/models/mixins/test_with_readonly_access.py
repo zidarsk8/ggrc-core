@@ -3,7 +3,7 @@
 
 """Integration test for TestWithReadOnlyAccess mixin"""
 
-# pylint: disable=invalid-name,too-many-arguments
+# pylint: disable=invalid-name,too-many-arguments,too-many-lines
 
 from collections import OrderedDict
 import json
@@ -21,6 +21,9 @@ from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 
 
+_NOT_SPECIFIED = '<NOT_SPECIFIED>'
+
+
 @ddt.ddt
 class TestWithReadOnlyAccessAPI(TestCase):
   """Test WithReadOnlyAccess mixin"""
@@ -34,6 +37,7 @@ class TestWithReadOnlyAccessAPI(TestCase):
       ('System', True),
       ('System', False),
       ('System', None),
+      ('System', _NOT_SPECIFIED),
       ('System', "qwert"),
   )
   @ddt.unpack
@@ -41,24 +45,52 @@ class TestWithReadOnlyAccessAPI(TestCase):
     """Test flag readonly ignored on object {0} POST for body readonly={1}"""
 
     dct = dict()
-    if readonly is not None:
+    if readonly is not _NOT_SPECIFIED:
       dct['readonly'] = readonly
     resp, obj = self.object_generator.generate_object(
         get_model(obj_type),
-        {'readonly': readonly},
+        dct,
     )
 
     self.assertStatus(resp, 201)
-
     self.assertFalse(obj.readonly)
+
+  @ddt.data(
+      ('System', True, True),
+      ('System', False, False),
+      ('System', None, False),
+      ('System', _NOT_SPECIFIED, False),
+  )
+  @ddt.unpack
+  def test_readonly_set_on_post_as_external(self, obj_type, readonly, result):
+    """Test flag readonly on {0} POST for body readonly={1} as external user"""
+
+    dct = dict()
+    if readonly is not _NOT_SPECIFIED:
+      dct['readonly'] = readonly
+
+    with self.object_generator.api.as_external():
+      resp, obj = self.object_generator.generate_object(
+          get_model(obj_type),
+          dct,
+      )
+      obj_id = obj.id
+
+    self.assertStatus(resp, 201)
+    obj = get_model(obj_type).query.get(obj_id)
+    self.assertEqual(obj.readonly, result)
 
   @ddt.data(
       ('System', False, False, 200),
       ('System', False, True, 200),
       ('System', False, None, 200),
+      ('System', False, _NOT_SPECIFIED, 200),
+      ('System', False, "qwerty", 200),
       ('System', True, False, 405),
       ('System', True, True, 405),
       ('System', True, None, 405),
+      ('System', True, _NOT_SPECIFIED, 405),
+      ('System', True, "qwerty", 405),
   )
   @ddt.unpack
   def test_put(self, obj_type, current, new, exp_code):
@@ -70,7 +102,7 @@ class TestWithReadOnlyAccessAPI(TestCase):
       obj_id = obj.id
 
     data = {'title': 'b'}
-    if new is not None:
+    if new is not _NOT_SPECIFIED:
       data['readonly'] = new
 
     resp = self.object_generator.api.put(obj, data)
@@ -78,6 +110,38 @@ class TestWithReadOnlyAccessAPI(TestCase):
     self.assertStatus(resp, exp_code)
     obj = get_model(obj_type).query.get(obj_id)
     self.assertEqual(obj.readonly, current)
+
+  @ddt.data(
+      ('System', False, False, 200, False),
+      ('System', False, True, 200, True),
+      ('System', False, None, 200, False),
+      ('System', False, _NOT_SPECIFIED, 200, False),
+      ('System', True, False, 200, False),
+      ('System', True, True, 200, True),
+      ('System', True, None, 200, True),
+      ('System', True, _NOT_SPECIFIED, 200, True),
+  )
+  @ddt.unpack
+  def test_put_as_external(self, obj_type, current, new, exp_code,
+                           exp_readonly):
+    """Test {0} PUT readonly={2} for current readonly={1} for external user"""
+
+    factory = factories.get_model_factory(obj_type)
+    with factories.single_commit():
+      obj = factory(title='a', readonly=current)
+      obj_id = obj.id
+
+    data = {'title': 'b'}
+    if new is not _NOT_SPECIFIED:
+      data['readonly'] = new
+
+    with self.object_generator.api.as_external():
+      obj = get_model(obj_type).query.get(obj_id)
+      resp = self.object_generator.api.put(obj, data)
+
+    self.assertStatus(resp, exp_code)
+    obj = get_model(obj_type).query.get(obj_id)
+    self.assertEqual(obj.readonly, exp_readonly)
 
   @ddt.data('System')
   def test_403_if_put_readonly_without_perms(self, obj_type):
@@ -108,11 +172,14 @@ class TestWithReadOnlyAccessAPI(TestCase):
     self.assert403(resp)
 
   @ddt.data(
-      ('System', False, 200, True),
-      ('System', True, 405, False),
+      ('System', True, False, 200, True),
+      ('System', True, True, 405, False),
+      ('System', False, False, 200, True),
+      ('System', False, True, 405, False),
   )
   @ddt.unpack
-  def test_delete(self, obj_type, readonly, exp_code, exp_deleted):
+  def test_delete(self, obj_type, is_external, readonly, exp_code,
+                  exp_deleted):
     """Test {0} DELETE if readonly={1}"""
 
     factory = factories.get_model_factory(obj_type)
@@ -120,6 +187,12 @@ class TestWithReadOnlyAccessAPI(TestCase):
       obj = factory(title='a', readonly=readonly)
       obj_id = obj.id
 
+    if is_external:
+      self.object_generator.api.login_as_external()
+    else:
+      self.object_generator.api.login_as_normal()
+
+    obj = get_model(obj_type).query.get(obj_id)
     resp = self.object_generator.api.delete(obj)
 
     self.assertStatus(resp, exp_code)

@@ -40,7 +40,7 @@ class RelationshipResource(ggrc.services.common.Resource):
                       "dedicated for SOX needs")
 
   @staticmethod
-  def _validate_readonly_access(obj):
+  def _validate_readonly_access(obj, src):
     """Ensure that relationship is allowed for read-only objects"""
 
     if not isinstance(obj, relationship.Relationship):
@@ -55,13 +55,6 @@ class RelationshipResource(ggrc.services.common.Resource):
 
     if isinstance(obj2, WithReadOnlyAccess):
       RelationshipResource._validate_readonly_relationship(obj2, obj1)
-
-  @staticmethod
-  def _validate_readonly_access_on_post(objects):
-    """Validate read-only access on POST"""
-
-    for obj in objects:
-      RelationshipResource._validate_readonly_access(obj)
 
   @staticmethod
   def _parse_snapshot_data(src):
