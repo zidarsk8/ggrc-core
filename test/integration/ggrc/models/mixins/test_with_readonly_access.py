@@ -315,7 +315,7 @@ class TestWithReadOnlyAccessImport(TestCase):
       ("", False),
   )
   @ddt.unpack
-  def test_system_readonly_set_on_post(self, readonly, expected):
+  def test_system_create_with_readonly_set(self, readonly, expected):
     """Test flag readonly={0} for new System"""
 
     data = OrderedDict([
@@ -334,7 +334,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     obj = get_model("System").query.one()
     self.assertEqual(obj.readonly, expected)
 
-  def test_system_on_post_with_invalid_data(self):
+  def test_system_create_with_invalid_readonly(self):
     """Test invalid readonly value for new System"""
 
     data = OrderedDict([
@@ -365,7 +365,7 @@ class TestWithReadOnlyAccessImport(TestCase):
       ("", False),
   )
   @ddt.unpack
-  def test_system_update_to_readonly(self, new, expected):
+  def test_system_update_to_readonly_as_admin(self, new, expected):
     """Test System readonly={1} if new={0}"""
 
     with factories.single_commit():
@@ -384,15 +384,8 @@ class TestWithReadOnlyAccessImport(TestCase):
     obj = get_model("System").query.one()
     self.assertEqual(obj.readonly, expected)
 
-  @ddt.data(
-      ("no", "'Read-only', 'Title'"),
-      ("yes", "'Read-only', 'Title'"),
-      (None, "'Title'"),
-      ("", "'Read-only', 'Title'")
-  )
-  @ddt.unpack
-  def test_system_not_updated(self, new, exp_ignored_columns):
-    """Test readonly System not updated if new={0}"""
+  def test_system_not_updated_as_admin(self):
+    """Test readonly System not updated by admin"""
 
     with factories.single_commit():
       obj = factories.SystemFactory(title='a', readonly=True)
@@ -402,15 +395,13 @@ class TestWithReadOnlyAccessImport(TestCase):
         ("Code*", obj.slug),
         ("Title", "b"),
     ])
-    if new is not None:
-      data["Read-only"] = new
 
     response = self.import_data(data)
     self._check_csv_response(response, {
         "System": {
             "row_warnings": {
                 errors.READONLY_ACCESS_WARNING.format(
-                    line=3, columns=exp_ignored_columns),
+                    line=3, columns="'Title'"),
             },
         }
     })
@@ -419,7 +410,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     self.assertEqual(obj.title, 'a')
 
   @ddt.data("no", "yes", None, "", True)
-  def test_system_not_updated_without_perms(self, new):
+  def test_user_cannot_get_readonly_value_without_perms(self, new):
     """Test readonly System not updated if new={0} and user has no perms
 
     This test ensures that user without permission for the object
@@ -816,6 +807,50 @@ class TestWithReadOnlyAccessImport(TestCase):
     self._check_csv_response(response, expected_warning)
 
     obj = all_models.System.query.filter_by(slug="System-1").first()
+    self.assertEqual(obj.readonly, expected_readonly)
+
+  @ddt.data(
+      ("Creator", True),
+      ("Reader", True),
+      ("Editor", True),
+      ("Administrator", False),
+  )
+  @ddt.unpack
+  def test_readonly_unset_by_role(self, role_name, expected_readonly):
+    """Test setting Read-only to false under {}."""
+    role_obj = all_models.Role.query.filter(
+        all_models.Role.name == role_name
+    ).one()
+
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      system = factories.SystemFactory(readonly=True)
+      rbac_factories.UserRoleFactory(role=role_obj, person=user)
+      system.add_person_with_role_name(user, "Admin")
+
+      system_slug = system.slug
+      user_id = user.id
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "System"),
+        ("Code*", system_slug),
+        ("Read-only", "no"),
+    ]), person=all_models.Person.query.get(user_id))
+
+    expected_warning = {
+        "System": {
+            "row_warnings": {
+                errors.NON_ADMIN_ACCESS_ERROR.format(
+                    line=3,
+                    object_type="System",
+                    column_name="Read-only"
+                )
+            }
+        }
+    } if expected_readonly else {}
+    self._check_csv_response(response, expected_warning)
+
+    obj = all_models.System.query.filter_by(slug=system_slug).first()
     self.assertEqual(obj.readonly, expected_readonly)
 
   @ddt.data(

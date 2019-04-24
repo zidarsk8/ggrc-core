@@ -41,6 +41,7 @@ _ALLOWED_ATTRS_FOR_READONLY_ACCESS = (
     'slug',
     'email',
     'comments',
+    'readonly',
 )
 
 

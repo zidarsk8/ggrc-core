@@ -215,7 +215,8 @@ READONLY_ACCESS_WARNING = (u"Line {line}: The system is in a "
                            u"The following columns will be ignored: "
                            u"{columns}.")
 
-NON_ADMIN_ACCESS_ERROR = (u"Line {line}: You don't have permissions to make "
-                          u"the {object_type} read-only. Please contact your "
-                          u"administrator if you have any questions. "
-                          u"Column '{column_name}' will be ignored.")
+NON_ADMIN_ACCESS_ERROR = (u"Line {line}: You don't have permissions to use "
+                          u"column '{column_name}' for {object_type}. Please "
+                          u"contact your administrator if you have any "
+                          u"questions. Column '{column_name}' will be "
+                          u"ignored.")
