@@ -45,7 +45,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Policy': 13,
       'Process': 12,
       'System': 12,
-      'Program': 16,
+      'Program': 17,
       'Regulation': 13,
       'TaskGroup': 8,
       'TaskGroupTask': 7,
