@@ -87,9 +87,9 @@ class TestAssessmentTemplatesImport(TestCase):
 
     expected_messages = {
         "Assessment Template": {
-            "rows": 5,
+            "rows": 6,
             "updated": 0,
-            "created": 4,
+            "created": 5,
             "row_warnings": {
                 errors.UNKNOWN_USER_WARNING.format(
                     line=12,
@@ -101,6 +101,10 @@ class TestAssessmentTemplatesImport(TestCase):
                     column_name="Default Verifiers",
                     email="user1@a.com"
                 ),
+                errors.WRONG_VALUE.format(
+                    line=16,
+                    column_name="Custom Attributes"
+                )
             },
             "row_errors": {
                 errors.ERROR_TEMPLATE.format(

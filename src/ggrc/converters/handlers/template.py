@@ -83,7 +83,9 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
     lines = [line for line in lines if line]
     custom_attributes = []
     for line in lines:
-      custom_attributes.append(self._handle_ca_line(line))
+      attribute = self._handle_ca_line(line)
+      if attribute:
+        custom_attributes.append(attribute)
     return custom_attributes
 
   def set_obj_attr(self):
