@@ -371,13 +371,13 @@ export default can.Component.extend({
       // use cases (e.g. Assessment Snapshots)
       if (allItems.length && baseInstance) {
         if (baseInstance.type === allItems[0].type) {
+          let disabledIds = this.attr('disabledIds');
+          disabledIds.push(baseInstance.id);
+          this.attr('disabledIds', disabledIds);
+
           let self = allItems.find((item) => item.id === baseInstance.id);
           if (self) {
             self.isDisabled = true;
-            let disabledIds = this.attr('disabledIds');
-            disabledIds.push(self.id);
-            this.attr('disabledIds', disabledIds);
-
             if (isMegaMapping) {
               self.mapAsChild = null;
             }
