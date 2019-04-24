@@ -85,7 +85,7 @@
               <div class="info-pane__section-title">Responses/Comments</div>
               <comments-section class="flex-box flex-col"
                 {instance}="{instance}"
-                {notification}="'Notify Admins, Primary and Secondary Contacts'">
+                {notification}="'Notify Contacts'">
               </comments-section>
             </div>
           </div>
