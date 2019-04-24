@@ -156,8 +156,8 @@ class TestCommentNotification(TestCase):
   @ddt.data(
       all_models.AccessGroup,
       all_models.DataAsset,
-      all_models.Facility,
       all_models.Market,
+      all_models.Facility,
       all_models.Objective,
       all_models.OrgGroup,
       all_models.System,
