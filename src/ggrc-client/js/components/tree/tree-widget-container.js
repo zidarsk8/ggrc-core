@@ -44,6 +44,7 @@ import {
 import {
   getCounts,
 } from '../../plugins/utils/widgets-utils';
+import {getMegaObjectRelation} from '../../plugins/utils/mega-object-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
@@ -202,6 +203,10 @@ viewModel = can.Map.extend({
     this.attr('loading', true);
 
     let loadSnapshots = this.attr('options.objectVersion');
+    const operation = this.attr('options.megaRelated')
+      ? getMegaObjectRelation(this.attr('options.widgetId')).relation
+      : null;
+
     return TreeViewUtils
       .loadFirstTierItems(
         modelName,
@@ -209,7 +214,8 @@ viewModel = can.Map.extend({
         page,
         filter,
         request,
-        loadSnapshots)
+        loadSnapshots,
+        operation)
       .then((data) => {
         const total = data.total;
 
@@ -568,9 +574,18 @@ viewModel = can.Map.extend({
     let filter = this.attr('currentFilter');
     let request = this.attr('advancedSearch.request');
     let loadSnapshots = this.attr('options.objectVersion');
+    const operation = this.attr('options.megaRelated') ?
+      getMegaObjectRelation(this.attr('options.widgetId')).relation :
+      null;
 
-    TreeViewUtils
-      .startExport(modelName, parent, filter, request, loadSnapshots);
+    TreeViewUtils.startExport(
+      modelName,
+      parent,
+      filter,
+      request,
+      loadSnapshots,
+      operation,
+    );
 
     notifier('info', exportMessage, true);
   },

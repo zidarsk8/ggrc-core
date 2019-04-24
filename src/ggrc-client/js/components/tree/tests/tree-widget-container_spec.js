@@ -737,6 +737,7 @@ describe('tree-widget-container component', function () {
     let filter;
     let request;
     let loadSnapshots;
+    const operation = null;
 
     beforeEach(() => {
       spyOn(TreeViewUtils, 'startExport');
@@ -763,7 +764,7 @@ describe('tree-widget-container component', function () {
       vm.export();
 
       expect(TreeViewUtils.startExport).toHaveBeenCalledWith(
-        modelName, parent, filter, request, loadSnapshots);
+        modelName, parent, filter, request, loadSnapshots, operation);
     });
 
     it('shows info message', () => {

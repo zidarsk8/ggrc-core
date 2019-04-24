@@ -503,6 +503,7 @@ describe('revision-page component', function () {
         },
         source_id: 99,
         source_type: 'OtherObject',
+        content: {},
       };
 
       let result = viewModel._mappingChange(revision, [revision]);
@@ -537,6 +538,7 @@ describe('revision-page component', function () {
         },
         destination_id: 123,
         destination_type: 'ObjectFoo',
+        content: {},
       };
 
       let result = viewModel._mappingChange(revision, [revision]);
@@ -569,6 +571,7 @@ describe('revision-page component', function () {
         },
         destination_id: 123,
         destination_type: 'ObjectFoo',
+        content: {},
       };
 
       let result = viewModel._mappingChange(revision, [revision]);
@@ -617,6 +620,7 @@ describe('revision-page component', function () {
         },
         source_id: 99,
         source_type: 'OtherObject',
+        content: {},
       };
 
       let result = viewModel._mappingChange(revision, [revision]);

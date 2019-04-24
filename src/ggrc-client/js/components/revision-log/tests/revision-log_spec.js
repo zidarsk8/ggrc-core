@@ -354,7 +354,7 @@ describe('revision-log component', function () {
         revisionsForCompare = {mock: 'mock'};
         revisions.push(revisionsForCompare);
 
-        spyOn(viewModel, 'reifyRevision').and.callFake(
+        spyOn(viewModel, 'reifyObject').and.callFake(
           (revision) => {
             revision.isReified = true;
             return revision;
@@ -414,7 +414,7 @@ describe('revision-log component', function () {
       });
     });
 
-  describe('reifyRevision(revision) method', () => {
+  describe('reifyObject(revision) method', () => {
     let revision;
     let isReifiableSpy;
     let reifySpy;
@@ -433,7 +433,7 @@ describe('revision-log component', function () {
       revision = Object.assign(revision, {modified_by: {}});
       isReifiableSpy.and.returnValue(true);
 
-      viewModel.reifyRevision(revision);
+      viewModel.reifyObject(revision);
 
       expect(reifySpy).toHaveBeenCalled();
     });
@@ -443,14 +443,14 @@ describe('revision-log component', function () {
       revision = Object.assign(revision, {modified_by: {}});
       isReifiableSpy.and.returnValue(false);
 
-      expect(viewModel.reifyRevision.bind(null, revision)).not.toThrowError();
+      expect(viewModel.reifyObject.bind(null, revision)).not.toThrowError();
     });
 
     it('reifies "source" field if it has reify method', () => {
       revision = Object.assign(revision, {source: {}});
       isReifiableSpy.and.returnValue(true);
 
-      viewModel.reifyRevision(revision);
+      viewModel.reifyObject(revision);
 
       expect(reifySpy).toHaveBeenCalled();
     });
@@ -460,14 +460,14 @@ describe('revision-log component', function () {
       revision = Object.assign(revision, {source: {}});
       isReifiableSpy.and.returnValue(false);
 
-      expect(viewModel.reifyRevision.bind(null, revision)).not.toThrowError();
+      expect(viewModel.reifyObject.bind(null, revision)).not.toThrowError();
     });
 
     it('reifies "destination" field if it has reify method', () => {
       revision = Object.assign(revision, {destination: {}});
       isReifiableSpy.and.returnValue(true);
 
-      viewModel.reifyRevision(revision);
+      viewModel.reifyObject(revision);
 
       expect(reifySpy).toHaveBeenCalled();
     });
@@ -477,7 +477,7 @@ describe('revision-log component', function () {
       revision = Object.assign(revision, {destination: {}});
       isReifiableSpy.and.returnValue(false);
 
-      expect(viewModel.reifyRevision.bind(null, revision)).not.toThrowError();
+      expect(viewModel.reifyObject.bind(null, revision)).not.toThrowError();
     });
   });
 

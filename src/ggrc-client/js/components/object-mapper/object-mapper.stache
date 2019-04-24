@@ -15,6 +15,7 @@
     {source}="{parentInstance}"
     {source-type}="{object}"
     {destination-model}="{model}"
+    {mega-relation}="{config.general.megaRelation}"
   ></create-and-map>
 
 </div>
@@ -131,6 +132,7 @@
                       {deferred-list}="{deferred_list}"
                       {filter-items}="*filterItems"
                       {mapping-items}="*mappingItems"
+                      {mega-relation-obj}="megaRelationObj"
                       (loaded)="{onLoaded()}"
                       {status-item}="*statusItem">
       </mapper-results>

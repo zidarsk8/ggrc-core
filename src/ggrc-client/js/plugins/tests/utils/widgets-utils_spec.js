@@ -84,7 +84,7 @@ describe('GGRC Utils Widgets', function () {
     beforeEach(function () {
       spyOn(WidgetList, 'get_widget_list_for')
         .and.returnValue({
-          control: {
+          Control: {
             widgetType: 'treeview',
             content_controller_options: {
               model: {
@@ -100,7 +100,7 @@ describe('GGRC Utils Widgets', function () {
               },
             },
           },
-          objective: {
+          Objective: {
             widgetType: 'treeview',
             content_controller_options: {
               model: {
@@ -108,7 +108,7 @@ describe('GGRC Utils Widgets', function () {
               },
             },
           },
-          info: {
+          Info: {
             content_controller_options: {
               model: {
                 model_singular: 'Info',
@@ -128,7 +128,7 @@ describe('GGRC Utils Widgets', function () {
     it('returns assessment model name only for assessment view', function () {
       let result = method('assessment', '/assessments_view');
 
-      expect(result).toContain('Assessment');
+      expect(result).toContain('assessment');
     });
 
     it('returns appropriate models for non-assessment view',

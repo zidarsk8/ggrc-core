@@ -124,7 +124,7 @@ describe('Mappings', function () {
     Product: _.difference(filtered, ['Standard', 'Regulation']),
     ProductGroup: _.difference(filtered, ['Standard', 'Regulation']),
     Program: _.difference(allTypes,
-      ['Program', 'Audit', 'RiskAssessment', 'Assessment', 'Person']
+      ['Audit', 'RiskAssessment', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: _.difference(filtered, ['Standard', 'Regulation']),
     Regulation: _.difference(filtered, [...modules.core.scope, 'Regulation']),
