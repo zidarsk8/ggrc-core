@@ -14,8 +14,8 @@ export default can.Component.extend({
     objectName: '',
     searches: [],
     init() {
-      SavedSearch.findAll(this.attr('objectName')).then((searches) => {
-        this.attr('searches', searches);
+      SavedSearch.findByType(this.attr('objectName')).then((data) => {
+        this.attr('searches', data.values);
       });
     },
     removeSearch(search) {

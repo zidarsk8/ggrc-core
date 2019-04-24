@@ -10,7 +10,7 @@ export default can.Model.extend({
   destroy: 'DELETE /api/saved_searches/{id}',
   create: 'POST /api/saved_searches',
   findOne: 'GET /api/saved_searches/{id}',
-  findAll : function(type, params){
+  findByType(type) {
     return $.ajax({
       url: `/api/saved_searches/${type}`,
       type: 'get',
