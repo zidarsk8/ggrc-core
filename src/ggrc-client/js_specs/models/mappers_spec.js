@@ -161,9 +161,10 @@ describe('mappers', function () {
             expect(mappingName).toBe('mappings');
             return '_mapping';
           });
-        mr = new LL.MappingResult('instance', 'mappings', 'binding');
+        let instance = {};
+        mr = new LL.MappingResult(instance, 'mappings', 'binding');
 
-        expect(mr.instance).toBe('instance');
+        expect(mr.instance).toBe(instance);
         expect(mr.binding).toBe('binding');
         expect(mr.mappings).toBe('_mapping');
         expect(LL.MappingResult.prototype._make_mappings)
@@ -192,8 +193,8 @@ describe('mappers', function () {
     describe('#_make_mappings', function () {
       it('converts all elements of the supplied array to mapping results',
         function () {
-          let mr = new LL.MappingResult('foo', ['bar'], 'baz');
-          expect(mr._make_mappings(['baz', 'quux', mr]))
+          let mr = new LL.MappingResult({}, [{}], 'baz');
+          expect(mr._make_mappings([{}, {}, mr]))
             .toEqual([
               jasmine.any(LL.MappingResult),
               jasmine.any(LL.MappingResult),
@@ -204,7 +205,7 @@ describe('mappers', function () {
 
     describe('#get_bindings', function () {
       it('finds all depth-1 bindings touched by walk_instances', function () {
-        let mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        let mr = new LL.MappingResult({}, [{}], 'baz');
         let phonyBinding = {};
         let phonyResult = {binding: phonyBinding};
         spyOn(mr, 'walk_instances').and.callFake(function (fn) {
@@ -218,7 +219,7 @@ describe('mappers', function () {
     describe('#bindings_compute', function () {
       let mr;
       beforeEach(function () {
-        mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        mr = new LL.MappingResult({}, [{}], 'baz');
       });
 
       it('returns the saved compute if it exists.', function () {
@@ -237,7 +238,7 @@ describe('mappers', function () {
     describe('#get_bindings_compute', function () {
       let mr;
       beforeEach(function () {
-        mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        mr = new LL.MappingResult({}, [{}], 'baz');
       });
 
       it('returns a can.compute', function () {
@@ -265,14 +266,14 @@ describe('mappers', function () {
 
     describe('#get_mappings', function () {
       it('calls walk_instances', function () {
-        let mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        let mr = new LL.MappingResult({}, [{}], 'baz');
         spyOn(mr, 'walk_instances');
         mr.get_mappings();
         expect(mr.walk_instances).toHaveBeenCalled();
       });
 
       it('gets all instances where depth is 1', function () {
-        let mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        let mr = new LL.MappingResult({}, [{}], 'baz');
         spyOn(mr, 'walk_instances').and.callFake(function (fn) {
           fn('foo', {}, 1);
           fn('bar', {}, 2);
@@ -282,7 +283,7 @@ describe('mappers', function () {
 
       it('adds self for depth=1 and instance=true', function () {
         let instance = {};
-        let mr = new LL.MappingResult(instance, ['bar'], 'baz');
+        let mr = new LL.MappingResult(instance, [{}], 'baz');
         spyOn(mr, 'walk_instances').and.callFake(function (fn) {
           fn(true, {}, 1);
         });
@@ -294,7 +295,7 @@ describe('mappers', function () {
     describe('#mappings_compute', function () {
       let mr;
       beforeEach(function () {
-        mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        mr = new LL.MappingResult({}, [{}], 'baz');
       });
 
       it('returns the saved compute if it exists.', function () {
@@ -313,7 +314,7 @@ describe('mappers', function () {
     describe('#get_mappings_compute', function () {
       let mr;
       beforeEach(function () {
-        mr = new LL.MappingResult('foo', ['bar'], 'baz');
+        mr = new LL.MappingResult({}, [{}], 'baz');
       });
 
       it('returns a can.compute', function () {
@@ -344,9 +345,10 @@ describe('mappers', function () {
                'instance', function () {
         it('calls the function on itself', function () {
           let sanityCheck = false;
-          let mr = new LL.MappingResult('foo', [], 'bar');
+          let instance = {};
+          let mr = new LL.MappingResult(instance, [], 'bar');
           mr.walk_instances(function (instance, _result, depth) {
-            expect(instance).toBe('foo');
+            expect(instance).toBe(instance);
             expect(depth).toBe(0);
             sanityCheck = true;
           }, 'bar', 0);
@@ -360,11 +362,12 @@ describe('mappers', function () {
                 'fake_result', ['walk_instances']);
               spyOn(LL.MappingResult.prototype, '_make_mappings').and
                 .returnValue([fakeResult]);
-              let mr = new LL.MappingResult('foo', [], 'bar');
+              let instance = {};
+              let mr = new LL.MappingResult(instance, [], 'bar');
               let func = function () {};
               mr.walk_instances(func, 'bar', 0);
               expect(fakeResult.walk_instances)
-                .toHaveBeenCalledWith(func, 'foo', 1);
+                .toHaveBeenCalledWith(func, instance, 1);
             });
         });
       });
@@ -378,20 +381,22 @@ describe('mappers', function () {
                 'fake_result', ['walk_instances']);
               spyOn(LL.MappingResult.prototype, '_make_mappings').and
                 .returnValue([fakeResult]);
-              let mr = new LL.MappingResult('foo', [], 'bar');
+              let instance = {};
+              let mr = new LL.MappingResult(instance, [], 'bar');
               let func = function () {};
-              mr.walk_instances(func, 'foo', 0);
+              mr.walk_instances(func, instance, 0);
               expect(fakeResult.walk_instances)
-                .toHaveBeenCalledWith(func, 'foo', 0);
+                .toHaveBeenCalledWith(func, instance, 0);
             });
         });
 
         it('no action is taken', function () {
           let sanityCheck = false;
-          let mr = new LL.MappingResult('foo', [], 'bar');
-          mr.walk_instances(function (instance, _result, depth) {
+          let instance = {};
+          let mr = new LL.MappingResult(instance, [], 'bar');
+          mr.walk_instances(function (walkInstance, _result, depth) {
             fail('fn was called');
-          }, 'foo', 0);
+          }, instance, 0);
           expect(sanityCheck).toBe(false);
         });
       });
