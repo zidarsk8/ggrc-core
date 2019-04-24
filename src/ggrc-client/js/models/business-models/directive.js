@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import uniqueTitle from '../mixins/unique-title';
 import timeboxed from '../mixins/timeboxed';
 import caUpdate from '../mixins/ca-update';
-import baseNotifications from '../mixins/base-notifications';
+import baseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable.extend({

@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Mixin from './mixin';
+import Mixin from '../mixin';
 
 export default Mixin.extend({
   send_by_default: true,

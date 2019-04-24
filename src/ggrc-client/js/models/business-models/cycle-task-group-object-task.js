@@ -14,7 +14,7 @@ import timeboxed from '../mixins/timeboxed';
 import isOverdue from '../mixins/is-overdue';
 import accessControlList from '../mixins/access-control-list';
 import caUpdate from '../mixins/ca-update';
-import cycleTaskNotifications from '../mixins/cycle-task-notifications';
+import cycleTaskNotifications from '../mixins/notifications/cycle-task-notifications';
 import Stub from '../stub';
 import {reify} from '../../plugins/utils/reify-utils';
 
