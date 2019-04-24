@@ -1,8 +1,8 @@
-[//]: <> (updated 04/23/2019)
+[//]: <> (updated 04/24/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Mentioning person enabled at comments (v.2.2.0, 04/23/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.qny4l9tiyob)
+[Mentioning person enabled at comments (v.2.2.0, 04/24/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.qny4l9tiyob)
 
 [New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ny5sa23suyjm)
 
@@ -86,7 +86,7 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
-### Mentioning person enabled at comments (v.2.2.0, 04/23/2019)
+### Mentioning person enabled at comments (v.2.2.0, 04/24/2019)
 
 Comments functionality was enhanced by introducing mention a person feature. To leverage this feature use + or @ with a user email (example, +example@google.com or @example@google.com) in the comments box. A mentioned user will get an email notification when the comment is saved.
 
