@@ -12,15 +12,17 @@ Endpoints:
 """
 
 import json
-
 from datetime import datetime
 
 import ddt
 import mock
 
+from appengine import base
+
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.notifications import import_export
+from ggrc.utils import errors as app_errors
 
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
@@ -49,27 +51,63 @@ class TestImportExportBase(TestCase):
         content=data,
     )
 
-    with mock.patch("ggrc.views.converters.check_for_previous_run"):
-      return self.client.put(
-          "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
-          headers=self.headers,
-      )
+    return self.client.put(
+        "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+        headers=self.headers,
+    )
 
   def run_full_export(self, user, obj):
     """Run export of test data through the /api/people/{}/exports endpoint."""
-    with mock.patch("ggrc.views.converters.check_for_previous_run"):
-      return self.client.post(
-          "/api/people/{}/exports".format(user.id),
-          data=json.dumps({
-              "objects": [{
-                  "object_name": obj.type,
-                  "ids": [obj.id]}],
-              "current_time": str(datetime.now())}),
-          headers=self.headers
-      )
+    return self.client.post(
+        "/api/people/{}/exports".format(user.id),
+        data=json.dumps({
+            "objects": [{
+                "object_name": obj.type,
+                "ids": [obj.id]}],
+            "current_time": str(datetime.now())}),
+        headers=self.headers
+    )
+
+
+@base.with_memcache
+class TestImportExportExceptions(TestImportExportBase):
+  """Test exceptions Import Export jobs produce"""
+
+  def test_handle_stop_raises_warning(self):
+    """Test handle_export_stop method raises STOPPED_WARNING"""
+    user = all_models.Person.query.first()
+    ie_job = factories.ImportExportFactory(
+        job_type="Export",
+        created_at=datetime.now(),
+        created_by=user,
+        status="Stopped",
+    )
+    response = self.client.put(
+        "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+        headers=self.headers
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'], app_errors.STOPPED_WARNING)
+
+  def test_handle_stop_raises_wrong(self):
+    """Test handle_export_stop method raises wrong status exception"""
+    user = all_models.Person.query.first()
+    ie_job = factories.ImportExportFactory(
+        job_type="Export",
+        created_at=datetime.now(),
+        created_by=user,
+        status="Finished",
+    )
+    response = self.client.put(
+        "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+        headers=self.headers
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'], app_errors.WRONG_STATUS)
 
 
 @ddt.ddt
+@base.with_memcache
 class TestImportExports(TestImportExportBase):
   """Tests for imports/exports endpoints."""
 
@@ -213,18 +251,17 @@ class TestImportExports(TestImportExportBase):
         content=data,
     )
 
-    with mock.patch("ggrc.views.converters.check_for_previous_run"):
+    response = self.client.put(
+        "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
+        headers=self.headers,
+    )
+    self.assert200(response)
+    with mock.patch("ggrc.models.background_task.BackgroundTask.finish"):
       response = self.client.put(
           "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
           headers=self.headers,
       )
       self.assert200(response)
-      with mock.patch("ggrc.models.background_task.BackgroundTask.finish"):
-        response = self.client.put(
-            "/api/people/{}/imports/{}/start".format(user.id, imp_exp.id),
-            headers=self.headers,
-        )
-        self.assert200(response)
 
     imp_exp.status = "In Progress"
     db.session.add(imp_exp)

@@ -25,7 +25,7 @@ class Representation(object):
       "secondary_contacts", "audit_captains", "auditors",
       "control_operators", "control_owners",
       "principal_assignees", "secondary_assignees", "managers", "editors",
-      "readers", "reviewers"]  # multiply
+      "readers"]  # multiply
 
   @property
   def attrs_names(self):
@@ -81,7 +81,6 @@ class Representation(object):
         els.TITLE: "title", els.ADMIN: "admins",
         els.CODE: "slug", els.REVIEW_STATE: "os_state",
         els.OBJECT_REVIEW: "os_state",
-        els.OBJECT_REVIEW_FULL: "object_review_txt",
         els.STATE: "status"
     }
     ui_remap_items = {
@@ -108,11 +107,11 @@ class Representation(object):
         "CONTROL_OWNERS": "control_owners",
         "URL": "url",
         "ID": "id", "RISK_TYPE": "risk_type",
-        "REVIEWERS": "reviewers"
+        "REVIEW": "review"
     }
     csv_remap_items = {
-        csv.REVISION_DATE: "updated_at", "REVIEW_STATUS": "review_status",
-        "REVIEW_STATUS_DISPLAY_NAME": "review_status"
+        csv.REVISION_DATE: "updated_at", "REVIEW STATUS": "review_status",
+        "REVIEW_STATUS_DISPLAY_NAME": "review_status_display_name"
     }
     result_remap_items.update(ui_remap_items)
     result_remap_items.update(csv_remap_items)
@@ -274,7 +273,7 @@ class Representation(object):
   def repr_snapshot(self, parent_obj):
     """Convert entity's attributes values to Snapshot representation."""
     return (self.convert_repr_to_snapshot(
-        objs=self, parent_obj=parent_obj))
+        obj=self, parent_obj=parent_obj))
 
   def repr_min_dict(self):
     """Get and return entity's minimal dictionary representation w/
@@ -284,7 +283,7 @@ class Representation(object):
             "id": getattr(self, "id")}
 
   @classmethod  # noqa: ignore=C901
-  def convert_repr_to_snapshot(cls, objs, parent_obj):
+  def convert_repr_to_snapshot(cls, obj, parent_obj):
     """Convert object's or objects' attributes values to Snapshot
     representation.
     Retrieved values will be used for: 'id'.
@@ -301,7 +300,7 @@ class Representation(object):
           {k: v for k, v in snapshoted_obj.__dict__.iteritems()})
       return origin_obj
     return help_utils.execute_method_according_to_plurality(
-        objs=objs, types=Entity.all_entities_classes(),
+        objs=obj, types=Entity.all_entities_classes(),
         method_name=convert_repr_to_snapshot, parent_obj=parent_obj)
 
   def update_attrs(self, is_replace_attrs=True, is_allow_none=True,
@@ -642,7 +641,7 @@ class Entity(Representation):
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
-        RiskEntity, OrgGroupEntity, ProposalEntity)
+        RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -732,7 +731,7 @@ class ProgramEntity(Entity):
     self.delete_attrs("admins")
     self.set_attrs(
         "managers", "editors", "readers", "primary_contacts",
-        "secondary_contacts", "reviewers", **attrs)
+        "secondary_contacts", "review", **attrs)
 
 
 class ControlEntity(Entity):
@@ -812,6 +811,19 @@ class AssessmentEntity(Entity):
 
 class IssueEntity(Entity):
   """Class that represent model for Issue entity."""
+
+
+class ReviewEntity(Entity):
+  """Class that represent model for Review entity."""
+
+  def __init__(self, **attrs):
+    super(ReviewEntity, self).__init__()
+    self.delete_attrs(
+        "admins", "slug", "title", "primary_contacts", "secondary_contacts",
+        "comments", "custom_attribute_definitions", "custom_attribute_values",
+        "custom_attributes")
+    self.set_attrs("type", "reviewers", "status", "last_reviewed_at",
+                   "last_reviewed_by", "reviewable", **attrs)
 
 
 class ProposalEntity(Representation):

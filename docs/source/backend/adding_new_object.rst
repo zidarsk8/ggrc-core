@@ -88,14 +88,15 @@ Create a Cacheable object
 
 1. Add ``new_object`` to ``objectTypeDecisionTree`` in
    plugins/utils/model-utils.js.
-2. Add ``new_object`` to ``business_object.js``
+2. Add ``new_object`` to ``base_widgets.js``
 
-   ``baseWidgetsByType`` is where you define the attributes shown in
-   widgets ``extra_descriptor_options`` is where you define special
+   ``baseWidgetsByType`` is where you define the child widgets for new object
+   
+3. Add ``new_object`` to ``business_objects.js``
+
+  ``extraDescriptorOptions`` is where you define special
    parameters for some of the widgets ie. their content controller,
-   icon, widget name etc. ``extra_content_controller_options`` is where
-   you define parameters for the ``content_controller`` ie can view
-   children, mapping, model, footer view etc.
+   icon, widget name etc.
 
 3. Add ``new_object`` to ``mappings-ggrc.js``
 
@@ -127,7 +128,7 @@ In :src:`ggrc-client/js/templates/dashboard/lhn.stache` add the line:
 
 ..  code-block:: javascript
 
-    {{{renderLive '/static/templates/dashboard/lhn_search.stache' type="NewObject" li_class="class"}}}
+    {{{renderLive 'dashboard/lhn_search' type="NewObject" li_class="class"}}}
 
 Create template files
 ---------------------

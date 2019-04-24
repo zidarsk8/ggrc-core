@@ -16,7 +16,7 @@ import template from './external-data-autocomplete.stache';
  */
 export default can.Component.extend({
   tag: 'external-data-autocomplete',
-  template,
+  template: can.stache(template),
   leakScope: true,
   viewModel: {
     define: {
@@ -115,7 +115,7 @@ export default can.Component.extend({
           type: 'itemSelected',
           selectedItem: model,
         });
-      }).finally(() => {// create is async and returns Promise (not $.Deferred)
+      }).always(() => {
         this.attr('saving', false);
       });
     },

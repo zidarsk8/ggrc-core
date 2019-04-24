@@ -270,7 +270,9 @@ describe('revisions-comparer companent', function () {
             title: 'person attr',
           },
           attribute_value: 'Person',
-          attribute_object_id: 3,
+          attribute_object: {
+            id: 3,
+          },
         }];
 
         let ca1s = [{
@@ -285,7 +287,9 @@ describe('revisions-comparer companent', function () {
             title: 'person attr',
           },
           attribute_value: 'Person',
-          attribute_object_id: 4,
+          attribute_object: {
+            id: 4,
+          },
         }];
 
         let index = 0;

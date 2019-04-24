@@ -7,8 +7,6 @@ export default can.Control.extend({
   defaults: {},
 }, {
   init_spinner: function () {
-    let renderer;
-    let spinner;
     let $footer;
     let $wrapper;
 
@@ -25,15 +23,10 @@ export default can.Control.extend({
         $wrapper.css('height', '40px');
       }
 
-      spinner = [
-        '<spinner toggle="showMe"',
-        '  size="large"',
-        '  extra-css-class="tree-items"',
-        '>',
-        '</spinner>',
-      ].join('');
-      renderer = can.view.mustache(spinner);
-      spinner = renderer({showMe: true});
+      let view = '<spinner {extra-css-class}="\'tree-items\'"' +
+      ' {toggle}="{showMe}" {size}="\'large\'"></spinner>';
+      let renderer = can.stache(view);
+      let spinner = renderer({showMe: true});
 
       // Admin dashboard
       if ($footer.length === 0 &&
@@ -61,8 +54,6 @@ export default can.Control.extend({
       if (!this.element) {
         return;
       }
-      can.trigger(this.element, 'updateCount',
-        [0, this.options.update_count]);
       this.init_count();
     }.bind(this));
 
@@ -95,8 +86,8 @@ export default can.Control.extend({
         }
         return $.when(...dfds);
       }))
-      .then(that._ifNotRemoved(that.proxy('draw_list')));
-
+      .then(that._ifNotRemoved((list, forcePrepareChildren) =>
+        this.draw_list(list, forcePrepareChildren)));
     return this._display_deferred;
   },
 
@@ -184,7 +175,7 @@ export default can.Control.extend({
     }
 
     this.insert_items(items, forcePrepareChildren)
-      .then(this._ifNotRemoved(this.proxy('_loading_finished')));
+      .then(this._ifNotRemoved(() => this._loading_finished()));
 
     return this._loading_deferred;
   },

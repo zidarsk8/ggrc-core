@@ -141,10 +141,6 @@ const getModifiedValue = (modifiedAttr, attr) => {
     };
   }
 
-  if (isPerson && value.attribute_object) {
-    value.attribute_object_id = value.attribute_object.id;
-  }
-
   return value;
 };
 

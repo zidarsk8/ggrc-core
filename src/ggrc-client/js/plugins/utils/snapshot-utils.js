@@ -120,6 +120,7 @@ function toObject(instance) {
     type: instance.child_type,
     id: instance.child_id,
   });
+  content.updated_at = instance.updated_at;
   content.canGetLatestRevision =
     !instance.is_latest_revision &&
     Permission.is_allowed_for('update', {

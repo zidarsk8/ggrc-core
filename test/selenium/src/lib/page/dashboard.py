@@ -9,6 +9,7 @@ from lib import base, decorator
 from lib.constants import locator
 from lib.element import tab_element
 from lib.page import widget_bar, lhn
+from lib.page.widget import object_modal
 from lib.utils import selenium_utils
 
 
@@ -153,8 +154,20 @@ class Dashboard(widget_bar.Dashboard, Header):
 
   def start_task_group(self):
     """Clicks "Create" button."""
-    self._browser.element(
-        class_name="section-create action-button create-button").click()
+    self._browser.div(class_name="tree-action").link(text="Create").click()
+
+  def click_create_obj_btn(self):
+    """Clicks "Create object" button."""
+    self._browser.element(class_name=(["get-started__list__item",
+                                       "get-started__list__item--top-space",
+                                       "hidden-widgets-list"]),
+                          visible_text='Create object').click()
+
+  def open_create_obj_modal(self, obj_type):
+    """Click "Create object" button, select type and click."""
+    self.click_create_obj_btn()
+    CreateObjectDropdown().click_item_by_text(text=obj_type)
+    return object_modal.get_modal_obj(obj_type=obj_type)
 
   @property
   def is_add_tab_present(self):
@@ -169,6 +182,14 @@ class Dashboard(widget_bar.Dashboard, Header):
     #   is removed only at end.
     self._browser.element(class_name="internav").\
         wait_until(lambda e: e.present)
+
+
+class CreateObjectDropdown(base.Widget):
+  """Create object dropdown."""
+
+  def click_item_by_text(self, text):
+    """Click item from list by text."""
+    self._browser.element(class_name="inner-nav-item", text=text).click()
 
 
 class AdminDashboard(widget_bar.AdminDashboard, GenericHeader):

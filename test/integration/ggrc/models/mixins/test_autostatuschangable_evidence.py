@@ -32,38 +32,6 @@ class TestEvidences(asc.TestMixinAutoStatusChangeableBase):
        models.Assessment.REWORK_NEEDED)
   )
   @ddt.unpack
-  def test_map_parent(self, kind,
-                      from_status, expected_status):
-    """Move Assessment from '{1}' to '{2}' map evid with parent of type {0}"""
-    assessment = factories.AssessmentFactory(status=from_status)
-
-    factories.EvidenceFactory(
-        title='Simple title',
-        kind=kind,
-        link='some link',
-        parent_obj={
-            'id': assessment.id,
-            'type': 'Assessment'
-        })
-    self.assertEquals(expected_status, assessment.status)
-
-  @ddt.data(
-      ('URL', models.Assessment.DONE_STATE,
-       models.Assessment.PROGRESS_STATE),
-      ('URL', models.Assessment.START_STATE,
-       models.Assessment.PROGRESS_STATE),
-      ('URL', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE),
-      ('FILE', models.Assessment.DONE_STATE,
-       models.Assessment.PROGRESS_STATE),
-      ('FILE', models.Assessment.START_STATE,
-       models.Assessment.PROGRESS_STATE),
-      ('FILE', models.Assessment.FINAL_STATE,
-       models.Assessment.PROGRESS_STATE),
-      ('FILE', models.Assessment.REWORK_NEEDED,
-       models.Assessment.REWORK_NEEDED)
-  )
-  @ddt.unpack
   def test_evidence_added_status_check(self, kind,
                                        from_status, expected_status):
     """Move Assessment from '{1}' to '{2}' adding evidence of type {0}"""

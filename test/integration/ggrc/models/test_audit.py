@@ -96,10 +96,8 @@ class TestAudit(TestCase):
           destination=assessment_template
       )
     response = self.api.delete(audit)
-    self.assert400(response)
-    self.assertEqual(response.json["message"],
-                     "This request will break a mandatory relationship from "
-                     "assessment_templates to audits.")
+    self.assertStatus(response, 409)
+    self.assertEqual(response.json["message"], errors.MAPPED_ASSESSMENT)
 
   def test_delete_audit_asmnt(self):
     """Check inability to delete audit in relation with assessment."""
@@ -112,12 +110,7 @@ class TestAudit(TestCase):
       )
     response = self.api.delete(audit)
     self.assertStatus(response, 409)
-    self.assertEqual(
-        response.json["message"],
-        "The audit cannot be deleted due to mapped assessment(s) to this "
-        "audit. Please delete assessment(s) mapped to this audit first "
-        "before deleting the audit.",
-    )
+    self.assertEqual(response.json["message"], errors.MAPPED_ASSESSMENT)
 
   def test_delete_audit_proper(self):
     """Check delete audit with assessment template. Remove template first"""

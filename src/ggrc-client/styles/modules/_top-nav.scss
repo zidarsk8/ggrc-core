@@ -10,19 +10,6 @@
   background: $white;
 }
 
-.not-priority-hide {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  &.visible {
-    border-left: 1px dotted;
-    border-right: 1px dotted;
-  }
-  i {
-    margin: auto 5px;
-  }
-}
-
 div.nav {
   &.internav {
     display: flex;
@@ -32,7 +19,7 @@ div.nav {
       add-tab-button {
         order: 20;
       }
-      li {
+      span {
         &.access_group, &.contract, &.control, &.data_asset, &.facility,
         &.market, &.objective, &.org_group, &.policy, &.process, &.product, &.product_group,
         &.metric, &.regulation, &.requirement, &.standard, &.system, &.vendor, &.risk,
@@ -59,20 +46,20 @@ div.nav {
         }
         // dashboard tab
         &.tachometer {
-          ~ li:nth-child(4) {
+          ~ span:nth-child(4) {
             margin-right: 0;
           }
 
-          ~ li:nth-child(5) {
+          ~ span:nth-child(5) {
             margin-left: 0;
             margin-right: auto;
           }
 
-          ~ li:nth-child(n+5) {
+          ~ span:nth-child(n+5) {
             order: 10;
           }
 
-          ~ li:nth-child(n+6) {
+          ~ span:nth-child(n+6) {
             order: 20;
           }
         }
@@ -82,59 +69,58 @@ div.nav {
 
 }
 
-ul.internav {
+nav.internav {
   @extend %reset-list;
   @extend %clearfix;
   margin-left: 28px;
-  li {
-    &.inner-nav__actions {
-      margin-left: auto;
-      align-self: center;
-      padding-right: 40px;
-      .message {
-        color: $green;
-      }
-      .tiny-help-text {
-        padding-top: 4px;
-        font-size: 10px;
-        line-height: 13px;
-        display: inline-block;
-        margin: 0;
-      }
-    }
-    &.hidden-widgets-list {
-      position: relative;
 
-      a {
-        white-space:nowrap;
-      }
+  .inner-nav__actions {
+    margin-left: auto;
+    align-self: center;
+    padding-right: 40px;
+    .message {
+      color: $green;
     }
-    &.active {
-      a {
-        color: $black;
-        font-weight: bold;
-        background: $contentBgnd;
+    .tiny-help-text {
+      padding-top: 4px;
+      font-size: 10px;
+      line-height: 13px;
+      display: inline-block;
+      margin: 0;
+    }
+  }
+  .hidden-widgets-list {
+    position: relative;
+
+    a {
+      white-space:nowrap;
+    }
+  }
+  .active {
+    a {
+      color: $black;
+      font-weight: bold;
+      background: $contentBgnd;
+      opacity: 1;
+      i {
         opacity: 1;
-        i {
-          opacity: 1;
-        }
-        &:hover {
-          color: $black;
-        }
+      }
+      &:hover {
+        color: $black;
       }
     }
-    .dropdown-menu {
-      a {
-        padding-top: 0;
-        padding-bottom: 0;
-      }
+  }
+  .dropdown-menu {
+    a {
+      padding-top: 0;
+      padding-bottom: 0;
     }
-    &.version {
-      a {
+  }
+  .version {
+    a {
+      color: $blue;
+      i.color {
         color: $blue;
-        i.color {
-          color: $blue;
-        }
       }
     }
   }
@@ -149,8 +135,6 @@ ul.internav {
     @include opacity(.7);
     position: relative;
     &:hover {
-      color: $black;
-      background: none;
       text-decoration: none;
       @include opacity(1);
       .closed {
@@ -173,11 +157,6 @@ ul.internav {
         font-size: 10px;
         color: $white;
       }
-      &.red {
-        top: -4px;
-        right: -4px;
-        background-position: -347px -275px;
-      }
     }
   }
   i {
@@ -191,21 +170,38 @@ ul.internav {
       width: 100%;
     }
 
-    ul.internav {
+    nav.internav {
       display: flex;
       flex-flow: row wrap;
     }
   }
   &.not-priority {
     display: flex;
-    ul.internav {
+    nav.internav {
       margin-left: 0;
       display: flex;
       flex-flow: row wrap;
       justify-content: flex-end;
-      li {
-
-      }
     }
+  }
+}
+
+inner-nav-collapse {
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+
+  .header {
+    display: flex;
+    align-items: center;
+
+    .fa {
+      margin: auto 5px;
+    }
+  }
+
+  .expanded {
+    border-left: 1px dotted;
+    border-right: 1px dotted;
   }
 }

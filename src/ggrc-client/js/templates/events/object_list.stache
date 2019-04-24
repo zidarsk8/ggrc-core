@@ -5,14 +5,14 @@
 
 <ul class="tree-structure new-tree event-tree">
   {{#each list}}
-    <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{data 'model'}}>
-      <div class="item-main" {{#instance}}{{data 'model'}}{{/instance}}>
+    <li class="tree-item {{resource_type.toLowerCase}}" data-model="true" {{canData 'model'}}>
+      <div class="item-main" {{#instance}}{{canData 'model'}}{{/instance}}>
         <div class="item-wrap">
           <div class="row-fluid">
             <div class="span12">
               <div class="item-data">
                 <div class="tree-title-area">
-                  <event-item {event}="."></event-item>
+                  <event-item {event}="{.}"></event-item>
                 </div>
               </div>
             </div>

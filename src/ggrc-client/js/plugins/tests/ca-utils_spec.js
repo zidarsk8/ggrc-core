@@ -292,25 +292,6 @@ describe('ca-utils', function () {
             id: value,
           });
         });
-
-      it('assigns value to "attribute_object_id" attr', function () {
-        let value = 'mockValue';
-        setCustomAttributeValue(ca, value);
-
-        expect(ca.attr('attribute_object_id')).toBe(value);
-      });
-
-      it('assigns null to attribute_object_id and attribute_object attrs' +
-      'if value is falsy', function () {
-        const falsyValues = ['', null, undefined, false, 0, NaN];
-
-        falsyValues.forEach((falsy) => {
-          setCustomAttributeValue(ca, falsy);
-
-          expect(ca.attr('attribute_object_id')).toBeNull();
-          expect(ca.attr('attribute_object')).toBeNull();
-        });
-      });
     });
   });
 });

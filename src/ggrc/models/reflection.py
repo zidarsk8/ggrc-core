@@ -154,7 +154,6 @@ class AttributeInfo(object):
       "test_plan",
       "owners",
       "task_type",
-      "due_on",
       "start_date",
       "end_date",
       "last_deprecated_date",

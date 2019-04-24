@@ -965,7 +965,12 @@ class Resource(ModelView):
           root_attribute))
 
     if 'context' not in src:
-      raise BadRequest('context MUST be specified.')
+      # context is obsolete functionality which is covered by ACL now.
+      # However, this functionality cannot be completely removed because
+      # it is deeply integrated into the code and requires too much effort
+      # to be removed for now. FE not always adds this field,
+      # but it is required by BE source code. So we add it with None value
+      src['context'] = None
 
     return src
 
@@ -1040,18 +1045,22 @@ class Resource(ModelView):
     """
     pass
 
-  def _gather_referenced_objects(self, data, accomulator=None):
-    if accomulator is None:
-      accomulator = collections.defaultdict(set)
+  def _gather_referenced_objects(self, data, accumulator=None):
+    if accumulator is None:
+      accumulator = collections.defaultdict(set)
     if isinstance(data, list):
       for value in data:
-        self._gather_referenced_objects(value, accomulator)
+        self._gather_referenced_objects(value, accumulator)
     elif isinstance(data, dict):
       if "type" in data and data.get("id"):
-        accomulator[data["type"]].add(data["id"])
+        try:
+          accumulator[data["type"]].add(data["id"])
+        except TypeError:
+          raise BadRequest("Either type or id are specified "
+                           "incorrectly in the request payload.")
       for value in data.values():
-        self._gather_referenced_objects(value, accomulator)
-    return accomulator
+        self._gather_referenced_objects(value, accumulator)
+    return accumulator
 
   def _build_request_stub_cache(self, data):
     objects = self._gather_referenced_objects(data)

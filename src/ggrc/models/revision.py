@@ -476,8 +476,10 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     cads = custom_attribute_definition.get_custom_attributes_for(
         self.resource_type, self.resource_id)
     cavs = {int(i["custom_attribute_id"]): i for i in self._get_cavs()}
+    cads_ids = set()
     for cad in cads:
       custom_attribute_id = int(cad["id"])
+      cads_ids.add(custom_attribute_id)
       if custom_attribute_id in cavs:
         # Old revisions can contain falsy values for a Checkbox
         if cad["attribute_type"] == "Checkbox" \
@@ -490,7 +492,6 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
         value = cad["default_value"]
       cavs[custom_attribute_id] = {
           "attribute_value": value,
-          "attribute_object_id": None,
           "custom_attribute_id": custom_attribute_id,
           "attributable_id": self.resource_id,
           "attributable_type": self.resource_type,
@@ -499,6 +500,10 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
           "type": "CustomAttributeValue",
           "context_id": None,
       }
+
+    cavs = {cad_id: value for cad_id, value in cavs.iteritems()
+            if cad_id in cads_ids}
+
     return {"custom_attribute_values": cavs.values(),
             "custom_attribute_definitions": cads}
 
@@ -626,7 +631,9 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)
-
+    # remove attribute_object_id not used by FE anymore
+    for item in populated_content["custom_attribute_values"]:
+      item.pop("attribute_object_id", None)
     return populated_content
 
   @content.setter

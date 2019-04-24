@@ -40,15 +40,15 @@ def open_url(url, is_via_js=False):
     driver = browsers.get_driver()
     _login_if_needed(driver)
     cur_url = driver.current_url
+    if cur_url != url:
+      if not is_via_js:
+        driver.get(url)
+      else:
+        driver.execute_script("window.open('{}', '_self')".format(url))
+      wait_for_doc_is_ready(driver)
   except UnexpectedAlertPresentException as exc:
     print "Automatically accepting alert: {0}".format(str(exc))
     handle_alert(driver, accept=True)
-  if cur_url != url:
-    if not is_via_js:
-      driver.get(url)
-    else:
-      driver.execute_script("window.open('{}', '_self')".format(url))
-    wait_for_doc_is_ready(driver)
 
 
 def _login_if_needed(driver):

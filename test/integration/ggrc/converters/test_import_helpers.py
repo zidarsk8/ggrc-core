@@ -416,7 +416,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Audit",
         "Object Under Assessment",
         "Use Control Assessment Procedure",
-        "Default Test Plan",
+        "Default Assessment Procedure",
         "Default Assignees",
         "Default Verifiers",
         "Custom Attributes",
@@ -496,7 +496,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Severity",
         "Priority",
         "Issue Type",
-        "Issue Title",
+        "Ticket Title",
         "Ticket Tracker Integration",
     }
     expected_fields = {
@@ -548,7 +548,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Severity",
         "Priority",
         "Issue Type",
-        "Issue Title",
+        "Ticket Title",
         "Ticket Tracker Integration",
     }
     expected_fields = {

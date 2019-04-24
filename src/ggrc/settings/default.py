@@ -34,6 +34,7 @@ exports = [
     "CREATE_ISSUE_BUTTON_NAME",
     "ASSESSMENT_SHORT_URL_PREFIX",
     "NOTIFICATION_PREFIX",
+    "DAILY_DIGEST_BATCH_SIZE",
     "CHANGE_REQUEST_URL",
 ]  # pylint: disable=invalid-name
 
@@ -56,7 +57,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "2.1.0-Pumpkin" + BUILD_NUMBER
+VERSION = "2.2.0-Pumpkin" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -125,6 +126,9 @@ EMAIL_BULK_SYNC_FAILED = JINJA2.get_template(
 )
 EMAIL_BULK_SYNC_EXCEPTION = JINJA2.get_template(
     "notifications/bulk_sync_exception.html"
+)
+EMAIL_MENTIONED_PERSON = JINJA2.get_template(
+    "notifications/email_mentioned.html"
 )
 
 USE_APP_ENGINE_ASSETS_SUBDOMAIN = False
@@ -228,6 +232,13 @@ NOTIFICATION_PREFIX = os.environ.get(
     'GGRC_NOTIFICATION_PREFIX',
     ''
 )
+
+if not os.environ.get('GGRC_DAILY_DIGEST_BATCH_SIZE', ''):
+  DAILY_DIGEST_BATCH_SIZE = 5000
+else:
+  DAILY_DIGEST_BATCH_SIZE = int(
+      os.environ.get('GGRC_DAILY_DIGEST_BATCH_SIZE')
+  )
 
 # Link for creation issue tracker issue
 CREATE_ISSUE_URL = os.environ.get('CREATE_ISSUE_URL', "")

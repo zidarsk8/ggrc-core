@@ -156,5 +156,5 @@ class TestTicketTrackerExport(TestCase):
     response = self.export_csv(data)
     self.assertEqual(response.status_code, 200)
 
-    self.assertIn("Issue Title", response.data)
+    self.assertIn("Ticket Title", response.data)
     self.assertIn("tickettitle", response.data)

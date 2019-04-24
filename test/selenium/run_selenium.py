@@ -9,7 +9,6 @@ its grace time is up, the script will return with an error code of 3. Error
 codes 1 and 2 are reserved by pytest and status 0 is returned only if all the
 tests pass.
 """
-
 import os
 import subprocess
 import sys
@@ -19,7 +18,7 @@ import urlparse
 import _pytest
 import requests
 
-from lib import decorator, environment, url as url_module, users
+from lib import decorator, environment, url as url_module, users, constants
 from lib.service.rest_service import client
 from lib.utils import test_utils
 
@@ -56,14 +55,31 @@ def add_user(url_origin):
   We workaround this issue by creating a user not in parallel as this issue
   is considered not worth to fix by developers.
   """
+  from lib.entities import entities_factory
+  import json
+  from lib.service.rest.template_provider import TemplateProvider
+  from lib.service.rest import session_pool
   environment.app_url = url_origin
   environment.app_url = urlparse.urljoin(environment.app_url, "/")
   session = requests.Session()
+  test_utils.wait_for(
+      lambda: session.get(environment.app_url).status_code == OK_CODE,
+      constants.ux.TWO_MIN_USER_WAIT * 4)
   test_utils.wait_for(
       lambda: session.get(url_module.Urls().gae_login(
           users.FAKE_SUPER_USER)).status_code == OK_CODE)
   test_utils.wait_for(
       lambda: session.get(url_module.Urls().login).status_code == OK_CODE)
+  person_dict = entities_factory.PeopleFactory().create(
+      is_add_rest_attrs=True, **{}).__dict__
+  url = environment.app_url + "api/people"
+  body = json.dumps(
+      [TemplateProvider.generate_template_as_dict(
+          json_tmpl_name='person', **person_dict)]).encode("string-escape")
+  test_utils.wait_for(
+      lambda: session.post(
+          url=url, data=body,
+          headers=session_pool.BASIC_HEADERS).status_code == OK_CODE)
 
 
 def prepare_dev_server(url_origin):

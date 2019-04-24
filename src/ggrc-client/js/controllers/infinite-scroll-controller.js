@@ -99,7 +99,7 @@ const LhnTooltipsControl = can.Control.extend({
         delay = 0;
       }
       this.fade_in_timeout = setTimeout(
-        this.proxy('on_fade_in_timeout', el, instance), delay);
+        () => this.on_fade_in_timeout(el, instance), delay);
       clearTimeout(this.fade_out_timeout);
       this.fade_out_timeout = null;
     } else if (this.fade_out_timeout) {
@@ -143,25 +143,27 @@ const LhnTooltipsControl = can.Control.extend({
     return path;
   },
   on_fade_in_timeout: function (el, instance) {
-    let self = this;
     let tooltipView = this.get_tooltip_view(el);
-
     if (tooltipView) {
       this.fade_in_timeout = null;
-      can.view(tooltipView, {instance: instance}, function (frag) {
-        let tooltipWidth = self.options.$extended.outerWidth();
+      $.ajax({
+        url: tooltipView,
+        dataType: 'text',
+      }).then((view) => {
+        let frag = can.stache(view)({instance: instance});
+        let tooltipWidth = this.options.$extended.outerWidth();
         let offset = el.parent().offset();
         let elLeft = offset ? offset.left : 0;
         let offsetLeft = elLeft - tooltipWidth > 0 ?
           elLeft - tooltipWidth : elLeft + el.parent().width();
 
-        self.options.$extended
+        this.options.$extended
           .html(frag)
           .addClass('in')
           .removeClass('hide')
           .css({top: el.offset().top, left: offsetLeft})
           .data('model', instance);
-        self.ensure_tooltip_visibility();
+        this.ensure_tooltip_visibility();
       });
     }
   },
@@ -186,7 +188,7 @@ const LhnTooltipsControl = can.Control.extend({
     clearTimeout(this.fade_out_timeout);
     this.fade_out_timeout =
       setTimeout(
-        this.proxy('on_fade_out_timeout'),
+        () => this.on_fade_out_timeout(),
         this.options.fade_out_delay);
   },
   destroy: function () {

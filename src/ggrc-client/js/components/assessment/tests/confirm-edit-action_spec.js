@@ -40,13 +40,14 @@ describe('confirm-edit-action component', function () {
 
   describe('isInEditableState() method', function () {
     it('returns true if instance state is ' +
-    '"In Progress", "Not Started" or "Rework Needed"',
+    '"In Progress", "Not Started", "Rework Needed" or "Deprecated"',
     function functionName() {
-      ['In Progress', 'Not Started', 'Rework Needed'].forEach(function (state) {
-        viewModel.attr('instance.status', state);
+      ['In Progress', 'Not Started', 'Rework Needed', 'Deprecated'].forEach(
+        function (state) {
+          viewModel.attr('instance.status', state);
 
-        expect(viewModel.isInEditableState()).toBe(true);
-      });
+          expect(viewModel.isInEditableState()).toBe(true);
+        });
     });
 
     it('returns false if instance state is not "In Progress" or "Not Started"',

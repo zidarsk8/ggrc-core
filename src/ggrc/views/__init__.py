@@ -330,7 +330,7 @@ def start_compute_attributes(revision_ids=None, event_id=None):
 
 def start_update_audit_issues(audit_id, message):
   """Start a background task to update IssueTracker issues related to Audit."""
-  bg_task = background_task.create_task(
+  background_task.create_task(
       name='update_audit_issues',
       url=flask.url_for(update_audit_issues.__name__),
       parameters={
@@ -341,7 +341,6 @@ def start_update_audit_issues(audit_id, message):
       queued_callback=update_audit_issues,
   )
   db.session.commit()
-  bg_task.start()
 
 
 @app.route("/_background_tasks/generate_wf_tasks_notifications",
@@ -353,8 +352,24 @@ def generate_wf_tasks_notifications(_):
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
+def _remove_dead_reindex_objects(indexed_models):
+  """Remove fulltext record entries for deleted objects.
+
+  This function cleans up orphan records for objects that have been deleted
+  but that have not removed their records for some reason.
+  """
+  record = fulltext.mysql.MysqlRecordProperty
+  with benchmark("Removing dead index records"):
+    for model_name, model in sorted(indexed_models.items()):
+      logger.info("Removing dead records for: %s", model_name)
+      record.query.filter(
+          record.type == model_name,
+          ~record.key.in_(db.session.query(model.id))
+      ).delete(synchronize_session='fetch')
+
+
 @helpers.without_sqlalchemy_cache
-def do_reindex(with_reindex_snapshots=False):
+def do_reindex(with_reindex_snapshots=False, delete=False):
   """Update the full text search index."""
 
   indexer = fulltext.get_indexer()
@@ -372,7 +387,12 @@ def do_reindex(with_reindex_snapshots=False):
       models.all_models.AccessControlRole.id,
       models.all_models.AccessControlRole.name,
   ))
+  _remove_dead_reindex_objects(indexed_models)
   for model_name in sorted(indexed_models.keys()):
+    if delete:
+      with benchmark("Deleting records for %s" % model_name):
+        pass
+
     logger.info("Updating index for: %s", model_name)
     with benchmark("Create records for %s" % model_name):
       model = indexed_models[model_name]

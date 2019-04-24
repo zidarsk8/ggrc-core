@@ -20,9 +20,9 @@ down_revision = ${repr(down_revision)}
 
 
 def upgrade():
-  """Upgrade database schema and/or data, creating a new revision."""
-  ${upgrades if upgrades else ""}
+    """Upgrade database schema and/or data, creating a new revision."""
+    ${upgrades if upgrades else ""}
 
 def downgrade():
-  """Downgrade database schema and/or data back to the previous revision."""
-  ${downgrades if downgrades else ""}
+    """Downgrade database schema and/or data back to the previous revision."""
+    raise NotImplementedError("Downgrade is not supported")

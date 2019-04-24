@@ -4,40 +4,49 @@
 */
 
 import DashboardWidgets from './dashboard_widgets_controller';
-import InnerNav from './inner-nav-controller';
 import InfoPin from './info_pin_controller';
 import {
   isAdmin,
+  getPageInstance,
 } from '../plugins/utils/current-page-utils';
 import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 import TreeViewConfig from '../apps/base_widgets';
+import pubSub from '../pub-sub';
 
 const DashboardControl = can.Control.extend({
   defaults: {
     widget_descriptors: null,
+    innerNavDescriptors: [],
+    /*
+      The widget should refetch items when opening
+      if "refetchOnce" has the model name of the widget.
+
+      For example: "refetchOnce" contains "Control" item.
+      The items of "Control" widget should be reloaded.
+    */
+    refetchOnce: new Set(),
+    pubSub,
   },
 }, {
   init: function (el, options) {
+    this.options = new can.Map(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
     this.init_widget_descriptors();
-    if (!this.inner_nav_controller) {
-      this.init_inner_nav();
-    }
 
     // Before initializing widgets, hide the container to not show
     // loading state of multiple widgets before reducing to one.
     this.hide_widget_area();
     this.init_default_widgets();
-    this.init_widget_area();
+    this.init_inner_nav();
   },
 
   init_tree_view_settings: function () {
     let validModels;
     let savedChildTreeDisplayList;
-    if (GGRC.pageType && GGRC.pageType === 'ADMIN') { // Admin dashboard
+    if (isAdmin()) { // Admin dashboard
       return;
     }
 
@@ -65,33 +74,79 @@ const DashboardControl = can.Control.extend({
   },
 
   init_page_header: function () {
-    let $pageHeader = this.element.find('#page-header');
-
+    let $pageHeader = $('#page-header');
     if (this.options.header_view && $pageHeader.length) {
-      $pageHeader.html(can.view(this.options.header_view));
-    }
-  },
-
-  init_widget_area: function () {
-    if (!this.inner_nav_controller) {
-      //  If there is no inner-nav, then ensure widgets are shown
-      //  FIXME: This is a workaround because widgets and widget-areas are
-      //    hidden, assuming InnerNav controller will show() them
-      this.get_active_widget_containers()
-        .show()
-        .find('.widget').show()
-        .find('> section.content').show();
+      $.ajax({
+        url: this.options.header_view,
+        dataType: 'text',
+      }).then((view) => {
+        let frag = can.stache(view)();
+        $pageHeader.html(frag);
+      });
     }
   },
 
   init_inner_nav: function () {
-    let $internav = this.element.find('.internav');
-    if ($internav.length) {
-      this.inner_nav_controller = new InnerNav(
-        this.element.find('.internav'), {
-          dashboard_controller: this,
-        });
+    let $innernav = this.element.find('#inner-nav');
+    if ($innernav.length && this.options.innernav_view) {
+      let pageInstance = getPageInstance();
+      let options = {
+        ...this.options,
+        isAuditScope: pageInstance.attr('type') === 'Audit',
+        instance: pageInstance,
+        showWidgetArea: this.showWidgetArea.bind(this),
+      };
+      $.ajax({
+        url: this.options.innernav_view,
+        dataType: 'text',
+        async: false,
+      }).then((view) => {
+        let render = can.stache(view);
+        $innernav.html(render(options));
+      });
+      return;
     }
+  },
+
+  showWidgetArea(event) {
+    let widget = event.widget;
+    let $widget = $('#' + widget.id);
+
+    if ($widget.length) {
+      this.show_widget_area();
+      $widget.siblings().addClass('hidden').trigger('widget_hidden');
+      $widget.removeClass('hidden').trigger('widget_shown');
+
+      let widgetController = $widget.control();
+      if (widgetController && widgetController.display) {
+        let refetch = this.tryToRefetchOnce(widget)
+          || widget.forceRefetch;
+        return widgetController.display(refetch);
+      }
+    }
+  },
+
+  tryToRefetchOnce(descriptor) {
+    const refetchOnce = this.options.attr('refetchOnce');
+
+    if (!refetchOnce.size) {
+      return false;
+    }
+
+    return refetchOnce.delete(descriptor.model.model_singular);
+  },
+
+  addRefetchOnceItems(modelNames) {
+    modelNames = typeof modelNames === 'string' ? [modelNames] : modelNames;
+    const refetchOnce = this.options.attr('refetchOnce');
+
+    modelNames.forEach((modelName) => {
+      refetchOnce.add(modelName);
+    });
+  },
+
+  '{pubSub} refetchOnce'(scope, event) {
+    this.addRefetchOnceItems(event.modelNames);
   },
 
   '.nav-logout click': function () {
@@ -114,23 +169,6 @@ const DashboardControl = can.Control.extend({
   },
   show_widget_area: function () {
     this.get_active_widget_containers().removeClass('hidden');
-  },
-  ' widgets_updated': 'update_inner_nav',
-  ' updateCount': function (el, ev, count, updateCount) {
-    if (_.isBoolean(updateCount) && !updateCount) {
-      return;
-    }
-    this.inner_nav_controller
-      .update_widget_count($(ev.target), count, updateCount);
-  },
-  update_inner_nav: function (el, ev, data) {
-    if (this.inner_nav_controller) {
-      if (data) {
-        this.inner_nav_controller
-          .update_widget(data.widget || data, data.index);
-      }
-      this.inner_nav_controller.sortWidgets();
-    }
   },
 
   get_active_widget_containers: function () {
@@ -186,8 +224,7 @@ const DashboardControl = can.Control.extend({
       $container.append($element);
     }
 
-    $element
-      .trigger('widgets_updated', $element);
+    this.options.innerNavDescriptors.push(control.options);
 
     return control;
   },
@@ -241,6 +278,14 @@ const PageObjectControl = DashboardControl.extend({}, {
 
   init_widget_descriptors: function () {
     this.options.widget_descriptors = this.options.widget_descriptors || {};
+  },
+
+  showWidgetArea(event) {
+    if (this.info_pin) {
+      this.hideInfoPin();
+    }
+
+    this._super(event);
   },
 });
 

@@ -278,7 +278,6 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
             'attributable_id': asmnt_id,
             'attributable_type': 'Assessment',
             'attribute_object': None,
-            'attribute_object_id': None,
             'attribute_value': attribute_value,
             'context_id': None,
             'custom_attribute_id': cad_id,
@@ -350,6 +349,39 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     content = revisions[0].content
     self.assertEqual(
         content["custom_attribute_values"][0]["attribute_value"], "0")
+
+  def test_revisions_cavs_wo_cad(self):
+    """Test filtering CAVs without definitions."""
+    with factories.single_commit():
+      asmnt = factories.AssessmentFactory()
+      ca_def = factories.CustomAttributeDefinitionFactory(
+          definition_id=asmnt.id,
+          definition_type="assessment",
+          title="CA",
+          attribute_type="Text",
+      )
+      ca_def_id = ca_def.id
+
+    self.gen.api.modify_object(
+        asmnt, {
+            "custom_attribute_values": [{
+                "attributable_id": asmnt.id,
+                "attributable_type": "assessment",
+                "attribute_value": "abc",
+                "custom_attribute_id": ca_def.id,
+            }, ],
+        },
+    )
+    ggrc.models.CustomAttributeDefinition.query.filter_by(
+        id=ca_def_id
+    ).delete()
+
+    revisions = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == asmnt.id,
+        ggrc.models.Revision.resource_type == "Assessment",
+    ).order_by(ggrc.models.Revision.id.desc()).all()
+    content = revisions[0].content
+    self.assertEqual(content["custom_attribute_values"], [])
 
   def test_revision_review_stub(self):
     """ Test proper review stub population in revision content """

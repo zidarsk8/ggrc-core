@@ -3,6 +3,7 @@
 """Locators for all elements."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
+# pylint: disable=invalid-name
 
 from selenium.webdriver.common.by import By
 
@@ -128,7 +129,8 @@ class Dashboard(object):
   CREATE_TASK_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST +
       ' [data-object-singular="CycleTaskGroupObjectTask"]')
-  CREATE_OBJECT_BTN_CSS = (By.CSS_SELECTOR, _GET_LIST + ' [href="#"]')
+  CREATE_OBJECT_BTN_CSS = (
+      By.CSS_SELECTOR, _GET_LIST + ' [href="javascript:void(0)"]')
   ALL_OBJECTS_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST + ' [href="/objectBrowser"]')
 
@@ -144,10 +146,18 @@ class LhnMenu(object):
 
     @staticmethod
     def get_create_new_button(label):
+      # Controls cannot be created from UI.
+      if label == objects.get_singular(objects.CONTROLS, title=True):
+        return(By.CSS_SELECTOR,
+               ('[data-model-name="{}"] '
+                'ul.sub-actions li.add-new a').format(label))
+      if label == objects.get_singular(objects.ASSESSMENTS, title=True):
+        return(By.CSS_SELECTOR,
+               ('[data-model-name="{}"] '
+                '[data-object-singular="{}"]').format(label, label))
       return (
           By.CSS_SELECTOR,
-          '[data-model-name="{}"] [data-test-id='
-          '"button_lhn_create_new_program_522c563f"]'.format(label))
+          '[data-model-name="{}"] [class="add-new oneline"]'.format(label))
 
     @staticmethod
     def get_accordion_count(label):
@@ -586,7 +596,7 @@ class WidgetBar(object):
     @staticmethod
     def get_widget(object_name):
       return (By.CSS_SELECTOR,
-              '.object-nav [href$="#!{}"]'.format(object_name))
+              '#inner-nav [href$="#!{}"]'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -596,7 +606,7 @@ class WidgetBar(object):
         setattr(cls, object_plural, cls._Locator.get_widget(name))
   BUTTON_ADD = (
       By.CSS_SELECTOR, '[data-test-id="button_widget_add_2c925d94"]')
-  TAB_WIDGET = (By.CSS_SELECTOR, ".object-nav .active")
+  TAB_WIDGET = (By.CSS_SELECTOR, "#inner-nav .active")
   ADMIN_PEOPLE = _Locator.get_widget("people_list")
   ADMIN_ROLES = _Locator.get_widget("roles_list")
   ADMIN_EVENTS = _Locator.get_widget("events_list")
@@ -620,7 +630,7 @@ class WidgetBarButtonAddDropdown(object):
       return (
           By.CSS_SELECTOR,
           '[data-test-id="button_widget_add_2c925d94"] '
-          '.object-nav [href$="#{}"]'.format(object_name))
+          '#inner-nav [href$="#{}"]'.format(object_name))
 
   class __metaclass__(type):
     def __init__(cls, *args):
@@ -683,9 +693,7 @@ class ModalCloneAudit(ModalCommonConfirmAction):
   """Locators for Clone object modals."""
   MODAL = Common.MODAL_CONFIRM
   CHECKBOX_CLONE_ASMT_TMPLS = (
-      By.CSS_SELECTOR,
-      '{} [can-value="instance.includeObjects.AssessmentTemplate"]'
-        .format(MODAL))
+      By.CSS_SELECTOR, '{} .modal-body input[type="checkbox"]'.format(MODAL))
 
 
 class CommonWidgetInfo(object):

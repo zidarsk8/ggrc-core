@@ -10,6 +10,7 @@ from lib.constants import roles, objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.service import rest_service
+from lib.utils import date_utils
 
 
 def create_program(**attrs):
@@ -22,7 +23,6 @@ def create_objective(program=None, **attrs):
   return _create_obj_in_program_scope("Objectives", program, **attrs)
 
 
-@decorator.work_by_external_user
 def create_control(**attrs):
   """Create an control."""
   return _create_obj_in_program_scope("Controls", None, **attrs)
@@ -68,10 +68,10 @@ def create_asmt_template(audit, all_cad_types=False, **attrs):
       factory_params=obj_attrs)
 
 
-def convert_cntrl_to_snapshot(audit, obj):
-  """Convert control to snapshot."""
+def convert_obj_to_snapshot(audit, obj):
+  """Convert object to snapshot."""
   return Representation.convert_repr_to_snapshot(
-      objs=obj, parent_obj=audit)
+      obj=obj, parent_obj=audit)
 
 
 def create_asmt_from_template(audit, asmt_template, objs_to_map):
@@ -81,7 +81,7 @@ def create_asmt_from_template(audit, asmt_template, objs_to_map):
 
 def create_asmts_from_template(audit, asmt_template, objs_to_map):
   """Create assessments from template."""
-  snapshots = [convert_cntrl_to_snapshot(audit, obj_to_map) for obj_to_map
+  snapshots = [convert_obj_to_snapshot(audit, obj_to_map) for obj_to_map
                in objs_to_map]
   return rest_service.AssessmentsFromTemplateService().create_assessments(
       audit=audit, template=asmt_template, snapshots=snapshots)
@@ -115,11 +115,13 @@ def create_risk(**attrs):
   return _create_obj_in_program_scope("Risks", None, **attrs)
 
 
+@decorator.check_that_obj_is_created
 def create_user():
   """Create a user"""
   return rest_service.PeopleService().create_obj()
 
 
+@decorator.check_that_obj_is_created
 def create_user_with_role(role_name):
   """Create user a role `role_name`"""
   user = create_user()
@@ -182,11 +184,10 @@ def _split_attrs(attrs, second_part_keys=None):
   return dict_1, dict_2
 
 
-@decorator.work_by_external_user
 def update_control(control, **attrs):
   """Update control."""
   # pylint: disable=no-else-return
-  if attrs is None:
+  if not attrs:
     attrs["title"] = "EDITED_" + control.title
     return (factory.get_cls_rest_service(
         objects.get_plural(control.type))().update_obj(
@@ -198,15 +199,26 @@ def update_control(control, **attrs):
         obj=control, **attrs))
 
 
-@decorator.work_by_external_user
 def delete_control(control):
   """Delete control."""
   return (factory.get_cls_rest_service(
       objects.get_plural(control.type))().delete_objs(control))
 
 
-@decorator.work_by_external_user
 def delete_control_cas(cas):
   """Delete control cas."""
   from lib.service.rest_service import CustomAttributeDefinitionsService
   return CustomAttributeDefinitionsService().delete_objs(cas)
+
+
+def get_last_review_date(obj):
+  """Get last review date as string in (mm/dd/yyyy hh:mm:ss AM/PM) format."""
+  return date_utils.iso8601_to_ui_str_with_zone(
+      get_obj_review(obj).last_reviewed_at)
+
+
+def get_obj_review(obj):
+  """Get obj review instance."""
+  rest_obj = get_obj(obj)
+  return get_obj(entities_factory.ReviewsFactory().create(
+      id=rest_obj.review["id"]))

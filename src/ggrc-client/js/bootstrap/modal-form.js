@@ -452,9 +452,10 @@ import {changeUrl} from '../router';
                 $html.append($(textContainer).text(message));
                 if (addLink) {
                   $html.removeClass('alert-autohide');
-                  $link = $(`<a href="javascript://" class="reload-link">
-                                Show results
-                             </a>`);
+                  $link = $(
+                    '<a href="javascript://" class="reload-link">Show results' +
+                    '</a>'
+                  );
                   $link.on('click', function () {
                     if (redirectLink) {
                       $('html').addClass('no-js');
@@ -469,7 +470,7 @@ import {changeUrl} from '../router';
           }
 
           $html.append(
-            '<a href="#" class="close" data-dismiss="alert">' +
+            '<a href="javascript:void(0)" class="close" data-dismiss="alert">' +
               '<i class="fa fa-times" aria-hidden="true"></i>' +
             '</a>'
           );

@@ -10,11 +10,9 @@ import {
   findGDriveItemById,
 } from '../../plugins/utils/gdrive-picker-utils';
 
-const tag = 'attach-button';
-
 export default can.Component.extend({
-  tag,
-  template,
+  tag: 'attach-button',
+  template: can.stache(template),
   confirmationCallback: '@',
   leakScope: true,
   viewModel: {
@@ -48,8 +46,11 @@ export default can.Component.extend({
       let items = event.items;
       this.dispatch({type: 'beforeCreate', items: items});
     },
-    finish: function () {
-      this.dispatch('finish');
+    created: function (event) {
+      this.dispatch({
+        ...event,
+        type: 'created',
+      });
     },
     checkFolder: function () {
       let self = this;

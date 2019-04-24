@@ -4,7 +4,7 @@
 }}
 
 {{#each list}}
-<li class="{{class.category}}" data-model="true" {{data 'model'}}>
+<li class="{{class.category}}" data-model="true" {{canData 'model'}}>
   <a href="{{viewLink}}" class="show-extended">
      <span class="lhs-item lhs-item-medium">
        {{title}}
@@ -14,5 +14,5 @@
 {{/each}}
 
 <li class="spinny">
-  <spinner {toggle}="list.is_loading"></spinner>
+  <spinner {toggle}="{list.is_loading}"></spinner>
 </li>

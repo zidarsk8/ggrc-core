@@ -32,7 +32,7 @@ def _get_object_presentation(obj_dict):
   - slug
 
   if Nothing is presented in serrialized object
-  than it will return `{tytle}_{id}` presentation.
+  than it will return `{type}_{id}` presentation.
   """
   keys = ("display_name", "title", "name", "slug")
   for key in keys:
@@ -50,18 +50,23 @@ def get_field_single_values(proposal, person_dict, cads_dict):
     cad_id = int(cad_id)
     if cad_id not in cads_dict:
       continue
-    if value_obj.get("attribute_object_id"):
+    if value_obj.get("attribute_object"):
       if value_obj["attribute_value"] != "Person":
         # log it
         continue
-      value = person_dict[int(value_obj["attribute_object_id"])]
+      value = person_dict[int(value_obj["attribute_object"]["id"])]
     else:
       value = value_obj["attribute_value"]
     values_dict[cads_dict[cad_id]] = value
 
   values_dict.update(
       {
-          k: _get_object_presentation(v)
+          # {id: None, type: None} is passed here since there may be proposals
+          # in DB havind None values for keys in content's mapping_fields. It
+          # could happen if proposable object once had nullable relationship
+          # and poposal for such object was created with empty values for this
+          # relationships (e.g. removing related object).
+          k: _get_object_presentation(v or {"id": None, "type": None})
           for k, v in proposal.content["mapping_fields"].iteritems()
       }
   )
