@@ -9,7 +9,7 @@ import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/base-notifications';
+import programNotifications from '../mixins/notifications/program-notifications';
 import megaObject from '../mixins/mega-object';
 import Stub from '../stub';
 
@@ -27,7 +27,7 @@ export default Cacheable.extend({
     caUpdate,
     timeboxed,
     accessControlList,
-    baseNotifications,
+    programNotifications,
     megaObject,
   ],
   is_custom_attributable: true,
