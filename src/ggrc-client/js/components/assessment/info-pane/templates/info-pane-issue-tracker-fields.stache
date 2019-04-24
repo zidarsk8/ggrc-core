@@ -26,7 +26,18 @@
               {is-edit-icon-denied}="{isEditIconDenied}"
               (set-edit-mode-inline)="{setEditModeInline(%event)}">
                 <div class="ticket-info-header">
-                  <span class="ggrc-form__title">Ticket Tracker</span>
+                  <span class="ggrc-form__title">
+                    Ticket Tracker
+                    {{#if instance.issue_tracker.enabled}}
+                      {{^if instance.audit.issue_tracker.people_sync_enabled}}
+                        <span class="people-sync-state"
+                          rel="tooltip"
+                          data-placement="top"
+                          data-original-title="You can enable People Sync in Audit Issue Tracker"
+                        >People sync: Disabled</span>
+                      {{/if}}
+                    {{/if}}
+                  </span>
                   {{#if instance.issueCreated}}
                       <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
                           Open Ticket
