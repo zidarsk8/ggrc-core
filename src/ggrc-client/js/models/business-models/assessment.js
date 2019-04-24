@@ -44,6 +44,13 @@ export default Cacheable.extend({
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
   unchangeableIssueTrackerIdStatuses: ['In Review', 'Verified', 'Completed',
     'Deprecated'],
+  assigneeHierarchy: {
+    Verifiers: 1,
+    Assignees: 2,
+    Creators: 3,
+    'Primary Contacts': 4,
+    'Secondary Contacts': 5,
+  },
   tree_view_options: {
     add_item_view: 'assessments/tree_add_item',
     attr_list: [{
