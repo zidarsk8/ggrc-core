@@ -337,8 +337,10 @@ class TestAssessmentImport(TestCase):
                     line=2,
                     column_name="actual error message"
                 ),
-                errors.UNKNOWN_COLUMN.format(
+                errors.UNSUPPORTED_MAPPING.format(
                     line=2,
+                    obj_a="Assessment",
+                    obj_b="project",
                     column_name="map:project"
                 ),
             },

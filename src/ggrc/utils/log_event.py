@@ -57,6 +57,7 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   revisions.extend(_revision_generator(
       current_user_id, "created", cache.new
   ))
+  revisions = sort_relationship_revisions(revisions)
   revisions.extend(_revision_generator(
       current_user_id, "modified", modified_objects
   ))
@@ -119,3 +120,12 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
     session.add(event)
   event.revisions.extend(revisions)
   return event
+
+
+def sort_relationship_revisions(revisions):
+  """Sort revisions of relationships to create automapping relationships
+  after original mapping"""
+  other = [rev for rev in revisions if rev.resource_type != "Relationship"]
+  rels = [rev for rev in revisions if rev.resource_type == "Relationship"]
+  rels.sort(key=lambda obj: obj.content["automapping_id"])
+  return other + rels

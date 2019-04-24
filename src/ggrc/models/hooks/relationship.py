@@ -9,6 +9,7 @@ import logging
 import itertools
 
 import sqlalchemy as sa
+from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc.models.hooks import assessment
@@ -383,3 +384,13 @@ def init_hook():  # noqa
 
     if isinstance(other, (Commentable, ExternalCommentable, ChangeTracked)):
       people_mentions.handle_comment_mapped(obj=other, comments=[comment])
+
+  @signals.Restful.collection_posted.connect_via(all_models.Relationship)
+  def forbid_self_relationship(sender, objects=None, **kwargs):
+    """Validates that created Relationship doesn't have same object
+    as source and destination"""
+    # pylint: disable=unused-argument
+    for obj in objects:
+      if (obj.source_type == obj.destination_type and
+              obj.source_id == obj.destination_id):
+        raise BadRequest("The mapping of object on itself is not possible")
