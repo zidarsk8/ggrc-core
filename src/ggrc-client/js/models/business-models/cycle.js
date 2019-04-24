@@ -8,6 +8,8 @@ import Permission from '../../permission';
 import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 import Workflow from './workflow';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
+import {REFRESH_MAPPING} from '../../events/eventTypes';
 
 function refreshWorkflow(ev, instance) {
   if (instance instanceof this === false) {
@@ -63,5 +65,13 @@ export default Cacheable.extend({
 }, {
   init: function () {
     this._super(...arguments);
+    this.bind('status', function (ev, newStatus, oldStatus) {
+      if (newStatus === 'Deprecated' || oldStatus === 'Deprecated') {
+        getPageInstance().dispatch({
+          type: `${REFRESH_MAPPING.type}`,
+          destinationType: this.type,
+        });
+      }
+    });
   },
 });
