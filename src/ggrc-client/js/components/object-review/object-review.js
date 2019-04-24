@@ -130,7 +130,7 @@ export default can.Component.extend({
         item.person.id === GGRC.current_user.id);
 
       if (!isCurrentUserReviewer) {
-        const reviewerRole = getRole('Review', 'Reviewer');
+        const reviewerRole = getRole('Review', 'Reviewers');
 
         acl.push({
           ac_role_id: reviewerRole.id,
