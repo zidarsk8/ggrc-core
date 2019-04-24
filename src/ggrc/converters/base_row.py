@@ -80,15 +80,24 @@ class ImportRowConverter(RowConverter):
   def _is_allowed_for_readonly_obj(self, attr_name, handler):
     """Return whether attr is allowed for readonly objects"""
     if not self._is_obj_readonly:
-      return False
+      return True
+
+    # Allow processing of all columns if object is read-only and user wants
+    # to unset readonly flag
+    # Note: if user doesn't have permission to change flag readonly,
+    # parsed value of column handler is set to None.
+    # In this case this function works as if readonly=True
+    readonly_handler = self.attrs.get('readonly')
+    if readonly_handler and readonly_handler.value is False:
+      return True
 
     if attr_name in _ALLOWED_ATTRS_FOR_READONLY_ACCESS:
-      return False
+      return True
 
     if isinstance(handler, handlers.MappingColumnHandler):
-      return False
+      return True
 
-    return True
+    return False
 
   def handle_raw_cell(self, attr_name, idx, header_dict):
     """Process raw value from self.row[idx] for attr_name.
@@ -100,7 +109,7 @@ class ImportRowConverter(RowConverter):
     handler_cls = header_dict["handler"]
     item = handler_cls(self, attr_name, raw_value=self.row[idx], **header_dict)
 
-    if not self._is_allowed_for_readonly_obj(attr_name, item):
+    if self._is_allowed_for_readonly_obj(attr_name, item):
       item.set_value()
     else:
       item.ignore = True

@@ -417,8 +417,10 @@ class ImportBlockConverter(BlockConverter):
     Special columns which are primary keys logically or affect the valid set of
     columns go before usual columns.
     """
+
     return [
-        k for k in self.headers if k in self.converter.priority_columns
+        # ensure that columns are ordered according to the priority list
+        k for k in self.converter.priority_columns if k in self.headers
     ] + [
         k for k in self.headers if k not in self.converter.priority_columns
     ]

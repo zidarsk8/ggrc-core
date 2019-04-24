@@ -409,9 +409,28 @@ class TestWithReadOnlyAccessImport(TestCase):
     self.assertEqual(obj.readonly, True)
     self.assertEqual(obj.title, 'a')
 
-  @ddt.data("no", "yes", None, "", True)
+  def test_system_update_and_unset_readonly_as_admin(self):
+    """Test System readonly unset and title updated by admin in same import"""
+
+    with factories.single_commit():
+      obj = factories.SystemFactory(title='a', readonly=True)
+
+    data = OrderedDict([
+        ("object_type", "System"),
+        ("Code*", obj.slug),
+        ("Title", "b"),
+        ("Read-Only", "no"),
+    ])
+
+    response = self.import_data(data)
+    self._check_csv_response(response, {})
+    obj = get_model("System").query.one()
+    self.assertEqual(obj.readonly, False)
+    self.assertEqual(obj.title, 'b')
+
+  @ddt.data("no", "yes", _NOT_SPECIFIED, "", True)
   def test_user_cannot_get_readonly_value_without_perms(self, new):
-    """Test readonly System not updated if new={0} and user has no perms
+    """Test readonly System not updated if new={0!r} and user has no perms
 
     This test ensures that user without permission for the object
     cannot obtain value for flag readonly
@@ -432,20 +451,31 @@ class TestWithReadOnlyAccessImport(TestCase):
         ("Code*", obj.slug),
         ("Title", "b"),
     ])
-    if new is not None:
+    if new is not _NOT_SPECIFIED:
       data["Read-only"] = new
 
     response = self.import_data(
         data,
         person=all_models.Person.query.get(person_id)
     )
-    self._check_csv_response(response, {
+    exp_csv_responsse = {
         "System": {
             "row_errors": {
                 errors.PERMISSION_ERROR.format(line=3),
             },
         }
-    })
+    }
+    if new is not _NOT_SPECIFIED:
+      exp_csv_responsse['System']['row_warnings'] = {
+          errors.NON_ADMIN_ACCESS_ERROR.format(
+              line=3,
+              object_type="System",
+              column_name="Read-only",
+          ),
+      }
+
+    self._check_csv_response(response, exp_csv_responsse)
+
     obj = get_model("System").query.one()
     self.assertEqual(obj.readonly, True)
     self.assertEqual(obj.title, 'a')
@@ -861,7 +891,7 @@ class TestWithReadOnlyAccessImport(TestCase):
   )
   @ddt.unpack
   def test_readonly_update_by_role(self, role, old_readonly, new_readonly):
-    """Test updating readonly attribute from {1} to {2}."""
+    """Test updating readonly attribute from {1} to {2} as {0}."""
     role_obj = all_models.Role.query.filter(
         all_models.Role.name == role
     ).one()

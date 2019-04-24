@@ -48,6 +48,7 @@ class ImportConverter(BaseConverter):
   priority_columns = [
       "email",
       "slug",
+      "readonly",
       "delete",
       "task_type",
       "audit",
