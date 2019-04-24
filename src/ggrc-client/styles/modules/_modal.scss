@@ -390,25 +390,7 @@
         border-color: $red;
       }
     }
-    .mandatory-dropdown {
-      &.select-failure {
-        .form-label {
-          color: $red;
-        }
 
-        .multiselect-dropdown__input  {
-          border-color: $red;
-        }
-
-        .help-inline.warning {
-          font-size: $f-small;
-          font-weight: bold;
-          color: $red;
-          margin-top: 5px;
-          padding: 0;
-        }
-      }
-    }
     .rich-text {
       margin-bottom: 20px;
     }
