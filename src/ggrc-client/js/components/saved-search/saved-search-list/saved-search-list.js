@@ -4,7 +4,6 @@
 */
 
 import template from './saved-search-list.stache';
-import SavedSearch from '../../../models/service-models/saved-search';
 
 export default can.Component.extend({
   tag: 'saved-search-list',
@@ -13,13 +12,19 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     objectName: '',
     searches: [],
-    init() {
-      SavedSearch.findByType(this.attr('objectName')).then((data) => {
-        this.attr('searches', data.values);
+    applySearch(search) {
+      this.dispatch({
+        type: 'applySearch',
+        search,
       });
     },
-    removeSearch(search) {
-      search.destroy();
+    removeSearch(search, event) {
+      event.stopPropagation();
+      search.attr('disabled', true);
+
+      search.destroy().then(() => {
+        this.dispatch('removed');
+      });
     },
   }),
 });

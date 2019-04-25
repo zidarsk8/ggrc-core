@@ -9,9 +9,12 @@
 
 <ul>
   {{#each searches}}
-    <li>
+    <li ($click)="applySearch(.)"
+     {{#if disabled}}class="disabled"{{/if}}>
       <span>{{name}}</span>
-      <i ($click)="removeSearch(.)" class="fa fa-trash"></i>
+      <i class="fa fa-trash"
+        ($click)="removeSearch(., %event)"
+      ></i>
     </li>
   {{/each}}
 </ul>

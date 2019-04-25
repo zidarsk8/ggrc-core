@@ -13,8 +13,8 @@ export default can.Component.extend({
   `),
   leakScope: false,
   viewModel: can.Map.extend({
+    query: null,
     searchName: '',
-    query: '',
     objectType: '',
     saveSearch() {
       const query = this.attr('query').serialize();
@@ -24,7 +24,9 @@ export default can.Component.extend({
         query: query,
         object_type: this.attr('objectType'),
       })
-      savedSearch.save();
+      savedSearch.save().then(() => {
+        this.dispatch('created');
+      });
     },
   }),
 });

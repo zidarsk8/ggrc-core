@@ -12,10 +12,13 @@
   </h2>
 </div>
 
+<saved-search-wrapper
+  {object-type}="{model.model_singular}">
 <div class="modal-body-wrapper">
   <aside>
     <saved-search-list
       objectName:from="model.model_singular"
+      on:removed="loadSavedSearches()"
     ></saved-search-list>
   </aside>
 
@@ -79,8 +82,9 @@
               <div class="object-controls__actions-search">
                 <create-saved-search
                   query:from="query"
-                  objectType:from="modelName">
-                </create-saved-search>
+                  objectType:from="modelName"
+                  on:created="loadSavedSearches()"
+                ></create-saved-search>
 
                 <div class="object-controls__actions--right">
                   <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
@@ -124,3 +128,4 @@
     </div>
   </main>
 </div>
+</saved-search-wrapper>
