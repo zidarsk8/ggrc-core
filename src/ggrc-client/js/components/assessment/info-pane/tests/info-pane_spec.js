@@ -449,7 +449,7 @@ describe('assessment-info-pane component', () => {
     it('sets "isUpdating{<passed capitalized type>}" property to true before ' +
     'resolving a request', function () {
       const type = 'type';
-      const expectedProp = `isUpdating${can.capitalize(type)}`;
+      const expectedProp = `isUpdating${_.capitalize(type)}`;
       vm.attr(expectedProp, false);
       vm.requestQuery({}, type);
       expect(vm.attr(expectedProp)).toBe(true);
@@ -489,7 +489,7 @@ describe('assessment-info-pane component', () => {
       it('sets "isUpdating{<passed capitalized type>}" property to false ',
         async function (done) {
           const type = 'type';
-          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          const expectedProp = `isUpdating${_.capitalize(type)}`;
           await vm.requestQuery({}, type);
           expect(vm.attr(expectedProp)).toBe(false);
           done();
@@ -510,7 +510,7 @@ describe('assessment-info-pane component', () => {
       it('sets "isUpdating{<passed capitalized type>}" property to false ',
         async function (done) {
           const type = 'type';
-          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          const expectedProp = `isUpdating${_.capitalize(type)}`;
           await vm.requestQuery({}, type);
           expect(vm.attr(expectedProp)).toBe(false);
           done();
@@ -604,7 +604,7 @@ describe('assessment-info-pane component', () => {
       beforeEach(function () {
         types = ['urls', 'files'];
         types.forEach((type, i) => {
-          const methodName = `load${can.capitalize(type)}`;
+          const methodName = `load${_.capitalize(type)}`;
           vm.attr(type.toLowerCase(), []);
           spyOn(vm, methodName);
         });
@@ -614,7 +614,7 @@ describe('assessment-info-pane component', () => {
         function () {
           vm.updateItems(...types);
           types.forEach((type) => {
-            const methodName = `load${can.capitalize(type)}`;
+            const methodName = `load${_.capitalize(type)}`;
             expect(vm[methodName]).toHaveBeenCalled();
           });
         });
@@ -623,7 +623,7 @@ describe('assessment-info-pane component', () => {
       'appropriate methods', function () {
         const loadedData = types.map((type, i) => [type, i]);
         types.forEach((type, i) => {
-          const methodName = `load${can.capitalize(type)}`;
+          const methodName = `load${_.capitalize(type)}`;
           vm[methodName].and.returnValue(loadedData[i]);
         });
         vm.updateItems(...types);
@@ -722,7 +722,7 @@ describe('assessment-info-pane component', () => {
 
     it('sets "isUpdating{<passed capitalized type>}" property to true',
       function () {
-        const expectedProp = `isUpdating${can.capitalize(type)}`;
+        const expectedProp = `isUpdating${_.capitalize(type)}`;
         vm.attr(expectedProp, false);
 
         vm.addItems(event, type);
@@ -845,7 +845,7 @@ describe('assessment-info-pane component', () => {
 
       it('sets "isUpdating{<passed capitalized type>}" property to false',
         function (done) {
-          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          const expectedProp = `isUpdating${_.capitalize(type)}`;
 
           vm.addRelatedItem(event, type);
 
@@ -895,7 +895,7 @@ describe('assessment-info-pane component', () => {
 
       it('sets "isUpdating{<passed capitalized type>}" property to false',
         function (done) {
-          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          const expectedProp = `isUpdating${_.capitalize(type)}`;
 
           vm.addRelatedItem(event, type);
 
@@ -990,7 +990,7 @@ describe('assessment-info-pane component', () => {
 
     it('sets "isUpdating{<passed capitalized type>}" property to true ' +
     'before deferredSave\'s resolve', function () {
-      const expectedProp = `isUpdating${can.capitalize(type)}`;
+      const expectedProp = `isUpdating${_.capitalize(type)}`;
       vm.attr(expectedProp, false);
       vm.removeRelatedItem(item, type);
       expect(vm.attr(expectedProp)).toBe(true);
@@ -1025,7 +1025,7 @@ describe('assessment-info-pane component', () => {
 
       it('sets "isUpdating{<passed capitalized type>}" property to false',
         function (done) {
-          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          const expectedProp = `isUpdating${_.capitalize(type)}`;
 
           vm.removeRelatedItem(item, type);
 
@@ -1072,7 +1072,7 @@ describe('assessment-info-pane component', () => {
 
       it('sets "isUpdating{<passed capitalized type>}" property to false',
         function (done) {
-          const expectedProp = `isUpdating${can.capitalize(type)}`;
+          const expectedProp = `isUpdating${_.capitalize(type)}`;
 
           vm.removeRelatedItem(item, type);
 
