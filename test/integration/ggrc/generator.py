@@ -363,21 +363,3 @@ class ObjectGenerator(Generator):
     }
     data[obj_name].update(kwargs)
     return self.generate(models.CustomAttributeDefinition, obj_name, data)
-
-  def generate_custom_attribute_value(self, custom_attribute_id, attributable,
-                                      **kwargs):
-    """Generate a CA value in `attributable` for CA def with certain id."""
-    obj_name = "custom_attribute_value"
-    data = {
-        obj_name: {
-            "title": kwargs.get("title", factories.random_str()),
-            "custom_attribute_id": custom_attribute_id,
-            "attributable_type": attributable.__class__.__name__,
-            "attributable_id": attributable.id,
-            "attribute_value": kwargs.get("attribute_value"),
-            # "attribute_object": not implemented
-            "context": {"id": None},
-        },
-    }
-    data[obj_name].update(kwargs)
-    return self.generate(models.CustomAttributeValue, obj_name, data)
