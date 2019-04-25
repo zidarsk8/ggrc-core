@@ -806,7 +806,7 @@ class ObjectPersonColumnHandler(UserColumnHandler):
   add people that are missing.
   """
 
-  def get_users_list(self):
+  def parse_item(self):
     users = set()
     for email in self._get_emails():
       person = self.get_person(email)
@@ -815,9 +815,6 @@ class ObjectPersonColumnHandler(UserColumnHandler):
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
     return list(users)
-
-  def parse_item(self):
-    return self.get_users_list()
 
   def set_obj_attr(self):
     pass
