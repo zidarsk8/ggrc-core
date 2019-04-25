@@ -376,3 +376,30 @@ def is_request_from_external_app():
   return (
       inbound_appid and inbound_appid in settings.ALLOWED_QUERYAPI_APP_IDS
   ) and is_external_app_user(request)
+
+
+def get_migrator_id():
+  """Get or create migrator account and return its ID.
+
+  If specified migrator doesn't exist a new one will be created using values
+  from ``ggrc.settings.MIGRATOR``.
+  """
+  name, email = parseaddr(settings.MIGRATOR)
+  if not email:
+    raise ValueError('Invalid migrator email. '
+                     'Check MIGRATOR value within settings')
+  if not name:
+    name = email
+
+  user = Person.query.filter(Person.email == email).first()
+  if user is not None:
+    return user.id
+
+  user_id_query = Person.__table__.insert().values(
+      email=email,
+      name=name,
+      created_at=datetime.datetime.now(),
+      updated_at=datetime.datetime.now(),
+  )
+  user_id = db.session.execute(user_id_query).inserted_primary_key[0]
+  return user_id

@@ -59,7 +59,11 @@ def do_missing_revisions():
   Iterate thought objects in objects_without_revisions
   table and create revisions
   """
-  event = all_models.Event(action="BULK")
+  from ggrc.utils.user_generator import get_migrator_id
+  event = all_models.Event(
+      modified_by_id=get_migrator_id(),
+      action="BULK"
+  )
   db.session.add(event)
   db.session.commit()
   revisions_table = all_models.Revision.__table__

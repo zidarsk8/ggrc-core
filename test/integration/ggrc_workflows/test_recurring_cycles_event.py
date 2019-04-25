@@ -50,6 +50,8 @@ class TestRecurringCyclesEvent(TestCase):
   def test_event_creation(self):
     """Test single event creation."""
     with freeze_time('2018-01-24'):
+      from ggrc.login import noop
+      noop.login()
       start_recurring_cycles()
 
     events = models.Event.query.filter(models.Event.action == 'BULK').all()
