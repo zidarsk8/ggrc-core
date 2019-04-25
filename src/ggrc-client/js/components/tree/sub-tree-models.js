@@ -18,12 +18,15 @@ let viewModel = can.Map.extend({
       type: Boolean,
       value: false,
     },
-    uniqueModelsList: {
+    displayModelsList: {
       get: function () {
-        return this.attr('modelsList').map(function (model) {
-          model.attr('inputId', 'stm-' +
-            (Date.now() * Math.random()).toFixed());
+        return this.attr('modelsList').map((model) => {
+          const displayName =
+            model.attr('name').split(/(?=[A-Z])/).join(' ');
+          model.attr('displayName', displayName);
           return model;
+        }).sort((a, b) => {
+          return a.displayName > b.displayName ? 1 : -1;
         });
       },
     },
