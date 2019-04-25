@@ -808,10 +808,7 @@ class ObjectPersonColumnHandler(UserColumnHandler):
 
   def get_users_list(self):
     users = set()
-    email_lines = self.raw_value.splitlines()
-    owner_emails = filter(unicode.strip, email_lines)  # noqa
-    for raw_line in owner_emails:
-      email = raw_line.strip().lower()
+    for email in self._get_emails():
       person = self.get_person(email)
       if person:
         users.add(person)
