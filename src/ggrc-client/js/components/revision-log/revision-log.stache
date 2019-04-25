@@ -15,10 +15,21 @@
         </label>
       </div>
     {{/if}}
-    <div class="grid-data__toolbar flex-box">
-      <tree-pagination  paging:from="pageInfo"
-                        class="{{#if isLoading}}disabled-block{{/if}}">
-      </tree-pagination>
+    <div class="revision-log__header">
+      {{#if instance.constructor.isChangeableExternally}}
+        <div class="revision-log__header-item">
+          <questionnaire-link
+            instance:from="instance"
+            linkType:from="'change-log'"
+            viewType:from="'button'">
+            Open Change Log in new frontend
+          </questionnaire-link>
+          <span class="revision-log__logs-message">The logs after migration to new UI on 06/27/2019 are available here.</span>
+        </div>
+      {{/if}}
+      <div class="revision-log__header-item revision-log__header-toolbar">
+        <tree-pagination paging:from="pageInfo" class="{{#if isLoading}}disabled-block{{/if}}"></tree-pagination>
+      </div>
     </div>
     <revision-page revisions:from="revisions"
                    instance:from="instance"
