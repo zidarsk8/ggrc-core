@@ -11,7 +11,6 @@ from sqlalchemy.dialects import mysql
 
 from ggrc import db
 from ggrc.models.mixins.base import Identifiable
-from ggrc.models import types
 from ggrc.login import get_current_user
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -62,7 +61,7 @@ class ImportExport(Identifiable, db.Model):
                                uselist=False)
   results = db.Column(mysql.LONGTEXT)
   title = db.Column(db.Text)
-  content = db.Column(types.CompressedType)
+  content = db.Column(mysql.LONGTEXT)
   gdrive_metadata = db.Column('gdrive_metadata', db.Text)
 
   def log_json(self, is_default=False):
