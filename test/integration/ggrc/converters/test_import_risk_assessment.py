@@ -18,8 +18,8 @@ class TestRiskAssessmentImport(TestCase):
   """Risk Assessment Import Test Class"""
 
   @ddt.data(
-      ("valid_user@example.com,", []),
-      ("user2@example.com,\nvalid_user@example.com",
+      ("valid_user@example.com", []),
+      ("user2@example.com\nvalid_user@example.com",
        [errors.MULTIPLE_ASSIGNEES.format(line=3, column_name="Risk Counsel")]),
   )
   @ddt.unpack
@@ -51,8 +51,8 @@ class TestRiskAssessmentImport(TestCase):
                      "valid_user@example.com")
 
   @ddt.data(
-      (" ;,", []),
-      ("user2@example.com;\nuser3@example.com",
+      (" ", []),
+      ("user2@example.com\nuser3@example.com",
        [
            errors.MULTIPLE_ASSIGNEES.format(line=3,
                                             column_name="Risk Counsel"),
