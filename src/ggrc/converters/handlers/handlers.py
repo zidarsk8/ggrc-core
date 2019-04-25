@@ -243,6 +243,11 @@ class UserColumnHandler(ColumnHandler):
         return None
     return new_objects[all_models.Person].get(email)
 
+  def _get_emails(self):
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    return sorted([raw_line.strip().lower() for raw_line in owner_emails])
+
   def _parse_raw_data_to_emails(self):
     """Parse raw data: split emails if necessary"""
     email_list = re.split("[, ;\n]+", self.raw_value.lower().strip())
@@ -307,11 +312,6 @@ class UsersColumnHandler(UserColumnHandler):
     """Create response for missing mandatory field"""
     self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
     return [get_current_user()]
-
-  def _get_emails(self):
-    email_lines = self.raw_value.splitlines()
-    owner_emails = filter(unicode.strip, email_lines)  # noqa
-    return [raw_line.strip().lower() for raw_line in owner_emails]
 
   def parse_item(self):
     """Parses multi users field."""
