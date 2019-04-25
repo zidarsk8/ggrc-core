@@ -321,6 +321,11 @@ class UsersColumnHandler(UserColumnHandler):
     self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
     return [get_current_user()]
 
+  def _get_emails(self):
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    return [raw_line.strip().lower() for raw_line in owner_emails]
+
   def parse_item(self):
     """Parses multi users field."""
     people = set()
@@ -330,10 +335,8 @@ class UsersColumnHandler(UserColumnHandler):
         return None
       return self._missed_mandatory_person()
 
-    email_lines = self.raw_value.splitlines()
-    owner_emails = filter(unicode.strip, email_lines)  # noqa
-    for raw_line in owner_emails:
-      email = raw_line.strip().lower()
+    emails = self._get_emails()
+    for email in emails:
       person = self.get_person(email)
       if person:
         people.add(person)
