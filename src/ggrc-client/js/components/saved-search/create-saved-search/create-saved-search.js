@@ -3,10 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import SavedSearch from '../../models/service-models/saved-search';
+import SavedSearch from '../../../models/service-models/saved-search';
 
 export default can.Component.extend({
-  tag: 'save-search',
+  tag: 'create-saved-search',
   template: can.stache(`
     <input {($value)}="{searchName}" type="text" placeholder="Type to Save Search">
     <button ($click)="saveSearch()" type="button" class="btn btn-small btn-green">Save Search</button>

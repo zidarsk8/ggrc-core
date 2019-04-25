@@ -4,7 +4,7 @@
 */
 
 import template from './saved-search-list.stache';
-import SavedSearch from '../../models/service-models/saved-search';
+import SavedSearch from '../../../models/service-models/saved-search';
 
 export default can.Component.extend({
   tag: 'saved-search-list',
