@@ -228,19 +228,6 @@ class UserColumnHandler(ColumnHandler):
   Used for primary and secondary contacts.
   """
 
-  def get_users_list(self):
-    users = set()
-    email_lines = self.raw_value.splitlines()
-    owner_emails = filter(unicode.strip, email_lines)  # noqa
-    for raw_line in owner_emails:
-      email = raw_line.strip().lower()
-      person = self.get_person(email)
-      if person:
-        users.add(person)
-      else:
-        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
-    return list(users)
-
   def get_person(self, email):
     from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
@@ -824,6 +811,19 @@ class ObjectPersonColumnHandler(UserColumnHandler):
   role. This handler will remove all people not listed in the value and will
   add people that are missing.
   """
+
+  def get_users_list(self):
+    users = set()
+    email_lines = self.raw_value.splitlines()
+    owner_emails = filter(unicode.strip, email_lines)  # noqa
+    for raw_line in owner_emails:
+      email = raw_line.strip().lower()
+      person = self.get_person(email)
+      if person:
+        users.add(person)
+      else:
+        self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
+    return list(users)
 
   def parse_item(self):
     return self.get_users_list()
