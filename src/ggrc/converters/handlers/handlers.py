@@ -248,12 +248,6 @@ class UserColumnHandler(ColumnHandler):
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     return sorted([raw_line.strip().lower() for raw_line in owner_emails])
 
-  def _parse_raw_data_to_emails(self):
-    """Parse raw data: split emails if necessary"""
-    email_list = re.split("[, ;\n]+", self.raw_value.lower().strip())
-    email_list = filter(None, email_list)
-    return sorted(email_list)
-
   def _parse_emails(self, email_list):
     """Parse user email. If it were multiply emails in this column parse them.
 
@@ -289,7 +283,7 @@ class UserColumnHandler(ColumnHandler):
     return person
 
   def parse_item(self):
-    email_list = self._parse_raw_data_to_emails()
+    email_list = self._get_emails()
 
     if len(email_list) > 1:
       self.add_warning(
