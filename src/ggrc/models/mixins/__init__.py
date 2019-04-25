@@ -747,8 +747,8 @@ class WithNetworkZone(object):
         self.__class__.__name__, key, option, 'network_zone')
 
   @classmethod
-  def eager_query(cls):
-    query = super(WithNetworkZone, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(WithNetworkZone, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload(
             "network_zone"

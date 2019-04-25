@@ -27,6 +27,11 @@ export default can.Component.extend({
           this.initializeColumns();
         },
       },
+      serviceColumns: {
+        set(newValue, setValue) {
+          setValue(TreeViewUtils.getVisibleColumnsConfig(newValue, newValue));
+        },
+      },
     },
     modelType: '',
     selectedColumns: [],

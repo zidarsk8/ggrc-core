@@ -12,7 +12,7 @@ import allModels from './all-models';
  *  trigger() -> Deferred
  */
 
-const ModelRefreshQueue = can.Construct({}, {
+const ModelRefreshQueue = can.Construct.extend({}, {
   init: function (model) {
     this.model = model;
     this.ids = [];
@@ -66,7 +66,7 @@ const ModelRefreshQueue = can.Construct({}, {
   },
 });
 
-const RefreshQueueManager = can.Construct({}, {
+const RefreshQueueManager = can.Construct.extend({}, {
   init: function () {
     this.null_queue = new ModelRefreshQueue(null);
     this.queues = [];
@@ -131,7 +131,7 @@ const RefreshQueueManager = can.Construct({}, {
   },
 });
 
-const RefreshQueue = can.Construct({
+const RefreshQueue = can.Construct.extend({
   refresh_queue_manager: new RefreshQueueManager(),
   refresh_all: function (instance, props, force) {
     let dfd = new $.Deferred();

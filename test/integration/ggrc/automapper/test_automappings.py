@@ -4,7 +4,10 @@
 """Test automappings"""
 
 import itertools
+from collections import OrderedDict
 from contextlib import contextmanager
+
+import ddt
 from sqlalchemy.orm import load_only
 
 import ggrc
@@ -503,3 +506,94 @@ class TestIssueAutomappings(TestCase):
                                   destination=self.asmt)
 
     self.assertEqual(all_models.Automapping.query.count(), 0)
+
+
+@ddt.ddt
+class TestMegaProgramAutomappings(TestCase):
+  """Test Mega Program automappings"""
+
+  @classmethod
+  def setUpClass(cls):
+    cls.gen = generator.ObjectGenerator()
+
+  def setUp(self):
+    super(TestMegaProgramAutomappings, self).setUp()
+
+    # TODO: replace this hack with a special test util
+    from ggrc.login import noop
+    noop.login()  # this is needed to pass the permission checks in automapper
+
+  @ddt.data(
+      "Regulation", "Objective", "Control", "Contract",
+      "Policy", "Risk", "Standard", "Threat", "Requirement",
+      "System", "Product", "Process", "Market", "DataAsset",
+      "Facility", "OrgGroup", "Metric", "TechnologyEnvironment",
+      "ProductGroup", "Project", "Vendor", "AccessGroup",
+      "KeyReport", "AccountBalance",
+  )
+  def test_megaprogram_automapping(self, model_name):
+    """Test automapping of {0} to parent programs"""
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_c = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      program_d = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      factories.RelationshipFactory(source=program_c,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_d,
+                                    destination=program_c)
+      _model = factories.get_model_factory(model_name)()
+      factories.RelationshipFactory(source=_model,
+                                    destination=program_b)
+
+    program_a_related = program_a.related_objects()
+    program_c_related = program_c.related_objects()
+    program_d_related = program_d.related_objects()
+    self.assertTrue(_model not in program_a_related)
+    self.assertTrue(_model in program_c_related)
+    self.assertTrue(_model in program_d_related)
+
+  def test_cyclic_automapping(self):
+    """Test mapping object to program in cycle program-to-program mapping"""
+    with factories.single_commit():
+      program_b = factories.ProgramFactory()
+      program_a = factories.ProgramFactory()
+      program_c = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      factories.RelationshipFactory(source=program_a,
+                                    destination=program_c)
+      factories.RelationshipFactory(source=program_c,
+                                    destination=program_b)
+      standard = factories.StandardFactory()
+      factories.RelationshipFactory(source=standard,
+                                    destination=program_c)
+
+    program_a_related = program_a.related_objects()
+    program_b_related = program_b.related_objects()
+    program_c_related = program_c.related_objects()
+    self.assertTrue(standard in program_a_related)
+    self.assertTrue(standard in program_b_related)
+    self.assertTrue(standard in program_c_related)
+
+  def test_automapping_during_import(self):
+    """Test automapping of Standart to parent Program during import"""
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+    program_b_id = program_b.id
+    response = self.import_data(OrderedDict([
+        ("object_type", "Standard"),
+        ("Code*", ""),
+        ("Title*", "Test standard"),
+        ("Admin*", "user@example.com"),
+        ("map:Program", program_a.slug),
+    ]))
+    self._check_csv_response(response, {})
+    program_b = all_models.Program.query.get(program_b_id)
+    program_b_related = program_b.related_objects()
+    self.assertIn("Standard", {obj.type for obj in program_b_related})

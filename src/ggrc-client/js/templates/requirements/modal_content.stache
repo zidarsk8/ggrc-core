@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{!div class="modal-body"}}
 <div class="hideable-holder">
 {{#instance}}
 <form action="javascript://">
@@ -23,8 +22,8 @@
         <label>
           Policy / Regulation / Standard / Contract
           <i class="fa fa-question-circle" rel="tooltip" title="Policy / Regulation / Standard / Contract containing this Requirement"></i>
-          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
+        <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <input tabindex="2" class="input-block-level" name="_directive.title" data-lookup="Policy,Regulation,Standard,Contract" data-permission-type="update" data-template="/directives/autocomplete_result.stache" placeholder="Choose Policy / Regulation / Standard / Contract" type="text" />
       {{/if_helpers}}
     </div>
@@ -34,9 +33,9 @@
     <div data-id="text_of_requirement_hidden" class="span6 hidable">
       <label>
         Description
-        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
-        <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
       </label>
+      <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <div class="rich-text">
           <rich-text
             tabindex="3"
@@ -64,8 +63,8 @@
       <label>
         Notes
         <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or HTML notes here."></i>
-        <a data-id="hide_note_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
+      <a data-id="hide_note_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <div class="rich-text">
           <rich-text
             tabindex="6"
@@ -95,8 +94,8 @@
         <label>
           Code
           <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects. If you would like to override this feature you may manually enter a code of your choosing. You should have a specific reason for doing this."></i>
-          <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
+        <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <input {{^if new_object_form}} disabled {{/if}} data-id="code_txtbx" tabindex="8" id="requirement-code" class="input-block-level" name="slug" placeholder="REQUIREMENT-XXX" type="text" value="{{slug}}">
       </div>
       <div class="span4 hidable">
@@ -108,16 +107,15 @@
         <label>
         State
         <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
-          <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
-        <dropdown {options-list}="{model.statuses}"
+        <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+        <dropdown-component {options-list}="{model.statuses}"
                   {name}="'instance.status'"
                   tabindex="23">
-        </dropdown>
+        </dropdown-component>
       </div>
     </div>
   </div>
 </form>
 {{/instance}}
 </div>
-{{!/div}}

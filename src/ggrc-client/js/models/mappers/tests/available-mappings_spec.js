@@ -79,8 +79,8 @@ describe('Mappings', () => {
     Process: coreObjectsRules,
     Product: coreObjectsRules,
     ProductGroup: coreObjectsRules,
-    Program:
-      [...modules.core, ...modules.workflow, 'Audit', 'Document', 'Person'],
+    Program: [...modules.core, ...modules.workflow, 'Audit', 'Document',
+      'Person', 'Program'],
     Project: coreObjectsRules,
     Regulation: _.difference(coreObjectsRules, ['Regulation']),
     Requirement: coreObjectsRules,

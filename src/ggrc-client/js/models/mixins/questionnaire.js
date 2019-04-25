@@ -5,7 +5,7 @@
 
 import Mixin from './mixin';
 
-export default Mixin({
+export default Mixin.extend({
   'after:init'() {
     if (GGRC.GGRC_Q_INTEGRATION_URL) {
       this.tree_view_options.attr_list.push({

@@ -688,7 +688,6 @@ Response:
                             "href": "/api/people/150",
                             "id": 150
                         },
-                        "task_group_objects": [],
                         "related_sources": [],
                         "notes": "",
                         "task_groups": [],
@@ -794,7 +793,6 @@ Response:
                             "href": "/api/people/150",
                             "id": 150
                         },
-                        "task_group_objects": [],
                         "related_sources": [
                             {
                                 "type": "Relationship",

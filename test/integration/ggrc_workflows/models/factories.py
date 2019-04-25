@@ -11,7 +11,6 @@ import factory
 from ggrc_workflows import models
 from integration.ggrc.models.factories import ContextFactory
 from integration.ggrc.models.factories import TitledFactory
-from integration.ggrc.models.model_factory import ModelFactory
 
 
 class WorkflowFactory(TitledFactory):
@@ -29,16 +28,6 @@ class TaskGroupFactory(TitledFactory):
 
   workflow = factory.SubFactory(WorkflowFactory)
   context = factory.LazyAttribute(lambda tg: tg.workflow.context)
-
-
-class TaskGroupObjectFactory(ModelFactory):
-
-  class Meta:
-    model = models.TaskGroupObject
-
-  task_group = factory.SubFactory(TaskGroupFactory)
-  object_id = 0
-  object_type = ""
 
 
 class TaskGroupTaskFactory(TitledFactory):

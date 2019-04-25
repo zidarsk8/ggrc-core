@@ -4,7 +4,7 @@
 }}
 
 <section class="assessment-module info info-pane{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
-  <spinner {toggle}="{isLoading}" class="spinner-wrapper active"></spinner>
+  <spinner-component {toggle}="{isLoading}" class="spinner-wrapper active"></spinner-component>
   <inline-form-control {instance}="{instance}" {deferred-save}="{deferredSave}">
     <div class="tier-content">
       {{> /static/templates/assessments/header.stache}}
@@ -94,7 +94,7 @@
                     <div class="assessment-controls__extra-controls">
                         <div>
                             <div class="info-pane__section-title">
-                                <spinner class="info-pane__section-title-icon" {toggle}="{isUpdatingFiles}"></spinner>
+                                <spinner-component class="info-pane__section-title-icon" {toggle}="{isUpdatingFiles}"></spinner-component>
                                 Evidence file
                             </div>
                             <object-list {items}="{files}" {empty-message}="{noItemsText}">
@@ -119,8 +119,6 @@
                                         {on-state-change-dfd}="{onStateChangeDfd}"
                                         {edit-mode}="{editMode}">
                             <attach-button
-                                        (before-create)="{addItems(%event, 'files')}"
-                                        (created)="{addRelatedItem(%event, 'files')}" 
                                         {is-attach-action-disabled}="{isUpdatingFiles}"
                                         {confirmation-callback}="{@confirmEdit}"
                                         {instance}="{instance}"></attach-button>
@@ -128,7 +126,7 @@
                         </div>
                         <div>
                             <div class="info-pane__section-title">
-                                <spinner class="info-pane__section-title-icon" {toggle}="{isUpdatingUrls}"></spinner>
+                                <spinner-component class="info-pane__section-title-icon" {toggle}="{isUpdatingUrls}"></spinner-component>
                                 Evidence URL
                             </div>
                             <object-list {items}="{urls}" {empty-message}="{noItemsText}">
@@ -151,9 +149,7 @@
                             {{#if urlsEditMode}}
                                 <create-url
                                     {context}="{instance.context}"
-                                    (set-edit-mode)="{setUrlEditMode(false)}"
-                                    (before-create)="{addItems(%event, 'urls')}"
-                                    (created)="{addRelatedItem(%event, 'urls')}">
+                                    (set-edit-mode)="{setUrlEditMode(false)}">
                                     <form class="create-form">
                                         <fieldset class="create-form__layout">
                                             <input {($value)}="{value}" class="create-form__input" type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
@@ -209,8 +205,6 @@
                                                  {state}="{state}"
                                                  {evidences}="{files}"
                                                  {is-updating-evidences}="{isUpdatingFiles}"
-                                                 (before-comment-created)="{addItems(%event, 'comments')}"
-                                                 (after-comment-created)="{addRelatedItem(%event, 'comments')}"
                         ></ca-object-modal-content>
                     </simple-modal>
                     <!-- End of Modal Window -->
@@ -228,7 +222,11 @@
                     {{/unless}}
                 </div>
                 <div class="info-pane__section">
-                    <assessment-people {instance}="{instance}">
+                    <assessment-people {instance}="{instance}"
+                      {main-roles}="{assessmentMainRoles}"
+                      {deferred-save}="{deferredSave}"
+                      {on-state-change-dfd}="{onStateChangeDfd}"
+                      {set-in-progress}="{@setInProgressState}">
                     </assessment-people>
                 </div>
             </div>
@@ -293,8 +291,7 @@
                 <related-assessments
                     {instance}="{instance}"
                     {need-reuse}="{true}"
-                    (refresh-assessment)="{refreshAssessment}"
-                    (after-object-reused)="{updateItems('files', 'urls')}">
+                    (reusable-objects-created)="{addReusableEvidence(%event)}">
                 </related-assessments>
             {{/instance}}
           </tab-panel>

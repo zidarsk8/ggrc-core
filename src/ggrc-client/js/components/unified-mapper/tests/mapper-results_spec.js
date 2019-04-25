@@ -95,6 +95,8 @@ describe('mapper-results component', function () {
 
     beforeEach(function () {
       viewModel.attr('columns', {});
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Control');
       mockColumns = {
         available: 'mock1',
         selected: 'mock2',
@@ -465,16 +467,6 @@ describe('mapper-results component', function () {
     });
   });
 
-  describe('getModel() method', function () {
-    it('returns model', function () {
-      let result;
-      spyOn(viewModel, 'getModelKey')
-        .and.returnValue('Program');
-      result = viewModel.getModel();
-      expect(result).toEqual(Program);
-    });
-  });
-
   describe('getDisplayModel() method', function () {
     it('returns displayModel', function () {
       let result;
@@ -494,7 +486,11 @@ describe('mapper-results component', function () {
         id: 124,
       },
     }];
-    let relatedIds = [123];
+    let relatedData = {
+      mockType: {
+        ids: [123],
+      },
+    };
     let expectedResult = [{
       data: {
         id: 123,
@@ -506,10 +502,12 @@ describe('mapper-results component', function () {
       },
       isDisabled: false,
     }];
+    let isMegaMapping = false;
+    let type = 'mockType';
 
     it('does nothing if viewModel.searchOnly() is true', function () {
       viewModel.attr('searchOnly', true);
-      viewModel.setDisabledItems(allItems, relatedIds);
+      viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
       expect(allItems).toEqual(allItems);
     });
 
@@ -518,13 +516,13 @@ describe('mapper-results component', function () {
         viewModel.attr({
           objectGenerator: true,
         });
-        viewModel.setDisabledItems(allItems, relatedIds);
+        viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
         expect(allItems).toEqual(allItems);
       });
 
     it('updates disabled items', function () {
       viewModel.attr('searchOnly', false);
-      viewModel.setDisabledItems(allItems, relatedIds);
+      viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
       expect(allItems).toEqual(expectedResult);
     });
   });
@@ -619,6 +617,8 @@ describe('mapper-results component', function () {
     let resultDfd;
 
     beforeEach(function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Control');
       spyOn(viewModel, 'getModelKey')
         .and.returnValue('program');
       spyOn(viewModel, 'getQuery')
@@ -631,6 +631,7 @@ describe('mapper-results component', function () {
         .and.returnValue('transformedValue');
       spyOn(viewModel, 'setSelectedItems');
       spyOn(viewModel, 'setDisabledItems');
+      spyOn(viewModel, 'disableItself');
       dfdRequest = $.Deferred();
       spyOn(QueryAPI, 'batchRequests');
       spyOn($, 'when')
@@ -651,10 +652,12 @@ describe('mapper-results component', function () {
             ids: 'ids',
           },
         };
+        let megaMapping = false;
+        let type = 'program';
         dfdRequest.resolve(data, relatedData);
         viewModel.load();
         expect(viewModel.setDisabledItems)
-          .toHaveBeenCalledWith(expectedResult, 'ids');
+          .toHaveBeenCalledWith(megaMapping, expectedResult, relatedData, type);
       });
 
     it('updates paging', function () {
@@ -968,14 +971,19 @@ describe('mapper-results component', function () {
 
     it('method should return data from "relatedData" array',
       function () {
-        let relatedData = {
-          Snapshot: {
-            ids: [1, 2, 3],
+        let responseArray = [
+          {
+            Snapshot: {
+              ids: [1, 2, 3],
+            },
           },
+        ];
+        let query = {
+          relatedQueryIndex: 0,
         };
 
         let result = viewModel
-          .buildRelatedData(relatedData, 'Snapshot');
+          .buildRelatedData(responseArray, query, 'Snapshot');
         expect(result.Snapshot.ids.length).toEqual(3);
         expect(result.Snapshot.ids[0]).toEqual(1);
       }
@@ -983,10 +991,15 @@ describe('mapper-results component', function () {
 
     it('method should return data from "deferred_list" array',
       function () {
-        let relatedData = {
-          Snapshot: {
-            ids: [1, 2, 3],
+        let responseArray = [
+          {
+            Snapshot: {
+              ids: [1, 2, 3],
+            },
           },
+        ];
+        let query = {
+          relatedQueryIndex: 0,
         };
         let result;
 
@@ -996,7 +1009,7 @@ describe('mapper-results component', function () {
         ]);
 
         result = viewModel
-          .buildRelatedData(relatedData, 'Snapshot');
+          .buildRelatedData(responseArray, query, 'Snapshot');
         expect(result.Snapshot.ids.length).toEqual(2);
         expect(result.Snapshot.ids[0]).toEqual(5);
       }
@@ -1005,6 +1018,9 @@ describe('mapper-results component', function () {
     it('return data from "deferred_list" array. RelatedData is undefined',
       function () {
         let result;
+        let query = {
+          relatedQueryIndex: 0,
+        };
 
         viewModel.attr('deferredList', [
           {id: 5, type: 'Snapshot'},
@@ -1012,7 +1028,7 @@ describe('mapper-results component', function () {
         ]);
 
         result = viewModel
-          .buildRelatedData(undefined, 'Snapshot');
+          .buildRelatedData([], query, 'Snapshot');
         expect(result.Snapshot.ids.length).toEqual(2);
         expect(result.Snapshot.ids[0]).toEqual(5);
       }

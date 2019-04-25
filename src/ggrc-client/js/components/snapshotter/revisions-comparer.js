@@ -155,7 +155,7 @@ export default can.Component.extend({
         // set correct order of revisions
         const isNeedReverse = revisions[0].id !== currentRevisionID;
         if (isNeedReverse) {
-          revisions = revisions.reverse();
+          revisions = _.reverse(revisions);
         }
         return new can.List(revisions);
       });
@@ -223,7 +223,7 @@ export default can.Component.extend({
           });
         })
         .then(function () {
-          let message = instance.child_type +
+          let message = businessModels[instance.child_type].title_singular +
         ' was refreshed successfully.';
           notifier('success', message);
         });

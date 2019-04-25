@@ -73,9 +73,9 @@ class TaskGroupObject(roleable.Roleable,
   _sanitize_html = []
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
 
-    query = super(TaskGroupObject, cls).eager_query()
+    query = super(TaskGroupObject, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload('task_group'))
 
@@ -120,7 +120,7 @@ class TaskGroupable(object):
   _include_links = []
 
   @classmethod
-  def eager_query(cls):
-    query = super(TaskGroupable, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(TaskGroupable, cls).eager_query(**kwargs)
     return cls.eager_inclusions(query, TaskGroupable._include_links).options(
         orm.subqueryload('task_group_objects'))

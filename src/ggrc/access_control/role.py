@@ -70,9 +70,9 @@ class AccessControlRole(attributevalidator.AttributeValidator,
     )
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Define fields to be loaded eagerly to lower the count of DB queries."""
-    return super(AccessControlRole, cls).eager_query()
+    return super(AccessControlRole, cls).eager_query(**kwargs)
 
   _api_attrs = reflection.ApiAttributes(
       "name",

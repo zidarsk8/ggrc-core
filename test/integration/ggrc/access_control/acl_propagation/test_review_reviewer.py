@@ -147,7 +147,7 @@ class TestReviewersPropagation(base.TestACLPropagation):
     """
     self.setup_people()
     reviewer_acr = all_models.AccessControlRole.query.filter_by(
-        name="Reviewer",
+        name="Reviewers",
         object_type="Review",
     ).one()
 

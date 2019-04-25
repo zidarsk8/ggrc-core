@@ -8,9 +8,7 @@ import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
 import WidgetList from '../modules/widget_list';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
-import {
-  getWidgetConfig,
-} from '../plugins/utils/object-versions-utils';
+import {getWidgetConfig} from '../plugins/utils/widgets-utils';
 import {widgetModules} from '../plugins/utils/widgets-utils';
 import {
   getPageInstance,
@@ -177,6 +175,15 @@ _.assign(CoreExtension, {
           order: 9,
         },
       },
+
+      Program: {
+        Program_parent: {
+          order: 8,
+        },
+        Program_child: {
+          order: 9,
+        },
+      },
     };
 
     _.forEach(farModels, function (modelName) {
@@ -204,11 +211,12 @@ _.assign(CoreExtension, {
         $.extend(descriptor, extraDescriptorOptions.all[modelName]);
       }
 
-      if (extraDescriptorOptions[object.constructor.model_singular] &&
-          extraDescriptorOptions[
-            object.constructor.model_singular][modelName]) {
-        $.extend(descriptor,
+      const customDescriptor =
+        extraDescriptorOptions[object.constructor.model_singular] &&
+        (extraDescriptorOptions[object.constructor.model_singular][widgetId] ||
           extraDescriptorOptions[object.constructor.model_singular][modelName]);
+      if (customDescriptor) {
+        $.extend(descriptor, customDescriptor);
       }
 
       descriptor.widgetType = 'treeview';

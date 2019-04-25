@@ -7,7 +7,6 @@ import Component from '../info-pane';
 import {getComponentVM, makeFakeInstance} from '../../../../../js_specs/spec_helpers';
 import tracker from '../../../../tracker';
 import {
-  REFRESH_TAB_CONTENT,
   RELATED_ITEMS_LOADED,
   REFRESH_MAPPING,
   REFRESH_RELATED,
@@ -680,7 +679,7 @@ describe('assessment-info-pane component', () => {
   describe('removeItems() method', () => {
     const itemsType = 'comments';
 
-    let items = new can.List(Array(3)).map((item, index) => {
+    let items = new can.List([...Array(3).keys()]).map((item, index) => {
       return {
         id: index,
         type: itemsType,
@@ -964,7 +963,7 @@ describe('assessment-info-pane component', () => {
       dfd = $.Deferred();
       type = 'type';
       items = new can.List(
-        Array(countOfItems)
+        Array(...Array(countOfItems).keys())
       ).map((item, index) => {
         return {
           id: index,
@@ -1732,11 +1731,11 @@ describe('assessment-info-pane component', () => {
           event();
         });
 
-        it('dispatches refresh tab event with appropriate data',
+        it('dispatches refresh related event with appropriate data',
           function (done) {
             const instance = vm.attr('instance');
-            instance.bind(REFRESH_TAB_CONTENT.type, (event) => {
-              expect(event.tabId).toBe('tab-related-assessments');
+            instance.bind(REFRESH_RELATED.type, (event) => {
+              expect(event.model).toBe('Related Assessments');
               done();
             });
             instance.dispatch('updated');

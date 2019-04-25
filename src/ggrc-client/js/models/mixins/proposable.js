@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 
-export default Mixin({
+export default Mixin.extend({
   isProposable: true,
 }, {
   after_update() {

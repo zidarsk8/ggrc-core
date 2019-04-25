@@ -7,16 +7,14 @@
   {{#unless hideLabel}}
     <label class="multi-type-label">
       Attachment
-      <label class="inline">
-        <i class="fa fa-question-circle" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i>
-      </label>
-      <a data-id="hide_folder_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <i class="fa fa-question-circle" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i>
     </label>
+    <a data-id="hide_folder_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
   {{/unless}}
 </div>
 <div class="mapped-folder">
   {{#if _folder_change_pending}}
-    <spinner class="mapped-folder__spinner" {toggle}="{_folder_change_pending}"></spinner>
+    <spinner-component class="mapped-folder__spinner" {toggle}="{_folder_change_pending}"></spinner-component>
   {{/if}}
 
   {{#if current_folder}}

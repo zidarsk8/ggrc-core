@@ -63,15 +63,6 @@ describe('autocomplete-input component', () => {
   describe('inputLatency() method', () => {
     const msTime = 501;
 
-    beforeEach(() => {
-      jasmine.clock().uninstall(); // required to fix jasmin.clock issue
-      jasmine.clock().install();
-    });
-
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
     it('should set "isPending" to true before dispatching event', () => {
       const value = 'f';
       viewModel.attr('value', value);
@@ -86,6 +77,8 @@ describe('autocomplete-input component', () => {
     });
 
     it('should notify that value is changed when value is not empty', () => {
+      jasmine.clock().install();
+
       const value = 'f';
       viewModel.attr('value', value);
       spyOn(viewModel, 'dispatch');
@@ -98,9 +91,13 @@ describe('autocomplete-input component', () => {
         type: 'inputChanged',
         value,
       });
+
+      jasmine.clock().uninstall();
     });
 
     it('should not notify that value is changed when value is empty', () => {
+      jasmine.clock().install();
+
       const value = '';
       viewModel.attr('value', value);
       spyOn(viewModel, 'dispatch');
@@ -110,9 +107,13 @@ describe('autocomplete-input component', () => {
       jasmine.clock().tick(msTime);
 
       expect(viewModel.dispatch).not.toHaveBeenCalled();
+
+      jasmine.clock().uninstall();
     });
 
     it('should set "isPending" to false after delay', () => {
+      jasmine.clock().install();
+
       ['any value', null, '', undefined].forEach((value) => {
         viewModel.attr('value', value);
         viewModel.attr('isPending', true);
@@ -122,6 +123,8 @@ describe('autocomplete-input component', () => {
 
         expect(viewModel.attr('isPending')).toBe(false);
       });
+
+      jasmine.clock().uninstall();
     });
   });
 

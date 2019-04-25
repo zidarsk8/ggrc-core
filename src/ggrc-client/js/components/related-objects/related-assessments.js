@@ -21,6 +21,7 @@ import tracker from '../../tracker';
 import Evidence from '../../models/business-models/evidence';
 import Context from '../../models/service-models/context';
 import * as businessModels from '../../models/business-models';
+import {REFRESH_RELATED} from '../../events/eventTypes';
 
 const defaultOrderBy = [
   {field: 'finished_date', direction: 'desc'},
@@ -92,6 +93,8 @@ export default can.Component.extend({
       return new Evidence(data);
     },
     reuseSelected: function () {
+      this.attr('isSaving', true);
+
       let reusedObjectList = this.attr('selectedEvidences').map((evidence) => {
         let model = this.buildEvidenceModel(evidence);
 
@@ -100,14 +103,17 @@ export default can.Component.extend({
         });
       });
 
-      this.attr('isSaving', true);
-
-      $.when(...reusedObjectList).always(() => {
-        this.attr('selectedEvidences').replace([]);
-        this.attr('isSaving', false);
-        this.dispatch('afterObjectReused');
-        this.dispatch('refreshAssessment');
-      });
+      $.when(...reusedObjectList)
+        .done((...evidence) => {
+          this.dispatch({
+            type: 'reusableObjectsCreated',
+            items: evidence,
+          });
+        })
+        .always(() => {
+          this.attr('selectedEvidences').replace([]);
+          this.attr('isSaving', false);
+        });
     },
     loadRelatedAssessments() {
       const limits = this.attr('paging.limits');
@@ -176,6 +182,11 @@ export default can.Component.extend({
     },
     '{viewModel.orderBy} changed'() {
       this.viewModel.loadRelatedAssessments();
+    },
+    [`{viewModel.instance} ${REFRESH_RELATED.type}`](scope, event) {
+      if (event.model === 'Related Assessments') {
+        this.viewModel.loadRelatedAssessments();
+      }
     },
   },
   helpers: {

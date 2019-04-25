@@ -501,3 +501,39 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
         "ids"
     )
     self.assertItemsEqual(resp, expected_ids)
+
+  def test_populated_automapping(self):
+    """Test automapping content in revision"""
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      regulation_a = factories.RegulationFactory()
+
+    program_a_id = program_a.id
+    program_b_id = program_b.id
+    regulation_a_id = regulation_a.id
+    self.gen.generate_relationship(regulation_a, program_a)
+    rel_1 = all_models.Relationship.query.filter_by(
+        source_type="Regulation",
+        source_id=regulation_a_id,
+        destination_type="Program",
+        destination_id=program_b_id
+    ).first()
+    rel_2 = all_models.Relationship.query.filter_by(
+        source_type="Program",
+        source_id=program_b_id,
+        destination_type="Regulation",
+        destination_id=regulation_a_id
+    ).first()
+    relationship = rel_1 or rel_2
+    revision = all_models.Revision.query.filter_by(
+        resource_type="Relationship",
+        resource_id=relationship.id
+    ).first()
+    automapping = revision.content["automapping"]
+    nodes = {automapping["source_type"]: automapping["source_id"],
+             automapping["destination_type"]: automapping["destination_id"]}
+    self.assertTrue(program_a_id == nodes["Program"])
+    self.assertTrue(regulation_a_id == nodes["Regulation"])

@@ -174,8 +174,8 @@ class Control(synchronizable.Synchronizable,
   }
 
   @classmethod
-  def eager_query(cls):
-    query = super(Control, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Control, cls).eager_query(**kwargs)
     return cls.eager_inclusions(query, Control._include_links).options(
         orm.joinedload('directive'),
     )

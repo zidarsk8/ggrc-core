@@ -75,9 +75,9 @@ class IssueTracked(object):
     )
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Define fields to be loaded eagerly to lower the count of DB queries."""
-    query = super(IssueTracked, cls).eager_query()
+    query = super(IssueTracked, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('issuetracker_issue')
     )
@@ -116,7 +116,7 @@ class IssueTrackedWithUrl(IssueTracked):
           "display_name": "Ticket Tracker Integration",
           "description": "Turn on integration with Ticket tracker, "
                          "On / Off options are possible",
-      }
+      },
   }
 
 
@@ -132,5 +132,18 @@ class IssueTrackedWithConfig(IssueTracked):
           "display_name": "Ticket Tracker Integration",
           "description": "Turn on integration with Ticket tracker, "
                          "On / Off options are possible",
-      }
+      },
+  }
+
+
+class IssueTrackedWithPeopleSync(object):
+  """Mixin that indentifies IssueTracked models with people sync option."""
+  # pylint: disable=too-few-public-methods
+  _aliases = {
+      "people_sync_enabled": {
+          "display_name": "Sync people with Ticket Tracker",
+          "description": "Check the box to enable sync between "
+                         "Audit roles and Ticket Tracker. "
+                         "Uncheck the box to disable the sync.",
+      },
   }

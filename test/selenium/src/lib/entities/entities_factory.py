@@ -361,7 +361,9 @@ class ProgramsFactory(EntitiesFactory):
     'is_add_rest_attrs' then add attributes for REST."""
     program_obj = self.obj_inst().update_attrs(
         title=self.obj_title, slug=self.obj_slug,
-        status=unicode(object_states.DRAFT))
+        status=unicode(object_states.DRAFT),
+        review=ReviewsFactory().default_review()
+    )
     if is_add_rest_attrs:
       program_obj.update_attrs(
           recipients=",".join((
@@ -715,4 +717,9 @@ class ReviewsFactory(EntitiesFactory):
   def _create_random_obj(self, is_add_rest_attrs):
     """Create Review entity."""
     return self.obj_inst().update_attrs(
-        status=unicode(ReviewStates.UNREVIEWED), type=self.obj_type)
+        status=unicode(ReviewStates.UNREVIEWED),
+        type=self.obj_type)
+
+  def default_review(self):
+    """Returns default review value as dict."""
+    return self.create().convert_review_to_dict()

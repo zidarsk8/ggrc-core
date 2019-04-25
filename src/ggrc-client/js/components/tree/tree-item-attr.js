@@ -39,6 +39,13 @@ export default can.Component.extend({
     instance: null,
     name: '',
     define: {
+      // workaround an issue: "instance.is_mega" is not
+      // handled properly in template
+      isMega: {
+        get() {
+          return this.attr('instance.is_mega');
+        },
+      },
       defaultValue: {
         type: String,
         get() {

@@ -62,7 +62,7 @@ class Reviewable(rest_handable.WithPutHandable,
   def reviewers(self):
     """Return list of reviewer persons"""
     if self.review:
-      return self.review.get_persons_for_rolename('Reviewer')
+      return self.review.get_persons_for_rolename('Reviewers')
     return []
 
   @builder.simple_property
@@ -93,8 +93,8 @@ class Reviewable(rest_handable.WithPutHandable,
     )
 
   @classmethod
-  def eager_query(cls):
-    return super(Reviewable, cls).eager_query().options(
+  def eager_query(cls, **kwargs):
+    return super(Reviewable, cls).eager_query(**kwargs).options(
         sa.orm.joinedload("review")
     )
 

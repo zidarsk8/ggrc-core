@@ -8,56 +8,64 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-arguments
 # pylint: disable=redefined-outer-name
+import copy
 
 import pytest
 
 from lib import base, users
 from lib.constants import roles
-from lib.constants.element import ReviewStates
-from lib.service import rest_service, webui_facade, rest_facade
+from lib.service import webui_facade, rest_facade, webui_service
 
 
 class TestObjectsReview(base.Test):
   """Tests for objects review workflow."""
 
   @pytest.fixture()
-  def program_with_assigned_reviewer(self):
-    """Creates program with assigned review.
-    Returns program and reviewer person."""
-    reviewer = rest_facade.create_user_with_role(roles.CREATOR)
-    users.set_current_user(rest_facade.create_user_with_role(roles.CREATOR))
-    program_with_review = rest_service.ReviewService().request_review(
-        rest_facade.create_program(), reviewer)
-    return {"program": program_with_review,
-            "reviewer": reviewer}
+  def reviewer(self):
+    """Create user with role 'Creator'."""
+    return rest_facade.create_user_with_role(roles.CREATOR)
+
+  @pytest.fixture()
+  def program_with_review(self, reviewer, login_as_creator, program):
+    """Returns program instance with assigned review."""
+    return rest_facade.request_obj_review(program, reviewer)
+
+  @pytest.fixture()
+  def program_with_approved_review(self, reviewer, program_with_review):
+    """Approve program review.
+    Returns program instance with approved review."""
+    users.set_current_user(reviewer)
+    return rest_facade.approve_obj_review(program_with_review)
 
   @pytest.mark.smoke_tests
-  def test_request_obj_review(self, selenium):
+  def test_request_obj_review(self, reviewer, login_as_creator, program,
+                              selenium):
     """Confirm reviewer is displayed on Program Info panel."""
-    reviewer = rest_facade.create_user_with_role(roles.CREATOR)
-    users.set_current_user(rest_facade.create_user_with_role(roles.CREATOR))
-    program = rest_facade.create_program()
-    webui_facade.submit_obj_for_review(selenium, program, reviewer.email)
+    webui_facade.submit_obj_for_review(selenium, program, reviewer)
     actual_program = webui_facade.get_object(selenium, program)
-    program.update_attrs(review={
-        "status": ReviewStates.UNREVIEWED,
-        "reviewers": [reviewer.email],
-        "last_reviewed_by": ""})
     self.general_equal_assert(program.repr_ui(), actual_program)
 
   @pytest.mark.smoke_tests
-  def test_obj_mark_reviewed(self, selenium, program_with_assigned_reviewer):
+  def test_obj_mark_reviewed(self, reviewer, program_with_review, selenium):
     """Confirm Reviewer with READ rights for an object
     able to Review an object."""
-    expected_program = program_with_assigned_reviewer["program"]
-    reviewer = program_with_assigned_reviewer["reviewer"]
     users.set_current_user(reviewer)
-    webui_facade.approve_obj_review(selenium, expected_program)
-    expected_program.update_attrs(review={
-        "status": ReviewStates.REVIEWED,
-        "reviewers": [reviewer.email],
-        "last_reviewed_by": "Last reviewed by\n" + reviewer.email + "\non " +
-                            rest_facade.get_last_review_date(expected_program)}
-    )
-    actual_program = webui_facade.get_object(selenium, expected_program)
-    self.general_equal_assert(expected_program.repr_ui(), actual_program)
+    webui_facade.approve_obj_review(selenium, program_with_review)
+    actual_program = webui_facade.get_object(selenium, program_with_review)
+    self.general_equal_assert(program_with_review.repr_ui(), actual_program)
+
+  @pytest.mark.smoke_tests
+  def test_reviewed_obj_buttons_state(self, program_with_approved_review,
+                                      selenium):
+    """Confirm 'Mark reviewed' button is hidden and 'Request review' button is
+    visible after review approval."""
+    info_page = webui_service.ProgramsService(selenium).open_info_page_of_obj(
+        program_with_approved_review)
+    expected_buttons_state = {"is_mark_reviewed_btn_visible": False,
+                              "is_request_review_btn_visible": True}
+    actual_buttons_state = copy.deepcopy(expected_buttons_state)
+    actual_buttons_state["is_mark_reviewed_btn_visible"] = (
+        info_page.mark_reviewed_btn.exists)
+    actual_buttons_state["is_request_review_btn_visible"] = (
+        info_page.request_review_btn.exists)
+    assert actual_buttons_state == expected_buttons_state

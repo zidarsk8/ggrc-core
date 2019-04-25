@@ -226,7 +226,7 @@ class TestReviewNotification(TestCase):
     """Reviewer should receive email notification"""
     reviewer = factories.PersonFactory()
     reviewer_role_id = all_models.AccessControlRole.query.filter_by(
-        name="Reviewer",
+        name="Reviewers",
         object_type="Review",
     ).one().id
     program = factories.ProgramFactory()
@@ -277,7 +277,7 @@ class TestReviewNotification(TestCase):
         email="user@example.com"
     ).one()
     reviewer_role_id = all_models.AccessControlRole.query.filter_by(
-        name="Reviewer",
+        name="Reviewers",
         object_type="Review",
     ).one().id
     program = factories.ProgramFactory()
@@ -323,9 +323,9 @@ class TestReviewNotification(TestCase):
     primary contacts, secondary contacts,
     if object is reverted to 'Unreviewed'.
     """
-    reviewer = factories.PersonFactory(name='reviewer')
+    reviewer = factories.PersonFactory(name='reviewers')
     reviewer_role_id = all_models.AccessControlRole.query.filter_by(
-        name="Reviewer",
+        name="Reviewers",
         object_type="Review",
     ).one().id
 
@@ -388,7 +388,7 @@ class TestReviewNotification(TestCase):
 
     reviewer = factories.PersonFactory()
     reviewer_role_id = all_models.AccessControlRole.query.filter_by(
-        name="Reviewer",
+        name="Reviewers",
         object_type="Review",
     ).one().id
 

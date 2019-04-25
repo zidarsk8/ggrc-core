@@ -417,8 +417,8 @@ class Workflow(roleable.Roleable,
     return target
 
   @classmethod
-  def eager_query(cls):
-    return super(Workflow, cls).eager_query().options(
+  def eager_query(cls, **kwargs):
+    return super(Workflow, cls).eager_query(**kwargs).options(
         orm.subqueryload('cycles').undefer_group('Cycle_complete')
            .subqueryload("cycle_task_group_object_tasks")
            .undefer_group("CycleTaskGroupObjectTask_complete"),

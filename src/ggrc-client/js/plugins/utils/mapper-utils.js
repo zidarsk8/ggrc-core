@@ -5,11 +5,12 @@
 
 import RefreshQueue from '../../models/refresh_queue';
 import {backendGdriveClient} from '../ggrc-gapi-client';
-import TaskGroupObject from '../../models/service-models/task-group-object';
 import Relationship from '../../models/service-models/relationship';
 
 async function mapObjects(instance, objects, {
   useSnapshots = false,
+  megaMapping = false,
+  relationsObj = false,
 } = {}) {
   let defer = [];
   let que = new RefreshQueue();
@@ -20,20 +21,21 @@ async function mapObjects(instance, objects, {
       let modelInstance;
       // Use simple Relationship Model to map Snapshot
       if (useSnapshots) {
-        modelInstance = new Relationship({
-          context,
-          source: instance,
-          destination: {
-            href: '/api/snapshots/' + destination.id,
-            type: 'Snapshot',
-            id: destination.id,
-          },
-        });
+        modelInstance = getSnapshotInstance(instance, destination, context);
+
+        return defer.push(modelInstance.save());
+      } else if (megaMapping) {
+        modelInstance =
+          getMegaInstance(instance, destination, context, relationsObj);
 
         return defer.push(modelInstance.save());
       }
 
-      modelInstance = getMapping(instance, destination, context);
+      modelInstance = new Relationship({
+        source: instance,
+        destination,
+        context,
+      });
       defer.push(backendGdriveClient.withAuth(() => {
         return modelInstance.save();
       }));
@@ -43,19 +45,40 @@ async function mapObjects(instance, objects, {
   });
 }
 
-function getMapping(source, destination, context) {
-  if (source.type === 'TaskGroup') {
-    return new TaskGroupObject({
-      task_group: source,
-      object: destination,
-      context,
-    });
+function getSnapshotInstance(instance, destination, context) {
+  return new Relationship({
+    context,
+    source: instance,
+    destination: {
+      href: '/api/snapshots/' + destination.id,
+      type: 'Snapshot',
+      id: destination.id,
+    },
+  });
+}
+
+function getMegaInstance(instance, destination, context, relationsObj) {
+  // If we map a new child to base program (relation == 'child'),
+  // the source is the base program and the destination is a new child.
+  // If we map a new parent to base program (relation == 'parent'),
+  // the source is a new program and the destination is the base program
+  const relation = relationsObj[destination.id] ||
+    relationsObj.defaultValue;
+  let src;
+  let dest;
+
+  if (relation === 'child') {
+    src = instance;
+    dest = destination;
+  } else if (relation === 'parent') {
+    src = destination;
+    dest = instance;
   }
 
   return new Relationship({
-    source,
-    destination,
     context,
+    source: src,
+    destination: dest,
   });
 }
 

@@ -10,8 +10,10 @@ import sqlalchemy as sa
 import flask
 
 from ggrc import db
+from ggrc import models
 from ggrc.automapper import rules
 from ggrc import login
+from ggrc.models.mixins import mega
 from ggrc.models.audit import Audit
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship, RelationshipsCache, Stub
@@ -35,7 +37,7 @@ class AutomapperGenerator(object):
   inserted mappings since we only queue ordered pairs (see `order`).
   """
 
-  COUNT_LIMIT = 10000
+  COUNT_LIMIT = 50000
 
   _AUTOMAP_WITHOUT_PERMISSION = [
       {"Audit", "Issue"},
@@ -100,6 +102,7 @@ class AutomapperGenerator(object):
       self._step(dst, src)
 
     if len(self.auto_mappings) <= self.COUNT_LIMIT:
+      logger.info("Automapping count: count=%s", len(self.auto_mappings))
       self._flush(relationship)
     else:
       logger.error("Automapping limit exceeded: limit=%s, count=%s",
@@ -118,6 +121,7 @@ class AutomapperGenerator(object):
               source_type=parent_relationship.source_type,
               destination_id=parent_relationship.destination_id,
               destination_type=parent_relationship.destination_type,
+              modified_by_id=current_user_id,
           )
       )
       automapping_id = automapping_result.inserted_primary_key[0]
@@ -203,7 +207,13 @@ class AutomapperGenerator(object):
     if mappings:
       dst_related = (o for o in self.related(dst)
                      if o.type in mappings and o != src)
+      dst_model = models.get_model(dst.type)
       for related in dst_related:
+        if (issubclass(dst_model, mega.Mega) and
+           dst_model.skip_automapping(src, dst, related)):
+          # Mega objects mapping are directed and objects from child
+          # object should be mapped to parent objects, but not vice versa
+          continue
         entry = self.order(related, src)
         if entry not in self.processed:
           self.queue.add(entry)

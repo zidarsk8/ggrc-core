@@ -288,6 +288,14 @@ class TestComprehensiveSheets(TestCase):
             },
         },
         "Program": {
+            "block_warnings": {
+                errors.UNSUPPORTED_MAPPING.format(
+                    line=6,
+                    obj_a="Program",
+                    obj_b="program",
+                    column_name="map:program"
+                ),
+            },
             "row_warnings": {
                 errors.OWNER_MISSING.format(
                     line=7, column_name="Program Managers"),

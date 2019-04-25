@@ -42,6 +42,8 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
   issue_tracked_obj = utils.PolymorphicRelationship("object_id", "object_type",
                                                     "{}_issue_tracked")
 
+  people_sync_enabled = db.Column(db.Boolean, nullable=False, default=True)
+
   @classmethod
   def get_issue(cls, object_type, object_id):
     """Returns an issue object by given type and ID or None.
@@ -74,6 +76,7 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
         'issue_type': self.issue_type,
         'issue_priority': self.issue_priority,
         'issue_severity': self.issue_severity,
+        'people_sync_enabled': self.people_sync_enabled,
     }
 
     if include_issue:
@@ -147,6 +150,8 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
 
         issue_id=info.get('issue_id'),
         issue_url=info.get('issue_url'),
+
+        people_sync_enabled=bool(info.get('people_sync_enabled', True)),
     )
 
   def update_from_dict(self, info):
@@ -191,6 +196,8 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
     if info.get('due_date'):
       self.due_date = info.get('due_date')
 
+    self.people_sync_enabled = info['people_sync_enabled']
+
   @staticmethod
   def get_issuetracker_issue_stub():
     """Returns dict with all Issue Tracker fields with empty values."""
@@ -205,4 +212,5 @@ class IssuetrackerIssue(base.ContextRBAC, Base, db.Model):
         'title': None,
         'issue_id': None,
         'issue_url': None,
+        'people_sync_enabled': True,
     }

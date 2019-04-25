@@ -9,7 +9,7 @@ import {navigate} from '../../plugins/utils/current-page-utils';
 import Workflow from '../../models/business-models/workflow';
 import ModalsController from '../../controllers/modals/modals_controller';
 
-let CloneWorkflow = Cacheable({
+let CloneWorkflow = Cacheable.extend({
   defaults: {
     clone_people: true,
     clone_tasks: true,

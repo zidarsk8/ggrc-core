@@ -12,7 +12,7 @@ import {confirm} from '../../plugins/utils/modals';
  *
  * @class Mixins.autoStatusChangeable
  */
-export default Mixin({}, {
+export default Mixin.extend({}, {
   /**
    * Display a confirmation dialog before starting to edit the instance.
    *

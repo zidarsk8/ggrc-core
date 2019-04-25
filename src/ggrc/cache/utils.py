@@ -137,11 +137,13 @@ def update_memcache_before_commit(context, modified_objects, expiry_time):
   if status_entries:
     logger.info("CACHE: status entries: %s", status_entries)
     ret = context.cache_manager.bulk_add(status_entries, expiry_time)
-    if ret is not None and not ret:
-      pass
-    else:
-      logger.error('CACHE: Unable to add status for newly created entries %s',
-                   ret)
+    if ret:
+      if ret == status_entries:
+        logger.error('CACHE: Unable to add status for newly created entries '
+                     'because of Network/RPC/Server errors')
+      else:
+        logger.error('CACHE: Newly created entries already exist in cache: %s',
+                     ret)
 
 
 def update_memcache_after_commit(context):

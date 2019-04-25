@@ -15,6 +15,7 @@
     {source}="{parentInstance}"
     {source-type}="{object}"
     {destination-model}="{model}"
+    {mega-relation}="{config.general.megaRelation}"
   ></create-and-map>
 
 </div>
@@ -131,6 +132,7 @@
                       {deferred-list}="{deferred_list}"
                       {filter-items}="*filterItems"
                       {mapping-items}="*mappingItems"
+                      {mega-relation-obj}="megaRelationObj"
                       (loaded)="{onLoaded()}"
                       {status-item}="*statusItem">
       </mapper-results>
@@ -141,7 +143,7 @@
       </div>
       <div class="span7">
         <div class="confirm-buttons">
-          <spinner {toggle}="{is_saving}"></spinner>
+          <spinner-component {toggle}="{is_saving}"></spinner-component>
           <span class="confirm-buttons__objects-count">
             {{selected.length}}
             object(s) selected

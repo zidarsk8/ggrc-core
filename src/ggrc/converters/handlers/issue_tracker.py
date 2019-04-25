@@ -111,11 +111,7 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
 
 
 class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
-  """Column handler for ticket tracker integration column.
-
-  Enabled flag stored as tinyint(1) in our DB.
-  """
-
+  """Column handler for ticket tracker integration column."""
   _true = "on"
   _false = "off"
 
@@ -125,12 +121,13 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
   NOT_ALLOWED_STATUSES = {"Fixed", "Fixed and Verified", "Deprecated"}
 
   def get_value(self):
+    """Get value for current column."""
     if super(IssueTrackerEnabledHandler, self).get_value():
       return self._true
     return self._false
 
   def _needs_status_check(self):
-    """Check if we should check status before turn integration On.
+    """Check if we should check status before turn integration on.
 
     According to our business rules we shouldn't generate tickets for Issues
     in some statuses. We can turn integration On for all already linked Issues.
@@ -167,3 +164,30 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
     self.add_warning(errors.WRONG_VALUE_DEFAULT,
                      column_name=self.display_name)
     return None
+
+
+class PeopleSyncEnabledHandler(IssueTrackerColumnHandler):
+  """Column handler for ticket tracker people sync column."""
+  _true = "on"
+  _false = "off"
+
+  TRUE_VALUES = {_true, }
+  FALSE_VALUES = {_false, }
+
+  def get_value(self):
+    """Get value for current column."""
+    if super(PeopleSyncEnabledHandler, self).get_value():
+      return self._true
+    return self._false
+
+  def parse_item(self):
+    """Parse provided value."""
+    value = self.raw_value.strip().lower()
+    if value in self.TRUE_VALUES:
+      return True
+    if value in self.FALSE_VALUES:
+      return False
+
+    self.add_warning(errors.WRONG_VALUE_DEFAULT,
+                     column_name=self.display_name)
+    return True

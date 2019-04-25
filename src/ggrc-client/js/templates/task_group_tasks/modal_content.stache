@@ -13,7 +13,7 @@
           <label class="form-label">
             Summary
             <i class="fa fa-asterisk"></i>
-            <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_singular}} a summary that is easy to search for and indicates the main goals of this {{model.model_singular}}"></i>
+            <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_singular}} a summary that is easy to search for and indicates the main goals of this {{model.title_singular}}"></i>
           </label>
           <input class="input-block-level required" id="task-title" placeholder="Enter Title" name="title" type="text" value="{{instance.title}}" tabindex="1" autofocus>
         </div>
@@ -39,7 +39,7 @@
             <div class="form-header-container">
               <label class="form-label">
                 Task Description
-                <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
+                <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
               </label>
               <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
             </div>
@@ -115,25 +115,25 @@
                   Start Date
                   <i class="fa fa-asterisk"></i>
               </label>
-              <datepicker id="repeate-start-date"
+              <datepicker-component id="repeate-start-date"
                           {(date)}="{instance.start_date}"
                           {required}="{true}"
                           {no-weekends}="{true}"
                           {readonly}="{true}">
-              </datepicker>
+              </datepicker-component>
             </label>
             <label class="smaller">
               <label class="form-label">
                   Due Date
                   <i class="fa fa-asterisk"></i>
               </label>
-              <datepicker id="repeate-end-date"
+              <datepicker-component id="repeate-end-date"
                           {set-min-date}="{instance.start_date}"
                           {(date)}="{instance.end_date}"
                           {required}="{true}"
                           {no-weekends}="{true}"
                           {readonly}="{true}">
-              </datepicker>
+              </datepicker-component>
             </label>
           </div>
         </object-loader>

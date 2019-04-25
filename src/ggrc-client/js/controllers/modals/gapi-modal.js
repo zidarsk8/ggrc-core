@@ -5,7 +5,7 @@
 
 import ModalsController from './modals_controller';
 
-export default ModalsController({
+export default ModalsController.extend({
   defaults: {
     skip_refresh: true,
     content_view: GGRC.templates_path + '/gdrive/auth_button.stache',

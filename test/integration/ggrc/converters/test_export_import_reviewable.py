@@ -25,8 +25,8 @@ class TestExportReviewable(TestCase):
       risk = factories.RiskFactory(title="Test risk")
       review = factories.ReviewFactory(reviewable=risk)
 
-      review.add_person_with_role_name(person1, 'Reviewer')
-      review.add_person_with_role_name(person2, 'Reviewer')
+      review.add_person_with_role_name(person1, 'Reviewers')
+      review.add_person_with_role_name(person2, 'Reviewers')
 
     self.client.get("/login")
 

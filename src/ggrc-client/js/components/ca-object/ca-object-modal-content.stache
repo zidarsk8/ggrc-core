@@ -27,7 +27,7 @@
         {{#if evidence}}
             <div class="simple-modal__section">
                 <div class="simple-modal__section-title">Evidence file
-                    <spinner class="simple-modal__section-title-icon" {toggle}="{isUpdatingEvidences}"></spinner>
+                    <spinner-component class="simple-modal__section-title-icon" {toggle}="{isUpdatingEvidences}"></spinner-component>
                 </div>
                 <object-list {items}="{evidences}" {empty-message}="{noItemsText}">
                     <editable-document-object-list-item {document}="{.}">
@@ -39,8 +39,6 @@
                     </editable-document-object-list-item>
                 </object-list>
                 <attach-button
-                    (before-create)="{addItems(%event, 'files')}"
-                    (created)="{addRelatedItem(%event, 'files')}" 
                     {is-attach-action-disabled}="{isUpdatingEvidences}"
                     {instance}="{instance}">
                 </attach-button>
@@ -61,9 +59,7 @@
                 {{#if urlsEditMode}}
                     <create-url {type}="{documentTypes.urls}"
                                 {context}="{instance.context}"
-                                (set-edit-mode)="{setUrlEditMode(false)}"
-                                (before-create)="{addItems(%event, 'urls')}"
-                                (created)="{addRelatedItem(%event, 'urls')}">
+                                (set-edit-mode)="{setUrlEditMode(false)}">
                         <form class="create-form">
                             <fieldset class="create-form__layout">
                                 <input {($value)}="{value}" class="create-form__input" type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">

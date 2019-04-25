@@ -5,8 +5,8 @@ Reasons for a facade:
 * It is not very convenient to use
 * More high level functions are often needed
 """
-from lib import factory, decorator
-from lib.constants import roles, objects
+from lib import factory, decorator, users
+from lib.constants import roles, objects, element
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.service import rest_service
@@ -96,7 +96,6 @@ def create_gcad(**attrs):
 @decorator.work_by_external_user
 def create_gcad_for_control():
   """Creates global CADs for all types."""
-  from lib.constants import element
   return [create_gcad(definition_type="control",
                       attribute_type=ca_type)
           for ca_type in element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
@@ -220,5 +219,34 @@ def get_last_review_date(obj):
 def get_obj_review(obj):
   """Get obj review instance."""
   rest_obj = get_obj(obj)
-  return get_obj(entities_factory.ReviewsFactory().create(
-      id=rest_obj.review["id"]))
+  return get_obj(entities_factory.ReviewsFactory().create(**rest_obj.review))
+
+
+def request_obj_review(obj, reviewer):
+  """Returns obj with assigned review."""
+  rest_service.ReviewService().create_obj(
+      {"reviewers": reviewer,
+       "reviewable": obj.repr_min_dict()})
+  exp_review = entities_factory.ReviewsFactory().create(
+      is_add_rest_attrs=True,
+      status=element.ReviewStates.UNREVIEWED,
+      reviewers=reviewer)
+  obj.review = exp_review.convert_review_to_dict()
+  obj.review_status = exp_review.status
+  return obj
+
+
+def approve_obj_review(obj):
+  """Returns obj with approved review."""
+  rest_review = get_obj_review(obj)
+  rest_service.ReviewService().update_obj(
+      obj=rest_review, status=element.ReviewStates.REVIEWED)
+  exp_review = entities_factory.ReviewsFactory().create(
+      is_add_rest_attrs=True,
+      status=element.ReviewStates.REVIEWED,
+      reviewers=users.current_user(),
+      last_reviewed_by=users.current_user().email,
+      last_reviewed_at=rest_review.last_reviewed_at)
+  obj.review = exp_review.convert_review_to_dict()
+  obj.review_status = exp_review.status
+  return obj
