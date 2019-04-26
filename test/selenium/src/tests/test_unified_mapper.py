@@ -8,10 +8,12 @@
 
 import pytest
 
-from lib import base
+from lib import base, browsers
 from lib.constants import objects
 from lib.entities.entity import Representation
+from lib.page.widget import object_modal
 from lib.service import webui_service
+from lib.ui import ui_facade
 
 
 class TestProgramPage(base.Test):
@@ -51,3 +53,21 @@ class TestProgramPage(base.Test):
     obj_modal = programs_service.add_and_map_obj_widget(objects.CONTROLS)
     assert not obj_modal.is_present, ("'New Control' modal "
                                       "should not be present.")
+
+  def test_user_cannot_map_control_to_scope_ojbects_via_add_tab(self, control,
+                                                                selenium):
+    """Tests that user cannot map control to scope objects/directives
+    via 'Add Tab' menu."""
+    service = webui_service.ControlsService(selenium)
+    controls_info_widget = service.open_info_page_of_obj(control)
+    controls_info_widget.click_add_tab_btn()
+    hidden_items = controls_info_widget.get_hidden_items_from_add_tab()
+    for h_item in hidden_items:
+      controls_info_widget.click_add_tab_btn()
+      h_item.click()
+      ui_facade.verify_modal_not_present(
+          object_modal.UnifiedMapperModal())
+      old_tab, new_tab = browsers.get_browser().windows()
+      assert old_tab.url == new_tab.url, "Urls for tabs should be the same."
+      old_tab.use()
+      new_tab.close()

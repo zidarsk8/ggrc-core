@@ -6,7 +6,7 @@
 * Proposal for object
 """
 from lib import base
-from lib.constants import objects
+from lib.constants import objects, locator
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
@@ -278,3 +278,11 @@ class TaskGroupModal(BaseObjectModal):
   def __init__(self):
     super(TaskGroupModal, self).__init__()
     self._fields = ["title"]
+
+
+class UnifiedMapperModal(BaseObjectModal):
+  """Represents unified mapper object modal."""
+
+  def __init__(self):
+    super(UnifiedMapperModal, self).__init__()
+    self._root = self._browser.element(css=locator.Common.MODAL_MAPPER)
