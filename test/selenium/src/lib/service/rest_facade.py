@@ -93,7 +93,6 @@ def create_gcad(**attrs):
       factory_params=attrs)
 
 
-@decorator.work_by_external_user
 def create_gcad_for_control():
   """Creates global CADs for all types."""
   return [create_gcad(definition_type="control",

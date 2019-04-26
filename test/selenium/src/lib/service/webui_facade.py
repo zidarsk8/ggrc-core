@@ -4,7 +4,7 @@
 import copy
 import re
 
-from lib import url, users, base, decorator
+from lib import url, users, base
 from lib.constants import objects, element
 from lib.entities import entities_factory
 from lib.page import dashboard
@@ -14,7 +14,6 @@ from lib.service.webui_service import ControlsService
 from lib.utils import selenium_utils, ui_utils, string_utils
 
 
-@decorator.work_by_external_user
 def create_control_in_program_scope(selenium, program):
   """Create control via UI."""
   controls_service = webui_service.ControlsService(selenium)
