@@ -49,7 +49,7 @@ export default Cacheable.extend({
     'Ready for External Review', 'Completed', 'Deprecated'],
   obj_nav_options: {
     show_all_tabs: false,
-    force_show_list: ['In Scope Controls', 'Assessment Templates',
+    force_show_list: ['Assessment Templates',
       'Issues', 'Assessments', 'Evidence'],
   },
   tree_view_options: {

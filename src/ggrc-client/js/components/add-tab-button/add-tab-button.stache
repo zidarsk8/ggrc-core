@@ -62,7 +62,7 @@
                 </a>
               {{else}}
 
-                {{#canMapObject model.model_singular}}
+                {{#is_allowed_to_map instance model.model_singular}}
                   <a href="{{urlPath}}{{ href }}"
                       data-clickable="true"
                       data-toggle="unified-mapper"
@@ -87,7 +87,7 @@
                       {{title}}
                     </div>
                   </a>
-                {{/canMapObject}}
+                {{/is_allowed_to_map}}
                 
               {{/isMappableExternally}}
             {{/shouldCreateObject}}

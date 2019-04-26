@@ -38,6 +38,8 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
     }
   }
 
+  <create> - models that cannot be mapped but can be created in scope of source
+    object
   <map> - models that can be mapped to source object directly
     using object mapper
   <externalMap> - models that can be mapped only through external system
@@ -52,13 +54,19 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
 const roleableObjects = getRoleableModels()
   .map((model) => model.model_singular);
 
+const createRule = {
+  create: ['CycleTaskGroupObjectTask'],
+};
+
 const coreObjectConfig = {
+  ...createRule,
   map: _.difference(businessObjects, ['Assessment']),
   unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
 
 const scopingObjectConfig = {
+  ...createRule,
   map: _.difference(businessObjects,
     ['Assessment', 'Control', 'Standard', 'Regulation']),
   externalMap: ['Control'],
@@ -75,9 +83,10 @@ new Mappings({
   },
 
   Program: {
+    create: ['Audit', 'CycleTaskGroupObjectTask'],
     map: [...coreObjects, 'Program', 'Document'],
     unmap: [...coreObjects, 'Program', 'Document'],
-    indirectMappings: ['Audit', 'Person', 'TaskGroup', 'Workflow'],
+    indirectMappings: ['Person', 'TaskGroup', 'Workflow'],
   },
 
   Document: {
@@ -88,6 +97,7 @@ new Mappings({
 
   // Core objects
   Issue: {
+    ...createRule,
     map: [...coreObjects, 'Document', 'Program'],
     // mapping audit and assessment to issue is not allowed,
     // but unmapping possible
@@ -96,11 +106,13 @@ new Mappings({
       'Workflow'],
   },
   Contract: {
+    ...createRule,
     map: _.difference(businessObjects, ['Assessment', 'Contract']),
     unmap: _.difference(businessObjects, ['Assessment', 'Audit', 'Contract']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Control: {
+    ...createRule,
     map: _.difference(businessObjects,
       ['Assessment', ...scopingObjects, ...externalDirectiveObjects]),
     externalMap: [...scopingObjects, ...externalDirectiveObjects],
@@ -111,6 +123,7 @@ new Mappings({
     ...coreObjectConfig,
   },
   Policy: {
+    ...createRule,
     map: _.difference(businessObjects, ['Assessment', 'Policy']),
     unmap: _.difference(businessObjects, ['Assessment', 'Audit', 'Policy']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
@@ -119,6 +132,7 @@ new Mappings({
     ...coreObjectConfig,
   },
   Regulation: {
+    ...createRule,
     map: _.difference(businessObjects,
       [...scopingObjects, 'Assessment', 'Control', 'Regulation']),
     externalMap: ['Control'],
@@ -131,6 +145,7 @@ new Mappings({
     ...coreObjectConfig,
   },
   Standard: {
+    ...createRule,
     map: _.difference(businessObjects,
       [...scopingObjects, 'Assessment', 'Control', 'Standard']),
     externalMap: ['Control'],
@@ -145,6 +160,7 @@ new Mappings({
 
   // Scoping objects
   AccessGroup: {
+    ...createRule,
     map: _.difference(businessObjects,
       ['Assessment', 'AccessGroup', 'Control', 'Standard', 'Regulation']),
     externalMap: ['Control'],
@@ -198,10 +214,10 @@ new Mappings({
 
   // Audit
   Audit: {
+    create: ['Assessment', 'AssessmentTemplate', 'CycleTaskGroupObjectTask'],
     map: [...snapshotableObjects, 'Issue'],
     unmap: ['Issue'],
-    indirectMappings:
-      ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person', 'Program'],
+    indirectMappings: ['Evidence', 'Person', 'Program'],
   },
   Assessment: {
     map: [...snapshotableObjects, 'Issue'],

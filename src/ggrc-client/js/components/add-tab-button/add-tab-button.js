@@ -5,7 +5,6 @@
 
 import template from './add-tab-button.stache';
 import {
-  getPageType,
   isMyWork,
   isAllObjects,
 } from '../../plugins/utils/current-page-utils';
@@ -34,7 +33,6 @@ const viewModel = can.Map.extend({
           && !instance.attr('archived')
           && !isMyWork()
           && !isAllObjects()
-          && !['Person', 'Evidence'].includes(getPageType())
           && this.attr('widgetList.length') > 0;
       },
     },
@@ -42,10 +40,6 @@ const viewModel = can.Map.extend({
   instance: null,
   widgetList: null,
   addTabTitle: '',
-  isAllowedToMap(target) {
-    let source = this.attr('instance');
-    return Mappings.allowedToMap(source, target);
-  },
 });
 
 export default can.Component.extend({
@@ -74,12 +68,6 @@ export default can.Component.extend({
         return options.fn(options.contexts);
       }
 
-      return options.inverse(options.contexts);
-    },
-    canMapObject(modelShortName, options) {
-      if (this.isAllowedToMap(modelShortName())) {
-        return options.fn(options.contexts);
-      }
       return options.inverse(options.contexts);
     },
     isMappableExternally(instance, modelShortName, options) {

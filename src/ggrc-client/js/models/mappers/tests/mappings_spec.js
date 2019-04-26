@@ -165,25 +165,13 @@ describe('Mappings', function () {
     });
   });
 
-  describe('isMappableType() method', function () {
-    it('returns false for AssessmentTemplate and  any type', function () {
-      let result = Mappings.isMappableType('AssessmentTemplate', 'Program');
-      expect(result).toBe(false);
-    });
-
-    it('returns true for Program and Control', function () {
-      let result = Mappings.isMappableType('Program', 'Control');
-      expect(result).toBe(true);
-    });
-  });
-
   describe('allowedToMap() method', () => {
     beforeEach(() => {
       spyOn(Permission, 'is_allowed_for').and.returnValue(true);
     });
 
     it('checks that types are mappable', () => {
-      spyOn(Mappings, 'isMappableType').and.returnValue(false);
+      spyOn(Mappings, 'getAllowedToMapModels');
 
       let result = Mappings.allowedToMap('SourceType', 'TargetType');
 
@@ -191,23 +179,131 @@ describe('Mappings', function () {
       expect(Permission.is_allowed_for).not.toHaveBeenCalled();
     });
 
-    it('checks permissions to update source', () => {
-      spyOn(Mappings, 'isMappableType').and.returnValue(true);
+    it('checks map and externalMap collections', () => {
+      spyOn(Mappings, 'getAllowedToMapModels');
+      spyOn(Mappings, 'getExternalMapModels');
 
-      let result = Mappings.allowedToMap('DataAsset', 'AccessGroup');
+      Mappings.allowedToMap('SourceType', 'TargetType');
+
+      expect(Mappings.getAllowedToMapModels).toHaveBeenCalled();
+      expect(Mappings.getExternalMapModels).toHaveBeenCalled();
+    });
+
+    it('checks permissions to update source', () => {
+      spyOn(Mappings, 'getAllowedToMapModels').and.returnValue({
+        TargetType: {},
+      });
+
+      let result = Mappings.allowedToMap('SourceType', 'TargetType');
 
       expect(result).toBeTruthy();
       expect(Permission.is_allowed_for)
-        .toHaveBeenCalledWith('update', 'DataAsset');
+        .toHaveBeenCalledWith('update', 'SourceType');
       expect(Permission.is_allowed_for.calls.count()).toEqual(1);
     });
 
     it('checks permissions to update target', () => {
-      spyOn(Mappings, 'isMappableType').and.returnValue(true);
+      spyOn(Mappings, 'getAllowedToMapModels').and.returnValue({
+        TargetType: {},
+      });
 
-      let source = new can.Map({type: 'DataAsset'});
-      let target = new can.Map({type: 'AccessGroup'});
+      let source = new can.Map({type: 'SourceType'});
+      let target = new can.Map({type: 'TargetType'});
       let result = Mappings.allowedToMap(source, target);
+
+      expect(result).toBeTruthy();
+      expect(Permission.is_allowed_for.calls.count()).toEqual(2);
+      expect(Permission.is_allowed_for.calls.argsFor(0))
+        .toEqual(['update', source]);
+      expect(Permission.is_allowed_for.calls.argsFor(1))
+        .toEqual(['update', target]);
+    });
+  });
+
+  describe('allowedToCreate() method', () => {
+    beforeEach(() => {
+      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+    });
+
+    it('checks that types are mappable', () => {
+      spyOn(Mappings, 'getAllowedToCreateModels').and.returnValue({
+        anyType: {},
+      });
+
+      let result = Mappings.allowedToCreate('SourceType', 'TargetType');
+
+      expect(result).toBeFalsy();
+      expect(Permission.is_allowed_for).not.toHaveBeenCalled();
+    });
+
+    it('checks permissions to update source', () => {
+      spyOn(Mappings, 'getAllowedToCreateModels').and.returnValue({
+        TargetType: {},
+      });
+
+      let result = Mappings.allowedToCreate('SourceType', 'TargetType');
+
+      expect(result).toBeTruthy();
+      expect(Permission.is_allowed_for)
+        .toHaveBeenCalledWith('update', 'SourceType');
+      expect(Permission.is_allowed_for.calls.count()).toEqual(1);
+    });
+
+    it('checks permissions to update target', () => {
+      spyOn(Mappings, 'getAllowedToCreateModels').and.returnValue({
+        TargetType: {},
+      });
+
+      let source = new can.Map({type: 'SourceType'});
+      let target = new can.Map({type: 'TargetType'});
+      let result = Mappings.allowedToCreate(source, target);
+
+      expect(result).toBeTruthy();
+      expect(Permission.is_allowed_for.calls.count()).toEqual(2);
+      expect(Permission.is_allowed_for.calls.argsFor(0))
+        .toEqual(['update', source]);
+      expect(Permission.is_allowed_for.calls.argsFor(1))
+        .toEqual(['update', target]);
+    });
+  });
+
+  describe('allowedToUnmap() method', () => {
+    beforeEach(() => {
+      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+    });
+
+    it('checks that types are unmappable', () => {
+      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
+        anyType: {},
+      });
+
+      let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
+
+      expect(result).toBeFalsy();
+      expect(Permission.is_allowed_for).not.toHaveBeenCalled();
+    });
+
+    it('checks permissions to update source', () => {
+      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
+        TargetType: {},
+      });
+
+      let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
+
+      expect(result).toBeTruthy();
+      expect(Permission.is_allowed_for)
+        .toHaveBeenCalledWith('update', 'SourceType');
+      expect(Permission.is_allowed_for.calls.count()).toEqual(1);
+    });
+
+    it('checks permissions to update target', () => {
+      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
+        TargetType: {},
+      });
+
+      let source = new can.Map({type: 'SourceType'});
+      let target = new can.Map({type: 'TargetType'});
+      let result = Mappings.allowedToUnmap(source, target);
 
       expect(result).toBeTruthy();
       expect(Permission.is_allowed_for.calls.count()).toEqual(2);

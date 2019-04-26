@@ -53,63 +53,82 @@ export default can.Construct.extend({
     return _.keys(Object.assign({}, allowedToMap, externalMap));
   },
   /**
-   * Determine if two types of models can be mapped
+   * Checks user permissions for mappings
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
    *
-   * @param {String} target - the target type of model
-   * @param {String} source - the source type of model
+   * @return {Boolean} whether user has permissions for mappings
+   */
+  userHasPermissions(source, target) {
+    let hasPermissions = Permission.is_allowed_for('update', source)
+      || source.isNew();
+
+    if (target instanceof can.Map) {
+      hasPermissions = hasPermissions
+        && Permission.is_allowed_for('update', target);
+    }
+
+    return hasPermissions;
+  },
+  /**
+   * Determine if `target` is allowed to be created and mapped to `source`.
+   *
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
    *
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
-  isMappableType: function (target, source) {
-    if (!target || !source) {
-      return false;
-    }
-    let result = this.getMappingList(target);
-    return _.includes(result, source);
+  allowedToCreate(source, target) {
+    let targetType = this._getType(target);
+    let sourceType = this._getType(source);
+
+    let allowedTypes = _.keys(this.getAllowedToCreateModels(sourceType));
+    let canCreate = _.includes(allowedTypes, targetType);
+
+    return canCreate && this.userHasPermissions(source, target);
   },
   /**
    * Determine if `target` is allowed to be mapped to `source`.
    *
    * @param {Object} source - the source object the mapping
    * @param {Object} target - the target object of the mapping
-   * @param {Object} options - the options objects, similar to the one that is
-   *   passed as an argument to helpers
    *
    * @return {Boolean} - true if mapping is allowed, false otherwise
    */
-  allowedToMap: function (source, target, options) {
+  allowedToMap: function (source, target) {
     let targetType = this._getType(target);
     let sourceType = this._getType(source);
 
-    // special check for snapshot:
-    if (options &&
-      options.context &&
-      options.context.parent_instance &&
-      options.context.parent_instance.snapshot) {
-      // Avoid add mapping for snapshot
-      return false;
-    }
+    let mappableTypes = _.keys(this.getAllowedToMapModels(sourceType));
+    let externalTypes = _.keys(this.getExternalMapModels(sourceType));
 
-    if (!this.isMappableType(sourceType, targetType)) {
-      return false;
-    }
+    let canMap = _.includes(mappableTypes, targetType) ||
+      _.includes(externalTypes, targetType);
 
-    let targetContext = _.exists(target, 'context.id');
-    let sourceContext = _.exists(source, 'context.id');
-    let createContexts = _.exists(
-      GGRC, 'permissions.create.Relationship.contexts');
+    return canMap && this.userHasPermissions(source, target);
+  },
+  /**
+   * Determine if `target` is allowed to be mapped to `source` or created and
+   * mapped to 'source'.
+   *
+   * @param {Object} source - the source object the mapping
+   * @param {Object} target - the target object of the mapping
+   *
+   * @return {Boolean} - true if mapping is allowed, false otherwise
+   */
+  allowedToCreateOrMap(source, target) {
+    let sourceType = this._getType(source);
+    let targetType = this._getType(target);
 
-    let canMap = Permission.is_allowed_for('update', source) ||
-      _.includes(createContexts, sourceContext) ||
-      // Also allow mapping to source if the source is about to be created.
-      _.isUndefined(source.created_at);
+    let mappableTypes = _.keys(this.getAllowedToMapModels(sourceType));
+    let externalTypes = _.keys(this.getExternalMapModels(sourceType));
+    let createTypes = _.keys(this.getAllowedToCreateModels(sourceType));
 
-    if (target instanceof can.Map && targetType) {
-      canMap = canMap &&
-        (Permission.is_allowed_for('update', target) ||
-          _.includes(createContexts, targetContext));
-    }
-    return canMap;
+    let canCreateOrMap = _.includes(mappableTypes, targetType) ||
+      _.includes(createTypes, targetType) ||
+      _.includes(externalTypes, targetType);
+
+    return canCreateOrMap && this.userHasPermissions(source, target);
   },
   /**
    * Determine if `target` is allowed to be unmapped from `source`.
@@ -124,16 +143,9 @@ export default can.Construct.extend({
     let targetType = this._getType(target);
 
     let unmappableTypes = _.keys(this.getAllowedToUnmapModels(sourceType));
-    if (!_.includes(unmappableTypes, targetType)) {
-      return false;
-    }
+    let canUnmap = _.includes(unmappableTypes, targetType);
 
-    let canUnmap = Permission.is_allowed_for('update', source);
-
-    if (target instanceof can.Map && targetType) {
-      canUnmap = canUnmap && Permission.is_allowed_for('update', target);
-    }
-    return canUnmap;
+    return canUnmap && this.userHasPermissions(source, target);
   },
   _getType: function (object) {
     let type;
@@ -178,8 +190,10 @@ export default can.Construct.extend({
     let allowedToMap = this.getAllowedToMapModels(type);
     let related = this.getIndirectlyMappedModels(type);
     let externalMap = this.getExternalMapModels(type);
+    let allowedToCreate = this.getAllowedToCreateModels(type);
 
-    return Object.assign({}, allowedToMap, related, externalMap);
+    return Object.assign({},
+      allowedToMap, related, externalMap, allowedToCreate);
   },
   /**
    * Return grouped types.
@@ -261,6 +275,14 @@ export default can.Construct.extend({
    */
   getAllowedToUnmapModels(object) {
     return this._getModelsFromConfig(object, 'unmap');
+  },
+  /**
+   * Returns collection of models allowed for creating and mapping
+   * @param {String} object - the object type's short name
+   * @return {Object} - a keyed object of allowed for creating and mapping models
+   */
+  getAllowedToCreateModels(object) {
+    return this._getModelsFromConfig(object, 'create');
   },
   _getModelsFromConfig(object, prop) {
     let mappings = {};

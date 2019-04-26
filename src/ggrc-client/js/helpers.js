@@ -298,15 +298,14 @@ can.stache.registerHelper('is_allowed_to_map',
     return options.inverse(options.contexts || this);
   });
 
-can.stache.registerHelper('is_allowed_to_map_task', (sourceType, options) => {
-  const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
-    'Contract', 'Requirement', 'Control', 'Objective', 'KeyReport',
-    'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
-    'Product', 'ProductGroup', 'Project', 'Facility', 'Market', 'Metric',
-    'TechnologyEnvironment', 'AccountBalance'];
-  sourceType = resolveComputed(sourceType);
+can.stache.registerHelper('is_allowed_to_create', (source, target, options) => {
+  let canCreate;
 
-  if (mappableTypes.includes(sourceType)) {
+  source = resolveComputed(source);
+  target = resolveComputed(target);
+  canCreate = Mappings.allowedToCreate(source, target);
+
+  if (canCreate) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
