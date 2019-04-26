@@ -9,6 +9,7 @@ It allows to mark objects as read-only
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.fulltext import attributes
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
 
@@ -34,6 +35,15 @@ class WithReadOnlyAccess(object):
           "hidden": True,
       },
   }
+
+  _fulltext_attrs = [
+      attributes.BooleanFullTextAttr(
+          'readonly',
+          'readonly',
+          true_value="yes",
+          false_value="no",
+      )
+  ]
 
   def can_change_relationship_with(self, obj):
     """Check whether relationship from self to obj1 can be changed
