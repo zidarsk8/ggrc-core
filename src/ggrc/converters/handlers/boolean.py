@@ -91,18 +91,25 @@ class AdminCheckboxColumnHandler(CheckboxColumnHandler):
   and False. Only global Admin can setup such value.
   """
 
-  def set_obj_attr(self):
-    """Handle set object for boolean values by global Admin."""
+  def parse_item(self):
+    """Return parsed column value
+
+    Mark current handler value "not specified" if current user
+    is not global admin
+    """
+
     user = login.get_current_user(use_external_user=False)
     role = getattr(user, 'system_wide_role', None)
     if role in rbac.SystemWideRoles.admins:
-      super(AdminCheckboxColumnHandler, self).set_obj_attr()
-    else:
-      self.add_warning(
-          errors.NON_ADMIN_ACCESS_ERROR,
-          object_type=self.row_converter.obj.type,
-          column_name=self.display_name,
-      )
+      return super(AdminCheckboxColumnHandler, self).parse_item()
+
+    self.add_warning(
+        errors.NON_ADMIN_ACCESS_ERROR,
+        object_type=self.row_converter.obj.type,
+        column_name=self.display_name,
+    )
+    self.set_empty = True
+    return None
 
 
 class KeyControlColumnHandler(CheckboxColumnHandler):
