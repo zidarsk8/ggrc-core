@@ -9,13 +9,13 @@
       <a href="{{urlPath}}{{href}}" rel="tooltip" data-placement="bottom" title="{{title}}">
         <i class="fa fa-{{ icon }} color"></i>
         {{#showTitle}} {{title}} {{/showTitle}}
-        {{^uncountable}}
+        {{^if uncountable}}
           {{#if showTitle}}
             ({{count}})
           {{else}}
             {{count}}
           {{/if}}
-        {{/uncountable}}
+        {{/if}}
         {{#showCloseButton}}
           <span class="closed" on:el:click="closeTab()"><i class="fa fa-times"></i></span>
         {{/showCloseButton}}

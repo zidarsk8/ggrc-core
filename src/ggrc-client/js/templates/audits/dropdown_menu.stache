@@ -74,7 +74,7 @@
     <permalink-component instance:from="instance"/>
   </li>
 
-  {{#is_info_pin}}
+  {{#if is_info_pin}}
     <unmap-dropdown-item
       page_instance:from="page_instance"
       instance:from="instance"
@@ -89,7 +89,7 @@
         </a>
       </li>
     {{/if}}
-  {{/is_info_pin}}
+  {{/if}}
 
   <object-loader path:from="instance.program">
     {{^if instance.archived}}

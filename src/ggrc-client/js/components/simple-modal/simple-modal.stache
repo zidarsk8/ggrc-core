@@ -4,7 +4,7 @@
 }}
 
 <div data-modal-wrapper-target="true">
-    {{#state.open}}
+    {{#if state.open}}
     <div class="simple-modal__overlay">
         <div class="simple-modal {{extraCssClass}}">
             {{#if replaceContent}}
@@ -23,5 +23,5 @@
             {{/if}}
         </div>
     </div>
-    {{/state.open}}
+    {{/if}}
 </div>

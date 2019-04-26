@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<section class="assessment-module info info-pane{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
+<section class="assessment-module info info-pane{{#if is_info_pin}} sticky-info-panel assignable{{/if}}">
   <spinner-component toggle:from="isLoading" class="spinner-wrapper active"></spinner-component>
   <inline-form-control instance:from="instance" deferredSave:from="deferredSave">
     <div class="tier-content">

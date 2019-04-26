@@ -5,14 +5,14 @@
 
 
 {{#instance}}
-  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+  <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
     <div class="tier-content">
       <div class="pane-header" >
         <div class="pane-header__container">
           <div class="pane-header__title" data-test-id="title_0ad9fbaf">
-            {{#is_info_pin}}
+            {{#if is_info_pin}}
               <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
-            {{/is_info_pin}}
+            {{/if}}
             <div class="pane-header__title-details">
               <h3 class="pane-header__title-name">{{title}}</h3>
               <span class="pane-header__title-item">
@@ -22,12 +22,12 @@
           </div>
 
           <div class="pane-header__toolbar">
-            {{#is_info_pin}}
+            {{#if is_info_pin}}
               <info-pin-buttons maximized:from="maximized" 
                                 onChangeMaximizedState:from="@onChangeMaximizedState" 
                                 onClose:from="@onClose">
               </info-pin-buttons>
-            {{/is_info_pin}}
+            {{/if}}
           </div>
         </div>
       </div>

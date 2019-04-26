@@ -11,9 +11,9 @@
     <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
       <div class="pane-header__container">
         <div class="pane-header__title" data-test-id="title_0ad9fbaf">
-          {{#is_info_pin}}
+          {{#if is_info_pin}}
             <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
-          {{/is_info_pin}}
+          {{/if}}
           <div class="pane-header__title-details">
             <h3 class="pane-header__title-name">{{title}}</h3>
             {{#if status}}

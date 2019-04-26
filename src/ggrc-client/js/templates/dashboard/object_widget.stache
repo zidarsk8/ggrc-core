@@ -4,7 +4,7 @@
 }}
 {{#switch widget_id}}
   {{#case "roles_list"}}
-    <header class="header tree-header no-left-space {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+    <header class="header tree-header no-left-space {{#if filter_is_hidden}}no-filter{{/if}}">
       <div class="row-fluid">
         <div class="span6">
           <div class="title-heading oneline">

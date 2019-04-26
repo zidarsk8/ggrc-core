@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+<section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
   <div class="tier-content">
     <general-page-header instance:from="instance"></general-page-header>
 

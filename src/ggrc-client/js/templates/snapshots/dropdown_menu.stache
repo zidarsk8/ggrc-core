@@ -56,13 +56,13 @@
         {{/if}}
     {{/if}}
 
-    {{#is_info_pin}}
+    {{#if is_info_pin}}
       <unmap-dropdown-item
         page_instance:from="page_instance"
         instance:from="instance.snapshot"
         options:from="options">
       </unmap-dropdown-item>
-    {{/is_info_pin}}
+    {{/if}}
     {{^if instance.snapshot.archived}}
       {{#if_instance_of page_instance "Audit"}}
         {{#is_allowed 'delete' instance.snapshot}}

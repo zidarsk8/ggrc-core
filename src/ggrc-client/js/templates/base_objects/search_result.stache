@@ -13,9 +13,9 @@
         </span>
       </div>
       <div class="lhs-people">
-        {{^contact}}
+        {{^if contact}}
         <i class="fa fa-person red"></i>
-        {{/contact}}
+        {{/if}}
       </div>
     </div>
   </a>

@@ -7,7 +7,7 @@
   {{#if_helpers '\n #is_dashboard_or_all' '\n and #if' is_info_widget}}
     {{> /static/templates/dashboard/info/info.stache}}
   {{else}}
-    <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+    <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
       <div class="tier-content">
         <div class="pane-header">
           <div class="pane-header__container">
@@ -40,7 +40,7 @@
               </div>
             </div>
             <div class="pane-header__toolbar">
-              {{#is_info_pin}}
+              {{#if is_info_pin}}
                 <info-pin-buttons class="details-wrap"
                                   maximized:from="maximized"
                                   onChangeMaximizedState:from="@onChangeMaximizedState"
@@ -49,7 +49,7 @@
                 <div class="info-pane-utility">
                   {{> /static/templates/people/dropdown_menu.stache}}
                 </div>
-              {{/is_info_pin}}
+              {{/if}}
             </div>
           </div>
         </div>

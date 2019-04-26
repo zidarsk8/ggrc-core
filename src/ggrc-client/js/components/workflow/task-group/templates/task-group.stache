@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+  <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
     <div class="tier-content">
       <div class="pane-header">
         <div class="pane-header__container">
@@ -12,12 +12,12 @@
             <h3 class="pane-header__title-name">{{instance.title}}</h3>
           </div>
           <div class="pane-header__toolbar">
-            {{#is_info_pin}}
+            {{#if is_info_pin}}
               <info-pin-buttons maximized:from="maximized"
                                 onChangeMaximizedState:from="@onChangeMaximizedState"
                                 onClose:from="@onClose">
               </info-pin-buttons>
-            {{/is_info_pin}}
+            {{/if}}
             <div class="info-pane-utility">
               {{#is_allowed 'update' instance}}
                 <three-dots-menu>

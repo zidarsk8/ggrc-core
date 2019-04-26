@@ -5,17 +5,17 @@
 
 <h6>
   Filter by mapping
-  {{^readOnly}}
+  {{^if readOnly}}
     <a href="javascript://" on:el:click="addFilter()" class="add-filter-rule">
       <i class="fa fa-fw fa-plus-circle"></i>
     </a>
-  {{/readOnly}}
+  {{/if}}
 </h6>
 {{#each relevant}}
   <div class="single-line-filter">
-    {{^readOnly}}
+    {{^if readOnly}}
       <i class="fa fa-trash" on:el:click="removeFilter(scope.element, @index)"></i>
-    {{/readOnly}}
+    {{/if}}
     {{#if @index}}
       <dropdown-component optionsList:from="operators"
                 name:bind="operator"
@@ -24,7 +24,7 @@
     {{/if}}
     Mapped to:
     <select class="filter-type-selector select-filter{{@index}}"
-            {{#readOnly}}disabled="disabled"{{/readOnly}}
+            {{#if readOnly}}disabled="disabled"{{/if}}
             el:value:bind="model_name">
       {{#menu}}
         {{#if model_singular}}
@@ -40,7 +40,7 @@
         {{#model_name}}
           <div class="modal-search objective-selector">
             <input
-                {{#readOnly}}disabled="disabled"{{/readOnly}}
+                {{#if readOnly}}disabled="disabled"{{/if}}
                 class="input-large search-icon search-filter-{{@index}}"
                 placeholder="Enter text to search for {{model_name}}"
                 type="text"

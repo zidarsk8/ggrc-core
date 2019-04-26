@@ -4,7 +4,7 @@
 }}
 
 {{#instance}}
-  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+  <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
     <div class="tier-content">
       <general-page-header instance:from="instance"></general-page-header>
       <tab-container>
