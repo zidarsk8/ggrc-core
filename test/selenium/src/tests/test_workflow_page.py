@@ -7,7 +7,6 @@
 # pylint: disable=invalid-name
 import datetime
 import pytest
-from nerodia.wait.wait import TimeoutError
 
 from lib import base, url, users
 from lib.app_entity_factory import (
@@ -209,15 +208,8 @@ class TestActivateWorkflow(base.Test):
       workflow_rest_facade.create_task_group_task(
           task_group=task_group, assignees=[assignee], due_date=due_date)
       workflow_rest_service.WorkflowRestService().activate(app_workflow)
-      # handle GGRC-6527 only
-      try:
-        emails = daily_emails_ui_facade.get_emails_by_user_names(
-            [users.current_user().name, assignee.name])
-      except TimeoutError as err:
-        if "digest" in err.message:
-          pytest.xfail("GGRC-6527: Digest is not opened")
-        else:
-          raise err
+      emails = daily_emails_ui_facade.get_emails_by_user_names(
+          [users.current_user().name, assignee.name])
       TestActivateWorkflow._data = {
           "wf": app_workflow,
           "wf_creator_email": emails[users.current_user().name],
