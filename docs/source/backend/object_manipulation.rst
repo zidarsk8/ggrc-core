@@ -896,7 +896,6 @@ Examples
                "lock_task_order": null,
                "title": "Task Group 1",
                "created_at": "2016-05-19T14:37:23",
-               "sort_index": "",
                "contact": {
                    "href": "/api/people/1",
                    "type": "Person",

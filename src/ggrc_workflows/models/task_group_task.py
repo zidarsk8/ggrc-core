@@ -54,8 +54,6 @@ class TaskGroupTask(roleable.Roleable,
       db.ForeignKey('task_groups.id', ondelete="CASCADE"),
       nullable=False,
   )
-  sort_index = db.Column(
-      db.String(length=250), default="", nullable=False)
 
   object_approval = db.Column(
       db.Boolean, nullable=False, default=False)
@@ -115,7 +113,6 @@ class TaskGroupTask(roleable.Roleable,
 
   _api_attrs = reflection.ApiAttributes(
       'task_group',
-      'sort_index',
       'object_approval',
       'task_type',
       'response_options',
@@ -203,7 +200,6 @@ class TaskGroupTask(roleable.Roleable,
     columns = ['title',
                'description',
                'task_group',
-               'sort_index',
                'start_date',
                'end_date',
                'access_control_list',

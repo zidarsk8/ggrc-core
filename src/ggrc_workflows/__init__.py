@@ -221,7 +221,6 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group, current_user):
       task_group_task=task_group_task,
       title=task_group_task.title,
       description=description,
-      sort_index=task_group_task.sort_index,
       start_date=start_date,
       end_date=end_date,
       access_control_list=access_control_list,
@@ -302,7 +301,6 @@ def build_cycle(workflow, cycle=None, current_user=None):
         modified_by=current_user,
         contact=task_group.contact,
         status=models.CycleTaskGroup.ASSIGNED,
-        sort_index=task_group.sort_index,
     )
 
     # preserve the old cycle creation for old workflows, so each object
