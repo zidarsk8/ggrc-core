@@ -14,7 +14,7 @@ from alembic import op
 from ggrc.migrations.utils.custom_attributes import create_custom_attribute
 
 revision = 'fd7f3834a37e'
-down_revision = 'fd7f3834a37e'
+down_revision = '2dd5e1292b9c'
 
 
 def upgrade():
