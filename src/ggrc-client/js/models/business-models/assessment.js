@@ -9,7 +9,6 @@ import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import autoStatusChangeable from '../mixins/auto-status-changeable';
 import timeboxed from '../mixins/timeboxed';
@@ -30,7 +29,7 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/assessments/{id}',
   create: 'POST /api/assessments',
   mixins: [
-    uniqueTitle, caUpdate,
+    caUpdate,
     autoStatusChangeable, timeboxed,
     accessControlList, refetchHash,
     assessmentIssueTracker, relatedAssessmentsLoader,
