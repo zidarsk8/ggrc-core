@@ -33,7 +33,7 @@
           <div class="object-controls__type">
             <h6>Object type</h6>
             <mapping-type-selector {types}="{availableTypes}"
-                                   {selected-type}="{type}"
+                                   {(selected-type)}="{type}"
                                    {disabled}="{isLoadingOrSaving}">
             </mapping-type-selector>
           </div>
