@@ -21,7 +21,7 @@ from ggrc.migrations.utils import migrator
 
 # revision identifiers, used by Alembic.
 revision = 'f2428adea671'
-down_revision = 'fd7f3834a37e'
+down_revision = '2168ca30ae3b'
 
 
 default_recipients = ("Program Managers,Program Editors,Program Readers,"
