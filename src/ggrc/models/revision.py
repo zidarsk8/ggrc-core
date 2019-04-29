@@ -638,6 +638,18 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
       automapping_json = flask.g.automappings_cache[automapping_id]
     return {"automapping": automapping_json}
 
+  @staticmethod
+  def _populate_recipients(populated_content):
+    """Normalize recipients if present in content."""
+    if "recipients" in populated_content:
+      # There are revisions with same recipients put in different order and
+      # since this field is of string type, order matters which leads to wrong
+      # result during diff calculation. To prevent it, recipients should be
+      # sorted in same order when populating content.
+      populated_content["recipients"] = ",".join(
+          sorted(populated_content["recipients"].split(",")),
+      )
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -662,6 +674,7 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     self.populate_requirements(populated_content)
     self.populate_options(populated_content)
     self.populate_review_status_display_name(populated_content)
+    self._populate_recipients(populated_content)
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)
