@@ -33,9 +33,9 @@
   <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
     <advanced-search-wrapper modelName:from="type"
       modelDisplayName:from="type"
-      mappingItems:to="*mappingItems"
-      filterItems:to="*filterItems"
-      statusItem:to="*statusItem"
+      mappingItems:to="scope.vars.mappingItems"
+      filterItems:to="scope.vars.filterItems"
+      statusItem:to="scope.vars.statusItem"
       on:el:enter="onSubmit()">
       <div class="object-controls">
         <div class="object-controls__row">
@@ -86,7 +86,7 @@
 </div>
 
 <div class="modal-footer modal-footer--trailed">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{*totalObjects}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{scope.vars.totalObjects}})'" expanded:bind="showResults">
     <div class="search-results">
       <mapper-results
         baseInstance:from="parentInstance"
@@ -95,11 +95,11 @@
         type:from="type"
         selected:from="selected"
         submitCbs:from="submitCbs"
-        paging.total:to="*totalObjects"
+        paging.total:to="scope.vars.totalObjects"
         entries:bind="entries"
-        filterItems:from="*filterItems"
-        mappingItems:from="*mappingItems"
-        statusItem:from="*statusItem">
+        filterItems:from="scope.vars.filterItems"
+        mappingItems:from="scope.vars.mappingItems"
+        statusItem:from="scope.vars.statusItem">
       </mapper-results>
     </div>
 

@@ -16,9 +16,9 @@
     <advanced-search-wrapper
       modelName:from="model.model_singular"
       modelDisplayName:from="model.title_plural"
-      mappingItems:to="*mappingItems"
-      filterItems:to="*filterItems"
-      statusItem:to="*statusItem"
+      mappingItems:to="scope.vars.mappingItems"
+      filterItems:to="scope.vars.filterItems"
+      statusItem:to="scope.vars.statusItem"
       relevantTo:from="relevantTo"
       on:el:enter="onSubmit()">
       <div class="object-controls">
@@ -78,7 +78,7 @@
 </div>
 
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{*totalObjects}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{scope.vars.totalObjects}})'" expanded:bind="showResults">
     <div class="search-results">
       <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
                       baseInstance:from="parentInstance"
@@ -87,16 +87,16 @@
                       type:from="type"
                       selected:from="selected"
                       submitCbs:from="submitCbs"
-                      paging.total:to="*totalObjects"
+                      paging.total:to="scope.vars.totalObjects"
                       useSnapshots:from="useSnapshots"
                       afterSearch:bind="afterSearch"
                       entries:bind="entries"
                       relevantTo:from="relevantTo"
                       objectGenerator:from="true"
-                      filterItems:from="*filterItems"
-                      mappingItems:from="*mappingItems"
+                      filterItems:from="scope.vars.filterItems"
+                      mappingItems:from="scope.vars.mappingItems"
                       on:loaded="onLoaded()"
-                      statusItem:from="*statusItem">
+                      statusItem:from="scope.vars.statusItem">
       </mapper-results>
     </div>
     <div class="control-buttons row-fluid">

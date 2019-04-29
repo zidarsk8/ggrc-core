@@ -4,7 +4,7 @@
 }}
 
 <div class="comment-add-form__section">
-    <comment-input value:bind="*commentValue"
+    <comment-input value:bind="scope.vars.commentValue"
                    disabled:from="isSaving"></comment-input>
 </div>
 <div class="comment-add-form__toolbar comment-add-form__section">
@@ -15,7 +15,7 @@
             <i class="fa fa-question-circle" rel="tooltip" title="{{tooltipTitle}}"></i>
         </label>
         <comment-add-button class="comment-add-form__toolbar-item"
-                            value:bind="*commentValue"
+                            value:bind="scope.vars.commentValue"
                             on:commentCreated="onCommentCreated(scope.event)"
                             isSaving:from="isSaving">Add</comment-add-button>
 </div>

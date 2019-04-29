@@ -11,7 +11,7 @@
             <ggrc-gdrive-folder-picker hideLabel:from="true"
                                        readonly:from="readonly"
                                        instance:from="instance"
-                                       current_folder:to="*currentFolder"
+                                       current_folder:to="scope.vars.currentFolder"
                                        folder_error:bind="folderError"
             ></ggrc-gdrive-folder-picker>
         <object-list items:from="documents" emptyMessage:from="noItemsText" showMore:from="showMore">
@@ -31,7 +31,7 @@
 
     {{#unless readonly}}
     {{#is_allowed 'update' instance context='for'}}
-    {{#if *currentFolder}}
+    {{#if scope.vars.currentFolder}}
     {{^if folderError}}
     <span class="attachments-list-action">
         <button

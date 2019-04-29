@@ -16,8 +16,8 @@
     <advanced-search-wrapper
       modelName:from="model.model_singular"
       modelDisplayName:from="model.title_plural"
-      filterItems:to="*filterItems"
-      statusItem:to="*statusItem"
+      filterItems:to="scope.vars.filterItems"
+      statusItem:to="scope.vars.statusItem"
       on:el:enter="onSubmit()">
       <div class="object-controls">
         <div class="object-controls__row">
@@ -53,7 +53,7 @@
 </div>
 
 <div class="modal-body">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{*totalObjects}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{scope.vars.totalObjects}})'" expanded:bind="showResults">
     <div class="search-results">
       <mapper-results
         baseInstance:from="parentInstance"
@@ -63,10 +63,10 @@
         selected:from="selected"
         submitCbs:from="submitCbs"
         defaultSort:from="defaultSort"
-        paging.total:to="*totalObjects"
+        paging.total:to="scope.vars.totalObjects"
         entries:bind="entries"
-        filterItems:from="*filterItems"
-        statusItem:from="*statusItem"
+        filterItems:from="scope.vars.filterItems"
+        statusItem:from="scope.vars.statusItem"
         on:loaded="onLoaded()"
         applyOwnedFilter:from="reduceToOwnedItems">
       </mapper-results>

@@ -19,8 +19,8 @@
             <div class="simple-modal__section">
                 <div class="simple-modal__section-title">Comment</div>
                 <comment-input
-                    value:bind="*commentValue"
-                    disabled:from="*isSaving">
+                    value:bind="scope.vars.commentValue"
+                    disabled:from="scope.vars.isSaving">
                 </comment-input>
             </div>
         {{/if}}
@@ -87,8 +87,8 @@
         <div class="simple-modal__toolbar">
         {{#if comment}}
             <comment-add-button class="simple-modal__toolbar-item"
-                                value:bind="*commentValue"
-                                isSaving:to="*isSaving"
+                                value:bind="scope.vars.commentValue"
+                                isSaving:to="scope.vars.isSaving"
                                 on:commentCreated="onCommentCreated(scope.event)"
                                 isDisabled:from="isUpdatingEvidences">
               Save
