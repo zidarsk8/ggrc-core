@@ -12,8 +12,8 @@ from integration.ggrc import api_helper
 
 
 @mock.patch(
-    'ggrc.settings.EXTERNAL_APP_USER',
-    new='External App <external_app@example.com>'
+    "ggrc.settings.EXTERNAL_APP_USER",
+    new="external_app@example.com"
 )
 class TestSoxSystem(TestCase):
   """Tests for Sox System model."""
@@ -26,12 +26,15 @@ class TestSoxSystem(TestCase):
     self.app_user_email = "external_app@example.com"
     self.ext_user_email = "external@example.com"
 
-    custom_headers = {
-        'X-GGRC-user': '{"email": "%s"}' % self.app_user_email,
-        'X-external-user': '{"email": "%s"}' % self.ext_user_email
+    self.custom_headers = {
+        "X-GGRC-user": '{"email": "%s"}' % self.app_user_email,
+        "X-external-user": '{"email": "%s"}' % self.ext_user_email,
+        "X-Requested-By": "SYNC_SERVICE",
+        "Content-Type": "application/json",
+        "X-URLFetch-Service-Id": "test",
     }
 
-    self.api.headers.update(custom_headers)
+    self.api.headers.update(self.custom_headers)
     self.api.client.get("/login", headers=self.api.headers)
 
   def test_system_acl_create(self):
@@ -89,3 +92,45 @@ class TestSoxSystem(TestCase):
         actual_people_ids,
         [i[0] for i in expected_people_ids]
     )
+
+  def test_system_external_put(self):
+    """Test updating of System without If-Match/If-Unmodified-Since headers."""
+    system = factories.SystemFactory()
+
+    data = {
+        "system": {
+            "id": system.id,
+            "title": "updated system",
+            "test_plan": "test plan",
+            "notes": "test notes",
+            "description": "test description",
+            "slug": "SYSTEM-{}".format(system.id),
+        }
+    }
+    response = self.api.client.put(
+        self.api.api_link(system, obj_id=system.id),
+        data=self.api.resource.as_json(data),
+        headers=self.custom_headers
+    )
+    self.assert200(response, response.data)
+    system = all_models.System.query.get(system.id)
+    self.assertEqual(system.title, "updated system")
+
+  def test_system_external_post(self):
+    """Test creation of new System by external service."""
+    data = {
+        "system": {
+            "title": "new system",
+            "test_plan": "test plan",
+            "notes": "test notes",
+            "description": "test description",
+        }
+    }
+    response = self.api.client.post(
+        self.api.api_link(all_models.System),
+        data=self.api.resource.as_json(data),
+        headers=self.custom_headers
+    )
+    self.assertStatus(response, 201, response.data)
+    system = all_models.System.query.get(response.json["system"]["id"])
+    self.assertEqual(system.title, "new system")
