@@ -14,7 +14,7 @@
 {{#each relevant}}
   <div class="single-line-filter">
     {{^readOnly}}
-      <i class="fa fa-trash" on:el:click="removeFilter(%element, @index)"></i>
+      <i class="fa fa-trash" on:el:click="removeFilter(scope.element, @index)"></i>
     {{/readOnly}}
     {{#if @index}}
       <dropdown-component optionsList:from="operators"
