@@ -102,7 +102,8 @@ class AutomapperGenerator(object):
       self._step(dst, src)
 
     if len(self.auto_mappings) <= self.COUNT_LIMIT:
-      logger.info("Automapping count: count=%s", len(self.auto_mappings))
+      if self.auto_mappings:
+        logger.info("Automapping count: count=%s", len(self.auto_mappings))
       self._flush(relationship)
     else:
       logger.error("Automapping limit exceeded: limit=%s, count=%s",
