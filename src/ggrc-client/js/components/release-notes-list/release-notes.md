@@ -1,8 +1,10 @@
-[//]: <> (updated 04/10/2019)
+[//]: <> (updated 04/24/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.t02sm9tcam2t)
+[Mentioning person enabled at comments (v.2.2.0, 04/24/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.qny4l9tiyob)
+
+[New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ny5sa23suyjm)
 
 [Introducing new Control Library frontend (v.2.0.0, 03/26/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.oo6v96vy5j1x)
 
@@ -84,9 +86,13 @@ Our product team is working hard to engineer compliance @ scale and make your da
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
 
+### Mentioning person enabled at comments (v.2.2.0, 04/24/2019)
+
+Comments functionality was enhanced by introducing mention a person feature. To leverage this feature use + or @ with a user email (example, +example@google.com or @example@google.com) in the comments box. A mentioned user will get an email notification when the comment is saved.
+
 ### New object Account Balance (v.2.1.0, 04/10/2019)
 
-Account Balance can be used to sort, store and summarize a company's transactions and processes. Account Balance is categorized as a scoping object and can be mapped to other GRC objects similar to other scoping objects.
+Account Balance can be used to sort, store and summarize a company's transactions and processes. Account Balance is categorized as a scoping object and can be mapped to other GRC objects similar to other Scoping Objects.
 
 ### Introducing new Control Library frontend (v.2.0.0, 03/26/2019)
 
@@ -190,7 +196,7 @@ To prevent unnecessary automated mappings, the system won’t create automatic m
 
 ### Evidences for Assessments and Audits (v1.11.0, 05/30/2018)
 
-The system will now track each evidence file/ URL as a separate object type which is searchable.For audits, the system will ensure evidence integrity for making a separate Audit specific copy. The object containing the file metadata will be archived along with the audit.
+The system will now track each evidence file/ URL as a separate object type which is searchable. For audits, the system will ensure evidence integrity for making a separate Audit specific copy. The object containing the file metadata will be archived along with the audit.
 
 ### Offline mode for Import and export (v1.9.0, 04/25/2018)
 
