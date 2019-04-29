@@ -91,7 +91,7 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
-          <tab-panel tab-id="change-log" panels:bind="panels" titleText:from="'Change Log'">
+          <tab-panel tabId:from="'change-log'" panels:bind="panels" titleText:from="'Change Log'">
               <revision-log instance:from="instance" options:from="tabOptions"></revision-log>
           </tab-panel>
         {{/if}}
