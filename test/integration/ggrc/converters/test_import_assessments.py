@@ -368,6 +368,10 @@ class TestAssessmentImport(TestCase):
                     column_name="State",
                     value="open",
                 ),
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=22,
+                    column_name="Verified Date"
+                ),
             },
         }
     }
