@@ -13,6 +13,6 @@
     data-original-title="{{tooltip}}"
   {{/if}}
   on:el:click="onClickHandler"
-  on:el:keyup="onKeyup(%element, %event)">
+  on:el:keyup="onKeyup(%element, scope.event)">
   <content></content>
 </button>

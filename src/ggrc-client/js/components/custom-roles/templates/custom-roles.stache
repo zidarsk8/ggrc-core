@@ -7,7 +7,7 @@
 <div class="flex-box">
   <related-people-access-control
     class="width-100"
-    on:saveCustomRole="save(%event)"
+    on:saveCustomRole="save(scope.event)"
     conflictRoles:from="conflictRoles"
     orderOfRoles:from="orderOfRoles"
     includeRoles:from="includeRoles"
@@ -21,7 +21,7 @@
         {{#groups}}
           <related-people-access-control-group
             class="people-group"
-            on:updateRoles="updateRoles(%event)"
+            on:updateRoles="updateRoles(scope.event)"
             required:from="required"
             groupId:from="groupId"
             title:from="title"
@@ -33,10 +33,10 @@
               <div>
                   <editable-people-group
                     required:from="required"
-                    on:unmap="removePerson(%event)"
-                    on:changeEditableMode="changeEditableGroup(%event)"
+                    on:unmap="removePerson(scope.event)"
+                    on:changeEditableMode="changeEditableGroup(scope.event)"
                     on:saveChanges="saveChanges()"
-                    on:personSelected="personSelected(%event)"
+                    on:personSelected="personSelected(scope.event)"
                     canUnmap:from="canEdit"
                     canEdit:from="canEdit"
                     isLoading:from="isLoading"

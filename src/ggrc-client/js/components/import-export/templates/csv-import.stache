@@ -178,8 +178,8 @@
   {{#history.length}}
   <div class="csv-import__import-history">
     <import-history history:from="history"
-                    on:removeItem="onRemove(%event)"
-                    on:downloadCsv="onDownload(%event)"
+                    on:removeItem="onRemove(scope.event)"
+                    on:downloadCsv="onDownload(scope.event)"
     ></import-history>
   </div>
   {{/history.length}}

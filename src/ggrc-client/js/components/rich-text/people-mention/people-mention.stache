@@ -17,8 +17,8 @@
       items:from="result"
       showResults:bind="showResults"
       showNewValue:from="showNewValue"
-      on:addNewItem="createLabel(%event)"
-      on:selectItem="personSelected(%event)"
+      on:addNewItem="createLabel(scope.event)"
+      on:selectItem="personSelected(scope.event)"
       actionKey:from="actionKey"
     ></people-autocomplete-results>
 </people-autocomplete-wrapper>

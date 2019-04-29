@@ -13,5 +13,5 @@
                       instanceState:from="currentState"
                       disabled:from="isInfoPaneSaving"
                       isUndoButtonVisible:from="isUndoButtonVisible"
-                      on:onStateChange="onStateChange(%event)">
+                      on:onStateChange="onStateChange(scope.event)">
 </object-state-toolbar>

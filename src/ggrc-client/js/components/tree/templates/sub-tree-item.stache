@@ -10,7 +10,7 @@
                      expanded:from="expanded"
                      deepLimit:from="limitDepthTree"
   ></tree-item-actions>
-  <div class="flex-box columns" on:el:click="onClick($element, %event)">
+  <div class="flex-box columns" on:el:click="onClick($element, scope.event)">
     <span class="title">
       {{#if isMega}}
         <i class="fa fa-bookmark mega-object-tree-view-icon"></i>
@@ -26,7 +26,7 @@
   </div>
 
   <cycle-task-actions instance:from="instance"
-                      on:expand="onExpand(%event)"
+                      on:expand="onExpand(scope.event)"
   ></cycle-task-actions>
 
   <tree-item-extra-info instance:from="instance"></tree-item-extra-info>

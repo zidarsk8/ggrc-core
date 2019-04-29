@@ -16,7 +16,7 @@
   {{#if isOpen}}
   <div class="autocomplete-dropdown__body-wrapper">
     <div class="dropdown-menu dropdown-menu-form autocomplete-dropdown__body"
-         on:el:click="onBodyClick(%event)">
+         on:el:click="onBodyClick(scope.event)">
       <input class="autocomplete-dropdown__input"
             type="text"
             placeholder="Lookup attributes..."

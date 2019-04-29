@@ -11,7 +11,7 @@
                        expanded:from="expanded"
                        deepLimit:from="limitDepthTree"
     ></tree-item-actions>
-    <div class="flex-box selectable-attrs width-100" on:el:click="onClick($element, %event)">
+    <div class="flex-box selectable-attrs width-100" on:el:click="onClick($element, scope.event)">
         {{#selectedColumns}}
           <div class="flex-box attr-cell">
             {{#switch attr_type}}

@@ -11,7 +11,7 @@
           activeWidget:from="activeWidget"
           showTitle:from="true"
           showAllTabs:from="showAllTabs"
-          on:close="closeTab(%event)"></inner-nav-item>
+          on:close="closeTab(scope.event)"></inner-nav-item>
       {{/priorityTabs}}
     {{/if}}
   </nav>
@@ -26,7 +26,7 @@
             activeWidget:from="activeWidget"
             showTitle:from="false"
             showAllTabs:from="showAllTabs"
-            on:close="closeTab(%event)"></inner-nav-item>
+            on:close="closeTab(scope.event)"></inner-nav-item>
         {{/notPriorityTabs}}
 
         <add-tab-button

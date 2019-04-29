@@ -17,52 +17,52 @@
               noValue:from="dropdownNoValue"
               dropdownOptionsGroups:from="dropdownOptionsGroups"
               isGroupedDropdown:from="isGroupedDropdown"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></dropdown-form-field>
           {{/case}}
           {{#case "input"}}
             <text-form-field value:from="value"
               class="inline__content-input inline-input-form-field"
               placeholder:from="placeholder"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></text-form-field>
           {{/case}}
           {{#case "text"}}
             <rich-text-form-field value:from="value"
               class="inline__content-input"
               placeholder:from="placeholder"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></rich-text-form-field>
           {{/case}}
            {{#case "checkbox"}}
             <checkbox-form-field value:from="value"
               class="inline__content-input"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></checkbox-form-field>
           {{/case}}
            {{#case "date"}}
             <date-form-field value:from="value"
               class="inline__content-input"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></date-form-field>
           {{/case}}
           {{#case "person"}}
             <person-form-field value:from="value"
               class="inline__content-input"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></person-form-field>
           {{/case}}
           {{#case "number"}}
             <numberbox-form-field value:from="value"
               class="inline__content-input inline-input-form-field"
               placeholder:from="placeholder"
-              on:valueChanged="fieldValueChanged(%event)"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></numberbox-form-field>
           {{/case}}
           {{#case "multi-select-label"}}
             <multi-select-label labels:from="value"
                 editMode:from="true"
-                on:valueChanged="fieldValueChanged(%event)">
+                on:valueChanged="fieldValueChanged(scope.event)">
             </multi-select-label>
           {{/case}}
         {{/switch}}

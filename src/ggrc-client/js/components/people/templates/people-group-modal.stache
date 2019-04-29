@@ -33,11 +33,11 @@
           <external-data-autocomplete type:from="'Person'"
                                       placeholder:from="'Type person'"
                                       minLength:from="2"
-                                      on:itemSelected="personSelected(%event.selectedItem)">
+                                      on:itemSelected="personSelected(scope.event.selectedItem)">
           </external-data-autocomplete>
         {{else}}
           <autocomplete-component searchItemsType:from="'Person'"
-                        on:itemSelected="personSelected(%event.selectedItem)"
+                        on:itemSelected="personSelected(scope.event.selectedItem)"
                         placeholder:from="'Type person'">
           </autocomplete-component>
         {{/if_config_exist}}

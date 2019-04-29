@@ -4,7 +4,7 @@
 }}
 
 <inline-edit-control
-  on:inlineSave="saveInlineForm(%event)"
+  on:inlineSave="saveInlineForm(scope.event)"
   isGroupedDropdown:from="isGroupedDropdown"
   dropdownOptionsGroups:from="dropdownOptionsGroups"
   isEditIconDenied:from="isEditIconDenied"
@@ -19,7 +19,7 @@
   mandatory:from="mandatory"
   withReadMore:from="withReadMore">
     <confirm-edit-action
-      on:setEditMode="setEditModeInline(%event)"
+      on:setEditMode="setEditModeInline(scope.event)"
       on:setInProgress="setInProgressState()"
       isEditIconDenied:from="isEditIconDenied"
       instance:from="instance"

@@ -147,7 +147,7 @@
             canDisplayWarning:from="true"
             preRenderContent:from="true">
               <related-proposals
-                on:updateProposalsWarning="updateWarningState(%event)"
+                on:updateProposalsWarning="updateWarningState(scope.event)"
                 baseInstance:from="instance">
               </related-proposals>
           </tab-panel>

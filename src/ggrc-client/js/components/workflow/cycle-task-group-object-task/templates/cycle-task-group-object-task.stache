@@ -41,7 +41,7 @@
                   <li>
                     {{#is(instance.status, "Deprecated")}}
                       <object-change-state toState:from="initialState"
-                                           on:onStateChange="onStateChange(%event)">
+                                           on:onStateChange="onStateChange(scope.event)">
                         <a href="javascript:void(0)">
                           <i class="fa fa-reply"></i>
                           Restore
@@ -49,7 +49,7 @@
                       </object-change-state>
                     {{else}}
                       <object-change-state toState:from="'Deprecated'"
-                                           on:onStateChange="onStateChange(%event)">
+                                           on:onStateChange="onStateChange(scope.event)">
                         <a href="javascript:void(0)">
                           <i class="fa fa-times-circle"></i> Deprecate
                         </a>
@@ -228,8 +228,8 @@
               <comment-add-form class="comment-add-form"
                                 instance:from="instance"
                                 isSaving:from="isLoading"
-                                on:beforeCreate="addComment(%event)"
-                                on:afterCreate="processComment(%event)"
+                                on:beforeCreate="addComment(scope.event)"
+                                on:afterCreate="processComment(scope.event)"
                                 notificationsInfo:from="'Notify Task Assignees and Task Secondary Assignees'">
               </comment-add-form>
             {{/unless}}

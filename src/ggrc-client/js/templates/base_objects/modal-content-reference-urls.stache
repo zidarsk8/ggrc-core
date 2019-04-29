@@ -10,8 +10,8 @@
       instance:from="instance"
       kind:from="'REFERENCE_URL'"
       autorefresh:from="false"
-      on:addMappings="addMappings(%event.objects)"
-      on:removeMappings="removeMappings(%event.object)">
+      on:addMappings="addMappings(scope.event.objects)"
+      on:removeMappings="removeMappings(scope.event.object)">
       <!-- tabindex is necessary to work of 'Hide optional field' function -->
       <related-urls
         tabindex="20"
@@ -19,8 +19,8 @@
         allowToRemove:from="new_object_form"
         urls:bind="documents"
         isDisabled:from="isLoading"
-        on:createUrl="markDocumentForAddition(%event.payload)"
-        on:removeUrl="markDocumentForDeletion(%event.payload)">
+        on:createUrl="markDocumentForAddition(scope.event.payload)"
+        on:removeUrl="markDocumentForDeletion(scope.event.payload)">
         <label>
           Reference URL
           <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>

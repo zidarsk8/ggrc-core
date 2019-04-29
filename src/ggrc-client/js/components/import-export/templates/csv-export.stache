@@ -6,9 +6,9 @@
   <current-exports exports:from="currentExports"
                    disabled:from="disabledItems"
                    inProgress:from="isInProgress"
-                   on:stopExport="onStopExport(%event)"
-                   on:removeItem="onRemove(%event)"
-                   on:viewContent="onViewContent(%event)"
+                   on:stopExport="onStopExport(scope.event)"
+                   on:removeItem="onRemove(scope.event)"
+                   on:viewContent="onViewContent(scope.event)"
   ></current-exports>
 {{/if}}
 

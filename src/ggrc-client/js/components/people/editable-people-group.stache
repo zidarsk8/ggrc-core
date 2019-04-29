@@ -52,14 +52,14 @@
             {{else}}
               {{^if_config_exist 'external_services.Person'}}
               <autocomplete-component searchItemsType:from="'Person'"
-                            on:itemSelected="personSelected(%event.selectedItem)"
+                            on:itemSelected="personSelected(scope.event.selectedItem)"
                             placeholder:from="placeholder">
               </autocomplete-component>
               {{else}}
               <external-data-autocomplete type:from="'Person'"
                                           placeholder:from="placeholder"
                                           minLength:from="2"
-                                          on:itemSelected="personSelected(%event.selectedItem)">
+                                          on:itemSelected="personSelected(scope.event.selectedItem)">
               </external-data-autocomplete>
               {{/if_config_exist}}
             {{/if}}

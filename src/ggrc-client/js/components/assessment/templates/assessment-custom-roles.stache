@@ -8,7 +8,7 @@
   <related-people-access-control
     class="width-100"
     deferredSave:from="deferredSave"
-    on:vm:saveCustomRole="{save(%event)}"
+    on:vm:saveCustomRole="{save(scope.event)}"
     conflictRoles:from="conflictRoles"
     orderOfRoles:from="orderOfRoles"
     includeRoles:from="includeRoles"
@@ -22,7 +22,7 @@
         {{#groups}}
           <related-people-access-control-group
             class="people-group"
-            on:vm:updateRoles="{updateRoles(%event)}"
+            on:vm:updateRoles="{updateRoles(scope.event)}"
             required:from="required"
             groupId:from="groupId"
             title:from="title"
@@ -34,10 +34,10 @@
               <div>
                   <editable-people-group
                     required:from="required"
-                    on:vm:unmap="{removePerson(%event)}"
-                    on:vm:changeEditableMode="{changeEditableGroup(%event)}"
+                    on:vm:unmap="{removePerson(scope.event)}"
+                    on:vm:changeEditableMode="{changeEditableGroup(scope.event)}"
                     on:vm:saveChanges="{saveChanges()}"
-                    on:vm:personSelected="{personSelected(%event)}"
+                    on:vm:personSelected="{personSelected(scope.event)}"
                     canUnmap:from="canEdit"
                     canEdit:from="canEdit"
                     isLoading:from="isLoading"

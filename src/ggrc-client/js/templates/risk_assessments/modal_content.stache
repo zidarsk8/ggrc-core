@@ -53,8 +53,8 @@
             <external-data-autocomplete
               type:from="'Person'"
               placeholder:from="'Enter email address'"
-              on:itemSelected="setItem(%event.selectedItem)"
-              on:criteriaChanged="setItem(%event.value)"
+              on:itemSelected="setItem(scope.event.selectedItem)"
+              on:criteriaChanged="setItem(scope.event.value)"
               autoClean:from="false"
               minLength:from="2"
               searchCriteria:from="textValue">
@@ -85,8 +85,8 @@
             <external-data-autocomplete
               type:from="'Person'"
               placeholder:from="'Enter email address'"
-              on:itemSelected="setItem(%event.selectedItem)"
-              on:criteriaChanged="setItem(%event.value)"
+              on:itemSelected="setItem(scope.event.selectedItem)"
+              on:criteriaChanged="setItem(scope.event.value)"
               autoClean:from="false"
               minLength:from="2"
               searchCriteria:from="textValue">

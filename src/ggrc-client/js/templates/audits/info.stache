@@ -69,8 +69,8 @@
                   urls:bind="documents"
                   isDisabled:from="isLoading"
                   isNotEditable:from="instance.archived"
-                  on:createUrl="createRelatedDocument(%event.payload)"
-                  on:removeUrl="removeRelatedDocument(%event.payload)">
+                  on:createUrl="createRelatedDocument(scope.event.payload)"
+                  on:removeUrl="removeRelatedDocument(scope.event.payload)">
                   <div class="related-urls__heading">
                     <h6 class="related-urls__title">Evidence URL</h6>
                   </div>

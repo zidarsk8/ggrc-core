@@ -188,11 +188,11 @@
                         saving:to="formState.saving"
                         isDirty:to="formState.isDirty"
                         on:validationError="setLastErrorTab(tabIndex)"
-                        on:validationChanged="showRequiredInfoModal(%event)">
+                        on:validationChanged="showRequiredInfoModal(scope.event)">
                       <custom-attributes
                             fields:from="fields"
                             editMode:from="canEdit"
-                            on:valueChanged="attributeChanged(%event)">
+                            on:valueChanged="attributeChanged(scope.event)">
                       </custom-attributes>
                     </assessment-local-ca>
                     <!-- Modal Window to fix validation issues of CA fields -->
@@ -217,7 +217,7 @@
                           formState:from="formState"
                           isInfoPaneSaving:from="isInfoPaneSaving"
                           isUndoButtonVisible:from="isUndoButtonVisible"
-                          on:onStateChange="onStateChange(%event)"
+                          on:onStateChange="onStateChange(scope.event)"
                       ></assessment-controls-toolbar>
                     {{/unless}}
                 </div>
@@ -269,8 +269,8 @@
                         class="comment-add-form"
                         instance:from="instance"
                         isSaving:from="isUpdatingComments"
-                        on:afterCreate="addRelatedItem(%event, 'comments')"
-                        on:beforeCreate="addItems(%event, 'comments')"
+                        on:afterCreate="addRelatedItem(scope.event, 'comments')"
+                        on:beforeCreate="addItems(scope.event, 'comments')"
                         notificationsInfo:from="'Notify Assignees and Verifiers'">
                     </comment-add-form>
                 {{/unless}}
@@ -291,7 +291,7 @@
                 <related-assessments
                     instance:from="instance"
                     needReuse:from="true"
-                    on:reusableObjectsCreated="addReusableEvidence(%event)">
+                    on:reusableObjectsCreated="addReusableEvidence(scope.event)">
                 </related-assessments>
             {{/instance}}
           </tab-panel>
@@ -314,7 +314,7 @@
                     instance:from="instance"
                     deferredSave:from="deferredSave">
                 </custom-roles>
-                <assessment-custom-attributes on:onUpdateAttributes="saveGlobalAttributes(%event)"
+                <assessment-custom-attributes on:onUpdateAttributes="saveGlobalAttributes(scope.event)"
                                               items:from="globalAttributes"
                                               isEditDenied:from="isEditDenied"
                                               class="ggrc-form ggrc-form-multiple-columns">

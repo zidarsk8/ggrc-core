@@ -24,7 +24,7 @@
            {{#if disabled}} disabled {{/if}}
            {{#if readonly}} readonly {{/if}}/>
     {{#if date}}
-    <a class="datepicker__remove-value" on:el:click="removeValue(%event)">
+    <a class="datepicker__remove-value" on:el:click="removeValue(scope.event)">
       <i class="fa fa-times"></i>
     </a>
     {{/if}}

@@ -19,7 +19,7 @@
           <related-people-access-control-group
             class="people-group"
             autoUpdate:from="true"
-            on:updateRoles="updateRoles(%event)"
+            on:updateRoles="updateRoles(scope.event)"
             isNewInstance:from="isNewInstance"
             required:from="required"
             groupId:from="groupId"
@@ -40,7 +40,7 @@
                 <deletable-people-group
                   showEmptyMessage:from="false"
                   required:from="required"
-                  on:unmap="removePerson(%event)"
+                  on:unmap="removePerson(scope.event)"
                   canUnmap:from="canEdit"
                   isLoading:from="isLoading"
                   groupId:from="groupId"
@@ -66,7 +66,7 @@
                       {{^if_config_exist 'external_services.Person'}}
                       <autocomplete-component
                           searchItemsType:from="'Person'"
-                          on:itemSelected="addPerson(%event.selectedItem, @groupId)"
+                          on:itemSelected="addPerson(scope.event.selectedItem, @groupId)"
                           placeholder:from="placeholder">
                       </autocomplete-component>
                       {{else}}
@@ -74,7 +74,7 @@
                         type:from="'Person'"
                         placeholder:from="placeholder"
                         minLength:from="2"
-                        on:itemSelected="addPerson(%event.selectedItem, @groupId)">
+                        on:itemSelected="addPerson(scope.event.selectedItem, @groupId)">
                       </external-data-autocomplete>
                       {{/if_config_exist}}
                     {{else}}

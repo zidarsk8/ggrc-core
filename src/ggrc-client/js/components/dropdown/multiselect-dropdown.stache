@@ -20,7 +20,7 @@
   </div>
   {{#if isOpen}}
   <div class="multiselect-dropdown__body-wrapper">
-    <div class="dropdown-menu dropdown-menu-form multiselect-dropdown__body" on:el:click="dropdownBodyClick(%event)">
+    <div class="dropdown-menu dropdown-menu-form multiselect-dropdown__body" on:el:click="dropdownBodyClick(scope.event)">
       <ul class="multiselect-dropdown__list">
         <li class="multiselect-dropdown__element">
           <label class="multiselect-dropdown__label" >

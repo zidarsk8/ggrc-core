@@ -22,14 +22,14 @@
           fieldId:from="id"
           placeholder:from="placeholder"
           options:from="options"
-          on:valueChanged="fieldValueChanged(%event, %context)"
+          on:valueChanged="fieldValueChanged(scope.event, %context)"
           class="form-field__content custom-attribute-{{type}}"
         ></custom-attributes-field>
         {{#if validation.hasMissingInfo}}
           <div class="form-field__validation-hint-placeholder">
               <button type="button"
                       class="btn btn-small btn-link btn-link-nopadding"
-                      on:el:click="showRequiredInfoModal(%event, %context)">
+                      on:el:click="showRequiredInfoModal(scope.event, %context)">
                 Add required info
               </button>
           </div>

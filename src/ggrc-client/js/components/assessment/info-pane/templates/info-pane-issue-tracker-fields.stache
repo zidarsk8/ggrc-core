@@ -7,14 +7,14 @@
   <div class="ggrc-form-item__multiple-row">
     <issue-tracker-switcher
       setIssueTitle:from="true"
-      on:issueTrackerSwitcherChanged="saveInlineForm(%event)"
+      on:issueTrackerSwitcherChanged="saveInlineForm(scope.event)"
       instance:from="instance">
       <ticket-id-checker
         instance:from="instance"
         issueTrackerEnabled:from="instance.issue_tracker.enabled"
-        on:valueChange="inlineDropdownValueChange(%event)">
+        on:valueChange="inlineDropdownValueChange(scope.event)">
         <inline-edit-control
-          on:inlineSave="checkTicketId(%event)"
+          on:inlineSave="checkTicketId(scope.event)"
           isEditIconDenied:from="isEditDenied"
           dropdownOptions:from="instance.class.issue_tracker_enable_options"
           instance:from="instance"
@@ -24,7 +24,7 @@
               class="inline__header"
               editMode:from="editMode"
               isEditIconDenied:from="isEditIconDenied"
-              on:setEditModeInline="setEditModeInline(%event)">
+              on:setEditModeInline="setEditModeInline(scope.event)">
                 <div class="ticket-info-header">
                   <span class="ggrc-form__title">
                     Ticket Tracker

@@ -7,5 +7,5 @@
     type:from="type"
     join_object_id:from="join_object_id"
     object:from="object"
-    on:refreshTreeView="refreshTreeView(%event)">
+    on:refreshTreeView="refreshTreeView(scope.event)">
 </assessment-template-clone>

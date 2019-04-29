@@ -64,7 +64,7 @@
       review:from="review"
       parentInstance:from="instance"
       modalState:bind="reviewersModalState"
-      on:reviewersUpdated="reviewersUpdated(%event)">
+      on:reviewersUpdated="reviewersUpdated(scope.event)">
     </request-review-modal>
   {{/if}}
 </div>

@@ -8,8 +8,8 @@
     <comment-add-form class="comment-add-form"
                       instance:from="instance"
                       isSaving:from="isLoading"
-                      on:beforeCreate="addComment(%event)"
-                      on:afterCreate="processComment(%event)"
+                      on:beforeCreate="addComment(scope.event)"
+                      on:afterCreate="processComment(scope.event)"
                       notificationsInfo:from="notification">
     </comment-add-form>
   {{/if}}

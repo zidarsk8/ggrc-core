@@ -20,14 +20,14 @@
   {{#is(selectedValue, "other")}}
     {{^if_config_exist 'external_services.Person'}}
       <autocomplete-component searchItemsType:from="'Person'"
-                    on:itemSelected="personAdded(%event)"
+                    on:itemSelected="personAdded(scope.event)"
                     placeholder:from="'Enter text to search for {{listName}}'"
       ></autocomplete-component>
     {{else}}
       <external-data-autocomplete type:from="'Person'"
                                   placeholder:from="'Enter text to search for {{listName}}'"
                                   minLength:from="2"
-                                  on:itemSelected="personAdded(%event)">
+                                  on:itemSelected="personAdded(scope.event)">
       </external-data-autocomplete>
     {{/if_config_exist}}
     {{#if validationError}}

@@ -16,7 +16,7 @@
       {{/each}}
 
       {{#if editMode}}
-        <autocomplete-input on:inputChanged="getResult(%event)"
+        <autocomplete-input on:inputChanged="getResult(scope.event)"
                             showResults:bind="showResults"
         ></autocomplete-input>
       {{else}}
@@ -30,8 +30,8 @@
                                   items:from="result"
                                   showResults:bind="showResults"
                                   showNewValue:from="showNewValue"
-                                  on:addNewItem="createLabel(%event)"
-                                  on:selectItem="labelSelected(%event)">
+                                  on:addNewItem="createLabel(scope.event)"
+                                  on:selectItem="labelSelected(scope.event)">
       </label-autocomplete-results>
     {{/if}}
   </label-autocomplete-wrapper>

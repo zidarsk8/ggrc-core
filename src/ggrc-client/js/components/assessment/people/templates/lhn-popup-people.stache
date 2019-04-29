@@ -29,7 +29,7 @@
           <related-people-access-control-group
             class="lhn-people-group"
             autoUpdate:from="true"
-            on:updateRoles="updateRoles(%event)"
+            on:updateRoles="updateRoles(scope.event)"
             isNewInstance:from="isNewInstance"
             required:from="required"
             groupId:from="groupId"
@@ -41,7 +41,7 @@
                 <deletable-people-group
                   showEmptyMessage:from="true"
                   required:from="required"
-                  on:unmap="removePerson(%event)"
+                  on:unmap="removePerson(scope.event)"
                   canUnmap:from="canEdit"
                   isLoading:from="denyUnmap"
                   groupId:from="groupId"

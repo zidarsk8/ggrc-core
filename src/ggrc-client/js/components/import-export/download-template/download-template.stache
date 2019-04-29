@@ -33,7 +33,7 @@
     <h4>Choose Templates</h4>
     <multiselect-dropdown options:from="importableModels"
                           placeholder:from="'Choose Templates'"
-                          on:selectedChanged="selectItems(%event)">
+                          on:selectedChanged="selectItems(scope.event)">
     </multiselect-dropdown>
   </div>
 

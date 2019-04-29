@@ -19,7 +19,7 @@
                           infoFieldPath:from="'email'"
                           loading:from="loading"
                           values:from="values"
-                          on:itemPicked="onItemPicked(%event.data)">
+                          on:itemPicked="onItemPicked(scope.event.data)">
     </autocomplete-results>
 </external-data-provider>
 {{/if}}

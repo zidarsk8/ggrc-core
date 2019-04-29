@@ -26,7 +26,7 @@
           <multiselect-dropdown options:from="filterStates"
                                 placeholder:from="'Filter by State'"
                                 disabled:from="advancedSearch.filter"
-                                on:dropdownClose="selectItems(%event)">
+                                on:dropdownClose="selectItems(scope.event)">
           </multiselect-dropdown>
           {{#if statusTooltipVisible}}
             <i class="fa fa-question-circle" rel="tooltip"
@@ -81,8 +81,8 @@
                  disableConfiguration:from="columns.disableConfiguration"
                  sortingInfo:from="sortingInfo"
                  model:from="model"
-                 on:sort="onSort(%event)"
-                 on:updateColumns="onUpdateColumns(%event)">
+                 on:sort="onSort(scope.event)"
+                 on:updateColumns="onUpdateColumns(scope.event)">
     </tree-header>
 
   </div>

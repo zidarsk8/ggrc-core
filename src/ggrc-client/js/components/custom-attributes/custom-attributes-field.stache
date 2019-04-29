@@ -9,7 +9,7 @@
         fieldId:from="fieldId"
         placeholder:from="placeholder"
         disabled:from="disabled"
-        on:valueChanged="fieldValueChanged(%event)"
+        on:valueChanged="fieldValueChanged(scope.event)"
         class="inline-input-form-field"
     ></text-form-field>
   {{/case}}
@@ -18,14 +18,14 @@
 			  fieldId:from="fieldId"
 			  placeholder:from="placeholder"
 			  disabled:from="disabled"
-			  on:valueChanged="fieldValueChanged(%event)"
+			  on:valueChanged="fieldValueChanged(scope.event)"
     ></rich-text-form-field>
   {{/case}}
   {{#case "checkbox"}}
     <checkbox-form-field value:from="value"
 			 fieldId:from="fieldId"
 			 disabled:from="disabled"
-			 on:valueChanged="fieldValueChanged(%event)"
+			 on:valueChanged="fieldValueChanged(scope.event)"
     ></checkbox-form-field>
   {{/case}}
   {{#case "dropdown"}}
@@ -33,21 +33,21 @@
 			 options:from="options"
 			 fieldId:from="fieldId"
 			 disabled:from="disabled"
-			 on:valueChanged="fieldValueChanged(%event)"
+			 on:valueChanged="fieldValueChanged(scope.event)"
     ></dropdown-form-field>
   {{/case}}
   {{#case "date"}}
     <date-form-field value:from="value"
 		     fieldId:from="fieldId"
 		     disabled:from="disabled"
-		     on:valueChanged="fieldValueChanged(%event)"
+		     on:valueChanged="fieldValueChanged(scope.event)"
     ></date-form-field>
   {{/case}}
   {{#case "person"}}
     <person-form-field value:from="value"
 		       fieldId:from="fieldId"
 		       disabled:from="disabled"
-		       on:valueChanged="fieldValueChanged(%event)"
+		       on:valueChanged="fieldValueChanged(scope.event)"
     ></person-form-field>
   {{/case}}
 {{/switch}}

@@ -43,8 +43,8 @@
                 type:from="'Person'"
                 extraCssClass:from="'span10 search-icon'"
                 placeholder:from="'Enter text to search for Assignee'"
-                on:itemSelected="setItem(%event.selectedItem)"
-                on:criteriaChanged="setItem(%event.value)"
+                on:itemSelected="setItem(scope.event.selectedItem)"
+                on:criteriaChanged="setItem(scope.event.value)"
                 autoClean:from="false"
                 minLength:from="2"
                 searchCriteria:from="textValue">

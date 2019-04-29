@@ -12,7 +12,7 @@
       Do you want to search for an existing document or
       <create-document-button
         parentInstance:from="source"
-        on:mapObjects="mapObjects(%event.objects)"
+        on:mapObjects="mapObjects(scope.event.objects)"
         on:cancel="cancel()">
         Attach new
       </create-document-button>

@@ -155,16 +155,16 @@
             modelType:from="'Evidence'"
             kind:from="'URL'"
             autorefresh:from="false"
-            on:addMappings="addMappings(%event.objects)"
-            on:removeMappings="removeMappings(%event.object)">
+            on:addMappings="addMappings(scope.event.objects)"
+            on:removeMappings="removeMappings(scope.event.object)">
             <related-urls
               tabindex="20"
               instance:from="instance"
               allowToRemove:from="new_object_form"
               urls:bind="documents"
               isDisabled:from="isLoading"
-              on:createUrl="markDocumentForAddition(%event.payload)"
-              on:removeUrl="markDocumentForDeletion(%event.payload)">
+              on:createUrl="markDocumentForAddition(scope.event.payload)"
+              on:removeUrl="markDocumentForDeletion(scope.event.payload)">
               <label>
                 Evidence URL
                 <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>

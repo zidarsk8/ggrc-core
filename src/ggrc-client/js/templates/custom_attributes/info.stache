@@ -11,7 +11,7 @@
       <div class="ggrc-form-item">
         <div class="{{#if_in attributeType 'input,text'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
           <inline-edit-control class="inline-edit-control"
-            on:inlineSave="saveCustomAttributes(%event, %context)"
+            on:inlineSave="saveCustomAttributes(scope.event, %context)"
             instance:from="instance"
             dropdownOptions:from="multiChoiceOptions"
             dropdownNoValue:from="true"
@@ -28,7 +28,7 @@
                 editMode:from="editMode"
                 redirectionEnabled:from="redirectionEnabled"
                 isEditIconDenied:from="isEditIconDenied"
-                on:setEditModeInline="setEditModeInline(%event)">
+                on:setEditModeInline="setEditModeInline(scope.event)">
                   <div class="info-pane__section-title {{#if mandatory}}form-label form-label__extended{{/if}}">
                     {{title}}
                     {{#if mandatory}}

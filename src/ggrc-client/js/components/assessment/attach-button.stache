@@ -15,8 +15,8 @@
                                        tooltip:from="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.'"
                                        disabled:from="isAttachActionDisabled"
                                        confirmationCallback:from="@confirmationCallback"
-                                       on:created="created(%event)"
-                                       on:beforeAttach="onBeforeCreate(%event)">Attach
+                                       on:created="created(scope.event)"
+                                       on:beforeAttach="onBeforeCreate(scope.event)">Attach
           </ggrc-gdrive-picker-launcher>
         {{else}}
          <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
@@ -26,8 +26,8 @@
                                        tooltip:from="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.'"
                                        disabled:from="isAttachActionDisabled"
                                        confirmationCallback:from="@confirmationCallback"
-                                       on:created="created(%event)"
-                                       on:beforeAttach="onBeforeCreate(%event)">Attach
+                                       on:created="created(scope.event)"
+                                       on:beforeAttach="onBeforeCreate(scope.event)">Attach
           </ggrc-gdrive-picker-launcher>
           <div class="attachment-upload-control__icon attachment-upload-control__icon__error">
             <i class="fa fa-exclamation-triangle red attachments-list-alert"

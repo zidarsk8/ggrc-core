@@ -7,12 +7,12 @@
   <audit-inner-nav
     instance:from="instance"
     widgetDescriptors:from="innerNavDescriptors"
-    on:activeChanged="showWidgetArea(%event)"
+    on:activeChanged="showWidgetArea(scope.event)"
   ></audit-inner-nav>
 {{else}}
   <inner-nav
     instance:from="instance"
     widgetDescriptors:from="innerNavDescriptors"
-    on:activeChanged="showWidgetArea(%event)"
+    on:activeChanged="showWidgetArea(scope.event)"
   ></inner-nav>
 {{/if}}

@@ -89,7 +89,7 @@
             <comment-add-button class="simple-modal__toolbar-item"
                                 value:bind="*commentValue"
                                 isSaving:to="*isSaving"
-                                on:commentCreated="onCommentCreated(%event)"
+                                on:commentCreated="onCommentCreated(scope.event)"
                                 isDisabled:from="isUpdatingEvidences">
               Save
             </comment-add-button>
