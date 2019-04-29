@@ -67,3 +67,25 @@ def validate_definition_type_ggrcq(mapper, content, target):
 
   if should_prevent:
     raise exceptions.MethodNotAllowed()
+
+
+def validate_name_correctness(name):
+  """Validate name does not contains invalid values"""
+  name_to_validate = name.strip().lower()
+
+  names_includes = ["*"]
+  for invalid in names_includes:
+    if invalid in name_to_validate:
+      raise ValueError(u"Name contains unsupported symbol '{}'"
+                       .format(invalid))
+
+  names_starts_with = ["map:", "unmap:"]
+  for invalid in names_starts_with:
+    if name_to_validate.startswith(invalid):
+      raise ValueError(u"Name should not starts with '{}'".format(invalid))
+
+  invalid_names = ["delete"]
+  for invalid in invalid_names:
+    if name_to_validate == invalid:
+      raise ValueError(u"'{}' is reserved word and should not be used as "
+                       u"an name".format(invalid))
