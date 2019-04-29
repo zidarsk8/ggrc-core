@@ -131,6 +131,13 @@ export default Cacheable.extend({
       value: '',
       validate: {
         required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
       },
     },
     program: {
