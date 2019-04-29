@@ -10,12 +10,12 @@ import {
   getDate,
 } from './utils/date-utils';
 
-const CannotBeBlankMessage = 'cannot be blank';
+const blankMessage = 'cannot be blank';
 
 const validateDefaultPeople = (people, attrName) => {
   if (!people || (_.isArray(people) && !people.length)) {
     return {
-      [`${attrName}`]: CannotBeBlankMessage,
+      [`${attrName}`]: blankMessage,
     };
   }
 };
@@ -34,7 +34,7 @@ validatejs.validators.validateAssignee = (value, roleType, key, attributes) => {
 validatejs.validators.validateIssueTracker = (value) => {
   if (value.enabled && !value.component_id) {
     return {
-      component_id: CannotBeBlankMessage,
+      component_id: blankMessage,
     };
   }
 };
@@ -45,7 +45,7 @@ validatejs.validators.validateAssessmentIssueTracker = (value,
       value.enabled &&
       !value.component_id) {
     return {
-      component_id: CannotBeBlankMessage,
+      component_id: blankMessage,
     };
   }
 };
@@ -56,7 +56,7 @@ validatejs.validators.validateIssueTrackerTitle = (value,
       value.enabled &&
       (!value.title || (value.title && !value.title.trim()))) {
     return {
-      title: CannotBeBlankMessage,
+      title: blankMessage,
     };
   }
 };
@@ -141,7 +141,7 @@ validatejs.validators.validateIssueTrackerIssueId = (value,
 
   if (value.enabled && !value.issue_id) {
     return {
-      issue_id: CannotBeBlankMessage,
+      issue_id: blankMessage,
     };
   }
 };
