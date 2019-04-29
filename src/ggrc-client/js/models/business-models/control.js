@@ -4,7 +4,6 @@
 */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
@@ -24,7 +23,6 @@ export default Cacheable.extend({
   update: 'PUT /api/controls/{id}',
   destroy: 'DELETE /api/controls/{id}',
   mixins: [
-    uniqueTitle,
     caUpdate,
     timeboxed,
     accessControlList,
@@ -115,27 +113,6 @@ export default Cacheable.extend({
     this._super(...arguments);
   },
 }, {
-  define: {
-    title: {
-      value: '',
-      validate: {
-        required: true,
-        validateUniqueTitle: true,
-      },
-    },
-    _transient_title: {
-      value: '',
-      validate: {
-        validateUniqueTitle: true,
-      },
-    },
-    assertions: {
-      value: [],
-      validate: {
-        required: true,
-      },
-    },
-  },
   init: function () {
     this._super(...arguments);
     this.bind('refreshInstance', this.refresh.bind(this));
