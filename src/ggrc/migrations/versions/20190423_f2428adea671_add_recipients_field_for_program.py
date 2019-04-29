@@ -21,7 +21,7 @@ from ggrc.migrations.utils import migrator
 
 # revision identifiers, used by Alembic.
 revision = 'f2428adea671'
-down_revision = '2dd5e1292b9c'
+down_revision = 'fd7f3834a37e'
 
 
 default_recipients = ("Program Managers,Program Editors,Program Readers,"
@@ -38,7 +38,7 @@ def add_recipients_column():
   op.add_column(
       "programs",
       sa.Column("send_by_default", mysql.TINYINT(display_width=1),
-                nullable=False, default=True),
+                nullable=True, default=True),
   )
 
 
@@ -50,7 +50,7 @@ def fill_programs_recipients(connection):
       sa.Column('id', sa.Integer(), nullable=False),
       sa.Column('recipients', sa.String(length=250), nullable=True),
       sa.Column('send_by_default', mysql.TINYINT(display_width=1),
-                nullable=False),
+                nullable=True),
       sa.Column('updated_at', sa.DateTime, nullable=False),
       sa.Column('modified_by_id', sa.Integer, nullable=True),
   )
