@@ -22,13 +22,6 @@ can.Control.prototype._ifNotRemoved = function (fn) {
   };
 };
 
-can.camelCaseToUnderscore = function (string) {
-  if (!_.isString(string)) {
-    throw new TypeError('Invalid type, string required.');
-  }
-  return _.snakeCase(string);
-};
-
 // Insert current Control instance into element's data
 can.Control.setup = function () {
   let originalInit = this.prototype.init;

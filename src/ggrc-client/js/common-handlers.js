@@ -29,7 +29,7 @@ function openMapperByElement(ev, disableMapper) {
   let data = {};
 
   _.forEach(btn.data(), function (val, key) {
-    data[can.camelCaseToUnderscore(key)] = val;
+    data[_.snakeCase(key)] = val;
   });
 
   if (data.tooltip) {
