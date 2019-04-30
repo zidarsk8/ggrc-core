@@ -7,10 +7,10 @@ import CanMap from 'can-map/can-map';
 import CanList from 'can-list/can-list';
 import CanModel from 'can-model/src/can-model';
 
-import {isValidAttrProperty} from '../../utils/validation-utils';
+import {isValidAttr, validateAttr} from '../../utils/validation-utils';
 
 describe('validation utils', () => {
-  describe('isValidAttrProperty method', () => {
+  describe('validateAttr util', () => {
     let testModel;
 
     beforeAll(() => {
@@ -19,33 +19,40 @@ describe('validation utils', () => {
 
     it('should return undefined. model is valid', () => {
       testModel.attr('errors', undefined);
-      const result = isValidAttrProperty(testModel, 'issue_tracker', 'title');
+      const result = validateAttr(testModel, 'issue_tracker.title');
       expect(result).toBeUndefined();
     });
 
     it('should return undefined. issue_tracker is valid', () => {
       const errors = new CanMap({});
       testModel.attr('errors', errors);
-      const result = isValidAttrProperty(testModel, 'issue_tracker', 'title');
+      const result = validateAttr(testModel, 'issue_tracker.title');
       expect(result).toBeUndefined();
     });
 
-    it('should return undefined. issue_tracker does not have title error',
+    it('should return undefined. title is valid', () => {
+      const errors = new CanMap({});
+      testModel.attr('errors', errors);
+      const result = validateAttr(testModel, 'title');
+      expect(result).toBeUndefined();
+    });
+
+    it('should return error message for simple attrubute',
       () => {
         const errors = new CanMap({
-          issue_tracker: new CanList([
+          title: new CanList([
             'cannot be blank',
             'missed componed id',
           ]),
         });
 
         testModel.attr('errors', errors);
-        const result = isValidAttrProperty(testModel, 'issue_tracker', 'title');
-        expect(result).toBeUndefined();
+        const result = validateAttr(testModel, 'title');
+        expect(result).toEqual('cannot be blank; missed componed id');
       }
     );
 
-    it('should return errorMessage. issue_tracker has title error',
+    it('should return error message. issue_tracker has title error',
       () => {
         const errors = new CanMap({
           issue_tracker: new CanList([
@@ -55,12 +62,12 @@ describe('validation utils', () => {
         });
 
         testModel.attr('errors', errors);
-        const result = isValidAttrProperty(testModel, 'issue_tracker', 'title');
+        const result = validateAttr(testModel, 'issue_tracker.title');
         expect(result).toEqual('cannot be blank');
       }
     );
 
-    it('should return errorMessage. issue_tracker has title errors',
+    it('should return error message. issue_tracker has title errors',
       () => {
         const errors = new CanMap({
           issue_tracker: new CanList([
@@ -71,8 +78,82 @@ describe('validation utils', () => {
         });
 
         testModel.attr('errors', errors);
-        const result = isValidAttrProperty(testModel, 'issue_tracker', 'title');
+        const result = validateAttr(testModel, 'issue_tracker.title');
         expect(result).toEqual('cannot be blank; max length is 100500');
+      }
+    );
+  });
+
+  describe('isValidAttr util', () => {
+    let testModel;
+
+    beforeAll(() => {
+      testModel = new CanModel();
+    });
+
+    it('should return TRUE. model is valid', () => {
+      testModel.attr('errors', undefined);
+      const result = isValidAttr(testModel, 'issue_tracker.title');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return TRUE. issue_tracker is valid', () => {
+      const errors = new CanMap({});
+      testModel.attr('errors', errors);
+      const result = isValidAttr(testModel, 'issue_tracker.title');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return TRUE. title is valid', () => {
+      const errors = new CanMap({});
+      testModel.attr('errors', errors);
+      const result = isValidAttr(testModel, 'title');
+      expect(result).toBeTruthy();
+    });
+
+    it('should return FALSE. simple attr is not valid',
+      () => {
+        const errors = new CanMap({
+          title: new CanList([
+            'cannot be blank',
+            'missed componed id',
+          ]),
+        });
+
+        testModel.attr('errors', errors);
+        const result = isValidAttr(testModel, 'title');
+        expect(result).toBeFalsy();
+      }
+    );
+
+    it('should return FALSE. issue_tracker has title error',
+      () => {
+        const errors = new CanMap({
+          issue_tracker: new CanList([
+            'something wrong',
+            {title: 'cannot be blank'},
+          ]),
+        });
+
+        testModel.attr('errors', errors);
+        const result = isValidAttr(testModel, 'issue_tracker.title');
+        expect(result).toBeFalsy();
+      }
+    );
+
+    it('should return FALSE. issue_tracker has title errors',
+      () => {
+        const errors = new CanMap({
+          issue_tracker: new CanList([
+            'something wrong',
+            {title: 'cannot be blank'},
+            {title: 'max length is 100500'},
+          ]),
+        });
+
+        testModel.attr('errors', errors);
+        const result = isValidAttr(testModel, 'issue_tracker.title');
+        expect(result).toBeFalsy();
       }
     );
   });

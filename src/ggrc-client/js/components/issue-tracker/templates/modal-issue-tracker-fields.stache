@@ -59,15 +59,15 @@
             {{{linkingNote}}}
           </div>
         </div>
-        <div class="ggrc-form-item__multiple-row {{#isValidAttrProperty instance "issue_tracker" "issue_id"}}field-failure{{/isValidAttrProperty}}">
+        <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.issue_id"}}field-failure{{/isValidAttr}}">
           <numberbox-component attrDataId:from="'code_txtbx'"
                      additionalClass:from="'input-block-level'"
                      placeholder:from="'Enter Ticket ID'"
                      value:bind="instance.issue_tracker.issue_id">
           </numberbox-component>
-          {{#isValidAttrProperty instance "issue_tracker" "issue_id"}}
+          {{#validateAttr instance "issue_tracker.issue_id"}}
             <label class="help-inline warning">{{this}}</label>
-          {{/isValidAttrProperty}}
+          {{/validateAttr}}
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@
                  value:bind="instance.issue_tracker.hotlist_id">
       </numberbox-component>
     </div>
-    <div class="ggrc-form-item__multiple-row {{#isValidAttrProperty instance "issue_tracker" "component_id"}}field-failure{{/isValidAttrProperty}}">
+    <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.component_id"}}field-failure{{/isValidAttr}}">
       <label class="form-label ggrc-form-item__label">
         Component ID
         <i class="fa fa-asterisk"></i>
@@ -94,9 +94,9 @@
                  placeholder:from="'Enter Component ID'"
                  value:bind="instance.issue_tracker.component_id">
       </numberbox-component>
-      {{#isValidAttrProperty instance "issue_tracker" "component_id"}}
+      {{#validateAttr instance "issue_tracker.component_id"}}
         <label class="help-inline warning">{{this}}</label>
-      {{/isValidAttrProperty}}
+      {{/validateAttr}}
     </div>
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">
@@ -128,7 +128,7 @@
     </div>
 
     {{#if setIssueTitle}}
-      <div class="ggrc-form-item__multiple-row {{#isValidAttrProperty instance "issue_tracker" "title"}}field-failure{{/isValidAttrProperty}}">
+      <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.title"}}field-failure{{/isValidAttr}}">
         <label class="form-label ggrc-form-item__label">
           Ticket Title
           <i class="fa fa-asterisk"></i>
@@ -139,9 +139,9 @@
                type="text"
                el:value:bind="instance.issue_tracker.title"
         />
-        {{#isValidAttrProperty instance "issue_tracker" "title"}}
+        {{#validateAttr instance "issue_tracker.title"}}
           <label class="help-inline warning">{{this}}</label>
-        {{/isValidAttrProperty}}
+        {{/validateAttr}}
       </div>
     {{/if}}
   </div>
