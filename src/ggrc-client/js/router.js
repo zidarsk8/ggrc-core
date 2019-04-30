@@ -11,7 +11,7 @@ class RouterConfig {
       can.route(route.template, route.defaults);
     });
     can.route.map(router);
-    can.route.ready();
+    can.route.start();
   }
 }
 
