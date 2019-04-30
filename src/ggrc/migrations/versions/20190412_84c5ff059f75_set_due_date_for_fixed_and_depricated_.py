@@ -17,7 +17,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '84c5ff059f75'
-down_revision = '2dd5e1292b9c'
+down_revision = 'f2428adea671'
 
 
 # We need to create a migration for existing issues in statuses Fixed,
@@ -37,13 +37,18 @@ def get_issues_without_due_date(connection):
 def get_revision_due_date(con, issue_id):
   """Fund due_date value in related revision"""
   query = "SELECT content, created_at FROM revisions WHERE " \
-          "resource_type = 'Issue' AND resource_id = :id"
+          "resource_type = 'Issue' AND resource_id = :id " \
+          "ORDER BY id DESC"
   all_revisions = con.execute(sa.text(query), id=issue_id)
+  result = None
+  last_status = None
   for rev in all_revisions:
-    doc = json.loads(rev['content'])
-    if doc['status'] in STATUSES:
-      return rev['created_at']
-  return None
+    if not result:
+      last_status = json.loads(rev['content'])['status']
+    elif json.loads(rev['content'])['status'] != last_status:
+      break
+    result = rev['created_at']
+  return result
 
 
 def set_due_date(con, issue_id, due_date):
