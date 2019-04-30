@@ -26,60 +26,60 @@ describe('validateIssueTrackerTitle extension', () => {
   });
 
   it('should return FALSE. issue tracker does not have title', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
     }));
-    model.attr('can_use_issue_tracker', true);
-    expect(model.validate()).toBeFalsy();
-    expect(model.errors.issue_tracker[0].title)
+    instance.attr('can_use_issue_tracker', true);
+    expect(instance.validate()).toBeFalsy();
+    expect(instance.errors.issue_tracker[0].title)
       .toEqual('cannot be blank');
   });
 
   it('should return FALSE. issue tracker has empty title', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
       title: '     ',
     }));
-    model.attr('can_use_issue_tracker', true);
-    expect(model.validate()).toBeFalsy();
-    expect(model.errors.issue_tracker[0].title)
+    instance.attr('can_use_issue_tracker', true);
+    expect(instance.validate()).toBeFalsy();
+    expect(instance.errors.issue_tracker[0].title)
       .toEqual('cannot be blank');
   });
 
   it('should return TRUE. issue tracker has title', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
       title: 'my title',
     }));
-    model.attr('can_use_issue_tracker', true);
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    instance.attr('can_use_issue_tracker', true);
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return TRUE. can_use_issue_tracker - true, enabled - false',
     () => {
-      const model = new TestModel();
-      model.attr('issue_tracker', new CanMap({
+      const instance = new TestModel();
+      instance.attr('issue_tracker', new CanMap({
         enabled: false,
       }));
-      model.attr('can_use_issue_tracker', true);
-      expect(model.validate()).toBeTruthy();
-      expect(model.errors.issue_tracker).toBeUndefined();
+      instance.attr('can_use_issue_tracker', true);
+      expect(instance.validate()).toBeTruthy();
+      expect(instance.errors.issue_tracker).toBeUndefined();
     }
   );
 
   it('should return TRUE. can_use_issue_tracker - false, enabled - false',
     () => {
-      const model = new TestModel();
-      model.attr('issue_tracker', new CanMap({
+      const instance = new TestModel();
+      instance.attr('issue_tracker', new CanMap({
         enabled: false,
       }));
-      model.attr('can_use_issue_tracker', false);
-      expect(model.validate()).toBeTruthy();
-      expect(model.errors.issue_tracker).toBeUndefined();
+      instance.attr('can_use_issue_tracker', false);
+      expect(instance.validate()).toBeTruthy();
+      expect(instance.errors.issue_tracker).toBeUndefined();
     }
   );
 });

@@ -24,50 +24,50 @@ describe('validateIssueTrackerIssueId extension', () => {
   });
 
   it('should return TRUE. issue tracker is disabled', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: false,
     }));
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return TRUE. issue tracker is empty object', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', {});
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    const instance = new TestModel();
+    instance.attr('issue_tracker', {});
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return TRUE. issue tracker has issue id', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
       issue_id: 12345,
     }));
-    model.attr('status', 'Fixed');
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    instance.attr('status', 'Fixed');
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return TRUE. issue tracker has wrong status', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
     }));
-    model.attr('status', 'Draft');
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    instance.attr('status', 'Draft');
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return FALSE. issue tracker does not have issue id', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
     }));
-    model.attr('status', 'Fixed');
-    expect(model.validate()).toBeFalsy();
-    expect(model.errors.issue_tracker[0].issue_id)
+    instance.attr('status', 'Fixed');
+    expect(instance.validate()).toBeFalsy();
+    expect(instance.errors.issue_tracker[0].issue_id)
       .toEqual('cannot be blank');
   });
 });

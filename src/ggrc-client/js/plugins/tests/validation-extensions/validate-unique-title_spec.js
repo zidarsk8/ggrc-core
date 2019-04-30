@@ -27,31 +27,31 @@ describe('validateUniqueTitle extension', () => {
     });
   });
 
-  it('Should return FALSE. transient_title - not empty', () => {
-    const model = new TestModel();
-    model.attr('_transient_title', 'title must be unique');
-    expect(model.validate()).toBeFalsy();
+  it('should return FALSE. transient_title - not empty', () => {
+    const instance = new TestModel();
+    instance.attr('_transient_title', 'title must be unique');
+    expect(instance.validate()).toBeFalsy();
   });
 
-  it('Should return TRUE. transient_title - empty', () => {
-    const model = new TestModel();
-    model.attr('_transient_title', '');
-    expect(model.validate()).toBeTruthy();
+  it('should return TRUE. transient_title - empty', () => {
+    const instance = new TestModel();
+    instance.attr('_transient_title', '');
+    expect(instance.validate()).toBeTruthy();
   });
 
-  it('Should return TRUE. transient_title - empty, title - not empty', () => {
-    const model = new TestModel();
-    model.attr('_transient_title', '');
-    model.attr('title', 'test title');
-    expect(model.validate()).toBeTruthy();
+  it('should return TRUE. transient_title - empty, title - not empty', () => {
+    const instance = new TestModel();
+    instance.attr('_transient_title', '');
+    instance.attr('title', 'test title');
+    expect(instance.validate()).toBeTruthy();
   });
 
-  it('Should return FALSE. transient_title - not empty, title - not empty',
+  it('should return FALSE. transient_title - not empty, title - not empty',
     () => {
-      const model = new TestModel();
-      model.attr('_transient_title', 'title must be unique');
-      model.attr('title', 'test title');
-      expect(model.validate()).toBeFalsy();
+      const instance = new TestModel();
+      instance.attr('_transient_title', 'title must be unique');
+      instance.attr('title', 'test title');
+      expect(instance.validate()).toBeFalsy();
     }
   );
 });

@@ -27,50 +27,50 @@ describe('validateMultiChoiceOptions extension', () => {
     });
   });
 
-  it('Should return TRUE. attribute_type is empty string', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', '');
-    expect(model.validate()).toBeTruthy();
+  it('should return TRUE. attribute_type is empty string', () => {
+    const instance = new TestModel();
+    instance.attr('attribute_type', '');
+    expect(instance.validate()).toBeTruthy();
   });
 
-  it('Should return TRUE. attribute_type is not dropdown', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', 'test type');
-    expect(model.validate()).toBeTruthy();
+  it('should return TRUE. attribute_type is not dropdown', () => {
+    const instance = new TestModel();
+    instance.attr('attribute_type', 'test type');
+    expect(instance.validate()).toBeTruthy();
   });
 
-  it('Should return TRUE. Dropdown has correct values', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', 'Dropdown');
-    model.attr('multi_choice_options', '5 , 51, 52');
-    expect(model.validate()).toBeTruthy();
+  it('should return TRUE. Dropdown has correct values', () => {
+    const instance = new TestModel();
+    instance.attr('attribute_type', 'Dropdown');
+    instance.attr('multi_choice_options', '5 , 51, 52');
+    expect(instance.validate()).toBeTruthy();
   });
 
-  it('Should return FALSE. Empty string as Dropdown value', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', 'Dropdown');
-    model.attr('multi_choice_options', '');
-    expect(model.validate()).toBeFalsy();
+  it('should return FALSE. Empty string as Dropdown value', () => {
+    const instance = new TestModel();
+    instance.attr('attribute_type', 'Dropdown');
+    instance.attr('multi_choice_options', '');
+    expect(instance.validate()).toBeFalsy();
   });
 
-  it('Should return FALSE. Null as Dropdown value', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', 'Dropdown');
-    model.attr('multi_choice_options', null);
-    expect(model.validate()).toBeFalsy();
+  it('should return FALSE. Null as Dropdown value', () => {
+    const instance = new TestModel();
+    instance.attr('attribute_type', 'Dropdown');
+    instance.attr('multi_choice_options', null);
+    expect(instance.validate()).toBeFalsy();
   });
 
-  it('Should return FALSE. Dropdown has "Blank" values', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', 'Dropdown');
-    model.attr('multi_choice_options', ' , 1, 2');
-    expect(model.validate()).toBeFalsy();
+  it('should return FALSE. Dropdown has "Blank" values', () => {
+    const instance = new TestModel();
+    instance.attr('attribute_type', 'Dropdown');
+    instance.attr('multi_choice_options', ' , 1, 2');
+    expect(instance.validate()).toBeFalsy();
   });
 
   it('Should return FALSE. Dropdown has duplicates', () => {
-    const model = new TestModel();
-    model.attr('attribute_type', 'Dropdown');
-    model.attr('multi_choice_options', '2, 1, 2');
-    expect(model.validate()).toBeFalsy();
+    const instance = new TestModel();
+    instance.attr('attribute_type', 'Dropdown');
+    instance.attr('multi_choice_options', '2, 1, 2');
+    expect(instance.validate()).toBeFalsy();
   });
 });

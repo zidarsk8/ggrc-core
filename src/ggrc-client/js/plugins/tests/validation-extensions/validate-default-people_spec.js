@@ -25,40 +25,40 @@ describe('validateDefaultPeople extensions.', () => {
     });
 
     it('shoud return TRUE, assignees is NOT empty list', () => {
-      const model = new TestModel();
-      model.attr('default_people', new CanMap({
+      const instance = new TestModel();
+      instance.attr('default_people', new CanMap({
         assignees: new CanList([1, 2]),
       }));
-      expect(model.validate()).toBeTruthy();
-      expect(model.errors.default_people).toBeUndefined();
+      expect(instance.validate()).toBeTruthy();
+      expect(instance.errors.default_people).toBeUndefined();
     });
 
     it('shoud return TRUE, assignees is NOT empty string', () => {
-      const model = new TestModel();
-      model.attr('default_people', new CanMap({
+      const instance = new TestModel();
+      instance.attr('default_people', new CanMap({
         assignees: 'Auditor',
       }));
-      expect(model.validate()).toBeTruthy();
-      expect(model.errors.default_people).toBeUndefined();
+      expect(instance.validate()).toBeTruthy();
+      expect(instance.errors.default_people).toBeUndefined();
     });
 
     it('shoud return FALSE, assignees is EMPTY string', () => {
-      const model = new TestModel();
-      model.attr('default_people', new CanMap({
+      const instance = new TestModel();
+      instance.attr('default_people', new CanMap({
         assignees: '',
       }));
-      expect(model.validate()).toBeFalsy();
-      expect(model.errors.default_people[0].assignees)
+      expect(instance.validate()).toBeFalsy();
+      expect(instance.errors.default_people[0].assignees)
         .toEqual('cannot be blank');
     });
 
     it('shoud return FALSE, assignees is EMPTY list', () => {
-      const model = new TestModel();
-      model.attr('default_people', new CanMap({
+      const instance = new TestModel();
+      instance.attr('default_people', new CanMap({
         assignees: new CanList([]),
       }));
-      expect(model.validate()).toBeFalsy();
-      expect(model.errors.default_people[0].assignees)
+      expect(instance.validate()).toBeFalsy();
+      expect(instance.errors.default_people[0].assignees)
         .toEqual('cannot be blank');
     });
   });

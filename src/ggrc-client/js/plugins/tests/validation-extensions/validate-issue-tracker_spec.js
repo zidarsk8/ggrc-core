@@ -23,38 +23,38 @@ describe('validateIssueTracker extension', () => {
   });
 
   it('should return TRUE. issue tracker is disabled', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: false,
     }));
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return TRUE. issue tracker is empty object', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', {});
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    const instance = new TestModel();
+    instance.attr('issue_tracker', {});
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return TRUE. issue tracker has component id', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
       component_id: 12345,
     }));
-    expect(model.validate()).toBeTruthy();
-    expect(model.errors.issue_tracker).toBeUndefined();
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
   });
 
   it('should return FALSE. issue tracker does not have component id', () => {
-    const model = new TestModel();
-    model.attr('issue_tracker', new CanMap({
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new CanMap({
       enabled: true,
     }));
-    expect(model.validate()).toBeFalsy();
-    expect(model.errors.issue_tracker[0].component_id)
+    expect(instance.validate()).toBeFalsy();
+    expect(instance.errors.issue_tracker[0].component_id)
       .toEqual('cannot be blank');
   });
 });

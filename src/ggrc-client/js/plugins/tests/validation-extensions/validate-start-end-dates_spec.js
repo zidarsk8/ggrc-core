@@ -28,28 +28,28 @@ describe('validateStartEndDates extension', () => {
   });
 
   it('should return TRUE. daterange is correct', () => {
-    const model = new TestModel();
-    model.attr('start_date', '2015-05-20');
-    model.attr('end_date', '2015-05-23');
-    expect(model.validate()).toBeTruthy();
+    const instance = new TestModel();
+    instance.attr('start_date', '2015-05-20');
+    instance.attr('end_date', '2015-05-23');
+    expect(instance.validate()).toBeTruthy();
   });
 
   it('should return FALSE. end_date is empty', () => {
-    const model = new TestModel();
-    model.attr('start_date', '2015-05-20');
-    expect(model.validate()).toBeFalsy();
+    const instance = new TestModel();
+    instance.attr('start_date', '2015-05-20');
+    expect(instance.validate()).toBeFalsy();
   });
 
   it('should return FALSE. start_date is empty', () => {
-    const model = new TestModel();
-    model.attr('end_date', '2015-05-20');
-    expect(model.validate()).toBeFalsy();
+    const instance = new TestModel();
+    instance.attr('end_date', '2015-05-20');
+    expect(instance.validate()).toBeFalsy();
   });
 
   it('should return FALSE. dates are empty', () => {
-    const model = new TestModel();
-    model.attr('end_date', null);
-    model.attr('start_date', null);
-    expect(model.validate()).toBeFalsy();
+    const instance = new TestModel();
+    instance.attr('end_date', null);
+    instance.attr('start_date', null);
+    expect(instance.validate()).toBeFalsy();
   });
 });
