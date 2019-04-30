@@ -46,6 +46,8 @@ class MysqlRecordProperty(db.Model):
   @declared_attr
   def __table_args__(cls):  # pylint: disable=no-self-argument
     return (
+        db.Index('ix_{}_type_property'.format(cls.__tablename__),
+                 'type', 'property'),
         db.Index('ix_{}_tags'.format(cls.__tablename__), 'tags'),
         db.Index('ix_{}_key'.format(cls.__tablename__), 'key'),
         db.Index('ix_{}_type'.format(cls.__tablename__), 'type'),
