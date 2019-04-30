@@ -4,6 +4,13 @@
  */
 
 import template from './templates/related-proposals.stache';
+import {
+  PROPOSAL_CREATED,
+  RELATED_REFRESHED,
+  RELATED_ADDED,
+  ADD_RELATED,
+} from '../../../events/eventTypes';
+
 
 export default can.Component.extend({
   tag: 'related-proposals',
@@ -55,6 +62,35 @@ export default can.Component.extend({
   events: {
     '{viewModel.proposals} change'() {
       this.viewModel.checkTabWarning();
+    },
+    [`{viewModel.baseInstance} ${PROPOSAL_CREATED.type}`](scope, event) {
+      let vm = this.viewModel;
+      let newProposal = event.proposal;
+      let proposals = vm.attr('proposals');
+
+      vm.attr('baseInstance').one(RELATED_REFRESHED.type, (event) => {
+        if (event.model !== 'Proposal') {
+          return;
+        }
+
+        // Sometimes BE does not return newly created proposal through Query API
+        // because of reindexing job. New proposal is added
+        // on FE to the proposals list in this case to not confuse user.
+        let proposal = _.find(proposals,
+          (proposal) => proposal.instance.id === newProposal.id);
+
+        if (!proposal) {
+          proposals.dispatch({
+            ...ADD_RELATED,
+            object: newProposal,
+          });
+        }
+      });
+
+      proposals.dispatch({
+        ...RELATED_ADDED,
+        model: 'Proposal',
+      });
     },
   },
 });
