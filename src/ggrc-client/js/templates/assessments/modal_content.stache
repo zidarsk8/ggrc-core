@@ -237,7 +237,7 @@
           </issue-tracker-switcher>
         </div>
       </div>
-    {{/if }}
+    {{/if}}
 
   </form>
   {{/instance}}

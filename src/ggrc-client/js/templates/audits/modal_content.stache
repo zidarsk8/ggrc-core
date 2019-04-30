@@ -231,7 +231,7 @@
           </div>
         </div>
       </div>
-    {{/if }}
+    {{/if}}
   </form>
 {{/instance}}
 </div>

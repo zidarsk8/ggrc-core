@@ -200,7 +200,7 @@
                                 types:from="types"
                                 on:remove="fieldRemoved"></template-field>
                           </li>
-                      {{/if _pending_delete}}
+                      {{/if}}
                     {{/fields}}
                   </ul>
                 </div>
@@ -241,7 +241,7 @@
           </div>
         </div>
       </div>
-    {{/if }}
+    {{/if}}
  </form>
  </wrapper-assessment-template>
 </div>

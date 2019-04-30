@@ -8,4 +8,4 @@
     instance:from="instance"
     options:from="options">
   </task-group>
-{{/instance}}
+{{/if}}

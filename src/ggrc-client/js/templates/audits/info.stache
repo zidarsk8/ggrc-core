@@ -184,7 +184,7 @@
                     </generate-issues-in-bulk-button>
                   {{/if}}
                 </info-issue-tracker-fields>
-              {{/if }}
+              {{/if}}
             </div><!-- hidden-fields-area end -->
           </div><!-- custom-attr-wrap end -->
           {{> /static/templates/custom_attributes/info.stache}}

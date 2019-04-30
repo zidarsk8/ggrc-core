@@ -32,7 +32,7 @@
           {{^new_object_form}}
             <a
               tabindex="25"
-              class="btn btn-small btn-green {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"
+              class="btn btn-small btn-green {{#if instance.computed_unsuppressed_errors}}disabled{{/if}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>
@@ -41,14 +41,14 @@
             {{^is(model.model_singular, "AssessmentTemplate")}}
             <a
               tabindex="24"
-              class="btn btn-small btn-lightBlue {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"
+              class="btn btn-small btn-lightBlue {{#if instance.computed_unsuppressed_errors}}disabled{{/if}}"
               data-toggle="modal-submit-addmore"
               href="javascript://"
               >Save &amp; Add Another</a>
             {{/is}}
             <a
               tabindex="25"
-              class="btn btn-small btn-green {{#if instance.computed_unsuppressed_errors}}disabled{{/if instance.computed_unsuppressed_errors}}"
+              class="btn btn-small btn-green {{#if instance.computed_unsuppressed_errors}}disabled{{/if}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>

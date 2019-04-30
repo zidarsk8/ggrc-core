@@ -127,7 +127,7 @@
                   </div>
                 </div>
               </div>
-            {{/if }}
+            {{/if}}
 
           </tab-panel>
           <tab-panel panels:bind="panels" titleText:from="'Change Log'">
