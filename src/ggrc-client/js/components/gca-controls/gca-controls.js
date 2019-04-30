@@ -60,6 +60,7 @@ export default can.Component.extend({
       return errorMessages[type] || errorMessages.any;
     },
     isHidable(item, options) {
+      item = isFunction(item) ? item() : item;
       const hidable = (this.attr('allowHide') && !item.mandatory);
       return hidable
         ? options.fn()
