@@ -74,10 +74,6 @@ export default Cacheable.extend({
       return ''; // no errors
     },
   },
-
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   define: {
     title: {
@@ -101,8 +97,5 @@ export default Cacheable.extend({
         validateMultiChoiceOptions: true,
       },
     },
-  },
-  init: function () {
-    this._super(...arguments);
   },
 });

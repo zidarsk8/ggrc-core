@@ -59,10 +59,6 @@ export default Cacheable.extend({
     display_attr_names: ['title', 'status', 'updated_at', 'Admin',
       'Workflow Member'],
   },
-
-  init: function () {
-    this._super && this._super(...arguments);
-  },
 }, {
   define: {
     title: {

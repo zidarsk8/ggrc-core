@@ -24,8 +24,4 @@ export default Cacheable.extend({
     modified_by: Stub,
     context: Stub,
   },
-
-  init: function () {
-    this._super(...arguments);
-  },
 }, {});

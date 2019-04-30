@@ -147,11 +147,6 @@ export default Cacheable.extend({
     'Not Applicable'],
   editModeStatuses: ['In Progress', 'Rework Needed', 'Not Started'],
   readModeStatuses: ['Completed', 'Verified', 'In Review'],
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
   prepareAttributes: function (attrs) {
     return attrs[this.root_object] ? attrs[this.root_object] : attrs;
   },

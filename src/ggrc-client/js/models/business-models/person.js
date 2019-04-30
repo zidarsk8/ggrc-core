@@ -72,9 +72,6 @@ export default Cacheable.extend({
   sub_tree_view_options: {
     default_filter: ['Program', 'Control', 'Risk', 'Assessment'],
   },
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   define: {
     email: {

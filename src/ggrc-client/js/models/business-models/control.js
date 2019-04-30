@@ -109,9 +109,6 @@ export default Cacheable.extend({
     [{title: 'No', value: false}, {title: 'Yes', value: true}],
   keyControlOptions:
     [{title: 'Non-Key', value: false}, {title: 'Key', value: true}],
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   init: function () {
     this._super(...arguments);

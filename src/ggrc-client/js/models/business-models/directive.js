@@ -62,9 +62,6 @@ export default Cacheable.extend({
     context: Stub,
     modified_by: Stub,
   },
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   define: {
     title: {

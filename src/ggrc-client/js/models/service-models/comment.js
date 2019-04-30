@@ -14,11 +14,6 @@ export default Cacheable.extend({
   update: 'PUT /api/comments/{id}',
   destroy: 'DELETE /api/comments/{id}',
   create: 'POST /api/comments',
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
 }, {
   define: {
     description: {

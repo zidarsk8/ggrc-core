@@ -80,11 +80,6 @@ export default Cacheable.extend({
       enabled: instance.isNew(),
     };
   },
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
 }, {
   define: {
     title: {

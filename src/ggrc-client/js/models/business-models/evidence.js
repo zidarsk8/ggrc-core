@@ -71,9 +71,6 @@ export default Cacheable.extend({
         disable_sorting: true,
       }],
   },
-  init() {
-    this._super(...arguments);
-  },
 }, {
   define: {
     title: {

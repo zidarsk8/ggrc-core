@@ -109,11 +109,6 @@ export default Cacheable.extend({
   sub_tree_view_options: {
     default_filter: ['Product'],
   },
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
   buildIssueTrackerConfig() {
     return {
       hotlist_id: '766459',

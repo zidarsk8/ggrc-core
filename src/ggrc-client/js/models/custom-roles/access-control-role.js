@@ -25,9 +25,6 @@ export default Cacheable.extend({
     update: true,
     'delete': true,
   },
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   define: {
     name: {
@@ -36,8 +33,5 @@ export default Cacheable.extend({
         required: true,
       },
     },
-  },
-  init: function () {
-    this._super(...arguments);
   },
 });

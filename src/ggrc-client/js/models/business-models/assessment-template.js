@@ -72,15 +72,6 @@ export default Cacheable.extend({
     }],
     add_item_view: 'assessment_templates/tree_add_item',
   },
-
-  /**
-   * Initialize the newly created object instance. Validate that its title is
-   * non-blank and its default assignees / verifiers lists are set if
-   * applicable.
-   */
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   define: {
     title: {

@@ -18,11 +18,4 @@ export default Cacheable.extend({
   attributes: {
     modified_by: Stub,
   },
-  init: function () {
-    this._super(...arguments);
-  },
-}, {
-  init: function () {
-    this._super(...arguments);
-  },
-});
+}, {});

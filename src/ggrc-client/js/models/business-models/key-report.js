@@ -68,11 +68,6 @@ export default Cacheable.extend({
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
   orderOfRoles: ['Admin', 'Assignee', 'Verifier'],
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
 }, {
   define: {
     title: {

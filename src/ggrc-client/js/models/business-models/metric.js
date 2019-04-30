@@ -69,9 +69,6 @@ export default Cacheable.extend({
     default_filter: ['Product'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    this._super(...arguments);
-  },
 }, {
   define: {
     title: {

@@ -69,11 +69,6 @@ export default Cacheable.extend({
     kind: null,
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
 }, {
   define: {
     title: {

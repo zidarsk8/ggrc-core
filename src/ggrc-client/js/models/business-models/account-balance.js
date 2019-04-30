@@ -67,11 +67,6 @@ export default Cacheable.extend({
     default_filter: ['Control'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-  },
 }, {
   title: {
     value: '',
