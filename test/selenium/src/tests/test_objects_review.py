@@ -13,7 +13,7 @@ import copy
 import pytest
 
 from lib import base, users, factory
-from lib.constants import roles, objects
+from lib.constants import roles, objects, element
 from lib.service import webui_facade, rest_facade, webui_service
 
 
@@ -94,3 +94,17 @@ class TestObjectsReview(base.Test):
     expected_elements_state["is_floating_message_visible"] = True
     expected_elements_state["is_undo_btn_visible"] = True
     assert actual_elements_state == expected_elements_state
+
+  @pytest.mark.smoke_tests
+  def test_obj_history_is_updated(self, program_with_approved_review,
+                                  selenium):
+    """Confirm Review history is updated in Change Log."""
+    expected_entry = {
+        "author": users.current_user().email,
+        "Review State": {"original_value": element.ReviewStates.UNREVIEWED,
+                         "new_value": element.ReviewStates.REVIEWED}}
+    actual_entries = (webui_service.ProgramsService(selenium).
+                      open_info_page_of_obj(program_with_approved_review).
+                      get_changelog_entries())
+    assert (expected_entry == actual_entries.pop(0) and
+            expected_entry not in actual_entries)
