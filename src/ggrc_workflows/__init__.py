@@ -236,19 +236,22 @@ def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user):
   """ This function preserves the old style of creating cycles, so each object
   gets its own task assigned to it.
   """
-  if len(task_group.task_group_objects) == 0:
+  related_objs = [
+      obj for obj in task_group.related_objects()
+      if not isinstance(obj, (all_models.TaskGroupTask, all_models.Workflow))
+  ]
+  if len(related_objs) == 0:
     for task_group_task in task_group.task_group_tasks:
-      cycle_task_group_object_task = _create_cycle_task(
-          task_group_task, cycle, cycle_task_group,
-          current_user)
+      _create_cycle_task(
+          task_group_task, cycle, cycle_task_group, current_user
+      )
 
-  for task_group_object in task_group.task_group_objects:
-    object_ = task_group_object.object
+  for obj in related_objs:
     for task_group_task in task_group.task_group_tasks:
       cycle_task_group_object_task = _create_cycle_task(
-          task_group_task, cycle, cycle_task_group,
-          current_user)
-      Relationship(source=cycle_task_group_object_task, destination=object_)
+          task_group_task, cycle, cycle_task_group, current_user
+      )
+      Relationship(source=cycle_task_group_object_task, destination=obj)
 
 
 def build_cycle(workflow, cycle=None, current_user=None):
@@ -567,17 +570,6 @@ def handle_cycle_task_group_object_task_put(
             )
         ]
     )
-
-  # Doing this regardless of status.history.has_changes() is important in order
-  # to update objects that have been declined. It updates the os_last_updated
-  # date and last_updated_by.
-  with benchmark("handle CycleTask put"):
-    if getattr(obj.task_group_task, 'object_approval', None):
-      for tgobj in obj.task_group_task.task_group.objects:
-        if obj.status == 'Verified':
-          tgobj.modified_by = get_current_user()
-          tgobj.set_reviewed_state()
-      db.session.flush()
 
 
 @signals.Restful.model_posted.connect_via(
