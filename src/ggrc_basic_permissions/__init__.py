@@ -312,7 +312,7 @@ def load_personal_context(user, permissions):
       .append(personal_context.id)
 
 
-def _get_acl_filter(acl_model):
+def _get_acl_filter(acl_model_alias):
   """Get filter for acl entries.
 
   This creates a filter to select only acl entries for objects that were
@@ -327,9 +327,7 @@ def _get_acl_filter(acl_model):
   stubs = getattr(flask.g, "referenced_object_stubs", None)
   if stubs is None:
     logger.warning("Using full permissions query")
-    return [
-        acl_model.object_type != all_models.Relationship.__name__,
-    ]
+    return "AND {}.object_type != 'Relationship'".format(acl_model_alias)
 
   roleable_models = {m.__name__ for m in all_models.all_models
                      if issubclass(m, Roleable)}
@@ -340,42 +338,37 @@ def _get_acl_filter(acl_model):
       if type_ in roleable_models
   ]
   if not keys:
-    return [
-        sa.false()
-    ]
-  return [
-      sa.tuple_(
-          acl_model.object_type,
-          acl_model.object_id,
-      ).in_(
-          keys,
-      )
-  ]
+    return "AND 0 = 1"
+  return """AND ({0}.object_type, {0}.object_id) IN ({1})
+         """.format(acl_model_alias,
+                    ",".join("('%s', %s)" % pair for pair in keys))
 
 
 def load_access_control_list(user, permissions):
-  """Load permissions from access_control_list"""
-  acl_base = db.aliased(all_models.AccessControlList, name="acl_base")
-  acl_propagated = db.aliased(all_models.AccessControlList,
-                              name="acl_propagated")
-  acr = all_models.AccessControlRole
-  acp = all_models.AccessControlPerson
-  additional_filters = _get_acl_filter(acl_propagated)
-  access_control_list = db.session.query(
-      acl_propagated.object_type,
-      acl_propagated.object_id,
-      acr.read,
-      acr.update,
-      acr.delete,
-  ).filter(
-      sa.and_(
-          acp.person_id == user.id,
-          acp.ac_list_id == acl_base.id,
-          acl_base.id == acl_propagated.base_id,
-          acl_propagated.ac_role_id == acr.id,
-          *additional_filters
-      )
-  )
+  """Load permissions from access_control_list.
+
+  This is rewritten with raw SQL because SQLAlchemy
+  objects consume too much memory when lots of objects
+  are loaded.
+  """
+  access_control_list = db.engine.execute(sa.text("""
+      SELECT
+          acl_propagated.object_type AS acl_propagated_object_type,
+          acl_propagated.object_id AS acl_propagated_object_id,
+          access_control_roles.`read` AS access_control_roles_read,
+          access_control_roles.`update` AS access_control_roles_update,
+          access_control_roles.`delete` AS access_control_roles_delete
+      FROM
+          access_control_list AS acl_propagated,
+          access_control_roles,
+          access_control_people,
+          access_control_list AS acl_base
+      WHERE
+          access_control_people.person_id = :user_id
+              AND access_control_people.ac_list_id = acl_base.id
+              AND acl_base.id = acl_propagated.base_id
+              AND acl_propagated.ac_role_id = access_control_roles.id {}
+  """.format(_get_acl_filter("acl_propagated"))), user_id=user.id)
 
   for object_type, object_id, read, update, delete in access_control_list:
     actions = (("read", read), ("update", update), ("delete", delete))
