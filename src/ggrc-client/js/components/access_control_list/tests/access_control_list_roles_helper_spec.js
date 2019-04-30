@@ -4,22 +4,30 @@
  */
 
 import {
-  makeFakeInstance,
+  makeFakeModel,
   getComponentVM,
 } from '../../../../js_specs/spec_helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import Component from '../access-control-list-roles-helper';
-import Assessment from '../../../models/business-models/assessment';
-import Control from '../../../models/business-models/control';
-
+import Cacheable from '../../../models/cacheable';
+import accessControlList from '../../../models/mixins/access-control-list';
 
 describe('access-control-list-roles-helper component', function () {
   'use strict';
 
   let viewModel;
+  let DummyModel;
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
+    DummyModel = makeFakeModel({
+      model: Cacheable,
+      staticProps: {
+        mixins: [
+          accessControlList,
+        ],
+      },
+    });
   });
 
   describe('"setAutoPopulatedRoles" method', function () {
@@ -28,26 +36,26 @@ describe('access-control-list-roles-helper component', function () {
     it('should set current user for 2 roles', function () {
       spyOn(aclUtils, 'getRolesForType').and.returnValue([
         {
-          object_type: 'Assessment',
+          object_type: 'DummyModel',
           id: 5,
           name: 'Admin',
           default_to_current_user: true,
         },
         {
-          object_type: 'Assessment',
+          object_type: 'DummyModel',
           id: 7,
           name: 'SuperAdmin',
           default_to_current_user: true,
         },
         {
-          object_type: 'Assessment',
+          object_type: 'DummyModel',
           id: 8,
           name: 'Primary contacts',
           default_to_current_user: false,
         },
       ]);
 
-      instance = makeFakeInstance({model: Assessment})({id: 25});
+      instance = new DummyModel({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
       viewModel.setAutoPopulatedRoles();
@@ -63,14 +71,14 @@ describe('access-control-list-roles-helper component', function () {
     it('should set current user for 1 role', function () {
       spyOn(aclUtils, 'getRolesForType').and.returnValue([
         {
-          object_type: 'Control',
+          object_type: 'DummyModel',
           id: 6,
           name: 'Primary Contact',
           default_to_current_user: true,
         },
       ]);
 
-      instance = makeFakeInstance({model: Control})({id: 25});
+      instance = new DummyModel({id: 25});
       viewModel.attr('instance', instance);
       expect(instance.access_control_list.length).toEqual(0);
       viewModel.setAutoPopulatedRoles();

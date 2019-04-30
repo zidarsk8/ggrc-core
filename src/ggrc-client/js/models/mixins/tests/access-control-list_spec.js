@@ -3,9 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  makeFakeModel,
+} from '../../../../js_specs/spec_helpers';
 import * as snapshotUtils from '../../../plugins/utils/snapshot-utils';
 import Cacheable from '../../cacheable';
-import Control from '../../business-models/control';
+import accessControlList from '../../../models/mixins/access-control-list';
 
 describe('accessControlList mixin', () => {
   describe('"cleanupAcl" method: ', () => {
@@ -18,7 +21,16 @@ describe('accessControlList mixin', () => {
       id = 711;
       objectFromResourceSpy =
         spyOn(Cacheable, 'object_from_resource');
-      model = new Control({id: id});
+
+      let DummyModel = makeFakeModel({
+        model: Cacheable,
+        staticProps: {
+          mixins: [
+            accessControlList,
+          ],
+        },
+      });
+      model = new DummyModel({id: id});
     });
 
     afterEach(() => {
