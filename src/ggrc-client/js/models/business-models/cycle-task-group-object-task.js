@@ -24,7 +24,7 @@ function populateFromWorkflow(form, workflow) {
     form.removeAttr('workflow');
     form.removeAttr('context');
     form.removeAttr('cycle');
-    form.removeAttr('cycle_task_group');
+    form.attr('cycle_task_group', null);
     return;
   }
 
@@ -57,7 +57,7 @@ function populateFromWorkflow(form, workflow) {
     form.attr('cycle', {id: activeCycle.id, type: 'Cycle'});
 
     // reset cycle task group after workflow updating
-    form.removeAttr('cycle_task_group');
+    form.attr('cycle_task_group', null);
   });
 }
 
