@@ -10,6 +10,7 @@ from werkzeug import exceptions as wzg_exceptions
 from ggrc import db
 from ggrc.access_control import roleable
 from ggrc.fulltext import mixin as ft_mixin
+from ggrc.models import comment
 from ggrc.models import context
 from ggrc.models import deferred
 from ggrc.models import mixins
@@ -26,6 +27,7 @@ from ggrc.utils import errors
 class Program(mega.Mega,
               review.Reviewable,
               mixins.CustomAttributable,
+              comment.Commentable,
               object_document.PublicDocumentable,
               roleable.Roleable,
               object_person.Personable,
@@ -43,8 +45,22 @@ class Program(mega.Mega,
 
   KINDS = ['Directive']
   KINDS_HIDDEN = ['Company Controls Policy']
+  VALID_RECIPIENTS = frozenset([
+      "Program Managers",
+      "Program Editors",
+      "Program Readers",
+      "Primary Contacts",
+      "Secondary Contacts",
+  ])
 
   kind = deferred.deferred(db.Column(db.String), 'Program')
+
+  recipients = db.Column(
+      db.String,
+      nullable=True,
+      default=(u"Program Managers,Program Editors,Program Readers,"
+               u"Primary Contacts,Secondary Contacts"),
+  )
 
   audits = db.relationship(
       'Audit', backref='program', cascade='all, delete-orphan')

@@ -6,7 +6,7 @@
 import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
-import baseNotifications from '../mixins/base-notifications';
+import baseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
 import Program from './program';
 

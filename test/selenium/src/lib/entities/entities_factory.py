@@ -371,7 +371,10 @@ class ProgramsFactory(EntitiesFactory):
     if is_add_rest_attrs:
       program_obj.update_attrs(
           recipients=",".join((
-              unicode(roles.ADMIN), unicode(roles.PRIMARY_CONTACTS),
+              unicode(objects.get_plural(roles.PROGRAM_MANAGER, title=True)),
+              unicode(objects.get_plural(roles.PROGRAM_EDITOR, title=True)),
+              unicode(objects.get_plural(roles.PROGRAM_READER, title=True)),
+              unicode(roles.PRIMARY_CONTACTS),
               unicode(roles.SECONDARY_CONTACTS))))
     return program_obj
 

@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/base-notifications';
+import baseNotifications from '../mixins/notifications/base-notifications';
 import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 
