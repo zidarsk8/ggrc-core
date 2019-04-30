@@ -414,7 +414,11 @@ class DateColumnHandler(ColumnHandler):
   def check_readonly_changes(self, new_date, attr_name):
     """Check if the new object don't contain changed date."""
     old_date = getattr(self.row_converter.obj, attr_name, None)
-    is_modified = old_date and new_date and old_date.date() != new_date.date()
+    if hasattr(old_date, "date"):
+      old_date = old_date.date()
+    if hasattr(new_date, "date"):
+      new_date = new_date.date()
+    is_modified = old_date and new_date and old_date != new_date
     if is_modified:
       self.add_warning(errors.UNMODIFIABLE_COLUMN,
                        column_name=self.display_name,)
