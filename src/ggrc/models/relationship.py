@@ -218,7 +218,7 @@ class Relationship(base.ContextRBAC, Base, db.Model):
 
     # Check Control
     control_external_only_mappings = set(scoping_models_names)
-    control_external_only_mappings.update(("Regulation", "Standard"))
+    control_external_only_mappings.update(("Regulation", "Standard", "Risk"))
     if cls._check_relation_types_group(source_type, destination_type,
                                        control_external_only_mappings,
                                        ("Control", )):
