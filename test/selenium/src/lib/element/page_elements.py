@@ -117,19 +117,24 @@ class RelatedPeopleList(object):
         class_name="people-group__title", text=acr_name).parent(
             class_name="people-group")
     if with_inline_edit:
-      self._inline_edit = InlineEdit(self._root)
+      self.inline_edit = InlineEdit(self._root)
     else:
-      self._inline_edit = None
+      self.inline_edit = None
+
+  @property
+  def add_person_text_field(self):
+    """Returns 'Add person' text field object."""
+    return self._root.text_field(placeholder="Add person")
 
   def add_person(self, person):
     """Adds person to Related People list."""
-    if self._inline_edit:
-      self._inline_edit.open()
+    if self.inline_edit:
+      self.inline_edit.open()
     email = person.email
-    self._root.text_field(placeholder="Add person").set(email)
+    self.add_person_text_field.set(email)
     ui_utils.select_user(self._root, email)
-    if self._inline_edit:
-      self._inline_edit.confirm()
+    if self.inline_edit:
+      self.inline_edit.confirm()
 
   def get_people_emails(self):
     """Get emails of people"""
