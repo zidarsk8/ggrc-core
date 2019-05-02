@@ -34,7 +34,7 @@ class Assessments(CommonDropdownSettings):
     """Select generate Assessments in 3BBS dropdown modal to
     open unified mapper modal.
 
-    Return: lib.page.modal.unified_mapper.GenerateAssessmentsModal
+    Return: GenerateAssessmentsModal
     """
     base.Button(self._driver, self._locators.BTN_3BBS_GENERATE_CSS).click()
     return unified_mapper.GenerateAssessmentsModal(self._driver, self.obj_name)

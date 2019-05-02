@@ -209,5 +209,5 @@ class TestMyWorkPage(base.Test):
   def test_user_cannot_create_control_from_lhn(self, lhn_menu):
     """Tests that `New Control` modal object cannot be opened from lhn."""
     lhn_menu.select_controls_or_objectives().select_controls().create_new()
-    ui_facade.verify_modal_not_present(
+    ui_facade.verify_modal_obj_not_present_in_all_windows(
         object_modal.ControlModal())

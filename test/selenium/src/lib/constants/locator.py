@@ -4,6 +4,7 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
 # pylint: disable=invalid-name
+# pylint: disable=super-init-not-called
 
 from selenium.webdriver.common.by import By
 
@@ -279,6 +280,7 @@ class CommonModalUnifiedMapper(object):
   # user input elements
   OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
   BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " button[type='submit']")
+  FOUND_MAPPER_RESULTS_CSS = "mapper-results .list-object-item"
   FOUND_OBJECTS_TITLES = (
       By.CSS_SELECTOR, MODAL + " .flex-box .attr:first-child")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
