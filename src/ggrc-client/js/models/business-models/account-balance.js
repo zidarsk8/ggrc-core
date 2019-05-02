@@ -68,11 +68,19 @@ export default Cacheable.extend({
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
 }, {
-  title: {
-    value: '',
-    validate: {
-      required: true,
-      validateUniqueTitle: true,
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
     },
   },
 });
