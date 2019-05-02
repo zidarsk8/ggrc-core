@@ -14,5 +14,18 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     withReadMore: false,
     value: '',
+    define: {
+      items: {
+        get() {
+          let value = this.attr('value');
+          if (value && typeof(value) === 'string') {
+            return value.split(',')
+              .map((item) => `<p><i class="fa fa-circle"></i>${item}</p>`)
+              .join('');
+          }
+          return '';
+        },
+      },
+    },
   }),
 });

@@ -43,6 +43,7 @@ export default can.Component.extend({
     _value: '',
     _options: [],
     fieldId: null,
+    isInlineMode: false,
     valueChanged(newValue) {
       this.dispatch({
         type: 'valueChanged',

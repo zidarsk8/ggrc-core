@@ -6,6 +6,13 @@
 .inline-edit {
   &__text {
     word-break: break-word;
+
+    .fa.fa-circle {
+      position: relative;
+      bottom: 2px;
+      font-size: 5px;
+      margin-right: 5px;
+    }
   }
   &__title {
     padding-left: 4px;

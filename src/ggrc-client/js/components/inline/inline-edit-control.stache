@@ -43,7 +43,9 @@
           {{#case "multiselect"}}
             <multiselect-form-field value:from="value"
               class="inline__content-input"
+              options:from="multiChoiceOptions"
               on:valueChanged="fieldValueChanged(scope.event)"
+              isInlineMode:from="true"
             ></multiselect-form-field>
           {{/case}}
            {{#case "date"}}

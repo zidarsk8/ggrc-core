@@ -5,25 +5,28 @@
 
 <div class="multiselect-dropdown flex-box flex-col">
   <!-- HACK: using of tabindex can set styles on focus -->
-  <div tabindex="-1" class="multiselect-dropdown__input-container {{#disabled}}disabled{{/disabled}}" on:el:click="openDropdown()">
-    <input
-      type="text"
-      readonly="readonly"
-      class="multiselect-dropdown__input {{#if isOpen}}dropdown-focus{{/if}}"
-      placeholder="{{placeholder}}"
-      value="{{_displayValue}}"
-      size="{{_inputSize}}"
-      {{#disabled}}disabled{{/disabled}}/>
-    <span class="multiselect-dropdown__icon">
-      <i class="fa fa-caret-down"></i>
-    </span>
-  </div>
-  {{#if isOpen}}
+  {{^if isInlineMode}}
+    <div tabindex="-1" class="multiselect-dropdown__input-container {{#disabled}}disabled{{/disabled}}" on:el:click="openDropdown()">
+      <input
+        type="text"
+        readonly="readonly"
+        class="multiselect-dropdown__input {{#if isOpen}}dropdown-focus{{/if}}"
+        placeholder="{{placeholder}}"
+        value="{{_displayValue}}"
+        size="{{_inputSize}}"
+        {{#disabled}}disabled{{/disabled}}/>
+      <span class="multiselect-dropdown__icon">
+        <i class="fa fa-caret-down"></i>
+      </span>
+    </div>
+  {{/if}}
+  {{#if isOpenOrInline}}
   <div class="multiselect-dropdown__body-wrapper">
-    <div class="dropdown-menu dropdown-menu-form multiselect-dropdown__body" on:el:click="dropdownBodyClick(scope.event)">
+    <div class="dropdown-menu dropdown-menu-form multiselect-dropdown__body {{#if isInlineMode}}inline{{/if}}" 
+         on:el:click="dropdownBodyClick(scope.event)">
       <ul class="multiselect-dropdown__list">
         <li class="multiselect-dropdown__element">
-          <label class="multiselect-dropdown__label" >
+          <label class="multiselect-dropdown__label">
             <input type="checkbox"
               el:checked:bind="_selectedAll"
               on:el:click="selectAll()"
@@ -33,7 +36,7 @@
         </li>
         {{#options}}
         <li class="multiselect-dropdown__element">
-          <label class="multiselect-dropdown__label">
+          <label class="multiselect-dropdown__label single-line">
             <input type="checkbox"
               el:checked:bind="checked"
               on:el:click="optionChange(.)"

@@ -60,6 +60,10 @@
 
   .multiselect-dropdown {
     &__body {
+      &.inline {
+        position: initial;
+        box-shadow: none;
+      }
       position: absolute;
       box-sizing: border-box;
       width: 100%;

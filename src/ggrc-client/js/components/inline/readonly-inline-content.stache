@@ -39,10 +39,9 @@
 
   {{#default}}
     {{#if withReadMore}}
-      <div class="inline-edit__text">
-        <read-more
-          text:from="value"
-          handleMarkdown:from="instance.class.isChangeableExternally">
+      <div class="inline-edit__text {{#is(type, "multiselect")}}single-line{{/is}}">
+        <read-more text:from="{{#is(type, "multiselect")}}items{{else}}value{{/is}}"
+          handleMarkdown:from="instance.constructor.isChangeableExternally">
         </read-more>
       </div>
     {{else}}
