@@ -102,7 +102,8 @@ validatejs.validators.validateMultiChoiceOptions = (value,
     return; // nothing  to validate here
   }
 
-  if (attributes.attribute_type !== 'Dropdown') {
+  if (attributes.attribute_type !== 'Dropdown' &&
+    attributes.attribute_type !== 'Multiselect') {
     return; // all ok, the value of multi_choice_options not needed
   }
 
