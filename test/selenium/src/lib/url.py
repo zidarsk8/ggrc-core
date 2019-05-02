@@ -68,6 +68,7 @@ class Urls(object):
     self.admin_dashboard = environment.app_url + ADMIN_DASHBOARD
     self.admin_people_tab = self.admin_dashboard + PEOPLE_TAB
     self.dashboard = environment.app_url + DASHBOARD
+    self.dashboard_info_tab = self.dashboard + Widget.INFO
     self.dashboard_controls_tab = self.dashboard + CONTROLS_TAB
     self.login = environment.app_url + LOGIN
 
