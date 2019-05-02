@@ -4,6 +4,7 @@
  */
 
 import '../form/field-views/checkbox-form-field-view';
+import '../form/field-views/multiselect-form-field-view';
 import '../form/field-views/date-form-field-view';
 import '../form/field-views/person-form-field-view';
 import '../form/field-views/rich-text-form-field-view';

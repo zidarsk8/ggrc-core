@@ -10,6 +10,7 @@ let customAttributesType = {
   Date: 'date',
   Input: 'input',
   Checkbox: 'checkbox',
+  Multiselect: 'multiselect',
   Dropdown: 'dropdown',
 };
 
@@ -113,7 +114,7 @@ function convertFromCaValue(type, value, valueObj) {
     return null;
   }
 
-  if (type === 'dropdown') {
+  if (type === 'dropdown' || type === 'multiselect') {
     if (value === null || value === undefined) {
       return '';
     }

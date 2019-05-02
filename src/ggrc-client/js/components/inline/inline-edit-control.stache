@@ -40,6 +40,12 @@
               on:valueChanged="fieldValueChanged(scope.event)"
             ></checkbox-form-field>
           {{/case}}
+          {{#case "multiselect"}}
+            <multiselect-form-field value:from="value"
+              class="inline__content-input"
+              on:valueChanged="fieldValueChanged(scope.event)"
+            ></multiselect-form-field>
+          {{/case}}
            {{#case "date"}}
             <date-form-field value:from="value"
               class="inline__content-input"

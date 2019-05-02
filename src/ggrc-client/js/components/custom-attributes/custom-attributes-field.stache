@@ -28,6 +28,13 @@
 			 on:valueChanged="fieldValueChanged(scope.event)"
     ></checkbox-form-field>
   {{/case}}
+  {{#case "multiselect"}}
+    <multiselect-form-field value:from="value"
+			 fieldId:from="fieldId"
+			 disabled:from="disabled"
+			 on:valueChanged="fieldValueChanged(scope.event)"
+    ></multiselect-form-field>
+  {{/case}}
   {{#case "dropdown"}}
     <dropdown-form-field value:from="value"
 			 options:from="options"

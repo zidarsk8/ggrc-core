@@ -21,6 +21,7 @@ const controlRelationshipType = {
   [caDefTypeName.Date]: CONTROL_TYPE.DATE,
   [caDefTypeName.Input]: CONTROL_TYPE.INPUT,
   [caDefTypeName.Checkbox]: CONTROL_TYPE.CHECKBOX,
+  [caDefTypeName.Multiselect]: CONTROL_TYPE.MULTISELECT,
   [caDefTypeName.Dropdown]: CONTROL_TYPE.DROPDOWN,
 };
 

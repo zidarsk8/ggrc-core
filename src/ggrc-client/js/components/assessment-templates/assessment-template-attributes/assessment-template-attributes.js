@@ -31,6 +31,10 @@ export default can.Component.extend({
       name: 'Checkbox',
       text: '',
     }, {
+      type: 'Multiselect',
+      name: 'Multiselect',
+      text: 'Enter values separated by comma',
+    }, {
       type: 'Dropdown',
       name: 'Dropdown',
       text: 'Enter values separated by comma',

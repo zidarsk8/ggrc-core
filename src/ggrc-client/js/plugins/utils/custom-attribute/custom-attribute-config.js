@@ -23,5 +23,6 @@ export const caDefTypeName = {
   Date: 'Date',
   Input: 'Input',
   Checkbox: 'Checkbox',
+  Multiselect: 'Multiselect',
   Dropdown: 'Dropdown',
 };

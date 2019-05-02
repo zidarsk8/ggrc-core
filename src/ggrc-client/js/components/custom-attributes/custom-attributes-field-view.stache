@@ -19,6 +19,11 @@
       value:from="value"
     ></checkbox-form-field-view>
   {{/case}}
+  {{#case "multiselect"}}
+    <multiselect-form-field-view
+      value:from="value"
+    ></multiselect-form-field-view>
+  {{/case}}
   {{#case "dropdown"}}
     <text-form-field-view
       value:from="value"
