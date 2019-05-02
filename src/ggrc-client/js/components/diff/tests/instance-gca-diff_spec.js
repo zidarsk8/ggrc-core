@@ -5,6 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../instance-gca-diff';
+import {formatDate} from '../../../../js/plugins/utils/date-utils';
 
 describe('instance-gca-diff component', () => {
   let viewModel;
@@ -109,6 +110,18 @@ describe('instance-gca-diff component', () => {
     it('should return emptyValue. Checkbox type. Wrong string', () => {
       const result = convertValue('11', CHECKOBX_TYPE);
       expect(result).toEqual(emptyValue);
+    });
+
+    it('should return string value. Date type', () => {
+      const date = new Date();
+      const result = convertValue(date, 'Date');
+      expect(result).toEqual(formatDate(date, true));
+    });
+
+    it('should return same value. Not Date type. Not empty string', () => {
+      const str = 'some Value %^*&^*()';
+      const result = convertValue(str, 'Multiselect');
+      expect(result).toEqual(str);
     });
   });
 });

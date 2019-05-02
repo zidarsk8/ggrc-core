@@ -11,8 +11,6 @@ import * as businessModels from '../../../models/business-models';
 import TreeViewConfig from '../../../apps/base_widgets';
 
 describe('tree-item-extra-info component', function () {
-  'use strict';
-
   let viewModel;
   let activeModel = [
     'Regulation',
