@@ -822,17 +822,13 @@ class Controls(WithAssignFolder, InfoWidget):
     self.control_operator_text = roles.CONTROL_OPERATORS.upper()
     self.control_operator_entered_text = (
         self.control_operators.get_people_emails())
-    self._assertions = self._root.element(
-        class_name="custom-attr-wrap").element(
-        text="Assertions").parent().text.splitlines()
-    self.assertions_text = self._assertions[0]
-    self.assertions_entered_text = self._assertions[1:]
+    self.assertions = self._assertions_dropdown()
     self.reference_urls = self._related_urls(
         self._reference_url_label, self._root)
     self._extend_list_all_scopes(
-        [self.admin_text, self.control_operator_text, self.assertions_text],
+        [self.admin_text, self.control_operator_text, self.assertions.text],
         [self.admin_entered_text, self.control_operator_entered_text,
-         self.assertions_entered_text])
+         self.assertions.assertions_values])
 
   @property
   def control_review_status(self):
