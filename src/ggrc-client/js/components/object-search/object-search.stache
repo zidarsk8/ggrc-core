@@ -18,6 +18,7 @@
   <aside>
     <saved-search-list
       objectName:from="model.model_singular"
+      on:applySearch="applySearch(scope.event)"
       on:removed="loadSavedSearches()"
     ></saved-search-list>
   </aside>

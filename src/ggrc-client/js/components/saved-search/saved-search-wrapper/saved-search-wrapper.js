@@ -11,6 +11,12 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     objectType: '',
     searches: [],
+    filterItems: [],
+    applySearch({search}) {
+      const query = JSON.parse(search.query)[0];
+      const filters = query.filters;
+      console.log(filters);
+    },
     init() {
       this.loadSavedSearches();
     },
