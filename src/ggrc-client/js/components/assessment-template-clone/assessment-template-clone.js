@@ -60,8 +60,8 @@ export default can.Component.extend({
           this.viewModel.attr('is_saving', false);
         })
         .done(() => {
-          this.closeModal();
           this.viewModel.dispatch('refreshTreeView');
+          this.closeModal();
         });
     },
     cloneObjects() {
