@@ -57,6 +57,11 @@ class Workflow(roleable.Roleable,
   def default_status(cls):
     return cls.DRAFT
 
+  parent_id = db.Column(
+      db.Integer,
+      db.ForeignKey('workflows.id', ondelete="SET NULL"),
+      nullable=True,
+  )
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
   notify_custom_message = deferred(
@@ -375,7 +380,9 @@ class Workflow(roleable.Roleable,
                'start_date',
                'repeat_every',
                'unit',
+               'parent_id',
                'is_verification_needed']
+    kwargs['parent_id'] = self.id
     if kwargs.get('clone_people', False):
       access_control_list = [
           {
