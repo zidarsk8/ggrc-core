@@ -192,7 +192,7 @@ def _generate_mention_email(object_name, comments_data):
   for comment in sorted(comments_data):
     body.append(body_template.format(
         author=comment.author,
-        object_name=object_name,
+        object_name=flask.escape(object_name),
         created_at=data_handlers.as_user_time(comment.created_at),
         comment_text=comment.comment_text,
     ))
