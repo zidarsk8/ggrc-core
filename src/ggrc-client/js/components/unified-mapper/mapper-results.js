@@ -104,6 +104,7 @@ export default can.Component.extend({
         tracker.USER_ACTIONS.ADVANCED_SEARCH_FILTER);
 
       this.attr('items').replace([]);
+      this.attr('isLoading', true);
       return this.load()
         .then((items) => {
           this.attr('items', items);
@@ -114,6 +115,9 @@ export default can.Component.extend({
           this.setRelatedAssessments();
           this.attr('isBeforeLoad', false);
           stopFn();
+        })
+        .always(() => {
+          this.attr('isLoading', false);
         });
     },
     setColumnsConfiguration: function () {
@@ -402,7 +406,6 @@ export default can.Component.extend({
       const isMegaMapping = this.attr('isMegaMapping');
       const dfd = $.Deferred();
       const query = this.getQuery('values', true, isMegaMapping);
-      this.attr('isLoading', true);
 
       $.when(...query.request.map((request) => batchRequests(request)))
         .done((...responseArr) => {
@@ -437,7 +440,6 @@ export default can.Component.extend({
         })
         .fail(() => dfd.resolve([]))
         .always(() => {
-          this.attr('isLoading', false);
           this.dispatch('loaded');
         });
       return dfd;
