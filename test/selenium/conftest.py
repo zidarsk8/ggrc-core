@@ -688,7 +688,7 @@ def gcads_for_asmt():
 @pytest.fixture()
 def gcads_for_control():
   """Creates GCADs of all types for Control."""
-  return rest_facade.create_gcad_for_control()
+  return rest_facade.create_gcads_for_control()
 
 
 @pytest.fixture()
