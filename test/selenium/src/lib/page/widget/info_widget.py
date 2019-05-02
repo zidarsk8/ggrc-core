@@ -332,6 +332,21 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     return tab_containers.changelog_tab_validate(
         self._browser.driver, self._active_tab_root.wd)
 
+  def get_changelog_entries(self):
+    """Returns list of entries from changelog."""
+    self.tabs.ensure_tab(self._changelog_tab_name)
+    ui_utils.wait_for_spinner_to_disappear()
+    log_items = []
+    entry_list = self._browser.elements(class_name="w-status")
+    for entry in entry_list:
+      entry_data = {"author": entry.element(tag_name="person-data").text}
+      for row in entry.elements(class_name="clearfix"):
+        data = row.text.split("\n")
+        entry_data.update({data[0]: {"original_value": data[1],
+                                     "new_value": data[2]}})
+      log_items.append(entry_data)
+    return log_items
+
   def edit_obj(self, **changes):
     """Makes changes `changes` to object."""
     self.three_bbs.select_edit()
