@@ -177,11 +177,13 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     RICH_TEXT = "Rich Text"
     DROPDOWN = "Dropdown"
     CHECKBOX = "Checkbox"
+    MULTISELECT = "Multiselect"
     DATE = "Date"
     MAP = "Map"
 
     DEFAULT_VALUE = {
         CHECKBOX: "0",
+        MULTISELECT: "",
         RICH_TEXT: "",
         TEXT: "",
         DROPDOWN: "",
@@ -209,6 +211,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       "Rich Text": "Rich Text",
       "Dropdown": "Dropdown",
       "Checkbox": "Checkbox",
+      "Multiselect": "Multiselect",
       "Date": "Date",
       "Person": "Map:Person",
   }
@@ -232,10 +235,10 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       value_list = [part.strip() for part in value.split(",")]
       value_set = set(value_list)
       if len(value_set) != len(value_list):
-        raise ValidationError("Duplicate dropdown options are not allowed: "
+        raise ValidationError("Duplicate attribute options are not allowed: "
                               "'{}'".format(value))
       if "" in value_set:
-        raise ValidationError("Empty dropdown options are not allowed: '{}'"
+        raise ValidationError("Empty attribute options are not allowed: '{}'"
                               .format(value))
       value = ",".join(value_list)
 
