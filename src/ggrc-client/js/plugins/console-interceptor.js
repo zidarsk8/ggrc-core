@@ -3,27 +3,52 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+/* eslint-disable */
 const originalWarn = console.warn;
+const originalLog = console.log;
 const hiddenWarings = [];
+const hiddenLogs = [];
 
 const hideTemplates = [
   'can-component: Assigning a DefineMap or constructor type',
+  'No property found for handling',
 ];
 
-console.warn = function (text) {
-  let matched = _.filter(hideTemplates, (template) => text.includes(template));
-  if (matched.length) {
-    hiddenWarings.push(arguments);
+const isHidden = function (text) {
+  let matched = _.filter(
+    hideTemplates,
+    (template) => text.includes(template)
+  );
 
+  return !!matched.length;
+};
+
+console.warn = function (text) {
+  if (isHidden(text)) {
+    hiddenWarings.push(arguments);
     return;
   }
 
   originalWarn.apply(this, arguments);
 };
 
-/* eslint-disable */
+console.log = function (text) {
+  if (isHidden(text)) {
+    hiddenLogs.push(arguments);
+    return;
+  }
+
+  originalLog.apply(this, arguments);
+};
+
 console.showHiddenWarnings = function () {
   hiddenWarings.forEach((args) => {
     originalWarn.apply(null, args);
+  });
+};
+
+console.showHiddenLogs = function () {
+  hiddenLogs.forEach((args) => {
+    originalLog.apply(null, args);
   });
 };
