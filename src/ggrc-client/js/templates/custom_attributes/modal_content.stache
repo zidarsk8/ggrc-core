@@ -11,5 +11,5 @@
                     allowHide:from="true"
       ></gca-controls>
     </div>
-  {{/if}}
+  {{/if_instance_of}}
 {{/instance.class.is_custom_attributable}}
