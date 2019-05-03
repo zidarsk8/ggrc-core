@@ -267,6 +267,7 @@ class CustomAttribute(object):
         AdminWidgetCustomAttributes.RICH_TEXT: RichTextCAActionsStrategy,
         AdminWidgetCustomAttributes.DATE: DateCAActionsStrategy,
         AdminWidgetCustomAttributes.CHECKBOX: CheckboxCAActionsStrategy,
+        AdminWidgetCustomAttributes.MULTISELECT: MultiselectCAActionsStrategy,
         AdminWidgetCustomAttributes.DROPDOWN: DropdownCAActionsStrategy,
         AdminWidgetCustomAttributes.PERSON: PersonCAActionsStrategy
     }[self.ca_type](self._root, self._label_el)
@@ -297,6 +298,7 @@ class CustomAttribute(object):
         "text": AdminWidgetCustomAttributes.RICH_TEXT,
         "date": AdminWidgetCustomAttributes.DATE,
         "checkbox": AdminWidgetCustomAttributes.CHECKBOX,
+        "multiselect": AdminWidgetCustomAttributes.MULTISELECT,
         "dropdown": AdminWidgetCustomAttributes.DROPDOWN,
         "person": AdminWidgetCustomAttributes.PERSON
     }[js_type]
@@ -309,7 +311,7 @@ class CustomAttribute(object):
       value = self._ca_strategy.get_lcas_from_inline()
     empty_string_strategies = (
         TextCAActionsStrategy, RichTextCAActionsStrategy,
-        DropdownCAActionsStrategy)
+        MultiselectCAActionsStrategy, DropdownCAActionsStrategy)
     if isinstance(self._ca_strategy, empty_string_strategies) and value == "":
       return None
     elif (isinstance(self._ca_strategy, DateCAActionsStrategy) and
@@ -459,6 +461,35 @@ class CheckboxCAActionsStrategy(CAActionsStrategy):
   def _fill_input_field(self, value):
     """Fills input field."""
     self._input.set(value)
+
+
+class MultiselectCAActionsStrategy(CAActionsStrategy):
+  """Actions for Multiselect CA."""
+
+  def __init__(self, *args):
+    super(MultiselectCAActionsStrategy, self).__init__(*args)
+    self._dropdown = self._root.element(class_name="multiselect-dropdown")
+
+  def get_lcas_from_inline(self):
+    """Gets value of inline LCA field."""
+    return self._dropdown.input().value
+
+  def set_lcas_from_inline(self, value):
+    """Sets value of inline LCA field."""
+    self._set_value(value)
+
+  def set_gcas_from_popup(self, value):
+    """Sets value of GCA field."""
+    self._set_value(value)
+
+  def _set_value(self, value):
+    """Sets value of CA field."""
+    self._dropdown.click()
+    self._fill_input_field(value)
+
+  def _fill_input_field(self, value):
+    """Fills input field."""
+    self._dropdown.label(text=value).click()
 
 
 class DropdownCAActionsStrategy(CAActionsStrategy):
