@@ -40,7 +40,7 @@ export default can.Component.extend({
         }
       }
     },
-    '{viewModel.selectedList} change'() {
+    '{viewModel.selectedList} length'() {
       this.viewModel.setIsChecked();
     },
   },
