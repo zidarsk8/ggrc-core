@@ -4,14 +4,14 @@
 */
 
 export default can.Component.extend({
-  tag: 'sort',
+  tag: 'sort-component',
   leakScope: true,
   viewModel: {
     sortedItems: [],
     items: [],
     sort() {
       const items = this.attr('items');
-      const sortedItems = items.sort(items);
+      const sortedItems = items.sort();
       this.attr('sortedItems', sortedItems);
     },
   },

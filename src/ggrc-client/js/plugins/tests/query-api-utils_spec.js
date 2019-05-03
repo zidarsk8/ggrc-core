@@ -124,4 +124,174 @@ describe('QueryAPI utils', function () {
       }
     );
   });
+
+  describe('loadObjectsByStubs() method', () => {
+    const BATCH_TIMEOUT = 100;
+
+    beforeEach(() => {
+      spyOn(can, 'ajax').and.returnValue($.Deferred());
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('makes request with based on passed object stubs and fields ' +
+    'configuration', () => {
+      const stubs = [
+        new can.Map({id: 123, type: 'Type1'}),
+        new can.Map({id: 223, type: 'Type1'}),
+        new can.Map({id: 323, type: 'Type1'}),
+        new can.Map({id: 423, type: 'Type2'}),
+        new can.Map({id: 523, type: 'Type2'}),
+      ];
+      const fields = ['id', 'type', 'title'];
+      const expectedQuery = [
+        {
+          object_name: 'Type1',
+          filters: {
+            expression: {
+              left: 'id',
+              op: {name: 'IN'},
+              right: [123, 223, 323],
+            },
+          },
+          fields,
+        },
+        {
+          object_name: 'Type2',
+          filters: {
+            expression: {
+              left: 'id',
+              op: {name: 'IN'},
+              right: [423, 523],
+            },
+          },
+          fields,
+        },
+      ];
+
+      QueryAPI.loadObjectsByStubs(stubs, fields);
+
+      jasmine.clock().tick(BATCH_TIMEOUT + 1);
+
+      expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+        data: JSON.stringify(expectedQuery),
+      }));
+    });
+
+    it('returns flatten result of query', () => {
+      const stubs = [
+        new can.Map({id: 123, type: 'Type1'}),
+        new can.Map({id: 223, type: 'Type1'}),
+        new can.Map({id: 323, type: 'Type1'}),
+        new can.Map({id: 423, type: 'Type2'}),
+        new can.Map({id: 523, type: 'Type2'}),
+      ];
+      const fields = ['id', 'type', 'title'];
+      const generateObject = (type, fields, id) => ({
+        ...fields.reduce((res, field) => ({
+          ...res,
+          [field]: `test ${field}`,
+        }), {}),
+        type,
+        id,
+      });
+
+      const expectedResult = stubs.map((stub) =>
+        generateObject(stub.attr('type'), fields, stub.attr('id')));
+
+      const generateQueryApiResponse = ({
+        object_name: type,
+        filters: {expression: expr},
+        fields,
+      }) => ({
+        [type]: {
+          values: expr.right.map((id) => generateObject(type, fields, id)),
+        },
+      });
+
+      can.ajax.and.callFake(({data}) => Promise.resolve(
+        JSON.parse(data).map(generateQueryApiResponse),
+      ));
+
+      const result = QueryAPI.loadObjectsByStubs(stubs, fields);
+
+      jasmine.clock().tick(BATCH_TIMEOUT + 1);
+
+      return expectAsync(result).toBeResolvedTo(expectedResult);
+    });
+  });
+
+  describe('loadObjectsByTypes() method', () => {
+    const BATCH_TIMEOUT = 100;
+
+    beforeEach(() => {
+      spyOn(can, 'ajax').and.returnValue($.Deferred());
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('makes request with based on passed object types and fields ' +
+    'configuration', () => {
+      const object = {id: 12345, type: 'FakeType'};
+      const types = ['Type1', 'Type2', 'Type3'];
+      const fields = ['id', 'type', 'title'];
+      const expectedQuery = types.map((type) => ({
+        object_name: type,
+        filters: {
+          expression: {
+            object_name: object.type,
+            op: {name: 'relevant'},
+            ids: [String(object.id)],
+          },
+        },
+        fields,
+      }));
+
+      QueryAPI.loadObjectsByTypes(object, types, fields);
+
+      jasmine.clock().tick(BATCH_TIMEOUT + 1);
+
+      expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+        data: JSON.stringify(expectedQuery),
+      }));
+    });
+
+    it('returns flatten result of query', () => {
+      const object = new can.Map({id: 12345, type: 'FakeType'});
+      const types = ['Type1', 'Type2', 'Type3'];
+      const fields = ['id', 'type', 'title'];
+      const generateObject = (type, fields) => fields.reduce((res, prop) => ({
+        ...res,
+        [prop]: `test ${prop}`,
+        type,
+      }), {});
+
+      const expectedResult = types.map((type) => generateObject(type, fields));
+
+      const generateQueryApiResponse = ({
+        object_name: type,
+        fields,
+      }) => ({
+        [type]: {
+          values: [generateObject(type, fields)],
+        },
+      });
+
+      can.ajax.and.callFake(({data}) => Promise.resolve(
+        JSON.parse(data).map(generateQueryApiResponse),
+      ));
+
+      const result = QueryAPI.loadObjectsByTypes(object, types, fields);
+
+      jasmine.clock().tick(BATCH_TIMEOUT + 1);
+
+      return expectAsync(result).toBeResolvedTo(expectedResult);
+    });
+  });
 });

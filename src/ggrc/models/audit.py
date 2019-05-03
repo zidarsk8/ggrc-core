@@ -39,6 +39,7 @@ class Audit(Snapshotable,
             Relatable,
             Roleable,
             issue_tracker_mixins.IssueTrackedWithConfig,
+            issue_tracker_mixins.IssueTrackedWithPeopleSync,
             WithLastDeprecatedDate,
             mixins.Timeboxed,
             base.ContextRBAC,
@@ -218,8 +219,8 @@ class Audit(Snapshotable,
     ).exists()
 
   @classmethod
-  def eager_query(cls):
-    query = super(Audit, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Audit, cls).eager_query(**kwargs)
     return query.options(
         orm.joinedload('program'),
         orm.subqueryload('object_people').joinedload('person'),

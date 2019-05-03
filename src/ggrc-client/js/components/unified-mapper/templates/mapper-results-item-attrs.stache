@@ -4,7 +4,7 @@
 }}
 
 <div class="flex-box flex-box-single">
-  {{#each selectedColumns}}
+  {{#each aggregatedColumns}}
     <div class="attr">
       {{#switch attr_type}}
         {{#case "custom"}}
@@ -20,8 +20,20 @@
           </div>
         {{/case}}
 
+        {{#case 'map_as'}}
+          <mega-relation-selection-item
+            class="tree-radio-select-area"
+            {is-disabled}="{isDisabled}"
+            {id}="{instance.id}"
+            {map-as-child}="{mapAsChild}">
+          </mega-relation-selection-item>
+        {{/case}}
+
         {{#default}}
-          <tree-item-attr {instance}="{instance}" {name}="{attr_name}"></tree-item-attr>
+          <tree-item-attr
+            {instance}="{instance}"
+            {name}="{attr_name}"
+          ></tree-item-attr>
         {{/default}}
       {{/switch}}
     </div>

@@ -3,7 +3,7 @@
 
 """Sets up Flask app."""
 
-
+from datetime import datetime
 import re
 import time
 
@@ -186,12 +186,18 @@ def _set_display_queries(report_type):
 
     # We have to copy the queries list below otherwise queries executed
     # in the for loop will be appended causing an endless loop
-    for query in queries[:]:
+    for i, query in enumerate(list(queries)):
       if report_type == 'slow' and query.duration < slow_threshold:
         continue
       logger.info(
-          "%.8f %s\n%s\n%s",
+          "Query #%s\n"
+          "Duration: %.8f (from %s to %s) in %s\n"
+          "Statement:\n%s\n"
+          "Parameters:\n%s",
+          i + 1,
           query.duration,
+          datetime.fromtimestamp(query.start_time),
+          datetime.fromtimestamp(query.end_time),
           query.context,
           query.statement,
           query.parameters)
@@ -204,6 +210,7 @@ def _set_display_queries(report_type):
           logger.info(tabulate(result.fetchall(), headers=result.keys()))
         except:  # pylint: disable=bare-except
           logger.warning("Statement failed: %s", statement, exc_info=True)
+
     return response
 
 

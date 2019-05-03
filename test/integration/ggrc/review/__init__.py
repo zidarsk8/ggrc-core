@@ -9,7 +9,7 @@ def build_reviewer_acl(acr_id=None, user_id=None):
   """Build reviewer acl list from passed values of create new user"""
   if not acr_id:
     acr_id = all_models.AccessControlRole.query.filter_by(
-        name="Reviewer", object_type="Review"
+        name="Reviewers", object_type="Review"
     ).one().id
 
   if not user_id:

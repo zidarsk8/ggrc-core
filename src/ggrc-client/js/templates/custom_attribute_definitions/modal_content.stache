@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{!div class="modal-body"}}
 {{#instance}}
 <form action="javascript://">
   <input type="hidden" name="definition_type" value="{{definition_type}}">
@@ -12,7 +11,7 @@
       <label class="form-label">
         Attribute title
         <i class="fa fa-asterisk"></i>
-        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name."></i>
+        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.title_plural}} a name."></i>
       </label>
       <input-filter
         {name}="'title'"
@@ -29,10 +28,10 @@
         <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
-        <dropdown {options-list}="{model.attributeTypes}"
+        <dropdown-component {options-list}="{model.attributeTypes}"
                   {name}="'instance.attribute_type'"
                   {data-purpose}="'ca-type'">
-        </dropdown>
+        </dropdown-component>
     </div>
     <div class="span2">
       <label>

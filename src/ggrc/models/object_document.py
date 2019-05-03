@@ -71,10 +71,10 @@ class Documentable(object):
     return self.get_documents_by_kind(Document.REFERENCE_URL)
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager query classmethod."""
     return cls.eager_inclusions(
-        super(Documentable, cls).eager_query(),
+        super(Documentable, cls).eager_query(**kwargs),
         Documentable._include_links,
     ).options(
         sa.orm.subqueryload(

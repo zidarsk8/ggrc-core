@@ -56,9 +56,9 @@ class Requirement(Roleable,
   _include_links = []
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Define fields to be loaded eagerly to lower the count of DB queries."""
-    query = super(Requirement, cls).eager_query()
+    query = super(Requirement, cls).eager_query(**kwargs)
     return query.options(orm.undefer('notes'))
 
   @classmethod

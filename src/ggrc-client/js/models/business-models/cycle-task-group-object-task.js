@@ -255,14 +255,6 @@ export default Cacheable.extend({
       }
     }
   },
-  object: function () {
-    return this.refresh_all(
-      'task_group_object', 'object'
-    ).then(function (object) {
-      return object;
-    });
-  },
-
   /**
    * Determine whether the Task's response options can be edited, taking
    * the Task and Task's Cycle status into account.

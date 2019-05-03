@@ -48,13 +48,13 @@
     {{/is_allowed}}
     {{^if_instance_of instance "TaskGroup|TaskGroupTask"}}
     <li>
-      <permalink {instance}="{instance}"/>
+      <permalink-component {instance}="{instance}"/>
     </li>
     {{/if_instance_of}}
     {{#if_instance_of instance "Assessment"}}
       {{#if_config_exist 'ASSESSMENT_SHORT_URL_PREFIX'}}
         <li>
-          <shortlink {instance}="{instance}"/>
+          <shortlink-component {instance}="{instance}"/>
         </li>
       {{/if_config_exist}}
     {{/if_instance_of}}

@@ -112,6 +112,17 @@ class TestRelationship(TestCase):
     with self.assertRaises(ValidationError):
       factories.RelationshipFactory(source=snapshot, destination=snapshottable)
 
+  def test_relationship_validation(self):
+    """Test validator that forbid creation of Relationship with the same object
+    as source and destination"""
+    response = self.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(self.assessment, self.assessment),
+        headers=self.HEADERS)
+    self.assert400(response)
+    self.assertEqual(response.json[0][1],
+                     "The mapping of object on itself is not possible")
+
 
 @ddt.ddt
 class TestExternalRelationship(TestCase):

@@ -45,7 +45,7 @@ have Docker up and running. Here are the steps:
 * Set up the necessary keys:
 
 ``` sh
-mv docker-compose.override.yml{.example,}
+cp docker-compose.override.yml{.example,}
 vim docker-compose.override.yml # Add the keys from cloud console
 ```
 * Run the following:
@@ -120,7 +120,7 @@ by default and can be monitored with:
 docker exec $(docker container ls -f name=ggrccore_db_1 -q -a) tail -f /tmp/mysql.log
 ```
 
-Error logs, with all deadlock information: 
+Error logs, with all deadlock information:
 
 ```
 docker exec $(docker container ls -f name=ggrccore_db_1 -q -a) tail -f /tmp/mysql_error.log
@@ -134,7 +134,7 @@ docker exec $(docker container ls -f name=ggrccore_db_1 -q -a) tail -f /tmp/slow
 
 ## Running Tests
 
-Tests are your friend! Keep them running, keep them updated.
+Tests are your friends! Keep them running, keep them updated.
 
 #### For JavaScript tests:
 
@@ -315,7 +315,7 @@ Put this in `/etc/docker/daemon.json`:
 {
    "dns": ["10.0.0.2", "10.0.0.3"]
 }
-```   
+```
 Exit from root:
 ```
 # exit

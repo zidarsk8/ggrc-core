@@ -191,13 +191,12 @@ describe('datepicker component', function () {
       let that;
 
       beforeEach(function () {
-        that = new can.Map({
-          viewModel: {
-            picker: {
-              datepicker: jasmine.createSpy(),
-            },
-          },
-        });
+        that = {
+          viewModel: getComponentVM(Component),
+        };
+        that.viewModel.picker = {
+          datepicker: jasmine.createSpy(),
+        };
         method = events.updateDate.bind(that);
       });
 

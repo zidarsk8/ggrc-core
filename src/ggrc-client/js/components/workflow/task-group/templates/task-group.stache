@@ -13,8 +13,8 @@
           </div>
           <div class="pane-header__toolbar">
             {{#is_info_pin}}
-              <info-pin-buttons {maximized}="{maximized}" 
-                                {on-change-maximized-state}="{@onChangeMaximizedState}" 
+              <info-pin-buttons {maximized}="{maximized}"
+                                {on-change-maximized-state}="{@onChangeMaximizedState}"
                                 {on-close}="{@onClose}">
               </info-pin-buttons>
             {{/is_info_pin}}
@@ -38,21 +38,20 @@
           </div>
         </div>
       </div>
+
       <div class="pane-content">
         {{> /static/templates/task_groups/tier2_content.stache}}
         <div class="info-pane__section">
-          {{#if readyToRenderTaskGroupObjects}}
-            <task-group-objects {task-group}="{instance}"
-                                {can-edit}="{canEdit}"
-            ></task-group-objects>
-          {{/if}}
+          <task-group-objects {task-group}="{instance}"
+                              {can-edit}="{canEdit}"
+          ></task-group-objects>
         </div>
         <div class="info-pane__section">
           <h5 class="info-pane__section-title">
             Tasks
           </h5>
           <task-list {base-instance}="{instance}"
-                      {workflow}="{workflow}"
+                     {workflow}="{workflow}"
           ></task-list>
         </div>
       </div>

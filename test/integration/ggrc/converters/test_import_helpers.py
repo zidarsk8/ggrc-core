@@ -393,6 +393,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Priority",
         "Issue Type",
         "Ticket Tracker Integration",
+        "Sync people with Ticket Tracker",
     }
     expected_fields = {
         "mandatory": {

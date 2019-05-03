@@ -4,11 +4,11 @@
 */
 
 import ModalsController from './modals_controller';
-import pubsub from '../../pub-sub';
+import pubSub from '../../pub-sub';
 import {bindXHRToButton} from '../../plugins/utils/modals';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
-export default ModalsController({
+export default ModalsController.extend({
   defaults: {
     skip_refresh: true,
   },
@@ -41,7 +41,7 @@ export default ModalsController({
           that.element.trigger('modal:success', that.options.instance);
         }
 
-        pubsub.dispatch({
+        pubSub.dispatch({
           type: 'objectDeleted',
           instance,
         });

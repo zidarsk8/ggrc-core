@@ -70,15 +70,15 @@ class TestAssessmentTemplatesImport(TestCase):
         ("Code*", slug),
         ("Audit*", "Audit"),
         ("Title", "Title"),
-        ("Object Under Assessment", 'Control'),
-        ("Default Verifiers", "Secondary Contacts")
+        ("Object Under Assessment", "Control"),
+        ("Default Verifiers", "Auditors")
     ]))
     template = models.AssessmentTemplate.query \
         .filter(models.AssessmentTemplate.slug == slug) \
         .first()
     self._check_csv_response(response, {})
-    self.assertEqual(template.default_people['verifiers'],
-                     "Secondary Contacts")
+    self.assertEqual(template.default_people["verifiers"],
+                     "Auditors")
 
   def test_invalid_import(self):
     """Test invalid import."""

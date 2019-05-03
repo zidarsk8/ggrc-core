@@ -21,7 +21,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   <div {{ style.notification_container() }} >
     <div {{ style.notification_block() }}>
       <h1 {{ style.bulk_sync_title() }}>
-        Tickets generation for audit "{{ sync_data.title }}" was completed
+        Tickets generation for audit "{{ sync_data.title|e }}" was completed
         successfully
       </h1>
       <hr>

@@ -134,6 +134,7 @@ export default Cacheable.extend({
       issue_priority: 'P2',
       issue_type: 'PROCESS',
       enabled: false,
+      people_sync_enabled: true,
     };
   },
 }, {

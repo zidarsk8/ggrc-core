@@ -137,8 +137,8 @@ class Snapshot(rest_handable.WithDeleteHandable,
     return self.revisions and self.revisions[-1].action == "deleted"
 
   @classmethod
-  def eager_query(cls):
-    query = super(Snapshot, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Snapshot, cls).eager_query(**kwargs)
     return cls.eager_inclusions(query, Snapshot._include_links).options(
         orm.subqueryload('revision'),
         orm.subqueryload('revisions'),

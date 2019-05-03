@@ -896,14 +896,13 @@ class TestSyncServiceControl(TestCase):
     with factories.single_commit():
       control = factories.ControlFactory()
       task_group = wf_factories.TaskGroupFactory()
-      wf_factories.TaskGroupObjectFactory(
-          task_group=task_group,
-          object=control
+      factories.RelationshipFactory(
+          source=task_group,
+          destination=control
       )
 
     response = self.api.put(control, {
         "title": "new title",
-        "task_group_objects": [],
         "task_groups": [],
     })
     self.assert200(response)
@@ -911,12 +910,16 @@ class TestSyncServiceControl(TestCase):
     self.assertEqual(control.title, "new title")
     tg_ids = [id_[0] for id_ in db.session.query(all_models.TaskGroup.id)]
     self.assertEqual(len(tg_ids), 1)
-    self.assertEqual([tg.id for tg in control.task_groups], tg_ids)
-    tgo_ids = [
-        id_[0] for id_ in db.session.query(all_models.TaskGroupObject.id)
+    self.assertEqual([tg.source_id for tg in control.related_sources], tg_ids)
+    tg_mapped_obj_ids = [
+        id_[0] for id_ in db.session.query(
+            all_models.Relationship.destination_id
+        ).filter(
+            all_models.Relationship.source_type == 'TaskGroup',
+            all_models.Relationship.source_id.in_(tg_ids),
+        )
     ]
-    self.assertEqual(len(tgo_ids), 1)
-    self.assertEqual([tgo.id for tgo in control.task_group_objects], tgo_ids)
+    self.assertEqual(len(tg_mapped_obj_ids), 1)
 
   @staticmethod
   def generate_minimal_control_body():

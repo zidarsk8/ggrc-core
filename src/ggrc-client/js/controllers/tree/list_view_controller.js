@@ -19,7 +19,7 @@ function modelListLoader(controller, params) {
   return page;
 }
 
-export default TreeLoader({
+export default TreeLoader.extend({
   defaults: {
     is_related: false,
     model: null,

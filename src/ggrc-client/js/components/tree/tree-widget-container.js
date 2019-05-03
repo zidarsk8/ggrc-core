@@ -28,7 +28,6 @@ import '../bulk-update-button/bulk-update-button';
 import '../assessment-template-clone-button/assessment-template-clone-button';
 import '../create-document-button/create-document-button';
 import '../dropdown/multiselect-dropdown';
-import '../dropdown/dropdown-multiselect-wrapper';
 import '../dropdown/dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
@@ -45,6 +44,7 @@ import {
 import {
   getCounts,
 } from '../../plugins/utils/widgets-utils';
+import {getMegaObjectRelation} from '../../plugins/utils/mega-object-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
@@ -149,17 +149,6 @@ viewModel = can.Map.extend({
       },
     },
   },
-  /**
-   * This deferred describes operations which should be executed before
-   * the moment when info pane is loaded. Initial need of this deferred was
-   * for the case when Task Group's info pane is opened - without it
-   * mapped objects might be reloaded before instance.refresh() which is
-   * preformed in selectedItemHandler() method.
-   */
-  infoPaneLoadDfd: $.Deferred(),
-  /**
-   *
-   */
   sortingInfo: {
     sortDirection: null,
     sortBy: null,
@@ -214,6 +203,10 @@ viewModel = can.Map.extend({
     this.attr('loading', true);
 
     let loadSnapshots = this.attr('options.objectVersion');
+    const operation = this.attr('options.megaRelated')
+      ? getMegaObjectRelation(this.attr('options.widgetId')).relation
+      : null;
+
     return TreeViewUtils
       .loadFirstTierItems(
         modelName,
@@ -221,7 +214,8 @@ viewModel = can.Map.extend({
         page,
         filter,
         request,
-        loadSnapshots)
+        loadSnapshots,
+        operation)
       .then((data) => {
         const total = data.total;
 
@@ -580,9 +574,18 @@ viewModel = can.Map.extend({
     let filter = this.attr('currentFilter');
     let request = this.attr('advancedSearch.request');
     let loadSnapshots = this.attr('options.objectVersion');
+    const operation = this.attr('options.megaRelated') ?
+      getMegaObjectRelation(this.attr('options.widgetId')).relation :
+      null;
 
-    TreeViewUtils
-      .startExport(modelName, parent, filter, request, loadSnapshots);
+    TreeViewUtils.startExport(
+      modelName,
+      parent,
+      filter,
+      request,
+      loadSnapshots,
+      operation,
+    );
 
     notifier('info', exportMessage, true);
   },
@@ -602,7 +605,7 @@ viewModel = can.Map.extend({
 
     pinControl.setLoadingIndicator(componentSelector, true);
 
-    const infoPaneLoadDfd = pageLoadDfd
+    pageLoadDfd
       .then(function () {
         const items = this.attr('showedItems');
         const newInstance = items[relativeIndex];
@@ -638,8 +641,6 @@ viewModel = can.Map.extend({
       .always(function () {
         pinControl.setLoadingIndicator(componentSelector, false);
       });
-
-    this.attr('infoPaneLoadDfd', infoPaneLoadDfd);
   },
 });
 

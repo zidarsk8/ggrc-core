@@ -1305,13 +1305,14 @@ class AssessmentTrackerHandler(object):
         "reporter": reporter,
         "cc_list": ccs,
         "due_date": assessment.start_date,
-        "issue_id": assmt_src.get("issue_id")
+        "issue_id": assmt_src.get("issue_id"),
+        "people_sync_enabled": cls._is_people_sync_enabled(assessment.audit),
     }
 
     return issue_db_info
 
-  @staticmethod
-  def _update_with_assmt_data_for_ticket_update(assessment, assmt_src):
+  @classmethod
+  def _update_with_assmt_data_for_ticket_update(cls, assessment, assmt_src):
     # pylint: disable=invalid-name
     """Collect issue information for assessment update.
 
@@ -1336,7 +1337,8 @@ class AssessmentTrackerHandler(object):
         "enabled": True,
         "due_date": assessment.start_date,
         "issue_id": assmt_src["issue_id"],
-        "issue_url": assmt_src["issue_url"]
+        "issue_url": assmt_src["issue_url"],
+        "people_sync_enabled": cls._is_people_sync_enabled(assessment.audit),
     }
 
     return issue_db_info
@@ -1377,7 +1379,8 @@ class AssessmentTrackerHandler(object):
         "assignee": assignee,
         "reporter": reporter,
         "cc_list": ccs,
-        "due_date": assessment.start_date
+        "due_date": assessment.start_date,
+        "people_sync_enabled": self._is_people_sync_enabled(assessment.audit),
     }
 
     return issue_db_info
@@ -1417,7 +1420,8 @@ class AssessmentTrackerHandler(object):
             "issue_severity",
             constants.DEFAULT_ISSUETRACKER_VALUES["issue_severity"]
         ),
-        "enabled": audit_src["enabled"]
+        "enabled": audit_src["enabled"],
+        "people_sync_enabled": audit_src.get("people_sync_enabled", True),
     }
 
     return issue_db_info
@@ -1601,20 +1605,22 @@ class AssessmentTrackerHandler(object):
     """
     reporter = self._merge_reporter(
         issue_db_info["reporter"],
-        issue_tracker_info["reporter"]
+        issue_tracker_info["reporter"],
+        people_sync_enabled=issue_db_info["people_sync_enabled"],
     )
     assignee = self._merge_assignee(
         issue_db_info["assignee"],
-        issue_tracker_info["assignee"]
+        issue_tracker_info["assignee"],
+        people_sync_enabled=issue_db_info["people_sync_enabled"],
     )
     ccs = self._merge_ccs(
         issue_db_info["cc_list"],
-        issue_tracker_info["ccs"]
+        issue_tracker_info["ccs"],
+        people_sync_enabled=issue_db_info["people_sync_enabled"],
     )
-    if self._is_reporters_not_equals(
-        issue_db_info["reporter"],
-        issue_tracker_info["reporter"]
-    ):
+    reporters_differ = self._is_reporters_not_equals(
+        issue_db_info["reporter"], issue_tracker_info["reporter"])
+    if issue_db_info["people_sync_enabled"] and reporters_differ:
       ccs.add(issue_db_info["reporter"])
 
     issue_payload = {
@@ -1733,20 +1739,23 @@ class AssessmentTrackerHandler(object):
     """
     reporter = self._merge_reporter(
         issue_info_db["reporter"],
-        issue_tracker_info["reporter"]
+        issue_tracker_info["reporter"],
+        people_sync_enabled=issue_info_db["people_sync_enabled"],
     )
     assignee = self._merge_assignee(
         issue_info_db["assignee"],
-        issue_tracker_info["assignee"]
+        issue_tracker_info["assignee"],
+        people_sync_enabled=issue_info_db["people_sync_enabled"],
     )
     ccs = self._merge_ccs(
         issue_info_db["cc_list"],
-        issue_tracker_info.get("ccs", [])
+        issue_tracker_info.get("ccs", []),
+        people_sync_enabled=issue_info_db["people_sync_enabled"],
     )
-    if self._is_reporters_not_equals(
-        issue_info_db["reporter"],
-        issue_tracker_info["reporter"]
-    ):
+
+    reporters_differ = self._is_reporters_not_equals(
+        issue_info_db["reporter"], issue_tracker_info["reporter"])
+    if issue_info_db["people_sync_enabled"] and reporters_differ:
       ccs.add(issue_info_db["reporter"])
 
     issue_info_db.update({
@@ -1758,47 +1767,60 @@ class AssessmentTrackerHandler(object):
     return issue_info_db
 
   @staticmethod
-  def _merge_reporter(reporter_db, reporter_tracker):
+  def _merge_reporter(reporter_db, reporter_tracker,
+                      people_sync_enabled=True):
     """Merge reporter with Issue Tracker.
 
     Args:
         reporter_db: reporter from ggrc system.
         reporter_tracker: reporter from Issue Tracker.
+        people_sync_enabled: flag indicating whether assignees from GGRC
+          system should be synced with Issue Tracker or not.
 
     Returns:
         Reporter regarding business rules
     """
-    return reporter_tracker or reporter_db or ""
+    # pylint: disable=unused-argument
+    result = reporter_tracker or ""
+    if people_sync_enabled:
+      result = result or reporter_db
+    return result
 
   @staticmethod
-  def _merge_assignee(assignee_db, assignee_tracker):
+  def _merge_assignee(assignee_db, assignee_tracker,
+                      people_sync_enabled=True):
     """Merge assignee with Issue Tracker.
 
     Args:
         assignee_db: assignee from ggrc system.
         assignee_tracker: assignee from Issue Tracker.
+        people_sync_enabled: flag indicating whether assignees from GGRC
+          system should be synced with Issue Tracker or not.
 
     Returns:
         Assignee regarding business rules
     """
-    return assignee_db or assignee_tracker or ""
+    result = assignee_tracker or ""
+    if people_sync_enabled:
+      result = assignee_db or result
+    return result
 
   @staticmethod
-  def _merge_ccs(ccs_db, ccs_tracker):
+  def _merge_ccs(ccs_db, ccs_tracker, people_sync_enabled=True):
     """Merge ccs with Issue Tracker.
 
     Args:
         ccs_db: ccs from ggrc system.
         ccs_tracker: ccs from Issue Tracker.
+        people_sync_enabled: flag indicating whether assignees from GGRC
+          system should be synced with Issue Tracker or not.
 
     Returns:
-        Union of ccs
+        Ccs regarding business rules
     """
-    ccs_db = set(ccs_db)
-    ccs_tracker = set(ccs_tracker)
-
-    ccs = ccs_db.union(ccs_tracker)
-
+    ccs = set(ccs_tracker)
+    if people_sync_enabled:
+      ccs |= set(ccs_db)
     return ccs
 
   def _send_issue_create(self, issue_payload):
@@ -2047,6 +2069,21 @@ class AssessmentTrackerHandler(object):
 
     audit_tracker_info = audit.issue_tracker or {}
     if not audit_tracker_info.get("enabled"):
+      return False
+    return True
+
+  @staticmethod
+  def _is_people_sync_enabled(audit):
+    """Returns a boolean whether people sync feature is enabled.
+
+    Args:
+      audit: Audit model instance.
+
+    Returns:
+      A boolean, True if feature is enabled or False otherwise.
+    """
+    audit_tracker_info = audit.issue_tracker or {}
+    if not audit_tracker_info.get("people_sync_enabled"):
       return False
     return True
 

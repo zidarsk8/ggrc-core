@@ -194,15 +194,33 @@ def check_user_menu_has_icons(user_menu):
   assert user_menu.email.text == users.current_user().name
 
 
-def submit_obj_for_review(selenium, obj, user_email):
-  """Submit object for review scenario."""
+def submit_obj_for_review(selenium, obj, reviewer):
+  """Submit object for review scenario.
+  Returns obj with assigned review."""
   _get_ui_service(selenium, obj).submit_for_review(
-      obj, user_email, string_utils.StringMethods.random_string())
+      obj, reviewer.email, string_utils.StringMethods.random_string())
+  exp_review = entities_factory.ReviewsFactory().create(
+      is_add_rest_attrs=True,
+      reviewers=reviewer,
+      status=element.ReviewStates.UNREVIEWED)
+  obj.review = exp_review.convert_review_to_dict()
+  obj.review_status = exp_review.status
+  return obj
 
 
 def approve_obj_review(selenium, obj):
-  """Approve obj review."""
+  """Approve obj review.
+  Returns obj with approved review."""
   _get_ui_service(selenium, obj).approve_review(obj)
+  exp_review = entities_factory.ReviewsFactory().create(
+      is_add_rest_attrs=True,
+      status=element.ReviewStates.REVIEWED,
+      last_reviewed_by=users.current_user().email,
+      last_reviewed_at=rest_facade.get_last_review_date(obj),
+      reviewers=users.current_user())
+  obj.review = exp_review.convert_review_to_dict()
+  obj.review_status = exp_review.status
+  return obj
 
 
 def get_object(selenium, obj):

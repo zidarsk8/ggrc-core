@@ -4,18 +4,21 @@
 """Defines a Revision model for storing snapshots."""
 import json
 
+import flask
+
 from ggrc import builder
 from ggrc import db
-from ggrc.models.mixins import base
+from ggrc.access_control import role
+from ggrc.models import automapping
+from ggrc.models import reflection
 from ggrc.models.mixins import Base
+from ggrc.models.mixins import base
 from ggrc.models.mixins.filterable import Filterable
 from ggrc.models.mixins.synchronizable import ChangesSynchronized
 from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
-from ggrc.models import reflection
-from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
-from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils import referenced_objects
+from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils.revisions_diff import meta_info
 
 
@@ -77,10 +80,10 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
   ]
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     from sqlalchemy import orm
 
-    query = super(Revision, cls).eager_query()
+    query = super(Revision, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload('modified_by'),
         orm.subqueryload('event'),  # used in description
@@ -550,7 +553,6 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
         "ObjectTemplates": ["name", ],
         "Proposal": ["instance_type", ],
         "Snapshot": ["child_type", "parent_type", ],
-        "TaskGroupObject": ["object_type", ],
     }
     # change to add special values cases
     special_cases = {
@@ -605,6 +607,29 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
         else:
           populated_content[attr] = None
 
+  def populate_automappings(self):
+    """Add automapping info in revisions.
+
+    Populate Relationship revisions with automapping info to help FE
+    show Change Log, but we should not show automapping info
+    in case of deleted relationship"""
+    if ("automapping_id" not in self._content or
+            not self._content["automapping_id"] or
+            self.action != "created"):
+      return {}
+    automapping_id = self._content["automapping_id"]
+    if not hasattr(flask.g, "automappings_cache"):
+      flask.g.automappings_cache = dict()
+    if automapping_id not in flask.g.automappings_cache:
+      automapping_obj = automapping.Automapping.query.get(automapping_id)
+      if automapping_obj is None:
+        return {}
+      automapping_json = automapping_obj.log_json()
+      flask.g.automappings_cache[automapping_id] = automapping_json
+    else:
+      automapping_json = flask.g.automappings_cache[automapping_id]
+    return {"automapping": automapping_json}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -624,6 +649,7 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     populated_content.update(self.populate_cad_default_values())
     populated_content.update(self.populate_cavs())
     populated_content.update(self.populate_readonly())
+    populated_content.update(self.populate_automappings())
 
     self.populate_requirements(populated_content)
     self.populate_options(populated_content)

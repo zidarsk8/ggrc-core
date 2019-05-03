@@ -84,7 +84,7 @@ tree-view {
   .tree-spinner {
     display: none;
 
-    spinner {
+    spinner-component {
       margin: auto;
     }
   }
@@ -111,6 +111,12 @@ tree-view {
         display: none;
       }
     }
+  }
+
+  .mega-object-tree-view-icon {
+    font-size: 1em;
+    margin-right: 0.2em;
+    color: $lightBlueBtn;
   }
 }
 

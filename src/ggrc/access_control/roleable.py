@@ -144,9 +144,9 @@ class Roleable(object):
       acl.update_people(persons_by_acl[acl])
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Eager Query"""
-    query = super(Roleable, cls).eager_query()
+    query = super(Roleable, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload(
             '_access_control_list'

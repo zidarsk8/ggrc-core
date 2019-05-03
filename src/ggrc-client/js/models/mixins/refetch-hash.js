@@ -8,7 +8,7 @@ import Mixin from './mixin';
 /**
  * A mixin to generate hash with refetch param.
  */
-export default Mixin({
+export default Mixin.extend({
   getHashFragment: function () {
     let widgetName = this.constructor.table_singular;
     if (window.location.hash

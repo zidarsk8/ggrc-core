@@ -71,8 +71,8 @@ class Product(Roleable,
     ).exists()
 
   @classmethod
-  def eager_query(cls):
-    query = super(Product, cls).eager_query()
+  def eager_query(cls, **kwargs):
+    query = super(Product, cls).eager_query(**kwargs)
     return query.options(orm.joinedload('kind'))
 
   @classmethod

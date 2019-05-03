@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Provides an HTML cleaner function with sqalchemy compatible API"""
+import re
+
 import HTMLParser
 
 import bleach
@@ -22,6 +24,8 @@ ATTRS = [
     'href', 'src', 'width', 'height', 'alt', 'cite', 'datetime',
     'title', 'class', 'name', 'xml:lang', 'abbr'
 ]
+
+BUGGY_STRINGS_PATTERN = "&.{2,3};"
 
 for tag in BLEACH_TAGS:
   BLEACH_ATTRS[tag] = ATTRS
@@ -54,9 +58,28 @@ def cleaner(dummy, value, *_):
     return value
 
   value = unicode(value)
+
+  buggy_strings = re.finditer(BUGGY_STRINGS_PATTERN, PARSER.unescape(value))
+
   while True:
     lastvalue = value
     value = PARSER.unescape(CLEANER.clean(value))
     if value == lastvalue:
       break
+
+  # for some reason clean() function converts strings like "&*!;" to "&*;;".
+  # if we have such string we are replacing new incorrect values to old ones
+  if buggy_strings:
+    backup_value = value
+    updated_buggy_strings = re.finditer(BUGGY_STRINGS_PATTERN, value)
+    for match in updated_buggy_strings:
+      try:
+        old_value = buggy_strings.next().group()
+        start, finish = match.span()
+        value = value[:start] + old_value + value[finish:]
+      except StopIteration:
+        # If we have different number of string after clean function
+        # we should skip replacing
+        return backup_value
+
   return value

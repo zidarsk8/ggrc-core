@@ -552,3 +552,21 @@ ul.new-tree {
 .ordered-item-data {
   padding-left: 5px;
 }
+
+.tree-radio-select-area {
+  display: flex;
+  margin-left: 2px;
+
+  label {
+    display: flex;
+    margin-bottom: 0;
+
+    &:first-child {
+      margin-right: 20px;
+    }
+  }
+
+  input[type="radio"] {
+    margin-right: 5px;
+  }
+}

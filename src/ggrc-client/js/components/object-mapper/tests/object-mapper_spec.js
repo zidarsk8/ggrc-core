@@ -340,7 +340,8 @@ describe('object-mapper component', function () {
       that = {
         viewModel: viewModel,
         deferredSave: jasmine.createSpy().and.returnValue('deferredSave'),
-        mapObjects: events.mapObjects,
+        proceedWithRegularMapping: events.proceedWithRegularMapping,
+        proceedWithMegaMapping: events.proceedWithMegaMapping,
       };
       spyOn(RefreshQueue.prototype, 'enqueue')
         .and.returnValue({
@@ -364,10 +365,40 @@ describe('object-mapper component', function () {
       expect(result).toEqual('deferredSave');
     });
 
-    it('maps selected objects', function () {
-      spyOn(that, 'mapObjects');
+    it('calls proceedWithRegularMapping', function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Control');
+
+      spyOn(that, 'proceedWithRegularMapping');
       handler.call(that, element, event);
-      expect(that.mapObjects).toHaveBeenCalled();
+      expect(that.proceedWithRegularMapping).toHaveBeenCalled();
+    });
+
+    it('calls proceedWithMegaMapping', function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Program');
+
+      spyOn(that, 'proceedWithMegaMapping');
+      handler.call(that, element, event);
+      expect(that.proceedWithMegaMapping).toHaveBeenCalled();
+    });
+  });
+
+  describe('proceedWithRegularMapping method', function () {
+    let that;
+
+    beforeEach(function () {
+      that = {
+        viewModel,
+        mapObjects: events.mapObjects,
+      };
+      handler = events.proceedWithRegularMapping.bind(that);
+    });
+
+    it('calls mapObjects', function () {
+      spyOn(that, 'mapObjects');
+      handler([]);
+      expect(that.mapObjects).toHaveBeenCalledWith([]);
     });
   });
 

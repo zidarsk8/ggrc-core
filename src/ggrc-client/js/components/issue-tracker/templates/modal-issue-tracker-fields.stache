@@ -7,9 +7,16 @@
   <div class="ggrc-form-item__row">
     <label class="ggrc-form-item__label">
       Ticket Tracker
+      {{#if_instance_of instance 'Assessment'}}
+        {{#if instance.issue_tracker.enabled}}
+          {{^if instance.audit.issue_tracker.people_sync_enabled}}
+            <span class="people-sync-state">People sync: Disabled</span>
+          {{/if}}
+        {{/if}}
+      {{/if_instance_of}}
     </label>
     <div class="ggrc-form-item__note">
-      {{{note}}}
+      <span class="issue-tracker__note">{{{note}}}</span>
       {{#if instance.issueCreated}}
         <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
             Open Ticket
@@ -17,9 +24,22 @@
       {{/if}}
     </div>
     <div class="ggrc-form-item__multiple-row">
-      <dropdown {options-list}="{instance.class.issue_tracker_enable_options}"
-                {name}="'isIntegrationEnabled'">
-      </dropdown>
+      <dropdown-component class="issue-tracker__dropdown"
+          {options-list}="{instance.class.issue_tracker_enable_options}"
+          {name}="'isIntegrationEnabled'"
+      ></dropdown-component>
+      {{#if_instance_of instance 'Audit'}}
+        {{#if instance.issue_tracker.enabled}}
+          <div class="ggrc-form-item__note people-sync">
+            <label class="people-sync__label">
+              <input type="checkbox" can-value="instance.issue_tracker.people_sync_enabled"
+              >Sync people with Ticket Tracker
+            </label>
+            <i class="fa fa-question-circle" rel="tooltip"
+              title="Check the box to enable sync between Audit roles and Ticket Tracker. Uncheck the box to disable the sync."></i>
+          </div>
+        {{/if}}
+      {{/if_instance_of}}
     </div>
   </div>
 </div>
@@ -40,11 +60,11 @@
           </div>
         </div>
         <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_issue_id}}field-failure{{/instance.computed_errors.issue_tracker_issue_id}}">
-          <numberbox {attr-data-id}="'code_txtbx'"
+          <numberbox-component {attr-data-id}="'code_txtbx'"
                      {additional-class}="'input-block-level'"
                      {placeholder}="'Enter Ticket ID'"
                      {(value)}="{instance.issue_tracker.issue_id}">
-          </numberbox>
+          </numberbox-component>
           {{#instance.computed_errors.issue_tracker_issue_id}}
             <label class="help-inline warning">{{this}}</label>
           {{/instance.computed_errors.issue_tracker_issue_id}}
@@ -58,22 +78,22 @@
       <label class="ggrc-form-item__label">
         Hotlist ID
       </label>
-      <numberbox {attr-data-id}="'code_txtbx'"
+      <numberbox-component {attr-data-id}="'code_txtbx'"
                  {additional-class}="'input-block-level'"
                  {placeholder}="'Enter Hotlist ID'"
                  {(value)}="{instance.issue_tracker.hotlist_id}">
-      </numberbox>
+      </numberbox-component>
     </div>
     <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_component_id}}field-failure{{/instance.computed_errors.issue_tracker_component_id}}">
-      <label class="form-label ggrc-form-item__label form-label__extended">
+      <label class="form-label ggrc-form-item__label">
         Component ID
         <i class="fa fa-asterisk"></i>
       </label>
-      <numberbox {attr-data-id}="'code_txtbx'"
+      <numberbox-component {attr-data-id}="'code_txtbx'"
                  {additional-class}="'input-block-level'"
                  {placeholder}="'Enter Component ID'"
                  {(value)}="{instance.issue_tracker.component_id}">
-      </numberbox>
+      </numberbox-component>
       {{#instance.computed_errors.issue_tracker_component_id}}
         <label class="help-inline warning">{{this}}</label>
       {{/instance.computed_errors.issue_tracker_component_id}}
@@ -93,23 +113,23 @@
       <label class="ggrc-form-item__label">
         Ticket Priority
       </label>
-      <dropdown {options-list}="{instance.class.issue_tracker_priorities}"
+      <dropdown-component {options-list}="{instance.class.issue_tracker_priorities}"
                 {name}="'instance.issue_tracker.issue_priority'">
-      </dropdown>
+      </dropdown-component>
     </div>
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">
         Ticket Severity
       </label>
-      <dropdown {instance}="{instance}"
+      <dropdown-component {instance}="{instance}"
                 {options-list}="{instance.class.issue_tracker_severities}"
                 {name}="'instance.issue_tracker.issue_severity'">
-      </dropdown>
+      </dropdown-component>
     </div>
 
     {{#if setIssueTitle}}
       <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_title}}field-failure{{/instance.computed_errors.issue_tracker_title}}">
-        <label class="form-label ggrc-form-item__label form-label__extended">
+        <label class="form-label ggrc-form-item__label">
           Ticket Title
           <i class="fa fa-asterisk"></i>
         </label>

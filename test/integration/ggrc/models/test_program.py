@@ -48,3 +48,88 @@ class TestProgram(TestCase):
     self.assert200(response)
     response = self.api.delete(self.program)
     self.assert200(response)
+
+
+class TestMegaProgram(TestCase):
+  """Mega Program test cases"""
+
+  def setUp(self):
+    """Setup tests"""
+    self.api = api_helper.Api()
+
+  def test_is_mega_attr(self):
+    """Test is_mega attribute of program"""
+    with factories.single_commit():
+      program_child = factories.ProgramFactory()
+      program_parent = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_parent,
+                                    destination=program_child)
+    program_child_id = program_child.id
+    program_parent_id = program_parent.id
+    response = self.api.get(all_models.Program, program_child_id)
+    self.assertEqual(response.json["program"]["is_mega"], False)
+    response = self.api.get(all_models.Program, program_parent_id)
+    self.assertEqual(response.json["program"]["is_mega"], True)
+
+  def test_program_relatives(self):
+    """Test program children and parents
+               +--C<--+
+               |      |
+               v      |
+        A<-----B<-----E<----F
+                      |
+                      |
+               D<-----+
+    """
+
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      program_c = factories.ProgramFactory()
+      program_d = factories.ProgramFactory()
+      program_e = factories.ProgramFactory()
+      program_f = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      factories.RelationshipFactory(source=program_c,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_e,
+                                    destination=program_d)
+      factories.RelationshipFactory(source=program_e,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_e,
+                                    destination=program_c)
+      factories.RelationshipFactory(source=program_f,
+                                    destination=program_e)
+    parents_b = program_b.get_all_relatives_ids("parents")
+    children_b = program_b.get_all_relatives_ids("children")
+    parents_e = program_e.get_all_relatives_ids("parents")
+    children_e = program_e.get_all_relatives_ids("children")
+    self.assertEqual(parents_b, {program_c.id, program_e.id, program_f.id})
+    self.assertEqual(children_b, {program_a.id, })
+    self.assertEqual(parents_e, {program_f.id, })
+    self.assertEqual(children_e, {program_c.id, program_b.id,
+                                  program_d.id, program_a.id})
+
+  def test_program_cycle_relatives(self):
+    """Test programs cycle children and parents
+        +-->C--+
+        |      |
+        |      v
+        A<-----B
+    """
+
+    with factories.single_commit():
+      program_a = factories.ProgramFactory()
+      program_b = factories.ProgramFactory()
+      program_c = factories.ProgramFactory()
+      factories.RelationshipFactory(source=program_b,
+                                    destination=program_a)
+      factories.RelationshipFactory(source=program_c,
+                                    destination=program_b)
+      factories.RelationshipFactory(source=program_a,
+                                    destination=program_c)
+    parents_b = program_b.get_all_relatives_ids("parents")
+    children_b = program_b.get_all_relatives_ids("children")
+    self.assertEqual(parents_b, {program_a.id, program_c.id})
+    self.assertEqual(children_b, {program_a.id, program_c.id})

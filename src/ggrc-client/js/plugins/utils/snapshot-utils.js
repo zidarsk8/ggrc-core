@@ -102,10 +102,8 @@ function isAuditScopeModel(model) {
  * @return {Object} The object
  */
 function toObject(instance) {
-  let object;
-  let model = businessModels[instance.child_type];
-  let content = instance.revision.content;
-  let audit;
+  let content = instance.revision.content instanceof can.Construct ?
+    instance.revision.content.attr() : instance.revision.content;
 
   content.originalLink = getParentUrl(instance);
   content.snapshot = new can.Map(instance);
@@ -139,12 +137,13 @@ function toObject(instance) {
     content.last_assessment_date = instance.last_assessment_date;
   }
 
-  object = new model(content);
+  let model = businessModels[instance.child_type];
+  let object = new model(content);
   object.attr('originalLink', content.originalLink);
   // Update archived flag in content when audit is archived:
   if (instance.parent &&
     Audit.findInCacheById(instance.parent.id)) {
-    audit = Audit.findInCacheById(instance.parent.id);
+    let audit = Audit.findInCacheById(instance.parent.id);
     audit.bind('change', function () {
       let field = arguments[1];
       let newValue = arguments[3];

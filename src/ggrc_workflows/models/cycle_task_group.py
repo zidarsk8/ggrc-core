@@ -242,7 +242,7 @@ class CycleTaskGroup(roleable.Roleable,
     )
 
   @classmethod
-  def eager_query(cls):
+  def eager_query(cls, **kwargs):
     """Add cycle tasks and objects to cycle task group eager query.
 
     Make sure we load all cycle task group relevant data in a single query.
@@ -250,7 +250,7 @@ class CycleTaskGroup(roleable.Roleable,
     Returns:
       a query object with cycle_task_group_tasks added to joined load options.
     """
-    query = super(CycleTaskGroup, cls).eager_query()
+    query = super(CycleTaskGroup, cls).eager_query(**kwargs)
     return query.options(
         orm.subqueryload("cycle_task_group_tasks"),
         orm.joinedload("cycle").undefer_group("Cycle_complete"),

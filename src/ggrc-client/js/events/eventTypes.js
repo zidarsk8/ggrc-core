@@ -74,16 +74,6 @@ const DESTINATION_UNMAPPED = {
 };
 
 /**
- * Refreshes cached Related Assessments tab
- * @event refreshRelatedAssessments
- * @type {object}
- * @property {string} type - Event name.
- */
-const REFRESH_TAB_CONTENT = {
-  type: 'refreshTabContent',
-};
-
-/**
  * Refreshes diff of proposals
  * @event refreshProposalDiff
  * @type {object}
@@ -222,6 +212,16 @@ const REFRESH_MAPPED_COUNTER = {
   type: 'refreshMappedCounter',
 };
 
+/**
+ * Objects were mapped via object-mapper functionality.
+ * @event objectsMappedViaMapper
+ * @type {object}
+ * @property {(Stub[]|Cacheable[])=} objects - Mapped objects.
+ */
+const OBJECTS_MAPPED_VIA_MAPPER = {
+  type: 'objectsMappedViaMapper',
+};
+
 export {
   REFRESHED,
   REFRESH_SUB_TREE,
@@ -231,7 +231,6 @@ export {
   SHOW_INVALID_FIELD,
   VALIDATION_ERROR,
   DESTINATION_UNMAPPED,
-  REFRESH_TAB_CONTENT,
   NAVIGATE_TO_TAB,
   REFRESH_PROPOSAL_DIFF,
   REFRESH_COMMENTS,
@@ -244,4 +243,5 @@ export {
   MAP_OBJECTS,
   DEFERRED_MAP_OBJECTS,
   REFRESH_MAPPED_COUNTER,
+  OBJECTS_MAPPED_VIA_MAPPER,
 };

@@ -8,13 +8,15 @@
                   {disabled-ids}="{disabledIds}"
                   {all-items}="{allItems}"
                   {(refresh-selection)}="{refreshItems}"
-                  {(all-selected)}="{allSelected}">
+                  {(all-selected)}="{allSelected}"
+                  {{#if serviceColumnsEnabled}}class="object-selection__service-columns"{{/if}}>
   {{#if items.length}}
     <div class="list-header">
       {{^disableColumnsConfiguration}}
         <mapper-results-columns-configuration {model-type}="{getDisplayModel.model_singular}"
                                               {available-columns}="{columns.available}"
-                                              {(selected-columns)}="{columns.selected}">
+                                              {(selected-columns)}="{columns.selected}"
+                                              {service-columns}="{columns.service}">
         </mapper-results-columns-configuration>
       {{/disableColumnsConfiguration}}
       <mapper-results-items-header class="{{#useSnapshots}}is-snapshot{{/useSnapshots}}
@@ -22,6 +24,7 @@
                                           {{#relatedAssessments.show}}has-related-assessments{{/relatedAssessments.show}}"
                                    {model-type}="{type}"
                                    {columns}="{columns.selected}"
+                                   {service-columns}="{columns.service}"
                                    {(sort-key)}="{sort.key}"
                                    {(sort-direction)}="{sort.direction}">
       </mapper-results-items-header>
@@ -48,6 +51,7 @@
                              {item-data}="{data}"
                              {search-only}="{searchOnly}"
                              {selected-columns}="{columns.selected}"
+                             {service-columns}="{columns.service}"
                              {draw-related-assessments}="{relatedAssessments.show}"
                              (show-related-assessments)="{showRelatedAssessments(%event)}">
         </mapper-results-item>
@@ -57,7 +61,7 @@
   {{else}}
     {{#if isLoading}}
       <div class="no-items-spinner-wrapper">
-        <spinner {toggle}="{isLoading}" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner>
+        <spinner-component {toggle}="{isLoading}" {extra-css-class}="'grid-spinner'" class="spinner-wrapper active"></spinner-component>
       </div>
     {{else}}
       <div class="well well-small">No {{getDisplayModel.title_plural}} were found</div>

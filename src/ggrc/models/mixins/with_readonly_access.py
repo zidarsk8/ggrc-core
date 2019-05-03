@@ -6,8 +6,11 @@
 It allows to mark objects as read-only
 """
 
+from sqlalchemy.orm import validates
+
 from ggrc import db
 from ggrc.models import reflection
+from ggrc.models.exceptions import ValidationError
 
 
 class WithReadOnlyAccess(object):
@@ -21,7 +24,7 @@ class WithReadOnlyAccess(object):
   readonly = db.Column(db.Boolean, nullable=False, default=False)
 
   _api_attrs = reflection.ApiAttributes(
-      reflection.Attribute("readonly", create=False, update=False),
+      reflection.Attribute("readonly", create=True, update=True),
   )
 
   _aliases = {
@@ -48,3 +51,15 @@ class WithReadOnlyAccess(object):
       return True
 
     return obj.__class__.__name__ not in self._read_only_model_relationships
+
+  @validates('readonly')
+  def validate_readonly(self, _, value):  # pylint: disable=no-self-use
+    """Validate readonly"""
+    if value is None:
+      # if value is not specified or is set to None, use default value False
+      return self.readonly
+
+    if not isinstance(value, bool):
+      raise ValidationError("Attribute 'readonly' has invalid value")
+
+    return value

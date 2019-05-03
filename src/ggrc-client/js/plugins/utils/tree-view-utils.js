@@ -25,9 +25,15 @@ import {
 } from './query-api-utils';
 import {
   parentHasObjectVersions,
+} from './object-versions-utils';
+import {
   getWidgetConfigs,
   getWidgetConfig,
-} from './object-versions-utils';
+} from './widgets-utils';
+import {
+  isMegaObjectRelated,
+  transformQueryForMega,
+} from './mega-object-utils';
 import {getRolesForType} from './acl-utils';
 import Mappings from '../../models/mappers/mappings';
 import {caDefTypeName} from './custom-attribute/custom-attribute-config';
@@ -221,6 +227,7 @@ function getColumnsForModel(modelType, modelName) {
   let displayColumns;
 
   let allAttrs = getAvailableAttributes(modelType);
+
   if (disableConfiguration) {
     return {
       available: allAttrs,
@@ -380,6 +387,7 @@ function getModelsForSubTier(modelName) {
  * @param {Object} filter -
  * @param {Object} request - Collection of QueryAPI sub-requests
  * @param {Boolean} transformToSnapshot - Transform query to Snapshot
+ * @param {String|null} operation - Type of operation
  * @return {Promise} Deferred Object
  */
 function loadFirstTierItems(modelName,
@@ -387,13 +395,15 @@ function loadFirstTierItems(modelName,
   pageInfo,
   filter,
   request,
-  transformToSnapshot) {
+  transformToSnapshot,
+  operation) {
   let params = buildParam(
     modelName,
     pageInfo,
-    makeRelevantExpression(modelName, parent.type, parent.id),
+    makeRelevantExpression(modelName, parent.type, parent.id, operation),
     null,
-    filter
+    filter,
+    operation,
   );
   let requestedType;
   let requestData = request.slice() || can.List();
@@ -448,13 +458,6 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
       dfds = loadedModelObjects.map(function (modelObject) {
         let subTreeFields = getSubTreeFields(type, modelObject.name);
 
-        if (!pageInfo && countMap[modelObject.name]) {
-          pageInfo = {
-            current: 1,
-            pageSize: countMap[modelObject.name],
-          };
-        }
-
         let params = buildParam(
           modelObject.name,
           pageInfo,
@@ -463,9 +466,17 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
           filter
         );
 
+        const isMegaRelated = isMegaObjectRelated(modelObject.countsName);
+
+        if (isMegaRelated) {
+          params.object_name = modelObject.countsName;
+        }
+
         if (isSnapshotRelated(relevant.type, params.object_name) ||
           modelObject.isObjectVersion) {
           params = transformQuery(params);
+        } else if (isMegaRelated) {
+          params = transformQueryForMega(params);
         }
 
         return batchRequests(params);
@@ -526,7 +537,7 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
  * @param {String} requestedType - Type of requested object.
  * @param {String} relevantToType - Type of parent object.
  * @param {Number} relevantToId - ID of parent object.
- * @param {String} [operation] - Type of operation
+ * @param {String|null} operation - Type of operation
  * @return {object} Returns expression for load items for 1st level of tree view.
  */
 function makeRelevantExpression(requestedType,
@@ -628,6 +639,8 @@ function _buildSubTreeCountMap(models, relevant, filter) {
             relevant.type,
             param.object_name)) {
             param = transformQuery(param);
+          } else if (isMegaObjectRelated(param.object_name)) {
+            param = transformQueryForMega(param);
           }
           return param;
         });
@@ -637,9 +650,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
       .then((...response) => {
         let total = 0;
         let showMore = models.some(function (model, index) {
-          let count = response[index][model] ?
-            response[index][model].total :
-            response[index].Snapshot.total;
+          const count = Object.values(response[index])[0].total;
 
           if (!count) {
             return false;
@@ -701,11 +712,12 @@ function _getTreeViewOperation(objectName, relevantToType) {
   }
 }
 
-function startExport(modelName, parent, filter, request, transformToSnapshot) {
+function startExport(
+  modelName, parent, filter, request, transformToSnapshot, operation) {
   let params = buildParam(
     modelName,
     {},
-    makeRelevantExpression(modelName, parent.type, parent.id),
+    makeRelevantExpression(modelName, parent.type, parent.id, operation),
     'all',
     filter
   );

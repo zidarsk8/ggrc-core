@@ -301,9 +301,18 @@ class BlockConverter(object):
           continue
         clean_headers[field_name] = self.object_headers[field_name]
       else:
-        self.add_warning(errors.UNKNOWN_COLUMN,
-                         line=self.offset + 2,
-                         column_name=header)
+        if header.startswith(("map:", "unmap:")):
+          obj_a = self.name
+          obj_b = header.split(":", 1)[1]
+          self.add_warning(errors.UNSUPPORTED_MAPPING,
+                           line=self.offset + 2,
+                           obj_a=obj_a,
+                           obj_b=obj_b,
+                           column_name=header)
+        else:
+          self.add_warning(errors.UNKNOWN_COLUMN,
+                           line=self.offset + 2,
+                           column_name=header)
         self._remove_column(index - removed_count)
         removed_count += 1
     return clean_headers

@@ -6,7 +6,7 @@
 import {bindXHRToButton} from '../../plugins/utils/modals';
 import ModalsController from './modals_controller';
 
-export default ModalsController({
+export default ModalsController.extend({
   defaults: {
     skip_refresh: false,
   },
