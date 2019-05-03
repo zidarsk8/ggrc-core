@@ -553,6 +553,7 @@ export default can.Component.extend({
       let previous;
       let madeByPersonId;
       let automapping;
+      let person;
 
       if (revision.destination_type === this.attr('instance.type') &&
         revision.destination_id === this.attr('instance.id')) {
@@ -591,8 +592,11 @@ export default can.Component.extend({
         if (automapping.source instanceof Stub) {
           automapping.source = reify(automapping.source);
         }
-        const person = automapping.modified_by.name ||
-          automapping.modified_by.email;
+        if (revision.modified_by) {
+          person = revision.modified_by.name || revision.modified_by.email;
+        } else {
+          person = '"unknown" user';
+        }
         const automappingTitle =
           `(automapping triggered after ${person} mapped ` +
         `${automapping.destination.type} "${automapping.destination.title}"` +
