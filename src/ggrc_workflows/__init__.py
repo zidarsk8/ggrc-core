@@ -569,6 +569,7 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
     )
 
     copied_task_groups = models.TaskGroup.query.filter_by(
+        workflow_id=source_task_group.workflow_id,
         parent_id=source_task_group.id).values('title')
     used_titles = [t.title for t in copied_task_groups]
     obj.title = get_copy_title(source_task_group.title, used_titles)
