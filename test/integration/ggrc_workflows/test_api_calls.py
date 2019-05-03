@@ -6,7 +6,7 @@
 import datetime
 import collections
 import string
-from mock import MagicMock
+from mock import MagicMock, patch
 
 import ddt
 
@@ -247,7 +247,7 @@ class TestCloneWorkflow(TestCase):
       (all_models.Workflow.WEEK_UNIT, 10),
   )
   @ddt.unpack
-  def test_workflow_copy(self, unit, repeat_every):
+  def test_workflow_copy(self, unit, repeat_every, title_patch):
     """Check clone wf with unit and repeat."""
     with factories.single_commit():
       workflow = wf_factories.WorkflowFactory(unit=unit,
@@ -256,6 +256,23 @@ class TestCloneWorkflow(TestCase):
         all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
     self.assertEqual(unit, clone_wf.unit)
     self.assertEqual(repeat_every, clone_wf.repeat_every)
+
+  @patch("ggrc_workflows.get_copy_title")
+  def test_workflow_proper_copy_title_set(self, get_copy_title_patch):
+    """Check if get_copy_title is called with proper arguments."""
+    expected_title = 'Copy Title'
+    get_copy_title_patch.return_value = expected_title
+
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      cloned_workflow = wf_factories.WorkflowFactory(parent_id=workflow.id)
+
+    _, clone_wf = self.object_generator.generate_object(
+        all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
+    get_copy_title_patch.assert_called_once_with(
+        workflow.title, [cloned_workflow.title])
+    assert clone_wf.title == expected_title
+    assert clone_wf.parent_id == workflow.id
 
 
 @ddt.ddt
