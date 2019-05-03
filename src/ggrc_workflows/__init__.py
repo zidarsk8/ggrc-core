@@ -34,7 +34,7 @@ from ggrc_basic_permissions.contributed_roles import RoleContributions
 # pylint: disable=invalid-name
 logger = logging.getLogger(__name__)
 
-COPIED_TITLE_TEMPLATE = '%(parent_title)s (copy %(copy_count)s)'
+COPY_TITLE_TEMPLATE = '%(parent_title)s (copy %(copy_count)s)'
 
 # Initialize Flask Blueprint for extension
 blueprint = Blueprint(
@@ -110,7 +110,7 @@ def get_copy_title(current_title, used_titles):
           parent
   """
   for copy_count in range(1, len(used_titles) + 2):
-    title = COPIED_TITLE_TEMPLATE % {
+    title = COPY_TITLE_TEMPLATE % {
         'parent_title': current_title,
         'copy_count': copy_count
     }

@@ -11,15 +11,15 @@ import ddt
 from freezegun import freeze_time
 from mock import patch
 
-from ggrc_workflows import COPIED_TITLE_TEMPLATE, get_copy_title
+from ggrc_workflows import COPY_TITLE_TEMPLATE, get_copy_title
 from ggrc_workflows.models import cycle_task_group_object_task as cycle_task
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import workflow
 
 
 def get_copy_name(title, copy_count):
-  """Helper function to improve readibility in tests."""
-  return COPIED_TITLE_TEMPLATE % {
+  """Helper function to improve readability in tests."""
+  return COPY_TITLE_TEMPLATE % {
       'parent_title': title,
       'copy_count': copy_count
   }
