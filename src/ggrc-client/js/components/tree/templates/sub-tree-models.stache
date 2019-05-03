@@ -17,9 +17,9 @@
   <div class="flex-box flex-box-multi sub-tree-models__options">
     {{#displayModelsList}}
       <div class="flex-box sub-models_item">
-          <label for="{{inputId}}" class="single-line" title="{{displayName}}">
+          <label for="{{firstnonempty inputId ''}}" class="single-line" title="{{displayName}}">
             <input type="checkbox"
-              id="{{inputId}}"
+              id="{{firstnonempty inputId ''}}"
               el:checked:bind="display"
               value="{{name}}">
             {{displayName}}
