@@ -451,8 +451,15 @@ export default can.Control.extend({
   },
 
   'input, textarea, select change':
-    function (el, ev) {
-      this.options.instance.removeAttr('_suppress_errors');
+    function (el) {
+      const instance = this.options.instance;
+      if (instance.isNew()) {
+        if (instance.isDirty()) {
+          instance.removeAttr('_suppress_errors');
+        }
+      } else {
+        instance.removeAttr('_suppress_errors');
+      }
       // Set the value if it isn't a search field
       if (!el.hasClass('search-icon') ||
         el.is('[null-if-empty]') &&
