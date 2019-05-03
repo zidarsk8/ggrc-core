@@ -93,7 +93,7 @@ export default can.Component.extend({
           destinationModel.model_singular !== externalObjectName
         )
         .map((externalObjectName) =>
-          businessModels[externalObjectName].table_plural)
+          businessModels[externalObjectName].title_plural.toLowerCase())
         .join(', ');
       const listOfObjects = `scope, ${objects}, standards and regulations`;
 
