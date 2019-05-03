@@ -6,7 +6,6 @@
 import template from './last-comment.stache';
 import RefreshQueue from '../../models/refresh_queue';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
-import isFunction from 'can-util/js/is-function/is-function';
 import {COMMENT_CREATED} from '../../events/eventTypes';
 import {formatDate} from '../../plugins/utils/date-utils';
 import Comment from '../../models/service-models/comment';
@@ -26,6 +25,20 @@ export default can.Component.extend({
 
           this.attr('comment', comment);
           return instance;
+        },
+      },
+      commentText: {
+        get() {
+          const html = this.attr('comment.description') || '';
+
+          const regexTags = /<[^>]*>?/g;
+          const regexNewLines = /<\/p>?/g;
+
+          let lines = html
+            .replace(regexNewLines, '\n')
+            .replace(regexTags, ' ')
+            .trim();
+          return lines;
         },
       },
     },
@@ -63,19 +76,6 @@ export default can.Component.extend({
     [`{instance} ${COMMENT_CREATED.type}`](instance, {comment}) {
       this.viewModel.attr('comment', comment);
       this.viewModel.getAuthor();
-    },
-  },
-  helpers: {
-    getText(html, options) {
-      let resolvedHtml = isFunction(html) ? html() : html || '';
-      const regexTags = /<[^>]*>?/g;
-      const regexNewLines = /<\/p>?/g;
-
-      let lines = resolvedHtml
-        .replace(regexNewLines, '\n')
-        .replace(regexTags, ' ')
-        .trim();
-      return lines;
     },
   },
 });
