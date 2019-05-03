@@ -4,9 +4,6 @@
  */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
 import proposable from '../mixins/proposable';
 import changeableExternally from '../mixins/changeable-externally';
 import Stub from '../stub';
@@ -21,9 +18,6 @@ export default Cacheable.extend({
   update: 'PUT /api/risks/{id}',
   destroy: 'DELETE /api/risks/{id}',
   mixins: [
-    uniqueTitle,
-    caUpdate,
-    accessControlList,
     proposable,
     changeableExternally,
   ],
@@ -86,36 +80,5 @@ export default Cacheable.extend({
   sub_tree_view_options: {
     default_filter: ['Control'],
   },
-  defaults: {
-    status: 'Draft',
-  },
   statuses: ['Draft', 'Deprecated', 'Active'],
-}, {
-  define: {
-    title: {
-      value: '',
-      validate: {
-        required: true,
-        validateUniqueTitle: true,
-      },
-    },
-    _transient_title: {
-      value: '',
-      validate: {
-        validateUniqueTitle: true,
-      },
-    },
-    description: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
-    risk_type: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
-  },
-});
+}, {});
