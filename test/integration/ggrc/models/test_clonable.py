@@ -145,6 +145,13 @@ class TestClonable(SnapshotterBaseTestCase):
         {
             "definition_type": "assessment_template",
             "definition_id": assessment_template_1.id,
+            "title": "test multiselect",
+            "attribute_type": "Multiselect",
+            "multi_choice_options": "test multiselect label"
+        },
+        {
+            "definition_type": "assessment_template",
+            "definition_id": assessment_template_1.id,
             "title": "test checkbox",
             "attribute_type": "Checkbox",
             "multi_choice_options": "test checkbox label"
@@ -211,14 +218,19 @@ class TestClonable(SnapshotterBaseTestCase):
           destination=assessment_template
       )
       for cad_type in [
-          "Text", "Rich Text", "Checkbox", "Date", "Dropdown", "Map:Person"
+          "Text", "Rich Text", "Checkbox", "Multiselect", "Date", "Dropdown",
+          "Map:Person"
       ]:
+        if cad_type in ("Dropdown", "Multiselect"):
+          multi_choice_options = "a,b,c"
+        else:
+          multi_choice_options = ""
         factories.CustomAttributeDefinitionFactory(
             definition_type="assessment_template",
             definition_id=assessment_template.id,
             title="Test {}".format(cad_type),
             attribute_type=cad_type,
-            multi_choice_options="a,b,c" if cad_type == "Dropdown" else "",
+            multi_choice_options=multi_choice_options,
         )
 
     self.clone_asmnt_templates([assessment_template.id], audit2)
@@ -291,14 +303,19 @@ class TestClonable(SnapshotterBaseTestCase):
             destination=assessment_template)
 
         for cad_type in [
-            "Text", "Rich Text", "Checkbox", "Date", "Dropdown", "Map:Person"
+            "Text", "Rich Text", "Checkbox", "Date", "Dropdown", "Map:Person",
+            "Multiselect"
         ]:
+          if cad_type in ("Dropdown", "Multiselect"):
+            multi_choice_options = "a,b,c"
+          else:
+            multi_choice_options = ""
           factories.CustomAttributeDefinitionFactory(
               definition_type="assessment_template",
               definition_id=assessment_template.id,
               title="Test {}".format(cad_type),
               attribute_type=cad_type,
-              multi_choice_options="a,b,c" if cad_type == "Dropdown" else "",
+              multi_choice_options=multi_choice_options,
           )
     self.clone_asmnt_templates(template_ids, audit2)
     template_copies = models.AssessmentTemplate.query.filter(

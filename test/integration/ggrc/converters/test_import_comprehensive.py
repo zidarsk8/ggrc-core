@@ -352,6 +352,8 @@ class TestComprehensiveSheets(TestCase):
     gen("program", title="my_checkbox", attribute_type="Checkbox")
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
+    gen("program", title="my_multiselect", attribute_type="Multiselect",
+        options="yes,no")
     # gen("program", title="my_description", attribute_type="Rich Text")
 
   def test_case_sensitive_slugs(self):

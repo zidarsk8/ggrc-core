@@ -138,3 +138,5 @@ class TestComprehensiveSheets(TestCase):
       cad(definition_type="program", title="my_dropdown",
           attribute_type="Dropdown",
           multi_choice_options="a,b,c,d")
+      cad(definition_type="program", title="my_multiselect",
+          attribute_type="Multiselect")
