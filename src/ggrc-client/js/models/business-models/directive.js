@@ -62,8 +62,20 @@ export default Cacheable.extend({
     context: Stub,
     modified_by: Stub,
   },
-  init: function () {
-    this.validateNonBlank('title');
-    this._super(...arguments);
+}, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
+    },
   },
-}, {});
+});

@@ -8,9 +8,9 @@ import template from './editable-document-object-list-item.stache';
 
 export default can.Component.extend({
   tag: 'editable-document-object-list-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     document: {},
-  },
+  }),
 });

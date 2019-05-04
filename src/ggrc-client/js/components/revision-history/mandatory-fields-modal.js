@@ -9,9 +9,9 @@ import template from './templates/mandatory-fields-modal.stache';
 
 export default can.Component.extend({
   tag: 'mandatory-fields-modal',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       showCAs: {
         type: 'boolean',
@@ -55,7 +55,7 @@ export default can.Component.extend({
       this.dispatch('cancel');
       this.attr('state.open', false);
     },
-  },
+  }),
   events: {
     '{viewModel.state} open'() {
       if (this.viewModel.state.open) {

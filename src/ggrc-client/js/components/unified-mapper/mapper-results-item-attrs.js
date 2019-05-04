@@ -11,9 +11,9 @@ import template from './templates/mapper-results-item-attrs.stache';
 
 export default can.Component.extend({
   tag: 'mapper-results-item-attrs',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: null,
     columns: [],
     serviceColumns: [],
@@ -21,7 +21,7 @@ export default can.Component.extend({
     aggregatedColumns() {
       return this.attr('columns').concat(this.attr('serviceColumns'));
     },
-  },
+  }),
   events: {
     click(element, event) {
       if ($(event.target).is('.link')) {

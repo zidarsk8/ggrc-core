@@ -200,3 +200,17 @@ export const buildFilter = (data, request) => {
   let result = builders.group(data, request);
   return result;
 };
+
+/**
+ * Fills statusItem with default values for passed modelName.
+ * @param {can.Map} state - Current state.
+ * @param {String} modelName - Name of the model to find states of.
+ * @return {can.Map} - updated state.
+ */
+export const setDefaultStatusConfig = (state, modelName) => {
+  const items = StateUtils.getStatesForModel(modelName);
+  state.attr('items', items);
+  state.attr('operator', 'ANY');
+  state.attr('modelName', modelName);
+  return state;
+};

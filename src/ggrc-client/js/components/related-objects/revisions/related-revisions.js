@@ -10,9 +10,9 @@ import Revision from '../../../models/service-models/revision.js';
 
 export default can.Component.extend({
   tag: 'related-revisions',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       paging: {
         value: function () {
@@ -65,7 +65,7 @@ export default can.Component.extend({
       query[attr + '_id'] = this.attr('instance.id');
       return Revision.findAll(query);
     },
-  },
+  }),
   events: {
     inserted() {
       this.viewModel.loadRevisions();

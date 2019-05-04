@@ -266,10 +266,9 @@ How/when are they validated?
 
 -  Client-side:
 
-   -  Defined in class ``init()`` method on Model classes, and uses Can
-      Validations (http://canjs.com/docs/can.Map.validations.html)
-   -  Includes a custom ``validateNonBlank()`` validation function that
-      trims strings before checking for empty strings.
+   -  Defined in Model classes, and uses Can
+      Validations (https://v3.canjs.com/doc/can-validate-legacy.html)
+   -  Includes a custom validation functions (validation-extensions.js).
 
 View
 ~~~~

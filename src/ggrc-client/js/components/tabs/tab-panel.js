@@ -10,9 +10,9 @@ const PRE_RENDER_DELAY = 3000;
 
 export default can.Component.extend({
   tag: 'tab-panel',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       cssClasses: {
         type: 'string',
@@ -83,12 +83,12 @@ export default can.Component.extend({
     updateWarningState(event) {
       this.attr('warningState', event.warning);
     },
-  },
+  }),
   events: {
     /**
      * On Components rendering finished add this viewModel to `panels` list
      */
-    inserted: function () {
+    init: function () {
       let vm = this.viewModel;
       vm.addPanel();
 

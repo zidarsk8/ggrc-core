@@ -30,54 +30,54 @@
   </div>
 </div>
 <div class="modal-filter modal-body">
-  <collapsible-panel {soft-mode}="{true}" {title-text}="'filter'" {(expanded)}="{showSearch}">
-    <advanced-search-wrapper {model-name}="{type}"
-      {model-display-name}="{type}"
-      {^mapping-items}="*mappingItems"
-      {^filter-items}="*filterItems"
-      {^status-item}="*statusItem"
-      ($enter)="{onSubmit()}">
+  <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
+    <advanced-search-wrapper modelName:from="type"
+      modelDisplayName:from="type"
+      mappingItems:to="scope.vars.mappingItems"
+      filterItems:to="scope.vars.filterItems"
+      statusItem:to="scope.vars.statusItem"
+      on:el:enter="onSubmit()">
       <div class="object-controls">
         <div class="object-controls__row">
           <div class="object-controls__state">
             <advanced-search-filter-state
-              {model-name}="{type}"
-              {(state-model)}="{statusItem.value}"
-              {show-operator}="{false}">
+              modelName:from="type"
+              stateModel:bind="statusItem.value"
+              showOperator:from="false">
             </advanced-search-filter-state>
           </div>
         </div>
         <div class="object-controls__filters">
           <advanced-search-filter-container
-            {(items)}="{filterItems}"
-            {available-attributes}="{availableAttributes}"
-            {model-name}="{modelName}"
-            {default-status-filter}="{false}"
-            {show-add-button}="{mappingItems.length}">
+            items:bind="filterItems"
+            availableAttributes:from="availableAttributes"
+            modelName:from="modelName"
+            defaultStatusFilter:from="false"
+            showAddButton:from="mappingItems.length">
           </advanced-search-filter-container>
         </div>
 
         {{#if mappingItems.length}}
         <div class="object-controls__mappings">
           <advanced-search-mapping-container
-            {(items)}="{mappingItems}"
-            {model-name}="{modelName}"
-            {is-clone}="{true}"
-            {show-add-button}="{false}">
+            items:bind="mappingItems"
+            modelName:from="modelName"
+            isClone:from="true"
+            showAddButton:from="false">
           </advanced-search-mapping-container>
         </div>
         {{/if}}
 
           <div class="filter-container__footer">
             {{^if mappingItems.length}}
-              <button type="button" class="btn btn-small btn-white" ($click)="addFilterAttribute">Add Attribute</button>
+              <button type="button" class="btn btn-small btn-white" on:el:click="addFilterAttribute">Add Attribute</button>
             {{/if}}
-            <button type="button" class="btn btn-small btn-white" ($click)="addMappingFilter">Add Mapping Filter</button>
+            <button type="button" class="btn btn-small btn-white" on:el:click="addMappingFilter">Add Mapping Filter</button>
           </div>
 
           <div class="object-controls__actions--right">
-            <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} ($click)="resetFilters()">Reset</button>
-            <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} ($click)="onSubmit()">Search</button>
+            <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
+            <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="onSubmit()">Search</button>
           </div>
 
       </div>
@@ -86,26 +86,26 @@
 </div>
 
 <div class="modal-footer modal-footer--trailed">
-  <collapsible-panel {soft-mode}="{true}" {title-text}="'Search Results ({{*totalObjects}})'" {(expanded)}="{showResults}">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{scope.vars.totalObjects}})'" expanded:bind="showResults">
     <div class="search-results">
       <mapper-results
-        {base-instance}="{parentInstance}"
-        {(is-loading)}="{is_loading}"
-        {object}="{object}"
-        {type}="{type}"
-        {selected}="{selected}"
-        {submit-cbs}="{submitCbs}"
-        {^paging.total}="*totalObjects"
-        {(entries)}="{entries}"
-        {filter-items}="*filterItems"
-        {mapping-items}="*mappingItems"
-        {status-item}="*statusItem">
+        baseInstance:from="parentInstance"
+        isLoading:bind="is_loading"
+        object:from="object"
+        type:from="type"
+        selected:from="selected"
+        submitCbs:from="submitCbs"
+        paging.total:to="scope.vars.totalObjects"
+        entries:bind="entries"
+        filterItems:from="scope.vars.filterItems"
+        mappingItems:from="scope.vars.mappingItems"
+        statusItem:from="scope.vars.statusItem">
       </mapper-results>
     </div>
 
     <div class="control-buttons">
       <div class="confirm-buttons">
-        <spinner-component {toggle}="{is_saving}"></spinner-component>
+        <spinner-component toggle:from="is_saving"></spinner-component>
         <span class="confirm-buttons__objects-count">
           {{selected.length}}
           object(s) selected

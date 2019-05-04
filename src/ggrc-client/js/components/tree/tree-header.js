@@ -11,9 +11,9 @@ import {getVisibleColumnsConfig, getSortingForModel}
 
 export default can.Component.extend({
   tag: 'tree-header',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       cssClasses: {
         type: String,
@@ -106,7 +106,7 @@ export default can.Component.extend({
       this.initializeOrder();
       this.initializeColumns();
     },
-  },
+  }),
   events: {
     '{viewModel} availableColumns': function () {
       this.viewModel.initializeColumns();

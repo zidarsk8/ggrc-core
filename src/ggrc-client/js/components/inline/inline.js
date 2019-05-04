@@ -16,9 +16,9 @@ import template from './inline.stache';
 
 export default can.Component.extend({
   tag: 'inline-edit-control',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       isValid: {
         get() {
@@ -46,10 +46,10 @@ export default can.Component.extend({
     editMode: false,
     withReadMore: false,
     isLoading: false,
-    type: '@',
-    value: '@',
-    placeholder: '@',
-    propName: '@',
+    type: '',
+    value: '',
+    placeholder: '',
+    propName: '',
     dropdownOptions: [],
     dropdownNoValue: false,
     dropdownOptionsGroups: {},
@@ -110,7 +110,7 @@ export default can.Component.extend({
     fieldValueChanged: function (args) {
       this.attr('context.value', args.value);
     },
-  },
+  }),
   events: {
     init: function () {
       this.viewModel.updateContext();

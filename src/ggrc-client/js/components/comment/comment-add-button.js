@@ -7,13 +7,13 @@ import Comment from '../../models/service-models/comment';
 
 export default can.Component.extend({
   tag: 'comment-add-button',
-  template: can.stache(
+  view: can.stache(
     '<button type="button" class="btn btn-small btn-gray"' +
-    ' ($click)="createComment()">' +
+    ' on:el:click="createComment()">' +
     '<content/></button>'
   ),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       disabled: {
         get: function () {
@@ -52,5 +52,5 @@ export default can.Component.extend({
         comment: comment,
       });
     },
-  },
+  }),
 });

@@ -11,9 +11,9 @@ import {sanitizer} from '../../plugins/utils/url-utils';
 
 export default can.Component.extend({
   tag: 'related-urls',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       canAddUrl: {
         get() {
@@ -134,7 +134,7 @@ export default can.Component.extend({
         payload: url,
       });
     },
-  },
+  }),
   events: {
     /**
      * @description Handler for 'inserted' event to save reference

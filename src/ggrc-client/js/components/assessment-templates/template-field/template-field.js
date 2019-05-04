@@ -16,9 +16,9 @@ import template from './template-field.stache';
  */
 export default can.Component.extend({
   tag: 'template-field',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     types: [],
     field: null,
     /*
@@ -79,7 +79,7 @@ export default can.Component.extend({
     normalizeMandatory: function (attrs) {
       return _.filteredMap(attrs, ddValidationMapToValue).join(',');
     },
-  },
+  }),
   events: {
     /**
      * The component's entry point.

@@ -1122,66 +1122,82 @@ describe('assessment-info-pane component', () => {
       });
 
       it('replaces mappedSnapshots list with loaded mapped snapshots',
-        function () {
+        function (done) {
           data.Snapshot = {data: '1'};
-          vm.updateRelatedItems();
-          expect(vm.attr('mappedSnapshots').serialize()).toEqual([
-            data.Snapshot,
-          ]);
+          vm.updateRelatedItems().then(() => {
+            expect(vm.attr('mappedSnapshots').serialize()).toEqual([
+              data.Snapshot,
+            ]);
+            done();
+          });
         });
 
-      it('replaces comments list with loaded comments', function () {
+      it('replaces comments list with loaded comments', function (done) {
         data.Comment = {data: '1'};
-        vm.updateRelatedItems();
-        expect(vm.attr('comments').serialize()).toEqual([data.Comment]);
+        vm.updateRelatedItems().then(() => {
+          expect(vm.attr('comments').serialize()).toEqual([data.Comment]);
+          done();
+        });
       });
 
-      it('replaces files list with loaded files', function () {
+      it('replaces files list with loaded files', function (done) {
         let evidenceData = {data: '1'};
         data['Evidence:FILE'] = [evidenceData];
-        vm.updateRelatedItems();
-        expect(vm.attr('files').serialize()).toEqual([
-          (new Evidence(evidenceData)).serialize(),
-        ]);
-      });
 
-      it('creates Evidence model for each loaded file', function () {
-        data['Evidence:FILE'] = [{data: '1'}, {data: '2'}];
-        vm.updateRelatedItems();
-
-        vm.attr('files').forEach((file) => {
-          expect(file).toEqual(jasmine.any(Evidence));
+        vm.updateRelatedItems().then(() => {
+          expect(vm.attr('files')[0].serialize()).toEqual(
+            (new Evidence(evidenceData)).serialize()
+          );
+          done();
         });
       });
 
-      it('replaces urls list with loaded urls', function () {
+      it('creates Evidence model for each loaded file', function (done) {
+        data['Evidence:FILE'] = [{data: '1'}, {data: '2'}];
+        vm.updateRelatedItems().then(() => {
+          vm.attr('files').forEach((file) => {
+            expect(file).toEqual(jasmine.any(Evidence));
+          });
+          done();
+        });
+      });
+
+      it('replaces urls list with loaded urls', function (done) {
         let evidenceData = {data: '1'};
         data['Evidence:URL'] = [evidenceData];
-        vm.updateRelatedItems();
-        expect(vm.attr('urls').serialize()).toEqual([
-          (new Evidence(evidenceData)).serialize(),
-        ]);
-      });
 
-      it('creates Evidence model for each loaded url', function () {
-        data['Evidence:URL'] = [{data: '1'}, {data: '2'}];
-        vm.updateRelatedItems();
-
-        vm.attr('urls').forEach((url) => {
-          expect(url).toEqual(jasmine.any(Evidence));
+        vm.updateRelatedItems().then(() => {
+          expect(vm.attr('urls')[0].serialize()).toEqual(
+            (new Evidence(evidenceData)).serialize()
+          );
+          done();
         });
       });
 
-      it('sets isUpdatingRelatedItems to false', function () {
-        vm.updateRelatedItems();
-        expect(vm.attr('isUpdatingRelatedItems')).toBe(false);
+      it('creates Evidence model for each loaded url', function (done) {
+        data['Evidence:URL'] = [{data: '1'}, {data: '2'}];
+        vm.updateRelatedItems().then(() => {
+          vm.attr('urls').forEach((url) => {
+            expect(url).toEqual(jasmine.any(Evidence));
+          });
+          done();
+        });
       });
 
-      it('dispatches RELATED_ITEMS_LOADED for the instance', function () {
+      it('sets isUpdatingRelatedItems to false', function (done) {
+        vm.updateRelatedItems().then(() => {
+          expect(vm.attr('isUpdatingRelatedItems')).toBe(false);
+          done();
+        });
+      });
+
+      it('dispatches RELATED_ITEMS_LOADED for the instance', function (done) {
         const dispatchSpy = jasmine.createSpy('dispatch');
         vm.attr('instance').dispatch = dispatchSpy;
-        vm.updateRelatedItems();
-        expect(dispatchSpy).toHaveBeenCalledWith(RELATED_ITEMS_LOADED);
+        vm.updateRelatedItems().then(() => {
+          expect(dispatchSpy).toHaveBeenCalledWith(RELATED_ITEMS_LOADED);
+          done();
+        });
       });
     });
   });
@@ -1545,7 +1561,8 @@ describe('assessment-info-pane component', () => {
           const expectedResult = $.Deferred();
           event.saveDfd = expectedResult;
           vm.showRequiredInfoModal(event);
-          expect(vm.attr('modal.content.saveDfd')).toBe(expectedResult);
+          expect(vm.attr('modal.content.saveDfd').serialize())
+            .toEqual(expectedResult);
         });
 
         it('resolved deferred object, if there is no event.saveDfd',
@@ -1836,7 +1853,7 @@ describe('assessment-info-pane component', () => {
       spyOn(viewModel.attr('deferredSave'), 'isPending')
         .and.returnValue(true);
 
-      handler(instance);
+      handler([instance]);
       expect(viewModel.reinitFormFields.calls.count()).toBe(0);
     });
 
@@ -1845,12 +1862,12 @@ describe('assessment-info-pane component', () => {
       spyOn(viewModel.attr('deferredSave'), 'isPending')
         .and.returnValue(false);
 
-      handler(instance);
+      handler([instance]);
       expect(viewModel.reinitFormFields.calls.count()).toBe(1);
     });
 
     it('should make a backup of instance', () => {
-      handler(instance);
+      handler([instance]);
 
       expect(instance.backup).toHaveBeenCalled();
     });

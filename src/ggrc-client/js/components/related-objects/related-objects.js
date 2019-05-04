@@ -15,7 +15,7 @@ let defaultOrderBy = 'created_at';
 export default can.Component.extend({
   tag: 'related-objects',
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       noRelatedObjectsMessage: {
         type: 'string',
@@ -42,9 +42,9 @@ export default can.Component.extend({
     },
     baseInstance: null,
     modelConstructor: null,
-    relatedItemsType: '@',
+    relatedItemsType: '',
     orderBy: {},
-    initialOrderBy: '@',
+    initialOrderBy: '',
     selectedItem: {},
     getFilters: function (id, type) {
       let predefinedFilter = this.attr('predefinedFilter');
@@ -134,7 +134,7 @@ export default can.Component.extend({
     setRelatedItems: function () {
       this.attr('relatedObjects').replace(this.loadRelatedItems());
     },
-  },
+  }),
   init: function () {
     this.viewModel.setRelatedItems();
   },

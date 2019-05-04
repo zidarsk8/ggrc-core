@@ -18,11 +18,11 @@ const icons = {
  */
 export default can.Component.extend({
   tag: 'form-validation-icon',
-  template: can.stache(
+  view: can.stache(
     '<i class="fa form-validation-icon__body {{iconCls}}"></i>'
   ),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       validation: {},
       iconCls: {
@@ -44,5 +44,5 @@ export default can.Component.extend({
         },
       },
     },
-  },
+  }),
 });

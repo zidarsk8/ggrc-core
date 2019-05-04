@@ -10,9 +10,9 @@ import template from './custom-attributes.stache';
 
 export default can.Component.extend({
   tag: 'custom-attributes',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     fields: [],
     editMode: false,
     fieldValueChanged: function (e, field) {
@@ -23,5 +23,5 @@ export default can.Component.extend({
         field: field,
       });
     },
-  },
+  }),
 });

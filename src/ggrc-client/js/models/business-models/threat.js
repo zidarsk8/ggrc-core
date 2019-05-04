@@ -65,10 +65,20 @@ export default Cacheable.extend({
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-    this.validatePresenceOf('title');
+}, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
+    },
   },
-}, {});
+});

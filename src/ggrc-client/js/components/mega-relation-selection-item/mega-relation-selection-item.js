@@ -8,9 +8,9 @@ import pubSub from '../../pub-sub';
 
 export default can.Component.extend({
   tag: 'mega-relation-selection-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: false,
-  viewModel: {
+  viewModel: can.Map.extend({
     mapAsChild: null,
     isDisabled: false,
     id: null,
@@ -36,5 +36,5 @@ export default can.Component.extend({
         },
       },
     },
-  },
+  }),
 });

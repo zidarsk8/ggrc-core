@@ -67,11 +67,20 @@ export default Cacheable.extend({
     default_filter: ['Control'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-
-    this.validateNonBlank('title');
+}, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
+    },
   },
-}, {});
+});

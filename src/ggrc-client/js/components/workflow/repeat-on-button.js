@@ -9,9 +9,9 @@ import * as config from '../../apps/workflow-config';
 
 export default can.Component.extend({
   tag: 'repeat-on-button',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       buttonText: {
         get: function () {
@@ -122,13 +122,13 @@ export default can.Component.extend({
       }
 
       this.attr('isSaving', true);
-      onSave(unit, repeatEvery)
+      return onSave(unit, repeatEvery)
         .then(function () {
           this.attr('isSaving', false);
           this.attr('state.open', false);
         }.bind(this));
     },
-  },
+  }),
   events: {
     '{state.result} unit': function () {
       this.viewModel.updateRepeatEveryOptions();

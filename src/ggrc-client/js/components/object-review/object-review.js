@@ -20,9 +20,9 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'object-review',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       reviewStatus: {
         get() {
@@ -153,7 +153,7 @@ export default can.Component.extend({
         },
       });
     },
-  },
+  }),
   events: {
     inserted() {
       this.viewModel.loadReview();

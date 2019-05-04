@@ -7,14 +7,14 @@ import template from './custom-attributes-actions.stache';
 
 export default can.Component.extend({
   tag: 'custom-attributes-actions',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: null,
     formEditMode: false,
     disabled: false,
     edit: function () {
       this.attr('formEditMode', true);
     },
-  },
+  }),
 });

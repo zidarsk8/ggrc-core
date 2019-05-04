@@ -18,9 +18,9 @@ import template from './detailed-business-object-list-item.stache';
  */
 export default can.Component.extend({
   tag: 'detailed-business-object-list-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: {},
     customAttributes: null,
     deletableAdmin: false,
@@ -66,5 +66,5 @@ export default can.Component.extend({
         },
       },
     },
-  },
+  }),
 });

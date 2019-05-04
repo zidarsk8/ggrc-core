@@ -7,12 +7,12 @@ import template from './tree_pagination.stache';
 
 /**
  * A component that renders a tree pagination widget
- * Usage: <tree-pagination {paging}="{paging}"></tree-pagination>
- * Optional parameter: {placement}="'top'" - to display content above the control
+ * Usage: <tree-pagination paging:from="paging"></tree-pagination>
+ * Optional parameter: placement:from="'top'" - to display content above the control
  */
 export default can.Component.extend({
   tag: 'tree-pagination',
-  template: can.stache(template),
+  view: can.stache(template),
   init: function () {
     /**
      * Entrance object validation
@@ -31,8 +31,8 @@ export default can.Component.extend({
     }
   },
   leakScope: true,
-  viewModel: {
-    placement: '@',
+  viewModel: can.Map.extend({
+    placement: '',
     setCurrentPage: function (pageNumber) {
       this.paging.attr('current', pageNumber);
     },
@@ -79,5 +79,5 @@ export default can.Component.extend({
 
       return `Page ${pageNumber}: ${first}-${last}`;
     },
-  },
+  }),
 });

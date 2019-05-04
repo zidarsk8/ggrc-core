@@ -7,11 +7,11 @@ import template from './spinner.stache';
 
 export default can.Component.extend({
   tag: 'spinner-component',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  scope: {
-    extraCssClass: '@',
-    size: '@',
+  scope: can.Map.extend({
+    extraCssClass: '',
+    size: '',
     toggle: null,
-  },
+  }),
 });

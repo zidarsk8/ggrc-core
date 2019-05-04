@@ -16,9 +16,9 @@ import template from './external-data-autocomplete.stache';
  */
 export default can.Component.extend({
   tag: 'external-data-autocomplete',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       /**
        * The flag indicating that results will be rendered.
@@ -103,10 +103,11 @@ export default can.Component.extend({
     /**
      * Creates model in system and dispatches corresponding event.
      * @param {Object} item - an item picked by user.
+     * @return {Object} - Deferred chain.
      */
     onItemPicked(item) {
       this.attr('saving', true);
-      this.createOrGet(item).then((model) => {
+      return this.createOrGet(item).then((model) => {
         if (this.attr('autoClean')) {
           this.attr('searchCriteria', '');
         }
@@ -142,5 +143,5 @@ export default can.Component.extend({
         return result;
       });
     },
-  },
+  }),
 });

@@ -10,35 +10,35 @@
         {{#case "state"}}
         <div class="filter-container__state">
           <advanced-search-filter-state
-            {model-name}="{modelName}"
-            {(state-model)}="{value}">
+            modelName:from="modelName"
+            stateModel:bind="value">
           </advanced-search-filter-state>
         </div>
         {{/case}}
         {{#case "operator"}}
         <div class="filter-container__operator">
           <advanced-search-filter-operator
-            {(operator)}="{value}">
+            operator:bind="value">
           </advanced-search-filter-operator>
         </div>
         {{/case}}
         {{#case "attribute"}}
         <div class="filter-container__attribute">
           <advanced-search-filter-attribute
-            {(attribute)}="{value}"
-            (remove)="{removeItem(.)}"
-            {available-attributes}="{availableAttributes}"
-            {extendable}="{true}"
-            (createGroup)="{createGroup(.)}">
+            attribute:bind="value"
+            on:remove="removeItem(.)"
+            availableAttributes:from="availableAttributes"
+            extendable:from="true"
+            on:createGroup="createGroup(.)">
           </advanced-search-filter-attribute>
         </div>
         {{/case}}
         {{#case "group"}}
         <div class="filter-container__group">
           <advanced-search-filter-group
-            {(items)}="{value}"
-            (remove)="{removeItem(.)}"
-            {available-attributes}="{availableAttributes}">
+            items:bind="value"
+            on:remove="removeItem(.)"
+            availableAttributes:from="availableAttributes">
           </advanced-search-filter-group>
         </div>
         {{/case}}
@@ -50,7 +50,7 @@
     <div>
       <button type="button"
               class="btn btn-small btn-white"
-              ($click)="addFilterCriterion()">
+              on:el:click="addFilterCriterion()">
         Add Attribute
       </button>
     </div>

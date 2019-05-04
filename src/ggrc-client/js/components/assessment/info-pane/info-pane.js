@@ -72,9 +72,9 @@ import * as businessModels from '../../../models/business-models';
  */
 export default can.Component.extend({
   tag: 'assessment-info-pane',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       verifiers: {
         get: function () {
@@ -431,7 +431,7 @@ export default can.Component.extend({
     updateRelatedItems: function () {
       this.attr('isUpdatingRelatedItems', true);
 
-      this.attr('instance').getRelatedObjects()
+      return this.attr('instance').getRelatedObjects()
         .then((data) => {
           this.attr('mappedSnapshots').replace(data.Snapshot);
           this.attr('comments').replace(data.Comment);
@@ -630,7 +630,7 @@ export default can.Component.extend({
       this.attr('previousStatus', undefined);
       this.attr('isUndoButtonVisible', false);
     },
-  },
+  }),
   init: function () {
     this.viewModel.initializeFormFields();
     this.viewModel.initGlobalAttributes();
@@ -655,7 +655,7 @@ export default can.Component.extend({
       const status = this.viewModel.attr('instance.status');
       this.viewModel.setCurrentState(status);
     },
-    '{viewModel.instance} updated'(instance) {
+    '{viewModel.instance} updated'([instance]) {
       const vm = this.viewModel;
       const isPending = vm.attr('deferredSave').isPending();
       instance.backup();

@@ -11,9 +11,9 @@ import template from './templates/lhn-popup-people.stache';
 
 export default can.Component.extend({
   tag: 'lhn-popup-people',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       instance: {
         set: function (value, setValue) {
@@ -38,5 +38,5 @@ export default can.Component.extend({
         this.attr('denyUnmap', false);
       });
     },
-  },
+  }),
 });

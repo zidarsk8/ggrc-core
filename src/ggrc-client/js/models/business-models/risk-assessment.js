@@ -55,13 +55,27 @@ export default Cacheable.extend({
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    this._super && this._super(...arguments);
-    this.validateNonBlank('title');
-    this.validateNonBlank('start_date');
-    this.validateNonBlank('end_date');
-  },
 }, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+    start_date: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+    end_date: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+  },
   save: function () {
     // Make sure the context is always set to the parent program
     if (!this.context || !this.context.id) {

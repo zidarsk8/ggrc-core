@@ -14,9 +14,9 @@ const defaultRightPosition = 60;
  */
 export default can.Component.extend({
   tag: 'object-popover',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     expanded: false,
     direction: 'left',
     maxInnerHeight: defaultMaxInnerHeight,
@@ -29,8 +29,8 @@ export default can.Component.extend({
       return this.attr('active');
     },
     setPopoverStyle: function (el, direction) {
-      let pos = el[0].getBoundingClientRect();
-      let top = Math.floor(el.position().top);
+      let pos = el.getBoundingClientRect();
+      let top = Math.floor($(el).position().top);
       let left = Math.floor(pos.width / 2);
       let width = (direction !== 'right') ?
         Math.floor(window.innerWidth - (pos.right - pos.width / 2)) :
@@ -52,7 +52,7 @@ export default can.Component.extend({
       this.attr('openStyle', style);
       this.attr('expanded', false);
     },
-  },
+  }),
   events: {
     '{viewModel.item} el': function (scope, ev, el) {
       this.viewModel.setStyle(el);

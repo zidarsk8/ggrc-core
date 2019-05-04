@@ -13,9 +13,9 @@ import template from './templates/gdrive_folder.stache';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-folder-picker',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       readonly: {
         type: 'boolean',
@@ -40,10 +40,10 @@ export default can.Component.extend({
       },
     },
     _folder_change_pending: false,
-    no_detach: '@',
-    deferred: '@',
-    tabindex: '@',
-    placeholder: '@',
+    no_detach: '',
+    deferred: '',
+    tabindex: '',
+    placeholder: '',
     instance: null,
     /**
      * Helper method for unlinking folder currently linked to the
@@ -115,10 +115,10 @@ export default can.Component.extend({
         this.setCurrent(folderId);
       }
     },
-  },
+  }),
 
   events: {
-    inserted: function () {
+    init: function () {
       let viewModel = this.viewModel;
 
       if (!viewModel.attr('readonly')) {
@@ -144,6 +144,7 @@ export default can.Component.extend({
      * @param {Object} el - The jQuery-wrapped DOM element on which the event
      *   has been triggered.
      * @param {Object} ev - The event object.
+     * @return {Object} - Deferred chain.
      */
     'a[data-toggle=gdrive-remover] click': function (el, ev) {
       let viewModel = this.viewModel;
@@ -156,7 +157,7 @@ export default can.Component.extend({
         dfd = viewModel.unlinkFolder();
       }
 
-      dfd.then(viewModel.unsetCurrent.bind(viewModel));
+      return dfd.then(viewModel.unsetCurrent.bind(viewModel));
     },
     'a[data-toggle=gdrive-picker] click': function (el, ev) {
       uploadFiles({

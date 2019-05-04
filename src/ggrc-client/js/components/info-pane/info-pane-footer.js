@@ -10,11 +10,11 @@ import template from './info-pane-footer.stache';
  */
 export default can.Component.extend({
   tag: 'info-pane-footer',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     createdAt: '',
     modifiedAt: '',
     modifiedBy: {},
-  },
+  }),
 });

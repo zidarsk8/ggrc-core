@@ -32,15 +32,17 @@ describe('reminder component', function () {
       eventObj = $.Event();
       $element = $('<div></div>');
 
-      method = Component.prototype.viewModel.reminder.bind(viewModel);
+      method = Component.prototype.viewModel.prototype.reminder.bind(viewModel);
     });
 
-    it('saves the instance only after it has been refreshed', function () {
+    it('saves the instance only after it has been refreshed', function (done) {
       method(viewModel, $element, eventObj);
 
       expect(instance.save).not.toHaveBeenCalled();
-      pendingRefresh.resolve(instance);
-      expect(instance.save).toHaveBeenCalled();
+      pendingRefresh.resolve(instance).then(() => {
+        expect(instance.save).toHaveBeenCalled();
+        done();
+      });
     });
   });
 });

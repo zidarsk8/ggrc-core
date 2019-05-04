@@ -7,9 +7,9 @@ import template from './templates/export-panel.stache';
 
 export default can.Component.extend({
   tag: 'export-panel',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       showAttributes: {
         value: true,
@@ -46,7 +46,7 @@ export default can.Component.extend({
     },
     exportable: GGRC.Bootstrap.exportable,
     snapshotable_objects: GGRC.config.snapshotable_objects,
-    panel_index: '@',
+    panel_index: '',
     has_parent: false,
     removable: false,
     item: null,
@@ -66,7 +66,7 @@ export default can.Component.extend({
       this.attr('showAttributes', true);
       this.attr('showLocalAttributes', true);
     },
-  },
+  }),
   events: {
     '[data-action=select_toggle] click': function (el, ev) {
       let type = el.data('type');
@@ -89,7 +89,7 @@ export default can.Component.extend({
 
       this.viewModel.updateIsSelected(targetList, value);
     },
-    '{viewModel} type': function (viewModel, ev, type) {
+    '{viewModel} type': function ([viewModel], ev, type) {
       viewModel.attr('item').changeType(type);
       viewModel.setSelected();
     },

@@ -10,18 +10,18 @@
         Comment
       </label>
       <rich-text
-          {hidden-toolbar}="{true}"
-          {placeholder}="'Enter Proposal Agenda'"
-          {(content)}="{proposalAgenda}"
-          {with-mentions}="{true}">
+          hiddenToolbar:from="true"
+          placeholder:from="'Enter Proposal Agenda'"
+          content:bind="proposalAgenda"
+          withMentions:from="true">
       </rich-text>
     </div>
   </div>
 
   <div class="proposal__save-button">
-    <spinner-component class="proposal__spinner" {toggle}="{loading}"></spinner-component>
+    <spinner-component class="proposal__spinner" toggle:from="loading"></spinner-component>
     <a class="btn btn-small btn-green {{#if isDisabled}}disabled{{/isDisabled}}"
-       ($click)="create(%element, %event)">
+       on:el:click="create(scope.element, scope.event)">
         Propose
     </a>
   </div>

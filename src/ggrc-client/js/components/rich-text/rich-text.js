@@ -12,9 +12,9 @@ const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
 
 export default can.Component.extend('richText', {
   tag: 'rich-text',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       disabled: {
         set(disabled) {
@@ -214,7 +214,7 @@ export default can.Component.extend('richText', {
       // Empty editor contains single service line-break symbol.
       return editor.getLength() - 1;
     },
-  },
+  }),
   events: {
     inserted() {
       let wysiwyg = this.element.find('.rich-text__content')[0];

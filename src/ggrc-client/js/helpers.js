@@ -21,6 +21,7 @@ import {
   getFormattedLocalDate,
   formatDate,
 } from './plugins/utils/date-utils';
+import {validateAttr, isValidAttr} from './plugins/utils/validation-utils';
 
 // Chrome likes to cache AJAX requests for templates.
 let templateUrls = {};
@@ -743,10 +744,43 @@ can.stache.registerHelper('if_recurring_workflow', function (object, options) {
 });
 
 // Sets current "can" context into element data
-can.stache.registerHelper('canData', (key, options) => {
-  key = isFunction(key) ? key() : key;
+can.stache.registerHelper('canData',
+  (key, options) => {
+    key = isFunction(key) ? key() : key;
 
-  return (el) => {
-    $(el).data(key, options.context);
-  };
+    return (el) => {
+      $(el).data(key, options.context);
+    };
+  }
+);
+
+can.stache.registerHelper('validateAttr',
+  (instance, attrName, options) => {
+    instance = isFunction(instance) ? instance() : instance;
+    attrName = isFunction(attrName) ? attrName() : attrName;
+    const errorMessage = validateAttr(instance, attrName);
+
+    return errorMessage ?
+      options.fn(errorMessage) :
+      options.inverse(options.contexts);
+  }
+);
+
+can.stache.registerHelper('isValidAttr',
+  (instance, attrName, options) => {
+    instance = isFunction(instance) ? instance() : instance;
+    attrName = isFunction(attrName) ? attrName() : attrName;
+
+    return isValidAttr(instance, attrName) ?
+      options.fn(options.context) :
+      options.inverse(options.contexts);
+  }
+);
+
+can.stache.registerHelper('isArray', (items, options) => {
+  items = isFunction(items) ? items() : items;
+
+  return _.isArray(items) || items instanceof can.List ?
+    options.fn(options.contexts) :
+    options.inverse(options.contexts);
 });

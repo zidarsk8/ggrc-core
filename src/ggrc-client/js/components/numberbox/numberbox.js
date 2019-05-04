@@ -11,16 +11,16 @@ const NEGATIVE_NUMBER_PATTERN = '([-]{0,1})';
 
 export default can.Component.extend({
   tag: 'numberbox-component',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     value: '',
     enableFloat: false,
     enableNegative: false,
     disabled: false,
-    attrDataId: '@',
-    additionalClass: '@',
-    placeholder: '@',
+    attrDataId: '',
+    additionalClass: '',
+    placeholder: '',
     ckeckKey(positivePattern, negativePattern, key) {
       return this.attr('enableNegative') ?
         !!key.match(negativePattern) :
@@ -59,7 +59,7 @@ export default can.Component.extend({
         this.attr('value', '');
       }
     },
-  },
+  }),
   events: {
     '.numberbox-input keypress'(el, ev) {
       const key = ev.key;

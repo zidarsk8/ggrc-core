@@ -11,9 +11,9 @@ import template from './object-state-toolbar.stache';
  */
 export default can.Component.extend({
   tag: 'object-state-toolbar',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       updateState: {
         get: function () {
@@ -62,5 +62,5 @@ export default can.Component.extend({
         undo: isUndo,
       });
     },
-  },
+  }),
 });

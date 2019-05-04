@@ -36,7 +36,7 @@ const events = {
 
     if (releaseNotesDate !== lastSeenDate) {
       profile.attr('last_seen_whats_new', releaseNotesDate);
-      profile.save()
+      return profile.save()
         .then(() => {
           this.viewModel.open();
         });
@@ -46,7 +46,7 @@ const events = {
 
 export default can.Component.extend({
   tag: 'release-notes-menu-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
   events,

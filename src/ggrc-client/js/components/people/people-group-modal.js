@@ -8,9 +8,9 @@ import template from './templates/people-group-modal.stache';
 
 export default can.Component.extend({
   tag: 'people-group-modal',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       selectedCount: {
         get: function () {
@@ -34,5 +34,5 @@ export default can.Component.extend({
       this.attr('modalState.open', false);
       this.dispatch('save');
     },
-  },
+  }),
 });

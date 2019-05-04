@@ -34,6 +34,9 @@ let CloneTaskGroup = Cacheable.extend({
 
 export default can.Component.extend({
   tag: 'task-group-clone',
+  viewModel: can.Map.extend({
+    taskGroup: null,
+  }),
   events: {
     click(el) {
       const $target = $('<div class="modal hide"></div>').uniqueId();
