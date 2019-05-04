@@ -29,10 +29,6 @@
         </tab-panel>
         <tab-panel panels:bind="panels" titleText:from="'Comments'">
             <related-comments parentInstance:from="item.data">
-                <mapped-objects parentInstance:from="parentInstance"
-                                relatedTypes:from="relatedTypes">
-                    <comment-list-item instance:from="instance"></comment-list-item>
-                </mapped-objects>
             </related-comments>
         </tab-panel>
     </tab-container>
