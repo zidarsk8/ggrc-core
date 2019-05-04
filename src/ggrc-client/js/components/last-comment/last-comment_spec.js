@@ -18,6 +18,24 @@ describe('last-comment component', () => {
     vm = getComponentVM(Component);
   });
 
+  describe('"commentText" get', () => {
+    beforeEach(() => {
+      vm.attr('comment', {});
+    });
+
+    it('returns comment description without tags', () => {
+      vm.attr('comment.description', '<a>ara</a>');
+
+      expect(vm.attr('commentText')).toBe('ara');
+    });
+
+    it('returns empty string if no description in comment', () => {
+      vm.attr('comment.description', null);
+
+      expect(vm.attr('commentText')).toBe('');
+    });
+  });
+
   describe('getAuthor() method', () => {
     let person;
 
@@ -39,10 +57,6 @@ describe('last-comment component', () => {
   });
 
   describe('tooltip() method', () => {
-    beforeEach(() => {
-
-    });
-
     describe('returns empty string', () => {
       it('if there is no comment', () => {
         vm.attr('comment', null);
