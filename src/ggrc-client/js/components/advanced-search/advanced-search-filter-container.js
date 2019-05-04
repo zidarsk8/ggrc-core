@@ -30,7 +30,11 @@ let viewModel = AdvancedSearchContainer.extend({
       get: function (items) {
         if (this.attr('defaultStatusFilter') && items && !items.length &&
           StateUtils.hasFilter(this.attr('modelName'))) {
-          items.push(AdvancedSearch.create.state());
+          const statusItem = new can.Map(AdvancedSearch.create.state());
+          statusItem.value = AdvancedSearch.setDefaultStatusConfig(
+            statusItem.value, this.attr('modelName')
+          );
+          items.push(statusItem);
         }
         return items;
       },

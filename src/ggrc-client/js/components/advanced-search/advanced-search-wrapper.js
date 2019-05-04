@@ -44,12 +44,25 @@ export default can.Component.extend({
     resetFilters: function () {
       this.attr('filterItems', [AdvancedSearch.create.attribute()]);
       this.attr('mappingItems', []);
-      this.attr('statusItem.value', {});
+      this.setDefaultStatusItem();
+    },
+    setDefaultStatusItem: function () {
+      if (this.attr('hasStatusFilter')) {
+        const defaultStatusItem = AdvancedSearch.setDefaultStatusConfig(
+          this.attr('statusItem.value'), this.attr('modelName')
+        );
+        this.attr('statusItem.value', defaultStatusItem);
+      } else {
+        this.attr('statusItem', AdvancedSearch.create.state());
+      }
     },
   }),
   events: {
     '{viewModel} modelName': function () {
       this.viewModel.resetFilters();
     },
+  },
+  init: function () {
+    this.viewModel.setDefaultStatusItem();
   },
 });

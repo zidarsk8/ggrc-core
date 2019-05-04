@@ -5,8 +5,8 @@
 
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import * as ModelsUtils from '../../../plugins/utils/models-utils';
 import Component from '../advanced-search-filter-state';
+import * as ModelsUtils from '../../../plugins/utils/models-utils';
 
 describe('advanced-search-filter-state component', function () {
   'use strict';
@@ -17,56 +17,17 @@ describe('advanced-search-filter-state component', function () {
     viewModel = getComponentVM(Component);
   });
 
-  describe('stateModel set() method', function () {
-    let statesSpy;
+  describe('label getter', () => {
+    it('with "Launch Status" if it is scoping object', () => {
+      spyOn(ModelsUtils, 'isScopeModel').and.returnValue(true);
 
-    beforeEach(() => {
-      statesSpy = spyOn(StateUtils, 'getStatesForModel');
+      expect(viewModel.attr('label')).toBe('Launch Status');
     });
 
-    it('assigns states to items of stateModel if items is not defined',
-      function () {
-        let states = ['state1', 'state2', 'state3'];
-        statesSpy.and.returnValue(states);
-        viewModel.attr('modelName', 'Requirement');
+    it('with "State" if it is not scoping object', () => {
+      spyOn(ModelsUtils, 'isScopeModel').and.returnValue(false);
 
-        viewModel.attr('stateModel', new can.Map());
-
-        expect(viewModel.attr('stateModel.items').serialize())
-          .toEqual(states);
-      });
-
-    it('assigns "ANY" to operator if it is not defined', () => {
-      viewModel.attr('stateModel', new can.Map());
-
-      expect(viewModel.attr('stateModel.operator')).toBe('ANY');
-    });
-
-    it('assigns modelName with value from viewModel', () => {
-      let modelName = 'SomeModel';
-      viewModel.attr('modelName', modelName);
-
-      viewModel.attr('stateModel', new can.Map());
-
-      expect(viewModel.attr('stateModel.modelName')).toBe(modelName);
-    });
-
-    describe('assigns label of state', () => {
-      it('with "Launch Status" if it is scoping object', () => {
-        spyOn(ModelsUtils, 'isScopeModel').and.returnValue(true);
-
-        viewModel.attr('stateModel', new can.Map());
-
-        expect(viewModel.attr('stateModel.label')).toBe('Launch Status');
-      });
-
-      it('with "State" if it is not scoping object', () => {
-        spyOn(ModelsUtils, 'isScopeModel').and.returnValue(false);
-
-        viewModel.attr('stateModel', new can.Map());
-
-        expect(viewModel.attr('stateModel.label')).toBe('State');
-      });
+      expect(viewModel.attr('label')).toBe('State');
     });
   });
 
