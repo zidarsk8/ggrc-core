@@ -12,6 +12,8 @@ const hiddenLogs = [];
 const hideTemplates = [
   'can-component: Assigning a DefineMap or constructor type',
   'No property found for handling',
+  'Dispatching a synthetic event on a disabled is problematic in FireFox',
+  'can-stache/src/expression.js: Unable to find key or helper',
 ];
 
 const isHidden = function (text) {
