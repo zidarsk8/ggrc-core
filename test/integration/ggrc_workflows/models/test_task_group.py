@@ -98,9 +98,9 @@ class TestCloneTaskGroup(workflow_test_case.WorkflowTestCase):
 
     cloned_title = cloned_task_group.title
 
-    _, clone_wf = self.object_generator.generate_object(
+    _, clone_tg = self.object_generator.generate_object(
         all_models.TaskGroup, {"title": "TG - copy 1", "clone": task_group.id})
     get_copy_title_patch.assert_called_once_with(
         task_group.title, [cloned_title])
-    assert clone_wf.title == expected_title
-    assert clone_wf.parent_id == task_group.id
+    self.assertEqual(clone_tg.title, expected_title)
+    self.assertEqual(clone_tg.parent_id, task_group.id)

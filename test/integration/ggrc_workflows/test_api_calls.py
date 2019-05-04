@@ -271,8 +271,8 @@ class TestCloneWorkflow(TestCase):
         all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
     get_copy_title_patch.assert_called_once_with(
         workflow.title, [cloned_workflow.title])
-    assert clone_wf.title == expected_title
-    assert clone_wf.parent_id == workflow.id
+    self.assertEqual(clone_wf.title, expected_title)
+    self.assertEqual(clone_wf.parent_id, workflow.id)
 
 
 @ddt.ddt
