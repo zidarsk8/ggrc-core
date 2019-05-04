@@ -9,10 +9,10 @@ import TreeViewConfig from '../../apps/base_widgets';
 
 export default can.Component.extend({
   tag: 'relevant-filter',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
-    relevant_menu_item: '@',
+  viewModel: can.Map.extend({
+    relevant_menu_item: '',
     operators: [{title: 'AND', value: 'AND'}, {title: 'OR', value: 'OR'}],
     addFilter: function () {
       let menu = this.menu();
@@ -59,7 +59,7 @@ export default can.Component.extend({
     removeFilter(el, index) {
       this.attr('relevant').splice(index, 1);
     },
-  },
+  }),
   events: {
     init: function () {
       this.setRelevant();

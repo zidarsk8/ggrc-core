@@ -7,8 +7,8 @@ import template from './event-item.stache';
 
 export default can.Component.extend({
   tag: 'event-item',
-  template: can.stache(template),
-  viewModel: {
+  view: can.stache(template),
+  viewModel: can.Map.extend({
     define: {
       hasHiddenRevisions: {
         get() {
@@ -22,5 +22,5 @@ export default can.Component.extend({
       },
     },
     event: null,
-  },
+  }),
 });

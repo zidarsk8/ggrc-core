@@ -4,21 +4,22 @@
  */
 
 import template from './object-selection-item.stache';
+import {trigger} from 'can-event';
 
 export default can.Component.extend({
   tag: 'object-selection-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     isSaving: false,
     item: null,
     isDisabled: false,
     isSelected: false,
     toggleSelection: function (el, isSelected) {
       let event = isSelected ? 'selectItem' : 'deselectItem';
-      can.trigger(el, event, [this.attr('item')]);
+      trigger.call(el[0], event, [this.attr('item')]);
     },
-  },
+  }),
   events: {
     'input[type="checkbox"] click': function (el, ev) {
       let isSelected = el[0].checked;

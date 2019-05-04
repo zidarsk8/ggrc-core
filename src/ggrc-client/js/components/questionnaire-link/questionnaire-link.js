@@ -15,9 +15,9 @@ import template from './questionnaire-link.stache';
 
 export default can.Component.extend({
   tag: 'questionnaire-link',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       url: {
         type: String,
@@ -69,5 +69,5 @@ export default can.Component.extend({
     linkType: 'info',
     showIcon: false,
     viewType: 'link',
-  },
+  }),
 });

@@ -8,10 +8,10 @@
     {{labelName}}
   </label>
   <dropdown-component
-    {options-list}="{peopleValues}"
-    {name}="'selectedValue'"
-    ($change)="{dropdownChanged}"
-    {no-value}="{hasEmptyValue}"
+    optionsList:from="peopleValues"
+    name:bind="selectedValue"
+    on:el:change="dropdownChanged"
+    noValue:from="hasEmptyValue"
   ></dropdown-component>
 </div>
 
@@ -19,23 +19,23 @@
   <label>&nbsp;</label>
   {{#is(selectedValue, "other")}}
     {{^if_config_exist 'external_services.Person'}}
-      <autocomplete-component {search-items-type}="'Person'"
-                    (item-selected)="{personAdded(%event)}"
-                    {placeholder}="'Enter text to search for {{listName}}'"
+      <autocomplete-component searchItemsType:from="'Person'"
+                    on:itemSelected="personAdded(scope.event)"
+                    placeholder:from="'Enter text to search for {{listName}}'"
       ></autocomplete-component>
     {{else}}
-      <external-data-autocomplete {type}="'Person'"
-                                  {placeholder}="'Enter text to search for {{listName}}'"
-                                  {min-length}="2"
-                                  (item-selected)="{personAdded(%event)}">
+      <external-data-autocomplete type:from="'Person'"
+                                  placeholder:from="'Enter text to search for {{listName}}'"
+                                  minLength:from="2"
+                                  on:itemSelected="personAdded(scope.event)">
       </external-data-autocomplete>
     {{/if_config_exist}}
     {{#if validationError}}
       <label class="help-inline warning">{{validationError}}</label>
     {{/if}}
     {{#each peopleList}}
-      <person-data {person-id}="{{.}}">
-        <a href="javascript://" class="unmap" title="Remove" ($click)="removePerson(person)">
+      <person-data personId:from="{{.}}">
+        <a href="javascript://" class="unmap" title="Remove" on:el:click="removePerson(person)">
         <i class="fa fa-trash"></i>
         </a>
       </person-data>

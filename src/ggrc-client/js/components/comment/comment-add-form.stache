@@ -4,20 +4,18 @@
 }}
 
 <div class="comment-add-form__section">
-    <comment-input {(value)}="*commentValue"
-                   {disabled}="{isSaving}"></comment-input>
+    <comment-input value:bind="scope.vars.commentValue"
+                   disabled:from="isSaving"></comment-input>
 </div>
 <div class="comment-add-form__toolbar comment-add-form__section">
     <label class="comment-add-form__toolbar-item comment-add-form__toolbar-label">
-            <input type="checkbox"
-                   class="comment-add-form__toolbar-checkbox"
-                   name="send_notification"
-                   can-value="sendNotifications">
+            <input type="checkbox" class="comment-add-form__toolbar-checkbox"
+                   name="send_notification" el:checked:bind="sendNotifications">
             {{notificationsInfo}}
             <i class="fa fa-question-circle" rel="tooltip" title="{{tooltipTitle}}"></i>
         </label>
         <comment-add-button class="comment-add-form__toolbar-item"
-                            {(value)}="*commentValue"
-                            (comment-created)="{onCommentCreated(%event)}"
-                            {is-saving}="{isSaving}">Add</comment-add-button>
+                            value:bind="scope.vars.commentValue"
+                            on:commentCreated="onCommentCreated(scope.event)"
+                            isSaving:from="isSaving">Add</comment-add-button>
 </div>

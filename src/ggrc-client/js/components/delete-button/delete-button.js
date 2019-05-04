@@ -14,9 +14,9 @@ import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
 export default can.Component.extend({
   tag: 'delete-button',
-  template: can.stache('<span><i class="fa fa-trash"/>Delete</span>'),
+  view: can.stache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       instance: {
         set(instance) {
@@ -108,7 +108,7 @@ export default can.Component.extend({
         relatedToOriginal,
       };
     },
-  },
+  }),
   events: {
     click() {
       this.viewModel.confirmDelete();

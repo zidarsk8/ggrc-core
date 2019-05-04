@@ -14,7 +14,7 @@ const viewModel = can.Map.extend({
     },
     title: {
       get() {
-        return can.capitalize(GGRC.config.CREATE_ISSUE_BUTTON_NAME) ||
+        return _.capitalize(GGRC.config.CREATE_ISSUE_BUTTON_NAME) ||
           'Feedback';
       },
     },
@@ -23,7 +23,7 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'feedback-link',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
 });

@@ -26,7 +26,7 @@ import {notifier} from '../../../plugins/utils/notifiers-utils';
  * ViewModel for Assessment Mapped Controls Popover.
  * @type {can.Map}
  */
-const viewModel = {
+const viewModel = can.Map.extend({
   define: {
     /**
      * Private Attribute defining array of requested Objects, Types and Fields of Objects
@@ -68,12 +68,12 @@ const viewModel = {
   regulations: [],
   customAttributes: [],
   state: {},
-  titleText: '@',
-  mapping: '@',
-  mappingType: '@',
+  titleText: '',
+  mapping: '',
+  mappingType: '',
   selectedItem: {},
   snapshot: {},
-  assessmentType: '@',
+  assessmentType: '',
   withoutDetails: false,
   /**
    * Generate params required for Query API
@@ -102,7 +102,7 @@ const viewModel = {
     let params = this.getParams(id);
 
     this.attr('isLoading', true);
-    $.when(...params.map((param) => {
+    return $.when(...params.map((param) => {
       return batchRequests(param.request).then((response) => {
         let objects = response.Snapshot.values.map((item) => toObject(item));
         this.attr(param.type, objects);
@@ -118,13 +118,13 @@ const viewModel = {
       .map(convertToFormViewField);
     return attributes;
   },
-};
+});
 /**
  * Assessment specific mapped controls view component
  */
 export default can.Component.extend({
   tag: 'assessment-mapped-controls',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel: viewModel,
   events: {

@@ -3,16 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if isAuditScope}} 
+{{#if isAuditScope}}
   <audit-inner-nav
-    {instance}="{instance}"
-    {widget-descriptors}="{innerNavDescriptors}"
-    (active-changed)="{showWidgetArea(%event)}"
+    instance:from="instance"
+    widgetDescriptors:from="innerNavDescriptors"
+    on:activeChanged="showWidgetArea(scope.event)"
   ></audit-inner-nav>
 {{else}}
   <inner-nav
-    {instance}="{instance}"
-    {widget-descriptors}="{innerNavDescriptors}"
-    (active-changed)="{showWidgetArea(%event)}"
+    instance:from="instance"
+    widgetDescriptors:from="innerNavDescriptors"
+    on:activeChanged="showWidgetArea(scope.event)"
   ></inner-nav>
 {{/if}}

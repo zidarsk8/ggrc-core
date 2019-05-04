@@ -7,9 +7,9 @@ import template from './templates/mapper-results-items-header.stache';
 
 export default can.Component.extend({
   tag: 'mapper-results-items-header',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     columns: [],
     serviceColumns: [],
     sortKey: '',
@@ -39,5 +39,5 @@ export default can.Component.extend({
         this.attr('sortDirection', 'asc');
       }
     },
-  },
+  }),
 });

@@ -69,6 +69,15 @@ const viewModel = can.Map.extend({
       type: 'boolean',
       get() {
         let type = this.attr('instance.type');
+
+        if (type === 'Assessment') {
+          let audit = this.attr('instance.audit');
+
+          if (!Permission.is_allowed_for('read', audit)) {
+            return false;
+          }
+        }
+
         let denyEditAndMap = this.attr('denyEditAndMap');
         let mappingTypes = Mapper.getMappingList(type);
 
@@ -92,9 +101,6 @@ const viewModel = can.Map.extend({
   expand(scope, el, ev) {
     this.dispatch('expand');
     ev.stopPropagation();
-  },
-  subTreeTypes() {
-    can.trigger(this.attr('$el'), 'childTreeTypes');
   },
   instance: null,
   childOptions: null,
@@ -126,7 +132,7 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'tree-item-actions',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
   events: {

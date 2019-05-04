@@ -9,9 +9,9 @@ import {hasRelatedAssessments} from '../../plugins/utils/models-utils';
 
 export default can.Component.extend({
   tag: 'show-related-assessments-button',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       cssClasses: {
         type: String,
@@ -43,8 +43,8 @@ export default can.Component.extend({
     state: {
       open: false,
     },
-    extraBtnCss: '@',
-    text: '@',
+    extraBtnCss: '',
+    text: '',
     modalTitle: 'Related Assessments',
     showRelatedAssessments: function () {
       this.attr('state.open', true);
@@ -53,5 +53,5 @@ export default can.Component.extend({
     isAllowedToShow: function () {
       return hasRelatedAssessments(this.attr('instance.type'));
     },
-  },
+  }),
 });

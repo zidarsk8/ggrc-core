@@ -9,11 +9,7 @@ import {
 import {getCounts} from '../../plugins/utils/widgets-utils';
 import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
-
-const prohibitedMapList = Object.freeze({
-  Issue: ['Assessment', 'Audit'],
-  Assessment: ['Evidence'],
-});
+import Mappings from '../../models/mappers/mappings';
 
 export default can.Map.extend({
   define: {
@@ -108,11 +104,14 @@ export default can.Map.extend({
      * @param {can.Map} widget widget object
      */
   updateHiddenWidgets(widget) {
+    let instance = this.attr('instance');
+    let targetType = widget.model.model_singular;
+
     if (this.attr('showAllTabs')
         || widget.attr('inForceShowList')
         || widget.attr('type') === 'version'
         || widget.attr('uncountable')
-        || this.isInProhibitedMap(widget)) {
+        || !Mappings.allowedToCreateOrMap(instance, targetType)) {
       // widget will never be in hiddenWidgets
       return;
     }
@@ -123,18 +122,6 @@ export default can.Map.extend({
     } else {
       this.removeFromHiddenWidgets(widget);
     }
-  },
-  /**
-     * Checks additional rules for hidden widgets
-     * @param {can.Map} widget widget object
-     * @return {boolean} whether widget is in prohibited list
-     */
-  isInProhibitedMap(widget) {
-    const instanceType = this.attr('instance.type');
-    const shortName = widget.model.model_singular;
-
-    return prohibitedMapList[instanceType] &&
-        prohibitedMapList[instanceType].includes(shortName);
   },
   /**
      * Adds widget to hiddenWidgets for Add tab button

@@ -37,7 +37,7 @@
             Please ensure that all Administrator users are also members of <span style="white-space: nowrap">{{ggrc_config_value "GAPI_ADMIN_GROUP"}}</span>
           </p>
         {{/is}}
-        {{#scope}}<p><strong>Role Scope:</strong> {{role_scope scope}}</p>{{/scope}}
+        {{#scope}}<p><strong>Role Scope:</strong> {{role_scope this.scope}}</p>{{/scope}}
       </div>
     </li>
     {{/rolesList}}

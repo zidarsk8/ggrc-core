@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import uniqueTitle from '../mixins/unique-title';
 import timeboxed from '../mixins/timeboxed';
 import caUpdate from '../mixins/ca-update';
-import baseNotifications from '../mixins/base-notifications';
+import baseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -62,8 +62,20 @@ export default Cacheable.extend({
     context: Stub,
     modified_by: Stub,
   },
-  init: function () {
-    this.validateNonBlank('title');
-    this._super(...arguments);
+}, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
+    },
   },
-}, {});
+});

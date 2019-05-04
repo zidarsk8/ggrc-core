@@ -11,9 +11,9 @@ import {
 
 export default can.Component.extend({
   tag: 'questionnaire-mapping-link',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: false,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       externalUrl: {
         get() {
@@ -35,5 +35,5 @@ export default can.Component.extend({
     destinationModel: null,
     cssClasses: '',
     type: 'map',
-  },
+  }),
 });

@@ -7,10 +7,10 @@ import template from './checkbox-form-field-view.stache';
 
 export default can.Component.extend({
   tag: 'checkbox-form-field-view',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     value: null,
     disabled: false,
-  },
+  }),
 });

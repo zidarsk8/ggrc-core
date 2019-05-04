@@ -284,7 +284,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
          instance. This means we can have two CAD with a name "my cad", with
          different attributable_id fields.
       4) Names must not match any existing custom attribute role name
-      5) Names should not contains "*" symbol
+      5) Names should not contains special values (.validate_name_correct)
       6) Names should be stripped
 
     Third rule is handled by the database with unique key uq_custom_attribute
@@ -304,6 +304,9 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     """
 
     value = value if value is None else re.sub(r"\s+", " ", value).strip()
+
+    if key == "title":
+      validators.validate_name_correctness(value)
 
     if key == "title" and self.definition_type:
       orig_name = value
@@ -330,9 +333,6 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
 
     if definition_type == "assessment":
       self.validate_assessment_title(name)
-
-    if key == "title" and "*" in name:
-      raise ValueError(u"Attribute title contains unsupported symbol '*'")
 
     return value
 

@@ -5,49 +5,49 @@
 
 {{#switch type}}
   {{#case "input"}}
-    <text-form-field {value}="{value}"
-        {field-id}="{fieldId}"
-        {placeholder}="{placeholder}"
-        {disabled}="{disabled}"
-        (value-changed)="{fieldValueChanged(%event)}"
+    <text-form-field value:from="value"
+        fieldId:from="fieldId"
+        placeholder:from="placeholder"
+        disabled:from="disabled"
+        on:valueChanged="fieldValueChanged(scope.event)"
         class="inline-input-form-field"
     ></text-form-field>
   {{/case}}
   {{#case "text"}}
-    <rich-text-form-field {value}="{value}"
-			  {field-id}="{fieldId}"
-			  {placeholder}="{placeholder}"
-			  {disabled}="{disabled}"
-			  (value-changed)="{fieldValueChanged(%event)}"
+    <rich-text-form-field value:from="value"
+			  fieldId:from="fieldId"
+			  placeholder:from="placeholder"
+			  disabled:from="disabled"
+			  on:valueChanged="fieldValueChanged(scope.event)"
     ></rich-text-form-field>
   {{/case}}
   {{#case "checkbox"}}
-    <checkbox-form-field {value}="{value}"
-			 {field-id}="{fieldId}"
-			 {disabled}="{disabled}"
-			 (value-changed)="{fieldValueChanged(%event)}"
+    <checkbox-form-field value:from="value"
+			 fieldId:from="fieldId"
+			 disabled:from="disabled"
+			 on:valueChanged="fieldValueChanged(scope.event)"
     ></checkbox-form-field>
   {{/case}}
   {{#case "dropdown"}}
-    <dropdown-form-field {value}="{value}"
-			 {options}="{options}"
-			 {field-id}="{fieldId}"
-			 {disabled}="{disabled}"
-			 (value-changed)="{fieldValueChanged(%event)}"
+    <dropdown-form-field value:from="value"
+			 options:from="options"
+			 fieldId:from="fieldId"
+			 disabled:from="disabled"
+			 on:valueChanged="fieldValueChanged(scope.event)"
     ></dropdown-form-field>
   {{/case}}
   {{#case "date"}}
-    <date-form-field {value}="{value}"
-		     {field-id}="{fieldId}"
-		     {disabled}="{disabled}"
-		     (value-changed)="{fieldValueChanged(%event)}"
+    <date-form-field value:from="value"
+		     fieldId:from="fieldId"
+		     disabled:from="disabled"
+		     on:valueChanged="fieldValueChanged(scope.event)"
     ></date-form-field>
   {{/case}}
   {{#case "person"}}
-    <person-form-field {value}="{value}"
-		       {field-id}="{fieldId}"
-		       {disabled}="{disabled}"
-		       (value-changed)="{fieldValueChanged(%event)}"
+    <person-form-field value:from="value"
+		       fieldId:from="fieldId"
+		       disabled:from="disabled"
+		       on:valueChanged="fieldValueChanged(scope.event)"
     ></person-form-field>
   {{/case}}
 {{/switch}}

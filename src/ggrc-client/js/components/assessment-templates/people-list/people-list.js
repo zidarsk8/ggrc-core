@@ -4,12 +4,13 @@
 */
 
 import template from './people-list.stache';
+import {validateAttr} from '../../../plugins/utils/validation-utils';
 
 export default can.Component.extend({
   tag: 'people-list',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     peopleList: [],
     instance: null,
     hasEmptyValue: false,
@@ -42,9 +43,8 @@ export default can.Component.extend({
       validationError: {
         type: String,
         get() {
-          let errors = this.instance.computed_errors();
-          let attr = this.attr('peopleListAttr');
-          return errors && errors[attr] ? errors[attr] : '';
+          let attr = this.attr('listName');
+          return validateAttr(this.instance, `default_people.${attr}`);
         },
       },
     },
@@ -114,7 +114,7 @@ export default can.Component.extend({
       const data = this.attr('selectedValue');
       return data === 'other' ? this.attr('peopleList') : data;
     },
-  },
+  }),
   init() {
     this.viewModel.unpackPeopleData();
   },

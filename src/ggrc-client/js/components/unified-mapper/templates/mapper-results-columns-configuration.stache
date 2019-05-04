@@ -3,11 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<a href="javascript:void(0)" class="dropdown-toggle tview-dropdown-toggle" 
-   data-toggle="dropdown" ($click)="initializeColumns()">
+<a href="javascript:void(0)" class="dropdown-toggle tview-dropdown-toggle"
+   data-toggle="dropdown" on:el:click="initializeColumns()">
   <i class="fa fa-fw fa-bars"></i>
 </a>
-<div class="dropdown-menu dropdown-menu-form" can-click="stopPropagation">
+<div class="dropdown-menu dropdown-menu-form" on:el:click="stopPropagation">
   <tree-header-selector>
     <button type="button" class="pull-right close-dropdown">
       <i class="fa fa-times black"></i>
@@ -16,20 +16,19 @@
     <ul class="attr-list">
       {{#columns}}
         <li class="{{#mandatory}}disabled{{/mandatory}}">
-          <tree-visible-column-checkbox {column}="{.}">
+          <tree-visible-column-checkbox column:from="{.}">
           </tree-visible-column-checkbox>
         </li>
       {{/columns}}
       {{#serviceColumns}}
         <li class="{{#mandatory}}disabled{{/mandatory}}">
-          <tree-visible-column-checkbox {column}="{.}">
+          <tree-visible-column-checkbox column:from="{.}">
           </tree-visible-column-checkbox>
         </li>
       {{/serviceColumns}}
     </ul>
-    <button type="button"
-            class="btn btn-small btn-lightBlue set-tree-attrs"
-            can-click="setColumns">
+    <button type="button" class="btn btn-small btn-lightBlue set-tree-attrs"
+            on:el:click="setColumns">
       Set fields
     </button>
   </tree-header-selector>

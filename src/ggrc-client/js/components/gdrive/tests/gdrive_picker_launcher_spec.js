@@ -113,30 +113,33 @@ describe('gdrive-picker-launcher', function () {
         spyOn(viewModel, 'createDocumentModel').and.returnValue(createModelDfd);
       });
 
-      it('when uploadFiles() was failed', function () {
+      it('when uploadFiles() was failed', function (done) {
         uploadFilesDfd.reject();
 
-        viewModel.trigger_upload(viewModel, el);
-
-        expect(viewModel.attr('isUploading')).toBe(false);
+        viewModel.trigger_upload(viewModel, el).fail(() => {
+          expect(viewModel.attr('isUploading')).toBe(false);
+          done();
+        });
       });
 
-      it('after createDocumentModel() success', function () {
+      it('after createDocumentModel() success', function (done) {
         uploadFilesDfd.resolve();
         createModelDfd.resolve([]);
 
-        viewModel.trigger_upload(viewModel, el);
-
-        expect(viewModel.attr('isUploading')).toBe(false);
+        viewModel.trigger_upload(viewModel, el).then(() => {
+          expect(viewModel.attr('isUploading')).toBe(false);
+          done();
+        });
       });
 
-      it('when createDocumentModel() was failed', function () {
+      it('when createDocumentModel() was failed', function (done) {
         uploadFilesDfd.resolve();
         createModelDfd.reject();
 
-        viewModel.trigger_upload(viewModel, el);
-
-        expect(viewModel.attr('isUploading')).toBe(false);
+        viewModel.trigger_upload(viewModel, el).fail(() => {
+          expect(viewModel.attr('isUploading')).toBe(false);
+          done();
+        });
       });
     });
   });
@@ -157,18 +160,24 @@ describe('gdrive-picker-launcher', function () {
       spyOn(pickerUtils, 'uploadFiles').and.returnValue(uploadFilesDfd);
     });
 
-    it('sets "isUploading" flag to true', function () {
+    it('sets "isUploading" flag to true', function (done) {
       parentFolderDfd.resolve(parentFolderStub);
       viewModel.attr('isUploading', false);
 
-      viewModel.trigger_upload_parent(viewModel, el);
-
-      expect(viewModel.attr('isUploading')).toBe(true);
+      viewModel.trigger_upload_parent(viewModel, el).then(() => {
+        expect(viewModel.attr('isUploading')).toBe(true);
+        done();
+      });
     });
 
     describe('sets "isUploading" flag to false', function () {
       beforeEach(function () {
         viewModel.attr('isUploading', true);
+        jasmine.clock().install();
+      });
+
+      afterEach(function () {
+        jasmine.clock().uninstall();
       });
 
       it('after uploadFiles() success', function () {
@@ -179,6 +188,7 @@ describe('gdrive-picker-launcher', function () {
 
         viewModel.trigger_upload_parent(viewModel, el);
 
+        jasmine.clock().tick(1);
         expect(viewModel.attr('isUploading')).toBe(false);
       });
 
@@ -188,6 +198,7 @@ describe('gdrive-picker-launcher', function () {
 
         viewModel.trigger_upload_parent(viewModel, el);
 
+        jasmine.clock().tick(1);
         expect(viewModel.attr('isUploading')).toBe(false);
       });
     });

@@ -14,9 +14,9 @@ import template from './templates/review-proposal.stache';
 
 export default can.Component.extend({
   tag: 'review-proposal',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       buttonView: {
         get() {
@@ -133,7 +133,7 @@ export default can.Component.extend({
         revisionsComparer.viewModel().compareIt();
       }
     },
-  },
+  }),
   events: {
     inserted() {
       this.viewModel.attr('$el', this.element);

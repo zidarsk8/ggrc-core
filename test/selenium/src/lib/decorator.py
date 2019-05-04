@@ -7,7 +7,7 @@ import logging
 import time
 from functools import wraps
 
-from lib import constants, environment, exception, file_ops, users
+from lib import constants, environment, exception, file_ops
 from lib.utils import selenium_utils
 
 LOGGER = logging.getLogger(__name__)
@@ -96,21 +96,6 @@ def track_time(fun):
     elapsed_time = time.time() - start_time
     print "Execution of '{0:s}' function took {1:.3f} s".format(
         fun.func_name, elapsed_time)
-    return result
-  return wrapper
-
-
-def work_by_external_user(fun):
-  """Decorator to work by external user and return to previous user."""
-  from lib.entities import entities_factory
-
-  def wrapper(*args, **kwargs):
-    "Wrapper."
-    user = users.current_user()
-    users.set_current_user(users.EXTERNAL_APP_USER)
-    users.set_current_user(entities_factory.PeopleFactory.external_app_user)
-    result = fun(*args, **kwargs)
-    users.set_current_user(user)
     return result
   return wrapper
 

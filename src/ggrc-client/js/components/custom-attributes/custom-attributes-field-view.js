@@ -12,10 +12,10 @@ import template from './custom-attributes-field-view.stache';
 
 export default can.Component.extend({
   tag: 'custom-attributes-field-view',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     type: null,
     value: null,
-  },
+  }),
 });

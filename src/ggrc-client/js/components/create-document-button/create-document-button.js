@@ -22,7 +22,7 @@ import Context from '../../models/service-models/context';
 const viewModel = can.Map.extend({
   parentInstance: null,
   openPicker() {
-    uploadFiles()
+    return uploadFiles()
       .then((files) => {
         this.mapDocuments(files);
       }, () => {
@@ -142,7 +142,7 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'create-document-button',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
 });

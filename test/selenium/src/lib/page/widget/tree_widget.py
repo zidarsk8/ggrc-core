@@ -81,6 +81,20 @@ class TreeItem(object):
     """Clicks tree item to open info panel."""
     self._root.element(class_name="selectable-attrs").click()
 
+  def hover(self):
+    """Hovers over tree item."""
+    self._root.element(class_name="selectable-attrs").hover()
+
+  def hover_actions_gear(self):
+    """Hovers over gear actions for tree item."""
+    self.hover()
+    self._root.element(tag_name="tree-item-actions").hover()
+
+  def select_map_to_this_object(self):
+    """Select map to this object from gear."""
+    self.hover_actions_gear()
+    self._root.link(data_toggle="unified-mapper").click()
+
   @property
   def is_expanded(self):
     """Returns whether the row is expanded."""

@@ -305,49 +305,6 @@ class TestSyncServiceControl(TestCase):
     ).one()
     self.assertIsNotNone(revision)
 
-  @ddt.data((" http://www.some.url", " http://www.some.url"),
-            ("<a>http://www.some.url</a>",
-             "<a>http://www.some.url</a>"))
-  @ddt.unpack
-  def test_control_rich_text_validate(self, initial_value, expected_value):
-    """Test rich text validation for control."""
-    response = self.api.post(all_models.Control, {
-        "control": {
-            "id": 11111,
-            "title": "Some title",
-            "context": None,
-            "external_id": factories.SynchronizableExternalId.next(),
-            "external_slug": factories.random_str(),
-            "assertions": '["any assertion"]',
-            "review_status": all_models.Review.STATES.UNREVIEWED,
-            "review_status_display_name": "any status",
-        },
-    })
-    self.assertEqual(response.status_code, 201)
-    control = all_models.Control.query.filter_by(title="Some title").first()
-
-    cad = factories.CustomAttributeDefinitionFactory(
-        definition_type="control",
-        definition_id=control.id,
-        attribute_type="Rich Text",
-        title="CA",
-    )
-
-    response = self.api.post(all_models.CustomAttributeValue, {
-        "custom_attribute_value": {
-            "custom_attribute_id": cad.id,
-            "attributable_type": "control",
-            "attributable_id": control.id,
-            "attribute_value": initial_value,
-            "context": {"id": None},
-        }
-    })
-    self.assertEqual(response.status_code, 201)
-
-    control = all_models.Control.query.filter_by(title="Some title").first()
-    self.assertEqual(control.custom_attribute_values[0].attribute_value,
-                     expected_value)
-
   def test_create_with_assertions(self):
     """Check control creation with assertions pass"""
     response = self.api.post(all_models.Control, {

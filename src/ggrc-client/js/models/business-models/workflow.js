@@ -59,12 +59,15 @@ export default Cacheable.extend({
     display_attr_names: ['title', 'status', 'updated_at', 'Admin',
       'Workflow Member'],
   },
-
-  init: function () {
-    this._super && this._super(...arguments);
-    this.validateNonBlank('title');
-  },
 }, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+  },
   /**
    * Saves or updates workflow
    * @param {Boolean} createDefaultTaskGroup if set to true default TaskGroup

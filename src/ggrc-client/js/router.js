@@ -10,8 +10,8 @@ class RouterConfig {
     routes.forEach((route) => {
       can.route(route.template, route.defaults);
     });
-    can.route.map(router);
-    can.route.ready();
+    can.route.data = router;
+    can.route.start();
   }
 }
 

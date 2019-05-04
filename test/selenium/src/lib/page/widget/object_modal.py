@@ -6,13 +6,13 @@
 * Proposal for object
 """
 from lib import base
-from lib.constants import objects
+from lib.constants import objects, locator
 from lib.element import page_elements
 from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
-from lib.page.modal import unified_mapper, delete_object
+from lib.page.modal import delete_object
 from lib.page.modal.repeat_workflow_modal import RepeatWorkflowModal
-from lib.utils import ui_utils
+from lib.utils import ui_utils, selenium_utils
 
 
 def get_modal_obj(obj_type, _selenium=None):
@@ -53,7 +53,7 @@ class BaseObjectModal(base.WithBrowser):
     self.title_field = self._root.text_field(name="title")
     self.description_field = self._root.div(
         data_placeholder="Enter Description")
-    self.state_select = self._root.select(can_value="instance.status")
+    self.state_select = self._root.element(id="state").select()
     self.code_field = self._root.text_field(name="slug")
     self._fields = ["title", "description", "status", "slug"]
     self.close_btn = self._root.element(class_name="modal-dismiss")
@@ -132,6 +132,12 @@ class BaseObjectModal(base.WithBrowser):
     """Checks presence of modal element."""
     return self._root.exist
 
+  def close(self):
+    """Close modal window."""
+    self.close_btn.click()
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locators.MODAL_CSS)
+
 
 class DiscardChangesModal(BaseObjectModal):
   """Represents discard changes modal."""
@@ -195,12 +201,12 @@ class AssessmentModal(BaseObjectModal):
 
   def map_objects(self, objs):
     """Maps objects using `Map Objects` button."""
+    from lib.page.modal import unified_mapper
     objs = [entity.Representation.repr_dict_to_obj(obj)
             if isinstance(obj, dict) else obj for obj in objs]
     # Ordinary `click()` doesn't work in headless Chrome in this case
     self._root.element(class_name="assessment-map-btn").js_click()
-    mapper = unified_mapper.AssessmentCreationMapperModal(
-        self._driver, "assessments")
+    mapper = unified_mapper.AssessmentCreationMapperModal(self._driver)
     mapper.map_dest_objs(
         dest_objs_type=objs[0].type,
         dest_objs_titles=[obj.title for obj in objs])
@@ -278,3 +284,11 @@ class TaskGroupModal(BaseObjectModal):
   def __init__(self):
     super(TaskGroupModal, self).__init__()
     self._fields = ["title"]
+
+
+class UnifiedMapperModal(BaseObjectModal):
+  """Represents unified mapper object modal."""
+
+  def __init__(self):
+    super(UnifiedMapperModal, self).__init__()
+    self._root = self._browser.element(css=locator.Common.MODAL_MAPPER)

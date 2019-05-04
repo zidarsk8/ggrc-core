@@ -23,7 +23,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'revision-log',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   /**
    * The component's entry point. Invoked when a new component instance has
@@ -36,7 +36,7 @@ export default can.Component.extend({
 
     viewModel.fetchItems();
   },
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       showFilter: {
         get() {
@@ -223,7 +223,7 @@ export default can.Component.extend({
         this.attr('review', reifyUtil(review));
       }
     },
-  },
+  }),
   events: {
     '{viewModel.instance} refreshInstance': function () {
       this.viewModel.fetchItems();

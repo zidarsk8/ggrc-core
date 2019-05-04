@@ -22,9 +22,9 @@ import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-picker-launcher',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       isInactive: {
         get: function () {
@@ -35,9 +35,9 @@ export default can.Component.extend({
     modelType: 'Document',
     tooltip: null,
     instance: {},
-    link_class: '@',
-    click_event: '@',
-    confirmationCallback: '@',
+    link_class: '',
+    click_event: '',
+    confirmationCallback: '',
     disabled: false,
     isUploading: false,
 
@@ -67,12 +67,13 @@ export default can.Component.extend({
       });
     },
     trigger_upload: function (scope, el) {
+      let $el = $(el);
       let stopFn = () => {};
 
       this.attr('isUploading', true);
-      uploadFiles({
-        parentId: el.data('folder-id'),
-        pickFolder: el.data('type') === 'folders',
+      return uploadFiles({
+        parentId: $el.data('folder-id'),
+        pickFolder: $el.data('type') === 'folders',
       })
         .then((files) => {
           let filesCount = files && files.length ? files.length : 0;
@@ -92,7 +93,7 @@ export default can.Component.extend({
         .fail((err) => {
           stopFn(true);
           if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
-            el.trigger('rejected');
+            $el.trigger('rejected');
           }
         });
     },
@@ -115,10 +116,10 @@ export default can.Component.extend({
       }
       bindXHRToButton(parentFolderDfd, el);
 
-      parentFolderDfd
+      return parentFolderDfd
         .done(function (parentFolder) {
           that.attr('isUploading', true);
-          uploadFiles({
+          return uploadFiles({
             parentId: parentFolder.id,
           })
             .then((files) => {
@@ -201,5 +202,5 @@ export default can.Component.extend({
         notifierXHR('error', xhr);
       });
     },
-  },
+  }),
 });

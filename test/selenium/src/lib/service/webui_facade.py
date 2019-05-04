@@ -4,17 +4,17 @@
 import copy
 import re
 
-from lib import url, users, base, decorator
+from lib import url, users, base
 from lib.constants import objects, element
 from lib.entities import entities_factory
 from lib.page import dashboard
+from lib.page.modal import unified_mapper
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_service, rest_service, rest_facade
 from lib.service.webui_service import ControlsService
 from lib.utils import selenium_utils, ui_utils, string_utils
 
 
-@decorator.work_by_external_user
 def create_control_in_program_scope(selenium, program):
   """Create control via UI."""
   controls_service = webui_service.ControlsService(selenium)
@@ -226,3 +226,17 @@ def approve_obj_review(selenium, obj):
 def get_object(selenium, obj):
   """Get and return object from Info page."""
   return _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
+
+
+def map_object_via_unified_mapper(selenium, obj_name, dest_objs_type,
+                                  return_tree_items=True,
+                                  open_in_new_frontend=False):
+  """Maps selected obj to dest_obj_type via Unified Mapper."""
+  modal = unified_mapper.MapObjectsModal(driver=selenium, obj_name=obj_name)
+  modal.search_dest_objs(dest_objs_type=dest_objs_type,
+                         return_tree_items=return_tree_items)
+  if open_in_new_frontend:
+    modal.open_in_new_frontend_btn.click()
+  else:
+    raise NotImplementedError
+  return modal

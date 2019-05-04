@@ -8,8 +8,8 @@ import {getTruncatedList} from '../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'tree-field',
-  template: can.stache(template),
-  viewModel: {
+  view: can.stache(template),
+  viewModel: can.Map.extend({
     define: {
       tooltipContent: {
         get() {
@@ -20,5 +20,5 @@ export default can.Component.extend({
     },
     showTooltip: true,
     source: [],
-  },
+  }),
 });

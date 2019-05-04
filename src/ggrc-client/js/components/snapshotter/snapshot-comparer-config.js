@@ -6,7 +6,7 @@
 export default can.Component.extend({
   tag: 'snapshot-comparer-config',
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       rightRevision: {
         get() {
@@ -15,10 +15,10 @@ export default can.Component.extend({
       },
     },
     instance: {},
-    leftRevisionId: '@',
+    leftRevisionId: '',
     rightRevisions: [],
     modalTitle: 'Compare with the latest version',
     modalConfirm: 'Update',
     buttonView: `${GGRC.templates_path}/modals/prompt_buttons.stache`,
-  },
+  }),
 });

@@ -1,15 +1,16 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modals for map objects."""
-
 from lib import base, decorator
 from lib.constants import element, locator, value_aliases as alias, objects
+from lib.page.widget import object_modal
 from lib.utils import selenium_utils
 
 
-class CommonUnifiedMapperModal(base.Modal):
+class CommonUnifiedMapperModal(object_modal.BaseObjectModal):
   """Common unified mapper modal."""
   # pylint: disable=too-many-instance-attributes
+  # pylint: disable=inconsistent-return-statements
   _locators = locator.ModalMapObjects
   _elements = element.UnifiedMapperModal
 
@@ -30,7 +31,9 @@ class CommonUnifiedMapperModal(base.Modal):
     self._add_attr_btn = None
     self.search_result_toggle = base.Toggle(
         self.modal_elem, self._locators.RESULT_TOGGLE_CSS)
-    self.close_btn = base.Button(self.modal_elem, self._locators.CLOSE_BTN_CSS)
+    self.open_in_new_frontend_btn = self._browser.link(
+        class_name=["btn", "btn-small", "btn-white"],
+        text="Open in new frontend")
 
   def get_available_to_map_obj_aliases(self):
     """Return texts of all objects available to map via UnifiedMapper."""
@@ -126,24 +129,33 @@ class CommonUnifiedMapperModal(base.Modal):
     selenium_utils.get_when_invisible(
         self._driver, locator.TreeView.NO_RESULTS_MSG_CSS)
 
-  def search_dest_objs(self, dest_objs_type, dest_objs_titles,
-                       is_asmts_generation=False):
+  def search_dest_objs(self, dest_objs_type, dest_objs_titles=None,
+                       is_asmts_generation=False, return_tree_items=True):
     """Filter and search destination objects according to them type and titles.
     If is_asmts_generation then TextFilterDropdown is using.
+    If moved_to_new_frontend then doesn't return tree items.
     """
     if not self.filter_toggle.is_activated:
       self.filter_toggle.toggle()
     self._select_dest_obj_type(obj_name=dest_objs_type,
                                is_asmts_generation=is_asmts_generation)
-    for enum, title in enumerate(dest_objs_titles):
-      if enum == 0:
-        operator = None
-      else:
-        operator = alias.OR_OP
-      self.add_filter_attr(self._elements.ATTRIBUTE_TITLE, title,
-                           operator=operator)
+    # Add filter attr.
+    if dest_objs_titles:
+      for enum, title in enumerate(dest_objs_titles):
+        if enum == 0:
+          operator = None
+        else:
+          operator = alias.OR_OP
+        self.add_filter_attr(self._elements.ATTRIBUTE_TITLE, title,
+                             operator=operator)
     self._select_search_dest_objs()
-    return self.tree_view.get_list_members_as_list_scopes()
+    # Return items or check nothin is returned.
+    if return_tree_items:
+      return self.tree_view.get_list_members_as_list_scopes()
+    else:
+      found_mapper_results = self._browser.elements(
+          css=locator.CommonModalUnifiedMapper.FOUND_MAPPER_RESULTS_CSS)
+      assert not found_mapper_results.to_list, "Search shouldn't return items."
 
   def map_dest_objs(self, dest_objs_type, dest_objs_titles,
                     is_asmts_generation=False):
@@ -160,17 +172,10 @@ class CommonUnifiedMapperModal(base.Modal):
   def click_create_and_map_obj(self):
     """Clicks `Create and map new object` link
     and returns new modal for object."""
-    from lib.page.widget import object_modal
     self._browser.element(class_name="modal-header").button(
         text="Create and map new object").click()
     return object_modal.get_modal_obj(
         obj_type=objects.get_singular(self.tree_view.obj_name))
-
-  def close_modal(self):
-    """Close Unified Mapper's modal window."""
-    self.close_btn.click()
-    selenium_utils.wait_until_not_present(
-        self._driver, self._locators.MODAL_CSS)
 
 
 class MapObjectsModal(CommonUnifiedMapperModal):
@@ -215,6 +220,9 @@ class CloneOrCreateAssessmentTemplatesModal(CommonUnifiedMapperModal):
 
 class AssessmentCreationMapperModal(CommonUnifiedMapperModal):
   """Class for UnifiedMapper modal on Assessment Edit/Create Modal."""
+  def __init__(self, driver, obj_name=objects.ASSESSMENTS):
+    super(AssessmentCreationMapperModal, self).__init__(driver, obj_name)
+
   def _confirm_items_added(self):
     """Wait until items shown on Edit/Create Assessment Modal."""
     selenium_utils.get_when_invisible(

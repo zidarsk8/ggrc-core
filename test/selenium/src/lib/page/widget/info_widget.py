@@ -14,12 +14,23 @@ from lib.constants import (
 from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import (
     info_widget_three_bbs, page_elements, tables, tab_element, tab_containers)
+from lib.page import dashboard
 from lib.page.modal import apply_decline_proposal, set_value_for_asmt_ca
 from lib.page.widget import (
     info_panel, object_modal, object_page, related_proposals)
 from lib.page.widget.page_mixins import (
     WithAssignFolder, WithObjectReview, WithPageElements)
 from lib.utils import selenium_utils, help_utils, ui_utils
+
+
+def get_widget_bar(obj_name):
+  """Gets widget bar for object based on its name."""
+  mapping = {
+      objects.ASSESSMENTS: Assessments,
+      objects.CONTROLS: Controls,
+      objects.RISKS: Risks,
+  }
+  return mapping.get(obj_name, InfoWidget)()
 
 
 class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
@@ -46,6 +57,8 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     self.inline_edit_controls = self._browser.elements(
         class_name="set-editable-group")
     self.tabs = tab_element.Tabs(self._browser, tab_element.Tabs.INTERNAL)
+    self.add_tab_btn = self._browser.element(
+        data_test_id="button_widget_add_2c925d94")
     self._attributes_tab_name = "Attributes"
     self._changelog_tab_name = "Change Log"
     # for overridable methods
@@ -319,6 +332,21 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     return tab_containers.changelog_tab_validate(
         self._browser.driver, self._active_tab_root.wd)
 
+  def get_changelog_entries(self):
+    """Returns list of entries from changelog."""
+    self.tabs.ensure_tab(self._changelog_tab_name)
+    ui_utils.wait_for_spinner_to_disappear()
+    log_items = []
+    entry_list = self._browser.elements(class_name="w-status")
+    for entry in entry_list:
+      entry_data = {"author": entry.element(tag_name="person-data").text}
+      for row in entry.elements(class_name="clearfix"):
+        data = row.text.split("\n")
+        entry_data.update({data[0]: {"original_value": data[1],
+                                     "new_value": data[2]}})
+      log_items.append(entry_data)
+    return log_items
+
   def edit_obj(self, **changes):
     """Makes changes `changes` to object."""
     self.three_bbs.select_edit()
@@ -340,6 +368,17 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
   def is_comments_panel_present(self):
     """Returns whether comments panel exists on the page."""
     return self._comment_area().exists
+
+  def get_hidden_items_from_add_tab(self):
+    """Returns all hidden items from 'Add Tab' dropdown."""
+    dropdown = self.click_add_tab_btn()
+    hidden_items = dropdown.get_all_hidden_items()
+    return hidden_items
+
+  def click_add_tab_btn(self):
+    """Clicks 'Add Tab' button."""
+    self.add_tab_btn.click()
+    return dashboard.CreateObjectDropdown()
 
 
 class Programs(InfoWidget):
@@ -803,6 +842,11 @@ class Controls(WithAssignFolder, InfoWidget):
     """Returns Primary Contacts page element"""
     return self._related_people_list(
         roles.CONTROL_OPERATORS, self._root)
+
+  @property
+  def control_owners(self):
+    """Returns Control Owners page element."""
+    return self._related_people_list(roles.CONTROL_OWNERS, self._root)
 
   def select_first_available_date(self):
     """Select first available day on datepicker on submit for review popup."""

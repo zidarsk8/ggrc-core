@@ -5,26 +5,26 @@
 
 <div data-id="reference_url_hidden" class="span12">
   <deferred-mapper
-    {instance}="{instance}">
+    instance:from="instance">
     <related-documents
-      {instance}="{instance}"
-      {kind}="'REFERENCE_URL'"
-      {autorefresh}="{false}"
-      (add-mappings)="{addMappings(%event.objects)}"
-      (remove-mappings)="{removeMappings(%event.object)}">
+      instance:from="instance"
+      kind:from="'REFERENCE_URL'"
+      autorefresh:from="false"
+      on:addMappings="addMappings(scope.event.objects)"
+      on:removeMappings="removeMappings(scope.event.object)">
       <!-- tabindex is necessary to work of 'Hide optional field' function -->
       <related-urls
         tabindex="20"
-        {instance}="{instance}"
-        {allow-to-remove}="{new_object_form}"
-        {(urls)}="{documents}"
-        {is-disabled}="{isLoading}"
-        (createUrl)="{markDocumentForAddition(%event.payload)}"
-        (removeUrl)="{markDocumentForDeletion(%event.payload)}">
+        instance:from="instance"
+        allowToRemove:from="new_object_form"
+        urls:bind="documents"
+        isDisabled:from="isLoading"
+        on:createUrl="markDocumentForAddition(scope.event.payload)"
+        on:removeUrl="markDocumentForDeletion(scope.event.payload)">
         <label>
           Reference URL
           <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
-          <spinner-component {toggle}="{isDisabled}"></spinner-component>
+          <spinner-component toggle:from="isDisabled"></spinner-component>
         </label>
         <a data-id="hide_reference_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </related-urls>

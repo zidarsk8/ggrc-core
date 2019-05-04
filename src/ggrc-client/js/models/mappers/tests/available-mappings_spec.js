@@ -43,6 +43,7 @@ describe('Mappings', () => {
       'Audit',
     ],
     workflow: [
+      'CycleTaskGroupObjectTask',
       'TaskGroup',
       'Workflow',
     ],
@@ -58,7 +59,7 @@ describe('Mappings', () => {
     Assessment: [...snapshotableObjects, 'Evidence', 'Audit', 'Person'],
     AssessmentTemplate: ['Audit'],
     Audit: [...snapshotableObjects, 'Evidence', 'Assessment',
-      'AssessmentTemplate', 'Person', 'Program'],
+      'AssessmentTemplate', 'CycleTaskGroupObjectTask', 'Person', 'Program'],
     Contract: _.difference(coreObjectsRules, ['Contract']),
     Control: coreObjectsRules,
     CycleTaskGroupObjectTask: [...modules.core, 'Audit', 'Person', 'Program',

@@ -7,9 +7,9 @@
   <div class="general-page-header pane-header {{#if snapshot}}snapshot{{/if}}" >
     <div class="pane-header__container">
       <div class="pane-header__title" data-test-id="title_0ad9fbaf">
-        {{#is_info_pin}}
+        {{#if is_info_pin}}
           <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
-        {{/is_info_pin}}
+        {{/if}}
         <div class="general-page-header__title-details">
           <div class="action-toolbar general-page-header__title-wrapper">
             {{#if instance.is_mega}}
@@ -20,8 +20,8 @@
             <div class="action-toolbar__controls">
               <div class="action-toolbar__controls-item">
                 <proposable-control
-                  {instance}="{instance}"
-                  {attr-name}="'title'"
+                  instance:from="instance"
+                  attrName:from="'title'"
                 ></proposable-control>
               </div>
             </div>
@@ -41,8 +41,8 @@
               <div class="action-toolbar__controls">
                 <div class="action-toolbar__controls-item">
                   <proposable-control
-                    {instance}="{instance}"
-                    {attr-name}="'status'"
+                    instance:from="instance"
+                    attrName:from="'status'"
                   ></proposable-control>
                 </div>
               </div>
@@ -79,12 +79,12 @@
       </div>
 
       <div class="pane-header__toolbar">
-        {{#is_info_pin}}
-          <info-pin-buttons {maximized}="{maximized}"
-                            {on-change-maximized-state}="{@onChangeMaximizedState}"
-                            {on-close}="{@onClose}">
+        {{#if is_info_pin}}
+          <info-pin-buttons maximized:from="maximized"
+                            onChangeMaximizedState:from="@onChangeMaximizedState"
+                            onClose:from="@onClose">
           </info-pin-buttons>
-        {{/is_info_pin}}
+        {{/if}}
 
         {{> /static/templates/base_objects/info-pane-utility.stache}}
       </div>
@@ -94,17 +94,17 @@
           <div class="pane-header__snapshot-info">
             <hr class="snapshot">
               <snapshot-comparer-config
-                {instance}="{instance}"
-                {left-revision-id}="{instance.snapshot.revision_id}"
-                {right-revisions}="{instance.snapshot.revisions}">
+                instance:from="instance"
+                leftRevisionId:from="instance.snapshot.revision_id"
+                rightRevisions:from="instance.snapshot.revisions">
                   <revisions-comparer
-                    {modal-title}="{modalTitle}"
-                    {modal-confirm}="{modalConfirm}"
-                    {button-view}="{buttonView}"
-                    {instance}="{instance}"
-                    {left-revision-id}="{leftRevisionId}"
-                    {right-revision}="{rightRevision}">
-                      <a href="javascript://" can-click="compareIt">Get the latest version</a>
+                    modalTitle:from="modalTitle"
+                    modalConfirm:from="modalConfirm"
+                    buttonView:from="buttonView"
+                    instance:from="instance"
+                    leftRevisionId:from="leftRevisionId"
+                    rightRevision:from="rightRevision">
+                      <a href="javascript://" on:el:click="compareIt">Get the latest version</a>
                   </revisions-comparer>
               </snapshot-comparer-config>
           </div>

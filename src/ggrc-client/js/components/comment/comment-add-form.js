@@ -17,33 +17,28 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
  */
 export default can.Component.extend({
   tag: 'comment-add-form',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       notificationsInfo: {
-        value: 'Send Notifications',
         set(newValue) {
-          return this.attr('instance').class.category === 'scope' ?
+          return this.attr('instance').constructor.category === 'scope' ?
             'Notify Contacts' :
             newValue;
         },
       },
       tooltipTitle: {
         get() {
-          let title;
-          if (this.attr('instance').class.category === 'scope') {
-            title = 'Comments will be sent as a part of daily digest email ' +
-            'notifications to Admins, Assignee, Verifier, ' +
-            'Compliance Contacts, Primary Contacts, Secondary Contacts, ' +
-            'Product Managers, Technical Leads, Technical / Program Managers,' +
-            ' Legal Counsels, System Owners, Line of Defense One Contacts, ' +
-            'Vice Presidents';
-          } else {
-            title = 'Comments will be sent as part of daily digest email ' +
-            'notification.';
+          const title = 'Comments will be sent as part of daily digest email ' +
+          'notification';
+          const category = this.attr('instance').constructor.category;
+          const recipients = this.attr('instance').recipients;
+
+          if (['scope', 'programs'].includes(category)) {
+            return `${title} to ${recipients.replace(/,/g, ', ')}.`;
           }
-          return title;
+          return `${title}.`;
         },
       },
     },
@@ -99,5 +94,5 @@ export default can.Component.extend({
           self.afterCreation(comment, false);
         });
     },
-  },
+  }),
 });

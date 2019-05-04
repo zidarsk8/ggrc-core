@@ -7,15 +7,15 @@ import template from './reusable-objects-item.stache';
 
 export default can.Component.extend({
   tag: 'reusable-objects-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     disabled: false,
     reuseAllowed: true,
     instance: {},
     selectedList: [],
     isChecked: false,
-  },
+  }),
   events: {
     '{viewModel} isChecked'(viewModel, ev, isChecked) {
       let list = viewModel.attr('selectedList');
@@ -32,7 +32,7 @@ export default can.Component.extend({
     },
     '{viewModel.selectedList} change'(list) {
       let instance = this.viewModel.attr('instance');
-      let index = list.indexOf(instance);
+      let index = $.makeArray(list).indexOf(instance);
 
       this.viewModel.attr('isChecked', index >= 0);
     },

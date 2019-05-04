@@ -5,10 +5,7 @@
 
 from ggrc.models.assessment import Assessment
 from integration.ggrc import TestCase
-from integration.ggrc import generator
 from integration.ggrc.models import factories
-
-GENERATOR = generator.ObjectGenerator()
 
 
 # pylint: disable=too-many-instance-attributes
@@ -227,54 +224,6 @@ class TestPreconditionsFailed(TestCase):
     self.assertEqual(set(ca.value.preconditions_failed),
                      {"url", "comment", "evidence"})
 
-  def test_preconditions_failed_with_changed_value(self):
-    """Preconditions failed and comment invalidated on update to CAV."""
-    ca = CustomAttributeMock(
-        self.assessment,
-        attribute_type="Dropdown",
-        dropdown_parameters=("foo,comment_required", "0,1"),
-        value=None,  # the value is made with generator to store revision too
-    )
-    _, ca.value = GENERATOR.generate_custom_attribute_value(
-        custom_attribute_id=ca.definition.id,
-        attributable=self.assessment,
-        attribute_value="comment_required",
-    )
-    comment = factories.CommentFactory(
-        assignee_type="Assignees",
-        description="Mandatory comment",
-    )
-    comment.custom_attribute_revision_upd({
-        "custom_attribute_revision_upd": {
-            "custom_attribute_value": {
-                "id": ca.value.id,
-            },
-        },
-    })
-    factories.RelationshipFactory(
-        source=self.assessment,
-        destination=comment,
-    )
-
-    # new CA value not requiring comment
-    self.assessment.custom_attribute_values = [{
-        "attribute_value": "foo",
-        "custom_attribute_id": ca.definition.id,
-    }]
-    GENERATOR.api.modify_object(self.assessment, {})
-
-    # new CA value requiring comment; the old comment should be considered
-    # invalid
-    self.assessment.custom_attribute_values = [{
-        "attribute_value": "comment_required",
-        "custom_attribute_id": ca.definition.id,
-    }]
-    GENERATOR.api.modify_object(self.assessment, {})
-
-    preconditions_failed = self.assessment.preconditions_failed
-
-    self.assertTrue(preconditions_failed)
-
   def test_preconditions_failed_with_missing_several_mandatory_evidences(self):
     """Preconditions failed if count(evidences) < count(evidences_required)."""
     ca1 = CustomAttributeMock(
@@ -349,40 +298,6 @@ class TestPreconditionsPassed(TestCase):
     """No preconditions failed if global mandatory CA is filled."""
     ca = CustomAttributeMock(self.assessment, mandatory=True, global_=True,
                              value="Foo")
-
-    preconditions_failed = self.assessment.preconditions_failed
-
-    self.assertFalse(preconditions_failed)
-    self.assertFalse(ca.value.preconditions_failed)
-
-  def test_preconditions_failed_with_present_mandatory_comment(self):
-    """No preconditions failed if comment required by CA is present."""
-    ca = CustomAttributeMock(
-        self.assessment,
-        attribute_type="Dropdown",
-        dropdown_parameters=("foo,comment_required", "0,1"),
-        value=None,  # the value is made with generator to store revision too
-    )
-    _, ca.value = GENERATOR.generate_custom_attribute_value(
-        custom_attribute_id=ca.definition.id,
-        attributable=self.assessment,
-        attribute_value="comment_required",
-    )
-    comment = factories.CommentFactory(
-        assignee_type="Assignees",
-        description="Mandatory comment",
-    )
-    comment.custom_attribute_revision_upd({
-        "custom_attribute_revision_upd": {
-            "custom_attribute_value": {
-                "id": ca.value.id,
-            },
-        },
-    })
-    factories.RelationshipFactory(
-        source=self.assessment,
-        destination=comment,
-    )
 
     preconditions_failed = self.assessment.preconditions_failed
 

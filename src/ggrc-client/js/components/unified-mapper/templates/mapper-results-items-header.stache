@@ -10,14 +10,17 @@
         {{attr_title}}
       </div>
     {{else}}
-      <div class="title title_sortable" can-click="applySort">
+      <div class="title title_sortable" on:el:click="applySort">
         {{attr_title}}
-        {{#isSorted}}
+        {{#if isSorted}}
           <i class="fa
-            {{#isSortedAsc}}fa-caret-up{{/isSortedAsc}}
-            {{^isSortedAsc}}fa-caret-down{{/isSortedAsc}}">
+            {{#if isSortedAsc}}
+              fa-caret-up
+            {{else}}
+              fa-caret-down
+            {{/if}}">
           </i>
-        {{/isSorted}}
+        {{/if}}
       </div>
     {{/if}}
   {{/each}}

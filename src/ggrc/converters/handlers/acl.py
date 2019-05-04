@@ -4,6 +4,7 @@
 """Handlers for access control roles."""
 
 from ggrc.converters.handlers import handlers
+from ggrc.login import get_current_user
 
 
 class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
@@ -32,3 +33,20 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
         for acp in self.acl.access_control_people
     )
     return "\n".join(people)
+
+  def insert_object(self):
+    """Set the assignee type of imported comments"""
+    if self.row_converter.comments:
+      current_user = get_current_user()
+      role_name = self.acl.ac_role.name
+      parent = self.row_converter.obj
+      acl_people = [person for person, acl in parent.access_control_list
+                    if acl.ac_role.name == self.acl.ac_role.name]
+
+      if current_user in acl_people:
+        for comment in self.row_converter.comments:
+          if role_name not in comment.assignee_type:
+            if comment.assignee_type:
+              comment.assignee_type += ',' + role_name
+            else:
+              comment.assignee_type = role_name

@@ -15,9 +15,9 @@ const MENTION_REGEX = /(^.*[\s]|^)[@+]([\S]*)$/s;
  */
 export default can.Component.extend({
   tag: 'people-mention',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: false,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       editor: {
         set(editor) {
@@ -111,7 +111,7 @@ export default can.Component.extend({
       editor.setSelection(retainLength + mention.length + 1);
       this.clearMention();
     },
-  },
+  }),
   events: {
     '{window} click'() {
       this.viewModel.clearMention();

@@ -8,9 +8,9 @@ import template from './person-form-field.stache';
 
 export default can.Component.extend({
   tag: 'person-form-field',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       inputValue: {
         set(newValue) {
@@ -53,5 +53,5 @@ export default can.Component.extend({
         value: newValue,
       });
     },
-  },
+  }),
 });

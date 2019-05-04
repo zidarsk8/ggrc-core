@@ -8,9 +8,9 @@ import {unitOptions as workflowUnitOptions} from '../../apps/workflow-config';
 
 export default can.Component.extend({
   tag: 'repeat-on-summary',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       unitText: {
         get: function () {
@@ -37,5 +37,5 @@ export default can.Component.extend({
     },
     unit: null,
     repeatEvery: null,
-  },
+  }),
 });

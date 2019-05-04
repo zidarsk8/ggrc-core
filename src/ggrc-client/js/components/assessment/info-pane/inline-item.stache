@@ -4,33 +4,33 @@
 }}
 
 <inline-edit-control
-  (inline-save)="{saveInlineForm(%event)}"
-  {is-grouped-dropdown}="{isGroupedDropdown}"
-  {dropdown-options-groups}="{dropdownOptionsGroups}"
-  {is-edit-icon-denied}="{isEditIconDenied}"
-  {prop-name}="{propName}"
-  {dropdown-options}="{dropdownOptions}"
-  {dropdown-class}="{dropdownClass}"
-  {dropdown-no-value}="{dropdownNoValue}"
-  {is-loading}="{isLoading}"
-  {instance}="{instance}"
-  {value}="{value}"
-  {type}="{type}"
-  {mandatory}="{mandatory}"
-  {with-read-more}="{withReadMore}">
+  on:inlineSave="saveInlineForm(scope.event)"
+  isGroupedDropdown:from="isGroupedDropdown"
+  dropdownOptionsGroups:from="dropdownOptionsGroups"
+  isEditIconDenied:from="isEditIconDenied"
+  propName:from="propName"
+  dropdownOptions:from="dropdownOptions"
+  dropdownClass:from="dropdownClass"
+  dropdownNoValue:from="dropdownNoValue"
+  isLoading:from="isLoading"
+  instance:from="instance"
+  value:from="value"
+  type:from="type"
+  mandatory:from="mandatory"
+  withReadMore:from="withReadMore">
     <confirm-edit-action
-      (set-edit-mode)="{setEditModeInline(%event)}"
-      (set-in-progress)="{setInProgressState()}"
-      {is-edit-icon-denied}="{isEditIconDenied}"
-      {instance}="{instance}"
-      {is-confirmation-needed}="{isConfirmationNeeded}"
-      {on-state-change-dfd}="{onStateChangeDfd}"
-      {edit-mode}="{editMode}">
+      on:setEditMode="setEditModeInline(scope.event)"
+      on:setInProgress="setInProgressState()"
+      isEditIconDenied:from="isEditIconDenied"
+      instance:from="instance"
+      isConfirmationNeeded:from="isConfirmationNeeded"
+      onStateChangeDfd:from="onStateChangeDfd"
+      editMode:from="editMode">
         <base-inline-control-title
           class="inline__header"
-          {edit-mode}="{editMode}"
-          {is-edit-icon-denied}="{isEditIconDenied}"
-          (set-edit-mode-inline)="{confirmEdit()}">
+          editMode:from="editMode"
+          isEditIconDenied:from="isEditIconDenied"
+          on:setEditModeInline="confirmEdit()">
             <content></content>
         </base-inline-control-title>
     </confirm-edit-action>

@@ -14,7 +14,7 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'assessment-template-clone',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel: function () {
     return ObjectOperationsBaseVM.extend({
@@ -60,8 +60,8 @@ export default can.Component.extend({
           this.viewModel.attr('is_saving', false);
         })
         .done(() => {
-          this.closeModal();
           this.viewModel.dispatch('refreshTreeView');
+          this.closeModal();
         });
     },
     cloneObjects() {

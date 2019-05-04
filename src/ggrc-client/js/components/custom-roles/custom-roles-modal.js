@@ -12,9 +12,9 @@ import template from './templates/custom-roles-modal.stache';
 
 export default can.Component.extend({
   tag: 'custom-roles-modal',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: {},
     updatableGroupId: null,
     isNewInstance: false,
@@ -26,5 +26,5 @@ export default can.Component.extend({
     readOnly: false,
     showGroupTooltip: false,
     groupTooltip: null,
-  },
+  }),
 });

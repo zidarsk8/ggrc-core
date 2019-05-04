@@ -7,7 +7,7 @@ import Cacheable from '../cacheable';
 import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/base-notifications';
+import baseNotifications from '../mixins/notifications/base-notifications';
 import proposable from '../mixins/proposable';
 import Stub from '../stub';
 
@@ -89,13 +89,32 @@ export default Cacheable.extend({
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  init: function () {
-    let reqFields = ['title', 'description', 'risk_type'];
-    if (this._super) {
-      this._super(...arguments);
-    }
-    reqFields.forEach(function (reqField) {
-      this.validatePresenceOf(reqField);
-    }.bind(this));
+}, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
+    },
+    description: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+    risk_type: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
   },
-}, {});
+});

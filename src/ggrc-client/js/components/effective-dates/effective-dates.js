@@ -8,14 +8,14 @@ import template from './effective-dates.stache';
 
 export default can.Component.extend({
   tag: 'effective-dates',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: null,
     configStartDate: {
       label: 'Effective Date',
       helpText: 'Enter the date this object becomes effective.',
       required: false,
     },
-  },
+  }),
 });

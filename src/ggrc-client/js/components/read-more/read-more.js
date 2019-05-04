@@ -9,7 +9,7 @@ import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
 const readMore = 'Read More';
 const readLess = 'Read Less';
 const classPrefix = 'ellipsis-truncation-';
-const viewModel = {
+const viewModel = can.Map.extend({
   define: {
     text: {
       type: 'string',
@@ -66,11 +66,11 @@ const viewModel = {
     clonedReadMoreWrap.remove();
     this.attr('overflowing', extendedHeight > truncatedHeight);
   },
-};
+});
 
 export default can.Component.extend({
   tag: 'read-more',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
   init() {

@@ -6,13 +6,13 @@
 export default can.Component.extend({
   tag: 'restored-revision-comparer-config',
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: {},
     rightRevision: {},
-    leftRevisionId: '@',
+    leftRevisionId: '',
     modalTitle: 'Restore Version: Compare to Current',
     buttonView: `${GGRC.templates_path}/modals/restore_revision.stache`,
     leftRevisionDescription: 'Current version:',
     rightRevisionDescription: 'Revision:',
-  },
+  }),
 });

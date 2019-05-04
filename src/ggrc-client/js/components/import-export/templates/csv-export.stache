@@ -2,26 +2,26 @@
   Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-{{#currentExports.length}}
-  <current-exports {exports}="{currentExports}"
-                   {disabled}="{disabledItems}"
-                   {in-progress}="{isInProgress}"
-                   (stop-export)="{onStopExport(%event)}"
-                   (remove-item)="{onRemove(%event)}"
-                   (view-content)="{onViewContent(%event)}"
+{{#if currentExports.length}}
+  <current-exports exports:from="currentExports"
+                   disabled:from="disabledItems"
+                   inProgress:from="isInProgress"
+                   on:stopExport="onStopExport(scope.event)"
+                   on:removeItem="onRemove(scope.event)"
+                   on:viewContent="onViewContent(scope.event)"
   ></current-exports>
-{{/currentExports.length}}
+{{/if}}
 
 <h2>Export Objects</h2>
 
-<export-group {(panels)}="{panels}"></export-group>
+<export-group panels:bind="panels"></export-group>
 
 <div class="export-group__actions-wrap">
     <button type="button"
             id="export-csv-button"
             {{^if exportAllowed}} disabled {{/if}}
             class="btn btn-green btn-small"
-            ($click)="exportObjects()">
+            on:el:click="exportObjects()">
       Start Export
     </button>
 </div>

@@ -7,6 +7,7 @@ import {confirm} from '../plugins/utils/modals';
 import {hasPending as hasPendingUtil} from '../plugins/ggrc_utils';
 import {navigate} from '../plugins/utils/current-page-utils';
 import {changeUrl} from '../router';
+import {trigger} from 'can-event';
 
 (function ($) {
   'use strict';
@@ -194,7 +195,6 @@ import {changeUrl} from '../router';
           return;
         }
         if (instance) {
-          instance._backupStore()['-1'] = instance['-1'];
           changedInstance = instance.isDirty(true);
           if (!instance.id) {
             hasPending = false;
@@ -213,8 +213,8 @@ import {changeUrl} from '../router';
               '/modals/discard_buttons.stache',
             skip_refresh: true,
           }, function () {
-            can.trigger(instance, 'modal:dismiss');
-            can.trigger(instance, 'modal:discard');
+            trigger.call(instance, 'modal:dismiss');
+            trigger.call(instance, 'modal:discard');
             this.$element.trigger('modal:discard');
             this.$trigger.trigger('modal:dismiss');
             this.$element
@@ -232,7 +232,7 @@ import {changeUrl} from '../router';
 
       // Hide the modal like normal
       if (instance) {
-        can.trigger(instance, 'modal:dismiss');
+        trigger.call(instance, 'modal:dismiss');
       }
       $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
       this.$element.trigger('modal:dismiss');

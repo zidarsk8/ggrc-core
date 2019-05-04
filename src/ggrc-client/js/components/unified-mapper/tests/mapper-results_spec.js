@@ -19,8 +19,8 @@ describe('mapper-results component', function () {
   let viewModel;
 
   beforeEach(function () {
-    let init = Component.prototype.viewModel.init;
-    Component.prototype.viewModel.init = undefined;
+    let init = Component.prototype.viewModel.prototype.init;
+    Component.prototype.viewModel.prototype.init = undefined;
     viewModel = getComponentVM(Component);
     viewModel.attr('mapper', {
       type: 'Control',
@@ -28,7 +28,7 @@ describe('mapper-results component', function () {
     viewModel.attr('submitCbs', $.Callbacks());
     viewModel.attr('paging',
       new Pagination({pageSizeSelect: [5, 10, 15]}));
-    Component.prototype.viewModel.init = init;
+    Component.prototype.viewModel.prototype.init = init;
     viewModel.init = init;
   });
 
@@ -58,35 +58,43 @@ describe('mapper-results component', function () {
       viewModel.attr({});
     });
 
-    it('sets loaded items to viewModel.items', function () {
+    it('sets loaded items to viewModel.items', function (done) {
       viewModel.attr('items', []);
-      viewModel.setItems();
-      expect(viewModel.attr('items').length).toEqual(1);
-      expect(viewModel.attr('items')[0])
-        .toEqual(jasmine.objectContaining({
-          data: 'mockData',
-        }));
+      viewModel.setItems().then(() => {
+        expect(viewModel.attr('items').length).toEqual(1);
+        expect(viewModel.attr('items')[0])
+          .toEqual(jasmine.objectContaining({
+            data: 'mockData',
+          }));
+        done();
+      });
     });
 
-    it('sets data of loaded items to viewModel.entries', function () {
+    it('sets data of loaded items to viewModel.entries', function (done) {
       viewModel.attr('entries', []);
-      viewModel.setItems();
-      expect(viewModel.attr('entries').length).toEqual(1);
-      expect(viewModel.attr('entries')[0])
-        .toEqual('mockData');
+      viewModel.setItems().then(() => {
+        expect(viewModel.attr('entries').length).toEqual(1);
+        expect(viewModel.attr('entries')[0])
+          .toEqual('mockData');
+        done();
+      });
     });
 
     it('calls setColumnsConfiguration and setRelatedAssessments',
-      function () {
-        viewModel.setItems();
-        expect(viewModel.setColumnsConfiguration).toHaveBeenCalled();
-        expect(viewModel.setRelatedAssessments).toHaveBeenCalled();
+      function (done) {
+        viewModel.setItems().then(() => {
+          expect(viewModel.setColumnsConfiguration).toHaveBeenCalled();
+          expect(viewModel.setRelatedAssessments).toHaveBeenCalled();
+          done();
+        });
       });
 
-    it('sets viewModel.isBeforeLoad to false', function () {
+    it('sets viewModel.isBeforeLoad to false', function (done) {
       viewModel.attr('isBeforeLoad', true);
-      viewModel.setItems();
-      expect(viewModel.attr('isBeforeLoad')).toEqual(false);
+      viewModel.setItems().then(() => {
+        expect(viewModel.attr('isBeforeLoad')).toEqual(false);
+        done();
+      });
     });
   });
 
@@ -964,7 +972,7 @@ describe('mapper-results component', function () {
     let viewModel;
 
     beforeEach(function () {
-      Component.prototype.viewModel.init = undefined;
+      Component.prototype.viewModel.prototype.init = undefined;
       viewModel = getComponentVM(Component);
       viewModel.attr({});
     });

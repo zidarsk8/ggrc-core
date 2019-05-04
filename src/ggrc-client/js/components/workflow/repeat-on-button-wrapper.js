@@ -7,14 +7,14 @@ import './repeat-on-button';
 
 export default can.Component.extend({
   tag: 'repeat-on-button-wrapper',
-  template: can.stache(
-    '<repeat-on-button {unit}="{instance.unit}"' +
-    ' {repeat-every}="{instance.repeat_every}"' +
-    ' {on-save-repeat}="{@onSetRepeat}">' +
+  view: can.stache(
+    '<repeat-on-button unit:from="instance.unit"' +
+    ' repeatEvery:from="instance.repeat_every"' +
+    ' onSaveRepeat:from="@onSetRepeat">' +
     '</repeat-on-button>'
   ),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       autoSave: {
         type: 'boolean',
@@ -55,5 +55,5 @@ export default can.Component.extend({
 
       return $.Deferred().resolve();
     },
-  },
+  }),
 });

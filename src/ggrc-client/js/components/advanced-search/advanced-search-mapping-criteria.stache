@@ -7,7 +7,7 @@
   <h6>{{title}}</h6>
   <div class="mapping-criteria__content flex-box flex-box-multi">
     <div class="mapping-criteria__type">
-      <select {($value)}="{criteria.objectName}" {{#if isClone}}disabled{{/if}}>
+      <select el:value:bind="criteria.objectName" {{#if isClone}}disabled{{/if}}>
       {{#mappingTypes}}
         <option value="{{model_singular}}"
                 label="{{title_singular}}">
@@ -18,34 +18,34 @@
     <div class="flex-box flex-box-multi">
       <div class="flex-box flex-box-multi">
         <advanced-search-filter-attribute
-                {(attribute)}="{criteria.filter.value}"
-                {available-attributes}="{availableAttributes}"
-                {show-actions}="{false}">
+                attribute:bind="criteria.filter.value"
+                availableAttributes:from="availableAttributes"
+                showActions:from="false">
         </advanced-search-filter-attribute>
-        <button type="button" class="mapping-criteria__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
+        <button type="button" class="mapping-criteria__remove" on:el:click="remove()"><i class="fa fa-trash"></i></button>
       </div>
       <div class="mapping-criteria__action">
         {{#if showPopover}}
-          <simple-popover {button-text}="'+ Add'" {extra-css-class}="'advanced-search'" {placement}="'top'">
+          <simple-popover buttonText:from="'+ Add'" extraCssClass:from="'advanced-search'" placement:from="'top'">
             <button type="button"
                     class="mapping-criteria__action-button"
-                    ($click)="addRelevant()">
+                    on:el:click="addRelevant()">
               Map Condition
             </button>
             {{^if isClone}}
               <button type="button"
                       class="mapping-criteria__action-button"
-                      ($click)="createGroup()">
+                      on:el:click="createGroup()">
                 Group Expression
               </button>
             {{/if}}
           </simple-popover>
         {{else}}
           {{#if canAddMapping}}
-            <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
+            <a href="javascript:void(0)" class="advanced-filter" on:el:click="addRelevant()">+ Add Map Condition</a>
           {{/if}}
           {{#if canBeGrouped}}
-            <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
+            <a href="javascript:void(0)" class="advanced-filter" on:el:click="createGroup()">+ Add Group Expression</a>
           {{/if}}
         {{/if}}
       </div>
@@ -57,20 +57,20 @@
     {{#switch criteria.mappedTo.type}}
       {{#case "mappingCriteria"}}
         <advanced-search-mapping-criteria
-          {(criteria)}="{criteria.mappedTo.value}"
-          (remove)="{removeRelevant()}"
-          {model-name}="{criteria.objectName}"
-          {extendable}="{extendable}"
-          (createGroup)="{relevantToGroup()}"
-          {^can-be-grouped}="{childCanBeGrouped}">
+          criteria:bind="criteria.mappedTo.value"
+          on:remove="removeRelevant()"
+          modelName:from="criteria.objectName"
+          extendable:from="extendable"
+          on:createGroup="relevantToGroup()"
+          canBeGrouped:to="childCanBeGrouped">
         </advanced-search-mapping-criteria>
       {{/case}}
       {{#case "group"}}
         <advanced-search-mapping-group
-          {(items)}="{criteria.mappedTo.value}"
-          (remove)="{removeRelevant()}"
-          {model-name}="{criteria.objectName}"
-          {^root}="{childCanBeGrouped}">
+          items:bind="criteria.mappedTo.value"
+          on:remove="removeRelevant()"
+          modelName:from="criteria.objectName"
+          root:to="childCanBeGrouped">
         </advanced-search-mapping-group>
         {{/case}}
       {{/switch}}

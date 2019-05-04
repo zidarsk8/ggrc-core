@@ -4,13 +4,13 @@
 }}
 
 <div class="flex-box sub-item-content {{cssClasses}}">
-  <tree-item-actions {instance}="{instance}"
-                     (expand)="{onExpand()}"
-                     (preview)="{select($element)}"
-                     {expanded}="{expanded}"
-                     {deep-limit}="{limitDepthTree}"
+  <tree-item-actions instance:from="instance"
+                     on:expand="onExpand()"
+                     on:preview="select($element)"
+                     expanded:from="expanded"
+                     deepLimit:from="limitDepthTree"
   ></tree-item-actions>
-  <div class="flex-box columns" ($click)="onClick($element, %event)">
+  <div class="flex-box columns" on:el:click="onClick($element, scope.event)">
     <span class="title">
       {{#if isMega}}
         <i class="fa fa-bookmark mega-object-tree-view-icon"></i>
@@ -18,25 +18,25 @@
       <i class="fa fa-{{instance.class.table_singular}}"></i>
       {{title}}
     </span>
-      <tree-item-status-for-workflow {instance}="{instance}"></tree-item-status-for-workflow>
+      <tree-item-status-for-workflow instance:from="instance"></tree-item-status-for-workflow>
 
       {{#if isCycleTaskGroupObjectTask}}
         <span class="tree-item__overdue {{dueDateCssClass}}">{{localize_date dueDate}}</span>
       {{/if}}
   </div>
 
-  <cycle-task-actions {instance}="{instance}"
-                      (expand)="{onExpand(%event)}"
+  <cycle-task-actions instance:from="instance"
+                      on:expand="onExpand(scope.event)"
   ></cycle-task-actions>
 
-  <tree-item-extra-info {instance}="{instance}"></tree-item-extra-info>
+  <tree-item-extra-info instance:from="instance"></tree-item-extra-info>
 </div>
 
 <div class="sub-tier">
-  <sub-tree-wrapper {parent}="{instance}"
-                    {limit-depth-tree}="{limitDepthTree}"
-                    {get-depth-filter}="{@getDepthFilter}"
-                    {is-open}="{expanded}"
-                    (collapse-subtree)="{collapseAndHighlightItem()}"
+  <sub-tree-wrapper parent:from="instance"
+                    limitDepthTree:from="limitDepthTree"
+                    getDepthFilter:from="@getDepthFilter"
+                    isOpen:from="expanded"
+                    on:collapseSubtree="collapseAndHighlightItem()"
   ></sub-tree-wrapper>
 </div>

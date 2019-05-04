@@ -8,10 +8,21 @@
 
 import pytest
 
-from lib import base
+from lib import base, browsers, url
 from lib.constants import objects
 from lib.entities.entity import Representation
-from lib.service import webui_service
+from lib.page.widget import controls_tab, object_modal
+from lib.service import webui_service, webui_facade
+from lib.ui import ui_facade
+from lib.utils import selenium_utils
+
+
+@pytest.fixture(scope="function")
+def dashboard_controls_tab(selenium):
+  """Open My Work Dashboard Controls Tab URL and
+  return Controls Tab page objects model."""
+  selenium_utils.open_url(url.Urls().dashboard_controls_tab)
+  return controls_tab.ControlsTab()
 
 
 class TestProgramPage(base.Test):
@@ -51,3 +62,40 @@ class TestProgramPage(base.Test):
     obj_modal = programs_service.add_and_map_obj_widget(objects.CONTROLS)
     assert not obj_modal.is_present, ("'New Control' modal "
                                       "should not be present.")
+
+  def test_user_cannot_map_control_to_scope_ojbects_via_add_tab(self, control,
+                                                                selenium):
+    """Tests that user cannot map control to scope objects/directives
+    via 'Add Tab' menu."""
+    service = webui_service.ControlsService(selenium)
+    controls_info_widget = service.open_info_page_of_obj(control)
+    controls_info_widget.click_add_tab_btn()
+    hidden_items = controls_info_widget.get_hidden_items_from_add_tab()
+    for h_item in hidden_items:
+      controls_info_widget.click_add_tab_btn()
+      h_item.click()
+      ui_facade.verify_modal_obj_not_present_in_all_windows(
+          object_modal.UnifiedMapperModal())
+      old_tab, new_tab = browsers.get_browser().windows()
+      assert old_tab.url == new_tab.url, "Urls for tabs should be the same."
+      old_tab.use()
+      new_tab.close()
+
+
+class TestControlsPage(base.Test):
+  """Tests of unified mapper for Controls."""
+
+  def test_user_cannot_map_control_via_unified_mapper(self, control,
+                                                      dashboard_controls_tab,
+                                                      selenium):
+    """Tests that user cannot map Control to Scope Objects/Directives
+    via Unified Mapper (existent new scope/directive object)"""
+    dashboard_controls_tab.get_control(control).select_map_to_this_object()
+    modal = webui_facade.map_object_via_unified_mapper(
+        selenium=selenium, obj_name=objects.CONTROLS,
+        dest_objs_type=objects.get_singular(plural=objects.PRODUCTS,
+                                            title=True),
+        return_tree_items=False,
+        open_in_new_frontend=True)
+    browsers.get_browser().windows()[1].use()
+    ui_facade.verify_modal_obj_not_present(modal_obj=modal)

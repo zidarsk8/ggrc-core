@@ -46,7 +46,7 @@ class TestTotalReindex(TestCase):
       'Person': 5,
       'Policy': 10,
       'Process': 8,
-      'Program': 8,
+      'Program': 9,
       'Regulation': 10,
       'TaskGroup': 4,
       'TaskGroupTask': 4,

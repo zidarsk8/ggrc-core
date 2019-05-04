@@ -12,9 +12,9 @@ import * as businessModels from '../../models/business-models';
 
 export default can.Component.extend({
   tag: 'mapper-results-item-details',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     init() {
       let instance = this.attr('instance');
       if (instance.snapshotObject) {
@@ -29,5 +29,5 @@ export default can.Component.extend({
     isMapperDetails: true,
     adminRole: ['Admin'],
     deletableAdmin: false,
-  },
+  }),
 });

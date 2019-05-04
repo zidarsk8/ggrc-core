@@ -15,7 +15,7 @@ import template from './editable-people-group.stache';
 const SHOW_MODAL_LIMIT = 4;
 
 let viewModel = peopleGroupVM.extend({
-  title: '@',
+  title: '',
   canEdit: {},
   showPeopleGroupModal: false,
   updatableGroupId: null,
@@ -99,7 +99,7 @@ let viewModel = peopleGroupVM.extend({
 
 export default can.Component.extend({
   tag: 'editable-people-group',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
   events: {

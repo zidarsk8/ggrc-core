@@ -8,6 +8,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import {initCounts} from '../../plugins/utils/widgets-utils';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
+import {trigger} from 'can-event';
 
 /**
  * A component that wraps a button for ending a Workflow cycle, and
@@ -18,7 +19,7 @@ import {countsMap as workflowCountsMap} from '../../apps/workflows';
  *
  * Usage example (state and permission checks not included):
  *
- *   <cycle-end-cycle {cycle}="{instance}">
+ *   <cycle-end-cycle cycle:from="instance">
  *       <button>Click to end a Cycle</button>
  *   </cycle-end-cycle>
  *
@@ -26,11 +27,14 @@ import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
 export default can.Component.extend({
   tag: 'cycle-end-cycle',
+  viewModel: can.Map.extend({
+    cycle: null,
+  }),
   events: {
     click: function (el, ev) {
       ev.stopPropagation();
 
-      this.scope.cycle
+      this.viewModel.attr('cycle')
         .refresh()
         .then(function (cycle) {
           return cycle.attr('is_current', false).save();
@@ -40,7 +44,7 @@ export default can.Component.extend({
         })
         .then(function () {
           let pageInstance = getPageInstance();
-          can.trigger(el, 'refreshTree');
+          trigger.call(el[0], 'refreshTree');
 
           return initCounts(
             [workflowCountsMap.history],

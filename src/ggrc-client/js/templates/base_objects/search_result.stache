@@ -13,9 +13,9 @@
         </span>
       </div>
       <div class="lhs-people">
-        {{^contact}}
+        {{^if contact}}
         <i class="fa fa-person red"></i>
-        {{/contact}}
+        {{/if}}
       </div>
     </div>
   </a>
@@ -23,5 +23,5 @@
 {{/each}}
 
 <li class="spinny">
-  <spinner-component {toggle}="{list.is_loading}"></spinner-component>
+  <spinner-component toggle:from="list.is_loading"></spinner-component>
 </li>

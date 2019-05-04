@@ -13,9 +13,9 @@ import Issue from '../../models/business-models/issue';
 
 export default can.Component.extend({
   tag: 'add-issue-button',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       prepareJSON: {
         get: function () {
@@ -35,7 +35,7 @@ export default can.Component.extend({
       },
     },
     relatedInstance: {},
-  },
+  }),
   events: {
     refreshIssueList: function (window, event, instance) {
       let model = 'Issue';
