@@ -351,7 +351,7 @@ def load_access_control_list(user, permissions):
   objects consume too much memory when lots of objects
   are loaded.
   """
-  access_control_list = db.engine.execute(sa.text("""
+  access_control_list = db.session.execute(sa.text("""
       SELECT
           acl_propagated.object_type AS acl_propagated_object_type,
           acl_propagated.object_id AS acl_propagated_object_id,
@@ -368,7 +368,7 @@ def load_access_control_list(user, permissions):
               AND access_control_people.ac_list_id = acl_base.id
               AND acl_base.id = acl_propagated.base_id
               AND acl_propagated.ac_role_id = access_control_roles.id {}
-  """.format(_get_acl_filter("acl_propagated"))), user_id=user.id)
+  """.format(_get_acl_filter("acl_propagated"))), {"user_id": user.id})
 
   for object_type, object_id, read, update, delete in access_control_list:
     actions = (("read", read), ("update", update), ("delete", delete))
