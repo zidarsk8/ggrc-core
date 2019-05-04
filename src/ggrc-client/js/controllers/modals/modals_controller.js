@@ -453,7 +453,7 @@ export default can.Control.extend({
   'input, textarea, select change':
     function (el) {
       const instance = this.options.instance;
-      if (instance.isNew()) {
+      if (instance.isNew && instance.isNew()) {
         if (instance.isDirty()) {
           instance.removeAttr('_suppress_errors');
         }
