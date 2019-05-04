@@ -37,6 +37,9 @@ let CloneWorkflow = Cacheable.extend({
 
 export default can.Component.extend({
   tag: 'workflow-clone',
+  viewModel: can.Map.extend({
+    workflow: null,
+  }),
   events: {
     click(el) {
       let $target;
@@ -48,7 +51,9 @@ export default can.Component.extend({
           new ModalsController($target, {
             modal_title: 'Clone Workflow',
             model: CloneWorkflow,
-            instance: new CloneWorkflow({source_workflow: this.scope.workflow}),
+            instance: new CloneWorkflow({
+              source_workflow: this.viewModel.workflow,
+            }),
             content_view: GGRC.templates_path +
               '/workflows/clone_modal_content.stache',
             custom_save_button_text: 'Proceed',
