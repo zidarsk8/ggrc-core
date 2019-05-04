@@ -34,9 +34,9 @@ describe('DeferredTransaction module', function () {
     });
     setTimeout(function () {
       deferredTransaction.push(action).then(function () {
-        done();
         expect(completeTransactionCount).toBe(1);
         expect(completeActionsCount).toBe(2);
+        done();
       });
     }, 150);
   });
@@ -46,9 +46,9 @@ describe('DeferredTransaction module', function () {
     deferredTransaction.push(action);
     setTimeout(function () {
       deferredTransaction.push(action).then(function () {
-        done();
         expect(completeTransactionCount).toBe(1);
         expect(completeActionsCount).toBe(2);
+        done();
       });
     }, 50);
   });
