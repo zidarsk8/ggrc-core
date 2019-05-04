@@ -61,6 +61,6 @@ describe('DeferredTransaction module', function () {
         expect(completeTransactionCount).toBe(1);
         expect(completeActionsCount).toBe(2);
         done();
-      }, 0);
+      }, 10);
     });
 });
