@@ -247,7 +247,7 @@ class TestCloneWorkflow(TestCase):
       (all_models.Workflow.WEEK_UNIT, 10),
   )
   @ddt.unpack
-  def test_workflow_copy(self, unit, repeat_every, title_patch):
+  def test_workflow_copy(self, unit, repeat_every):
     """Check clone wf with unit and repeat."""
     with factories.single_commit():
       workflow = wf_factories.WorkflowFactory(unit=unit,
@@ -258,7 +258,7 @@ class TestCloneWorkflow(TestCase):
     self.assertEqual(repeat_every, clone_wf.repeat_every)
 
   @patch("ggrc_workflows.get_copy_title")
-  def test_workflow_proper_copy_title_set(self, get_copy_title_patch):
+  def test_workflow_copy_title(self, get_copy_title_patch):
     """Check if get_copy_title is called with proper arguments."""
     expected_title = 'Copy Title'
     get_copy_title_patch.return_value = expected_title

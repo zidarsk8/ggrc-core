@@ -109,13 +109,16 @@ def get_copy_title(current_title, used_titles):
       used_titles (List[str]): List of object titles copied from the same
           parent
   """
+  copy_title = ''
   for copy_count in range(1, len(used_titles) + 2):
     title = COPY_TITLE_TEMPLATE % {
         'parent_title': current_title,
         'copy_count': copy_count
     }
     if title not in used_titles:
-      return title
+      copy_title = title
+      break
+  return copy_title
 
 
 def _get_min_next_due_date(due_dated_objects):
