@@ -26,6 +26,7 @@ class UserRoleColumnHandler(UserColumnHandler):
       "Creator",
       "Editor",
       "Reader",
+      "No Access",
       ""
   ]
 
@@ -52,8 +53,14 @@ class UserRoleColumnHandler(UserColumnHandler):
     ).delete(synchronize_session="fetch")
 
   def insert_object(self):
-    if self.dry_run or not self.value:
+    if self.dry_run:
       return
+    if not self.value:
+      role_value = self.row_converter.objects['user_role'].raw_value
+      if role_value.lower() == 'no access':
+        self.remove_current_roles()
+      return
+
     self.remove_current_roles()
     context = None
     if self.value.name == "Administrator":
