@@ -57,6 +57,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    max-width: 450px;
   }
 
   &__section-title-icon {
@@ -67,10 +68,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  &__section-title-text {
-
   }
 
   &__main-content {
