@@ -9,7 +9,6 @@ import ddt
 import mock
 
 from ggrc.models import all_models
-from ggrc import settings
 
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -23,12 +22,10 @@ from integration.ggrc.models import factories
             new='External App <external_app@example.com>')
 class TestExternalPermissions(TestCase):
   """Tests for external permissions and modified by."""
-  _external_app_user = ''
 
   def setUp(self):
     """Set up request mock and mock dependencies."""
     super(TestExternalPermissions, self).setUp()
-    self._external_app_user = settings.EXTERNAL_APP_USER
     self.clear_data()
     self.headers = {
         "Content-Type": "application/json",
