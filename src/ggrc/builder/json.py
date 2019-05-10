@@ -23,6 +23,7 @@ from ggrc import db
 from ggrc.login import get_current_user_id, is_external_app_user
 from ggrc.models.mixins import WithProtectedAttributes
 from ggrc.models.mixins.synchronizable import Synchronizable
+from ggrc.models.mixins.with_ext_custom_attrs import WithExtCustomAttrsSetter
 from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import SerializableAttribute
@@ -798,7 +799,7 @@ class Builder(AttributeInfo):
                      "ensure that default value is used")
         del json_obj['readonly']
 
-    if isinstance(obj, WithReadOnlyAccess):
+    if isinstance(obj, WithExtCustomAttrsSetter):
       self._handle_cav_for_readonly(json_obj, attrs, is_external)
 
     self.do_update_attrs(obj, json_obj, attrs)
@@ -823,7 +824,7 @@ class Builder(AttributeInfo):
                      "ensure that existing value is used")
         del json_obj['readonly']
 
-    if isinstance(obj, WithReadOnlyAccess):
+    if isinstance(obj, WithExtCustomAttrsSetter):
       self._handle_cav_for_readonly(json_obj, attrs, is_external)
 
     self.do_update_attrs(obj, json_obj, attrs)
