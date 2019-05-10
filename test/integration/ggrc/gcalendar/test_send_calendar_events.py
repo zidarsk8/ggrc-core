@@ -51,6 +51,6 @@ class TestSendCalendarEvents(BaseCalendarEventTest):
     person.profile.send_calendar_events = False
     with freeze_time("2015-01-1 12:00:00"):
       common.send_calendar_events()
-    self.assertEquals(event.needs_sync, False)
     event = self.get_event(person.id, task.end_date)
+    self.assertEquals(event.needs_sync, False)
     self.assertIsNone(event.last_synced_at)

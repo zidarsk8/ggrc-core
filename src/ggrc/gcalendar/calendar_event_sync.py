@@ -70,6 +70,8 @@ class CalendarEventsSync(object):
 
   def _update_event(self, event):
     """Updates the provided event using CalendarApiService."""
+    if not event.needs_update:
+      return
     response = self.service.get_event(
         calendar_id=self.calendar_id,
         external_event_id=event.external_event_id,
@@ -98,6 +100,8 @@ class CalendarEventsSync(object):
 
   def _delete_event(self, event):
     """Deletes the provided event using CalendarApiService."""
+    if not event.needs_delete:
+      return
     response = self.service.get_event(
         calendar_id=self.calendar_id,
         external_event_id=event.external_event_id,

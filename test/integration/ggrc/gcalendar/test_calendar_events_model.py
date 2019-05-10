@@ -21,7 +21,9 @@ class TestCalendarEventModel(BaseCalendarEventTest):
     self.api = api_helper.Api()
 
   def test_cycle_task_relationships(self):
-    """Test related sources and destinations of CycleTaskGroupObjectTask."""
+    """Test that related sources and destinations of CycleTaskGroupObjectTask
+       does not contain relationships to CalendarEvent in json representation.
+    """
     _, task, event = self.setup_person_task_event(date(2015, 1, 5))
     relationship = self.get_relationship(task.id, event.id)
 
