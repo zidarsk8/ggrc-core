@@ -266,11 +266,12 @@ class TestCloneWorkflow(TestCase):
     with factories.single_commit():
       workflow = wf_factories.WorkflowFactory()
       cloned_workflow = wf_factories.WorkflowFactory(parent_id=workflow.id)
+      cloned_title = cloned_workflow.title
 
     _, clone_wf = self.object_generator.generate_object(
         all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
     get_copy_title_patch.assert_called_once_with(
-        workflow.title, [cloned_workflow.title])
+        workflow.title, [cloned_title])
     self.assertEqual(clone_wf.title, expected_title)
     self.assertEqual(clone_wf.parent_id, workflow.id)
 
