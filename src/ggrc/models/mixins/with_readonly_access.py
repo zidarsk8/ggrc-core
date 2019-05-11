@@ -6,12 +6,17 @@
 It allows to mark objects as read-only
 """
 
+import logging
+
 from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.fulltext import attributes
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
+
+
+logger = logging.getLogger(__name__)
 
 
 class WithReadOnlyAccess(object):
