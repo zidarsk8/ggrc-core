@@ -31,7 +31,7 @@
                     <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
                       <read-more
                         text:from="description"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -48,7 +48,7 @@
                     <div class="rtf-block">
                       <read-more
                         text:from="test_plan"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -65,7 +65,7 @@
                     <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
                       <read-more
                         text:from="notes"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
