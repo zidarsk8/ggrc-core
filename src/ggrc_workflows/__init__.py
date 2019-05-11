@@ -196,6 +196,9 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):  # noqa pylint:
   # When called via a REST POST, use current user.
   workflow = obj.workflow
   workflow.status = workflow.ACTIVE
+  if not workflow.can_start_cycle:
+    raise ValueError("Workflow with misconfigured "
+                     "Task Groups can not be activated.")
   build_cycles(workflow, obj)
 
 
@@ -644,9 +647,10 @@ def handle_workflow_put(sender, obj=None, src=None, service=None):
   old = inspect(obj).attrs.status.history.deleted[-1]
   # first activate wf
   if (old, new) == (obj.DRAFT, obj.ACTIVE):
-    # allow only of it has at leask one task_group
-    if not obj.task_groups:
-      raise ValueError("Workflow with no Task Groups can not be activated.")
+    # allow only if it has at least one task_group with task configured
+    if not obj.can_start_cycle:
+      raise ValueError("Workflow with misconfigured "
+                       "Task Groups can not be activated.")
     build_cycles(obj)
 
 
