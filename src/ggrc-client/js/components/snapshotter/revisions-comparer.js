@@ -17,6 +17,8 @@ import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
 import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
 
+const HIGHLIGHT_CLASS = 'diff-highlighted';
+
 export default can.Component.extend({
   tag: 'revisions-comparer',
   view: can.stache('<content/>'),
@@ -246,23 +248,26 @@ export default can.Component.extend({
      */
     highlightAttributes: function ($target) {
       const emptySelector = '.empty-message';
-      const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
-      const attributesSelector = `.row-fluid h6 + *,
-        .pane-header__title-details .state-value,
-        .pane-header__title-details h3,
-        related-documents,
-        object-review`;
+      const titleSelector = '.general-page-header .pane-header__title';
+      const documentsSelector = 'related-documents';
+      const attributesSelector = this.instance.type === 'Control' ?
+        '.review-status, proposable-attribute' :
+        'object-review, .row-fluid h6 + *';
+
+      const fieldsSelector = [
+        titleSelector, documentsSelector, attributesSelector].join(',');
       let infoPanes = $target.find('.info .tier-content');
-      let valuesOld = infoPanes.eq(0).find(attributesSelector);
-      let valuesNew = infoPanes.eq(1).find(attributesSelector);
+      let valuesOld = infoPanes.eq(0).find(fieldsSelector);
+      let valuesNew = infoPanes.eq(1).find(fieldsSelector);
 
       valuesOld.each(function (index, valueOld) {
-        let $valueNew = $(valuesNew[index]);
-        let $valueOld = $(valueOld);
+        const $valueNew = $(valuesNew[index]);
+        const $valueOld = $(valueOld);
         let listOld = [];
         let listNew = [];
-        if ($valueOld.html() !== $valueNew.html()) {
+        if ($valueNew.text().replace(/\s/g, '') !==
+          $valueOld.text().replace(/\s/g, '')) {
           listOld = $valueOld.find(listSelector);
           listNew = $valueNew.find(listSelector);
           if (listOld.length) {
@@ -299,7 +304,7 @@ export default can.Component.extend({
             }
           });
           if (!atLeastOneIsEqual) {
-            $(li).addClass(highlightClass);
+            $(li).addClass(HIGHLIGHT_CLASS);
           }
         });
       }
@@ -310,7 +315,7 @@ export default can.Component.extend({
        */
       function highlightValues($value) {
         if ($value.html() && !$value.find(emptySelector).length) {
-          $value.addClass(highlightClass);
+          $value.addClass(HIGHLIGHT_CLASS);
         }
       }
 
@@ -340,7 +345,6 @@ export default can.Component.extend({
     highlightCustomAttributes($target, revisions) {
       const titleSelector = '.info-pane__section-title';
       const valueSelector = '.inline__content';
-      const highlightClass = 'diff-highlighted';
 
       let that = this;
       let $caPanes = $target.find('.info global-custom-attributes');
@@ -415,10 +419,10 @@ export default can.Component.extend({
         let title0 = ca0.def.title;
         let title1 = ca1 && ca1.def ? ca1.def.title : null;
         if (title0 !== title1) {
-          $ca0.find(titleSelector).addClass(highlightClass);
+          $ca0.find(titleSelector).addClass(HIGHLIGHT_CLASS);
 
           if ($ca1) {
-            $ca1.find(titleSelector).addClass(highlightClass);
+            $ca1.find(titleSelector).addClass(HIGHLIGHT_CLASS);
           }
         }
       }
@@ -440,10 +444,10 @@ export default can.Component.extend({
           ca1.attribute_object.id : null;
 
         if (value0 !== value1 || objectId0 !== objectId1) {
-          $ca0.find(valueSelector).addClass(highlightClass);
+          $ca0.find(valueSelector).addClass(HIGHLIGHT_CLASS);
 
           if ($ca1) {
-            $ca1.find(valueSelector).addClass(highlightClass);
+            $ca1.find(valueSelector).addClass(HIGHLIGHT_CLASS);
           }
         }
       }
@@ -468,8 +472,6 @@ export default can.Component.extend({
      *   revision diff comparison pane
      */
     highlightCustomRoles: function ($target) {
-      let HIGHLIGHT_CLASS = 'diff-highlighted';
-
       let $rolesPanes = $target
         .find('related-people-access-control');
       let $roleBlocksOld = $rolesPanes.eq(0)
