@@ -851,7 +851,6 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Description",
             "Admin",
             "Title",
-            "Risk Type",
         },
         "unique": {
             "Code",
