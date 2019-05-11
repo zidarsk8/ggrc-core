@@ -1,7 +1,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-# pylint: disable=maybe-no-member, invalid-name
+# pylint: disable=maybe-no-member, invalid-name, too-many-lines
 
 """Test request import and updates."""
 
@@ -13,6 +13,7 @@ import ddt
 import freezegun
 
 from ggrc import db
+from ggrc import utils
 from ggrc.models import all_models
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.converters import errors
@@ -750,6 +751,39 @@ class TestAssessmentImport(TestCase):
     ])
     response = self.import_data(data)
     self._check_csv_response(response, {})
+
+  def test_import_asmnt_rev_query_count(self):
+    """Test only one revisions insert query should occur while importing."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      cad_names = ("CAD1", "CAD2", "CAD3")
+      for name in cad_names:
+        factories.CustomAttributeDefinitionFactory(
+            title=name,
+            definition_type="assessment",
+            definition_id=asmnt.id,
+            attribute_type="Text",
+            mandatory=True,
+        )
+    data = OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+        ("CAD1", "Some value 1"),
+        ("CAD2", "Some value 2"),
+        ("CAD3", "Some value 3"),
+    ])
+    with utils.QueryCounter() as counter:
+      response = self.import_data(data)
+    self._check_csv_response(response, {})
+    rev_insert_queries = [query for query in counter.queries
+                          if 'INSERT INTO revisions' in query]
+    self.assertEqual(len(rev_insert_queries), 1)
 
   @ddt.data(
       ("", "In Review", "", True),
