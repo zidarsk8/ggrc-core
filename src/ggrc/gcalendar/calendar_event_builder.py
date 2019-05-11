@@ -12,7 +12,7 @@ from ggrc import db
 from ggrc import settings
 from ggrc.models import all_models
 from ggrc.gcalendar import utils
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, generate_query_chunks
 
 
 logger = logging.getLogger(__name__)
@@ -31,9 +31,9 @@ class CalendarEventBuilder(object):
 
   def __init__(self):
     """Initialize CalendarEventBuilder."""
-    self.tasks = []
     self.events = []
     self.title_prefix = ""
+    self.chunk_size = 1000
     if settings.NOTIFICATION_PREFIX:
       self.title_prefix = "[{}] ".format(settings.NOTIFICATION_PREFIX)
 
@@ -49,7 +49,15 @@ class CalendarEventBuilder(object):
 
   def _preload_data(self):
     """Preload data for Calendar Event generation."""
-    self.tasks = all_models.CycleTaskGroupObjectTask.query.options(
+    self.events = all_models.CalendarEvent.query.all()
+
+  def _generate_events(self):
+    """Generates Calendar Events."""
+    task_mappings = utils.get_related_mapping(
+        left=all_models.CycleTaskGroupObjectTask,
+        right=all_models.CalendarEvent
+    )
+    columns = all_models.CycleTaskGroupObjectTask.query.options(
         orm.joinedload("cycle").load_only(
             "workflow_id",
             "is_current",
@@ -83,19 +91,18 @@ class CalendarEventBuilder(object):
             all_models.CycleTaskGroupObjectTask.title,
             all_models.CycleTaskGroupObjectTask.verified_date,
         ),
-    ).all()
-    self.events = all_models.CalendarEvent.query.all()
-
-  def _generate_events(self):
-    """Generates Calendar Events."""
-    task_mappings = utils.get_related_mapping(
-        left=all_models.CycleTaskGroupObjectTask,
-        right=all_models.CalendarEvent
-    )
-    for task in self.tasks:
-      events = task_mappings[task.id] if task.id in task_mappings else set()
-      self._generate_events_for_task(task, events_ids=events)
-    db.session.flush()
+    ).order_by(all_models.CycleTaskGroupObjectTask.end_date)
+    all_count = columns.count()
+    handled = 0
+    for query_chunk in generate_query_chunks(
+        columns, chunk_size=self.chunk_size, needs_ordering=False
+    ):
+      handled += query_chunk.count()
+      logger.info("Cycle task processed: %s/%s", handled, all_count)
+      for task in query_chunk:
+        events = task_mappings[task.id] if task.id in task_mappings else set()
+        self._generate_events_for_task(task, events_ids=events)
+      db.session.flush()
 
   def _generate_events_for_task(self, task, events_ids):
     """Generates CalendarEvents for CycleTaskGroupObjectTask."""
@@ -240,19 +247,32 @@ class CalendarEventBuilder(object):
             all_models.CalendarEvent.id,
             all_models.CalendarEvent.description,
         )
-    ).all()
-    for event in events:
-      if event.id not in event_mappings:
-        continue
-      self._generate_description_for_event(
-          event,
-          task_ids=event_mappings[event.id],
-      )
+    )
+
+    for query_chunk in generate_query_chunks(
+        events, chunk_size=self.chunk_size
+    ):
+      for event in query_chunk:
+        if event.id not in event_mappings:
+          continue
+        self._generate_description_for_event(
+            event,
+            task_ids=event_mappings[event.id],
+        )
 
   def _generate_description_for_event(self, event, task_ids):
     """Generates CalendarEvent descriptions based on tasks."""
-    titles = [u"- {}".format(unicode(task.title)) for task in self.tasks
-              if task.id in task_ids]
+    tasks = db.session.query(all_models.CycleTaskGroupObjectTask).filter(
+        all_models.CycleTaskGroupObjectTask.id.in_(task_ids)
+    ).order_by(all_models.CycleTaskGroupObjectTask.title).options(
+        load_only(
+            all_models.CycleTaskGroupObjectTask.id,
+            all_models.CycleTaskGroupObjectTask.title,
+        )
+    ).all()
+
+    titles = [u"- {}".format(unicode(task.title)) for task in tasks]
+
     event.description = (
         self.TASK_DESCRIPTION_HEADER +
         u"\n".join(titles) + u"\n" +
