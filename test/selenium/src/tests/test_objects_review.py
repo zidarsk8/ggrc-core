@@ -13,7 +13,7 @@ import copy
 import pytest
 
 from lib import base, users, factory
-from lib.constants import roles, objects, element
+from lib.constants import objects, element
 from lib.service import webui_facade, rest_facade, webui_service
 
 
@@ -21,43 +21,39 @@ class TestObjectsReview(base.Test):
   """Tests for objects review workflow."""
 
   @pytest.fixture()
-  def reviewer(self):
-    """Create user with role 'Creator'."""
-    return rest_facade.create_user_with_role(roles.CREATOR)
-
-  @pytest.fixture()
-  def program_with_review(self, reviewer, login_as_creator, program):
+  def program_with_review(self, second_creator, login_as_creator, program):
     """Returns program instance with assigned review."""
-    return rest_facade.request_obj_review(program, reviewer)
+    return rest_facade.request_obj_review(program, second_creator)
 
   @pytest.fixture()
-  def program_with_approved_review(self, reviewer, program_with_review):
+  def program_with_approved_review(self, second_creator, program_with_review):
     """Approve program review.
     Returns program instance with approved review."""
-    users.set_current_user(reviewer)
+    users.set_current_user(second_creator)
     return rest_facade.approve_obj_review(program_with_review)
 
   @pytest.fixture()
-  def program_w_approved_via_ui_review(self, reviewer, program_with_review,
-                                       selenium):
+  def program_w_approved_via_ui_review(self, second_creator,
+                                       program_with_review, selenium):
     """Approve program review via UI.
     Returns program instance with approved review."""
-    users.set_current_user(reviewer)
+    users.set_current_user(second_creator)
     return webui_facade.approve_obj_review(selenium, program_with_review)
 
   @pytest.mark.smoke_tests
-  def test_request_obj_review(self, reviewer, login_as_creator, program,
+  def test_request_obj_review(self, second_creator, login_as_creator, program,
                               selenium):
     """Confirm reviewer is displayed on Program Info panel."""
-    webui_facade.submit_obj_for_review(selenium, program, reviewer)
+    webui_facade.submit_obj_for_review(selenium, program, second_creator)
     actual_program = webui_facade.get_object(selenium, program)
     self.general_equal_assert(program.repr_ui(), actual_program)
 
   @pytest.mark.smoke_tests
-  def test_obj_mark_reviewed(self, reviewer, program_with_review, selenium):
+  def test_obj_mark_reviewed(self, second_creator, program_with_review,
+                             selenium):
     """Confirm Reviewer with READ rights for an object
     able to Review an object."""
-    users.set_current_user(reviewer)
+    users.set_current_user(second_creator)
     webui_facade.approve_obj_review(selenium, program_with_review)
     actual_program = webui_facade.get_object(selenium, program_with_review)
     self.general_equal_assert(program_with_review.repr_ui(), actual_program)
@@ -79,7 +75,7 @@ class TestObjectsReview(base.Test):
     assert actual_buttons_state == expected_buttons_state
 
   @pytest.mark.smoke_tests
-  def test_message_with_undo_btn_appears(self, reviewer,
+  def test_message_with_undo_btn_appears(self, second_creator,
                                          program_w_approved_via_ui_review,
                                          selenium):
     """Confirm floating message 'Review is complete' with 'Undo' button
@@ -110,8 +106,7 @@ class TestObjectsReview(base.Test):
             expected_entry not in actual_entries)
 
   @pytest.mark.smoke_tests
-  def test_undo_obj_review_approval(self, reviewer,
-                                    program_w_approved_via_ui_review,
+  def test_undo_obj_review_approval(self, program_w_approved_via_ui_review,
                                     selenium):
     """Confirm Reviewer with READ rights for an object is able to unreview
     an object."""
@@ -121,3 +116,13 @@ class TestObjectsReview(base.Test):
                                              program_w_approved_via_ui_review)
     self.general_equal_assert(program_w_approved_via_ui_review.repr_ui(),
                               actual_program)
+
+  @pytest.mark.smoke_tests
+  def test_request_obj_review_as_reviewer(self, second_creator, third_creator,
+                                          program_with_review, selenium):
+    """Confirm reviewer is able to request review from another person."""
+    users.set_current_user(second_creator)
+    webui_facade.submit_obj_for_review(selenium, program_with_review,
+                                       third_creator)
+    actual_program = webui_facade.get_object(selenium, program_with_review)
+    self.general_equal_assert(program_with_review.repr_ui(), actual_program)

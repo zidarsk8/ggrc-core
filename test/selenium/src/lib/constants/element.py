@@ -156,7 +156,8 @@ class Common(object):
   OTHERS = "Others"
   OBJECT_REVIEW = "Object review"
   REVIEW_COMMENT_PATTERN = (
-      "Review requested from\n{email}\nwith a comment: {comment}")
+      "Review requested from\n{emails}\nwith a comment: {comment}")
+  REVIEW_COMMENT_REGEXP = r"Review requested from\n.*\nwith a comment: .*"
   APPROVED_DATE_REGEX = (
       r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M (\+|\-)\d{2}:\d{2}")
 

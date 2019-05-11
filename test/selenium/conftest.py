@@ -544,6 +544,18 @@ def creator():
 
 
 @pytest.fixture()
+def second_creator():
+  """Create user with role 'Creator'."""
+  return rest_facade.create_user_with_role(roles.CREATOR)
+
+
+@pytest.fixture()
+def third_creator():
+  """Create user with role 'Creator'."""
+  return rest_facade.create_user_with_role(roles.CREATOR)
+
+
+@pytest.fixture()
 def login_as_creator(creator):
   """Login by user with role 'Creator'."""
   users.set_current_user(creator)

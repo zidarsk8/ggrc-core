@@ -245,12 +245,10 @@ def request_obj_review(obj, reviewer):
   rest_service.ReviewService().create_obj(
       {"reviewers": reviewer,
        "reviewable": obj.repr_min_dict()})
-  exp_review = entities_factory.ReviewsFactory().create(
+  obj = obj.update_review(entities_factory.ReviewsFactory().create(
       is_add_rest_attrs=True,
       status=element.ReviewStates.UNREVIEWED,
-      reviewers=reviewer)
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
+      reviewers=reviewer))
   return obj
 
 
@@ -259,12 +257,10 @@ def approve_obj_review(obj):
   rest_review = get_obj_review(obj)
   rest_service.ReviewService().update_obj(
       obj=rest_review, status=element.ReviewStates.REVIEWED)
-  exp_review = entities_factory.ReviewsFactory().create(
+  obj = obj.update_review(entities_factory.ReviewsFactory().create(
       is_add_rest_attrs=True,
       status=element.ReviewStates.REVIEWED,
       reviewers=users.current_user(),
       last_reviewed_by=users.current_user().email,
-      last_reviewed_at=rest_review.last_reviewed_at)
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
+      last_reviewed_at=rest_review.last_reviewed_at))
   return obj
