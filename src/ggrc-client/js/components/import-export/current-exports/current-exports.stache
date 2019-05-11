@@ -6,12 +6,15 @@
 <h2>Exporting</h2>
 
 <div class="current-exports">
-  {{#inProgress}}
-    <div class="current-exports__in-progress">
+  <div class="current-exports__instruction">
+    {{#if inProgress}}
       Your export request has been submitted. You may close this page or continue
       your work. We will send you an email notification when it completes.
-    </div>
-  {{/inProgress}}
+    {{else}}
+      Please click button below to download csv or open spreadsheet with exported data.
+      Be aware that export results will be removed once you download them.
+    {{/if}}
+  </div>
   {{#each exports}}
     <div class="flex-box flex-col current-exports__item {{#isDisabled id}}disabled{{/isDisabled}}">
       {{#is(status, "Failed")}}
