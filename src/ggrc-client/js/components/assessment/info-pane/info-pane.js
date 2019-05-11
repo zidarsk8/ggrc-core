@@ -66,6 +66,7 @@ import {relatedAssessmentsTypes} from '../../../plugins/utils/models-utils';
 import {notifier, notifierXHR} from '../../../plugins/utils/notifiers-utils';
 import Evidence from '../../../models/business-models/evidence';
 import * as businessModels from '../../../models/business-models';
+import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 /**
  * Assessment Specific Info Pane View Component
@@ -575,7 +576,7 @@ export default can.Component.extend({
         } else {
           this.afterStatusSave(status);
           this.attr('previousStatus', previousStatus);
-          notifierXHR('error', xhr);
+          notifier('error', getAjaxErrorInfo(xhr).details);
         }
       }).always(() => {
         this.attr('isUpdatingState', false);
