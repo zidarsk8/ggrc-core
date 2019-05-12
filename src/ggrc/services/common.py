@@ -1086,6 +1086,10 @@ class Resource(ModelView):
             obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
         }
 
+  def _check_post_create_options(self, body):
+    """Do NOTHING by default"""
+    pass
+
   def collection_post_loop(self, body, res, no_result):
     """Handle all posted objects.
 
@@ -1094,6 +1098,8 @@ class Resource(ModelView):
       res: List that will get responses appended to it.
       no_result: Flag for suppressing results.
     """
+    with benchmark("Check create options"):
+      self._check_post_create_options(body)
     with benchmark("Generate objects"):
       objects = []
       sources = []
