@@ -207,3 +207,21 @@ class TestAccessControlRole(TestCase):
 
     response = self.api.delete(acr)
     self.assertEqual(response.status_code, 405)
+
+  def test_create_with_wrong_options(self):
+    """ Test if user create ACR with wrong options."""
+    options = [{
+        'access_control_role':
+            {
+                'name': 'Test',
+                'modal_title': 'Add Custom Role to type Regulation',
+                'read': False,
+                'object_type': 'Regulation',
+                'parent_type': 'Regulation',
+                'update': True,
+                'context': {'id': None},
+                'delete': True
+            }
+    }]
+    response = self.api.post(AccessControlRole, options)
+    self.assert400(response)
