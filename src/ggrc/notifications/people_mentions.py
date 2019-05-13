@@ -43,7 +43,7 @@ def handle_comment_mapped(obj, comments):
   comments_data = _fetch_comments_data(comments)
 
   if obj.__class__.__name__ == "CycleTaskGroupObjectTask":
-    url = calendar_utils.get_cycle_tasks_url_by_title(obj.title)
+    url = calendar_utils.get_cycle_tasks_url_by_slug(obj.slug)
   else:
     url = urljoin(get_url_root(), utils.view_url_for(obj))
 

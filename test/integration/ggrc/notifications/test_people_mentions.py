@@ -59,13 +59,16 @@ class TestPeopleMentions(TestCase):
     """Test handling of mapped comment to cycle task."""
     with factories.single_commit():
       person = factories.PersonFactory(email="author@example.com")
-      obj = wf_factories.CycleTaskGroupObjectTaskFactory(title=u"task1")
+      obj = wf_factories.CycleTaskGroupObjectTaskFactory(
+          slug=u"TSK-1",
+          title=u"task1",
+      )
       comment = factories.CommentFactory(
           description=u"One <a href=\"mailto:user@example.com\"></a>",
       )
       comment.modified_by_id = person.id
       comment.created_at = datetime.datetime(2018, 1, 10, 7, 31, 42)
-      url = "http://localhost/dashboard#!task&query=%22Task%20Title%22%3Dtask1"
+      url = "http://localhost/dashboard#!task&query=%22task%20slug%22%3DTSK-1"
 
     people_mentions.handle_comment_mapped(obj, [comment])
     expected_title = (u"author@example.com mentioned you "

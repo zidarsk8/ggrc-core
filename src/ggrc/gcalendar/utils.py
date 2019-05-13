@@ -26,10 +26,10 @@ def get_active_cycle_tasks_url(due_date):
   return base + urllib.quote(active_filter.encode('utf-8'))
 
 
-def get_cycle_tasks_url_by_title(title):
-  """Get CycleTask notification url based on title."""
+def get_cycle_tasks_url_by_slug(slug):
+  """Get CycleTask notification url based on slug."""
   base = urljoin(get_url_root(), u"dashboard#!task&query=")
-  active_filter = u'"Task Title"={title}'.format(title=title)
+  active_filter = u'"task slug"={slug}'.format(slug=slug)
   return base + urllib.quote(active_filter.encode('utf-8'))
 
 
