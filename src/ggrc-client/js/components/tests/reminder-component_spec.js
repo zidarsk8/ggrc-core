@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../reminder';
+import Component from '../reminder-component';
 
 describe('reminder component', function () {
   describe('reminder() method', function () {

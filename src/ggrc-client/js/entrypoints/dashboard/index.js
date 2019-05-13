@@ -24,7 +24,7 @@ import '../../components/workflow/cycle-task-objects/cycle-task-objects';
 import '../../components/tabs/tab-container';
 import '../../components/revision-log/revision-log';
 import '../../components/quick-update/ggrc-quick-update';
-import '../../components/reminder';
+import '../../components/reminder-component';
 import '../../components/rich-text/rich-text';
 import '../../components/object-cloner/object-cloner';
 import '../../components/tree-pagination/tree-pagination';
