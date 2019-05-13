@@ -6,7 +6,7 @@
 import * as SnapshotUtils from '../../../../plugins/utils/snapshot-utils';
 import * as QueryAPI from '../../../../plugins/utils/query-api-utils';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
-import Component from '../mapped-controls';
+import Component from '../assessment-mapped-controls';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 
 describe('assessment-mapped-controls component', () => {

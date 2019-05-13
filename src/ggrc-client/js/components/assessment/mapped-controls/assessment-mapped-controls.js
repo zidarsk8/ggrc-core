@@ -19,7 +19,7 @@ import {
   toObject,
   transformQuery,
 } from '../../../plugins/utils/snapshot-utils';
-import template from './mapped-controls.stache';
+import template from './assessment-mapped-controls.stache';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 /**

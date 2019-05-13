@@ -12,7 +12,7 @@ import '../attach-button';
 import '../info-pane-save-status';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
-import '../mapped-controls/mapped-controls';
+import '../mapped-controls/assessment-mapped-controls';
 import '../../assessment/map-button-using-assessment-type';
 import '../../ca-object/ca-object-modal-content';
 import '../../comment/comment-add-form';
