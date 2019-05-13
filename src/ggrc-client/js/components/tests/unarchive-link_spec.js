@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../unarchive_link';
+import Component from '../unarchive-link';
 
 describe('unarchive-link component', function () {
   describe('click() event', function () {

@@ -20,7 +20,7 @@ import '../components/related-objects/revisions/related-revisions';
 import '../components/snapshotter/revisions-comparer';
 import '../components/snapshotter/snapshot-comparer-config';
 import '../components/revision-history/restore-revision';
-import '../components/unarchive_link';
+import '../components/unarchive-link';
 import '../components/sort/sort';
 import '../components/object-review/object-review';
 import '../components/review-state/review-state';
