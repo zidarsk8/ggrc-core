@@ -48,6 +48,7 @@
     <object-selection-item isDisabled:from="isDisabled"
                            isSelected:from="markedSelected"
                            isSaving:from="isSaving"
+                           isBlocked:from="isSelf"
                            item:from="itemData">
     </object-selection-item>
   {{/searchOnly}}
