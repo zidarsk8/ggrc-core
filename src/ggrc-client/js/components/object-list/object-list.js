@@ -4,7 +4,7 @@
  */
 
 import '../show-more/show-more';
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 import template from './object-list.stache';
 
 /**

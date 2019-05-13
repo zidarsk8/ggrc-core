@@ -16,7 +16,7 @@ import '../../components/textarea-array/textarea-array';
 import '../../components/object-list-item/object-list-item-updater';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-urls';
-import '../../components/spinner/spinner';
+import '../../components/spinner-component/spinner-component';
 import '../../components/object-list/object-list';
 import '../../components/object-list-item/document-object-list-item';
 import '../../components/action-toolbar-control/action-toolbar-control';

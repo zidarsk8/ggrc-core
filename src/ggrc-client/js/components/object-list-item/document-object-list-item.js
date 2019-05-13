@@ -4,7 +4,7 @@
  */
 
 import template from './document-object-list-item.stache';
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 
 /**
  * Simple component to show Document-like Objects

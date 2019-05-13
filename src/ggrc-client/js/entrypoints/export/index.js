@@ -6,7 +6,7 @@
 import '../commons';
 
 // Components
-import '../../components/spinner/spinner';
+import '../../components/spinner-component/spinner-component';
 import '../../components/import-export/export';
 import '../../components/object-list/object-list';
 import '../../components/tree-pagination/tree-pagination';

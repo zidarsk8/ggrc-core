@@ -10,7 +10,7 @@ import '../object-list-item/document-object-list-item';
 import '../object-popover/related-assessment-popover';
 import '../reusable-objects/reusable-objects-item';
 import '../state-colors-map/state-colors-map';
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 import '../tree-pagination/tree-pagination';
 import Pagination from '../base-objects/pagination';
 import template from './templates/related-assessments.stache';
