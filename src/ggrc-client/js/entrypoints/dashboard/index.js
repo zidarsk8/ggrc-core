@@ -26,7 +26,7 @@ import '../../components/revision-log/revision-log';
 import '../../components/quick_form/quick_update';
 import '../../components/reminder';
 import '../../components/rich-text/rich-text';
-import '../../components/object_cloner/object_cloner';
+import '../../components/object-cloner/object-cloner';
 import '../../components/tree_pagination/tree_pagination';
 import '../../components/tree/tree-widget-container';
 import '../../components/snapshotter/scope-update';
