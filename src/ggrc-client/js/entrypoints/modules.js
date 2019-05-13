@@ -13,12 +13,12 @@ import '../apps/risk_assessments';
 // ggrc_workflows
 import '../apps/workflow-config';
 import '../apps/workflows';
-import '../components/workflow/workflow_clone';
-import '../components/workflow/taskgroup_clone';
-import '../components/workflow/end_cycle';
+import '../components/workflow/workflow-clone';
+import '../components/workflow/task-group-clone';
+import '../components/workflow/cycle-end-cycle';
 import '../components/workflow/workflow-activate';
 import '../components/workflow/workflow-start-cycle';
-import '../components/workflow/workflow_deactivate';
+import '../components/workflow/workflow-deactivate';
 import '../components/workflow/repeat-on-button-wrapper';
 import '../components/workflow/repeat-on-summary';
 import '../components/workflow/cycle-task-group-object-task/cycle-task-group-object-task';
