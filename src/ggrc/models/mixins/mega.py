@@ -49,33 +49,38 @@ class Mega(object):
         sa.orm.subqueryload('_child_relationships').load_only("id")
     )
 
-  def get_all_relatives_ids(self, direction):
+  @classmethod
+  def get_all_relatives_ids(cls, _id, direction):
     """Returns ids of relatives for all generations
 
     Args:
+        _id: ID of Mega object
         direction: could be 'parents' or 'children'
     Returns:
         set of ids
     """
     visited = set()
-    not_visited = {self.id, }
+    not_visited = {_id, }
     while not_visited:
       visited.update(not_visited)
-      not_visited = self._get_relatives_for(direction, not_visited)
+      not_visited = cls._get_relatives_for(direction, not_visited)
       not_visited -= visited
-    return visited - {self.id}
+    return visited - {_id}
 
-  def get_relatives_ids(self, direction):
+  @classmethod
+  def get_relatives_ids(cls, _id, direction):
     """Returns ids of relatives for one generation
 
     Args:
+        _id: ID of Mega object
         direction: could be 'parents' or 'children'
     Returns:
         set of ids
     """
-    return self._get_relatives_for(direction, {self.id}) - {self.id}
+    return cls._get_relatives_for(direction, {_id}) - {_id}
 
-  def _get_relatives_for(self, direction, nodes):
+  @classmethod
+  def _get_relatives_for(cls, direction, nodes):
     """Return set of ids of relatives of nodes in selected direction
 
     Args:
@@ -96,8 +101,8 @@ class Mega(object):
 
     relationships = rel.query.filter(
         direction_filter(nodes),
-        rel.source_type == self.__class__.__name__,
-        rel.destination_type == self.__class__.__name__,
+        rel.source_type == cls.__name__,
+        rel.destination_type == cls.__name__,
     )
     return set(getattr(r, next_nodes_attr) for r in relationships)
 
@@ -113,8 +118,8 @@ class Mega(object):
     if obj.id in mega_parents_cache[obj.type]:
       parents_ids = mega_parents_cache[obj.type][obj.id]
     else:
-      obj = get_model(obj.type).query.get(obj.id)
-      parents_ids = obj.get_all_relatives_ids("parents")
+      obj_model = get_model(obj.type)
+      parents_ids = obj_model.get_all_relatives_ids(obj.id, "parents")
       mega_parents_cache[obj.type][obj.id] = parents_ids
     return parent.id in parents_ids
 
