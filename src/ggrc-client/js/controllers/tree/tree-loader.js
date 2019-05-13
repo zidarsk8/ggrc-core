@@ -95,12 +95,6 @@ export default can.Control.extend({
       return undefined;
     }
 
-    if (list) {
-      list = list.length === null ? new can.List([list]) : list;
-    } else {
-      list = this.options.list;
-    }
-
     // make attributes queue is correct.
     list.sort(function (a, b) {
       return a.id - b.id;
