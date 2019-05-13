@@ -9,7 +9,7 @@ import '../related-objects/related-assessments';
 import '../object-list/object-list';
 import '../object-selection/object-selection';
 import '../mega-relation-selection-item/mega-relation-selection-item';
-import '../tree_pagination/tree_pagination';
+import '../tree-pagination/tree-pagination';
 import template from './templates/mapper-results.stache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';

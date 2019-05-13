@@ -5,7 +5,7 @@
 
 import Pagination from '../../base-objects/pagination';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../tree_pagination';
+import Component from '../tree-pagination';
 
 describe('tree-pagination component', function () {
   let viewModel;

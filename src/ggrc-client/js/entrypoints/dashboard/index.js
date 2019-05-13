@@ -27,7 +27,7 @@ import '../../components/quick-update/ggrc-quick-update';
 import '../../components/reminder';
 import '../../components/rich-text/rich-text';
 import '../../components/object-cloner/object-cloner';
-import '../../components/tree_pagination/tree_pagination';
+import '../../components/tree-pagination/tree-pagination';
 import '../../components/tree/tree-widget-container';
 import '../../components/snapshotter/scope-update';
 import '../../components/page-header/page-header';
