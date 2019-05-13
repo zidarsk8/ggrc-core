@@ -3,7 +3,6 @@
 """Date utils."""
 import datetime
 
-import holidays
 from dateutil import tz
 
 
@@ -20,7 +19,7 @@ def first_working_day(date):
   """Returns the nearest working day today or in past.
   This algorithm is used when back-end generates a cycle task.
   """
-  while _is_weekend(date) or date in holidays.UnitedStates():
+  while _is_weekend(date):
     date += datetime.timedelta(days=-1)
   return date
 
@@ -29,7 +28,7 @@ def first_working_day_after_today(date):
   """Returns the nearest working day today or in future.
   """
   date = date + datetime.timedelta(days=1)
-  while _is_weekend(date) or date in holidays.UnitedStates():
+  while _is_weekend(date):
     date += datetime.timedelta(days=1)
   return date
 
