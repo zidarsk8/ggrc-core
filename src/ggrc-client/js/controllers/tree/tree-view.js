@@ -267,7 +267,6 @@ const TreeViewControl = TreeLoader.extend({
     if (listWindow.length > 0) {
       queue.push(listWindow);
     }
-    this.options.attr('filter_shown', 0);
     finalDfd = _.reduce(queue, function (dfd, listWindow) {
       return dfd.then(function () {
         let res = $.Deferred();
@@ -294,18 +293,6 @@ const TreeViewControl = TreeLoader.extend({
       });
     }, $.Deferred().resolve());
 
-    finalDfd.done(this._ifNotRemoved(function () {
-      let shown = this.element[0].children.length;
-      let count = this.options.list.length;
-      // We need to hide `of` in case the numbers are same
-      if (shown === count && shown > 0) {
-        shown = false;
-      } else {
-        shown = shown.toString();
-      }
-      this.options.attr('filter_shown', shown);
-      this.options.attr('filter_count', count.toString());
-    }.bind(this)));
     return finalDfd;
   },
   draw_items: function (optionsList) {
