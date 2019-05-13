@@ -101,10 +101,14 @@ class TestMegaProgram(TestCase):
                                     destination=program_c)
       factories.RelationshipFactory(source=program_f,
                                     destination=program_e)
-    parents_b = program_b.get_all_relatives_ids("parents")
-    children_b = program_b.get_all_relatives_ids("children")
-    parents_e = program_e.get_all_relatives_ids("parents")
-    children_e = program_e.get_all_relatives_ids("children")
+    parents_b = all_models.Program.get_all_relatives_ids(program_b.id,
+                                                         "parents")
+    children_b = all_models.Program.get_all_relatives_ids(program_b.id,
+                                                          "children")
+    parents_e = all_models.Program.get_all_relatives_ids(program_e.id,
+                                                         "parents")
+    children_e = all_models.Program.get_all_relatives_ids(program_e.id,
+                                                          "children")
     self.assertEqual(parents_b, {program_c.id, program_e.id, program_f.id})
     self.assertEqual(children_b, {program_a.id, })
     self.assertEqual(parents_e, {program_f.id, })
@@ -129,7 +133,9 @@ class TestMegaProgram(TestCase):
                                     destination=program_b)
       factories.RelationshipFactory(source=program_a,
                                     destination=program_c)
-    parents_b = program_b.get_all_relatives_ids("parents")
-    children_b = program_b.get_all_relatives_ids("children")
+    parents_b = all_models.Program.get_all_relatives_ids(program_b.id,
+                                                         "parents")
+    children_b = all_models.Program.get_all_relatives_ids(program_b.id,
+                                                          "children")
     self.assertEqual(parents_b, {program_a.id, program_c.id})
     self.assertEqual(children_b, {program_a.id, program_c.id})
