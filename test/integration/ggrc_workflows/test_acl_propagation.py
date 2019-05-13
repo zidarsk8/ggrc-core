@@ -113,7 +113,10 @@ class TestWorkflowAclPropagation(TestCase):
       for t in threads:
         t.start()
       for t in threads:
-        t.join()
+        t.join(90)
+        self.assertFalse(t.isAlive(),
+                         "Looks like deadlock happened during"
+                         "simultaneous ACL updates")
 
       acl = all_models.AccessControlList
 
