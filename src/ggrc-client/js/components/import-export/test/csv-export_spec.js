@@ -3,12 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../export';
+import Component from '../csv-export';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import router from '../../../router';
 import * as ModalsUtils from '../../../plugins/utils/modals';
 
-describe('export component', () => {
+describe('csv-export component', () => {
   let viewModel;
 
   beforeEach(function () {
