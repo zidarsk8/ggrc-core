@@ -4,7 +4,7 @@
  */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../dropdown';
+import Component from '../dropdown-component';
 
 describe('dropdown component', function () {
   'use strict';
