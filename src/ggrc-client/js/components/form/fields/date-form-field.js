@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../datepicker/datepicker';
+import '../../datepicker/datepicker-component';
 import template from './date-form-field.stache';
 
 export default can.Component.extend({

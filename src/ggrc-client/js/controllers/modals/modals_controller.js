@@ -32,7 +32,7 @@ import '../../components/deferred-mapper';
 import '../../components/modal-wrappers/assessment-modal';
 import '../../components/assessment/map-button-using-assessment-type';
 import '../../components/gca-controls/gca-controls';
-import '../../components/datepicker/datepicker';
+import '../../components/datepicker/datepicker-component';
 import '../../components/external-data-autocomplete/inline-autocomplete-wrapper';
 import '../../components/multi-select-label/multi-select-label';
 import '../../components/proposal/create-proposal';
