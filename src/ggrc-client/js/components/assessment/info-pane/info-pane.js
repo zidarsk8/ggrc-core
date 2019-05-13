@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../controls-toolbar/controls-toolbar';
+import '../controls-toolbar/assessment-controls-toolbar';
 import '../assessment-local-ca';
 import '../assessment-custom-attributes';
 import '../assessment-people';
