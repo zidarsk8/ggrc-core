@@ -31,7 +31,7 @@ import '../../object-state-toolbar/object-state-toolbar';
 import '../../loading/loading-status';
 import './info-pane-issue-tracker-fields';
 import '../../tabs/tab-container';
-import './inline-item';
+import './assessment-inline-item';
 import './create-url';
 import './confirm-edit-action';
 import '../../multi-select-label/multi-select-label';

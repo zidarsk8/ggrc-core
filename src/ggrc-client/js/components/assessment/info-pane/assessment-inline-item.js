@@ -4,7 +4,7 @@
 */
 
 import './confirm-edit-action';
-import template from './inline-item.stache';
+import template from './assessment-inline-item.stache';
 
 export default can.Component.extend({
   tag: 'assessment-inline-item',
