@@ -7,7 +7,7 @@ import {
   getComponentVM,
   makeFakeInstance,
 } from '../../../../js_specs/spec_helpers';
-import Component from '../assessment_template_form';
+import Component from '../wrapper-assessment-template';
 import AssessmentTemplate from '../../../models/business-models/assessment-template';
 
 const PEOPLE_VALUES_OPTIONS = Object.freeze({
