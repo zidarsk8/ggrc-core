@@ -23,7 +23,7 @@ import '../../components/clipboard-link/shortlink';
 import '../../components/workflow/cycle-task-objects/cycle-task-objects';
 import '../../components/tabs/tab-container';
 import '../../components/revision-log/revision-log';
-import '../../components/quick_form/quick_update';
+import '../../components/quick-update/ggrc-quick-update';
 import '../../components/reminder';
 import '../../components/rich-text/rich-text';
 import '../../components/object-cloner/object-cloner';
