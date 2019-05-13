@@ -1,5 +1,5 @@
 Object type,,,,,,,,,,,,
-Person,Name,Email*,Role,,,,,,,,,
+Person,Name,Email*,Role,,,,,,,
 ,Test User,user@example.com,Administrator,,,,,,,,,
 ,Admin,admin@test.com,Administrator,,,,,,,,,
 ,Creator PM,creatorpm@test.com,Creator,,,,,,,,,
@@ -23,7 +23,7 @@ Person,Name,Email*,Role,,,,,,,,,
 ,Admin Auditor,adminauditor@test.com,Administrator,,,,,,,,,
 ,,,,,,,,,,,,
 Object type,,,,,,,,,,,,
-Program,Code*,Title*,Program Managers*,Program Editors,Program Readers,State,,,,,,
+Program,Code*,Title*,Program Managers*,Program Editors,Program Readers,State,,,,
 ,PMRBACPROGRAM-1,Program Manager Audit RBAC Test,"user@example.com
 creatorpm@test.com
 readerpm@test.com
@@ -34,8 +34,8 @@ Editorpe@test.com
 adminpe@test.com","creatorpr@test.com
 readerpr@test.com
 editorpr@test.com
-Adminpr@test.com",Draft,,,,,,
-,,,,,,,,,,,,
+Adminpr@test.com",Draft,,,,
+,,,,,,,,,,
 Object type,,,,,,,,,,,,
 Access Group,code*,title*,description,admin,verifier,assignee,Launch Status,map:program,,,,
 ,ag-1,ag-1,test,user@example.com,user@example.com,user@example.com,Draft,PMRBACPROGRAM-1,,,,

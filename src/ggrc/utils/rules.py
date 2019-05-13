@@ -149,7 +149,7 @@ def _all_rules():
 
   all_models = {'AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
-                'Market', 'Objective', 'OrgGroup', 'Person',
+                'Market', 'Objective', 'OrgGroup',
                 'Policy', 'Process', 'Product', 'Program', 'Project',
                 'Regulation', 'Risk', 'Requirement', 'Standard',
                 'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
@@ -200,7 +200,7 @@ def _all_rules():
           StaticSnapshotMappingRule(type_) for type_ in snapshots
       },
       "Issue": {"Assessment", "Audit", "CycleTaskGroupObjectTask", "Issue",
-                "Person", "Program", "Project", "RiskAssessment"} | {
+                "Program", "Project", "RiskAssessment"} | {
           IssueMappingRule(type_) for type_ in snapshots
       },
   })
