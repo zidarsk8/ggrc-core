@@ -8,7 +8,8 @@ import {getCounts} from '../../plugins/utils/widgets-utils';
 import TreeLoader from './tree-loader';
 import TreeViewNode from './tree-view-node';
 import TreeViewOptions from './tree-view-options';
-import Mappings from '../../models/mappers/mappings';
+import CustomAttributeDefinition from '../../models/custom-attributes/custom-attribute-definition';
+import AccessControlRole from '../../models/custom-roles/access-control-role';
 
 const TreeViewControl = TreeLoader.extend({
   // static properties
@@ -176,40 +177,41 @@ const TreeViewControl = TreeLoader.extend({
           this.options.parent_instance.id : undefined);
     }
 
-    if (this.options.mapping) {
-      if (this.options.parent_instance === undefined) {
+    const {
+      mapping,
+      parent_instance: instance,
+    } = this.options;
+    // TODO Handle Add new GCA button - need to refresh list of GCA (the same for roles)
+    if (mapping) {
+      if (instance === undefined) {
         // TODO investigate why is this method sometimes called twice
         return undefined; // not ready, will try again
       }
-      let binding = Mappings.getBinding(
-        this.options.mapping,
-        this.options.parent_instance);
-      this.find_all_deferred = binding.refresh_list();
+
+      let dfd;
+      switch (mapping) {
+        case 'access_control_roles':
+          dfd = AccessControlRole.findAll({
+            object_type: instance.model_singular,
+            internal: false,
+          });
+          break;
+        case 'custom_attribute_definitions':
+          dfd = CustomAttributeDefinition.findAll({
+            definition_type: instance.root_object,
+            definition_id: null,
+          });
+          break;
+      }
+
+      this.find_all_deferred = dfd;
     } else if (this.options.list_loader) {
-      this.find_all_deferred =
-        this.options.list_loader(this.options.parent_instance);
+      this.find_all_deferred = this.options.list_loader(instance);
     } else {
       console.warn(`Unexpected code path ${this}`);
     }
 
     return this.find_all_deferred;
-  },
-
-  /*
-    * Removes items from the list by ids
-    * @param  {can.List}      list             list of items
-    * @param  {Array{Number}} removedItemsIds  array of item ids
-    */
-  removeFromList: function (list, removedItemsIds) {
-    // Since list items have slightly different format,
-    // we are lookig for instance property in possible places
-    let itemsToKeep = list.filter((item) => {
-      let inst = item && item.options && item.options.attr('instance') ||
-        item.attr('instance');
-
-      return !_.includes(removedItemsIds, inst.attr('id'));
-    });
-    list.replace(itemsToKeep);
   },
 
   prepare_child_options: function (v, forceReload) {
@@ -258,35 +260,10 @@ const TreeViewControl = TreeLoader.extend({
     return v;
   },
 
-  '{original_list} remove': function (list, ev, removedItems, index) {
-    let removedItemsIds = removedItems.map((remItem) => {
-      return remItem.attr('id');
-    });
-
-    this.removeFromList(this.options.list, removedItemsIds);
-    this.removeFromList(this.options.filteredList, removedItemsIds);
-
-    // NB: since row element are not rendered with template and binded element
-    // not always reflected in the filteredList ( for newly created items )
-    // we are just removeing the items from the lists and removing the DOM
-    // elements by ids
-    removedItemsIds.forEach((id) => {
-      this.element
-        .find(`.tree-view-node[data-object-id="${id}"]`)
-        .remove();
-    });
-  },
-
-  '{original_list} add': function (list, ev, newVals, index) {
-    let that = this;
-    let realAdd = [];
-
-    _.forEach(newVals, function (newVal) {
-      if (that.element) {
-        realAdd.push(newVal);
-      }
-    });
-    this.enqueue_items(realAdd);
+  removeListItem(item) {
+    this.element
+      .find(`.tree-view-node[data-object-id="${item.attr('id')}"]`)
+      .remove();
   },
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   add_child_lists: function (list) {
@@ -398,20 +375,14 @@ const TreeViewControl = TreeLoader.extend({
     return false;
   },
 
-  '.edit-object modal:success': function (el, ev, data) {
-    let model = el.closest('[data-model]').data('model');
-    model.attr(data[model.constructor.root_object] || data);
-    ev.stopPropagation();
-  },
-
-  reload_list: function (forceReload) {
+  reload_list() {
     if (this.options.list === undefined || this.options.list === null) {
       return;
     }
     this._draw_list_deferred = false;
     this.find_all_deferred = false;
     this.options.list.replace([]);
-    this.draw_list(this.options.original_list, forceReload);
+    this.draw_list(this.options.original_list);
     this.init_count();
   },
 

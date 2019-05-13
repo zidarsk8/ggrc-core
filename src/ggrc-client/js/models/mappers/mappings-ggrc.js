@@ -3,13 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {
-  Direct,
-  Search,
-} from '../mappers/mapper-helpers';
+import {Direct} from '../mappers/mapper-helpers';
 import Mappings from './mappings';
-import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
-import AccessControlRole from '../custom-roles/access-control-role';
 
 import {
   businessObjects,
@@ -28,7 +23,7 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
       unmap : [ <object name>, ...]
       indirectMappings: [ <object name>, ...]
       mappers : {
-        <mapping name>: Direct(...) | Search()
+        <mapping name>: Direct(...)
       }
     }
   }
@@ -268,27 +263,5 @@ new Mappings({
       'TaskGroupTask', 'TechnologyEnvironment', 'Threat',
       'Vendor', 'Workflow',
     ],
-  },
-  // Used by Custom Attributes widget
-  CustomAttributable: {
-    mappers: {
-      custom_attribute_definitions: Search(function (binding) {
-        return CustomAttributeDefinition.findAll({
-          definition_type: binding.instance.root_object,
-          definition_id: null,
-        });
-      }, 'CustomAttributeDefinition'),
-    },
-  },
-  // used by the Custom Roles admin panel tab
-  Roleable: {
-    mappers: {
-      access_control_roles: Search(function (binding) {
-        return AccessControlRole.findAll({
-          object_type: binding.instance.model_singular,
-          internal: false,
-        });
-      }, 'AccessControlRole'),
-    },
   },
 });

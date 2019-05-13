@@ -9,12 +9,5 @@ function Direct(
     optionModelName, instanceJoinAttr, remoteJoinAttr);
 }
 
-function Search(queryFunction, observeTypes) {
-  return new GGRC.ListLoaders.SearchListLoader(queryFunction, observeTypes);
-}
-
-export {
-  Direct,
-  Search,
-};
+export {Direct};
 
