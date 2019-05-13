@@ -20,13 +20,11 @@ const TreeViewControl = TreeLoader.extend({
     add_item_view: null,
     parent: null,
     list: null,
-    single_object: false,
     find_params: {},
     fields: [],
     filter_states: [],
     sortable: true,
     start_expanded: false, // true
-    find_function: null,
     options_property: 'tree_view_options',
     child_options: [], // this is how we can make nested configs. if you want to use an existing
     // example child option:
@@ -42,8 +40,6 @@ const TreeViewControl = TreeLoader.extend({
     'add_item_view',
     'list',
     'original_list',
-    'single_object',
-    'find_function',
     'find_all_deferred',
   ],
 }, {

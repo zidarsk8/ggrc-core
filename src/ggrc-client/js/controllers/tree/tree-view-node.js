@@ -152,7 +152,6 @@ export default can.Control.extend({
       this.add_child_list(this.options, options);
       options.attr({
         options_property: this.options.options_property,
-        single_object: false,
         parent: this,
         parent_instance: this.options.instance,
       });
