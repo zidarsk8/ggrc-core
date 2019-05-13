@@ -7,7 +7,7 @@ import '../commons';
 
 // Components
 import '../../components/spinner-component/spinner-component';
-import '../../components/import-export/import';
+import '../../components/import-export/csv-import';
 import '../../components/object-list/object-list';
 import '../../components/tree-pagination/tree-pagination';
 import '../../components/page-header/page-header';

@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../import';
+import Component from '../csv-import';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as ieUtils from '../../../plugins/utils/import-export-utils';
 import {
