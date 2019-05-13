@@ -212,7 +212,7 @@ const TreeViewControl = TreeLoader.extend({
     return this.find_all_deferred;
   },
 
-  prepare_child_options: function (v, forceReload) {
+  prepare_child_options: function (v) {
     //  v may be any of:
     //    <model_instance>
     //    { instance: <model instance>, mappings: [...] }
@@ -220,7 +220,7 @@ const TreeViewControl = TreeLoader.extend({
     let tmp;
     let that = this;
     let original = v;
-    if (v._child_options_prepared && !forceReload) {
+    if (v._child_options_prepared) {
       return v._child_options_prepared;
     }
     if (!(v instanceof TreeViewOptions)) {
