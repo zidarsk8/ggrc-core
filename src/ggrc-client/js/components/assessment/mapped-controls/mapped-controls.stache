@@ -74,16 +74,16 @@
         {{/if}}
         {{^if withoutDetails}}
           {{#is assessmentType 'Control'}}
-            <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
+            <mapped-control-related-objects class="mapped-controls-info__related-objects"
                                                        titleText:from="'Show Related Requirements ({{requirements.length}})'"
                                                        type:from="'Requirement'"
                                                        items:from="requirements">
-            </assessment-mapped-control-related-objects>
-            <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
+            </mapped-control-related-objects>
+            <mapped-control-related-objects class="mapped-controls-info__related-objects"
                                                        titleText:from="'Show Related Regulations ({{regulations.length}})'"
                                                        type:from="'Regulation'"
                                                        items:from="regulations">
-            </assessment-mapped-control-related-objects>
+            </mapped-control-related-objects>
           {{/is}}
         {{/if}}
     </div>
