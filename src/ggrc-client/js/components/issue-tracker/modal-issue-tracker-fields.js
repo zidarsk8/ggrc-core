@@ -4,7 +4,7 @@
  */
 
 import '../dropdown/dropdown-component';
-import '../numberbox/numberbox';
+import '../numberbox/numberbox-component';
 import template from './templates/modal-issue-tracker-fields.stache';
 
 export default can.Component.extend({

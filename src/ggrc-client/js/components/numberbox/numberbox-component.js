@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/numberbox.stache';
+import template from './templates/numberbox-component.stache';
 
 const FLOAT_NUMBER_PATTERN = '([0-9]+([.][0-9]+){0,1})';
 const INT_NUMBER_PATTERN = '([0-9]+)';

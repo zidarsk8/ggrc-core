@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../numberbox/numberbox';
+import '../../numberbox/numberbox-component';
 import template from './templates/numberbox-form-field.stache';
 import {TEXT_FORM_FIELD_VM} from './text-form-field';
 

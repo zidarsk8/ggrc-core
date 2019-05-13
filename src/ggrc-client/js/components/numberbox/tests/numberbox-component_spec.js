@@ -6,7 +6,7 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component,
 {FLOAT_NUMBER_PATTERN, INT_NUMBER_PATTERN, NEGATIVE_NUMBER_PATTERN}
-  from '../numberbox';
+  from '../numberbox-component';
 
 describe('numberbox component', () => {
   let viewModel;
