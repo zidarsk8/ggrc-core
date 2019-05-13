@@ -6,9 +6,9 @@
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../scope-update';
+import Component from '../snapshot-scope-update';
 
-describe('snapshot-scope-updater component', function () {
+describe('snapshot-scope-update component', function () {
   'use strict';
 
   let updaterViewModel;

@@ -29,7 +29,7 @@ import '../../components/rich-text/rich-text';
 import '../../components/object-cloner/object-cloner';
 import '../../components/tree-pagination/tree-pagination';
 import '../../components/tree/tree-widget-container';
-import '../../components/snapshotter/scope-update';
+import '../../components/snapshotter/snapshot-scope-update';
 import '../../components/page-header/page-header';
 import '../../components/inner-nav/inner-nav';
 import '../../components/inner-nav/audit-inner-nav';
