@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../info-pane';
+import Component from '../assessment-info-pane';
 import {getComponentVM, makeFakeInstance} from '../../../../../js_specs/spec_helpers';
 import tracker from '../../../../tracker';
 import {
