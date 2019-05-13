@@ -5,7 +5,7 @@
 
 import './people-group-modal';
 import './editable-people-group-header';
-import '../autocomplete/autocomplete';
+import '../autocomplete/autocomplete-component';
 import '../external-data-autocomplete/external-data-autocomplete';
 import '../person/person-data';
 import peopleGroupVM from '../view-models/people-group-vm';

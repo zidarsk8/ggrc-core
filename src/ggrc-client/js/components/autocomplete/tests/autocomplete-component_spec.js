@@ -4,10 +4,10 @@
 */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../autocomplete';
+import Component from '../autocomplete-component';
 
 
-describe('autocomplete', function () {
+describe('autocomplete-component', function () {
   describe('defining default viewModel values', function () {
     let viewModel;
 

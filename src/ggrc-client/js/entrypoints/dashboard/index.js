@@ -16,7 +16,7 @@ import '../../components/spinner/spinner';
 import '../../components/read-more/read-more';
 import '../../components/object-list/object-list';
 import '../../components/show-more/show-more';
-import '../../components/autocomplete/autocomplete';
+import '../../components/autocomplete/autocomplete-component';
 import '../../components/person/person-data';
 import '../../components/clipboard-link/permalink';
 import '../../components/clipboard-link/shortlink';

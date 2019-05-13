@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './autocomplete.stache';
+import template from './autocomplete-component.stache';
 
 /**
  * A component that renders an autocomplete text input field.

@@ -23,7 +23,7 @@ import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/effective-dates/effective-dates';
 import '../../components/dropdown/dropdown';
 import '../../components/modal-wrappers/wrapper-assessment-template';
-import '../../components/autocomplete/autocomplete';
+import '../../components/autocomplete/autocomplete-component';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/person/person-data';
 import '../../components/rich-text/rich-text';
