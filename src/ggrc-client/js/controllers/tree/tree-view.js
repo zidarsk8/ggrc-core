@@ -20,7 +20,6 @@ const TreeViewControl = TreeLoader.extend({
     add_item_view: null,
     parent: null,
     list: null,
-    filteredList: [],
     single_object: false,
     find_params: {},
     fields: [],
@@ -285,7 +284,6 @@ const TreeViewControl = TreeLoader.extend({
       queue.push(listWindow);
     }
     this.options.attr('filter_shown', 0);
-    this.options.attr('filteredList', []);
     finalDfd = _.reduce(queue, function (dfd, listWindow) {
       return dfd.then(function () {
         let res = $.Deferred();
@@ -330,7 +328,6 @@ const TreeViewControl = TreeLoader.extend({
     let items;
     let $footer = this.element.children('.tree-item-add').first();
     let drawItemsDfds = [];
-    let filteredItems = this.options.attr('filteredList') || [];
     let res;
 
     items = can.makeArray(optionsList);
@@ -339,7 +336,6 @@ const TreeViewControl = TreeLoader.extend({
       let elem = document.createElement('li');
       let control = new TreeViewNode(elem, options);
       drawItemsDfds.push(control._draw_node_deferred);
-      filteredItems.push(control);
       return control.element[0];
     });
 
@@ -351,7 +347,7 @@ const TreeViewControl = TreeLoader.extend({
     if (this.options.sortable) {
       $(this.element).sortable({element: 'li.tree-item', handle: '.drag'});
     }
-    this.options.attr('filteredList', filteredItems);
+
     res = $.when(...drawItemsDfds);
     return res;
   },
