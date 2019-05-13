@@ -4,9 +4,9 @@
  */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../sort';
+import Component from '../sort-component';
 
-describe('sort component', () => {
+describe('sort-component component', () => {
   let viewModel;
 
   beforeAll(() => {

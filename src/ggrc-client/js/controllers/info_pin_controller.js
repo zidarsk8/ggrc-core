@@ -21,7 +21,7 @@ import '../components/snapshotter/revisions-comparer';
 import '../components/snapshotter/snapshot-comparer-config';
 import '../components/revision-history/restore-revision';
 import '../components/unarchive-link';
-import '../components/sort/sort';
+import '../components/sort-component/sort-component';
 import '../components/object-review/object-review';
 import '../components/review-state/review-state';
 import '../components/redirects/proposable-control/proposable-control';
