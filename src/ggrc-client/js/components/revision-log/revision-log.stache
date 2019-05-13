@@ -24,7 +24,9 @@
             viewType:from="'button'">
             Open Change Log in new frontend
           </questionnaire-link>
-          <span class="revision-log__logs-message">The logs after migration to new UI on 06/27/2019 are available here.</span>
+          <span class="revision-log__logs-message">
+            The logs before and after migration to new UI on {{instance.constructor.migrationDate}} are available below.
+          </span>
         </div>
       {{/if}}
       <div class="revision-log__header-item revision-log__header-toolbar">

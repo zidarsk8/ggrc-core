@@ -277,6 +277,14 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
+          <tab-panel
+            panels:bind="panels"
+            titleText:from="'Change Log'">
+            <revision-log
+              instance:from="instance"
+              options:from="tabOptions"
+            ></revision-log>
+          </tab-panel>
           <tab-link
             instance:from="instance"
             panels:bind="panels"
@@ -287,12 +295,6 @@
             instance:from="instance"
             panels:bind="panels"
             titleText:from="'Version History'"
-            linkType:from="'change-log'"
-          ></tab-link>
-          <tab-link
-            instance:from="instance"
-            panels:bind="panels"
-            titleText:from="'Change Log'"
             linkType:from="'change-log'"
           ></tab-link>
         {{/if}}

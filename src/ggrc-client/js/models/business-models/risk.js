@@ -21,6 +21,7 @@ export default Cacheable.extend({
     proposable,
     changeableExternally,
   ],
+  migrationDate: '06/27/2019',
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
