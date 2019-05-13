@@ -67,12 +67,22 @@
       onStateChangeDfd:from="onStateChangeDfd"
       isEditIconDenied:from="isEditDenied"
       value:from="instance.issue_tracker.issue_id"
+      mandatory:from="isTicketIdMandatory"
       instance:from="instance">
         <div>
-          <div class="ggrc-form__title">Ticket ID</div>
+          <div class="ggrc-form__title">
+            Ticket ID
+            {{#if isTicketIdMandatory}}
+              <i class="fa fa-asterisk"></i>
+            {{/if}}
+          </div>
           <div class="ggrc-form-item__small-text">
             <small>
-              <em>If you would like to keep the existing bug linked to this assessment do not edit this attribute. If you would like to link to a different ticket, either clear this attribute to generate new or provide an existing ticket number.</em>
+              {{#if isTicketIdMandatory}} 
+                <em>You are not allowed to generate new ticket for Issues at statuses &quot;In Review&quot;, &quot;Completed (no verification)&quot;, &quot;Completed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform. If you would like to keep the existing ticket linked to this issue do not edit this attribute. If you would like to link to a different ticket provide an existing ticket number.</em>
+              {{else}}
+                <em>Please leave this empty for a new ticket to be generated and linked to this assessment. If you would like to link to an existing ticket please provide the ticket number.</em>
+              {{/if}}
             </small>
           </div>
         </div>
