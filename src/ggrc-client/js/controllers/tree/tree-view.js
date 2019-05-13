@@ -242,18 +242,6 @@ const TreeViewControl = TreeLoader.extend({
         v.attr('instance', this.options.model.model(v.instance));
       }
     }
-    v.attr('child_count', can.compute(function () {
-      let totalChildren = 0;
-      if (v.attr('child_options')) {
-        _.forEach(v.attr('child_options'), function (childCptions) {
-          let list = childCptions.attr('list');
-          if (list) {
-            totalChildren += list.attr('length');
-          }
-        });
-      }
-      return totalChildren;
-    }));
     original._child_options_prepared = v;
     return v;
   },
