@@ -38,7 +38,7 @@ import '../../components/unmap-button/unmap-button';
 import '../../components/delete-button/delete-button';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-urls';
-import '../../components/inline/inline';
+import '../../components/inline/inline-edit-control';
 import '../../components/inline/base-inline-control-title';
 import '../../components/global-custom-attributes/global-custom-attributes';
 import '../../components/unmap-button/unmap-dropdown-item';

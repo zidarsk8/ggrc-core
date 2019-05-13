@@ -12,7 +12,7 @@ import '../form/fields/rich-text-form-field';
 import '../form/fields/text-form-field';
 import '../form/fields/numberbox-form-field';
 import {isInnerClick, getPlainText} from '../../plugins/ggrc_utils';
-import template from './inline.stache';
+import template from './inline-edit-control.stache';
 
 export default can.Component.extend({
   tag: 'inline-edit-control',
