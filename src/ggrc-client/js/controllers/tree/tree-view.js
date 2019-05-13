@@ -139,8 +139,7 @@ const TreeViewControl = TreeLoader.extend({
 
     this.init_count();
 
-    this._init_view_deferred = $.when.apply($.when, dfds);
-    return this._init_view_deferred;
+    return $.when.apply($.when, dfds);
   },
 
   init_count: function () {

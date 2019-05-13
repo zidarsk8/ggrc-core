@@ -80,11 +80,8 @@ export default can.Control.extend({
       .then(this._ifNotRemoved(function () {
         let dfds = [loader()];
 
-        if (that._init_view_deferred) {
-          dfds.push(that._init_view_deferred);
-        } else {
-          dfds.push(that.init_view());
-        }
+        dfds.push(that.init_view());
+
         return $.when(...dfds);
       }))
       .then(that._ifNotRemoved((list) => this.draw_list(list)));
