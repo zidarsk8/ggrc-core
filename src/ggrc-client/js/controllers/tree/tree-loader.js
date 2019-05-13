@@ -79,6 +79,7 @@ export default can.Control.extend({
     this._display_deferred = this._display_deferred
       .then(this._ifNotRemoved(function () {
         let dfds = [loader()];
+
         if (that._init_view_deferred) {
           dfds.push(that._init_view_deferred);
         } else {
@@ -86,12 +87,11 @@ export default can.Control.extend({
         }
         return $.when(...dfds);
       }))
-      .then(that._ifNotRemoved((list, forcePrepareChildren) =>
-        this.draw_list(list, forcePrepareChildren)));
+      .then(that._ifNotRemoved((list) => this.draw_list(list)));
     return this._display_deferred;
   },
 
-  draw_list: function (list, forcePrepareChildren) {
+  draw_list: function (list) {
     // TODO figure out why this happens and fix the root of the problem
     if (!list && !this.options.list) {
       return undefined;
@@ -126,7 +126,7 @@ export default can.Control.extend({
     this.on();
 
     this._draw_list_deferred =
-      this.enqueue_items(list, forcePrepareChildren);
+      this.enqueue_items(list);
     return this._draw_list_deferred;
   },
 
@@ -168,19 +168,19 @@ export default can.Control.extend({
     }
   },
 
-  enqueue_items: function (items, forcePrepareChildren) {
+  enqueue_items: function (items) {
     if (!this._pending_items) {
       this._pending_items = [];
       this._loading_started();
     }
 
-    this.insert_items(items, forcePrepareChildren)
+    this.insert_items(items)
       .then(this._ifNotRemoved(() => this._loading_finished()));
 
     return this._loading_deferred;
   },
 
-  insert_items: function (items, forcePrepareChildren) {
+  insert_items: function (items) {
     let that = this;
     let preppedItems = [];
     let idMap = {};
@@ -201,7 +201,7 @@ export default can.Control.extend({
     }
 
     _.forEach(toInsert, function (item) {
-      let prepped = that.prepare_child_options(item, forcePrepareChildren);
+      let prepped = that.prepare_child_options(item);
       // Should we skip items without selfLink?
       if (prepped.instance.selfLink) {
         preppedItems.push(prepped);
