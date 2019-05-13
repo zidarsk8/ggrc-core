@@ -9,7 +9,7 @@ import {
   findGDriveItemById,
   GDRIVE_PICKER_ERR_CANCEL,
 } from '../../plugins/utils/gdrive-picker-utils';
-import template from './templates/gdrive_folder.stache';
+import template from './templates/ggrc-gdrive-folder-picker.stache';
 
 export default can.Component.extend({
   tag: 'ggrc-gdrive-folder-picker',

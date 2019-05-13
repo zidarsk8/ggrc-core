@@ -6,9 +6,9 @@
 import * as pickerUtils from '../../../plugins/utils/gdrive-picker-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../gdrive_picker_launcher';
+import Component from '../ggrc-gdrive-picker-launcher';
 
-describe('gdrive-picker-launcher', function () {
+describe('ggrc-gdrive-picker-launcher', function () {
   'use strict';
 
   let viewModel;

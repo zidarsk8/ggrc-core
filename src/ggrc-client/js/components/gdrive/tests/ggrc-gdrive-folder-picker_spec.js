@@ -4,9 +4,9 @@
  */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../gdrive_folder_picker';
+import Component from '../ggrc-gdrive-folder-picker';
 
-describe('gdrive-folder-picker component', function () {
+describe('ggrc-gdrive-folder-picker component', function () {
   'use strict';
 
   let events;

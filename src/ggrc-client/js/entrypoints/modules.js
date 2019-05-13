@@ -4,8 +4,8 @@
 */
 
 // ggrc_gdrive_integration
-import '../components/gdrive/gdrive_picker_launcher';
-import '../components/gdrive/gdrive_folder_picker';
+import '../components/gdrive/ggrc-gdrive-picker-launcher';
+import '../components/gdrive/ggrc-gdrive-folder-picker';
 
 // ggrc_risk_assessments
 import '../apps/risk_assessments';

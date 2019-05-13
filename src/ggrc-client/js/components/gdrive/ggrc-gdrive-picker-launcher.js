@@ -11,7 +11,7 @@ import {
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
 import {bindXHRToButton} from '../../plugins/utils/modals';
 import tracker from '../../tracker';
-import template from './templates/gdrive_file.stache';
+import template from './templates/ggrc-gdrive-picker-launcher.stache';
 import {
   notifier,
   notifierXHR,
