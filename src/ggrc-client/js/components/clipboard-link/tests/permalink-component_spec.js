@@ -4,7 +4,7 @@
  */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../permalink';
+import Component from '../permalink-component';
 
 
 describe('permalink component', () => {
