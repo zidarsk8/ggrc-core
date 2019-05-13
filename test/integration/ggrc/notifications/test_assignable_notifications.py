@@ -1197,7 +1197,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
         relationship2, {"AssigneeType": "Assignees,Verifiers"})
 
     change_notifs = self._get_notifications(notif_type="assessment_updated")
-    self.assertEqual(change_notifs.count(), 1)
+    self.assertEqual(change_notifs.count(), 0)
 
     # clear notifications, delete an Assignee, test for change notification
     self.client.get("/_notifications/send_daily_digest")
@@ -1220,7 +1220,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
         relationship2, {"AssigneeType": "Assignees"})  # not Verifier anymore
 
     change_notifs = self._get_notifications(notif_type="assessment_updated")
-    self.assertEqual(change_notifs.count(), 1)
+    self.assertEqual(change_notifs.count(), 0)
 
     # changing people if completed should result in "reopened" notification
 
