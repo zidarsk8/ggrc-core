@@ -4,7 +4,7 @@
  */
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Component from '../shortlink';
+import Component from '../shortlink-component';
 
 
 describe('shortlink component', () => {

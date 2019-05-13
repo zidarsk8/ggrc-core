@@ -19,7 +19,7 @@ import '../../components/show-more/show-more';
 import '../../components/autocomplete/autocomplete-component';
 import '../../components/person/person-data';
 import '../../components/clipboard-link/permalink-component';
-import '../../components/clipboard-link/shortlink';
+import '../../components/clipboard-link/shortlink-component';
 import '../../components/workflow/cycle-task-objects/cycle-task-objects';
 import '../../components/tabs/tab-container';
 import '../../components/revision-log/revision-log';
