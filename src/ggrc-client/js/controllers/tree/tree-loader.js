@@ -60,15 +60,9 @@ export default can.Control.extend({
     return this._prepare_deferred;
   },
 
-  display: function (refetch) {
+  display() {
     let that = this;
     let loader = this.fetch_list.bind(this);
-
-    if (refetch) {
-      this._draw_list_deferred = null;
-      this._display_deferred = null;
-      this.element.slideUp('fast').empty().slideDown();
-    }
 
     if (this._display_deferred) {
       return this._display_deferred;
