@@ -53,7 +53,7 @@
               </div>
 
               <div class="span4">
-                <h6>Default procedure description</h6>
+                <h6>Default assessment procedure</h6>
                 {{#if procedure_description}}
                   {{{procedure_description}}}
                 {{else}}
