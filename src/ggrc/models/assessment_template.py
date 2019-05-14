@@ -80,6 +80,7 @@ class AssessmentTemplate(assessment.AuditRelationship,
       ("Secondary Assignees", "Secondary Assignees"),
       ("Control Operators", "Control Operators"),
       ("Control Owners", "Control Owners"),
+      ("Risk Owners", "Risk Owners"),
       ("Other Contacts", "Other Contacts"),
   ])
 
