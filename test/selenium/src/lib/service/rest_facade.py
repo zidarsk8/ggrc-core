@@ -93,7 +93,6 @@ def create_gcad(**attrs):
       factory_params=attrs)
 
 
-@decorator.work_by_external_user
 def create_gcad_for_control():
   """Creates global CADs for all types."""
   return [create_gcad(definition_type="control",
@@ -223,7 +222,7 @@ def get_obj_review(obj):
 
 
 def request_obj_review(obj, reviewer):
-  """Returns obj with assigned review."""
+  """Returns obj with requested review."""
   rest_service.ReviewService().create_obj(
       {"reviewers": reviewer,
        "reviewable": obj.repr_min_dict()})

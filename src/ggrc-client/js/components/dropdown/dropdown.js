@@ -13,9 +13,9 @@ import template from './dropdown.stache';
 */
 export default can.Component.extend({
   tag: 'dropdown-component',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       options: {
         get: function () {
@@ -65,12 +65,12 @@ export default can.Component.extend({
         },
       },
     },
-    name: '@',
-    className: '@',
+    name: '',
+    className: '',
     onChange: $.noop,
-    noValue: '@',
-    noValueLabel: '@',
-    controlId: '@',
+    noValue: '',
+    noValueLabel: '',
+    controlId: '',
     isGroupedDropdown: false,
     tabIndex: 0,
     /*
@@ -83,7 +83,7 @@ export default can.Component.extend({
     optionsList: [],
     optionsGroups: {},
     isDisabled: false,
-  },
+  }),
   init: function (element, options) {
     let $el = $(element);
     let attrVal = $el.attr('is-disabled');

@@ -94,6 +94,7 @@ function makeDateSerializer(type, key) {
 }
 
 export default can.Model.extend({
+  ajax: $.ajax,
   root_object: '',
   attr_list: [
     {
@@ -128,7 +129,7 @@ export default can.Model.extend({
   findOne: 'GET {href}',
 
   makeDestroy: function (destroy) {
-    return (id) => destroy(id);
+    return (id) => destroy.call(this, id);
   },
 
   makeFindAll: function (finder) {
@@ -287,18 +288,6 @@ export default can.Model.extend({
       delete ret.hasFailCallback;
       return ret;
     };
-
-    // Register this type as a custom attributable type if it is one.
-    if (this.is_custom_attributable) {
-      this.validate(
-        '_gca_valid',
-        function () {
-          if (!this._gca_valid) {
-            return 'Missing required global custom attribute';
-          }
-        }
-      );
-    }
   },
 
   findInCacheById: function (id) {
@@ -559,6 +548,15 @@ export default can.Model.extend({
     };
   },
 }, {
+  define: {
+    custom_attribute_values: {
+      validate: {
+        validateGCA: function () {
+          return this;
+        },
+      },
+    },
+  },
   init: function () {
     let cache = this.constructor.cache;
     let idKey = this.constructor.id;
@@ -573,6 +571,17 @@ export default can.Model.extend({
     if (this.isCustomAttributable()) {
       this._customAttributeAccess = new CustomAttributeAccess(this);
     }
+
+    /*
+    * Trigger validation after each "change" event of instance
+    * to have actual "instance.errors" object
+    */
+    this.on('change', (ev, fieldName) => {
+      if (fieldName === 'errors') {
+        return;
+      }
+      this.validate();
+    });
   },
   /**
    * Updates custom attribute objects with help custom
@@ -658,15 +667,25 @@ export default can.Model.extend({
   isCustomAttributable() {
     return this.constructor.is_custom_attributable;
   },
+  getInstanceErrors: function () {
+    const errors = this.attr('errors');
+
+    if (!errors) {
+      return null;
+    }
+
+    const serializedErrors = errors.attr();
+    return _.isEmpty(serializedErrors) ? null : serializedErrors;
+  },
   computed_errors: function () {
-    let errors = this.errors();
+    let errors = this.getInstanceErrors();
     if (this.attr('_suppress_errors')) {
       return null;
     }
     return errors;
   },
   computed_unsuppressed_errors: function () {
-    return this.errors();
+    return this.getInstanceErrors();
   },
   refresh: function (params) {
     let dfd;

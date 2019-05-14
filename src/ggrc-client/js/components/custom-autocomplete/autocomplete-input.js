@@ -19,9 +19,9 @@ export const KEY_MAP = {
 
 export default can.Component.extend({
   tag: 'autocomplete-input',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       // flag for showing 'autocomplete-result'
       showResults: {
@@ -65,7 +65,7 @@ export default can.Component.extend({
         this.attr('isPending', false);
       }, 500);
     },
-  },
+  }),
   events: {
     'input.autocomplete-input keyup': function (element, event) {
       let viewModel = this.viewModel;

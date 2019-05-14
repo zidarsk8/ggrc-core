@@ -826,7 +826,7 @@ class ReviewEntity(Entity):
                    "last_reviewed_by", "reviewable", **attrs)
 
   def convert_review_to_dict(self):
-    """Convert review entity' to UI representation."""
+    """Convert review entity to UI representation."""
     return {
         "status": self.status,
         "reviewers": self.reviewers,

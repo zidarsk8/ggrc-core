@@ -12,12 +12,12 @@ import template from './autocomplete.stache';
 // the component's configuration object (i.e. its constructor's prototype)
 let component = {
   tag: 'autocomplete-component',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
-    placeholder: '@',
-    searchItemsType: '@',
-    className: '@',
+  viewModel: can.Map.extend({
+    placeholder: '',
+    searchItemsType: '',
+    className: '',
     value: null,
 
     // disable automatically mapping the picked item from the live search
@@ -29,7 +29,7 @@ let component = {
         value: false,
       },
     },
-  },
+  }),
 
   _EV_ITEM_SELECTED: 'item-selected',
 

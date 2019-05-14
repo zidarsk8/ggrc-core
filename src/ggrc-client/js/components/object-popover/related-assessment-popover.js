@@ -20,9 +20,9 @@ import template from './related-assessment-popover.stache';
  */
 export default can.Component.extend({
   tag: 'related-assessment-popover',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     selectedAssessment: {},
     popoverTitleInfo: 'Assessment Title: ',
     define: {
@@ -48,5 +48,5 @@ export default can.Component.extend({
         },
       },
     },
-  },
+  }),
 });

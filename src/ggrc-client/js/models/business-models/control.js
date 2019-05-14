@@ -4,7 +4,6 @@
 */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
@@ -24,7 +23,6 @@ export default Cacheable.extend({
   update: 'PUT /api/controls/{id}',
   destroy: 'DELETE /api/controls/{id}',
   mixins: [
-    uniqueTitle,
     caUpdate,
     timeboxed,
     accessControlList,
@@ -111,17 +109,6 @@ export default Cacheable.extend({
     [{title: 'No', value: false}, {title: 'Yes', value: true}],
   keyControlOptions:
     [{title: 'Non-Key', value: false}, {title: 'Key', value: true}],
-  init: function () {
-    this.validateNonBlank('title');
-
-    this.validate('assertions', function () {
-      if (!this.attr('assertions') || !this.attr('assertions.length')) {
-        return 'cannot be blank';
-      }
-    });
-
-    this._super(...arguments);
-  },
 }, {
   init: function () {
     this._super(...arguments);

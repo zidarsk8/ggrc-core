@@ -12,9 +12,9 @@ import Permission from '../../permission';
 
 export default can.Component.extend({
   tag: 'comments-section',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       notification: {
         value: 'Send Notifications',
@@ -37,5 +37,5 @@ export default can.Component.extend({
       },
     },
     instance: null,
-  },
+  }),
 });

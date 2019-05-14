@@ -19,19 +19,19 @@
       {{/if}}
       {{#if showExport}}
         <li>
-          <span class="section-import" ($click)="export">
+          <span class="section-import" on:el:click="export">
             <i class="fa fa-fw fa-download"></i>
             Export {{model.title_plural}}
           </span>
         </li>
       {{/if}}
       {{#if showGenerateAssessments}}
-        <assessment-generator-button {audit}="{parent_instance}">
+        <assessment-generator-button audit:from="parent_instance">
         </assessment-generator-button>
       {{/if}}
       {{#if showBulkUpdate}}
         <li>
-          <bulk-update-button {model}="{model}">
+          <bulk-update-button model:from="model">
           </bulk-update-button>
         </li>
       {{/if}}

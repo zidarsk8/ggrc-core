@@ -7,14 +7,14 @@ import template from './add-object-button.stache';
 
 export default can.Component.extend({
   tag: 'add-object-button',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: null,
-    linkclass: '@',
-    content: '@',
-    text: '@',
-    singular: '@',
-    plural: '@',
-  },
+    linkclass: '',
+    content: '',
+    text: '',
+    singular: '',
+    plural: '',
+  }),
 });

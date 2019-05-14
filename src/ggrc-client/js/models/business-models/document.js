@@ -69,20 +69,24 @@ export default Cacheable.extend({
         disable_sorting: true,
       }],
   },
-  init: function () {
-    this.validateNonBlank('title');
-    this._super(...arguments);
-  },
 }, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+  },
   kindTitle() {
     let value = this.attr('kind');
     let title = _.find(this.class.kinds, {value}).title;
     return title;
   },
   save() {
-    let baseSave = this._super;
+    let save = this._super.bind(this);
     return backendGdriveClient.withAuth(() => {
-      return baseSave.call(this);
+      return save();
     });
   },
 });

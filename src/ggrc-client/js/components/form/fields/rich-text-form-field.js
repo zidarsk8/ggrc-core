@@ -8,9 +8,9 @@ import template from './rich-text-form-field.stache';
 
 export default can.Component.extend({
   tag: 'rich-text-form-field',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     _value: '',
     _oldValue: null,
     placeholder: '',
@@ -71,7 +71,7 @@ export default can.Component.extend({
     onBlur: function () {
       this.checkValueChanged();
     },
-  },
+  }),
   events: {
     '.ql-editor blur': function () {
       this.viewModel.onBlur();

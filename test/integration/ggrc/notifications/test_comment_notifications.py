@@ -17,7 +17,6 @@ from ggrc.models import Assessment, all_models
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Revision
-from ggrc.models.mixins import ScopeObject
 from ggrc.notifications import common
 from integration.ggrc import TestCase
 from integration.ggrc import generator
@@ -26,10 +25,10 @@ from integration.ggrc.models import factories
 
 @ddt.ddt
 class TestCommentNotification(TestCase):
-
   """Test notification on assessment comments."""
 
   def setUp(self):
+    """Set up test."""
     super(TestCommentNotification, self).setUp()
     self.client.get("/login")
     self._fix_notification_init()
@@ -87,7 +86,6 @@ class TestCommentNotification(TestCase):
     Check if the correct notification entries are created when a comment gets
     posted.
     """
-
     factories.AuditFactory(slug="Audit")
     self.import_file("assessment_template_no_warnings.csv", safe=False)
     self.import_file("assessment_with_templates.csv")
@@ -155,58 +153,42 @@ class TestCommentNotification(TestCase):
         expected_suffix = "asmt " + str(parent_obj_key.id)
         self.assertTrue(comment["description"].endswith(expected_suffix))
 
-  SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
-                          if issubclass(m, ScopeObject) and
-                          not issubclass(m, all_models.SystemOrProcess)]
-
-  SCOPING_OBJECT_FACTORIES = [
-      factories.get_model_factory(name) for name in SCOPING_MODELS_NAMES]
-
   @ddt.data(
-      factories.AccessGroupFactory,
-      factories.DataAssetFactory,
-      factories.FacilityFactory,
-      factories.MarketFactory,
-      factories.ObjectiveFactory,
-      factories.OrgGroupFactory,
-      factories.SystemFactory,
-      factories.ProcessFactory,
-      factories.ProductFactory,
-      factories.RequirementFactory,
-      factories.VendorFactory,
-      factories.IssueFactory,
-      factories.PolicyFactory,
-      factories.RegulationFactory,
-      factories.StandardFactory,
-      factories.ContractFactory,
-      factories.RiskFactory,
-      factories.ThreatFactory,
-      factories.MetricFactory,
-      factories.TechnologyEnvironmentFactory,
-      factories.ProductGroupFactory,
+      all_models.AccessGroup,
+      all_models.DataAsset,
+      all_models.Market,
+      all_models.Facility,
+      all_models.Objective,
+      all_models.OrgGroup,
+      all_models.System,
+      all_models.Process,
+      all_models.Product,
+      all_models.Requirement,
+      all_models.Vendor,
+      all_models.Issue,
+      all_models.Policy,
+      all_models.Regulation,
+      all_models.Standard,
+      all_models.Contract,
+      all_models.Risk,
+      all_models.Threat,
+      all_models.Metric,
+      all_models.TechnologyEnvironment,
+      all_models.ProductGroup,
   )
   @patch("ggrc.notifications.common.send_email")
-  def test_models_comments(self, obj_factory, _):
+  def test_models_comments(self, model, _):
     """Test setting notification entries for model comments.
 
     Check if the correct notification entries are created when a comment gets
     posted.
     """
-    if obj_factory in self.SCOPING_OBJECT_FACTORIES:
-      recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts",
-                         "Assignee", "Compliance Contacts", "Verifier",
-                         "Product Managers", "Technical / Program Managers",
-                         "Technical Leads", "System Owners", "Legal Counsels",
-                         "Line of Defense One Contacts", "Vice Presidents", ]
-    elif obj_factory == factories.ControlFactory:
-      recipient_types = ["Admin", "Control Operators", "Control Owners"]
-    else:
-      recipient_types = ["Admin", "Primary Contacts", "Secondary Contacts"]
+    recipient_types = model.VALID_RECIPIENTS
     person = all_models.Person.query.first()
     person_email = person.email
 
     with factories.single_commit():
-      obj = obj_factory(
+      obj = factories.get_model_factory(model.__name__)(
           recipients=",".join(recipient_types),
           send_by_default=False,
       )
@@ -216,9 +198,8 @@ class TestCommentNotification(TestCase):
               ac_list=acl,
               person=person,
           )
-
-    self.generator.generate_comment(
-        obj, "", "some comment", send_notification="true")
+    self.generator.generate_comment(obj, "", "some comment",
+                                    send_notification="true")
 
     notifications, notif_data = common.get_daily_notifications()
     self.assertEqual(len(notifications), 1,

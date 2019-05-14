@@ -5,7 +5,7 @@
 
 const routes = [
   {
-    template: ':widget',
+    template: '{widget}',
     defaults: {},
   },
 ];

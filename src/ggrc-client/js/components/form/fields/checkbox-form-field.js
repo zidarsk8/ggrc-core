@@ -7,9 +7,9 @@ import template from './checkbox-form-field.stache';
 
 export default can.Component.extend({
   tag: 'checkbox-form-field',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       inputValue: {
         set(newValue) {
@@ -38,5 +38,5 @@ export default can.Component.extend({
         value: newValue,
       });
     },
-  },
+  }),
 });

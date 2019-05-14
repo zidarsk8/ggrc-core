@@ -6,12 +6,13 @@
 import template from './bulk-update-button.stache';
 import updateService from '../../plugins/utils/bulk-update-service';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import {trigger} from 'can-event';
 
 export default can.Component.extend({
   tag: 'bulk-update-button',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     model: null,
     openBulkUpdateModal: function (el, type) {
       import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')
@@ -40,7 +41,7 @@ export default can.Component.extend({
           notifier('info', message);
 
           if (updatedCount > 0) {
-            can.trigger(el.closest('tree-widget-container'), 'refreshTree');
+            trigger.call(el.closest('tree-widget-container')[0], 'refreshTree');
           }
         }.bind(this));
     },
@@ -58,7 +59,7 @@ export default can.Component.extend({
         `${namePluralLowerCase} were `) +
         'updated successfully.';
     },
-  },
+  }),
   events: {
     'a click': function (el) {
       let model = this.viewModel.attr('model');

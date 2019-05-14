@@ -7,12 +7,12 @@ import './clipboard-link';
 
 export default can.Component.extend({
   tag: 'permalink-component',
-  template: can.stache(
-    '<clipboard-link {text}="{text}">' +
+  view: can.stache(
+    '<clipboard-link text:from="text">' +
     '<i class="fa fa-link"></i>Get permalink</clipboard-link>'
   ),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: null,
     define: {
       text: {
@@ -30,5 +30,5 @@ export default can.Component.extend({
         },
       },
     },
-  },
+  }),
 });

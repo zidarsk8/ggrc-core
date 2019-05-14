@@ -8,16 +8,16 @@ import template from './inline-item.stache';
 
 export default can.Component.extend({
   tag: 'assessment-inline-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: {},
-    propName: '@',
+    propName: '',
     value: '',
-    type: '@',
+    type: '',
     dropdownOptions: [],
     dropdownOptionsGroups: {},
-    dropdownClass: '@',
+    dropdownClass: '',
     isGroupedDropdown: false,
     dropdownNoValue: false,
     withReadMore: false,
@@ -25,5 +25,5 @@ export default can.Component.extend({
     onStateChangeDfd: $.Deferred().resolve(),
     mandatory: false,
     isConfirmationNeeded: true,
-  },
+  }),
 });

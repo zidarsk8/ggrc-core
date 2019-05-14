@@ -21,6 +21,7 @@ import {
   getFormattedLocalDate,
   formatDate,
 } from './plugins/utils/date-utils';
+import {validateAttr, isValidAttr} from './plugins/utils/validation-utils';
 
 // Chrome likes to cache AJAX requests for templates.
 let templateUrls = {};
@@ -298,15 +299,14 @@ can.stache.registerHelper('is_allowed_to_map',
     return options.inverse(options.contexts || this);
   });
 
-can.stache.registerHelper('is_allowed_to_map_task', (sourceType, options) => {
-  const mappableTypes = ['Program', 'Regulation', 'Policy', 'Standard',
-    'Contract', 'Requirement', 'Control', 'Objective', 'KeyReport',
-    'OrgGroup', 'Vendor', 'AccessGroup', 'System', 'Process', 'DataAsset',
-    'Product', 'ProductGroup', 'Project', 'Facility', 'Market', 'Metric',
-    'TechnologyEnvironment', 'AccountBalance'];
-  sourceType = resolveComputed(sourceType);
+can.stache.registerHelper('is_allowed_to_create', (source, target, options) => {
+  let canCreate;
 
-  if (mappableTypes.includes(sourceType)) {
+  source = resolveComputed(source);
+  target = resolveComputed(target);
+  canCreate = Mappings.allowedToCreate(source, target);
+
+  if (canCreate) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
@@ -744,10 +744,43 @@ can.stache.registerHelper('if_recurring_workflow', function (object, options) {
 });
 
 // Sets current "can" context into element data
-can.stache.registerHelper('canData', (key, options) => {
-  key = isFunction(key) ? key() : key;
+can.stache.registerHelper('canData',
+  (key, options) => {
+    key = isFunction(key) ? key() : key;
 
-  return (el) => {
-    $(el).data(key, options.context);
-  };
+    return (el) => {
+      $(el).data(key, options.context);
+    };
+  }
+);
+
+can.stache.registerHelper('validateAttr',
+  (instance, attrName, options) => {
+    instance = isFunction(instance) ? instance() : instance;
+    attrName = isFunction(attrName) ? attrName() : attrName;
+    const errorMessage = validateAttr(instance, attrName);
+
+    return errorMessage ?
+      options.fn(errorMessage) :
+      options.inverse(options.contexts);
+  }
+);
+
+can.stache.registerHelper('isValidAttr',
+  (instance, attrName, options) => {
+    instance = isFunction(instance) ? instance() : instance;
+    attrName = isFunction(attrName) ? attrName() : attrName;
+
+    return isValidAttr(instance, attrName) ?
+      options.fn(options.context) :
+      options.inverse(options.contexts);
+  }
+);
+
+can.stache.registerHelper('isArray', (items, options) => {
+  items = isFunction(items) ? items() : items;
+
+  return _.isArray(items) || items instanceof can.List ?
+    options.fn(options.contexts) :
+    options.inverse(options.contexts);
 });

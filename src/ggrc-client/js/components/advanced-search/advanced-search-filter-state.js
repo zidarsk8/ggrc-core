@@ -15,29 +15,10 @@ import {isScopeModel} from '../../plugins/utils/models-utils';
  */
 let viewModel = can.Map.extend({
   define: {
-    /**
-     * Contains criterion's fields: operator, modelName, items.
-     * Initializes fitlterStates.
-     * @type {can.Map}
-     */
-    stateModel: {
-      type: '*',
-      set: function (state) {
-        if (!state.attr('items')) {
-          let defaultStates =
-            StateUtils.getStatesForModel(this.attr('modelName'));
-          state.attr('items', defaultStates);
-        }
-        if (!state.attr('operator')) {
-          state.attr('operator', 'ANY');
-        }
-        state.attr('modelName', this.attr('modelName'));
-
-        let stateLabel = isScopeModel(this.attr('modelName')) ?
+    label: {
+      get() {
+        return isScopeModel(this.attr('modelName')) ?
           'Launch Status' : 'State';
-        state.attr('label', stateLabel);
-
-        return state;
       },
     },
     /**
@@ -84,6 +65,12 @@ let viewModel = can.Map.extend({
     },
   },
   /**
+   * Contains criterion's fields: operator, modelName, items.
+   * Initializes filterStates.
+   * @type {can.Map}
+  */
+  stateModel: null,
+  /**
    * Contains specific model name.
    * @type {string}
    * @example
@@ -121,7 +108,7 @@ let viewModel = can.Map.extend({
  */
 export default can.Component.extend({
   tag: 'advanced-search-filter-state',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel: viewModel,
 });

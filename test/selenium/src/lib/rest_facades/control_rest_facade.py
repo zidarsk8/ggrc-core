@@ -7,7 +7,6 @@ from lib.rest_services import control_rest_service
 
 
 @decorator.check_that_obj_is_created
-@decorator.work_by_external_user
 def create_control(**attrs):
   """Creates Control via REST."""
   control = control_entity_factory.ControlFactory().create(**attrs)

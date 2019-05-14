@@ -13,10 +13,10 @@ import pubSub from '../../pub-sub';
 
 export default can.Component.extend({
   tag: 'attach-button',
-  template: can.stache(template),
-  confirmationCallback: '@',
+  view: can.stache(template),
+  confirmationCallback: '',
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       hasPermissions: {
         get: function (prevValue, setValue) {
@@ -86,5 +86,5 @@ export default can.Component.extend({
 
       return findGDriveItemById(folderId);
     },
-  },
+  }),
 });

@@ -5,17 +5,17 @@
 
 export default can.Component.extend({
   tag: 'textarea-array',
-  template: can.stache(
+  view: can.stache(
     '<textarea class="{{className}}" placeholder="{{placeholder}}">' +
     '{{content}}' +
     '</textarea>'
   ),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     array: null,
-    className: '@',
+    className: '',
     delimeter: ', ',
-    placeholder: '@',
+    placeholder: '',
     init: function () {
       this.updateContent();
     },
@@ -23,7 +23,7 @@ export default can.Component.extend({
       let array = this.attr('array') || [];
       this.attr('content', array.join(this.attr('delimeter')));
     },
-  },
+  }),
   events: {
     'textarea change': function (el, ev) {
       let val = $(el).val();

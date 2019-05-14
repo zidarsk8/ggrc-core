@@ -4,10 +4,10 @@
 }}
 
 <li class="{{li_class}} accordion-group"
-    data-tooltip-view="{{tooltip_view}}"
-    data-template="{{template_view}}"
+    data-tooltip-view="{{firstnonempty tooltip_view ''}}"
+    data-template="{{firstnonempty template_view ''}}"
     data-model-name="{{type}}"
-    data-actions="{{actions}}"
+    data-actions="{{firstnonempty actions ''}}"
     {{#is(type, "Workflow")}}
       data-model-extra="Workflow_All,Workflow_Active,Workflow_Draft,Workflow_Inactive"
       data-count="Workflow_All"

@@ -8,9 +8,9 @@ import template from './date-form-field.stache';
 
 export default can.Component.extend({
   tag: 'date-form-field',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       inputValue: {
         set(newValue) {
@@ -46,5 +46,5 @@ export default can.Component.extend({
         value: newValue,
       });
     },
-  },
+  }),
 });

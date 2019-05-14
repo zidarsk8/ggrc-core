@@ -7,13 +7,13 @@ import template from './templates/input-filter.stache';
 
 export default can.Component.extend({
   tag: 'input-filter',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     value: '',
-    excludeSymbols: '@',
-    placeholder: '@',
-    name: '@',
+    excludeSymbols: '',
+    placeholder: '',
+    name: '',
     tabindex: 0,
     autofocus: false,
     exclude(value, symbols) {
@@ -28,7 +28,7 @@ export default can.Component.extend({
 
       el.val(result);
     },
-  },
+  }),
   events: {
     '.input-filter input'(el) {
       this.viewModel.cleanUpInput(el);

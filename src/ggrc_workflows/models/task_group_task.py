@@ -16,11 +16,12 @@ from ggrc.builder import simple_property
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
-from ggrc.models.types import JsonType
 from ggrc.models import reflection
 from ggrc.models import relationship
-from ggrc_workflows.models.task_group import TaskGroup
+from ggrc.models.deferred import deferred
 from ggrc.models.mixins import base
+from ggrc.models.types import JsonType
+from ggrc_workflows.models.task_group import TaskGroup
 
 
 class TaskGroupTask(roleable.Roleable,
@@ -54,8 +55,6 @@ class TaskGroupTask(roleable.Roleable,
       db.ForeignKey('task_groups.id', ondelete="CASCADE"),
       nullable=False,
   )
-  sort_index = db.Column(
-      db.String(length=250), default="", nullable=False)
 
   object_approval = db.Column(
       db.Boolean, nullable=False, default=False)
@@ -65,6 +64,13 @@ class TaskGroupTask(roleable.Roleable,
 
   response_options = db.Column(
       JsonType(), nullable=False, default=[])
+
+  relative_start_day = deferred(
+      db.Column(db.Integer, default=None), "TaskGroupTask"
+  )
+  relative_end_day = deferred(
+      db.Column(db.Integer, default=None), "TaskGroupTask"
+  )
 
   # This parameter is overridden by workflow backref, but is here to ensure
   # pylint does not complain
@@ -115,7 +121,6 @@ class TaskGroupTask(roleable.Roleable,
 
   _api_attrs = reflection.ApiAttributes(
       'task_group',
-      'sort_index',
       'object_approval',
       'task_type',
       'response_options',
@@ -203,7 +208,6 @@ class TaskGroupTask(roleable.Roleable,
     columns = ['title',
                'description',
                'task_group',
-               'sort_index',
                'start_date',
                'end_date',
                'access_control_list',

@@ -11,9 +11,9 @@ import '../spinner/spinner';
  */
 export default can.Component.extend({
   tag: 'document-object-list-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: {},
     define: {
       showIcon: {
@@ -43,5 +43,5 @@ export default can.Component.extend({
         },
       },
     },
-  },
+  }),
 });

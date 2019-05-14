@@ -11,70 +11,70 @@
       <div class="inline__content inline--active">
         {{#switch type}}
           {{#case "dropdown"}}
-            <dropdown-form-field {value}="{value}"
+            <dropdown-form-field value:from="value"
               class="inline__content-input"
-              {options}="{dropdownOptions}"
-              {no-value}="{dropdownNoValue}"
-              {dropdown-options-groups}="{dropdownOptionsGroups}"
-              {is-grouped-dropdown}="{isGroupedDropdown}"
-              (value-changed)="{fieldValueChanged(%event)}"
+              options:from="dropdownOptions"
+              noValue:from="dropdownNoValue"
+              dropdownOptionsGroups:from="dropdownOptionsGroups"
+              isGroupedDropdown:from="isGroupedDropdown"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></dropdown-form-field>
           {{/case}}
           {{#case "input"}}
-            <text-form-field {value}="{value}"
+            <text-form-field value:from="value"
               class="inline__content-input inline-input-form-field"
-              {placeholder}="{placeholder}"
-              (value-changed)="{fieldValueChanged(%event)}"
+              placeholder:from="placeholder"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></text-form-field>
           {{/case}}
           {{#case "text"}}
-            <rich-text-form-field {value}="{value}"
+            <rich-text-form-field value:from="value"
               class="inline__content-input"
-              {placeholder}="{placeholder}"
-              (value-changed)="{fieldValueChanged(%event)}"
+              placeholder:from="placeholder"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></rich-text-form-field>
           {{/case}}
            {{#case "checkbox"}}
-            <checkbox-form-field {value}="{value}"
+            <checkbox-form-field value:from="value"
               class="inline__content-input"
-              (value-changed)="{fieldValueChanged(%event)}"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></checkbox-form-field>
           {{/case}}
            {{#case "date"}}
-            <date-form-field {value}="{value}"
+            <date-form-field value:from="value"
               class="inline__content-input"
-              (value-changed)="{fieldValueChanged(%event)}"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></date-form-field>
           {{/case}}
           {{#case "person"}}
-            <person-form-field {value}="{value}"
+            <person-form-field value:from="value"
               class="inline__content-input"
-              (value-changed)="{fieldValueChanged(%event)}"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></person-form-field>
           {{/case}}
           {{#case "number"}}
-            <numberbox-form-field {value}="{value}"
+            <numberbox-form-field value:from="value"
               class="inline__content-input inline-input-form-field"
-              {placeholder}="{placeholder}"
-              (value-changed)="{fieldValueChanged(%event)}"
+              placeholder:from="placeholder"
+              on:valueChanged="fieldValueChanged(scope.event)"
             ></numberbox-form-field>
           {{/case}}
           {{#case "multi-select-label"}}
-            <multi-select-label {labels}="{value}"
-                {edit-mode}="{true}"
-                (value-changed)="{fieldValueChanged(%event)}">
+            <multi-select-label labels:from="value"
+                editMode:from="true"
+                on:valueChanged="fieldValueChanged(scope.event)">
             </multi-select-label>
           {{/case}}
         {{/switch}}
 
         <ul class="inline__controls">
           <li class="inline__controls-item">
-            <a class="inline__controls-link" href="javascript://" ($click)="save()">
+            <a class="inline__controls-link" href="javascript://" on:el:click="save()">
               <i class="fa fa-check"></i>
             </a>
           </li>
           <li class="inline__controls-item">
-            <a class="inline__controls-link" href="javascript://" ($click)="cancel()">
+            <a class="inline__controls-link" href="javascript://" on:el:click="cancel()">
               <i class="fa fa-times"></i>
             </a>
           </li>
@@ -85,9 +85,9 @@
 
   {{#if isShowContent}}
     <div class="inline__content-wrapper">
-        <readonly-inline-content {value}="{value}"
+        <readonly-inline-content value:from="value"
           class="inline__content {{#if editMode}}inline--hidden{{/if}}"
-          {with-read-more}="{withReadMore}">
+          withReadMore:from="withReadMore">
         </readonly-inline-content>
     </div>
   {{/if}}

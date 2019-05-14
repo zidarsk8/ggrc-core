@@ -30,9 +30,9 @@ const defaultOrderBy = [
 
 export default can.Component.extend({
   tag: 'related-assessments',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       unableToReuse: {
         get: function () {
@@ -103,7 +103,7 @@ export default can.Component.extend({
         });
       });
 
-      $.when(...reusedObjectList)
+      return $.when(...reusedObjectList)
         .done((...evidence) => {
           this.dispatch({
             type: 'reusableObjectsCreated',
@@ -169,7 +169,7 @@ export default can.Component.extend({
     isFunction(evidence) {
       return isFunction(evidence) ? evidence() : evidence;
     },
-  },
+  }),
   init() {
     this.viewModel.loadRelatedAssessments();
   },

@@ -8,9 +8,9 @@ import isFunction from 'can-util/js/is-function/is-function';
 
 export default can.Component.extend({
   tag: 'info-pin-buttons',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     onChangeMaximizedState: null,
     onClose: null,
     define: {
@@ -41,5 +41,5 @@ export default can.Component.extend({
       ev.preventDefault();
       onClose();
     },
-  },
+  }),
 });

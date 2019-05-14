@@ -158,6 +158,9 @@ class TestCustomAttributesDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Send by default",
+        "Recipients",
+        "Comments",
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
@@ -350,6 +353,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Folder",
+        "Send by default",
+        "Recipients",
+        "Comments",
     }
     expected_fields = {
         "mandatory": {

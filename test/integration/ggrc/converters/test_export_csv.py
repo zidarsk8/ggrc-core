@@ -1,5 +1,6 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
 from os.path import abspath, dirname, join
 
 import collections
@@ -8,7 +9,6 @@ from flask.json import dumps
 
 from ggrc.converters import get_importables
 from ggrc.models import inflector, all_models
-from ggrc.models.mixins import ScopeObject
 from ggrc.models.reflection import AttributeInfo
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -626,9 +626,6 @@ class TestExportMultipleObjects(TestCase):
       else:
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
 
-  SCOPING_MODELS_NAMES = [m.__name__ for m in all_models.all_models
-                          if issubclass(m, ScopeObject)]
-
   @ddt.data(
       "Assessment",
       "Policy",
@@ -648,7 +645,6 @@ class TestExportMultipleObjects(TestCase):
       "Project",
       "Vendor",
       "Risk Assessment",
-      "Risk",
       "Threat",
       "Key Report",
       "Account Balance",
@@ -674,9 +670,7 @@ class TestExportMultipleObjects(TestCase):
           ("Start Date", "01/02/2019"),
           ("End Date", "03/03/2019"),
       ]))
-      if model == "Risk":
-        import_queries[-1]["Risk Type"] = "Risk type"
-      if model.replace(" ", "") in self.SCOPING_MODELS_NAMES:
+      if model.replace(" ", "") in all_models.get_scope_model_names():
         import_queries[-1]["Assignee"] = "user@example.com"
         import_queries[-1]["Verifier"] = "user@example.com"
 

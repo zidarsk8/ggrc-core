@@ -4,16 +4,16 @@
 }}
 
 {{#instance}}
-  <section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
-    <wrapper-assessment-template {instance}="{instance}">
+  <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
+    <wrapper-assessment-template instance:from="instance">
       <div class="tier-content">
 
         <div class="pane-header">
           <div class="pane-header__container">
             <div class="pane-header__title" data-test-id="title_0ad9fbaf">
-              {{#is_info_pin}}
+              {{#if is_info_pin}}
                 <h6>Title</h6>
-              {{/is_info_pin}}
+              {{/if}}
               <div class="pane-header__title-details">
                 <h3 class="pane-header__title-name">{{title}}</h3>
                 {{#if status}}
@@ -24,19 +24,19 @@
               </div>
             </div>
             <div class="pane-header__toolbar">
-              {{#is_info_pin}}
-                <info-pin-buttons {maximized}="{maximized}" 
-                                  {on-change-maximized-state}="{@onChangeMaximizedState}" 
-                                  {on-close}="{@onClose}">
+              {{#if is_info_pin}}
+                <info-pin-buttons maximized:from="maximized" 
+                                  onChangeMaximizedState:from="@onChangeMaximizedState" 
+                                  onClose:from="@onClose">
                 </info-pin-buttons>
-              {{/is_info_pin}}
+              {{/if}}
               {{> /static/templates/base_objects/info-pane-utility.stache}}
             </div>
           </div>
         </div>
 
         <tab-container>
-          <tab-panel {(panels)}="{panels}" {title-text}="'Attributes'">
+          <tab-panel panels:bind="panels" titleText:from="'Attributes'">
             <div class="row-fluid wrap-row">
               <div class="span4">
                 <h6>Objects under assessment</h6>
@@ -66,15 +66,15 @@
               <div class="span4">
                 <h6>Default Assignees</h6>
                 {{#if default_people.assignees}}
-                  {{#if default_people.assignees.length}}
+                  {{#isArray default_people.assignees}}
                     <ul class="person-info-list">
                       {{#each default_people.assignees}}
-                        <li><person-data {person-id}="{{.}}"></person-data></li>
+                        <li><person-data personId:from="{{.}}"></person-data></li>
                       {{/each}}
                     </ul>
                   {{else}}
                     {{defaultAssigneeLabel}}
-                  {{/if}}
+                  {{/isArray}}
                 {{else}}
                   <span class="empty-message">None</span>
                 {{/if}}
@@ -83,15 +83,15 @@
               <div class="span4">
                 <h6>Default Verifiers</h6>
                 {{#if default_people.verifiers}}
-                  {{#if default_people.verifiers.length}}
+                  {{#isArray default_people.verifiers}}
                     <ul class="person-info-list">
                       {{#each default_people.verifiers}}
-                        <li><person-data {person-id}="{{.}}"></person-data></li>
+                        <li><person-data personId:from="{{.}}"></person-data></li>
                       {{/each}}
                     </ul>
                   {{else}}
                     {{defaultVerifierLabel}}
-                  {{/if}}
+                  {{/isArray}}
                 {{else}}
                   <span class="empty-message">None</span>
                 {{/if}}
@@ -121,17 +121,17 @@
                   </div>
                   <div class="hidden-fields-area">
                     <info-issue-tracker-fields
-                      {instance}="{instance}"
-                      {note}="'Turns on Ticket Tracker integration.'">
+                      instance:from="instance"
+                      note:from="'Turns on Ticket Tracker integration.'">
                     </info-issue-tracker-fields>
                   </div>
                 </div>
               </div>
-            {{/if }}
+            {{/if}}
 
           </tab-panel>
-          <tab-panel {(panels)}="{panels}" {title-text}="'Change Log'">
-              <revision-log {instance}="{instance}" {options}="{tabOptions}"></revision-log>
+          <tab-panel panels:bind="panels" titleText:from="'Change Log'">
+              <revision-log instance:from="instance" options:from="tabOptions"></revision-log>
           </tab-panel>
         </tab-container>
       </div><!-- tier-content end -->
@@ -140,6 +140,6 @@
   </section>
 
   {{#if is_info_widget}}
-    <info-pane-footer {created-at}="{instance.created_at}" {modified-at}="{instance.updated_at}" {modified-by}="{instance.modified_by}"></info-pane-footer>
+    <info-pane-footer createdAt:from="instance.created_at" modifiedAt:from="instance.updated_at" modifiedBy:from="instance.modified_by"></info-pane-footer>
   {{/if}}
 {{/instance}}

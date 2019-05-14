@@ -25,9 +25,9 @@ import {isMegaMapping} from '../../plugins/utils/mega-object-utils';
 
 export default can.Component.extend({
   tag: 'create-and-map',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: false,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       destinationType: {
         get() {
@@ -179,7 +179,7 @@ export default can.Component.extend({
         modalConfirmLink: getMappingUrl(this.attr('source'), destinationModel),
       });
     },
-  },
+  }),
   events: {
     inserted() {
       this.viewModel.attr('element', this.element);

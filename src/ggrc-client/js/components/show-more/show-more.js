@@ -8,17 +8,17 @@ import template from './show-more.stache';
 /**
  * A component that limits list of items to acceptable count and shows
  * "Show more(<items count>)" link
- * Usage: <show-more {limit}="5" {items}="{itemsToDisplay}"
- *          {should-show-all-items}="{true}">
+ * Usage: <show-more limit:from="5" items:from="itemsToDisplay"
+ *          shouldShowAllItems:from="true">
  *          <some-item-component></some-item-component>
  *        </show-more>
  */
 
 export default can.Component.extend({
   tag: 'show-more',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       limit: {
         type: 'number',
@@ -74,5 +74,5 @@ export default can.Component.extend({
       newValue = !this.attr('shouldShowAllItems');
       this.attr('shouldShowAllItems', newValue);
     },
-  },
+  }),
 });

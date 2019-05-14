@@ -8,9 +8,9 @@ import template from './dropdown-form-field.stache';
 
 export default can.Component.extend({
   tag: 'dropdown-form-field',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       isNoneSelected: {
         get: function () {
@@ -57,5 +57,5 @@ export default can.Component.extend({
         value: newValue,
       });
     },
-  },
+  }),
 });

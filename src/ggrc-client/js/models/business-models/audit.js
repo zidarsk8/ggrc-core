@@ -49,7 +49,7 @@ export default Cacheable.extend({
     'Ready for External Review', 'Completed', 'Deprecated'],
   obj_nav_options: {
     show_all_tabs: false,
-    force_show_list: ['In Scope Controls', 'Assessment Templates',
+    force_show_list: ['Assessment Templates',
       'Issues', 'Assessments', 'Evidence'],
   },
   tree_view_options: {
@@ -109,23 +109,6 @@ export default Cacheable.extend({
   sub_tree_view_options: {
     default_filter: ['Product'],
   },
-  init: function () {
-    if (this._super) {
-      this._super(...arguments);
-    }
-    this.validatePresenceOf('program');
-    this.validateNonBlank('title');
-
-    this.validate(
-      'issue_tracker_component_id',
-      function () {
-        if (this.attr('issue_tracker.enabled') &&
-          !this.attr('issue_tracker.component_id')) {
-          return 'cannot be blank';
-        }
-      }
-    );
-  },
   buildIssueTrackerConfig() {
     return {
       hotlist_id: '766459',
@@ -138,6 +121,33 @@ export default Cacheable.extend({
     };
   },
 }, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+        validateUniqueTitle: true,
+      },
+    },
+    _transient_title: {
+      value: '',
+      validate: {
+        validateUniqueTitle: true,
+      },
+    },
+    program: {
+      value: null,
+      validate: {
+        required: true,
+      },
+    },
+    issue_tracker: {
+      value: {},
+      validate: {
+        validateIssueTracker: true,
+      },
+    },
+  },
   clone: function (options) {
     let cloneModel = new this.constructor({
       operation: 'clone',

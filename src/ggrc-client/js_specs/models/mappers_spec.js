@@ -344,15 +344,12 @@ describe('mappers', function () {
       describe('when last_instance is not this MappingResult\'s ' +
                'instance', function () {
         it('calls the function on itself', function () {
-          let sanityCheck = false;
           let instance = {};
           let mr = new LL.MappingResult(instance, [], 'bar');
-          mr.walk_instances(function (instance, _result, depth) {
-            expect(instance).toBe(instance);
-            expect(depth).toBe(0);
-            sanityCheck = true;
-          }, 'bar', 0);
-          expect(sanityCheck).toBe(true);
+          let spy = jasmine.createSpy('spy');
+          mr.walk_instances(spy, 'bar', 0);
+
+          expect(spy).toHaveBeenCalledWith(instance, jasmine.any(Object), 0);
         });
 
         describe('when mappings length is greater than zero', function () {
@@ -391,13 +388,11 @@ describe('mappers', function () {
         });
 
         it('no action is taken', function () {
-          let sanityCheck = false;
           let instance = {};
           let mr = new LL.MappingResult(instance, [], 'bar');
           mr.walk_instances(function (walkInstance, _result, depth) {
             fail('fn was called');
           }, instance, 0);
-          expect(sanityCheck).toBe(false);
         });
       });
     });
@@ -630,79 +625,61 @@ describe('mappers', function () {
 
     describe('#refresh_stubs', function () {
       it('returns promise based on existing deferred, ' +
-         'returning binding list, if it exists', function () {
+         'returning binding list, if it exists', function (done) {
         let binding = {list: []};
         let sourceDfd = binding._refresh_stubs_deferred = new $.Deferred();
         let ret = ll.refresh_stubs(binding);
-        let sanity = false;
         sourceDfd.resolve();
         ret.done(function (data) {
           expect(data).toBe(binding.list);
-          sanity = true;
+          done();
         });
-        if (!sanity) {
-          fail('sanity check failed for done callback from returned promise');
-        }
       });
 
       it('makes new refresh stubs deferred, returning binding list, ' +
-         'if it does not already exist', function () {
+         'if it does not already exist', function (done) {
         let ret;
         let binding = {list: []};
-        let sanity = false;
         ll._refresh_stubs = jasmine.createSpy().and.returnValue($.when());
         ret = ll.refresh_stubs(binding);
         ret.done(function (data) {
           expect(data).toBe(binding.list);
-          sanity = true;
+          done();
         });
-        if (!sanity) {
-          fail('sanity check failed for done callback from returned promise');
-        }
         expect(ll._refresh_stubs).toHaveBeenCalled();
       });
     });
 
     describe('#refresh_instances', function () {
       it('returns promise based on existing deferred, ' +
-         'returning binding list, if it exists', function () {
+         'returning binding list, if it exists', function (done) {
         let binding = {list: []};
         let sourceDfd = binding._refresh_instances_deferred = new $.Deferred();
         let ret = ll.refresh_instances(binding);
-        let sanity = false;
         sourceDfd.resolve();
         ret.done(function (data) {
           expect(data).toBe(binding.list);
-          sanity = true;
+          done();
         });
-        if (!sanity) {
-          fail('sanity check failed for done callback from returned promise');
-        }
       });
 
       it('makes new refresh instances deferred, returning binding list, ' +
-         'if it does not already exist', function () {
+         'if it does not already exist', function (done) {
         let ret;
         let binding = {list: []};
-        let sanity = false;
         ll._refresh_instances = jasmine.createSpy().and.returnValue($.when());
         ret = ll.refresh_instances(binding);
         ret.done(function (data) {
           expect(data).toBe(binding.list);
-          sanity = true;
+          done();
         });
-        if (!sanity) {
-          fail('sanity check failed for done callback from returned promise');
-        }
-        expect(ll._refresh_instances).toHaveBeenCalled();
       });
     });
 
     describe('#_refresh_instances', function () {
-      it('returns promise based on binding list', function () {
+      it('returns promise based on binding list', function (done) {
         let ret;
         let binding = {list: [{instance: 'a'}]};
-        let sanity = false;
         spyOn(ll, 'refresh_stubs').and.returnValue($.when());
         spyOn(RefreshQueue.prototype, 'trigger').and.callFake(function () {
           return $.when(this.objects);
@@ -711,11 +688,8 @@ describe('mappers', function () {
         ret = ll._refresh_instances(binding);
         ret.done(function (data) {
           expect(data).toEqual(['a']);
-          sanity = true;
+          done();
         });
-        if (!sanity) {
-          fail('sanity check failed for done callback from returned promise');
-        }
       });
     });
   });
@@ -749,17 +723,19 @@ describe('mappers', function () {
       });
 
       it('makes a new binding referencing the instance and ' +
-         'old mappings', () => {
+         'old mappings', (done) => {
         let rll = new LL.ReifyingListLoader();
         let binding = {};
         let result = rll.make_result({testField: 1}, []);
         spyOn(rll, 'insert_results');
 
-        rll.insert_from_source_binding(binding, [result]);
-        expect(rll.insert_results).toHaveBeenCalled();
-        expect(rll.insert_results.calls.argsFor(0)[1][0])
-          .toEqual(jasmine.objectContaining({testField: 1}));
-        expect(rll.insert_results.calls.argsFor(1)).toEqual([]);
+        rll.insert_from_source_binding(binding, [result]).then(() => {
+          expect(rll.insert_results).toHaveBeenCalled();
+          expect(rll.insert_results.calls.argsFor(0)[1][0])
+            .toEqual(jasmine.objectContaining({testField: 1}));
+          expect(rll.insert_results.calls.argsFor(1)).toEqual([]);
+          done();
+        });
       });
     });
 
@@ -849,19 +825,22 @@ describe('mappers', function () {
         expect(binding.source_binding.refresh_instances).toHaveBeenCalled();
       });
 
-      it('runs all results from source binding through filter function', () => {
-        let mockInst = new GGRC.Jasmine.MockModel({value: 'a'});
-        let mockResult = {instance: mockInst, mappings: []};
-        spyOn(binding.source_binding, 'refresh_instances')
-          .and.returnValue(new $.Deferred().resolve([mockResult]));
+      it('runs all results from source binding through filter function',
+        (done) => {
+          let mockInst = new GGRC.Jasmine.MockModel({value: 'a'});
+          let mockResult = {instance: mockInst, mappings: []};
+          spyOn(binding.source_binding, 'refresh_instances')
+            .and.returnValue(new $.Deferred().resolve([mockResult]));
 
-        // Items are sent through a refresh queue before continuing.
-        spyOn(RefreshQueue.prototype, 'trigger')
-          .and.returnValue($.when([mockInst]));
+          // Items are sent through a refresh queue before continuing.
+          spyOn(RefreshQueue.prototype, 'trigger')
+            .and.returnValue($.when([mockInst]));
 
-        cfll._refresh_stubs(binding);
-        expect(cfll.filter_fn).toHaveBeenCalledWith(mockResult);
-      });
+          cfll._refresh_stubs(binding).then(() => {
+            expect(cfll.filter_fn).toHaveBeenCalledWith(mockResult);
+            done();
+          });
+        });
     });
 
     describe('listeners', function () {
@@ -916,18 +895,24 @@ describe('mappers', function () {
 
         it('adds the new item when the filter func returns a deferred ' +
            'resolving to true', function () {
+          jasmine.clock().install();
           let filterResult = new LL.MappingResult({id: 2}, [newResult]);
           cfll.filter_fn.and.returnValue($.when(true));
           cfll.init_listeners(binding);
           spyOn(cfll, 'make_result').and.returnValue(filterResult);
           spyOn(cfll, 'insert_results');
           sourceBinding.list.push(newResult);
+
+          jasmine.clock().tick(1);
           expect(cfll.insert_results).toHaveBeenCalledWith(
             binding, [filterResult]);
+
+          jasmine.clock().uninstall();
         });
 
         it('does not add the new item when the filter func returns ' +
            'a deferred resolving to false', function () {
+          jasmine.clock().install();
           let filterResult = new LL.MappingResult({id: 2}, [newResult]);
           cfll.filter_fn.and.returnValue($.when(false));
           cfll.init_listeners(binding);
@@ -935,14 +920,18 @@ describe('mappers', function () {
           spyOn(cfll, 'insert_results');
           spyOn(cfll, 'remove_instance');
           sourceBinding.list.push(newResult);
+
+          jasmine.clock().tick(1);
           expect(cfll.insert_results).not.toHaveBeenCalledWith(
             binding, [filterResult]);
           expect(cfll.remove_instance).toHaveBeenCalledWith(
             binding, newResult.instance, newResult);
+          jasmine.clock().uninstall();
         });
 
         it('does not add the new item when the filter func returns ' +
            'a deferred that rejects', function () {
+          jasmine.clock().install();
           let filterResult = new LL.MappingResult({id: 2}, [newResult]);
           cfll.filter_fn.and.returnValue(new $.Deferred().reject());
           cfll.init_listeners(binding);
@@ -950,10 +939,13 @@ describe('mappers', function () {
           spyOn(cfll, 'insert_results');
           spyOn(cfll, 'remove_instance');
           sourceBinding.list.push(newResult);
+
+          jasmine.clock().tick(1);
           expect(cfll.insert_results).not.toHaveBeenCalledWith(
             binding, [filterResult]);
           expect(cfll.remove_instance).toHaveBeenCalledWith(
             binding, newResult.instance, newResult);
+          jasmine.clock().uninstall();
         });
       });
 

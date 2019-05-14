@@ -12,9 +12,9 @@ import template from './object-list.stache';
  */
 export default can.Component.extend({
   tag: 'object-list',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       itemSelector: {
         type: 'string',
@@ -56,7 +56,7 @@ export default can.Component.extend({
         },
       },
     },
-    listType: '@',
+    listType: '',
     isDisabled: false,
     showMore: false,
     /**
@@ -98,7 +98,7 @@ export default can.Component.extend({
       }
       this.attr('isInnerClick', false);
     },
-  },
+  }),
   events: {
     '.object-list__item click': function () {
       this.viewModel.attr('isInnerClick', true);

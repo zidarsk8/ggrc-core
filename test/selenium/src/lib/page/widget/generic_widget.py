@@ -25,7 +25,6 @@ class Widget(base.Widget):
       locator_parts[1] += "_version"
       self._locators_widget = (self._locators_widget[0], "\"".join(
           locator_parts))
-      objects.get_singular(self.obj_name) + "_version".upper()
     self.info_widget_cls = factory.get_cls_widget(
         object_name=obj_name, is_info=True)
     # Filter
@@ -171,7 +170,7 @@ class TreeView(base.TreeView):
   def open_map(self):
     """Click to Map button on Tree View to open unified mapper modal.
 
-    Return: lib.page.modal.unified_mapper.MapObjectsModal
+    Return: MapObjectsModal
     """
     self._browser.link(text="Map").click()
     return unified_mapper.MapObjectsModal(self._driver, self.obj_name)

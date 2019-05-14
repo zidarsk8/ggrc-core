@@ -4,20 +4,20 @@
 }}
 
 <div class="labels-wrapper {{cssClass}}">
-  <label-autocomplete-wrapper {objects-to-exclude}="{labels}">
+  <label-autocomplete-wrapper objectsToExclude:from="labels">
     <div class="labels">
       {{#each _labels}}
         <div class="label-box">
           {{name}}
-          <a class="remove-label" ($click)="removeLabel({{_index}})">
+          <a class="remove-label" on:el:click="removeLabel({{_index}})">
             <i class="fa fa-times"></i>
           </a>
         </div>
       {{/each}}
 
       {{#if editMode}}
-        <autocomplete-input (input-changed)="{getResult(%event)}"
-                            {(show-results)}="{showResults}"
+        <autocomplete-input on:inputChanged="getResult(scope.event)"
+                            showResults:bind="showResults"
         ></autocomplete-input>
       {{else}}
         {{#unless labels.length}}
@@ -26,12 +26,12 @@
       {{/if}}
     </div>
     {{#if editMode}}
-      <label-autocomplete-results {(current-value)}="{currentValue}"
-                                  {items}="{result}"
-                                  {(show-results)}="{showResults}"
-                                  {show-new-value}="{showNewValue}"
-                                  (add-new-item)="{createLabel(%event)}"
-                                  (select-item)="{labelSelected(%event)}">
+      <label-autocomplete-results currentValue:bind="currentValue"
+                                  items:from="result"
+                                  showResults:bind="showResults"
+                                  showNewValue:from="showNewValue"
+                                  on:addNewItem="createLabel(scope.event)"
+                                  on:selectItem="labelSelected(scope.event)">
       </label-autocomplete-results>
     {{/if}}
   </label-autocomplete-wrapper>

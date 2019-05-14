@@ -4,6 +4,7 @@
  */
 
 import template from './templates/tree-item-map.stache';
+import {trigger} from 'can-event';
 
 let viewModel = can.Map.extend({
   define: {
@@ -25,7 +26,7 @@ let viewModel = can.Map.extend({
 
 export default can.Component.extend({
   tag: 'tree-item-map',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
   viewModel,
   events: {
@@ -41,7 +42,7 @@ export default can.Component.extend({
           /* webpackChunkName: "mapper" */
           '../../controllers/mapper/mapper'
         ).then(() => {
-          can.trigger(el, 'openMapper', ev);
+          trigger.call(el[0], 'openMapper', ev);
         });
       }
 

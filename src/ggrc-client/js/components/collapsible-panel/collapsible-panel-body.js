@@ -10,13 +10,13 @@ import template from './collapsible-panel-body.stache';
  */
 export default can.Component.extend({
   tag: 'collapsible-panel-body',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     renderContent: function () {
       return this.attr('softMode') || this.attr('expanded');
     },
     softMode: false,
     expanded: null,
-  },
+  }),
 });

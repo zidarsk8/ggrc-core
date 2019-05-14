@@ -9,9 +9,9 @@ import template from './templates/modal-issue-tracker-fields.stache';
 
 export default can.Component.extend({
   tag: 'modal-issue-tracker-fields',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: {},
     note: '',
     linkingNote: '',
@@ -27,7 +27,7 @@ export default can.Component.extend({
             .includes(instance.attr('status')));
       }
     },
-  },
+  }),
   events: {
     inserted() {
       this.viewModel.setTicketIdMandatory();

@@ -51,8 +51,8 @@
               {{#isMappableExternally instance model.model_singular}}
                 <questionnaire-mapping-link 
                   class="external-link"
-                  {instance}="{instance}"
-                  {destination-model}="{model}">                  
+                  instance:from="instance"
+                  destinationModel:from="model">                  
                     <i class="fa fa-fw fa-{{ icon }} color"></i>
                     <span class="external-link__content">
                       {{title}}
@@ -62,7 +62,7 @@
                 </a>
               {{else}}
 
-                {{#canMapObject model.model_singular}}
+                {{#is_allowed_to_map instance model.model_singular}}
                   <a href="{{urlPath}}{{ href }}"
                       data-clickable="true"
                       data-toggle="unified-mapper"
@@ -87,7 +87,7 @@
                       {{title}}
                     </div>
                   </a>
-                {{/canMapObject}}
+                {{/is_allowed_to_map}}
                 
               {{/isMappableExternally}}
             {{/shouldCreateObject}}

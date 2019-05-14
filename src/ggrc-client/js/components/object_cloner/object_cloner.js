@@ -9,10 +9,10 @@ import {navigate} from '../../plugins/utils/current-page-utils';
 export default can.Component.extend({
   tag: 'object-cloner',
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     instance: null,
-    modalTitle: '@',
-    modalDescription: '@',
+    modalTitle: '',
+    modalDescription: '',
     includeObjects: {},
     getIncluded: function () {
       let included = this.attr('includeObjects');
@@ -45,5 +45,5 @@ export default can.Component.extend({
         });
       }.bind(this));
     },
-  },
+  }),
 });

@@ -7,6 +7,7 @@
 from urlparse import urldefrag
 
 from lib import environment
+from lib.constants import objects
 from lib.constants.objects import *  # noqa; the names are later exported
 from lib.entities import entity_operations
 
@@ -17,6 +18,7 @@ LOGIN = "login"
 DASHBOARD = "dashboard"
 ADMIN_DASHBOARD = "admin"
 PEOPLE_TAB = "#!people_list_widget"
+CONTROLS_TAB = "#!{}".format(objects.get_singular(objects.CONTROLS))
 AUDIT = AUDITS + "/{0}"
 RELATIONSHIPS = "relationships"
 USER_ROLES = "user_roles"
@@ -66,6 +68,7 @@ class Urls(object):
     self.admin_dashboard = environment.app_url + ADMIN_DASHBOARD
     self.admin_people_tab = self.admin_dashboard + PEOPLE_TAB
     self.dashboard = environment.app_url + DASHBOARD
+    self.dashboard_controls_tab = self.dashboard + CONTROLS_TAB
     self.login = environment.app_url + LOGIN
 
   @staticmethod

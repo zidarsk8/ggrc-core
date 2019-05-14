@@ -63,15 +63,12 @@ class CycleTaskGroup(roleable.Roleable,
       backref='_cycle_task_group',
       cascade='all, delete-orphan'
   )
-  sort_index = db.Column(
-      db.String(length=250), default="", nullable=False)
   next_due_date = db.Column(db.Date)
 
   _api_attrs = reflection.ApiAttributes(
       'cycle',
       'task_group',
       'cycle_task_group_tasks',
-      'sort_index',
       'next_due_date'
   )
 

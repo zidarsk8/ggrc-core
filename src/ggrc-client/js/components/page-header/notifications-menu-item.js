@@ -12,13 +12,13 @@ const emailDigestType = 'Email_Digest';
 
 export default can.Component.extend({
   tag: 'notifications-menu-item',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       emailDigest: {
         set(newValue) {
-          if (!this.attr('isLoading')) {
+          if (!this.attr('isLoading') && this.attr('isLoaded')) {
             this.saveEmailDigest(newValue);
           }
 
@@ -28,6 +28,7 @@ export default can.Component.extend({
     },
     isSaving: false,
     isLoading: false,
+    isLoaded: false,
     existingConfigId: null,
     async saveEmailDigest(checked) {
       this.attr('isSaving', true);
@@ -74,9 +75,10 @@ export default can.Component.extend({
         }
       } finally {
         this.attr('isLoading', false);
+        this.attr('isLoaded', true);
       }
     },
-  },
+  }),
   events: {
     // Don't close the dropdown if clicked on checkbox
     'click'(el, ev) {

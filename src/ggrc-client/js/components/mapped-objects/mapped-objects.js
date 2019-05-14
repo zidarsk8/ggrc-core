@@ -18,9 +18,9 @@ import QueryParser from '../../generated/ggrc_filter_query_parser';
  */
 export default can.Component.extend({
   tag: 'mapped-objects',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: true,
-  viewModel: {
+  viewModel: can.Map.extend({
     define: {
       emptyMessage: {
         type: 'string',
@@ -69,7 +69,7 @@ export default can.Component.extend({
       },
     },
     isLoading: false,
-    mapping: '@',
+    mapping: '',
     parentInstance: null,
     selectedItem: {},
     filter: {
@@ -208,7 +208,7 @@ export default can.Component.extend({
       objects = loadFn.call(this);
       this.attr('mappedItems').replace(objects);
     },
-  },
+  }),
   init: function () {
     this.viewModel.setMappedObjects();
   },

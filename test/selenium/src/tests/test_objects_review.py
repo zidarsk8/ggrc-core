@@ -12,8 +12,8 @@ import copy
 
 import pytest
 
-from lib import base, users
-from lib.constants import roles
+from lib import base, users, factory
+from lib.constants import roles, objects, element
 from lib.service import webui_facade, rest_facade, webui_service
 
 
@@ -36,6 +36,14 @@ class TestObjectsReview(base.Test):
     Returns program instance with approved review."""
     users.set_current_user(reviewer)
     return rest_facade.approve_obj_review(program_with_review)
+
+  @pytest.fixture()
+  def program_w_approved_via_ui_review(self, reviewer, program_with_review,
+                                       selenium):
+    """Approve program review via UI.
+    Returns program instance with approved review."""
+    users.set_current_user(reviewer)
+    return webui_facade.approve_obj_review(selenium, program_with_review)
 
   @pytest.mark.smoke_tests
   def test_request_obj_review(self, reviewer, login_as_creator, program,
@@ -69,3 +77,34 @@ class TestObjectsReview(base.Test):
     actual_buttons_state["is_request_review_btn_visible"] = (
         info_page.request_review_btn.exists)
     assert actual_buttons_state == expected_buttons_state
+
+  @pytest.mark.smoke_tests
+  def test_message_with_undo_btn_appears(self, reviewer,
+                                         program_w_approved_via_ui_review,
+                                         selenium):
+    """Confirm floating message 'Review is complete' with 'Undo' button
+    appears."""
+    info_page = factory.get_cls_widget(
+        objects.get_plural(program_w_approved_via_ui_review.type),
+        is_info=True)(selenium)
+    actual_elements_state = {
+        "is_floating_message_visible": info_page.floating_message.exists,
+        "is_undo_btn_visible": info_page.undo_button.exists}
+    expected_elements_state = copy.deepcopy(actual_elements_state)
+    expected_elements_state["is_floating_message_visible"] = True
+    expected_elements_state["is_undo_btn_visible"] = True
+    assert actual_elements_state == expected_elements_state
+
+  @pytest.mark.smoke_tests
+  def test_obj_history_is_updated(self, program_with_approved_review,
+                                  selenium):
+    """Confirm Review history is updated in Change Log."""
+    expected_entry = {
+        "author": users.current_user().email,
+        "Review State": {"original_value": element.ReviewStates.UNREVIEWED,
+                         "new_value": element.ReviewStates.REVIEWED}}
+    actual_entries = (webui_service.ProgramsService(selenium).
+                      open_info_page_of_obj(program_with_approved_review).
+                      get_changelog_entries())
+    assert (expected_entry == actual_entries.pop(0) and
+            expected_entry not in actual_entries)

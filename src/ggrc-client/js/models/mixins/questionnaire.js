@@ -8,6 +8,16 @@ import Mixin from './mixin';
 export default Mixin.extend({
   'after:init'() {
     if (GGRC.GGRC_Q_INTEGRATION_URL) {
+      const attrTitle = 'Questionnaire';
+      const attrList = this.tree_view_options.attr_list;
+      let isContainsAttr = !!attrList
+        .filter((attr) => attr.attr_title === attrTitle)
+        .length;
+
+      if (isContainsAttr) {
+        return;
+      }
+
       this.tree_view_options.attr_list.push({
         attr_title: 'Questionnaire',
         attr_name: 'questionnaire',

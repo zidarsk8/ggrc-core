@@ -164,7 +164,7 @@ class BaseWebUiService(object):
     self._set_list_objs_scopes_repr_on_mapper_tree_view(src_obj)
     list_objs_scopes, mapping_statuses = (
         self._search_objs_via_tree_view(src_obj, dest_objs))
-    self._get_unified_mapper(src_obj).close_modal()
+    self._get_unified_mapper(src_obj).close()
     for index in xrange(len(list_objs_scopes)):
       self.add_review_status_if_not_in_control_scope(list_objs_scopes[index])
     return self._create_list_objs(
@@ -257,7 +257,7 @@ class BaseWebUiService(object):
   def _get_unified_mapper(self, src_obj):
     """Open generic widget of mapped objects, open unified mapper modal from
     Tree View.
-    Return unified_mapper.MapObjectsModal"""
+    Return MapObjectsModal"""
     if self._unified_mapper is None:
       self._unified_mapper = (self.open_widget_of_mapped_objs(src_obj)
                               .tree_view.open_map())
