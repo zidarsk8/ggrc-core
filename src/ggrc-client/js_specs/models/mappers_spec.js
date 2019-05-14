@@ -104,21 +104,21 @@ describe('mappers', function () {
         spyOn(binding, 'refresh_instances').and.returnValue($.when());
       });
 
-      it('attaches its instance to a new ReifyingListLoader', function () {
-        binding.refresh_list();
+      it('attaches its instance to a new ReifyingListLoader', async () => {
+        await binding.refresh_list();
         expect(LL.ReifyingListLoader.newInstance).toHaveBeenCalledWith(binding);
         expect(loader.attach).toHaveBeenCalledWith(binding.instance);
       });
 
       it('sets the name of the ReifyingListLoader\'s ListBinding to ' +
-         'its own name plus "_instances"', function () {
+         'its own name plus "_instances"', async function () {
         binding.name = 'foo';
-        binding.refresh_list();
+        await binding.refresh_list();
         expect(otherBinding.name).toBe('foo_instances');
       });
 
-      it('refreshes instances on the new binding', function () {
-        binding.refresh_list();
+      it('refreshes instances on the new binding', async function () {
+        await binding.refresh_list();
         expect(otherBinding.refresh_instances).toHaveBeenCalledWith(binding);
       });
 
