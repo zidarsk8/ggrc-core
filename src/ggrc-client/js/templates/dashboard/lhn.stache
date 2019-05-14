@@ -32,11 +32,11 @@
 
       <div class="lhs-nav">
         <ul class="top-level">
-          {{{renderLive "dashboard/lhn_search" type="Program" title_plural="Programs" li_class="programs" template_view="programs/search_result"}}}
-          {{{renderLive "dashboard/lhn_search" type="Workflow" title_plural="Workflows" li_class="workflow" template_view="workflows/search_result" tooltip_view="/workflows/extended_info.stache"}}}
-          {{{renderLive "dashboard/lhn_search" type="Audit" title_plural="Audits" li_class="programs" template_view="audits/search_result" tooltip_view="/audits/extended_info.stache"}}}
-          {{{renderLive "dashboard/lhn_search" type="Assessment" title_plural="Assessments" li_class="programs" tooltip_view="/assessments/assignable_extended_info.stache" actions="base_objects/empty"}}}
-          {{{renderLive "dashboard/lhn_search" type="Issue" title_plural="Issues" li_class="programs" actions="base_objects/search_actions"}}}
+          {{{renderLive "dashboard/lhn_search" type="Program" title_plural="Programs" template_view="programs/search_result"}}}
+          {{{renderLive "dashboard/lhn_search" type="Workflow" title_plural="Workflows" template_view="workflows/search_result" tooltip_view="/workflows/extended_info.stache"}}}
+          {{{renderLive "dashboard/lhn_search" type="Audit" title_plural="Audits" template_view="audits/search_result" tooltip_view="/audits/extended_info.stache"}}}
+          {{{renderLive "dashboard/lhn_search" type="Assessment" title_plural="Assessments" tooltip_view="/assessments/assignable_extended_info.stache" actions="base_objects/empty"}}}
+          {{{renderLive "dashboard/lhn_search" type="Issue" title_plural="Issues" actions="base_objects/search_actions"}}}
         </ul>
       </div>
 
