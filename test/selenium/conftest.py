@@ -825,3 +825,45 @@ def standard_mapped_to_control(control, standard):
 def soft_assert():
   """Fixture for soft assertions."""
   return assert_utils.SoftAssert()
+
+
+@pytest.fixture()
+def regulation_mapped_to_program(program, control_mapped_to_program):
+  """Create Regulation under Program."""
+  return rest_facade.create_regulation(program)
+
+
+@pytest.fixture()
+def requirement_mapped_to_program(program, control_mapped_to_program):
+  """Create Requirement under Program."""
+  return rest_facade.create_requirement(program)
+
+
+@pytest.fixture()
+def obj_mapped_to_control(request, control_mapped_to_program):
+  """Fixture calls other fixture to create an object and map the object to
+  Control."""
+  obj = request.getfixturevalue(request.param)
+  rest_facade.map_objs(obj, control_mapped_to_program)
+  return obj
+
+
+@pytest.fixture()
+def audit_w_manually_mapped_control_and_obj_mapped_to_control(
+    program, control_mapped_to_program, obj_mapped_to_control
+):
+  """"Create an audit within program and manually map it to control and
+  object mapped to control."""
+  audit = rest_facade.create_audit(program=program, manual_snapshots=True)
+  rest_facade.map_objs(audit, control_mapped_to_program)
+  rest_facade.map_objs(obj_mapped_to_control, audit)
+  return audit
+
+
+@pytest.fixture()
+def asmt_w_control_snapshot(obj, control_mapped_to_program):
+  """Creates an assessment with control snapshot."""
+  asmt = rest_facade.create_asmt(obj)
+  rest_facade.map_to_snapshot(asmt, obj=control_mapped_to_program,
+                              parent_obj=obj)
+  return asmt

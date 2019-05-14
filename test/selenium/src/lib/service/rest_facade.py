@@ -18,6 +18,16 @@ def create_program(**attrs):
   return rest_service.ProgramsService().create_obj(factory_params=attrs)
 
 
+def create_requirement(program=None, **attrs):
+  """Create a requirement."""
+  return _create_obj_in_program_scope(objects.REQUIREMENTS, program, **attrs)
+
+
+def create_regulation(program=None, **attrs):
+  """Create a regulation."""
+  return _create_obj_in_program_scope(objects.REGULATIONS, program, **attrs)
+
+
 def create_objective(program=None, **attrs):
   """Create an objective (optionally map to a `program`)."""
   return _create_obj_in_program_scope("Objectives", program, **attrs)

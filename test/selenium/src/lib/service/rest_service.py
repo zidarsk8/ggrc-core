@@ -432,3 +432,15 @@ class StandardsService(BaseRestService):
   """Service for working with Standard entities."""
   def __init__(self):
     super(StandardsService, self).__init__(url.STANDARDS)
+
+
+class RegulationsService(BaseRestService):
+  """Service for working with Regulations entities."""
+  def __init__(self):
+    super(RegulationsService, self).__init__(url.REGULATIONS)
+
+
+class RequirementsService(BaseRestService):
+  """Service for working with Requirements entities."""
+  def __init__(self):
+    super(RequirementsService, self).__init__(url.REQUIREMENTS)
