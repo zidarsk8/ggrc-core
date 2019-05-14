@@ -28,6 +28,7 @@ class TestTaskGroupTask(unittest.TestCase):
     :return: None
     """
     taskgroup = task_group.TaskGroup()
+    taskgroup.title = 'title'
     taskgroup.contact = 'Person id=0x0000AABBCCDDEEFF'
     result = taskgroup.copy(clone_people=True)
     self.assertEqual(result.contact, taskgroup.contact)
@@ -45,6 +46,7 @@ class TestTaskGroupTask(unittest.TestCase):
         :return: None
         """
     taskgroup = task_group.TaskGroup()
+    taskgroup.title = 'title'
     taskgroup.contact = 'Person id=0x0000AABBCCDDEEFF'
     result = taskgroup.copy(clone_people=False)
     self.assertEqual(result.contact, get_current_user())
@@ -62,6 +64,7 @@ class TestTaskGroupTask(unittest.TestCase):
         :return: None
         """
     taskgroup = task_group.TaskGroup()
+    taskgroup.title = 'title'
     taskgroup.contact = None
     result = taskgroup.copy(clone_people=True)
     self.assertEqual(result.contact, get_current_user())
@@ -79,6 +82,7 @@ class TestTaskGroupTask(unittest.TestCase):
         :return: None
         """
     taskgroup = task_group.TaskGroup()
+    taskgroup.title = 'title'
     taskgroup.contact = None
     result = taskgroup.copy(clone_people=False)
     self.assertEqual(result.contact, get_current_user())

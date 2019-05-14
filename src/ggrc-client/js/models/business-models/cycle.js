@@ -41,6 +41,9 @@ export default Cacheable.extend({
     modified_by: Stub,
     context: Stub,
   },
+  defaults: {
+    title: '',
+  },
   tree_view_options: {
     attr_list: [{
       attr_title: 'Title',

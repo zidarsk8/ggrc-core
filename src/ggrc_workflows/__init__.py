@@ -521,6 +521,18 @@ def handle_task_group_task_delete(sender, obj=None, src=None, service=None):  # 
 
 @signals.Restful.model_posted.connect_via(models.TaskGroup)
 def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+
+  # NOTE. To clone task group the following operations are performed:
+  # 1) create new object, call json_create(), where attributes will be set
+  #    with value validation
+  # 2) This function is called which overrides some attributes,
+  #    attribute validator for these attributes are called
+  # So, validation for those attrs are called twice!
+  # One corner case of this behavior is validation of field "title".
+  # title cannot be None, and because title validation is performed before
+  # this function, API request MUST contain non-empty title in dict,
+  # however the value will be overridden and re-validated in this function!
+
   if src.get('clone'):
     source_task_group_id = src.get('clone')
     source_task_group = models.TaskGroup.query.filter_by(
