@@ -210,7 +210,7 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(prog.description, "test")
 
     custom_vals = [v.attribute_value for v in prog.custom_attribute_values]
-    expected_custom_vals = ['0', 'a', '2015-12-12', 'test1']
+    expected_custom_vals = ['0', 'a', '2015-12-12', 'test1', u'']
     self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
   @unittest.skip("unskip when import/export fixed for workflows")
