@@ -80,7 +80,7 @@ export default can.Control.extend({
 
   draw_list: function (list) {
     // TODO figure out why this happens and fix the root of the problem
-    if (!list && !this.options.list) {
+    if (!list) {
       return undefined;
     }
     if (this._draw_list_deferred) {
@@ -103,7 +103,6 @@ export default can.Control.extend({
     this.clearList();
 
     this.options.attr('original_list', list);
-    this.options.attr('list', []);
     this.on();
 
     this._draw_list_deferred =
@@ -175,7 +174,6 @@ export default can.Control.extend({
     });
 
     if (preppedItems.length > 0) {
-      this.options.list.push(...preppedItems);
       dfd = this.add_child_lists(preppedItems);
     } else {
       dfd = $.Deferred().resolve();

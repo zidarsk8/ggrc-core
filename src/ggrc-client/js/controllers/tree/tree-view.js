@@ -19,7 +19,6 @@ const TreeViewControl = TreeLoader.extend({
     show_header: false,
     add_item_view: null,
     parent: null,
-    list: null,
     find_params: {},
     fields: [],
     filter_states: [],
@@ -37,7 +36,6 @@ const TreeViewControl = TreeLoader.extend({
   do_not_propagate: [
     'header_view',
     'add_item_view',
-    'list',
     'original_list',
     'find_all_deferred',
   ],
@@ -338,12 +336,8 @@ const TreeViewControl = TreeLoader.extend({
   },
 
   reload_list() {
-    if (this.options.list === undefined || this.options.list === null) {
-      return;
-    }
     this._draw_list_deferred = false;
     this.find_all_deferred = false;
-    this.options.list.replace([]);
     this.draw_list(this.options.original_list);
     this.init_count();
   },

@@ -167,7 +167,6 @@ export default can.Control.extend({
         data.attr('original_list', findParams);
         findParams = findParams.slice(0);
       }
-      data.attr('list', findParams);
     } else {
       findParams = data.attr('find_params');
       if (findParams) {
