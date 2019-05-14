@@ -23,15 +23,11 @@ const TreeViewControl = TreeLoader.extend({
     fields: [],
     filter_states: [],
     sortable: true,
-    start_expanded: false, // true
     options_property: 'tree_view_options',
     child_options: [], // this is how we can make nested configs. if you want to use an existing
     // example child option:
     // { property: "controls", model: Control, }
     // { parent_find_param: "system_id" ... }
-    scroll_page_count: 1, // pages above and below viewport
-    subTreeElementsLimit: 20,
-    limitDeepOfTree: 2,
   },
   do_not_propagate: [
     'header_view',

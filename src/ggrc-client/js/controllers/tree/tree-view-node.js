@@ -150,7 +150,7 @@ export default can.Control.extend({
   // data is an entry from child options.  if child options is an array, run once for each.
   add_child_list: function (item, data) {
     let findParams;
-    data.attr({start_expanded: false});
+
     if (_.isFunction(item.instance[data.property])) {
       // Special case for handling mappings which are functions until
       // first requested, then set their name via .attr('...')
