@@ -65,6 +65,11 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
       return None
     ca_type, mandatory = self._get_ca_type(parts[0])
+
+    if ca_type not in self.TYPE_MAP:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+
     ca_title = parts[1]
     multi_options, multi_mandatory = self._get_multiple_choice(parts[2:])
 

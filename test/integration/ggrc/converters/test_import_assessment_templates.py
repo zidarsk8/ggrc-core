@@ -87,9 +87,9 @@ class TestAssessmentTemplatesImport(TestCase):
 
     expected_messages = {
         "Assessment Template": {
-            "rows": 6,
+            "rows": 7,
             "updated": 0,
-            "created": 5,
+            "created": 6,
             "row_warnings": {
                 errors.UNKNOWN_USER_WARNING.format(
                     line=12,
@@ -103,6 +103,10 @@ class TestAssessmentTemplatesImport(TestCase):
                 ),
                 errors.WRONG_VALUE.format(
                     line=16,
+                    column_name="Custom Attributes"
+                ),
+                errors.WRONG_VALUE.format(
+                    line=17,
                     column_name="Custom Attributes"
                 )
             },
