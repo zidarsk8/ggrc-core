@@ -362,6 +362,7 @@ function getProposalAttrUrl(instance, attributeName) {
 export {
   hasQuestions,
   isChangeableExternally,
+  isMappableExternally,
   getCommentFormUrl,
   getQuestionsUrl,
   getImportUrl,
