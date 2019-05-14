@@ -17,6 +17,7 @@ from ggrc import models
 from ggrc import settings
 from ggrc import utils
 from ggrc.app import db
+from ggrc.gcalendar import utils as calendar_utils
 from ggrc.notifications.common import send_mentions_bg
 from ggrc.notifications import data_handlers
 from ggrc.utils import user_generator, get_url_root
@@ -41,13 +42,18 @@ def handle_comment_mapped(obj, comments):
   """
   comments_data = _fetch_comments_data(comments)
 
+  if obj.__class__.__name__ == "CycleTaskGroupObjectTask":
+    url = calendar_utils.get_cycle_tasks_url_by_slug(obj.slug)
+  else:
+    url = urljoin(get_url_root(), utils.view_url_for(obj))
+
   models.background_task.create_task(
       name="send_mentions_bg",
       url=flask.url_for("send_mentions_bg"),
       parameters={
           "comments_data": comments_data,
           "object_name": obj.title,
-          "href": urljoin(get_url_root(), utils.view_url_for(obj)),
+          "href": url,
       },
       queued_callback=send_mentions_bg,
   )
