@@ -23,6 +23,10 @@
   }
 }
 
+.form-label__extend {
+  margin-top: 7px;
+}
+
 .modal {
   @include border-radius(2px);
   width:700px;
