@@ -82,7 +82,7 @@ def validate_name_correctness(name):
   names_starts_with = ["map:", "unmap:"]
   for invalid in names_starts_with:
     if name_to_validate.startswith(invalid):
-      raise ValueError(u"Name should not starts with '{}'".format(invalid))
+      raise ValueError(u"Name should not start with '{}'".format(invalid))
 
   invalid_names = ["delete"]
   for invalid in invalid_names:
