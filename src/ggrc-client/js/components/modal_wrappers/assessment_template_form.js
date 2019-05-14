@@ -6,7 +6,7 @@
 const peopleTitlesList = [
   'Auditors', 'Principal Assignees', 'Secondary Assignees',
   'Primary Contacts', 'Secondary Contacts', 'Control Operators',
-  'Control Owners',
+  'Control Owners', 'Risk Owners',
 ];
 const PEOPLE_VALUES_OPTIONS = Object.freeze({
   Control: [
