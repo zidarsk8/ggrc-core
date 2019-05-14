@@ -8,43 +8,41 @@
   isAttributesDisabled:from="isAttributesDisabled"
   class="ggrc-form ggrc-form-multiple-columns">
     {{#each items}}
-      <div class="ggrc-form-item">
-        <div class="{{#if_in attributeType 'input,text'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
-          <inline-edit-control class="inline-edit-control"
-            on:inlineSave="saveCustomAttributes(scope.event, %context)"
-            instance:from="instance"
-            dropdownOptions:from="multiChoiceOptions"
-            dropdownNoValue:from="true"
-            editMode:from="editMode"
-            isEditIconDenied:from="isEditDenied"
-            isLoading:from="isSaving"
-            value:from="value"
-            type:from="attributeType"
-            mandatory:from="mandatory"
-            withReadMore:from="true">
-              <base-inline-control-title
-                title:from="title"
-                instance:from="instance"
-                editMode:from="editMode"
-                redirectionEnabled:from="redirectionEnabled"
-                isEditIconDenied:from="isEditIconDenied"
-                on:setEditModeInline="setEditModeInline(scope.event)">
-                  <div class="info-pane__section-title {{#if mandatory}}form-label form-label__extended{{/if}}">
-                    {{title}}
-                    {{#if mandatory}}
-                      <i class="fa fa-asterisk"></i>
-                    {{/if}}
-                  </div>
-              </base-inline-control-title>
-              {{#if helptext}}
-                <div class="ggrc-form-item__small-text">
-                  <small>
-                    <em>{{helptext}}</em>
-                  </small>
+      <div class="ggrc-form-item {{#if_in attributeType 'input,text'}}ggrc-form-item--row{{else}}ggrc-form-item--column{{/if}}">
+        <inline-edit-control class="inline-edit-control"
+          on:inlineSave="saveCustomAttributes(scope.event, %context)"
+          instance:from="instance"
+          dropdownOptions:from="multiChoiceOptions"
+          dropdownNoValue:from="true"
+          editMode:from="editMode"
+          isEditIconDenied:from="isEditDenied"
+          isLoading:from="isSaving"
+          value:from="value"
+          type:from="attributeType"
+          mandatory:from="mandatory"
+          withReadMore:from="true">
+            <base-inline-control-title
+              title:from="title"
+              instance:from="instance"
+              editMode:from="editMode"
+              redirectionEnabled:from="redirectionEnabled"
+              isEditIconDenied:from="isEditIconDenied"
+              on:setEditModeInline="setEditModeInline(scope.event)">
+                <div class="info-pane__section-title {{#if mandatory}}form-label form-label__extended{{/if}}">
+                  {{title}}
+                  {{#if mandatory}}
+                    <i class="fa fa-asterisk"></i>
+                  {{/if}}
                 </div>
-              {{/if}}
-          </inline-edit-control>
-        </div>
+            </base-inline-control-title>
+            {{#if helptext}}
+              <div class="ggrc-form-item__small-text">
+                <small>
+                  <em>{{helptext}}</em>
+                </small>
+              </div>
+            {{/if}}
+        </inline-edit-control>
       </div>
     {{/each}}
 </global-custom-attributes>
