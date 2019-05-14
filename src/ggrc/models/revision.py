@@ -8,21 +8,27 @@ import flask
 
 from ggrc import builder
 from ggrc import db
+from ggrc import utils
 from ggrc.access_control import role
 from ggrc.models import automapping
+from ggrc.models import mixins
 from ggrc.models import reflection
-from ggrc.models.mixins import Base
+from ggrc.models import types
 from ggrc.models.mixins import base
-from ggrc.models.mixins.filterable import Filterable
-from ggrc.models.mixins.synchronizable import ChangesSynchronized
-from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
-from ggrc.models.types import LongJsonType
+from ggrc.models.mixins import before_flush_handleable
+from ggrc.models.mixins import filterable
+from ggrc.models.mixins import synchronizable
+from ggrc.models.mixins import with_readonly_access as wroa
 from ggrc.utils import referenced_objects
 from ggrc.utils.revisions_diff import builder as revisions_diff
 from ggrc.utils.revisions_diff import meta_info
 
 
-class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
+class Revision(before_flush_handleable.BeforeFlushHandleable,
+               synchronizable.ChangesSynchronized,
+               filterable.Filterable,
+               base.ContextRBAC,
+               mixins.Base,
                db.Model):
   """Revision object holds a JSON snapshot of the object at a time."""
 
@@ -33,13 +39,15 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
   event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
   action = db.Column(db.Enum(u'created', u'modified', u'deleted'),
                      nullable=False)
-  _content = db.Column('content', LongJsonType, nullable=False)
+  _content = db.Column('content', types.LongJsonType, nullable=False)
 
   resource_slug = db.Column(db.String, nullable=True)
   source_type = db.Column(db.String, nullable=True)
   source_id = db.Column(db.Integer, nullable=True)
   destination_type = db.Column(db.String, nullable=True)
   destination_id = db.Column(db.Integer, nullable=True)
+
+  is_empty = db.Column(db.Boolean, nullable=False, default=False)
 
   @staticmethod
   def _extra_table_args(_):
@@ -410,7 +418,7 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     from ggrc.models import all_models
 
     model = getattr(all_models, self.resource_type, None)
-    if not model or not issubclass(model, WithReadOnlyAccess):
+    if not model or not issubclass(model, wroa.WithReadOnlyAccess):
       return dict()
 
     if "readonly" in self._content:
@@ -630,6 +638,18 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
       automapping_json = flask.g.automappings_cache[automapping_id]
     return {"automapping": automapping_json}
 
+  @staticmethod
+  def _populate_recipients(populated_content):
+    """Normalize recipients if present in content."""
+    if "recipients" in populated_content:
+      # There are revisions with same recipients put in different order and
+      # since this field is of string type, order matters which leads to wrong
+      # result during diff calculation. To prevent it, recipients should be
+      # sorted in same order when populating content.
+      populated_content["recipients"] = ",".join(
+          sorted(populated_content["recipients"].split(",")),
+      )
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -654,6 +674,7 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
     self.populate_requirements(populated_content)
     self.populate_options(populated_content)
     self.populate_review_status_display_name(populated_content)
+    self._populate_recipients(populated_content)
     # remove custom_attributes,
     # it's old style interface and now it's not needed
     populated_content.pop("custom_attributes", None)
@@ -666,3 +687,21 @@ class Revision(ChangesSynchronized, Filterable, base.ContextRBAC, Base,
   def content(self, value):
     """ Setter for content property."""
     self._content = value
+
+  def _handle_if_empty(self):
+    """Check if revision is empty and update is_empty flag if true."""
+
+    # Check if new revision contains any changes in resource state. Revisions
+    # created with "created" or "deleted" action are not considered empty.
+    if self in db.session.new and self.action == u"modified":
+      obj = referenced_objects.get(self.resource_type, self.resource_id)
+      # Content serialization and deserialization is needed since content of
+      # prev revision stored in DB was serialized before storing and due to
+      # this couldn't be correctly compared to content of revision in hands.
+      content = json.loads(utils.as_json(self.content))
+      self.is_empty = bool(
+          obj and not revisions_diff.changes_present(obj, content))
+
+  def handle_before_flush(self):
+    """Handler that called  before SQLAlchemy flush event."""
+    self._handle_if_empty()

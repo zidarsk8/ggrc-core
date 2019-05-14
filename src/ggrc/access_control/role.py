@@ -223,6 +223,13 @@ def get_custom_roles_for(object_type):
   return flask.g.global_role_names[object_type]
 
 
+def _merge_roles_if_needed(object_type):
+  """Merge `object_type` objects from global_ac_roles in session if needed."""
+  for role_name, role in flask.g.global_ac_roles[object_type].iteritems():
+    if role not in db.session:
+      flask.g.global_ac_roles[object_type][role_name] = db.session.merge(role)
+
+
 def get_ac_roles_for(object_type):
   """Get all ACRs for the given object type.
 
@@ -244,6 +251,7 @@ def get_ac_roles_for(object_type):
     for role in query:
       flask.g.global_ac_roles[role.object_type][role.name] = role
 
+  _merge_roles_if_needed(object_type)
   return flask.g.global_ac_roles[object_type]
 
 

@@ -43,14 +43,10 @@ def _project_content(content):
 class TestRevisions(query_helper.WithQueryApi, TestCase):
   """ Tests for ggrc.models.Revision """
 
-  @classmethod
-  def setUpClass(cls):
-    """Sets up objects common to all tests."""
-    cls.gen = integration.ggrc.generator.ObjectGenerator()
-    cls.api_helper = api_helper.Api()
-
   def setUp(self):
     super(TestRevisions, self).setUp()
+    self.gen = integration.ggrc.generator.ObjectGenerator()
+    self.api_helper = api_helper.Api()
     self.api_helper.client.get("/login")
 
   def test_revisions(self):
@@ -537,3 +533,17 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
              automapping["destination_type"]: automapping["destination_id"]}
     self.assertTrue(program_a_id == nodes["Program"])
     self.assertTrue(regulation_a_id == nodes["Regulation"])
+
+  def test_empty_revision(self):
+    """Test revision is marked as empty if no changes present."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+
+    response = self.api_helper.put(audit, {})
+    self.assert200(response)
+
+    self.refresh_object(audit)
+    revisions = _get_revisions(audit)
+    self.assertEqual(len(revisions), 2)
+    self.assertFalse(revisions[0].is_empty)
+    self.assertTrue(revisions[1].is_empty)
