@@ -31,7 +31,6 @@ const TreeViewControl = TreeLoader.extend({
     // { property: "controls", model: Control, }
     // { parent_find_param: "system_id" ... }
     scroll_page_count: 1, // pages above and below viewport
-    is_subtree: false,
     subTreeElementsLimit: 20,
     limitDeepOfTree: 2,
   },
@@ -81,9 +80,6 @@ const TreeViewControl = TreeLoader.extend({
     }
 
     this.element.uniqueId();
-
-    this.options.attr('is_subtree',
-      this.element && this.element.closest('.inner-tree').length > 0);
 
     if (!this.options.scroll_element) {
       this.options.attr('scroll_element', $('.object-area'));

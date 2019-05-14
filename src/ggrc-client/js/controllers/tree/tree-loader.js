@@ -13,13 +13,9 @@ export default can.Control.extend({
     if (this.element) {
       $footer = this.element.children('.tree-item-add').first();
 
-      if (this.options.is_subtree) {
-        $wrapper = $('<li class="tree-item tree-spinner"/>');
-      } else {
-        $wrapper = $('<div class="tree-spinner"/>');
-      }
+      $wrapper = $('<div class="tree-spinner"/>');
 
-      if (!this.options.is_subtree && !this.element.next().length) {
+      if (!this.element.next().length) {
         $wrapper.css('height', '40px');
       }
 
@@ -168,24 +164,9 @@ export default can.Control.extend({
   insert_items: function (items) {
     let that = this;
     let preppedItems = [];
-    let idMap = {};
-    let toInsert;
     let dfd;
 
-    if (this.options.attr('is_subtree')) {
-      // Check the list of items to be inserted for any duplicate items.
-
-      _.forEach(this.options.list, function (item) {
-        idMap[item.instance.type + item.instance.id] = true;
-      });
-      toInsert = _.filter(items, function (item) {
-        return !idMap[item.instance.type + item.instance.id];
-      });
-    } else {
-      toInsert = items;
-    }
-
-    _.forEach(toInsert, function (item) {
+    _.forEach(items, function (item) {
       let prepped = that.prepare_child_options(item);
       // Should we skip items without selfLink?
       if (prepped.instance.selfLink) {
