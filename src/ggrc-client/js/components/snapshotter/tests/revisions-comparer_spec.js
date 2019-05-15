@@ -5,13 +5,11 @@
 
 import * as caUtils from '../../../plugins/utils/ca-utils';
 import Component from '../revisions-comparer';
-import RefreshQueue from '../../../models/refresh_queue';
 import Revision from '../../../models/service-models/revision';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Control from '../../../models/business-models/control';
-import Person from '../../../models/business-models/person';
 
-describe('revisions-comparer companent', function () {
+describe('revisions-comparer component', function () {
   let viewModel;
 
   beforeEach(function () {
@@ -164,63 +162,99 @@ describe('revisions-comparer companent', function () {
       });
   });
 
-  describe('"loadACLPeople" method', () => {
-    let method;
-    let instance;
+  describe('"highlightAttachments" method', () => {
+    const highlighted = '.diff-highlighted';
 
-    beforeEach(() => {
-      method = viewModel.loadACLPeople;
-      instance = new can.Map({
-        access_control_list: [{
-          person: {
-            id: 1,
-            type: 'Person',
-          },
-        }, {
-          person: {
-            id: 2,
-            type: 'Person',
-          },
-        }],
+    const prepareComparerModal = () => {
+      return $(
+        `<div>
+          <section class="info">
+            <div class="tier-content">
+              <div class="related-urls__list"></div>
+              <folder-attachments-list>
+                <div class="mapped-folder"></div>
+                <object-list></object-list>
+              </folder-attachments-list>
+            </div>
+          </section>
+          <section class="info">
+            <div class="tier-content">
+              <div class="related-urls__list"></div>
+              <folder-attachments-list>
+                <div class="mapped-folder"></div>
+                <object-list></object-list>
+              </folder-attachments-list>
+            </div>
+          </section>
+        </div>`
+      );
+    };
+
+    it('highlights "folder" value', () => {
+      const revisionsList = [
+        [
+          {instance: {folder: 'old_value'}},
+          {instance: {folder: 'new_value'}},
+        ],
+        [
+          {instance: {folder: undefined}},
+          {instance: {folder: 'some_value'}},
+        ],
+        [
+          {instance: {folder: ''}},
+          {instance: {folder: 'some_value'}},
+        ],
+      ];
+
+      revisionsList.forEach((revisions) => {
+        let $target = prepareComparerModal();
+        viewModel.highlightAttachments($target, revisions);
+        const selector = 'folder-attachments-list .mapped-folder';
+
+        expect($target.find(`${selector}${highlighted}`).length).toEqual(2);
       });
-
-      spyOn(RefreshQueue.prototype, 'enqueue').and.callThrough();
-      spyOn(RefreshQueue.prototype, 'trigger');
     });
 
-    it('does ajax call for all people no one is in cache', () => {
-      spyOn(Person, 'findInCacheById');
+    it('highlights "documents_file" value', () => {
+      const revisionsList = [
+        [
+          {instance: {documents_file: new can.Map({value: 'doc1'})}},
+          {instance: {documents_file: new can.Map({value: 'doc2'})}},
+        ],
+        [
+          {instance: {documents_file: undefined}},
+          {instance: {documents_file: new can.Map({value: 'doc3'})}},
+        ],
+      ];
 
-      method(instance);
+      revisionsList.forEach((revisions) => {
+        let $target = prepareComparerModal();
+        viewModel.highlightAttachments($target, revisions);
+        const selector = 'folder-attachments-list object-list';
 
-      expect(RefreshQueue.prototype.enqueue.calls.count()).toEqual(2);
-      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
+        expect($target.find(`${selector}${highlighted}`).length).toEqual(2);
+      });
     });
 
-    it('does ajax call for remain people when some people are in cache', () => {
-      spyOn(Person, 'findInCacheById').and.callFake((id) => {
-        return id === 1 ? {email: 'example@email.com'} : null;
+    it('highlights "documents_reference_url" value', () => {
+      const revisionsList = [
+        [
+          {instance: {documents_reference_url: new can.Map({value: 'url1'})}},
+          {instance: {documents_reference_url: new can.Map({value: 'url2'})}},
+        ],
+        [
+          {instance: {documents_reference_url: undefined}},
+          {instance: {documents_reference_url: new can.Map({value: 'url3'})}},
+        ],
+      ];
+
+      revisionsList.forEach((revisions) => {
+        let $target = prepareComparerModal();
+        viewModel.highlightAttachments($target, revisions);
+        const selector = '.related-urls__list';
+
+        expect($target.find(`${selector}${highlighted}`).length).toEqual(2);
       });
-
-      method(instance);
-
-      expect(RefreshQueue.prototype.enqueue.calls.count()).toEqual(1);
-      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
-    });
-
-    it('does not ajax call when all people are in cache', () => {
-      let dfd = new $.Deferred();
-      spyOn(Person, 'findInCacheById').and.callFake(() => {
-        return {email: 'example@email.com'};
-      });
-      spyOn($, 'Deferred').and.returnValue(dfd);
-      spyOn(dfd, 'resolve');
-
-      method(instance);
-
-      expect(RefreshQueue.prototype.enqueue.calls.any()).toEqual(false);
-      expect(RefreshQueue.prototype.trigger.calls.any()).toEqual(false);
-      expect(dfd.resolve).toHaveBeenCalled();
     });
   });
 
