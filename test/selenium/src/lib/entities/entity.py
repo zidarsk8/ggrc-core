@@ -355,6 +355,8 @@ class Representation(object):
     def update_obj_attrs_values(obj, is_replace_attrs_values,
                                 is_allow_none_values, **attrs):
       """Update object's attributes values."""
+      if "review" in attrs and isinstance(attrs["review"], ReviewEntity):
+        obj.update_review(attrs.pop("review"))
       for obj_attr_name in attrs:
         obj_attr_value = None
         if obj_attr_name in Representation.all_attrs_names():

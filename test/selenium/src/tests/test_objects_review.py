@@ -108,8 +108,8 @@ class TestObjectsReview(base.Test):
   @pytest.mark.smoke_tests
   def test_undo_obj_review_approval(self, program_w_approved_via_ui_review,
                                     selenium):
-    """Confirm Reviewer with READ rights for an object is able to unreview
-    an object."""
+    """Confirm Reviewer with READ rights for an object is able to undo
+    an object review approval."""
     webui_facade.undo_obj_review_approval(selenium,
                                           program_w_approved_via_ui_review)
     actual_program = webui_facade.get_object(selenium,
@@ -126,3 +126,15 @@ class TestObjectsReview(base.Test):
                                        third_creator)
     actual_program = webui_facade.get_object(selenium, program_with_review)
     self.general_equal_assert(program_with_review.repr_ui(), actual_program)
+
+  @pytest.mark.smoke_tests
+  def test_editor_can_undo_obj_review_approval(self, editor,
+                                               program_with_approved_review,
+                                               selenium):
+    """Confirm user with EDIT rights is able to undo an object review
+    approval."""
+    users.set_current_user(editor)
+    expected_program = webui_facade.cancel_review_by_editing_obj(
+        selenium, program_with_approved_review)
+    actual_program = webui_facade.get_object(selenium, expected_program)
+    self.general_equal_assert(expected_program.repr_ui(), actual_program)
