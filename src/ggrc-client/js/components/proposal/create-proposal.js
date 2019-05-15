@@ -7,7 +7,7 @@ import Proposal from '../../models/service-models/proposal';
 import template from './templates/create-proposal.stache';
 import {hasPending as hasPendingUtil} from '../../plugins/ggrc_utils';
 import {
-  REFRESH_RELATED,
+  PROPOSAL_CREATED,
   REFRESH_COMMENTS,
 } from '../../events/eventTypes';
 import {getRole} from '../../plugins/utils/acl-utils';
@@ -57,12 +57,12 @@ export default can.Component.extend({
       const instance = this.attr('instance');
 
       new Proposal(proposal).save().then(
-        () => {
+        (proposal) => {
           this.attr('loading', false);
           instance.restore(true);
           instance.dispatch({
-            ...REFRESH_RELATED,
-            model: 'Proposal',
+            ...PROPOSAL_CREATED,
+            proposal,
           });
           instance.dispatch(REFRESH_COMMENTS);
           this.closeModal(element);

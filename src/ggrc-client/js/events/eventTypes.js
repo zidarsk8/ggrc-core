@@ -27,6 +27,38 @@ const REFRESH_RELATED = {
 
 /**
  *
+ * @event addRelated
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} model -  Model name.
+ */
+const ADD_RELATED = {
+  type: 'addRelated',
+};
+
+/**
+ *
+ * @event relatedRefreshed
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} model -  Model name.
+ */
+const RELATED_REFRESHED = {
+  type: 'relatedRefreshed',
+};
+
+/**
+ * @event relatedAdded
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} model -  Model name.
+ */
+const RELATED_ADDED = {
+  type: 'relatedAdded',
+};
+
+/**
+ *
  * @event rolesConflict
  * @type {object}
  * @property {string} type - Event name.
@@ -71,6 +103,16 @@ const VALIDATION_ERROR = {
  */
 const DESTINATION_UNMAPPED = {
   type: 'destinationUnmapped',
+};
+
+/**
+ * Notifies that proposal was created
+ * @event proposalCreated
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const PROPOSAL_CREATED = {
+  type: 'proposalCreated',
 };
 
 /**
@@ -226,12 +268,16 @@ export {
   REFRESHED,
   REFRESH_SUB_TREE,
   REFRESH_RELATED,
+  ADD_RELATED,
+  RELATED_REFRESHED,
+  RELATED_ADDED,
   ROLES_CONFLICT,
   SWITCH_TO_ERROR_PANEL,
   SHOW_INVALID_FIELD,
   VALIDATION_ERROR,
   DESTINATION_UNMAPPED,
   NAVIGATE_TO_TAB,
+  PROPOSAL_CREATED,
   REFRESH_PROPOSAL_DIFF,
   REFRESH_COMMENTS,
   RELATED_ITEMS_LOADED,

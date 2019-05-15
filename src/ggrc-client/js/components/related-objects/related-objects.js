@@ -4,7 +4,12 @@
  */
 
 import '../sortable-column/sortable-column';
-import {REFRESH_RELATED} from '../../events/eventTypes';
+import {
+  REFRESH_RELATED,
+  ADD_RELATED,
+  RELATED_REFRESHED,
+  RELATED_ADDED,
+} from '../../events/eventTypes';
 import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
@@ -131,8 +136,15 @@ export default can.Component.extend({
         name: orderBy.attr('field'),
         desc: orderBy.attr('direction') === 'desc'}];
     },
-    setRelatedItems: function () {
-      this.attr('relatedObjects').replace(this.loadRelatedItems());
+    setRelatedItems: async function () {
+      let items = await this.loadRelatedItems();
+
+      this.attr('relatedObjects').replace(items);
+
+      this.attr('baseInstance').dispatch({
+        ...RELATED_REFRESHED,
+        model: this.attr('relatedItemsType'),
+      });
     },
   }),
   init: function () {
@@ -155,6 +167,33 @@ export default can.Component.extend({
       },
     '{viewModel.orderBy} changed': function () {
       this.viewModel.setRelatedItems();
+    },
+    [`{viewModel.relatedObjects} ${RELATED_ADDED.type}`](scope, event) {
+      let vm = this.viewModel;
+
+      if (vm.attr('relatedItemsType') !== event.model) {
+        return;
+      }
+
+      let paging = this.viewModel.attr('paging');
+
+      if (paging.attr('current') === 1) {
+        vm.setRelatedItems();
+      } else {
+        paging.attr('current', 1);
+      }
+    },
+    [`{viewModel.relatedObjects} ${ADD_RELATED.type}`](relatedObjects, event) {
+      let vm = this.viewModel;
+      relatedObjects.unshift({instance: event.object});
+
+      let paging = vm.attr('paging');
+      if (relatedObjects.length > paging.attr('pageSize')) {
+        relatedObjects.pop(); // remove last element
+      }
+
+      let total = paging.attr('total');
+      paging.attr('total', total + 1);
     },
   },
 });
