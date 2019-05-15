@@ -90,6 +90,7 @@ export default can.Component.extend({
                     target.find('.modal-body').html(fragLeft);
 
                     that.highlightDifference(target);
+                    that.highlightAttachments(target, revisions);
                     that.highlightCustomAttributes(target, revisions);
                   });
                 });
@@ -250,16 +251,14 @@ export default can.Component.extend({
       const emptySelector = '.empty-message';
       const listSelector = 'ul li, .object-list-item';
       const titleSelector = '.general-page-header .pane-header__title';
-      const documentsSelector = 'related-documents';
       const attributesSelector = this.instance.type === 'Control' ?
         '.review-status, proposable-attribute' :
         'object-review, .row-fluid h6 + *';
 
-      const fieldsSelector = [
-        titleSelector, documentsSelector, attributesSelector].join(',');
-      let infoPanes = $target.find('.info .tier-content');
-      let valuesOld = infoPanes.eq(0).find(fieldsSelector);
-      let valuesNew = infoPanes.eq(1).find(fieldsSelector);
+      const fieldsSelector = [titleSelector, attributesSelector].join(',');
+      const infoPanes = $target.find('.info .tier-content');
+      const valuesOld = infoPanes.eq(0).find(fieldsSelector);
+      const valuesNew = infoPanes.eq(1).find(fieldsSelector);
 
       valuesOld.each(function (index, valueOld) {
         const $valueNew = $(valuesNew[index]);
@@ -332,6 +331,60 @@ export default can.Component.extend({
         } else if (firstItemHeight < secondItemHeight) {
           $firstItem.outerHeight(secondItemHeight);
         }
+      }
+    },
+
+    /**
+     * Highlights difference in 'related documents' section
+     *
+     * @param {jQuery} $target - the root DOM element containing the
+     *   revision diff comparison
+     * @param {can.List} revisions - revisions for comparing
+     */
+    highlightAttachments($target, revisions) {
+      if (!isEqual(
+        revisions[0].instance.documents_reference_url,
+        revisions[1].instance.documents_reference_url
+      )) {
+        highlightValues('.related-urls__list');
+      }
+
+      if (!isEqual(
+        revisions[0].instance.documents_file,
+        revisions[1].instance.documents_file
+      )) {
+        highlightValues('folder-attachments-list object-list');
+      }
+
+      if (revisions[0].instance.folder !== revisions[1].instance.folder) {
+        highlightValues('folder-attachments-list .mapped-folder');
+      }
+
+      /**
+       * Checks if two lists are equal.
+       * @param {can.List} left - First list to compare
+       * @param {can.List} right - Second list to compare
+       *
+       * @return {Boolean} - Returns true if lists are equal
+       */
+      function isEqual(left, right) {
+        const valueOld = Object.assign({},
+          left && left instanceof can.Map && left.attr() || []);
+        const valueNew = Object.assign({},
+          right && right instanceof can.Map && right.attr() || []);
+
+        return _.isEqual(valueOld, valueNew);
+      }
+
+      /**
+       * Highlight difference in 'related documents' section
+       * @param {string} selector - Selector of area to be highlighted
+       */
+      function highlightValues(selector) {
+        const infoPanes = $target.find('.info .tier-content');
+        _.each(infoPanes, (pane) => {
+          $(pane).find(selector).addClass(HIGHLIGHT_CLASS);
+        });
       }
     },
 
