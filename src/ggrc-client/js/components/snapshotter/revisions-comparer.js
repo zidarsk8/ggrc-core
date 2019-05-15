@@ -8,7 +8,6 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {
   getInstanceView,
 } from '../../plugins/utils/object-history-utils';
-import RefreshQueue from '../../models/refresh_queue';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
@@ -74,26 +73,21 @@ export default can.Component.extend({
                 confirmSelf.attr('leftRevisionData', leftRevisionData);
                 confirmSelf.attr('rightRevisionData', rightRevisionData);
               }
-              // people should be preloaded before highlighting differences
-              // to avoid breaking UI markup as highlightDifference
-              // sets block's height
-              that.loadACLPeople(revisions[1].instance)
-                .then(() => {
-                  $.ajax({
-                    url: view, dataType: 'text',
-                  }).then((view) => {
-                    let render = can.stache(view);
-                    let fragLeft = render(revisions[0]);
-                    let fragRight = render(revisions[1]);
 
-                    fragLeft.appendChild(fragRight);
-                    target.find('.modal-body').html(fragLeft);
+              $.ajax({
+                url: view, dataType: 'text',
+              }).then((view) => {
+                let render = can.stache(view);
+                let fragLeft = render(revisions[0]);
+                let fragRight = render(revisions[1]);
 
-                    that.highlightDifference(target);
-                    that.highlightAttachments(target, revisions);
-                    that.highlightCustomAttributes(target, revisions);
-                  });
-                });
+                fragLeft.appendChild(fragRight);
+                target.find('.modal-body').html(fragLeft);
+
+                that.highlightDifference(target);
+                that.highlightAttachments(target, revisions);
+                that.highlightCustomAttributes(target, revisions);
+              });
             });
         },
       }, this.updateRevision.bind(this));
@@ -106,27 +100,6 @@ export default can.Component.extend({
       };
 
       return revisionData;
-    },
-    /**
-     * Loads to cache people from access control list
-     *
-     * @param {Object} instance - revision
-     * @return {Promise}
-     */
-    loadACLPeople: function (instance) {
-      let refreshQueue = new RefreshQueue();
-
-      instance.attr('access_control_list').forEach((acl) => {
-        let person = Person.findInCacheById(acl.person.id) || {};
-        if (!person.email) {
-          refreshQueue.enqueue(acl.person);
-        }
-      });
-
-      if (refreshQueue.objects.length) {
-        return refreshQueue.trigger();
-      }
-      return $.Deferred().resolve();
     },
     getRevisions: function (currentRevisionID, newRevisionID) {
       let notCached = [];
