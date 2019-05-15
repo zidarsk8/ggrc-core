@@ -109,6 +109,7 @@
             labelName:from="'Default Assignees'"
             peopleListAttr:from="'default_people.assignees'"
             peopleValues:from="peopleValues"
+            mandatory:from="true"
           ></people-list>
         </div>
 
@@ -120,6 +121,7 @@
             peopleListAttr:from="'default_people.verifiers'"
             hasEmptyValue:from="true"
             peopleValues:from="peopleValues"
+            mandatory:from="false"
           ></people-list>
         </div>
       </div>

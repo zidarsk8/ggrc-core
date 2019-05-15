@@ -19,6 +19,7 @@ export default can.Component.extend({
     listName: '',
     labelName: '',
     peopleValues: [],
+    mandatory: false,
 
     define: {
       peopleValues: {

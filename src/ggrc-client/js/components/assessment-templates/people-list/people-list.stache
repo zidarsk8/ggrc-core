@@ -4,8 +4,11 @@
 }}
 
 <div class="span6 bottom-spacing">
-  <label>
+  <label class="form-label">
     {{labelName}}
+    {{#if mandatory}}
+      <i class="fa fa-asterisk"></i>
+    {{/if}}
   </label>
   <dropdown-component
     optionsList:from="peopleValues"
