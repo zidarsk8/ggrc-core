@@ -179,7 +179,8 @@ class Workflow(roleable.Roleable,
     Boolean property, returns True if all task groups have at least one
     task group task, False otherwise.
     """
-    return not any(tg for tg in self.task_groups if not tg.task_group_tasks)
+    return not any(tg for tg in self.task_groups if not tg.task_group_tasks) \
+        if self.task_groups else False
 
   @property
   def tasks(self):
