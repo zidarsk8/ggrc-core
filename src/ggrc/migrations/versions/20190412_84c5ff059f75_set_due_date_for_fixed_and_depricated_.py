@@ -15,9 +15,11 @@ import sqlalchemy as sa
 
 from alembic import op
 
+from ggrc.migrations import utils
+
 # revision identifiers, used by Alembic.
 revision = '84c5ff059f75'
-down_revision = 'f2428adea671'
+down_revision = 'bba307188ef6'
 
 
 # We need to create a migration for existing issues in statuses Fixed,
@@ -60,10 +62,12 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   connection = op.get_bind()
   issues_for_update = get_issues_without_due_date(connection)
-
-  for issue in issues_for_update:
-    due_date = get_revision_due_date(connection, issue['id'])
-    set_due_date(connection, issue['id'], due_date)
+  issues_ids = [issue['id'] for issue in issues_for_update]
+  for issue_id in issues_ids:
+    due_date = get_revision_due_date(connection, issue_id)
+    set_due_date(connection, issue_id, due_date)
+  utils.add_to_objects_without_revisions_bulk(connection, issues_ids, "Issue",
+                                              "modified")
 
 
 def downgrade():

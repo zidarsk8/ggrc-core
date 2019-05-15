@@ -569,7 +569,6 @@ class TestIssueLink(TestIssueIntegration):
       with mock.patch.object(integration_utils, "exclude_auditor_emails",
                              return_value={u"user@example.com", }):
         response = self.api.post(all_models.Issue, issue_request_payload)
-        print response
       get_mock.assert_called_once()
     update_mock.assert_called_once()
 
