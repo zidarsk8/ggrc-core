@@ -249,6 +249,7 @@ class Evidence(Roleable, Relatable, mixins.Titled,
       response = process_gdrive_file(file_id, folder_id,
                                      is_uploaded=self.is_uploaded)
       self._update_fields(response, parent)
+      self._parent_obj = None  # pylint: disable=attribute-defined-outside-init
 
   def is_with_parent_obj(self):
     return bool(hasattr(self, '_parent_obj') and self._parent_obj)
