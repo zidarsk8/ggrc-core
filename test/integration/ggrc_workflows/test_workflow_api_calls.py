@@ -344,14 +344,12 @@ class TestWorkflowsApiPost(TestCase):
                for person, acl in workflow.access_control_list}
     self.assertDictEqual(exp_res, act_res)
 
-  @unittest.skip("enable after GGRC-6923 is fixed")
   def test_send_invalid_data(self):
     """Test send invalid data on Workflow post."""
     data = self.get_workflow_dict()
     del data["workflow"]["title"]
     response = self.api.post(all_models.Workflow, data)
     self.assert400(response)
-    # TODO: check why response.json["message"] is empty
 
   def test_create_one_time_workflows(self):
     """Test simple create one time Workflow over api."""
@@ -554,6 +552,7 @@ class TestWorkflowsApiPost(TestCase):
         "cycle": {
             "autogenerate": True,
             "isOverdue": False,
+            "title": factories.random_str(prefix='cycle - '),
             "workflow": {
                 "id": workflow.id,
                 "type": "Workflow",

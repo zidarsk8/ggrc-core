@@ -12,7 +12,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.gcalendar import calendar_api_service, utils
-from ggrc.utils import benchmark
+from ggrc.utils import benchmark, generate_query_chunks
 
 
 logger = getLogger(__name__)
@@ -28,6 +28,7 @@ class CalendarEventsSync(object):
   def __init__(self):
     self.service = calendar_api_service.CalendarApiService()
     self.calendar_id = "primary"
+    self.chunk_size = 1000
 
   def sync_cycle_tasks_events(self):
     """Generates Calendar Events descriptions."""
@@ -48,28 +49,37 @@ class CalendarEventsSync(object):
               all_models.CalendarEvent.due_date,
               all_models.CalendarEvent.last_synced_at,
           )
-      ).all()
+      ).order_by(all_models.CalendarEvent.due_date)
       event_mappings = utils.get_related_mapping(
           left=all_models.CalendarEvent,
           right=all_models.CycleTaskGroupObjectTask
       )
-      for event in events:
-        if not event.needs_sync:
-          continue
-        if event.id not in event_mappings or not event_mappings[event.id]:
+      all_count = events.count()
+      handled = 0
+      for query_chunk in generate_query_chunks(
+          events, chunk_size=self.chunk_size, needs_ordering=False
+      ):
+        handled += query_chunk.count()
+        logger.info("Sync of calendar events: %s/%s", handled, all_count)
+        for event in query_chunk:
+          if not event.needs_sync:
+            continue
+          if event.id not in event_mappings or not event_mappings[event.id]:
+            if not event.is_synced:
+              db.session.delete(event)
+            else:
+              self._delete_event(event)
+            continue
           if not event.is_synced:
-            db.session.delete(event)
-          else:
-            self._delete_event(event)
-          continue
-        if not event.is_synced:
-          self._create_event(event)
-          continue
-        self._update_event(event)
+            self._create_event(event)
+            continue
+          self._update_event(event)
       db.session.commit()
 
   def _update_event(self, event):
     """Updates the provided event using CalendarApiService."""
+    if not event.needs_update:
+      return
     response = self.service.get_event(
         calendar_id=self.calendar_id,
         external_event_id=event.external_event_id,
@@ -98,6 +108,8 @@ class CalendarEventsSync(object):
 
   def _delete_event(self, event):
     """Deletes the provided event using CalendarApiService."""
+    if not event.needs_delete:
+      return
     response = self.service.get_event(
         calendar_id=self.calendar_id,
         external_event_id=event.external_event_id,

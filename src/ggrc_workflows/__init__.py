@@ -196,6 +196,9 @@ def handle_cycle_post(sender, obj=None, src=None, service=None):  # noqa pylint:
   # When called via a REST POST, use current user.
   workflow = obj.workflow
   workflow.status = workflow.ACTIVE
+  if not workflow.can_start_cycle:
+    raise ValueError("Workflow with misconfigured "
+                     "Task Groups can not be activated.")
   build_cycles(workflow, obj)
 
 
@@ -521,6 +524,18 @@ def handle_task_group_task_delete(sender, obj=None, src=None, service=None):  # 
 
 @signals.Restful.model_posted.connect_via(models.TaskGroup)
 def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+
+  # NOTE. To clone task group the following operations are performed:
+  # 1) create new object, call json_create(), where attributes will be set
+  #    with value validation
+  # 2) This function is called which overrides some attributes,
+  #    attribute validator for these attributes are called
+  # So, validation for those attrs are called twice!
+  # One corner case of this behavior is validation of field "title".
+  # title cannot be None, and because title validation is performed before
+  # this function, API request MUST contain non-empty title in dict,
+  # however the value will be overridden and re-validated in this function!
+
   if src.get('clone'):
     source_task_group_id = src.get('clone')
     source_task_group = models.TaskGroup.query.filter_by(
@@ -644,9 +659,10 @@ def handle_workflow_put(sender, obj=None, src=None, service=None):
   old = inspect(obj).attrs.status.history.deleted[-1]
   # first activate wf
   if (old, new) == (obj.DRAFT, obj.ACTIVE):
-    # allow only of it has at leask one task_group
-    if not obj.task_groups:
-      raise ValueError("Workflow with no Task Groups can not be activated.")
+    # allow only if it has at least one task_group with task configured
+    if not obj.can_start_cycle:
+      raise ValueError("Workflow with misconfigured "
+                       "Task Groups can not be activated.")
     build_cycles(obj)
 
 

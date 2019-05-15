@@ -188,9 +188,12 @@ export default can.Component.extend({
 
       runExport(data)
         .then((jobInfo) => {
-          const isInProgress = this.getInProgressJobs().length;
+          const isInProgress = !!this.getInProgressJobs().length;
           this.attr('currentExports').push(jobInfo);
-          this.attr('isInProgress', !!isInProgress);
+
+          this.attr('isInProgress',
+            isInProgress || jobInfo.status === jobStatuses.IN_PROGRESS
+          );
 
           if (!isInProgress) {
             this.getExports([jobInfo.id]);

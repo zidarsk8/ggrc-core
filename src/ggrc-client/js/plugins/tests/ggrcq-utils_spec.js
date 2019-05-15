@@ -7,7 +7,13 @@ import {
   getUrl,
   getMappingUrl,
   getUnmappingUrl,
+  isMappableExternally,
 } from '../utils/ggrcq-utils';
+import {
+  businessObjects,
+  scopingObjects,
+  externalDirectiveObjects,
+} from '../../plugins/models-types-collections';
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import Cacheable from '../../models/cacheable';
 import Control from '../../models/business-models/control';
@@ -25,6 +31,54 @@ describe('GGRCQ utils', () => {
 
   afterAll(() => {
     GGRC.GGRC_Q_INTEGRATION_URL = originalIntegrationUrl;
+  });
+
+  describe('isMappableExternally util', () => {
+    it('should return True if map scope object to directive', () => {
+      scopingObjects.forEach((source) => {
+        externalDirectiveObjects.forEach((destination) => {
+          const srcModel = {model_singular: source};
+          const dstModel = {model_singular: destination};
+
+          expect(isMappableExternally(srcModel, dstModel)).toBeTruthy();
+        });
+      });
+    });
+
+    it('should return True if map directive object to scope', () => {
+      externalDirectiveObjects.forEach((source) => {
+        scopingObjects.forEach((destination) => {
+          const srcModel = {model_singular: source};
+          const dstModel = {model_singular: destination};
+
+          expect(isMappableExternally(srcModel, dstModel)).toBeTruthy();
+        });
+      });
+    });
+
+    it('should return False if map scope object to any non-directive', () => {
+      scopingObjects.forEach((source) => {
+        _.difference(businessObjects, externalDirectiveObjects).forEach(
+          (destination) => {
+            const srcModel = {model_singular: source};
+            const dstModel = {model_singular: destination};
+
+            expect(isMappableExternally(srcModel, dstModel)).toBeFalsy();
+          });
+      });
+    });
+
+    it('should return False if map directive object to any non-scope', () => {
+      externalDirectiveObjects.forEach((source) => {
+        _.difference(businessObjects, scopingObjects).forEach(
+          (destination) => {
+            const srcModel = {model_singular: source};
+            const dstModel = {model_singular: destination};
+
+            expect(isMappableExternally(srcModel, dstModel)).toBeFalsy();
+          });
+      });
+    });
   });
 
   describe('getUrl util', () => {
@@ -121,7 +175,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to map control to directive', () => {
+    it('should return url to map control to scope object', () => {
       let instance = makeFakeInstance({model: TechnologyEnvironment})({
         type: 'TechnologyEnvironment',
         slug: 'TechnologyEnvironment-1',
@@ -132,6 +186,32 @@ describe('GGRCQ utils', () => {
         'questionnaires/technology_environment=technologyenvironment-1' +
         '/controls?mappingStatus=in_progress,not_in_scope,reviewed';
       expect(result).toBe(expected);
+    });
+
+    it('should return url to map scope object to directive', () => {
+      let instance = makeFakeInstance({model: TechnologyEnvironment})({
+        type: 'TechnologyEnvironment',
+        slug: 'TechnologyEnvironment-1',
+      });
+
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'questionnaires/technology_environment=technologyenvironment-1' +
+        '/map-objects?mappingStatus=in_progress,not_in_scope,reviewed' +
+        '&types=standard';
+      expect(getMappingUrl(instance, Standard)).toBe(expected);
+    });
+
+    it('should return url to map directive to scope object', () => {
+      let instance = makeFakeInstance({model: Standard})({
+        type: 'Standard',
+        slug: 'STANDARD-1',
+      });
+
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'directives/standard=standard-1/applicable-scope' +
+        '?mappingStatus=in_progress,not_in_scope,reviewed' +
+        '&types=technology_environment';
+      expect(getMappingUrl(instance, TechnologyEnvironment)).toBe(expected);
     });
 
     it('should return url with path only', () => {
@@ -196,7 +276,7 @@ describe('GGRCQ utils', () => {
       expect(result).toBe(expected);
     });
 
-    it('should return url to unmap directive from control', () => {
+    it('should return url to unmap scope object from control', () => {
       let instance = makeFakeInstance({model: TechnologyEnvironment})({
         type: 'TechnologyEnvironment',
         slug: 'TechnologyEnvironment-1',
@@ -207,6 +287,30 @@ describe('GGRCQ utils', () => {
         'questionnaires/technology_environment=technologyenvironment-1' +
         '/controls?mappingStatus=in_progress,reviewed';
       expect(result).toBe(expected);
+    });
+
+    it('should return url to unmap scope object from directive', () => {
+      let instance = makeFakeInstance({model: TechnologyEnvironment})({
+        type: 'TechnologyEnvironment',
+        slug: 'TechnologyEnvironment-1',
+      });
+
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'questionnaires/technology_environment=technologyenvironment-1' +
+        '/map-objects?mappingStatus=in_progress,reviewed&types=standard';
+      expect(getUnmappingUrl(instance, Standard)).toBe(expected);
+    });
+
+    it('should return url to unmap directive from scope object', () => {
+      let instance = makeFakeInstance({model: Standard})({
+        type: 'Standard',
+        slug: 'STANDARD-1',
+      });
+
+      let expected = GGRC.GGRC_Q_INTEGRATION_URL +
+        'directives/standard=standard-1/applicable-scope' +
+        '?mappingStatus=in_progress,reviewed&types=technology_environment';
+      expect(getUnmappingUrl(instance, TechnologyEnvironment)).toBe(expected);
     });
   });
 });

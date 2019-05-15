@@ -1,0 +1,5 @@
+Object type,,
+Person,Email*,Role
+,reader@reciprocitylabs.com,
+,reader3@reciprocitylabs.com,No Access
+,user4@example.com,no access

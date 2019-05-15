@@ -4,6 +4,7 @@
  */
 
 import {
+  externalBusinessObjects,
   externalDirectiveObjects,
   scopingObjects,
 } from '../../plugins/models-types-collections';
@@ -35,6 +36,20 @@ function isChangeableExternally(instance) {
     instance.constructor.isChangeableExternally;
 }
 
+/**
+ * Determine whether model type is mappable externally.
+ * @param {Object} source - Source model
+ * @param {Object} destination - Destination model
+ * @return {Boolean} True or False
+ */
+function isMappableExternally(source, destination) {
+  return (
+    (externalDirectiveObjects.includes(source.model_singular) &&
+    scopingObjects.includes(destination.model_singular)) ||
+    (scopingObjects.includes(source.model_singular) &&
+    externalDirectiveObjects.includes(destination.model_singular))
+  );
+}
 /**
  * Determine whether instance is proposable externally.
  * @param {*} instance the model instance
@@ -177,6 +192,37 @@ function getChangeLogUrl(instance) {
 }
 
 /**
+ * Get urls for for external objects
+ * @param {object} instance - The model instance
+ * @param {object} destinationModel - Destination model
+ * @param {string} statuses - Required statuses list (comma separated)
+ * @return {string} Redirection url
+ */
+function getMapUrl(instance, destinationModel, statuses) {
+  if (isChangeableExternally(instance)) {
+    return getMapObjectToExternalObjectUrl(
+      instance,
+      destinationModel,
+      statuses,
+    );
+  } else if (destinationModel.isChangeableExternally) {
+    return getMapExternalObjectToObjectUrl(
+      instance,
+      destinationModel.table_plural,
+      statuses
+    );
+  } else if (isMappableExternally(instance.constructor, destinationModel)) {
+    return getMapObjectsExternallyUrl(
+      instance,
+      destinationModel,
+      statuses
+    );
+  }
+
+  return '';
+}
+
+/**
  * Get url to mapping view
  * @param {Object} instance - The model instance
  * @param {Object} destinationModel - The destination model
@@ -185,13 +231,7 @@ function getChangeLogUrl(instance) {
 function getMappingUrl(instance, destinationModel) {
   const statuses = 'in_progress,not_in_scope,reviewed';
 
-  if (instance.type === 'Control') {
-    return getMapObjectToControlUrl(instance, destinationModel, statuses);
-  } else if (destinationModel.model_singular === 'Control') {
-    return getMapControlToObjectUrl(instance, statuses);
-  }
-
-  return '';
+  return getMapUrl(instance, destinationModel, statuses);
 }
 
 /**
@@ -203,35 +243,39 @@ function getMappingUrl(instance, destinationModel) {
 function getUnmappingUrl(instance, destinationModel) {
   const statuses = 'in_progress,reviewed';
 
-  if (instance.type === 'Control') {
-    return getMapObjectToControlUrl(instance, destinationModel, statuses);
-  } else if (destinationModel.model_singular === 'Control') {
-    return getMapControlToObjectUrl(instance, statuses);
-  }
-
-  return '';
+  return getMapUrl(instance, destinationModel, statuses);
 }
 
 /**
- * Get url to mapping view for Control object
+ * Get url to mapping view for external objects
  * @param {Object} instance - The model instance
  * @param {Object} destinationModel - The destination model
  * @param {String} statuses - Required statuses list (comma separated)
  * @return {String} Url
  */
-function getMapObjectToControlUrl(instance, destinationModel, statuses) {
+function getMapObjectToExternalObjectUrl(instance, destinationModel, statuses) { // eslint-disable-line
   let view = '';
+  let useUrlTypes = true;
+
   if (externalDirectiveObjects.includes(destinationModel.model_singular)) {
     view = 'directives';
   } else if (scopingObjects.includes(destinationModel.model_singular)) {
     view = 'scope';
+  } else if (
+    externalBusinessObjects.includes(destinationModel.model_singular)
+  ) {
+    view = destinationModel.table_plural;
+    useUrlTypes = false;
   }
 
-  let destinationType = destinationModel.table_singular;
-  let params = `mappingStatus=${statuses}&types=${destinationType}`;
+  const destinationType = destinationModel.table_singular;
+  const params = `mappingStatus=${statuses}` + (useUrlTypes
+    ? `&types=${destinationType}`
+    : ''
+  );
 
   return getUrl({
-    path: 'controls',
+    path: instance.constructor.table_plural,
     model: instance.constructor.table_singular,
     slug: instance.slug,
     view,
@@ -240,27 +284,51 @@ function getMapObjectToControlUrl(instance, destinationModel, statuses) {
 }
 
 /**
- * Get url to Control mapping view for selected object
- * @param {Object} instance - The model instance
- * @param {String} statuses - Required statuses list (comma separated)
- * @return {String} Url
+ * Get url to external object mapping view for selected object
+ * @param {object} instance - The model instance
+ * @param {string} view - View parameter for url
+ * @param {string} statuses - Required statuses list (comma separated)
+ * @param {string} types - Required types list (comma separated)
+ * @return {string} Url
  */
-function getMapControlToObjectUrl(instance, statuses) {
+function getMapExternalObjectToObjectUrl(instance, view, statuses, types) { // eslint-disable-line
   let path = '';
-  let type = instance.constructor.model_singular;
-  if (externalDirectiveObjects.includes(type)) {
+  const sourceType = instance.constructor.model_singular;
+  if (externalDirectiveObjects.includes(sourceType)) {
     path = 'directives';
-  } else if (scopingObjects.includes(type)) {
+  } else if (scopingObjects.includes(sourceType)) {
     path = 'questionnaires';
   }
+
+  const params = `mappingStatus=${statuses}` + (types ? `&types=${types}`: '');
 
   return getUrl({
     path,
     model: instance.constructor.table_singular,
     slug: instance.slug,
-    view: 'controls',
-    params: `mappingStatus=${statuses}`,
+    view,
+    params,
   });
+}
+
+/**
+ * Get url to external object mapping view for selected object
+ * @param {object} instance - The source instance
+ * @param {Object} destinationModel - The destination model
+ * @param {string} statuses - Required statuses list (comma separated)
+ * @return {string} Url
+ */
+function getMapObjectsExternallyUrl(instance, destinationModel, statuses) { // eslint-disable-line
+  let view = '';
+  if (scopingObjects.includes(destinationModel.model_singular)) {
+    view = 'applicable-scope';
+  } else if (
+    externalDirectiveObjects.includes(destinationModel.model_singular)) {
+    view = 'map-objects';
+  }
+
+  return getMapExternalObjectToObjectUrl(
+    instance, view, statuses, destinationModel.table_singular);
 }
 
 /**
@@ -294,6 +362,7 @@ function getProposalAttrUrl(instance, attributeName) {
 export {
   hasQuestions,
   isChangeableExternally,
+  isMappableExternally,
   getCommentFormUrl,
   getQuestionsUrl,
   getImportUrl,

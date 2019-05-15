@@ -89,6 +89,12 @@
           <td>All objects which matches input values for admin field will be returned. Object Admins matching <em>john doe</em> or <em>nick doe</em> or both will be returned</td>
         </tr>
         <tr>
+          <td><span class="code">is empty</span></td>
+          <td><strong>field is empty</strong></td>
+          <td><span class="code">description is empty</span></td>
+          <td>All objects that do not contain any values in the description field</td>
+        </tr>
+        <tr>
           <td><span class="code">AND</span></td>
           <td><strong>logical AND</strong></td>
           <td><span class="code">title ~ PCI AND admin = “john doe”</span></td>
@@ -107,8 +113,11 @@
       <li>Use parentheses to create more complex searches. For example, <span class="code">(title ~ PCI OR title ~ ISO) AND description ~ “needs to be“</span></li>
       <li>Filters are case insensitive. For example, <span class="code">title</span> is the same as <span class="code">Title</span> or <span class="code">TITLE</span></li>
       <li><span class="code">AND</span> has precedence over <span class="code">OR</span></li>
-      <li>Use quotes every time space (“ “) or any other special character is part of search phrase or filter expression. For example, <span class="code">“modified date” &gt; 03/03/2015 AND “primary contacts“ = “example@google.com“</span></li>
+      <li>Use quotes every time space (“ “) or any other special character (like % ~ ! @ ( ) - _ = \ ") is part of search phrase or filter expression. For example, <span class="code">“modified date” &gt; 03/03/2015 AND “primary contacts“ = “example@google.com“</span></li>
       <li>Valid date formats are <span class="code">MM/DD/YYYY</span>, <span class="code">YYYY-MM-DD</span></li>
+      <li>Partial dates can be used: <span class="code">date = 2017</span> is the same as <span class="code">date >= 01/01/2017 AND date <= 12/31/2017; date < 06/2017</span> is the same as <span class="code">date < 01/06/2017;</span></li>
+      <li>When searching for dates, <span class="code">~</span> and <span class="code">!~</span> are synonymous to <span class="code">=</span> and <span class="code">!=</span> respectively</li>
+      <li>For non-date fields <span class="code">~</span> and <span class="code">!~</span> expressions accept wildcards: <span class="code">_</span> matches any character, <span class="code">%</span> matches any number of any characters: <span class="code">REVIEWER ~ B__ley</span> returns all the objects where Reviewer field contains a word that starts from <span class="code">B</span>, followed by 2 any other characters and ends with <span class="code">ley; REVIEWER ~ B%ley</span> returns all the objects where Reviewer field contains a word that starts from <span class="code">B</span> and ends with <span class="code">ley</span>, separated by any number of other characters</li>
     </ul>
   </div>
   <div class="footer-wrap">

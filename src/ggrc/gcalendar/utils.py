@@ -26,6 +26,13 @@ def get_active_cycle_tasks_url(due_date):
   return base + urllib.quote(active_filter.encode('utf-8'))
 
 
+def get_cycle_tasks_url_by_slug(slug):
+  """Get CycleTask notification url based on slug."""
+  base = urljoin(get_url_root(), u"dashboard#!task&query=")
+  active_filter = u'"task slug"={slug}'.format(slug=slug)
+  return base + urllib.quote(active_filter.encode('utf-8'))
+
+
 def get_relationship(left_id, left_model_name, right_id, right_model_name):
   """Get relationship between models."""
   rel_model = all_models.Relationship

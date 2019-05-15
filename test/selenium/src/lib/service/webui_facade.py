@@ -223,6 +223,21 @@ def approve_obj_review(selenium, obj):
   return obj
 
 
+def undo_obj_review_approval(selenium, obj):
+  """Cancel approved obj review.
+  Returns obj with reverted to unreviewed status review."""
+  _get_ui_service(selenium, obj).undo_review_approval(obj)
+  exp_review = entities_factory.ReviewsFactory().create(
+      is_add_rest_attrs=True,
+      status=element.ReviewStates.UNREVIEWED,
+      last_reviewed_by=users.current_user().email,
+      last_reviewed_at=rest_facade.get_last_review_date(obj),
+      reviewers=users.current_user())
+  obj.review = exp_review.convert_review_to_dict()
+  obj.review_status = exp_review.status
+  return obj
+
+
 def get_object(selenium, obj):
   """Get and return object from Info page."""
   return _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
