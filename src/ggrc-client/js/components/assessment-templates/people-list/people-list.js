@@ -6,6 +6,8 @@
 import template from './people-list.stache';
 import {validateAttr} from '../../../plugins/utils/validation-utils';
 
+const OtherOption = 'other';
+
 export default can.Component.extend({
   tag: 'people-list',
   view: can.stache(template),
@@ -39,6 +41,18 @@ export default can.Component.extend({
             }
           }
           return newValue;
+        },
+      },
+      hidable: {
+        get() {
+          if (this.attr('mandatory')) {
+            return false;
+          }
+
+          const isOtherSelected = this.attr('selectedValue') === OtherOption;
+          const isNotEmptyPeople = !!this.attr('peopleList.length');
+
+          return !isOtherSelected || (isOtherSelected && isNotEmptyPeople);
         },
       },
       validationError: {
@@ -100,7 +114,7 @@ export default can.Component.extend({
 
       if (peopleIds instanceof can.List) {
         this.attr('peopleList', peopleIds);
-        this.attr('selectedValue', 'other');
+        this.attr('selectedValue', OtherOption);
       } else {
         this.attr('peopleList', []);
         this.attr('selectedValue', peopleIds);
@@ -113,7 +127,7 @@ export default can.Component.extend({
     */
     packPeopleData() {
       const data = this.attr('selectedValue');
-      return data === 'other' ? this.attr('peopleList') : data;
+      return data === OtherOption ? this.attr('peopleList') : data;
     },
   }),
   init() {

@@ -246,4 +246,48 @@ describe('people-list component', function () {
       expect(viewModel.updatePeopleList).toHaveBeenCalled();
     });
   });
+
+  describe('"hidable" attribute', () => {
+    it('should return TRUE. Selected not OTHER value', () => {
+      viewModel.attr('selectedValue', 'Auditors');
+      expect(viewModel.attr('hidable')).toBeTruthy();
+    });
+
+    it('should return TRUE. ' +
+    'Selected OTHER value, but "peopleList" is not empty', () => {
+      viewModel.attr('selectedValue', 'other');
+      viewModel.attr('peopleList', [{id: 5}]);
+      expect(viewModel.attr('hidable')).toBeTruthy();
+    });
+
+    it('should return FALSE. ' +
+    'Selected OTHER value, but "peopleList" is empty', () => {
+      viewModel.attr('selectedValue', 'other');
+      viewModel.attr('peopleList', []);
+      expect(viewModel.attr('hidable')).toBeFalsy();
+    });
+
+    it('should return FALSE. "Mandatory" is true. ' +
+    'Selected not OTHER value', () => {
+      viewModel.attr('mandatory', true);
+      viewModel.attr('selectedValue', 'Auditors');
+      expect(viewModel.attr('hidable')).toBeFalsy();
+    });
+
+    it('should return FALSE. "Mandatory" is true. ' +
+    'Selected OTHER value, but "peopleList" is not empty', () => {
+      viewModel.attr('mandatory', true);
+      viewModel.attr('selectedValue', 'other');
+      viewModel.attr('peopleList', [{id: 5}]);
+      expect(viewModel.attr('hidable')).toBeFalsy();
+    });
+
+    it('should return FALSE. "Mandatory" is true. ' +
+    'Selected OTHER value, but "peopleList" is empty', () => {
+      viewModel.attr('mandatory', true);
+      viewModel.attr('selectedValue', 'other');
+      viewModel.attr('peopleList', []);
+      expect(viewModel.attr('hidable')).toBeFalsy();
+    });
+  });
 });
