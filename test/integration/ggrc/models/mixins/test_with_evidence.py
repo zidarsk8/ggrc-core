@@ -10,21 +10,19 @@ from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 COPIED_TITLE = 'test_name'
-
-
-# pylint: disable=unused-argument
-def dummy_gdrive_response(*args, **kwargs):  # noqa
-  return {'webViewLink': 'http://mega.doc',
-          'name': COPIED_TITLE,
-          'id': '12345'}
+GDRIVE_RESPONSE = {
+    'webViewLink': 'http://mega.doc',
+    'name': COPIED_TITLE,
+    'id': '12345'
+}
 
 
 class TestWithEvidence(TestCase):
   """Test case for WithEvidence mixin"""
 
   @mock.patch('ggrc.gdrive.file_actions.process_gdrive_file',
-              dummy_gdrive_response)
-  def test_evidences(self):
+              return_value=GDRIVE_RESPONSE)
+  def test_evidences(self, _):
     """Test related evidences"""
 
     audit = factories.AuditFactory()
@@ -42,8 +40,8 @@ class TestWithEvidence(TestCase):
     self.assertEqual(audit.evidences[0].title, COPIED_TITLE)
 
   @mock.patch('ggrc.gdrive.file_actions.process_gdrive_file',
-              dummy_gdrive_response)
-  def test_evidevce_type(self):
+              return_value=GDRIVE_RESPONSE)
+  def test_evidevce_type(self, _):
     """Test related evidences"""
 
     audit = factories.AuditFactory()
@@ -72,3 +70,20 @@ class TestWithEvidence(TestCase):
     self.assertEqual(len(audit.evidences), 2)
     self.assertEqual(len(audit.evidences_url), 1)
     self.assertEqual(len(audit.evidences_file), 1)
+
+  @mock.patch('ggrc.gdrive.file_actions.process_gdrive_file',
+              return_value=GDRIVE_RESPONSE)
+  def test_evidences_copied_once(self, mock_gdrive):
+    """Test evidences copied to GDrive only once"""
+    audit = factories.AuditFactory()
+    evidence = factories.EvidenceFactory(
+        title='Simple title',
+        kind=all_models.Evidence.FILE,
+        source_gdrive_id='123',
+        parent_obj={
+            'id': audit.id,
+            'type': audit.type
+        }
+    )
+    factories.RelationshipFactory(source=audit, destination=evidence)
+    self.assertEqual(mock_gdrive.call_count, 1)
