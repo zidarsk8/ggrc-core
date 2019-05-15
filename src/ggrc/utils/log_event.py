@@ -15,6 +15,7 @@ from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.login import get_current_user_id
+from ggrc.utils.revisions_diff import builder as revisions_diff
 
 logger = getLogger(__name__)
 
@@ -50,6 +51,12 @@ def _revision_generator(user_id, action, objects):
                  "destination_type",
                  "destination_id"]:
       rev[attr] = getattr(obj, attr, None)
+    if action in ("created", "deleted"):
+      rev["is_empty"] = False
+    else:
+      rev["is_empty"] = bool(
+          obj and not revisions_diff.changes_present(obj, rev["content"])
+      )
     yield rev
 
 

@@ -12,8 +12,10 @@ from ddt import ddt, data, unpack
 
 # pylint: disable=unused-import
 from ggrc import models  # NOQA
+from ggrc.app import app
 from ggrc.services import common
 from ggrc.utils import log_event
+from ggrc.utils.revisions_diff import builder as revisions_diff
 
 
 @ddt
@@ -103,11 +105,14 @@ class TestGetRevisionsList(TestCase):
     new = self.populate_object_list(created_count)
     deleted = self.populate_object_list(deleted_count)
     dirty = self.populate_object_list(modified_count)
-    with self.mock_get_cache(new, deleted, dirty):
-      self.assertEqual(
-          expected_results,
-          [r["action"] for r in self.get_log_revisions(self.new_simple_object)]
-      )
+    with mock.patch.object(revisions_diff, 'changes_present'):
+      with app.app_context():
+        with self.mock_get_cache(new, deleted, dirty):
+          self.assertEqual(
+              expected_results,
+              [r["action"] for r in
+               self.get_log_revisions(self.new_simple_object)]
+          )
 
   @data(
       # (created_count, modified_count, deleted_count,
@@ -127,10 +132,12 @@ class TestGetRevisionsList(TestCase):
     new = self.populate_object_list(created_count)
     deleted = self.populate_object_list(deleted_count)
     dirty = self.populate_object_list(modified_count)
-    with self.mock_get_cache(new, deleted, dirty):
-      self.assertEqual(
-          expected_results,
-          [r["action"] for r in self.get_log_revisions(dirty[0])])
+    with mock.patch.object(revisions_diff, 'changes_present'):
+      with app.app_context():
+        with self.mock_get_cache(new, deleted, dirty):
+          self.assertEqual(
+              expected_results,
+              [r["action"] for r in self.get_log_revisions(dirty[0])])
 
 
 class TestFilterResource(TestCase):
