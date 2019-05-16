@@ -3,9 +3,6 @@
 
 """Module for Snapshot object"""
 
-import collections
-from datetime import datetime
-
 from sqlalchemy import event
 from sqlalchemy import func
 from sqlalchemy import inspect
@@ -19,7 +16,6 @@ from werkzeug import exceptions
 from ggrc import builder
 from ggrc import db
 from ggrc.access_control import roleable
-from ggrc.login import get_current_user_id
 from ggrc.models import inflector
 from ggrc.models import mixins
 from ggrc.models import reflection
@@ -229,7 +225,7 @@ class Snapshotable(object):
         cascade='all, delete-orphan')
 
 
-def handle_post_flush(session, flush_context, instances):
+def handle_before_flush(session, flush_context, instances):
   """Handle snapshot objects on api post requests."""
   # pylint: disable=unused-argument
   # Arguments here are set in the event listener and are mandatory.
@@ -243,8 +239,12 @@ def handle_post_flush(session, flush_context, instances):
     with benchmark("Snapshot revert attrs"):
       _revert_attrs(snapshots)
 
-    new_snapshots = [o for o in snapshots
-                     if getattr(o, "_update_revision", "") == "new"]
+    new_snapshots = []
+    for o in snapshots:
+      if (getattr(o, "_update_revision", "") == "new" and
+         not getattr(o, "was_processed", False)):
+        new_snapshots.append(o)
+        o.was_processed = True
     if new_snapshots:
       with benchmark("Snapshot post api set revisions"):
         _set_latest_revisions(new_snapshots)
@@ -267,94 +267,64 @@ def _revert_attrs(objects):
         setattr(snapshot, attr, deleted[0])
 
 
-def _ensure_program_relationships(objects):
+def _ensure_program_relationships(snapshots):
   """Ensure that snapshotted object is related to audit program.
 
   This function is made to handle multiple snapshots for a single audit.
   Args:
-    objects: list of snapshot objects with child_id, child_type and parent set.
+    snapshots: list of snapshot objects with child_id, child_type and parent.
   """
   # assert that every parent is an Audit as the code relies on program_id field
-  assert {o.parent_type for o in objects} == {"Audit"}
-
-  relationship_stub = collections.namedtuple(
-      "RelationshipStub",
-      ["source_id", "source_type", "destination_id", "destination_type"],
-  )
-
-  required_relationships = set(
-      relationship_stub(o.parent.program_id, "Program",
-                        o.child_id, o.child_type)
-      for o in objects
-  )
-
-  if not required_relationships:
-    # nothing to create
-    return
+  assert {s.parent_type for s in snapshots} == {"Audit"}
 
   rel = relationship.Relationship
-  columns = db.session.query(
-      rel.source_id, rel.source_type,
-      rel.destination_id, rel.destination_type,
-  )
 
-  existing_mappings = columns.filter(
-      tuple_(rel.source_id, rel.source_type,
-             rel.destination_id, rel.destination_type)
-      .in_(required_relationships)
-  )
-  existing_mappings_reverse = columns.filter(
-      tuple_(rel.destination_id, rel.destination_type,
-             rel.source_id, rel.source_type)
-      .in_(required_relationships)
-  )
+  program_children = {}
+  for obj in snapshots:
+    program_children.setdefault(obj.parent.program, set()).add(
+        (obj.child_type, obj.child_id)
+    )
 
-  required_relationships -= set(
-      relationship_stub(row.source_id, row.source_type,
-                        row.destination_id, row.destination_type)
-      for row in existing_mappings
-  )
-  required_relationships -= set(
-      relationship_stub(row.destination_id, row.destination_type,
-                        row.source_id, row.source_type)
-      for row in existing_mappings_reverse
-  )
+  for program, children_set in program_children.items():
+    query = db.session.query(
+        rel.destination_type, rel.destination_id
+    ).filter(
+        and_(
+            rel.source_type == "Program",
+            rel.source_id == program.id,
+            tuple_(rel.destination_type, rel.destination_id).in_(children_set)
+        )
+    ).union_all(
+        db.session.query(
+            rel.source_type, rel.source_id
+        ).filter(
+            and_(
+                rel.destination_type == "Program",
+                rel.destination_id == program.id,
+                tuple_(rel.source_type, rel.source_id).in_(children_set)
+            )
+        )
+    )
+    children_set.difference_update(query.all())
 
-  _insert_program_relationships(required_relationships)
+    child_objects = {}
+    type_ids = {}
+    for child in children_set:
+      type_ids.setdefault(child[0], set()).add(child[1])
+    for child_type, ids in type_ids.items():
+      child_model = inflector.get_model(child_type)
+      query = child_model.query.filter(child_model.id.in_(ids))
+      for child in query:
+        child_objects[(child.type, child.id)] = child
 
-
-def _insert_program_relationships(relationship_stubs):
-  """Insert missing obj-program relationships."""
-  if not relationship_stubs:
-    return
-  current_user_id = get_current_user_id()
-  now = datetime.utcnow()
-  # We are doing an INSERT IGNORE INTO here to mitigate a race condition
-  # that happens when multiple simultaneous requests create the same
-  # automapping. If a relationship object fails our unique constraint
-  # it means that the mapping was already created by another request
-  # and we can safely ignore it.
-  inserter = relationship.Relationship.__table__.insert().prefix_with(
-      "IGNORE")
-  db.session.execute(
-      inserter.values([
-          {
-              "id": None,
-              "modified_by_id": current_user_id,
-              "created_at": now,
-              "updated_at": now,
-              "source_type": relationship_stub.source_type,
-              "source_id": relationship_stub.source_id,
-              "destination_type": relationship_stub.destination_type,
-              "destination_id": relationship_stub.destination_id,
-              "context_id": None,
-              "status": None,
-              "parent_id": None,
-              "is_external": False,
-          }
-          for relationship_stub in relationship_stubs
-      ])
-  )
+    for child in children_set:
+      if child in child_objects:
+        db.session.add(
+            relationship.Relationship(
+                source=program,
+                destination=child_objects[child],
+            )
+        )
 
 
 def _set_latest_revisions(objects):
@@ -384,4 +354,4 @@ def _set_latest_revisions(objects):
       raise exceptions.InternalServerError(errors.MISSING_REVISION)
 
 
-event.listen(Session, 'before_flush', handle_post_flush)
+event.listen(Session, 'before_flush', handle_before_flush)
