@@ -403,14 +403,12 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     """Get review_status if review_status_display_name is not found"""
     # pylint: disable=invalid-name
 
-    if self.resource_type != "Control":
-      return
-
-    if "review_status_display_name" in self._content:
-      result["review_status_display_name"] = self._content[
-          "review_status_display_name"]
-    elif "review_status" in result:
-      result["review_status_display_name"] = result["review_status"]
+    if self.resource_type in ("Control", "Risk"):
+      if "review_status_display_name" in self._content:
+        result["review_status_display_name"] = self._content[
+            "review_status_display_name"]
+      elif "review_status" in result:
+        result["review_status_display_name"] = result["review_status"]
 
   def populate_readonly(self):
     """Add readonly=False to older revisions of WithReadOnlyAccess models"""
