@@ -3,11 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Mappings from '../../../models/mappers/mappings';
 import * as businessModels from '../../../models/business-models';
 import {loadObjectsByTypes} from '../../../plugins/utils/query-api-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
+import {getRelevantMappingTypes} from '../../../plugins/utils/workflow-utils';
 
 /**
  * @typedef {Object} Stub
@@ -37,9 +37,13 @@ const viewModel = can.Map.extend({
     );
   },
   loadMappedObjects() {
-    const mappingTypes = Mappings.getMappingList('CycleTaskGroupObjectTask');
+    const instance = this.attr('instance');
     const fields = ['id', 'type', 'title'];
-    return loadObjectsByTypes(this.attr('instance'), mappingTypes, fields);
+    return loadObjectsByTypes(
+      instance,
+      getRelevantMappingTypes(instance),
+      fields
+    );
   },
   async init() {
     this.attr('preMappedObjects', this.loadPreMappedObjects());

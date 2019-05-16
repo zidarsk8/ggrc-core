@@ -4,7 +4,6 @@
 */
 
 import template from './cycle-task-objects.stache';
-import Mappings from '../../../models/mappers/mappings';
 import {
   loadObjectsByStubs,
   loadObjectsByTypes,
@@ -13,6 +12,7 @@ import {
   DEFERRED_MAPPED_UNMAPPED,
   OBJECTS_MAPPED_VIA_MAPPER,
 } from '../../../events/eventTypes';
+import {getRelevantMappingTypes} from '../../../plugins/utils/workflow-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
@@ -29,13 +29,13 @@ const viewModel = can.Map.extend({
     }));
   },
   async initMappedObjects() {
-    const mappingTypes = Mappings.getMappingList('CycleTaskGroupObjectTask');
+    const instance = this.attr('instance');
 
     this.attr('isLoading', true);
     try {
       const rawMappedObjects = await loadObjectsByTypes(
-        this.attr('instance'),
-        mappingTypes,
+        instance,
+        getRelevantMappingTypes(instance),
         fields,
       );
       this.attr('mappedObjects').replace(this.convertToMappedObjects(
