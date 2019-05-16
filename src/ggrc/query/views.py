@@ -1,6 +1,5 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
 """This module contains logic to handle '/query' endpoint."""
 
 import time
@@ -19,6 +18,7 @@ from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
 from ggrc.utils import as_json
 from ggrc.utils import benchmark
+from ggrc.utils.error_handlers import make_error_response
 
 
 logger = logging.getLogger()
@@ -48,6 +48,9 @@ def json_success_response(response_object, last_modified=None, status=200):
 
 
 def http_timestamp(timestamp):
+  """
+    Http timestamp helper function.
+  """
   return format_date_time(time.mktime(timestamp.utctimetuple()))
 
 
@@ -95,6 +98,7 @@ def get_objects_by_query():
 
 
 def init_query_views(app):
+  """Function which creates route for query API."""
   # pylint: disable=unused-variable
   @app.route('/query', methods=['POST'])
   @login_required
@@ -122,3 +126,25 @@ def init_clone_views(app):
     if issubclass(model, clonable.MultiClonable):
       url = "/api/{}/clone".format(model._inflector.table_singular)
       app.route(url, methods=['POST'])(lambda m=model: _clone_objects(m))
+
+
+def validate_post_data_keys(required_keys_list):
+  """
+    Post request parameters validator. Validates presence
+    of all required keys in json data supplied within request.
+  """
+  # pylint: disable=missing-docstring
+  def wrap(decorated_function):
+    def wrapper(*decorated_function_args):
+      request_data = request.get_json()
+      for key in required_keys_list:
+        if key not in request_data:
+          return make_error_response(
+              u"Key '{}' is missing in request data".format(key),
+              400,
+              force_json=True,
+          )
+      return decorated_function(*decorated_function_args)
+
+    return wrapper
+  return wrap
