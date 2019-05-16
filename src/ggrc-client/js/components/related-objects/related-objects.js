@@ -183,8 +183,9 @@ export default can.Component.extend({
         paging.attr('current', 1);
       }
     },
-    [`{viewModel.relatedObjects} ${ADD_RELATED.type}`](relatedObjects, event) {
-      let vm = this.viewModel;
+    [`{viewModel.relatedObjects} ${ADD_RELATED.type}`](scope, event) {
+      const vm = this.viewModel;
+      const relatedObjects = vm.attr('relatedObjects');
       relatedObjects.unshift({instance: event.object});
 
       let paging = vm.attr('paging');
