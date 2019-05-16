@@ -35,7 +35,6 @@ export {default as Project} from './project';
 export {default as Regulation} from './regulation';
 export {default as Requirement} from './requirement';
 export {default as Risk} from './risk';
-export {default as RiskAssessment} from './risk-assessment';
 export {default as Standard} from './standard';
 export {default as System} from './system';
 export {default as TaskGroup} from './task-group';

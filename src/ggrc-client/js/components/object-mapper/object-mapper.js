@@ -68,7 +68,6 @@ let DEFAULT_OBJECT_MAP = {
   Threat: 'Risk',
   Vendor: 'Program',
   Audit: 'Product',
-  RiskAssessment: 'Program',
   TaskGroup: 'Control',
   TechnologyEnvironment: 'Product',
 };

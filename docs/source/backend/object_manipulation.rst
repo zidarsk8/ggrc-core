@@ -494,7 +494,6 @@ Examples
                   "type": "Person",
                   "id": 4
               },
-              "risk_assessments": [],
               "object_people": [],
               "type": "Program",
               "start_date": "2016-05-01",

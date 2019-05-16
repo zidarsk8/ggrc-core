@@ -124,9 +124,6 @@ GGRC.Bootstrap = {
     title_plural: 'Regulations',
     model_singular: 'Regulation',
   }, {
-    title_plural: 'Risk Assessments',
-    model_singular: 'RiskAssessment',
-  }, {
     title_plural: 'Requirements',
     model_singular: 'Requirement',
   }, {
@@ -214,9 +211,6 @@ GGRC.Bootstrap = {
   }, {
     title_plural: 'Regulations',
     model_singular: 'Regulation',
-  }, {
-    title_plural: 'Risk Assessments',
-    model_singular: 'RiskAssessment',
   }, {
     title_plural: 'Requirements',
     model_singular: 'Requirement',

@@ -203,7 +203,7 @@ describe('StateUtils', function () {
           'Control', 'Product', 'System', 'Process', 'AccessGroup',
           'Assessment', 'Contract', 'DataAsset', 'Facility',
           'Issue', 'Market', 'OrgGroup', 'Policy', 'Program', 'Project',
-          'Risk', 'Threat', 'Vendor', 'Audit', 'RiskAssessment', 'Workflow',
+          'Risk', 'Threat', 'Vendor', 'Audit', 'Workflow',
           'AssessmentTemplate', 'Person', 'TaskGroup', 'TaskGroupTask',
           'Cycle', 'CycleTaskGroup', 'KeyReport', 'AccountBalance'];
 
@@ -240,7 +240,7 @@ describe('StateUtils', function () {
           'Control', 'Product', 'System', 'Process', 'AccessGroup',
           'Assessment', 'Contract', 'DataAsset', 'Facility',
           'Issue', 'Market', 'OrgGroup', 'Policy', 'Program', 'Project',
-          'Risk', 'Threat', 'Vendor', 'Audit', 'RiskAssessment', 'Workflow',
+          'Risk', 'Threat', 'Vendor', 'Audit', 'Workflow',
           'AssessmentTemplate', 'Person', 'TaskGroup', 'TaskGroupTask',
           'Cycle', 'CycleTaskGroup', 'KeyReport', 'AccountBalance'];
 
