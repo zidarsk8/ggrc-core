@@ -210,7 +210,7 @@ export default can.Component.extend({
       return valISO;
     },
 
-    '{viewModel} setMinDate': function (viewModel, ev, date) {
+    '{viewModel} setMinDate': function ([viewModel], ev, date) {
       let currentDateObj = null;
       let updated = this.updateDate('minDate', date);
 
@@ -224,11 +224,11 @@ export default can.Component.extend({
       }
     },
 
-    '{viewModel} setMaxDate': function (viewModel, ev, date) {
+    '{viewModel} setMaxDate': function ([viewModel], ev, date) {
       this.updateDate('maxDate', date);
     },
 
-    '{viewModel} _date': function (viewModel, ev, val) {
+    '{viewModel} _date': function ([viewModel], ev, val) {
       let valISO = this.prepareDate(viewModel, val);
       viewModel.attr('date', valISO);
       viewModel.picker.datepicker('setDate', valISO);

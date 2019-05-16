@@ -262,7 +262,7 @@ describe('datepicker component', function () {
         viewModel.attr('_date', '11/11/2011');
         that.updateDate = jasmine.createSpy()
           .and.returnValue(new Date());
-        method(viewModel, {});
+        method([viewModel], {});
         expect(viewModel.attr('_date')).toEqual('11/11/2011');
       });
       it('does not change _date if updated date is before current date',
@@ -271,7 +271,7 @@ describe('datepicker component', function () {
           viewModel.attr('date', '2011-11-11');
           that.updateDate = jasmine.createSpy()
             .and.returnValue(new Date('2010-10-10'));
-          method(viewModel, {});
+          method([viewModel], {});
           expect(viewModel.attr('_date')).toEqual('11/11/2011');
         });
       it('changes _date if updated date is after current date',
@@ -280,7 +280,7 @@ describe('datepicker component', function () {
           viewModel.attr('date', '2011-11-11');
           that.updateDate = jasmine.createSpy()
             .and.returnValue(new Date('2012-12-12'));
-          method(viewModel, {});
+          method([viewModel], {});
           expect(viewModel.attr('_date')).toEqual('12/12/2012');
         });
     });
@@ -297,7 +297,7 @@ describe('datepicker component', function () {
       it('calls updateDate with "maxDate" and new date as arguments',
         function () {
           let date = '11-11-2011';
-          method({}, {}, date);
+          method([], {}, date);
           expect(that.updateDate).toHaveBeenCalledWith('maxDate', date);
         });
     });
@@ -320,11 +320,11 @@ describe('datepicker component', function () {
       });
 
       it('sets prepared date to viewModel', function () {
-        method(viewModel, {}, {});
+        method([viewModel], {}, {});
         expect(viewModel.attr('date')).toEqual('ISODate');
       });
       it('sets prepared date to datepicker', function () {
-        method(viewModel, {}, {});
+        method([viewModel], {}, {});
         expect(viewModel.picker.datepicker)
           .toHaveBeenCalledWith('setDate', 'ISODate');
       });
