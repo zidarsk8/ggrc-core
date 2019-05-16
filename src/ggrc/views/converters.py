@@ -151,11 +151,17 @@ def get_csv_template(objects):
   """Make csv template"""
   for object_data in objects:
     class_name = object_data["object_name"]
+    template_ids = tuple(object_data.get("template_ids", []))
+
     object_class = EXPORTABLES_MAP[class_name]
     ignore_fields = IGNORE_FIELD_IN_TEMPLATE.get(class_name, [])
+
     filtered_fields = [
         field for field in
-        import_helper.get_object_column_definitions(object_class)
+        import_helper.get_object_column_definitions(
+            object_class,
+            template_ids=template_ids,
+        )
         if field not in ignore_fields
     ]
     object_data["fields"] = filtered_fields
