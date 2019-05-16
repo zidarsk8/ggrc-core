@@ -21,3 +21,7 @@ cron:
   url: /ggrc_sync
   target: ggrc-service
   schedule: every 1 minutes
+- description: ggrc sox sync
+  url: /sync_sox_objects
+  target: ggrc-service
+  schedule: every day 04:00

@@ -1,8 +1,12 @@
-[//]: <> (updated 04/24/2019)
+[//]: <> (updated 05/03/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Mentioning person enabled at comments (v.2.2.0, 04/24/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.qny4l9tiyob)
+[Introducing Program to Program mapping (Mega Program) (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.grald8eg2cgj)
+
+[A functionality to turn off sync of people fields between Assessment and Ticket tracker (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.bee9ft50hu3p)
+
+[Mentioning person enabled at comments (v.2.2.0, 04/24/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l5ud67lwwc62)
 
 [New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ny5sa23suyjm)
 
@@ -85,6 +89,16 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### Introducing Program to Program mapping (Mega Program) (v.2.3.0, 05/03/2019)
+
+Program to Program mapping was enabled. Through Unified mapper Programs can be selected to become a Parent or a Child. Objects listed below will be automapped from a Child Program to a Parent Program.
+
+Object types available for automapping: Regulation, Objective, Control, Clause, Contract, Policy, Risk, Standard, Thread, Requirement, System, Product, Process, Market, DataAsset, Facility, OrgGroup, Metric, Technology Environment, Product Group, Projects, Vendors, Access Groups, Key report, Account balance.
+
+### A functionality to turn off sync of people fields between Assessment and Ticket tracker (v.2.3.0, 05/03/2019)
+
+Configurable setting is available on Audit info pane to sync the people fields between Assessment and Ticket Tracker.
 
 ### Mentioning person enabled at comments (v.2.2.0, 04/24/2019)
 
