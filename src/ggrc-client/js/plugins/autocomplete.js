@@ -265,7 +265,7 @@ import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite
               console.warn(error);
             }
 
-            context.removeAttr('items_loading');
+            context.attr('items_loading', false);
             _.defer(function () {
               context.attr('scroll_op_in_progress', false);
             });
