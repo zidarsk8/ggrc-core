@@ -5,41 +5,14 @@
 # pylint: disable=not-an-iterable
 # pylint: disable=too-few-public-methods
 
-from lib import base, decorator
+from lib import base
 from lib.constants import locator
 from lib.element import info_widget_three_bbs
 from lib.entities import entities_factory
 from lib.utils import selenium_utils
 from lib.utils.string_utils import StringMethods
 from lib.page.modal import person_modal
-
-
-class _Modal(base.Modal):
-  """Base model for Edit modal."""
-  _locators = locator.ModalCustomAttribute
-
-  def __init__(self, driver):
-    super(_Modal, self).__init__(driver)
-    self.modal_window = selenium_utils.get_when_visible(
-        self._driver, self._locators.MODAL_CSS)
-    self.attr_title_ui = base.TextInputField(
-        self.modal_window, self._locators.ATTR_TITLE_UI_CSS)
-    self.submit_btn = base.Button(
-        self.modal_window, self._locators.SAVE_AND_CLOSE_BTN_CSS)
-
-  def enter_title(self, title):
-    self.attr_title_ui.enter_text(title)
-
-  @decorator.handle_alert
-  def save_and_close(self):
-    """
-    Return: WidgetAdminCustomAttributes
-    """
-    self.submit_btn.click()
-    selenium_utils.wait_until_not_present(
-        self._driver, self._locators.SAVE_AND_CLOSE_BTN_CSS)
-    selenium_utils.wait_until_not_present(
-        self._driver, self._locators.MODAL_CSS)
+from lib.page.widget import object_modal
 
 
 class CustomAttributesItemContent(base.Component):
@@ -53,21 +26,6 @@ class CustomAttributesItemContent(base.Component):
     self.add_btn = base.Button(self.item_el, self._locators.ADD_BTN_CSS)
     self.custom_attributes_list = []
     self._item_name = item_text
-
-  def add_new_custom_attribute(self, ca_obj):
-    """Create Custom Attribute entry based on given Custom Attribute object."""
-    ca_modal = self.open_add_new_ca_modal()
-    ca_modal.select_type(ca_obj.attribute_type)
-    ca_modal.enter_title(ca_obj.title)
-    if ca_obj.mandatory:
-      ca_modal.set_mandatory()
-    if ca_obj.placeholder:
-      ca_modal.enter_placeholder(ca_obj.placeholder)
-    if ca_obj.helptext:
-      ca_modal.enter_inline_help(ca_obj.helptext)
-    if ca_obj.multi_choice_options:
-      ca_modal.enter_possible_values(ca_obj.multi_choice_options)
-    ca_modal.save_and_close()
 
   def _set_custom_attributes_list(self):
     """Set custom attributes list with Custom Attribute objects from
@@ -99,68 +57,59 @@ class CustomAttributesItemContent(base.Component):
     self.add_btn.click()
     return CustomAttributeModal(self._driver)
 
-  def select_ca_member_by_num(self, num):
-    """Select Custom Attribute member from list of members by number
-    (start from 0).
-    Args: num (int)
-    Return: lib.page.widget.widget_base.CustomAttributeModal
+  def open_edit_ca_modal(self, index):
+    """Click 'Edit' button to open edit modal for Custom Attribute from list
+    with specified index (start from 0).
+
+    Args:
+      index (int)
+    Returns:
+      lib.page.widget.widget_base.CustomAttributeModal
     """
-    # check that the buttons are loaded
-    selenium_utils.get_when_clickable(
-        self._driver, self._locators.EDIT_BTN_CSS)
-    elements = self._driver.find_elements(self._locators.EDIT_BTN_CSS)
-    selenium_utils.scroll_into_view(self._driver, elements[num]).click()
-    return CustomAttributeModal(self._driver)
+    self._browser.links(text="Edit")[index].click()
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return CustomAttributeModal()
 
 
-class CustomAttributeModal(_Modal):
+class CustomAttributeModal(object_modal.BaseFormModal):
   """Custom attribute modal."""
-  # pylint: disable=too-many-instance-attributes
-  def __init__(self, driver):
+
+  def __init__(self, driver=None):
     super(CustomAttributeModal, self).__init__(driver)
-    self.attr_title_lbl = base.Label(
-        self.modal_window, self._locators.ATTR_TITLE_LBL_CSS)
-    self.attr_type_lbl = base.Label(
-        self.modal_window, self._locators.ATTR_TYPE_CSS)
-    self.attr_type_selector_dd = base.DropdownStatic(
-        self.modal_window, self._locators.ATTR_TYPE_SELECTOR_DD_CSS)
-    self.mandatory_lbl = base.Label(
-        self.modal_window, self._locators.MANDATORY_LBL_CSS)
-    self.mandatory_cb = base.Checkbox(
-        self.modal_window, self._locators.MANDATORY_CB_CSS)
-    self.inline_help_lbl = base.Label(
-        self.modal_window, self._locators.INLINE_HELP_LBL_CSS)
-    self.inline_help_ui = None
-    self.placeholder_lbl = base.Label(
-        self.modal_window, self._locators.PLACEHOLDER_LBL_CSS)
-    self.placeholder_ui = None
-    self.possible_values_ui = None
+    self._fields = ["title", "attribute_type", "mandatory", "helptext",
+                    "placeholder", "multi_choice_options"]
 
-  def enter_inline_help(self, inline_help):
-    """Fill 'Inline help' field."""
-    self.inline_help_ui = base.TextInputField(
-        self.modal_window, self._locators.INLINE_HELP_UI_CSS)
-    self.inline_help_ui.enter_text(inline_help)
+  def set_attribute_type(self, value):
+    """Sets attribute type dropdown with value."""
+    self._root.element(tag_name="dropdown-component").select().select(value)
 
-  def enter_placeholder(self, placeholder):
-    """Fill 'Placeholder' field."""
-    self.placeholder_ui = base.TextInputField(
-        self.modal_window, self._locators.PLACEHOLDER_UI_CSS)
-    self.placeholder_ui.enter_text(placeholder)
+  def set_title(self, title):
+    """Sets title field with value."""
+    self._root.text_field(name="title").set(title)
 
-  def set_mandatory(self):
-    """Check 'Mandatory' checkbox."""
-    self.mandatory_cb.click()
+  def set_helptext(self, value):
+    """Sets helptext field with value."""
+    self._root.text_field(name="helptext").set(value)
 
-  def select_type(self, ca_type):
-    """Select CustomAttribute type from 'Attribute type' dropdown."""
-    self.attr_type_selector_dd.select(ca_type)
+  def set_placeholder(self, value):
+    """Sets placeholder field with value."""
+    self._root.text_field(name="placeholder").set(value)
 
-  def enter_possible_values(self, values_string):
-    """Fill 'Possible values' field for 'Dropdown' type of CustomAttribute."""
-    self.possible_values_ui = base.TextInputField(
-        self.modal_window, self._locators.POSSIBLE_VALUES_UI_CSS)
-    self.possible_values_ui.enter_text(values_string)
+  def set_multi_choice_options(self, value):
+    """Sets multi choice options field with value."""
+    self._root.text_field(name="multi_choice_options").set(value)
+
+  def set_mandatory(self, value):
+    """Sets mandatory checkbox according to the value."""
+    self._root.checkbox(name="mandatory").set(bool(value))
+
+  def get_custom_attribute_dict(self):
+    """Return dict with custom attribute parameters according to visible fields
+    in modal window."""
+    data = {i.name: i.value for i in self._root.inputs()}
+    data.update({"attribute_type": self._root.select().value,
+                 "mandatory": self._root.checkbox().is_set})
+    return data
 
 
 class DynamicTreeToggle(base.Toggle):
@@ -169,16 +118,6 @@ class DynamicTreeToggle(base.Toggle):
     super(DynamicTreeToggle, self).__init__(driver, el_locator)
     self.element = driver.find_element(*el_locator)
     self.is_activated = selenium_utils.is_value_in_attr(self.element)
-
-
-class WidgetAdminCustomAttributes(base.Widget):
-  """Base model for custom attributes on Admin Dashboard page."""
-  _locators = locator.AdminCustomAttributes
-
-
-class WidgetAdminPeople(base.Widget):
-  """Base model for people on Admin Dashboard page."""
-  _locators = locator.WidgetAdminPeople
 
 
 class PeopleItemContent(base.Component):

@@ -1043,7 +1043,6 @@ class CustomAttributesItemContent(AdminCustomAttributes):
   TITLES_ROW_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + " thead tr")
   ROW_CSS = (By.CSS_SELECTOR, TREE_STRUCTURE)
   CELL_IN_ROW_CSS = (By.CSS_SELECTOR, "td")
-  EDIT_BTN_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + Common.TREE_LIST)
   ADD_BTN_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + " .add-item .btn")
   TREE_SPINNER_CSS = (By.CSS_SELECTOR, Common.TREE_SPINER)
 

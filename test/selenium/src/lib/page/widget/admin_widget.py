@@ -5,6 +5,7 @@
 
 from lib import base, exception
 from lib.constants import locator, objects
+from lib.entities import entity
 from lib.entities.entities_factory import PeopleFactory
 from lib.page import dashboard
 from lib.page.widget import widget_base
@@ -137,7 +138,7 @@ class CustomRoles(dashboard.AdminDashboard):
     return set(item.text for item in tree_view_items)
 
 
-class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
+class CustomAttributes(base.Widget):
   """Custom attributes widget on Admin Dashboard page."""
 
   def __init__(self, driver):
@@ -159,25 +160,27 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     """Return Tree View item objects from current widget."""
     return self.ca_tree_view.tree_view_items()
 
-  def add_custom_attribute(self, ca_obj):
-    """Add custom attribute from custom attribute object given."""
-    ca_item_content = self.expand_collapse_group(
-        objects.get_normal_form(ca_obj.definition_type), expand=True)
-    ca_item_content.add_new_custom_attribute(ca_obj)
-    self.expand_collapse_group(
-        objects.get_normal_form(ca_obj.definition_type), expand=False)
+  def get_custom_attributes_list(self, obj_type):
+    """Collect custom attributes from expanded object type Tree View.
 
-  def get_custom_attributes_list(self, ca_group):
-    """Collect custom attributes from expanded custom attribute group
-    Tree View.
+    Returns:
+      list of Custom Attribute objects.
     """
     ca_item_content = self.expand_collapse_group(
-        objects.get_normal_form(ca_group.definition_type), expand=True)
+        objects.get_normal_form(obj_type), expand=True)
     return ca_item_content.get_ca_list_from_group()
 
+  def open_edit_modal(self, obj_type, ca_title):
+    """Click "Edit" button to open edit modal window for specified custom
+    attribute.
 
-class ModalCustomAttributes(widget_base.CustomAttributeModal):
-  """Custom attributes modal."""
+    Returns:
+      lib.page.widget.widget_base.CustomAttributeModal
+    """
+    ca_item_content = self.expand_collapse_group(obj_type, expand=True)
+    ca_list = self.get_custom_attributes_list(obj_type)
+    return ca_item_content.open_edit_ca_modal(ca_list.index(
+        entity.Representation.filter_objs_by_attrs(ca_list, title=ca_title)))
 
 
 class EventTreeItem(object):
