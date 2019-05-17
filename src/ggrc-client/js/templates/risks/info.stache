@@ -224,7 +224,7 @@
                         </div>
                         {{#if created_by}}
                           <p>
-                            {{created_by}}
+                            {{created_by.email}}
                           </p>
                         {{else}}
                           <span class="empty-message">None</span>
@@ -258,7 +258,7 @@
                         </div>
                         {{#if last_submitted_by}}
                           <p>
-                            {{last_submitted_by}}
+                            {{last_submitted_by.email}}
                           </p>
                         {{else}}
                           <span class="empty-message">None</span>
@@ -290,7 +290,7 @@
                         </div>
                         {{#if last_verified_by}}
                           <p>
-                            {{localize_date last_verified_by}}
+                            {{last_verified_by.email}}
                           </p>
                         {{else}}
                           <span class="empty-message">None</span>
