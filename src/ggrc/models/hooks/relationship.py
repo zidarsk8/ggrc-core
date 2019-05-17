@@ -12,12 +12,13 @@ import sqlalchemy as sa
 from werkzeug.exceptions import BadRequest
 
 from ggrc import db
-from ggrc.models.hooks import assessment
-from ggrc.services import signals
+from ggrc.login import is_external_app_user
 from ggrc.models import all_models
-from ggrc.models.comment import Commentable, ExternalCommentable
-from ggrc.models.mixins.base import ChangeTracked
 from ggrc.models import exceptions
+from ggrc.models.comment import Commentable, ExternalCommentable
+from ggrc.models.hooks import assessment
+from ggrc.models.mixins.base import ChangeTracked
+from ggrc.services import signals
 
 
 LOGGER = logging.getLogger(__name__)
@@ -394,3 +395,21 @@ def init_hook():  # noqa
       if (obj.source_type == obj.destination_type and
               obj.source_id == obj.destination_id):
         raise BadRequest("The mapping of object on itself is not possible")
+
+  # pylint: disable=unused-argument
+  @signals.Restful.collection_posted.connect_via(all_models.Relationship)
+  def validate_external_creation(sender, objects=None, **kwargs):
+    """
+        Validate that external user can't create regular relationships.
+        Validate that local user can't create external relationships.
+    """
+    error_message = (
+        u"You do not have the necessary permissions to "
+        u"create {} relationships."
+    )
+    for obj in objects:
+      if is_external_app_user() and not obj.is_external:
+        raise BadRequest(error_message.format("regular"))
+
+      elif not is_external_app_user() and obj.is_external:
+        raise BadRequest(error_message.format("external"))

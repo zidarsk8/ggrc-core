@@ -4,7 +4,6 @@
 """Module for integration tests for Relationship."""
 
 import json
-import unittest
 
 import ddt
 
@@ -39,15 +38,31 @@ class TestRelationship(TestCase):
   REL_URL = "/api/relationships"
 
   @staticmethod
-  def build_relationship_json(source, destination):
+  def build_relationship_json(source, destination, is_external=False):
     """Builds relationship create request json."""
     return json.dumps([{
         "relationship": {
             "source": {"id": source.id, "type": source.type},
             "destination": {"id": destination.id, "type": destination.type},
             "context": {"id": None},
+            "is_external": is_external
         }
     }])
+
+  def test_local_user_create_external_relationship(self):
+    """Test that local user can't create external relationships"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      comment = factories.CommentFactory()
+
+    response = self.api.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(program, comment, is_external=True),
+        headers=self.HEADERS)
+    rel = all_models.Relationship.query.first()
+
+    self.assert400(response)
+    self.assertIsNone(rel)
 
   def test_changing_log_on_doc_change(self):
     """Changing object documents should generate new object revision."""
@@ -155,7 +170,7 @@ class TestExternalRelationship(TestCase):
   REL_URL = "/api/relationships"
 
   @staticmethod
-  def build_relationship_json(source, destination, is_external):
+  def build_relationship_json(source, destination, is_external=True):
     """Builds relationship create request json."""
     return json.dumps([{
         "relationship": {
@@ -200,8 +215,6 @@ class TestExternalRelationship(TestCase):
     self.assertIsNone(relationship.automapping_id)
     self.assertIsNone(relationship.context_id)
 
-  @unittest.skip("Need to update validation to allow update "
-                 "regular relationships but not to create")
   def test_create_ext_user_reg_relationship(self):
     """Validation external app user creates regular relationship."""
     self.api.set_user(self.person_ext)
@@ -215,7 +228,9 @@ class TestExternalRelationship(TestCase):
     self.assert400(response)
     self.assertEqual(
         response.json[0],
-        [400, "External application can create only external relationships."])
+        [400,
+         "You do not have the necessary permissions to "
+         "create regular relationships.", ])
 
   def test_update_ext_user_ext_relationship(self):
     """Validation external app user updates external relationship."""
@@ -225,7 +240,6 @@ class TestExternalRelationship(TestCase):
       system = factories.SystemFactory()
 
     self.create_relationship(product, system, True, self.person_ext)
-
     response = self.api.client.post(
         self.REL_URL,
         data=self.build_relationship_json(product, system, True),
@@ -246,13 +260,16 @@ class TestExternalRelationship(TestCase):
 
   def test_update_ext_user_reg_relationship(self):
     """External app user can update regular relationship."""
-    self.api.set_user(self.person_ext)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
+      self.create_relationship(product, system, False, self.person)
+      product_id = product.id
+      system_id = system.id
 
-    self.create_relationship(product, system, False, self.person_ext)
-
+    self.api.set_user(self.person_ext)
+    product = all_models.Product.query.get(product_id)
+    system = all_models.System.query.get(system_id)
     response = self.api.client.post(
         self.REL_URL,
         data=self.build_relationship_json(product, system, True),
@@ -267,8 +284,7 @@ class TestExternalRelationship(TestCase):
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
-
-    rel = self.create_relationship(product, system, True, self.person_ext)
+      rel = self.create_relationship(product, system, True, self.person_ext)
 
     response = self.api.delete(rel)
     self.assert200(response)
@@ -288,13 +304,16 @@ class TestExternalRelationship(TestCase):
 
   def test_update_reg_user_ext_relationship(self):
     """Validation regular app user updates external relationship."""
-    self.api.set_user(self.person)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
+      self.create_relationship(product, system, True, self.person_ext)
+      product_id = product.id
+      system_id = system.id
 
-    self.create_relationship(product, system, True, self.person)
-
+    self.api.set_user(self.person)
+    product = all_models.Product.query.get(product_id)
+    system = all_models.System.query.get(system_id)
     response = self.api.client.post(
         self.REL_URL,
         data=self.build_relationship_json(product, system, False),
@@ -303,13 +322,13 @@ class TestExternalRelationship(TestCase):
 
   def test_delete_reg_user_ext_relationship(self):
     """Validation regular user deletes external relationship."""
-    self.api.set_user(self.person)
     with factories.single_commit():
       product = factories.ProductFactory()
       system = factories.SystemFactory()
+      self.create_relationship(product, system, True, self.person_ext)
 
-    rel = self.create_relationship(product, system, True, self.person)
-
+    self.api.set_user(self.person)
+    rel = all_models.Relationship.query.first()
     response = self.api.delete(rel)
     self.assert200(response)
     relationship = all_models.Relationship.query.get(rel.id)

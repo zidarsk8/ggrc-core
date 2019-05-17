@@ -12,10 +12,10 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
 from ggrc.login import is_external_app_user
-from ggrc.models.mixins import base
-from ggrc.models.mixins import Base
 from ggrc.models import reflection
 from ggrc.models.exceptions import ValidationError
+from ggrc.models.mixins import base
+from ggrc.models.mixins import Base
 
 logger = logging.getLogger(__name__)
 
