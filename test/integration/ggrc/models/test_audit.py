@@ -203,18 +203,6 @@ class TestAudit(TestCase):
     expected_slug = "SLUG"
     self.assertEqual(current_slug, expected_slug)
 
-  def test_slug_validation_update(self):
-    """Test put slug with trailing space"""
-    with factories.single_commit():
-      audit = factories.AuditFactory(slug="SLUG-01")
-
-    response = self.api.put(audit, {"slug": "SLUG "})
-    self.assert200(response)
-    audit = db.session.query(all_models.Audit).get(audit.id)
-    current_slug = audit.slug
-    expected_slug = "SLUG"
-    self.assertEqual(current_slug, expected_slug)
-
 
 class TestManualAudit(TestCase):
   """ Test Audit with manual snapshot mapping"""

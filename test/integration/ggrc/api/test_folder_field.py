@@ -35,7 +35,6 @@ class TestFolderField(TestCase):
       factories.ProcessFactory,
       factories.ProductFactory,
       factories.ProductGroupFactory,
-      factories.ProgramFactory,
       factories.ProjectFactory,
       factories.RegulationFactory,
       factories.RequirementFactory,
