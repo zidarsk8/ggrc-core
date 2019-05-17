@@ -3,8 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Mappings from '../../../models/mappers/mappings';
 import * as businessModels from '../../../models/business-models';
+import {loadObjectsByTypes} from '../../../plugins/utils/query-api-utils';
+import {notifier} from '../../../plugins/utils/notifiers-utils';
+import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
+import {getRelevantMappingTypes} from '../../../plugins/utils/workflow-utils';
 
 /**
  * @typedef {Object} Stub
@@ -14,6 +17,7 @@ import * as businessModels from '../../../models/business-models';
 
 const viewModel = can.Map.extend({
   instance: null,
+  isNewInstance: false,
   /**
   * @type {Cacheable[]}
   */
@@ -26,23 +30,36 @@ const viewModel = can.Map.extend({
   * @type {Cacheable[]}
   */
   preMappedObjects: [],
+  isLoading: false,
   loadPreMappedObjects() {
     return this.attr('preMappedStubs').map((stub) =>
       businessModels[stub.type].findInCacheById(stub.id)
     );
   },
-  async loadMappedObjects() {
-    const mappedObjectsBindings = await Mappings
-      .getBinding('info_related_objects', this.attr('instance'))
-      .refresh_instances();
-    return mappedObjectsBindings.map((binding) =>
-      binding.instance ||
-      binding
+  loadMappedObjects() {
+    const instance = this.attr('instance');
+    const fields = ['id', 'type', 'title'];
+    return loadObjectsByTypes(
+      instance,
+      getRelevantMappingTypes(instance),
+      fields
     );
   },
   async init() {
     this.attr('preMappedObjects', this.loadPreMappedObjects());
-    this.attr('mappedObjects', await this.loadMappedObjects());
+
+    if (this.attr('isNewInstance')) {
+      return;
+    }
+
+    this.attr('isLoading', true);
+    try {
+      this.attr('mappedObjects', await this.loadMappedObjects());
+    } catch (xhr) {
+      notifier('error', getAjaxErrorInfo(xhr).details);
+    } finally {
+      this.attr('isLoading', false);
+    }
   },
 });
 
