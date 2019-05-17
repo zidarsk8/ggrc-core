@@ -4,7 +4,7 @@
 }}
 
 <people-autocomplete-wrapper {{#if showResults}}class="shown"{{/if}}
-    currentValue:from="mentionValue"
+    currentValue:from="mentionBeforeSelection"
     showResults:bind="showResults"
     modelName:from="'Person'"
     queryField:from="'email'"
