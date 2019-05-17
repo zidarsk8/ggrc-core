@@ -31,6 +31,12 @@ IMPORT_FAILED = {
     "url": u"import"
 }
 
+IMPORT_STOPPED = {
+    "title": (u"[WARNING] Import of {filename} was stopped"),
+    "body": u"The import was stopped. Only partial data was saved.",
+    "url": u"import"
+}
+
 EXPORT_COMPLETED = {
     "title": u"{filename} was exported successfully",
     "body": u"Go to export page to download the result. "

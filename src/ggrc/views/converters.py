@@ -345,6 +345,9 @@ def run_import_phases(task):
       job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                             ie_job.title)
   except models_exceptions.ImportStoppedException:
+    ie_job = import_export.get(ie_id)
+    job_emails.send_email(job_emails.IMPORT_STOPPED, user.email,
+                          ie_job.title)
     logger.info("Import was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception(e.message)
@@ -650,6 +653,7 @@ def handle_import_stop(**kwargs):
     ie_job = import_export.get(kwargs["id2"])
     if ie_job.status in ("Analysis", "In Progress", "Blocked"):
       ie_job.status = "Stopped"
+      ie_job.end_at = datetime.utcnow()
       # Stop tasks only on non local instance
       if getattr(settings, "APPENGINE_INSTANCE", "local") != "local":
         stop_ie_bg_tasks(ie_job)
