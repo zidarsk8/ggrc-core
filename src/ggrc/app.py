@@ -27,10 +27,13 @@ from ggrc import notifications
 from ggrc import settings
 from ggrc.gdrive import init_gdrive_routes
 from ggrc.utils import benchmark
-from ggrc.utils.issue_tracker_mock import init_issue_tracker_mock
+from ggrc.utils import issue_tracker_mock
 
 if settings.ISSUE_TRACKER_MOCK and not settings.PRODUCTION:
-  init_issue_tracker_mock()
+  if getattr(settings, "APP_ENGINE", False):
+    issue_tracker_mock.init_gae_issue_tracker_mock()
+  else:
+    issue_tracker_mock.init_issue_tracker_mock()
 
 setup_logging(settings.LOGGING)
 
