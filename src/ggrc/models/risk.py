@@ -7,6 +7,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc import utils as ggrc_utils
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models import comment
 from ggrc.models import exceptions
@@ -18,7 +19,6 @@ from ggrc.models.mixins import synchronizable
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
-from ggrc.utils import create_stub
 
 
 class Risk(synchronizable.Synchronizable,
@@ -117,6 +117,12 @@ class Risk(synchronizable.Synchronizable,
       'review_status_display_name'
   ]
 
+  _custom_publish = {
+      'created_by': ggrc_utils.created_by_stub,
+      'last_submitted_by': ggrc_utils.last_submitted_by_stub,
+      'last_verified_by': ggrc_utils.last_verified_by_stub,
+  }
+
   _api_attrs = reflection.ApiAttributes(
       'risk_type',
       'threat_source',
@@ -178,7 +184,7 @@ class Risk(synchronizable.Synchronizable,
 
   def log_json(self):
     res = super(Risk, self).log_json()
-    res["created_by"] = create_stub(self.created_by)
+    res["created_by"] = self.created_by
     res["last_submitted_by"] = self.last_submitted_by
     res["last_verified_by"] = self.last_verified_by
     return res
