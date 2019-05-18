@@ -170,6 +170,7 @@ h4.search-title {
         &:hover {
           text-decoration:none;
         }
+
         &.active {
           font-weight: 700;
           color: $black;
@@ -187,25 +188,29 @@ h4.search-title {
         a {
           color: $governance;
         }
+        .content a:hover {
+          color: $lhnGovernanceHover;
+        }
+      }
+      &.entities {
+        .content a:hover {
+          color: $lhnEntitiesHover;
+        }
       }
       &.business {
         a {
-          color:$business;
+          color: $business;
+        }
+        .content a:hover {
+          color: $lhnBusinessHover;
         }
       }
       &.risk {
         a {
-          color:$risk;
+          color: $risk;
         }
-      }
-      &.objectives {
-        a {
-          color: $objectives;
-        }
-      }
-      &.controls {
-        a {
-          color: $controls;
+        .content a:hover {
+          color: $lhnRiskHover;
         }
       }
     }
@@ -272,6 +277,9 @@ h4.search-title {
           .fa {
             color: $lhnLightBlue;
             font-size: 12px;
+          }
+          &:hover {
+            color: $lhnLightBlue;
           }
         }
       }
