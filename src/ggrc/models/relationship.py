@@ -387,6 +387,18 @@ class Relatable(object):
 
     return query
 
+  def map_to(self, destination):
+    """Create relationship to object."""
+    if not destination:
+      return None
+    relationship = Relationship(
+        source=self,
+        destination=destination,
+        context=self.context or destination.context,
+    )
+    db.session.add(relationship)
+    return relationship
+
 
 class Stub(collections.namedtuple("Stub", ["type", "id"])):
   """Minimal object representation."""
