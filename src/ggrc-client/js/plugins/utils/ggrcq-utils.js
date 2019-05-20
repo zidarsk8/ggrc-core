@@ -291,7 +291,7 @@ function getMapObjectToExternalObjectUrl(instance, destinationModel, statuses) {
  * @param {string} types - Required types list (comma separated)
  * @return {string} Url
  */
-function getMapExternalObjectToObjectUrl(instance, view, statuses, types) { // eslint-disable-line
+function getMapExternalObjectToObjectUrl(instance, view, statuses, types) { // eslint-disable-line id-length
   let path = '';
   const sourceType = instance.constructor.model_singular;
   if (externalDirectiveObjects.includes(sourceType)) {

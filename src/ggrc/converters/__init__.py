@@ -65,7 +65,6 @@ GGRC_IMPORTABLE = {
     "regulation": all_models.Regulation,
     "requirement": all_models.Requirement,
     "risk assessment": all_models.RiskAssessment,
-    "risk": all_models.Risk,
     "risk_assessment": all_models.RiskAssessment,
     "riskassessment": all_models.RiskAssessment,
     "standard": all_models.Standard,
@@ -80,6 +79,7 @@ GGRC_IMPORTABLE = {
 GGRC_EXPORTABLE = {
     "snapshot": all_models.Snapshot,
     "control": all_models.Control,
+    "risk": all_models.Risk,
 }
 
 

@@ -45,11 +45,19 @@ READONLY_MAPPING_PAIRS = list(
     itertools.product(_SCOPING_MODELS, (all_models.Standard,
                                         all_models.Regulation))
 )
+
 # Test relationship for Control and Scope objects, Standard and Regulation
 READONLY_MAPPING_PAIRS.extend(
     (all_models.Control, m) for m in itertools.chain(_SCOPING_MODELS,
                                                      (all_models.Standard,
-                                                      all_models.Regulation))
+                                                      all_models.Regulation,)
+                                                     )
+)
+READONLY_MAPPING_PAIRS.extend(
+    (all_models.Risk, m) for m in itertools.chain(_SCOPING_MODELS,
+                                                  (all_models.Standard,
+                                                   all_models.Regulation,)
+                                                  )
 )
 
 

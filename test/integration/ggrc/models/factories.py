@@ -475,6 +475,12 @@ class RiskFactory(TitledFactory):
 
   risk_type = "Some Type"
   description = factory.LazyAttribute(lambda _: random_str(length=100))
+  external_id = factory.LazyAttribute(lambda _:
+                                      SynchronizableExternalId.next())
+  created_by_id = factory.LazyAttribute(lambda _: PersonFactory().id)
+  external_slug = factory.LazyAttribute(lambda m: random_str())
+  review_status = all_models.Review.STATES.UNREVIEWED
+  review_status_display_name = "some status"
 
 
 class ThreatFactory(TitledFactory):
@@ -515,7 +521,7 @@ class ReviewFactory(ModelFactory):
   class Meta:
     model = all_models.Review
 
-  reviewable = factory.LazyAttribute(lambda _: RiskFactory())
+  reviewable = factory.LazyAttribute(lambda _: ProgramFactory())
   notification_type = all_models.Review.NotificationTypes.EMAIL_TYPE
 
 

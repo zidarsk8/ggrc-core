@@ -78,9 +78,9 @@ describe('Model "status" attr test', function () {
 
 describe('Model review state test', function () {
   const reviewObjects = ['Contract', 'Objective',
-    'Policy', 'Program', 'Regulation', 'Risk', 'Requirement', 'Standard',
+    'Policy', 'Program', 'Regulation', 'Requirement', 'Standard',
     'Threat'];
-  const externalReviewObjects = ['Control'];
+  const externalReviewObjects = ['Control', 'Risk'];
   const objectsWithoutReview = ['AccessGroup', 'AccountBalance', 'Assessment',
     'AssessmentTemplate', 'Audit', 'DataAsset', 'Facility', 'Issue',
     'KeyReport', 'Market', 'Metric', 'OrgGroup', 'Process', 'Product',

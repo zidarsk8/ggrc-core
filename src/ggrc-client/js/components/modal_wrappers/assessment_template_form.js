@@ -6,7 +6,7 @@
 const peopleTitlesList = [
   'Auditors', 'Principal Assignees', 'Secondary Assignees',
   'Primary Contacts', 'Secondary Contacts', 'Control Operators',
-  'Control Owners',
+  'Control Owners', 'Risk Owners',
 ];
 const PEOPLE_VALUES_OPTIONS = Object.freeze({
   Control: [
@@ -17,6 +17,16 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
     {value: 'Secondary Assignees', title: 'Secondary Assignees'},
     {value: 'Control Operators', title: 'Control Operators'},
     {value: 'Control Owners', title: 'Control Owners'},
+    {value: 'Other Contacts', title: 'Other Contacts'},
+    {value: 'other', title: 'Others...'},
+  ],
+  Risk: [
+    {value: 'Admin', title: 'Object Admins'},
+    {value: 'Audit Lead', title: 'Audit Captain'},
+    {value: 'Auditors', title: 'Auditors'},
+    {value: 'Principal Assignees', title: 'Principal Assignees'},
+    {value: 'Secondary Assignees', title: 'Secondary Assignees'},
+    {value: 'Risk Owners', title: 'Risk Owners'},
     {value: 'Other Contacts', title: 'Other Contacts'},
     {value: 'other', title: 'Others...'},
   ],

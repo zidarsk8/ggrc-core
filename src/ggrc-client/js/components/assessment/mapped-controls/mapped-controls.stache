@@ -65,10 +65,12 @@
             </detailed-business-object-list-item>
         </collapsible-panel>
         {{else}}
+          <div class="without-details-section">
             <detailed-business-object-list-item instance:from="instance"
                     customAttributes:from="customAttributes"
                     class="mapped-object-info">
             </detailed-business-object-list-item>
+          </div>
         {{/if}}
         {{^if withoutDetails}}
           {{#is assessmentType 'Control'}}
