@@ -1,6 +1,10 @@
-[//]: <> (updated 05/03/2019)
+[//]: <> (updated 05/22/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
+
+[Integration with Drogon enabled for SOX systems (v.2.5.0, 05/22/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7sp3gw0nc2)
+
+[Mapping Scope Object to Standard or Regulation moved to new frontend (v.2.5.0, 05/22/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.b64613515b6c)
 
 [Introducing Program to Program mapping (Mega Program) (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.grald8eg2cgj)
 
@@ -89,6 +93,14 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+
+### Integration with Drogon enabled for SOX systems (v.2.5.0, 05/22/2019)
+
+Integration with Drogon was enabled for read-only SOX systems. The frequency of data sync is once per day. Any updates will have to be executed Drogon as it is the source system.
+
+### Mapping Scope Object to Standard or Regulation moved to new frontend (v.2.5.0, 05/22/2019)
+
+Mapping and unmapping of Scope Object to Standard or Regulation was moved to a new frontend. To perform the mapping (or unmapping) follow the corresponding link to a new frontend.
 
 ### Introducing Program to Program mapping (Mega Program) (v.2.3.0, 05/03/2019)
 
