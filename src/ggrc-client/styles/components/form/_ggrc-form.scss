@@ -172,6 +172,10 @@
     */
     custom-attributes-field {
       outline: none;
+
+      .multiselect-dropdown {
+        max-width: 100%;
+      }
     }
   }
 

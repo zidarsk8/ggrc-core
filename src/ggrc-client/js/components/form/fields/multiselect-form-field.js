@@ -28,15 +28,26 @@ export default can.Component.extend({
           return this.attr('_value');
         },
       },
+      options: {
+        set(newValue) {
+          this.attr('_options', newValue);
+        },
+        get() {
+          const selected = this.attr('_value');
+          return _.map(this.attr('_options'), (item) => {
+            return {value: item, checked: selected.includes(item)};
+          });
+        },
+      },
     },
-    _value: false,
+    _value: '',
+    _options: [],
     fieldId: null,
-    options: [],
     valueChanged(newValue) {
       this.dispatch({
         type: 'valueChanged',
         fieldId: this.fieldId,
-        value: newValue,
+        value: newValue.selected.map((item) => item.attr('value')).join(','),
       });
     },
   }),
