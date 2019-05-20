@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """AccessControlRole API resource extension."""
+# pylint: disable=cyclic-import
 
 from ggrc.services import common
 

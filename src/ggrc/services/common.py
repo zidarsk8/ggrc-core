@@ -6,6 +6,7 @@
 resources.
 """
 # pylint: disable=too-many-lines
+# pylint: disable=cyclic-import
 
 import datetime
 import collections
