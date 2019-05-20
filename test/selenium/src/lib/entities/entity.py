@@ -880,6 +880,14 @@ class ProposalEmailUI(Representation):
         "recipient_email", "author", "obj_type", "changes", "comment", **attrs)
 
 
+class ReviewEmailUI(Representation):
+  """Review request notification email."""
+  def __init__(self, **attrs):
+    super(ReviewEmailUI, self).__init__()
+    self.set_attrs(
+        "recipient_email", "obj_type", "obj_title", "comment", **attrs)
+
+
 class DailyEmailUI(Representation):
   """Daily notification email."""
   def __init__(self, **attrs):
