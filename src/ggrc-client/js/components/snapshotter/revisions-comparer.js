@@ -15,6 +15,7 @@ import Snapshot from '../../models/service-models/snapshot';
 import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
 import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
+import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 
 const HIGHLIGHT_CLASS = 'diff-highlighted';
 
@@ -224,7 +225,12 @@ export default can.Component.extend({
       const emptySelector = '.empty-message';
       const listSelector = 'ul li, .object-list-item';
       const titleSelector = '.general-page-header .pane-header__title';
-      const attributesSelector = this.instance.type === 'Control' ?
+      const instance = this.attr('instance');
+      const isProposableExternalAttr = (
+        instance.constructor.isProposable &&
+        isChangeableExternally(instance)
+      );
+      const attributesSelector = isProposableExternalAttr ?
         '.review-status, proposable-attribute' :
         'object-review, .row-fluid h6 + *';
 
