@@ -34,8 +34,8 @@ console.warn = function (text) {
   originalWarn.apply(this, arguments);
 };
 
-console.log = function (text) {
-  if (isHidden(text)) {
+console.log = function (object) {
+  if (isHidden(String(object))) {
     hiddenLogs.push(arguments);
     return;
   }
