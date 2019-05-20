@@ -377,7 +377,10 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
         ggrc.models.Revision.resource_type == "Assessment",
     ).order_by(ggrc.models.Revision.id.desc()).all()
     content = revisions[0].content
-    self.assertEqual(content["custom_attribute_values"], [])
+    self.assertEqual(len(content["custom_attribute_values"]), 1)
+    cav = content["custom_attribute_values"][0]
+    self.assertEqual(cav["custom_attribute_id"], ca_def.id)
+    self.assertEqual(cav["attributable_id"], asmnt.id)
 
   def test_revision_review_stub(self):
     """ Test proper review stub population in revision content """

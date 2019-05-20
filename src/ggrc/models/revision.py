@@ -477,13 +477,25 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
       return self._content["custom_attributes"]
     return []
 
+  def _get_cads(self):
+    """Return cads definitions from content and new CADs from db."""
+    from ggrc.models import custom_attribute_definition
+
+    all_cads = []
+    if "custom_attribute_definitions" in self._content and \
+       self._content["custom_attribute_definitions"]:
+      all_cads.extend(self._content["custom_attribute_definitions"])
+
+    db_cads = custom_attribute_definition.get_custom_attributes_for(
+        self.resource_type, self.resource_id)
+    all_cads_ids = [cad['id'] for cad in all_cads]
+    return all_cads + [cad for cad in db_cads if cad['id'] not in all_cads_ids]
+
   def populate_cavs(self):
     """Setup cads in cav list if they are not presented in content
 
     but now they are associated to instance."""
-    from ggrc.models import custom_attribute_definition
-    cads = custom_attribute_definition.get_custom_attributes_for(
-        self.resource_type, self.resource_id)
+    cads = self._get_cads()
     cavs = {int(i["custom_attribute_id"]): i for i in self._get_cavs()}
     cads_ids = set()
     for cad in cads:
