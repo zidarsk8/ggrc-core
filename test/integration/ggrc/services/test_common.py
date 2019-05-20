@@ -287,20 +287,22 @@ class TestServices(TestCase):
     check_response_409(response_date_invalid)
 
   def test_put_relationship_405(self):
-    """
-    This test ensures that put method to the
-    /api/relationships/<id>/ PUT method not allowed
-    """
-    assessment = factories.AssessmentFactory()
-    assessment_2 = factories.AssessmentFactory()
-    evidence = factories.EvidenceUrlFactory()
-    rel_id = factories.RelationshipFactory(source=assessment,
-                                           destination=evidence).id
+    """Ensures that ability to modify relationships via PUT was removed"""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      assessment_id = assessment.id
+      assessment_2 = factories.AssessmentFactory()
+      evidence = factories.EvidenceUrlFactory()
+      rel_id = factories.RelationshipFactory(source=assessment,
+                                             destination=evidence).id
+
     relationship = all_models.Relationship.query.get(rel_id)
     response = self.api.put(relationship, {"relationship": {
-        "id": assessment_2.id, "type": assessment_2.type
+        "source": {"id": assessment_2.id, "type": assessment_2.type},
+        "destination": {"id": evidence.id, "type": evidence.type},
     }})
     self.assert405(response)
+    self.assertEqual(relationship.source_id, assessment_id)
 
   def test_options(self):
     mock_obj = self.mock_model()

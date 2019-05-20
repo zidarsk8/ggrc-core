@@ -14,7 +14,6 @@ import itertools
 import json
 import logging
 import time
-import re
 
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
@@ -627,9 +626,6 @@ class Resource(ModelView):
   @utils.validate_mimetype("application/json")
   def put(self, id):  # pylint: disable=redefined-builtin
     """PUT operation handler."""
-
-    if re.findall('/api/relationships/[0-9]+$', self.request.url):
-      raise MethodNotAllowed()
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
