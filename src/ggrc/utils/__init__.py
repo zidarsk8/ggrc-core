@@ -332,6 +332,63 @@ def create_stub(object_, context_id=None):
   }
 
 
+def created_by_stub(obj):
+  """Returns a stub of created_by.
+
+  Args:
+    obj: An instance of model with created_by.
+  Returns:
+    JSON with information for created_by.
+  """
+  if not obj.created_by:
+    return None
+  return {
+      'type': 'Person',
+      'id': obj.created_by.id,
+      'context_id': obj.context_id,
+      'href': '/api/people/%s' % obj.created_by.id,
+      'email': obj.created_by.email,
+  }
+
+
+def last_submitted_by_stub(obj):
+  """Returns a stub of last_submitted_by.
+
+  Args:
+    obj: An instance of model with last_submitted_by.
+  Returns:
+    JSON with information for last_submitted_by.
+  """
+  if not obj.last_submitted_by:
+    return None
+  return {
+      'type': 'Person',
+      'id': obj.last_submitted_by.id,
+      'context_id': obj.context_id,
+      'href': '/api/people/%s' % obj.last_submitted_by.id,
+      'email': obj.last_submitted_by.email,
+  }
+
+
+def last_verified_by_stub(obj):
+  """Returns a stub of last_verified_by.
+
+  Args:
+    obj: An instance of model with last_verified_by.
+  Returns:
+    JSON with information for last_verified_by.
+  """
+  if not obj.last_verified_by:
+    return None
+  return {
+      'type': 'Person',
+      'id': obj.last_verified_by.id,
+      'context_id': obj.context_id,
+      'href': '/api/people/%s' % obj.last_verified_by.id,
+      'email': obj.last_verified_by.email,
+  }
+
+
 def dump_attrs(obj):
   """Getting initial state of obj."""
   obj_cls = type(obj)
