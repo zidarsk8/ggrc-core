@@ -5,7 +5,7 @@
 
 import tracker from '../../tracker';
 import RefreshQueue from '../../models/refresh_queue';
-import template from './templates/generate_assessments_button.stache';
+import template from './templates/assessment-generator-button.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import BackgroundTask from '../../models/service-models/background-task';
 import Assessment from '../../models/business-models/assessment';
