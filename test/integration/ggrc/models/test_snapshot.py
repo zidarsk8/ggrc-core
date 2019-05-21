@@ -80,7 +80,6 @@ class TestSnapshotQueryApi(TestCase):
       "secondary_contact_id",
 
       "created_by_id",
-      "created_by",
       "modified_by_id",
 
       "attribute_object_id",
