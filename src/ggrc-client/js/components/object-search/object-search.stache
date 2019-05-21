@@ -17,7 +17,7 @@
 <div class="modal-body-wrapper">
   <aside>
     <saved-search-list
-      objectName:from="model.model_singular"
+      searches:from="searches"
       on:applySearch="applySearch(scope.event)"
       on:removed="loadSavedSearches()"
     ></saved-search-list>
