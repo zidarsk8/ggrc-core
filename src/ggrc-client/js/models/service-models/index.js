@@ -19,3 +19,4 @@ export {default as Role} from './role';
 export {default as Search} from './search';
 export {default as Snapshot} from './snapshot';
 export {default as PersonProfile} from './person-profile';
+export {default as ExternalComment} from './external-comment';
