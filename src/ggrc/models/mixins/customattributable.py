@@ -429,45 +429,16 @@ class CustomAttributable(object):
       # self.custom_attribute_values.append(new_value)
 
   @classmethod
-  def get_custom_attribute_definitions(cls, field_names=None, template_ids=()):
-    """
-      Get all applicable CA definitions (even ones without a value yet).
-
-      Arguments:
-
-        cls (db.Model inherited class) - class to find local and global
-          custom attributes for
-        field_name (iterable of strings) - field names to gather (unless
-          mandatory)
-        template_id (iterable of integers) - when gathering fields from
-          local custom attributes use assessment templates with ids from
-          given list
-
-      Returns:
-
-        db.query object with corresponding filters
-    """
+  def get_custom_attribute_definitions(cls, field_names=None):
+    """Get all applicable CA definitions (even ones without a value yet)."""
     from ggrc.models.custom_attribute_definition import \
         CustomAttributeDefinition as cad
 
     if cls.__name__ == "Assessment":
-      or_conditions = [
+      query = cad.query.filter(or_(
           cad.definition_type == utils.underscore_from_camelcase(cls.__name__),
-      ]
-
-      if template_ids:
-        or_conditions.append(
-            and_(
-                cad.definition_type == "assessment_template",
-                cad.definition_id.in_(template_ids),
-            )
-        )
-      else:
-        or_conditions.append(
-            cad.definition_type == "assessment_template",
-        )
-
-      query = cad.query.filter(or_(*or_conditions))
+          cad.definition_type == "assessment_template",
+      ))
     else:
       query = cad.query.filter(
           cad.definition_type == utils.underscore_from_camelcase(cls.__name__)

@@ -396,8 +396,8 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_custom_attr_definitions(cls, object_class, ca_cache=None,
-                                  fields=None, template_ids=()):
+  def get_custom_attr_definitions(cls, object_class,
+                                  ca_cache=None, fields=None):
     """Get column definitions for custom attributes on object_class.
 
     Args:
@@ -416,10 +416,7 @@ class AttributeInfo(object):
     if isinstance(ca_cache, dict) and object_name:
       custom_attributes = ca_cache.get(object_name, [])
     else:
-      custom_attributes = object_class.get_custom_attribute_definitions(
-          fields,
-          template_ids=template_ids,
-      )
+      custom_attributes = object_class.get_custom_attribute_definitions(fields)
     for attr in custom_attributes:
       description = attr.helptext or u""
       if (attr.attribute_type == attr.ValidTypes.DROPDOWN and
@@ -461,10 +458,8 @@ class AttributeInfo(object):
     return set(sum(unique_columns, []))
 
   @classmethod
-  # pylint: disable=too-many-arguments
   def get_object_attr_definitions(cls, object_class, ca_cache=None,
-                                  fields=None, include_hidden=False,
-                                  template_ids=()):
+                                  fields=None, include_hidden=False):
     """Get all column definitions for object_class.
 
     This function joins custom attribute definitions, mapping definitions and
@@ -478,6 +473,7 @@ class AttributeInfo(object):
         in _aliases dict).
     """
     definitions = {}
+
     aliases = AttributeInfo.gather_visible_aliases(object_class).items()
 
     # push the extra delete column at the end to override any custom behavior
@@ -517,11 +513,9 @@ class AttributeInfo(object):
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(cls.get_custom_attr_definitions(
-          object_class,
-          ca_cache=ca_cache,
-          fields=fields,
-          template_ids=template_ids,
+          object_class, ca_cache=ca_cache, fields=fields
       ))
+
     if object_class.__name__ not in EXCLUDE_MAPPINGS:
       definitions.update(cls.get_mapping_definitions(object_class))
 
