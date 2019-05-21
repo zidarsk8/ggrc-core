@@ -13,8 +13,19 @@ import '../../dropdown/dropdown-component';
 import '../../comment/comment-data-provider';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
-import {updateStatus} from '../../../plugins/utils/workflow-utils';
-import {getPageType} from '../../../plugins/utils/current-page-utils';
+import {countsMap} from '../../../apps/workflows';
+import {
+  initCounts,
+  getCounts,
+} from '../../../plugins/utils/widgets-utils';
+import {
+  updateStatus,
+  redirectToCycle,
+  redirectToHistory,
+} from '../../../plugins/utils/workflow-utils';
+import {
+  getPageType,
+} from '../../../plugins/utils/current-page-utils';
 import Permission from '../../../permission';
 
 let viewModel = can.Map.extend({
@@ -37,7 +48,7 @@ let viewModel = can.Map.extend({
     },
     showWorkflowLink: {
       get() {
-        return getPageType() !== 'Workflow';
+        return !this.isWorkflowPage();
       },
     },
     showMapObjectsButton: {
@@ -63,10 +74,43 @@ let viewModel = can.Map.extend({
   },
   instance: {},
   initialState: 'Assigned',
+  isWorkflowPage() {
+    return getPageType() === 'Workflow';
+  },
   onStateChange(event) {
     const instance = this.attr('instance');
     const status = event.state;
-    updateStatus(instance, status);
+    const isWorkflow = this.isWorkflowPage();
+
+    updateStatus(instance, status)
+      .then(async () => {
+        if (!isWorkflow) {
+          return;
+        }
+
+        await initCounts(
+          [countsMap.activeCycles, countsMap.history],
+          instance.workflow.type, instance.workflow.id,
+        );
+
+        this.redirectFromEmptyTab();
+      });
+  },
+  redirectFromEmptyTab() {
+    const counts = getCounts();
+
+    switch (window.location.hash) {
+      case '#!current':
+        if (counts['cycles:active'] === 0) {
+          redirectToHistory();
+        }
+        break;
+      case '#!history':
+        if (counts['cycles:history'] === 0) {
+          redirectToCycle();
+        }
+        break;
+    }
   },
 });
 

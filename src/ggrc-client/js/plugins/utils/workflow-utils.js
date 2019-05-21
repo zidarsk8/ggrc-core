@@ -46,6 +46,15 @@ function redirectToCycle() {
   });
 }
 
+/**
+ * Redirects to history tab.
+ */
+function redirectToHistory() {
+  changeHash({
+    widget: 'history',
+  });
+}
+
 function generateCycle(workflow) {
   let dfd = new $.Deferred();
   let cycle;
@@ -116,6 +125,7 @@ function getRelevantMappingTypes(instance) {
 export {
   createCycle,
   redirectToCycle,
+  redirectToHistory,
   generateCycle,
   updateStatus,
   refreshTGRelatedItems,
