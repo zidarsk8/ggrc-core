@@ -17,12 +17,25 @@ export default can.Model.extend({
       dataType: 'json',
     });
   },
-  init: function () {
-    this.validatePresenceOf('name');
-    this.validatePresenceOf('query');
-    this.validatePresenceOf('object_type');
-    if (this._super) {
-      this._super(...arguments);
-    }
+}, {
+  define: {
+    name: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+    query: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+    object_type: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
   },
-}, {});
+});
