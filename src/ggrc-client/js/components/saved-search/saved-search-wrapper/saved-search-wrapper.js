@@ -9,7 +9,15 @@ export default can.Component.extend({
   tag: 'saved-search-wrapper',
   leakScope: true,
   viewModel: can.Map.extend({
-    objectType: '',
+    define: {
+      objectType: {
+        set(newValue, setValue) {
+          setValue(newValue);
+
+          this.loadSavedSearches();
+        },
+      },
+    },
     searches: [],
     filterItems: [],
     applySearch({search}) {
