@@ -9,6 +9,7 @@ from selenium.common import exceptions
 from lib import base, factory
 from lib.constants import locator, regex, element, counters, messages, objects
 from lib.element import three_bbs
+from lib.page import widget_bar
 from lib.page.modal import unified_mapper
 from lib.utils import selenium_utils
 
@@ -314,3 +315,12 @@ class Projects(Widget):
 
 class Proposals(Widget):
   """Model for Proposals generic widgets."""
+
+
+class CADashboard(widget_bar.Dashboard):
+  """Model for Custom Attribute Dashboard widget."""
+
+  @property
+  def active_dashboard_tab_elem(self):
+    """Returns iframe content of selected CA dashboard tab."""
+    return self._browser.iframe()
