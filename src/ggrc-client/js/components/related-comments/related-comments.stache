@@ -6,7 +6,7 @@
              selectedItem:to="selectedItem"
              isLoading:from="isLoading"
              emptyMessage:from="emptyMessage">
-    <content></content>
+    <comment-list-item instance:from="instance"></comment-list-item>
 </object-list>
 {{#if requireLimit}}
     <button type="button"
