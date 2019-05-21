@@ -190,6 +190,7 @@
                         on:validationError="setLastErrorTab(tabIndex)"
                         on:validationChanged="showRequiredInfoModal(scope.event)">
                       <custom-attributes
+                            isLocalCa:from="true"
                             fields:from="fields"
                             editMode:from="canEdit"
                             on:valueChanged="attributeChanged(scope.event)">

@@ -45,6 +45,7 @@ export default can.Component.extend({
         type: 'number',
       },
     },
+    isLocalCa: false,
     _value: '',
     options: [],
     isGroupedDropdown: false,

@@ -17,6 +17,7 @@
       </div>
       {{#if editMode}}
         <custom-attributes-field
+          isLocalCa:from="isLocalCa"
           type:from="type"
           value:bind="value"
           fieldId:from="id"
