@@ -3,14 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#each items}}
-<li class="ui-menu-item" {{canData 'ui-autocomplete-item'}}>
-  <a href="javascript://" class='show-extended' {{canData 'model'}}>
-    {{title}}
-  </a>
-</li>
-{{/each}}
-{{^items}}
+{{#items}}
+  <li class="ui-menu-item" {{canData 'ui-autocomplete-item'}}>
+    <a href="javascript://" class='show-extended' {{canData 'model'}}>
+      {{title}}
+    </a>
+  </li>
+{{else}}
   <li class="ui-menu-item" data-ui-autocomplete-item="">
     No results
   </li>

@@ -3,18 +3,18 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#each items}}
-<li class="ui-menu-item" {{canData 'ui-autocomplete-item'}}>
-  <a href="javascript://" class='show-extended' {{canData 'model'}}>
-    {{title}}
-  </a>
-</li>
-{{/each}}
-{{^items}}
+{{#items}}
+  <li class="ui-menu-item" {{canData 'ui-autocomplete-item'}}>
+    <a href="javascript://" class='show-extended' {{canData 'model'}}>
+      {{title}}
+    </a>
+  </li>
+{{else}}
   <li class="ui-menu-item" data-ui-autocomplete-item="">
     No results
   </li>
 {{/items}}
+
 {{#if items_loading}}
   <li class="spinner ui-menu-item" data-ui-autocomplete-item="">
     <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
