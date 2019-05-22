@@ -12,6 +12,7 @@ from freezegun import freeze_time
 
 from integration.ggrc import TestCase, api_helper
 from integration.ggrc.models import factories
+from integration.ggrc_workflows.models import factories as wf_factories
 
 from ggrc import settings
 from ggrc import utils
@@ -42,6 +43,38 @@ class TestPeopleMentions(TestCase):
                       u"on a comment within Product1")
     expected_body = (
         u"author@example.com mentioned you on a comment within Product1 "
+        u"at 01/09/2018 23:31:42 PST:\n"
+        u"One <a href=\"mailto:user@example.com\"></a>\n"
+    )
+    body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
+        "comments": [expected_body],
+        "url": url,
+    })
+    send_email_mock.assert_called_once_with(u"user@example.com",
+                                            expected_title, body)
+
+  @mock.patch("ggrc.notifications.common.send_email")
+  # pylint: disable=no-self-use
+  def test_handle_task_comment(self, send_email_mock):
+    """Test handling of mapped comment to cycle task."""
+    with factories.single_commit():
+      person = factories.PersonFactory(email="author@example.com")
+      obj = wf_factories.CycleTaskGroupObjectTaskFactory(
+          slug=u"TSK-1",
+          title=u"task1",
+      )
+      comment = factories.CommentFactory(
+          description=u"One <a href=\"mailto:user@example.com\"></a>",
+      )
+      comment.modified_by_id = person.id
+      comment.created_at = datetime.datetime(2018, 1, 10, 7, 31, 42)
+      url = "http://localhost/dashboard#!task&query=%22task%20slug%22%3DTSK-1"
+
+    people_mentions.handle_comment_mapped(obj, [comment])
+    expected_title = (u"author@example.com mentioned you "
+                      u"on a comment within task1")
+    expected_body = (
+        u"author@example.com mentioned you on a comment within task1 "
         u"at 01/09/2018 23:31:42 PST:\n"
         u"One <a href=\"mailto:user@example.com\"></a>\n"
     )

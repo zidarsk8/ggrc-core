@@ -5,13 +5,9 @@
 
 import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
-import timeboxed from '../mixins/timeboxed';
-import accessControlList from '../mixins/access-control-list';
 import proposable from '../mixins/proposable';
-import assertionsCategories from '../mixins/assertions-categories';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import changeableExternally from '../mixins/changeable-externally';
-import Stub from '../stub';
 
 export default Cacheable.extend({
   root_object: 'control',
@@ -24,29 +20,12 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/controls/{id}',
   mixins: [
     caUpdate,
-    timeboxed,
-    accessControlList,
     proposable,
-    assertionsCategories,
     relatedAssessmentsLoader,
     changeableExternally,
   ],
   is_custom_attributable: true,
   isRoleable: true,
-  attributes: {
-    context: Stub,
-    modified_by: Stub,
-  },
-  defaults: {
-    selected: false,
-    title: '',
-    slug: '',
-    description: '',
-    url: '',
-    status: 'Draft',
-    send_by_default: true,
-    recipients: 'Admin,Control Operators,Control Owners,Other Contacts',
-  },
   tree_view_options: {
     attr_list: Cacheable.attr_list.concat([
       {
@@ -105,13 +84,4 @@ export default Cacheable.extend({
     default_filter: ['Objective'],
   },
   statuses: ['Draft', 'Deprecated', 'Active'],
-  fraudRelatedOptions:
-    [{title: 'No', value: false}, {title: 'Yes', value: true}],
-  keyControlOptions:
-    [{title: 'Non-Key', value: false}, {title: 'Key', value: true}],
-}, {
-  init: function () {
-    this._super(...arguments);
-    this.bind('refreshInstance', this.refresh.bind(this));
-  },
-});
+}, {});

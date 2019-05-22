@@ -382,6 +382,30 @@ class TestWorkflow(TestCase):
     expected_result = [title for title, _, _ in workflows_data[::-1]]
     self.assertEqual(observed_result, expected_result)
 
+  @ddt.data(
+      ({"task_groups": [{"task_group_tasks": [{}]}],
+        }, True, 201),
+      ({"task_groups": [{"task_group_tasks": [{}]},
+                        {"task_group_tasks": [{}]}],
+        }, True, 201),
+      ({"task_groups": [{"task_group_tasks": [{}]},
+                        {"task_group_tasks": []}],
+        }, False, 400),
+      ({"task_groups": [],
+        }, False, 400),
+  )
+  @ddt.unpack
+  def test_can_start_cycle(self, workflow_data, expected_result,
+                           expected_status_code):
+    """Test can start cycle when all task groups have at least one task."""
+    _, workflow = self.generator.generate_workflow(workflow_data)
+    response = self.api.get(all_models.Workflow, workflow.id)
+    self.assert200(response)
+    self.assertEqual(response.json["workflow"]["can_start_cycle"],
+                     expected_result)
+    response, _ = self.generator.generate_cycle(workflow)
+    self.assertEqual(response.status_code, expected_status_code)
+
 
 @ddt.ddt
 class TestWorkflowApiCalls(workflow_test_case.WorkflowTestCase):

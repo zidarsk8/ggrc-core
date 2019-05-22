@@ -24,6 +24,7 @@ from ggrc import utils
 from ggrc.notifications import common
 from ggrc.notifications.data_handlers import get_object_url
 from ggrc.utils import benchmark
+from ggrc.utils.revisions_diff import builder as revisions_diff
 
 logger = logging.getLogger(__name__)
 
@@ -401,13 +402,14 @@ class IssueTrackerBulkCreator(object):
             all_models.IssuetrackerIssue.object_id
         ).in_(resources)
     )
+    obj_content_pairs = [(obj, obj.log_json()) for obj in issue_objs]
     revision_data = [
         {
             "resource_id": obj.id,
             "resource_type": obj.type,
             "event_id": event_id,
             "action": action,
-            "content": obj.log_json(),
+            "content": content,
             "resource_slug": None,
             "source_type": None,
             "source_id": None,
@@ -417,8 +419,9 @@ class IssueTrackerBulkCreator(object):
             "modified_by_id": user_id,
             "created_at": datetime.datetime.utcnow(),
             "context_id": obj.context_id,
+            "is_empty": revisions_diff.changes_present(obj, content),
         }
-        for obj in issue_objs
+        for obj, content in obj_content_pairs
     ]
     inserter = all_models.Revision.__table__.insert()
     db.session.execute(inserter.values(revision_data))

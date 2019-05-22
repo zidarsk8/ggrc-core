@@ -16,12 +16,12 @@ from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
+from ggrc.models import revision
 from ggrc.models.mixins.filterable import Filterable
 from ggrc.query import autocast
 from ggrc.query import my_objects
 from ggrc.query.exceptions import BadQueryException
 from ggrc.snapshotter import rules
-from ggrc.utils import revisions_diff
 
 
 GETATTR_WHITELIST = {
@@ -492,7 +492,7 @@ def not_empty_revisions(exp, object_class, target_class, query):
   Revisions without object state changes are created when object editing
   without any actual changes is performed.
   """
-  if object_class is not all_models.Revision:
+  if object_class is not revision.Revision:
     raise BadQueryException("'not_empty_revisions' operator works with "
                             "Revision only")
 
@@ -504,34 +504,21 @@ def not_empty_revisions(exp, object_class, target_class, query):
     raise BadQueryException("'{}' resource type does not exist"
                             .format(resource_type))
 
-  query = all_models.Revision.query.filter(
-      all_models.Revision.resource_type == resource_type,
-      all_models.Revision.resource_id == resource_id,
+  rev_q = db.session.query(
+      revision.Revision.id,
+  ).filter(
+      revision.Revision.resource_type == resource_type,
+      revision.Revision.resource_id == resource_id,
+      sqlalchemy.not_(revision.Revision.is_empty),
   ).order_by(
-      all_models.Revision.created_at,
+      revision.Revision.created_at,
   )
 
-  current_instance = resource_cls.query.get(resource_id)
-  current_instance_meta = revisions_diff.meta_info.MetaInfo(current_instance)
-  latest_rev_content = revisions_diff.builder.get_latest_revision_content(
-      current_instance,
-  )
-  prev_diff = None
-  revision_with_changes = []
-  for revision in query:
-    diff = revisions_diff.builder.prepare_content_diff(
-        instance_meta_info=current_instance_meta,
-        l_content=latest_rev_content,
-        r_content=revision.content,
-    )
-    if diff != prev_diff:
-      revision_with_changes.append(revision.id)
-      prev_diff = diff
-
-  if not revision_with_changes:
+  result = {_id for _id, in rev_q}
+  if not result:
     return sqlalchemy.sql.false()
 
-  return all_models.Revision.id.in_(revision_with_changes)
+  return object_class.id.in_(result)
 
 
 @validate("object_name", "ids")

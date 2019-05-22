@@ -77,6 +77,7 @@ class BaseRBACFactory(object):
         "cycle": {
             "context": None,
             "autogenerate": True,
+            "title": factories.random_str(prefix="cycle - "),
             "isOverdue": False,
             "workflow": {
                 "id": workflow_id,

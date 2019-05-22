@@ -17,6 +17,7 @@ from integration.ggrc import TestCase
 from integration.ggrc import api_helper
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc import factories
+from integration.ggrc import query_helper
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 
@@ -25,7 +26,7 @@ _NOT_SPECIFIED = '<NOT_SPECIFIED>'
 
 
 @ddt.ddt
-class TestWithReadOnlyAccessAPI(TestCase):
+class TestWithReadOnlyAccessAPI(TestCase, query_helper.WithQueryApi):
   """Test WithReadOnlyAccess mixin"""
 
   def setUp(self):
@@ -297,6 +298,27 @@ class TestWithReadOnlyAccessAPI(TestCase):
     resp = self.object_generator.api.delete(robj)
 
     self.assertStatus(resp, expected_code)
+
+  @ddt.data(
+      ("yes", "readonly system"),
+      ("no", "non readonly system"),
+  )
+  @ddt.unpack
+  def test_readonly_searchable(self, test_value, expected_title):
+    """Test filtration by readonly attribute"""
+    with factories.single_commit():
+      factories.SystemFactory(title="readonly system", readonly=True)
+      factories.SystemFactory(title="non readonly system")
+
+    self.client.get("/login")
+    actual_systems = self.simple_query(
+        "System",
+        expression=["readonly", "=", test_value]
+    )
+    self.assertEqual(
+        [s.get("title") for s in actual_systems],
+        [expected_title]
+    )
 
 
 @ddt.ddt

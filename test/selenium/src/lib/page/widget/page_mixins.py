@@ -85,7 +85,8 @@ class WithObjectReview(base.WithBrowser):
   @property
   def object_review_txt(self):
     """Return page element with review message."""
-    return self._review_root.element(class_name="object-review__body")
+    return self._review_root.element(
+        class_name="object-review__body-description")
 
   @property
   def reviewers(self):
@@ -100,6 +101,10 @@ class WithObjectReview(base.WithBrowser):
   def click_approve_review(self):
     """Click approve review button."""
     self.mark_reviewed_btn.click()
+
+  def click_undo_button(self):
+    """Click 'Undo' button on floating message."""
+    self.undo_button.click()
 
   def get_object_review_txt(self):
     """Return review message on info pane."""

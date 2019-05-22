@@ -138,6 +138,7 @@ class WorkflowsGenerator(Generator):
 
     obj_dict = {
         obj_name: {
+            "title": factories.random_str(prefix="cycle - "),
             "workflow": {
                 "id": workflow.id,
                 "type": workflow.__class__.__name__,

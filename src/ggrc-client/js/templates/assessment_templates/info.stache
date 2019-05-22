@@ -53,7 +53,7 @@
               </div>
 
               <div class="span4">
-                <h6>Default procedure description</h6>
+                <h6>Default assessment procedure</h6>
                 {{#if procedure_description}}
                   {{{procedure_description}}}
                 {{else}}
@@ -68,9 +68,9 @@
                 {{#if default_people.assignees}}
                   {{#isArray default_people.assignees}}
                     <ul class="person-info-list">
-                      {{#each default_people.assignees}}
+                      {{#default_people.assignees}}
                         <li><person-data personId:from="{{.}}"></person-data></li>
-                      {{/each}}
+                      {{/default_people.assignees}}
                     </ul>
                   {{else}}
                     {{defaultAssigneeLabel}}
@@ -85,9 +85,9 @@
                 {{#if default_people.verifiers}}
                   {{#isArray default_people.verifiers}}
                     <ul class="person-info-list">
-                      {{#each default_people.verifiers}}
+                      {{#default_people.verifiers}}
                         <li><person-data personId:from="{{.}}"></person-data></li>
-                      {{/each}}
+                      {{/default_people.verifiers}}
                     </ul>
                   {{else}}
                     {{defaultVerifierLabel}}

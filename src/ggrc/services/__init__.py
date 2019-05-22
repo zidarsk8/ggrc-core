@@ -5,6 +5,7 @@
 
 from ggrc.services import common
 from ggrc.services.registry import service
+from ggrc.services.resources import external_internal
 
 
 def contributed_services():
@@ -68,7 +69,9 @@ def contributed_services():
       service('systems_or_processes',
               models.SystemOrProcess,
               common.ReadOnlyResource),
-      service('systems', models.System),
+      service('systems',
+              models.System,
+              external_internal.ExternalInternalResource),
       service('processes', models.Process),
       service('metrics', models.Metric),
       service('notification_configs', models.NotificationConfig),

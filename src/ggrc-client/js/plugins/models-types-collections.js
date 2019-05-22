@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2019 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 /**
@@ -31,10 +31,17 @@ export const scopingObjects = [
 ];
 
 /**
- * GGRCQ Directives
+ * External Directives
  */
 export const externalDirectiveObjects = [
   'Regulation', 'Standard',
+];
+
+/**
+ * External business objects
+ */
+export const externalBusinessObjects = [
+  'Control',
 ];
 
 /**

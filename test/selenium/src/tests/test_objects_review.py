@@ -108,3 +108,16 @@ class TestObjectsReview(base.Test):
                       get_changelog_entries())
     assert (expected_entry == actual_entries.pop(0) and
             expected_entry not in actual_entries)
+
+  @pytest.mark.smoke_tests
+  def test_undo_obj_review_approval(self, reviewer,
+                                    program_w_approved_via_ui_review,
+                                    selenium):
+    """Confirm Reviewer with READ rights for an object is able to unreview
+    an object."""
+    webui_facade.undo_obj_review_approval(selenium,
+                                          program_w_approved_via_ui_review)
+    actual_program = webui_facade.get_object(selenium,
+                                             program_w_approved_via_ui_review)
+    self.general_equal_assert(program_w_approved_via_ui_review.repr_ui(),
+                              actual_program)
