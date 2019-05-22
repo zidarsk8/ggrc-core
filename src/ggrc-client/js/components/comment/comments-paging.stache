@@ -1,0 +1,19 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if showButton}}
+  {{#if canShowMore}}
+    <button class="btn btn-white btn-small"
+      on:el:click="showMore">
+      Show {{remain}} older comment{{^eq remain 1}}s{{/eq}}
+    </button>
+  {{/if}}
+  {{#if canHide}}
+    <button class="btn btn-white btn-small"
+      on:el:click="showLess">
+      Show less comments
+    </button>
+  {{/if}}
+{{/if}}
