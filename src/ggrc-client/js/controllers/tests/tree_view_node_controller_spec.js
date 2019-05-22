@@ -32,7 +32,7 @@ describe('TreeViewNode Controller', function () {
       };
 
       method = Ctrl.prototype.draw_node.bind(ctrlInst);
-
+      spyOn($, 'ajax').and.returnValue(Promise.resolve('<div></div>'));
       spyOn(can, 'view');
     });
 
@@ -42,14 +42,14 @@ describe('TreeViewNode Controller', function () {
     });
 
     it('renders the DOM element with the "active" CSS class if node active',
-      function () {
+      async () => {
         let callArgs;
         let callback;
 
         ctrlInst.options.attr('isActive', false);
         $element.addClass('active');
 
-        method();
+        await method();
 
         expect(ctrlInst._ifNotRemoved).toHaveBeenCalled();
         callArgs = ctrlInst._ifNotRemoved.calls.mostRecent().args;
@@ -65,14 +65,14 @@ describe('TreeViewNode Controller', function () {
 
     it('renders the DOM element without the "active" CSS class if ' +
       'node not active',
-    function () {
+    async () => {
       let callArgs;
       let callback;
 
       ctrlInst.options.attr('isActive', false);
       $element.removeClass('active'); // make sure it is indeed inactive
 
-      method();
+      await method();
 
       expect(ctrlInst._ifNotRemoved).toHaveBeenCalled();
       callArgs = ctrlInst._ifNotRemoved.calls.mostRecent().args;
