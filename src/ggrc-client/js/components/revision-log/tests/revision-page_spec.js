@@ -645,6 +645,51 @@ describe('revision-page component', function () {
       });
     }
     );
+
+    it('returns correct change information ' +
+    'when revisions contains automapping content', function () {
+      let revision = {
+        updated_at: new Date('2015-05-17T17:24:01'),
+        source: {
+          display_type: function () {
+            return 'Other';
+          },
+          display_name: function () {
+            return 'OtherObject';
+          },
+        },
+        destination_id: 123,
+        destination_type: 'ObjectFoo',
+        content: {
+          automapping: {
+            destination: {
+              type: 'DestinationType',
+              title: 'DestinationTitle',
+            },
+            source: {
+              type: 'SourceType',
+              title: 'SourceTitle',
+            },
+          },
+        },
+      };
+
+      let result = viewModel._mappingChange(revision, [revision]);
+
+      expect(result).toEqual({
+        automapping: {
+          title: '(automapping triggered after "unknown" user mapped ' +
+          'DestinationType "DestinationTitle" to SourceType "SourceTitle")',
+        },
+        updatedAt: new Date('2015-05-17T17:24:01'),
+        role: 'none',
+        changes: {
+          origVal: '—',
+          newVal: '',
+          fieldName: 'Mapping to Other: OtherObject',
+        },
+      });
+    });
   });
 
   describe('_computeRoleChanges method', function () {

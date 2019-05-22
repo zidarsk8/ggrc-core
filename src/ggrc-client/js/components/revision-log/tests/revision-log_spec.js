@@ -233,17 +233,71 @@ describe('revision-log component', function () {
     });
   });
 
-  describe('fetchAdditionalInfoForRevisions(revisions) method',
+  describe('fetchAdditionalInfoForRevisions() method', () => {
+    let revisions;
+
+    beforeEach(() => {
+      revisions = [{
+        modified_by: 'mock1',
+      }, {
+        destination_type: 'mock2',
+        destination_id: 'mock3',
+      }, {
+        source_type: 'mock4',
+        source_id: 'mock5',
+        content: {
+          automapping: {
+            modified_by: 'mock1',
+            destination_type: 'mock2',
+            destination_id: 'mock3',
+            source_type: 'mock4',
+            source_id: 'mock5',
+          },
+        },
+      }];
+
+      spyOn(viewModel, 'enqueueRelated');
+      spyOn(RefreshQueue.prototype, 'trigger')
+        .and.returnValue(Promise.resolve(revisions));
+    });
+
+    it('calls "enqueueRelated" for each revision', () => {
+      viewModel.fetchAdditionalInfoForRevisions(revisions);
+      revisions.forEach((revision) => {
+        expect(viewModel.enqueueRelated)
+          .toHaveBeenCalledWith(revision, jasmine.any(RefreshQueue));
+      });
+    });
+
+    it('calls "enqueueRelated"  ' +
+      'if revisions contains automapping content', () => {
+      viewModel.fetchAdditionalInfoForRevisions(revisions);
+      const automappingRevisions = revisions
+        .filter((revision) => revision.content && revision.content.automapping)
+        .map((revision) => revision.content.automapping);
+
+      automappingRevisions.forEach((revision) => {
+        expect(viewModel.enqueueRelated)
+          .toHaveBeenCalledWith(revision, jasmine.any(RefreshQueue));
+      });
+    });
+
+    it('returns revisions', (done) => {
+      viewModel.fetchAdditionalInfoForRevisions(revisions)
+        .then((result) => {
+          expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
+          expect(result).toEqual(revisions);
+          done();
+        });
+    });
+  });
+
+  describe('enqueueRelated() method',
     () => {
       let revisions;
       let enqueueSpy;
-      let triggerDfd;
 
       beforeEach(() => {
-        enqueueSpy = spyOn(RefreshQueue.prototype, 'enqueue');
-        triggerDfd = $.Deferred();
-        spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(triggerDfd);
-
         revisions = [{
           modified_by: 'mock1',
         }, {
@@ -252,17 +306,29 @@ describe('revision-log component', function () {
         }, {
           source_type: 'mock4',
           source_id: 'mock5',
+          content: {
+            automapping: {
+              modified_by: 'mock1',
+              destination_type: 'mock2',
+              destination_id: 'mock3',
+              source_type: 'mock4',
+              source_id: 'mock5',
+            },
+          },
         }];
+
+        enqueueSpy = spyOn(RefreshQueue.prototype, 'enqueue');
+
+        revisions.forEach((revision) => {
+          viewModel.enqueueRelated(revision, RefreshQueue.prototype);
+        });
       });
 
-      it('calls enqueue for all users which modified object', () => {
-        viewModel.fetchAdditionalInfoForRevisions(revisions);
-
+      it('calls "enqueue" for all users which modified object', () => {
         const modifiers = revisions
           .filter((revision) => revision.modified_by)
           .map((revision) => revision.modified_by);
         expect(modifiers.length).not.toBe(0);
-
         modifiers.forEach((modifier) => {
           expect(enqueueSpy).toHaveBeenCalledWith(modifier);
         });
@@ -270,13 +336,12 @@ describe('revision-log component', function () {
 
       it('adds to revisions attribute "destination" ' +
       'if "destination_type" and "destination_id" are defined', () => {
-        viewModel.fetchAdditionalInfoForRevisions(revisions);
-
         const destinations = revisions
           .filter((revision) => revision.destination_id &&
-            revision.destination_type)
+          revision.destination_type)
           .map((revision) => revision.destination);
         expect(destinations.length).not.toBe(0);
+
         revisions.forEach((revision) => {
           if (revision.destination_id && revision.destination_type) {
             expect(revision.destination instanceof Stub);
@@ -288,9 +353,7 @@ describe('revision-log component', function () {
         });
       });
 
-      it('calls enqueue for each created "destination" in revision', () => {
-        viewModel.fetchAdditionalInfoForRevisions(revisions);
-
+      it('calls "enqueue" for each created "destination" in revision', () => {
         const destinations = revisions
           .filter((revision) => revision.destination_id &&
             revision.destination_type)
@@ -303,13 +366,12 @@ describe('revision-log component', function () {
 
       it('adds to revisions attribute "source" ' +
       'if "source_type" and "source_id" are defined', () => {
-        viewModel.fetchAdditionalInfoForRevisions(revisions);
-
         const sources = revisions
           .filter((revision) => revision.source_id &&
-            revision.source_type)
+          revision.source_type)
           .map((revision) => revision.source);
         expect(sources.length).not.toBe(0);
+
         revisions.forEach((revision) => {
           if (revision.source_id && revision.source_type) {
             expect(revision.source instanceof Stub);
@@ -321,9 +383,7 @@ describe('revision-log component', function () {
         });
       });
 
-      it('calls enqueue for each created "source" in revision', () => {
-        viewModel.fetchAdditionalInfoForRevisions(revisions);
-
+      it('calls "enqueue" for each created "source" in revision', () => {
         const sources = revisions
           .filter((revision) => revision.source_id &&
             revision.source_type)
@@ -332,15 +392,6 @@ describe('revision-log component', function () {
         sources.forEach((source) => {
           expect(enqueueSpy).toHaveBeenCalledWith(source);
         });
-      });
-
-      it('returns deferred with revisions', (done) => {
-        viewModel.fetchAdditionalInfoForRevisions(revisions)
-          .then((result) => {
-            expect(result).toBe(revisions);
-            done();
-          });
-        triggerDfd.resolve();
       });
     });
 
@@ -356,6 +407,11 @@ describe('revision-log component', function () {
           source: 'source',
         }, {
           modified_by: 'modified_by',
+          content: {
+            automapping: {
+              source: 'mock',
+            },
+          },
         }];
 
         revisionsForCompare = {mock: 'mock'};
@@ -401,6 +457,21 @@ describe('revision-log component', function () {
           viewModel.composeRevisionsData(revisions);
 
         expect(result).toEqual(expected);
+      });
+
+      it('calls "reifyObject" with automapping ' +
+        'if revisions contains automapping content', () => {
+        viewModel.composeRevisionsData(revisions);
+
+        const automappingRevisions = revisions
+          .filter((revision) => revision.content
+            && revision.content.automapping)
+          .map((revision) => revision.content.automapping);
+        expect(automappingRevisions.length).not.toBe(0);
+
+        automappingRevisions.forEach((revision) => {
+          expect(viewModel.reifyObject).toHaveBeenCalledWith(revision);
+        });
       });
 
       it('reifies all revisions in returned object', () => {
