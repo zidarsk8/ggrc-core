@@ -307,24 +307,31 @@
         width: 418px;
       }
     }
+    .assessment-procedure-message {
+      display: flex;
+      align-items: center;
+      height: 26px;
+
+      &__icon {
+        margin-left: 6px;
+        line-height: 16px;
+      }
+
+      &__label {
+        display: flex;
+        align-items: center;
+        margin: 0 0 0 6px;
+
+        .assessment-procedure-message__checkbox {
+          margin: 0 4px 0 0;
+        }
+      }
+    }
     label {
       font-weight: normal;
       color: #111;
       font-size: 16px;
       margin-bottom: 7px;
-      &.inline-check {
-        line-height: 26px;
-        margin-bottom: 0;
-        input {
-          margin-top: 5px;
-        }
-        i {
-          margin: 6px 0 0 0;
-        }
-        &.pull-left {
-          margin-left: 5px;
-        }
-      }
       .required {
         color: $red;
         font-weight: bold;
