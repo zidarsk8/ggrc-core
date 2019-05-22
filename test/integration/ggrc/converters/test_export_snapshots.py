@@ -317,9 +317,6 @@ class TestExportSnapshots(TestCase):
     # pylint: disable=too-many-locals
     self._create_cads("product")
     self.import_file("product_snapshot_data_multiple.csv")
-    # Duplicate import because we have a bug in logging revisions and this
-    # makes sure that the fixture created properly.
-    self.import_file("product_snapshot_data_multiple.csv")
 
     product = models.Product.query.all()
     with factories.single_commit():
