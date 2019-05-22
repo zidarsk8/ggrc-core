@@ -19,6 +19,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import utils
 from ggrc import models
+from ggrc.gcalendar.utils import get_cycle_tasks_url_by_slug
 from ggrc.models.relationship import Relationship
 from ggrc.models.revision import Revision
 from ggrc.notifications import data_handlers
@@ -157,6 +158,8 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
       cycle_task, filter_exp=url_filter_exp)
 
   task_info["workflow"] = cycle_task.cycle.workflow
+  task_info["workflow_url"] = get_workflow_url(cycle_task.cycle.workflow,
+                                               "info")
   task_info["workflow_cycle_url"] = cycle_task_workflow_cycle_url(
       cycle_task, filter_exp=url_filter_exp)
 
@@ -226,6 +229,8 @@ def get_cycle_task_overdue_data(
       cycle_task, filter_exp=url_filter_exp)
 
   task_info['workflow'] = cycle_task.cycle.workflow
+  task_info["workflow_url"] = get_workflow_url(cycle_task.cycle.workflow,
+                                               "info")
   task_info['workflow_cycle_url'] = cycle_task_workflow_cycle_url(
       cycle_task, filter_exp=url_filter_exp)
   result = {}
@@ -458,7 +463,7 @@ def get_workflow_starts_in_data(notification, workflow):
         },
         "cycle_starts_in": {
             workflow.id: {
-                "workflow_url": get_workflow_url(workflow),
+                "workflow_url": get_workflow_url(workflow, "info"),
                 "start_date": workflow.next_cycle_start_date,
                 "start_date_statement": utils.get_digest_date_statement(
                     workflow.next_cycle_start_date, "start", True),
@@ -490,7 +495,7 @@ def get_cycle_start_failed_data(notification, workflow):
         },
         "cycle_start_failed": {
             workflow.id: {
-                "workflow_url": get_workflow_url(workflow),
+                "workflow_url": get_workflow_url(workflow, "info"),
                 "start_date": workflow.next_cycle_start_date,
                 "start_date_statement": utils.get_digest_date_statement(
                     workflow.next_cycle_start_date, "start", True),
@@ -647,7 +652,7 @@ def get_cycle_task_dict(cycle_task, del_rels_cache=None):
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "due_date_statement": utils.get_digest_date_statement(
           cycle_task.end_date, "due"),
-      "cycle_task_url": get_cycle_task_url(),
+      "cycle_task_url": get_cycle_tasks_url_by_slug(cycle_task.slug),
   }
 
 
@@ -660,13 +665,15 @@ def get_cycle_dict(cycle, manual=False):
       "cycle_title": cycle.title,
       "cycle_url": cycle.cycle_url,
       "cycle_inactive_url": cycle.cycle_inactive_url,
-      "workflow_id": cycle.workflow_id,
   }
 
 
-def get_workflow_url(workflow):
+def get_workflow_url(workflow, widget_name="current"):
   """Get URL to workflow object."""
-  url = "workflows/{}#current".format(workflow.id)
+  url = "workflows/{workflow_id}#{widget_name}".format(
+      workflow_id=workflow.id,
+      widget_name=widget_name,
+  )
   return urljoin(get_url_root(), url)
 
 

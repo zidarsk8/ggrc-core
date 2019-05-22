@@ -42,7 +42,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['cycle_started_tasks'].values() %}
                     <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}&query=%22task+title%22%3d%22{{ task['title'] }}%22" {{ style.link_text() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                         {{ task['title'] }}</a> due on {{ task['end_date'] }}
                         <ul>
                         {% for related_object_title in task['related_objects'] %}
@@ -62,7 +62,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['task_declined'].values() %}
                     <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}&query=%22task+title%22%3d%22{{ task['title'] }}%22" {{ style.link_text() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                       {{ task['title'] }}</a>
                       <ul>
                       {% for related_object_title in task['related_objects'] %}
@@ -83,11 +83,11 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['due_today'].itervalues() %}
                     <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}&query=%22task+title%22%3d%22{{ task['title'] }}%22" {{ style.link_text() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                         {{ task['title'] }}
                       </a>
                       under {{ task['task_group'].title }} of
-                      <a href="/workflows/{{ task['workflow']['id'] }}#!info" {{ style.link_text() }} >
+                      <a href="{{ task['workflow_url'] }}" {{ style.link_text() }} >
                         {{ task['workflow'].title }}
                       </a>
                     </li>
@@ -107,7 +107,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['due_in'].values() %}
                     <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}&query=%22task+title%22%3d%22{{ task['title'] }}%22" {{ style.link_text() }} >
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }} >
                         {{ task['title'] }}
                       </a>
                       {{ task['due_date_statement'] }}
@@ -128,9 +128,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['task_overdue'].itervalues() %}
                     <li {{ style.list_item() }} >
-                      <a href="{{ task['cycle_task_url'] }}&query=%22task+title%22%3d%22{{ task['title'] }}%22" {{ style.link_text() }}>{{ task['title'] }}</a>
+                      <a href="{{ task['cycle_task_url'] }}" {{ style.link_text() }}>{{ task['title'] }}</a>
                       under {{ task['task_group'].title }} of
-                      <a href="/workflows/{{ task['workflow']['id'] }}#!info" {{ style.link_text() }}>{{ task['workflow'].title }}</a>
+                      <a href="{{ task['workflow_url'] }}" {{ style.link_text() }}>{{ task['workflow'].title }}</a>
                       ({{ task['due_date_statement'] }})
                       <ul>
                       {% for related_object_title in task['related_objects'] %}
@@ -150,7 +150,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   {% for cycle_id, cycle in digest['cycle_started'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
-                      <a href="/workflows/{{ cycle['workflow_id'] }}#!current" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>
+                      <a href="{{ cycle['cycle_url']|e }}" {{ style.link_text() }} >{{ cycle['cycle_title'] }}</a>
                       {% if cycle['custom_message'] %}
                         contains custom message:
                         <div {{ style.custom_message() }}>
@@ -170,7 +170,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   {% for workflow_id, workflow in digest['cycle_start_failed'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
-                      <a href="/workflows/{{ workflow_id }}#!info" {{ style.link_text() }} >
+                      <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
                         {{ workflow['title'] }}</a>
                     </li>
                   {% endfor %}
@@ -204,7 +204,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   {% for workflow_id, workflow in digest['cycle_starts_in'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
-                      <a href="/workflows/{{ workflow_id }}#!info" {{ style.link_text() }} >
+                      <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
                         {{ workflow['title'] }}</a>
                       {{ workflow['start_date_statement'] }}.
                     </li>
