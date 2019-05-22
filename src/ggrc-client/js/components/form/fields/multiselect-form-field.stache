@@ -8,5 +8,6 @@
                       disabled:from="disabled"
                       selected:from="selected"
                       on:selectedChanged="valueChanged(scope.event)"
-                      isInlineMode:from="isInlineMode">
+                      isInlineMode:from="isInlineMode"
+                      isHighlightable:from="false">
 </multiselect-dropdown>

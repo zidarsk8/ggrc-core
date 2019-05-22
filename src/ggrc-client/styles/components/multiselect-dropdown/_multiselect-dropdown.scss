@@ -30,7 +30,7 @@
     color: rgb(85, 85, 85);
     font-size: 12px;
 
-    &:focus {
+    &.highlightable:focus {
       @extend .dropdown-focus;
     }
     &[disabled] {

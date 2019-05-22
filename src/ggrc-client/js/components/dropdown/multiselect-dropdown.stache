@@ -10,7 +10,7 @@
       <input
         type="text"
         readonly="readonly"
-        class="multiselect-dropdown__input {{#if isOpen}}dropdown-focus{{/if}}"
+        class="multiselect-dropdown__input {{#if isHighlightable}}highlightable{{/if}} {{#if isHighlighted}}dropdown-focus{{/if}}"
         placeholder="{{placeholder}}"
         value="{{_displayValue}}"
         size="{{_inputSize}}"

@@ -11,6 +11,7 @@ export default can.Component.extend({
   leakScope: true,
   viewModel: can.Map.extend({
     disabled: false,
+    isHighlightable: true,
     isInlineMode: false,
     isOpen: false,
     _stateWasUpdated: false,
@@ -45,6 +46,11 @@ export default can.Component.extend({
       isOpenOrInline: {
         get() {
           return this.attr('isOpen') || this.attr('isInlineMode');
+        },
+      },
+      isHighlighted: {
+        get() {
+          return this.attr('isHighlightable') && this.attr('isOpen');
         },
       },
       options: {
