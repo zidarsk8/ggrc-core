@@ -8,6 +8,7 @@ import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Stub from '../../models/stub';
 import {handleAjaxError} from '../../plugins/utils/errors-utils';
+import pubSub from '../../pub-sub';
 
 const DEFAULT_TIMEOUT = 2000;
 const MAX_TIMEOUT = 60000;
@@ -99,6 +100,11 @@ export default can.Component.extend({
                   'tickets. More details will be sent by email.');
               } else {
                 notifier('success', 'Tickets were generated successfully.');
+                // need to refresh tree view with Ticket Tracker column
+                pubSub.dispatch({
+                  type: 'refetchOnce',
+                  modelNames: ['Assessment'],
+                });
               }
 
               this.attr('isGeneratingInProgress', false);
