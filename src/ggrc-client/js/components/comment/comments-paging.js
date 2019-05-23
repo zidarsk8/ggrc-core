@@ -4,6 +4,7 @@
  */
 
 import template from './comments-paging.stache';
+import '../spinner-component/spinner-component';
 
 export default can.Component.extend({
   tag: 'comments-paging',

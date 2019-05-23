@@ -17,3 +17,4 @@
     </button>
   {{/if}}
 {{/if}}
+<spinner-component toggle:from="isLoading"></spinner-component>
