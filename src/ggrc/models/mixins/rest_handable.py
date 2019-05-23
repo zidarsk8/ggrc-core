@@ -71,10 +71,6 @@ class WithRelationshipsHandable(object):
     """relationship POST handler"""
     pass
 
-  def handle_relationship_put(self, counterparty):
-    """relationship PUT handler"""
-    pass
-
   def handle_relationship_delete(self, counterparty):
     """relationship DELETE handler"""
     pass
@@ -111,15 +107,6 @@ class WithRelationshipsHandable(object):
         return
       obj, counterparty = get_obj_counterparty(relationship)
       model.handle_relationship_post(obj, counterparty)
-
-    @signals.Restful.model_put.connect_via(all_models.Relationship)
-    def relationship_updated(*args, **kwargs):
-      """relationship PUT handler"""
-      relationship = kwargs["obj"]
-      if not is_in_relationship(relationship):
-        return
-      obj, counterparty = get_obj_counterparty(relationship)
-      model.handle_relationship_put(obj, counterparty)
 
     @signals.Restful.model_deleted.connect_via(all_models.Relationship)
     def relationship_delete(*args, **kwargs):

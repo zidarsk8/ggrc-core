@@ -5,7 +5,7 @@
 
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import '../person/person-data';
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 import template from './comment-list-item.stache';
 
 /**

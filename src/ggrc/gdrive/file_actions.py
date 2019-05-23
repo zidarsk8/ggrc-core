@@ -147,22 +147,20 @@ def validate_response(response):
     raise InternalServerError(errors.MISSING_KEYS.format(keys))
 
 
-def process_gdrive_file(file_id, folder_id, postfix, separator,
-                        is_uploaded=False):
-  """Process gdrive file to new folder with renaming"""
+def process_gdrive_file(file_id, folder_id, is_uploaded=False):
+  """Process gdrive file to new folder"""
   http_auth = get_http_auth()
   try:
     drive_service = discovery.build(
         API_SERVICE_NAME, API_VERSION, http=http_auth)
-    file_meta = drive_service.files().get(fileId=file_id).execute()
-    new_file_name = generate_file_name(file_meta['name'], postfix, separator)
+    file_meta = drive_service.files().get(
+        fileId=file_id,
+        fields='id,webViewLink,name'
+    ).execute()
     if is_uploaded:
-      #  if file was uploaded from a local folder, FE put it into
-      #  a gdrive folder, we just need to rename file.
-      response = rename_file_request(drive_service, file_id,
-                                     body={'name': new_file_name})
+      response = file_meta
     else:
-      body = _build_request_body(folder_id, new_file_name)
+      body = _build_request_body(folder_id, file_meta['name'])
       response = copy_file_request(drive_service, file_id, body)
     validate_response(response)
   except HttpAccessTokenRefreshError:

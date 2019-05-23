@@ -12,11 +12,23 @@ import {
 
 const blankMessage = 'cannot be blank';
 
-const validateDefaultPeople = (people, attrName) => {
-  if (!people || (_.isArray(people) && !people.length)) {
-    return {
-      [`${attrName}`]: blankMessage,
-    };
+const validateDefaultPeople = (people, attrName, isMandatory) => {
+  const validationMessage = {
+    [`${attrName}`]: blankMessage,
+  };
+
+  // "people" arg is array in case when selected "other" option.
+  // empty array is not valid.
+  if (_.isArray(people)) {
+    return !people.length ? validationMessage : undefined;
+  }
+
+  if (!isMandatory) {
+    return;
+  }
+
+  if (!people || !people.length) {
+    return validationMessage;
   }
 };
 
@@ -125,11 +137,11 @@ validatejs.validators.validateStartEndDates = (value,
 };
 
 validatejs.validators.validateDefaultAssignees = (value) => {
-  return validateDefaultPeople(value.assignees, 'assignees');
+  return validateDefaultPeople(value.assignees, 'assignees', true);
 };
 
 validatejs.validators.validateDefaultVerifiers = (value) => {
-  return validateDefaultPeople(value.verifiers, 'verifiers');
+  return validateDefaultPeople(value.verifiers, 'verifiers', false);
 };
 
 validatejs.validators.validateIssueTrackerIssueId = (value,

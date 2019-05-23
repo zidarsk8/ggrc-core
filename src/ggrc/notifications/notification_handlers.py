@@ -448,7 +448,6 @@ def register_handlers():  # noqa: C901
       handle_comment_created(obj, src)
 
   @signals.Restful.model_posted.connect_via(models.Relationship)
-  @signals.Restful.model_put.connect_via(models.Relationship)
   @signals.Restful.model_deleted.connect_via(models.Relationship)
   def relationship_altered_listener(sender, obj=None, src=None, service=None):
     """Listener for modified relationships."""

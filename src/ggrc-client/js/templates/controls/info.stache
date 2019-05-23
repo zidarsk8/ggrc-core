@@ -12,16 +12,7 @@
         <tab-panel panels:bind="panels" titleText:from="'Attributes'">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
-              {{#if review_status}}
-                <div class="row-fluid wrap-row">
-                  <div class="span12">
-                    <h6>Review Status</h6>
-                    <span class="state-value-dot review-status {{addclass 'state' review_status}}">
-                      {{review_status_display_name}}
-                    </span>
-                  </div>
-                </div>
-              {{/if}}
+              {{> /static/templates/base_objects/object-review.stache}}
 
               <div class="row-fluid wrap-row">
                 <div data-test-id="title_description_7a906d2e" class="span12">
@@ -33,7 +24,7 @@
                     <div data-test-id="title_description_content_7a906d2e" class="rtf-block">
                       <read-more
                         text:from="description"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -41,7 +32,7 @@
               </div>
 
               <div class="row-fluid wrap-row">
-                <div class="span12">
+                <div data-test-id="title_assessment_procedure_7a906d2e" class="span12">
                   <proposable-attribute
                     instance:from="instance"
                     title:from="'Assessment Procedure'"
@@ -50,7 +41,7 @@
                     <div class="rtf-block">
                       <read-more
                         text:from="test_plan"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -67,7 +58,7 @@
                     <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
                       <read-more
                         text:from="notes"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -286,6 +277,14 @@
           </div>
         </tab-panel>
         {{^if isSnapshot}}
+          <tab-panel
+            panels:bind="panels"
+            titleText:from="'Change Log'">
+            <revision-log
+              instance:from="instance"
+              options:from="tabOptions"
+            ></revision-log>
+          </tab-panel>
           <tab-link
             instance:from="instance"
             panels:bind="panels"
@@ -296,12 +295,6 @@
             instance:from="instance"
             panels:bind="panels"
             titleText:from="'Version History'"
-            linkType:from="'change-log'"
-          ></tab-link>
-          <tab-link
-            instance:from="instance"
-            panels:bind="panels"
-            titleText:from="'Change Log'"
             linkType:from="'change-log'"
           ></tab-link>
         {{/if}}

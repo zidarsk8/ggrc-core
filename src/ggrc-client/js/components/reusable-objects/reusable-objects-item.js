@@ -15,8 +15,18 @@ export default can.Component.extend({
     instance: {},
     selectedList: [],
     isChecked: false,
+    setIsChecked() {
+      let instance = this.attr('instance');
+      let list = this.attr('selectedList');
+      let index = $.makeArray(list).indexOf(instance);
+
+      this.attr('isChecked', index >= 0);
+    },
   }),
   events: {
+    init() {
+      this.viewModel.setIsChecked();
+    },
     '{viewModel} isChecked'(viewModel, ev, isChecked) {
       let list = viewModel.attr('selectedList');
       let instance = viewModel.attr('instance');
@@ -30,11 +40,8 @@ export default can.Component.extend({
         }
       }
     },
-    '{viewModel.selectedList} change'(list) {
-      let instance = this.viewModel.attr('instance');
-      let index = $.makeArray(list).indexOf(instance);
-
-      this.viewModel.attr('isChecked', index >= 0);
+    '{viewModel.selectedList} length'() {
+      this.viewModel.setIsChecked();
     },
   },
 });

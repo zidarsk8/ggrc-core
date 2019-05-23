@@ -521,6 +521,12 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
   def test_filter_risk_by_vulnerability(self):
     """Test correct filtering by vulnerability field"""
+    with factories.single_commit():
+      for _ in range(2):
+        factories.RiskFactory(vulnerability="non-key")
+      for _ in range(2):
+        factories.RiskFactory(vulnerability="another-key")
+
     risks = self._get_first_result_set(
         self._make_query_dict("Risk",
                               expression=["vulnerability", "=", "non-key"]),
@@ -551,6 +557,12 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
   def test_filter_risk_by_threat_event(self):
     """Test correct filtering by threat_event field"""
+    with factories.single_commit():
+      for _ in range(2):
+        factories.RiskFactory(threat_event="yes")
+      for _ in range(2):
+        factories.RiskFactory(threat_event="no")
+
     risks = self._get_first_result_set(
         self._make_query_dict("Risk",
                               expression=["threat_event", "=", "yes"]),
@@ -580,6 +592,12 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
   def test_filter_risk_by_risk_type(self):
     """Test correct filtering by risk_type field"""
+    with factories.single_commit():
+      for _ in range(3):
+        factories.RiskFactory(risk_type="privacy")
+      for _ in range(2):
+        factories.RiskFactory(risk_type="security")
+
     risks = self._get_first_result_set(
         self._make_query_dict("Risk",
                               expression=["risk_type", "=", "privacy"]),
@@ -612,6 +630,12 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
   def test_filter_risk_by_threat_source(self):
     """Test correct filtering by threat_source field"""
+    with factories.single_commit():
+      for _ in range(3):
+        factories.RiskFactory(threat_source="Corrective")
+      for _ in range(2):
+        factories.RiskFactory(threat_source="Another")
+
     risks = self._get_first_result_set(
         self._make_query_dict(
             "Risk",
@@ -747,8 +771,8 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
   @ddt.data(
       (all_models.Control, [all_models.Objective, all_models.Control,
                             all_models.Market, all_models.Objective]),
-      (all_models.Issue, [all_models.Control, all_models.Control,
-                          all_models.Market, all_models.Objective]),
+      (all_models.Comment, [all_models.Control, all_models.Control,
+                            all_models.Market, all_models.Objective]),
   )
   @ddt.unpack
   def test_search_relevant_to_type(self, base_type, relevant_types):
@@ -842,6 +866,9 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     """Test filter with 'relevant to' conditions (Audit scope)."""
     audit = factories.AuditFactory()
     audit_data = {"audit": {"id": audit.id}}
+
+    if base_type == all_models.Issue or all_models.Issue in relevant_types:
+      audit_data["due_date"] = "10/10/2019"
 
     _, base_obj = self.generator.generate_object(base_type, audit_data)
     relevant_objects = []
