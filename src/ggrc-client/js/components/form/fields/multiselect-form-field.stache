@@ -4,6 +4,7 @@
 }}
 
 <multiselect-dropdown options:from="options"
+                      placeholder:from="'None'"
                       disabled:from="disabled"
                       selected:from="selected"
                       on:selectedChanged="valueChanged(scope.event)"
