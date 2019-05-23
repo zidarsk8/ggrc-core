@@ -7,9 +7,6 @@
 import '../components/gdrive/ggrc-gdrive-picker-launcher';
 import '../components/gdrive/ggrc-gdrive-folder-picker';
 
-// ggrc_risk_assessments
-import '../apps/risk_assessments';
-
 // ggrc_workflows
 import '../apps/workflow-config';
 import '../apps/workflows';

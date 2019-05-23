@@ -611,7 +611,6 @@ class WidgetBar(object):
   CUSTOM_ATTRIBUTES = _Locator.get_widget("custom_attribute")
   EVENTS = _Locator.get_widget("events_list")
   ROLES = _Locator.get_widget("roles_list")
-  RISK_ASSESSMENTS = _Locator.get_widget("risk_assessment")
   TASKS = _Locator.get_widget("task")
   DASHBOARD_TAB = _Locator.get_widget("dashboard")
 
@@ -1132,7 +1131,7 @@ class AdminCustomAttributes(object):
   class __metaclass__(type):
     def __init__(cls, *args):
       items = (
-          objects.WORKFLOWS, objects.RISK_ASSESSMENTS, objects.THREATS,
+          objects.WORKFLOWS, objects.THREATS,
           objects.RISKS, objects.PROGRAMS, objects.AUDITS,
           objects.OBJECTIVES, objects.REQUIREMENTS, objects.CONTROLS,
           objects.ISSUES, objects.ASSESSMENTS, objects.STANDARDS,

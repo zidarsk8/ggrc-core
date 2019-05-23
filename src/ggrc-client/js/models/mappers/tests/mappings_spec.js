@@ -48,10 +48,6 @@ describe('Mappings', function () {
       ],
       notMappable: ['Assessment', 'AssessmentTemplate', 'Evidence', 'Person'],
     },
-    risk_assessments: {
-      models: ['RiskAssessment'],
-      notMappable: ['RiskAssessment'],
-    },
     workflows: {
       models: [
         'TaskGroup',
@@ -118,12 +114,11 @@ describe('Mappings', function () {
     Product: filtered,
     ProductGroup: filtered,
     Program: _.difference(allTypes,
-      ['Audit', 'RiskAssessment', 'Assessment', 'Person']
+      ['Audit', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: filtered,
     Regulation: _.difference(filtered, ['Regulation']),
     Risk: filtered,
-    RiskAssessment: [],
     Requirement: filtered,
     Standard: _.difference(filtered, ['Standard']),
     System: filtered,
@@ -132,8 +127,7 @@ describe('Mappings', function () {
     TechnologyEnvironment: filtered,
     Threat: filtered,
     Vendor: filtered,
-    MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup',
-      'RiskAssessment']),
+    MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup']),
   });
 
   describe('getMappingTypes() method', function () {

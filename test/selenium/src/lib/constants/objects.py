@@ -39,7 +39,6 @@ KEY_REPORTS = "key_reports"
 MARKETS = "markets"
 RISKS = "risks"
 THREATS = "threats"
-RISK_ASSESSMENTS = "risk_assessments"
 CUSTOM_ATTRIBUTES = "custom_attribute_definitions"
 COMMENTS = "comments"
 SNAPSHOTS = "snapshots"
@@ -64,7 +63,7 @@ EDITABLE_GGRC_OBJ = (
 
 ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJ + (CONTROLS, )
 
-NOT_YET_SNAPSHOTABLE = (RISK_ASSESSMENTS, PROJECTS)
+NOT_YET_SNAPSHOTABLE = (PROJECTS, )
 
 EDITABLE_CA_OBJS = EDITABLE_GGRC_OBJ + NOT_YET_SNAPSHOTABLE + (
     WORKFLOWS, PROGRAMS, AUDITS, ISSUES, ASSESSMENTS, PEOPLE)
@@ -124,7 +123,7 @@ def _get_plural(singulars):
 
 def get_singular(plural, title=False):
   """Transform object name to singular and lower or title form.
- Example: risk_assessments -> risk_assessment
+ Example: product_groups -> product_group
  """
   _singular = _get_singular([plural])[0]
   if title:
@@ -136,7 +135,7 @@ def get_singular(plural, title=False):
 
 def get_plural(singular, title=False):
   """Transform object name to plural and lower form or title form.
-  Example: risk_assessment -> risk_assessments
+  Example: product_group -> product_groups
   """
   _plural = _get_plural([singular])[0]
   if title:
@@ -148,7 +147,7 @@ def get_plural(singular, title=False):
 
 def get_normal_form(obj_name):
   """Transforms object name to title form
-  (risk_assessments -> Risk Assessments).
+  (product_groups -> Product Groups).
   """
   return obj_name.replace("_", " ").title()
 
