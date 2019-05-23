@@ -243,15 +243,26 @@ def get_object(selenium, obj):
   return _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
 
 
-def map_object_via_unified_mapper(selenium, obj_name, dest_objs_type,
-                                  return_tree_items=True,
-                                  open_in_new_frontend=False):
+def map_object_via_unified_mapper(
+    selenium, obj_name, dest_objs_type=None, obj_to_map=None,
+    return_tree_items=False, open_in_new_frontend=False,
+    proceed_in_new_tab=False
+):
   """Maps selected obj to dest_obj_type via Unified Mapper."""
-  modal = unified_mapper.MapObjectsModal(driver=selenium, obj_name=obj_name)
-  modal.search_dest_objs(dest_objs_type=dest_objs_type,
-                         return_tree_items=return_tree_items)
+  assert dest_objs_type or obj_to_map, ("At least one of params "
+                                        "should be provided.")
+  if not dest_objs_type:
+    dest_objs_type = obj_to_map._obj_name()
+  map_modal = unified_mapper.MapObjectsModal(driver=selenium,
+                                             obj_name=obj_name)
+  map_modal.search_dest_objs(dest_objs_type=dest_objs_type,
+                             return_tree_items=return_tree_items)
   if open_in_new_frontend:
-    modal.open_in_new_frontend_btn.click()
+    map_modal.open_in_new_frontend_btn.click()
+    return map_modal
   else:
-    raise NotImplementedError
-  return modal
+    if obj_to_map:
+      dest_obj_modal = map_modal.click_create_and_map_obj()
+      dest_obj_modal.submit_obj(obj_to_map)
+    if proceed_in_new_tab:
+      object_modal.WarningModal().proceed_in_new_tab()

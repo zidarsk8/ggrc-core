@@ -3,6 +3,7 @@
 """Create, description, representation and equal of entities."""
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
+# pylint: disable=inconsistent-return-statements
 
 import copy
 from datetime import date, datetime
