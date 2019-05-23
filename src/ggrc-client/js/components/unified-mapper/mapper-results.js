@@ -384,6 +384,7 @@ export default can.Component.extend({
             self.isDisabled = true;
             if (isMegaMapping) {
               self.mapAsChild = null;
+              self.isSelf = true;
             }
           }
         }
