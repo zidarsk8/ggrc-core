@@ -119,14 +119,13 @@ class TestACLProposalsApi(base.BaseTestProposalApi):
     resp = self.api.post(
         all_models.Proposal,
         {"proposal": {
+            "full_instance_content": program_content,
+            "agenda": "delete access control roles",
+            "context": None,
             "instance": {
                 "id": program.id,
                 "type": program.type,
             },
-            # "content": {"123": 123},
-            "full_instance_content": program_content,
-            "agenda": "delete access control roles",
-            "context": None,
         }})
     self.assertEqual(201, resp.status_code)
     program = all_models.Program.query.get(program_id)

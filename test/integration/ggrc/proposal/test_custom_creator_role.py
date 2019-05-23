@@ -11,6 +11,7 @@ from integration.ggrc import TestCase
 from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
+from integration.ggrc.proposal import _get_query_proposal_request
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 from integration.ggrc.query_helper import WithQueryApi
@@ -41,45 +42,14 @@ class TestOwnerAccess(TestCase, WithQueryApi):
         }
     }
 
-  @staticmethod
-  def _get_query_proposal_request(program_id):
-    """Prepare dict with proposal creation request"""
-
-    return [{
-        "limit": [0, 5],
-        "object_name": all_models.Proposal.__name__,
-        "order_by":[
-            {"name": "status", "desc": True},
-            {"name": "created_at", "desc": True},
-        ],
-        "filters": {
-            "expression": {
-                "left": {
-                    "left": "instance_type",
-                    "op": {"name": "="},
-                    "right": all_models.Program.__name__,
-                },
-                "op": {"name": "AND"},
-                "right": {
-                    "left": "instance_id",
-                    "op": {"name": "="},
-                    "right": program_id,
-                },
-            },
-        },
-    }]
-
   def test_admin_has_access(self):
     """Ensure that global creator has access to created proposal by him"""
     role_creator = all_models.Role.query.filter(
         all_models.Role.name == "Creator").one()
 
     # prepare - create program, assign roles
-    factories.AccessControlRoleFactory(
-        name="ACL_Reader",
-        object_type="Program",
-        update=0
-    )
+    factories.AccessControlRoleFactory(name="ACL_Reader", update=0,
+                                       object_type="Program")
     with factories.single_commit():
       program = factories.ProgramFactory()
       person = factories.PersonFactory()
@@ -102,7 +72,7 @@ class TestOwnerAccess(TestCase, WithQueryApi):
         program_id, acr.id, person.id)
     self.api.post(all_models.Proposal, create_data)
 
-    query_data = self._get_query_proposal_request(program_id)
+    query_data = _get_query_proposal_request(program_id)
     headers = {"Content-Type": "application/json", }
     resp = self.api.client.post("/query",
                                 data=json.dumps(query_data),
@@ -116,11 +86,8 @@ class TestOwnerAccess(TestCase, WithQueryApi):
         all_models.Role.name == "Creator").one()
 
     # prepare - create program, assign roles
-    factories.AccessControlRoleFactory(
-        name="ACL_Reader",
-        object_type="Program",
-        update=0
-    )
+    factories.AccessControlRoleFactory(name="ACL_Reader", update=0,
+                                       object_type="Program")
     with factories.single_commit():
       program = factories.ProgramFactory()
       person1 = factories.PersonFactory()
@@ -150,7 +117,7 @@ class TestOwnerAccess(TestCase, WithQueryApi):
     self.api.set_user(all_models.Person.query.get(person2_id))
     self.client.get("/login")
 
-    query_data = self._get_query_proposal_request(program_id)
+    query_data = _get_query_proposal_request(program_id)
     headers = {"Content-Type": "application/json", }
     resp = self.api.client.post("/query",
                                 data=json.dumps(query_data),

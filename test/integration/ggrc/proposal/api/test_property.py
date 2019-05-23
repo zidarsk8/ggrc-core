@@ -3,12 +3,17 @@
 
 """TestCase for proposal property api."""
 
+import datetime
+
+import ddt
+
 from ggrc.models import all_models
 
 from integration.ggrc.models import factories
 from integration.ggrc.proposal.api import base
 
 
+@ddt.ddt
 class TestPropoertyProposals(base.BaseTestProposalApi):
   """Test case for proposal property api."""
 
@@ -90,3 +95,41 @@ class TestPropoertyProposals(base.BaseTestProposalApi):
     self.assertEqual(proposal.STATES.DECLINED, proposal.status)
     self.assertEqual("1", program.title)
     self.assertEqual(1, len(program.comments))
+
+  @ddt.data(
+      ("title", "new title"),
+      ("description", "new description"),
+      ("notes", "new note"),
+      ("status", "Active"),
+  )
+  @ddt.unpack
+  def test_update_field(self, field_name, value):
+    """Test that fields are changeable"""
+    program = factories.ProgramFactory()
+    proposal = factories.ProposalFactory(
+        instance=program,
+        content={"fields": {field_name: value}},
+        agenda="agenda content"
+    )
+    program_id = program.id
+    self.apply_proposal(proposal)
+    program = all_models.Program.query.get(program_id)
+    self.assertEqual(value, getattr(program, field_name))
+
+  @ddt.data(
+      ("start_date", "2019-02-02"),
+  )
+  @ddt.unpack
+  def test_update_dates(self, field_name, value):
+    """Test that date fields are changeable"""
+    program = factories.ProgramFactory()
+    proposal = factories.ProposalFactory(
+        instance=program,
+        content={"fields": {field_name: value}},
+        agenda="agenda content"
+    )
+    program_id = program.id
+    self.apply_proposal(proposal)
+    program = all_models.Program.query.get(program_id)
+    self.assertEqual(datetime.datetime.strptime(value, "%Y-%m-%d").date(),
+                     getattr(program, field_name))

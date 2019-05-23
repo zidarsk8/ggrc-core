@@ -12,6 +12,7 @@ from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
+from integration.ggrc.proposal import _get_query_proposal_request
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 
@@ -24,22 +25,15 @@ class TestPermissions(TestCase):
     super(TestPermissions, self).setUp()
     self.api = Api()
     roles = {r.name: r for r in all_models.Role.query.all()}
-    factories.AccessControlRoleFactory(
-        name="ACL_Reader",
-        object_type="Program",
-        update=0
-    )
-    factories.AccessControlRoleFactory(
-        name="ACL_Editor",
-        object_type="Program"
-    )
-    factories.AccessControlRoleFactory(
-        name="ACL_Nobody",
-        object_type="Program",
-        read=0,
-        update=0,
-        delete=0,
-    )
+    factories.AccessControlRoleFactory(name="ACL_Reader", update=0,
+                                       object_type="Program")
+    factories.AccessControlRoleFactory(name="ACL_Editor",
+                                       object_type="Program")
+    factories.AccessControlRoleFactory(name="ACL_Nobody",
+                                       object_type="Program",
+                                       read=0,
+                                       update=0,
+                                       delete=0,)
     with factories.single_commit():
       self.program = factories.ProgramFactory()
       self.program.context.related_object = self.program
@@ -212,29 +206,7 @@ class TestPermissions(TestCase):
                         that should be filtered by query
     """
     program_id = self.program.id
-    data = [{
-        "limit": [0, 5],
-        "object_name": all_models.Proposal.__name__,
-        "order_by":[
-            {"name": "status", "desc": True},
-            {"name": "created_at", "desc": True},
-        ],
-        "filters": {
-            "expression": {
-                "left": {
-                    "left": "instance_type",
-                    "op": {"name": "="},
-                    "right": self.program.type,
-                },
-                "op": {"name": "AND"},
-                "right": {
-                    "left": "instance_id",
-                    "op": {"name": "="},
-                    "right": program_id,
-                },
-            },
-        },
-    }]
+    data = _get_query_proposal_request(program_id)
     self.api.set_user(self.people[role_name])
     self.client.get("/login")
     headers = {"Content-Type": "application/json", }
