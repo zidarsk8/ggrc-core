@@ -12,7 +12,6 @@ from ggrc import settings
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
-from ggrc.models.deferred import deferred
 from ggrc.models.mixins import base
 from ggrc.models.mixins import Base, CustomAttributable
 from ggrc.models.custom_attribute_definition import CustomAttributeMapable
@@ -43,10 +42,10 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   __tablename__ = 'people'
 
-  email = deferred(db.Column(db.String, nullable=False), 'Person')
-  name = deferred(db.Column(db.String, nullable=False), 'Person')
-  language_id = deferred(db.Column(db.Integer), 'Person')
-  company = deferred(db.Column(db.String), 'Person')
+  email = db.Column(db.String, nullable=False)
+  name = db.Column(db.String, nullable=False)
+  language_id = db.Column(db.Integer)
+  company = db.Column(db.String)
 
   object_people = db.relationship(
       'ObjectPerson', backref='person', cascade='all, delete-orphan')
