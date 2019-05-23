@@ -57,6 +57,7 @@ from ggrc.query import utils as query_utils
 from ggrc import settings
 from ggrc.cache import utils as cache_utils
 from ggrc.utils import errors as ggrc_errors
+from ggrc.utils import format_api_error_response
 
 
 # pylint: disable=invalid-name
@@ -465,11 +466,7 @@ class Resource(ModelView):
           if code < 500:
             alternative_message = ggrc_errors.BAD_REQUEST_MESSAGE
           message = error.description or alternative_message
-          return current_app.make_response((
-              json.dumps({"message": message, "code": code}),
-              code,
-              [("Content-Type", "application/json")],
-          ))
+          return format_api_error_response(code, message)
         except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
           err.message = ggrc_errors.INTERNAL_SERVER_ERROR
@@ -545,27 +542,21 @@ class Resource(ModelView):
     missing_headers = required_headers.difference(
         set(self.request.headers.keys()))
     if missing_headers:
-      return current_app.make_response((
-          json.dumps({
-              "message": "Missing headers: " + ", ".join(missing_headers),
-          }),
+      return format_api_error_response(
           428,
-          [("Content-Type", "application/json")],
-      ))
+          "Missing headers: " + ", ".join(missing_headers)
+      )
 
     object_etag = etag(self.modified_at(obj), get_info(obj))
     object_timestamp = self.http_timestamp(self.modified_at(obj))
     if (request.headers["If-Match"] != object_etag or
             request.headers["If-Unmodified-Since"] != object_timestamp):
-      return current_app.make_response((
-          json.dumps({
-              "message": "The resource could not be updated due to a conflict "
-                         "with the current state on the server. Please "
-                         "resolve the conflict by refreshing the resource.",
-          }),
+      return format_api_error_response(
           409,
-          [("Content-Type", "application/json")]
-      ))
+          "The resource could not be updated due to a conflict "
+          "with the current state on the server. Please "
+          "resolve the conflict by refreshing the resource."
+      )
     return None
 
   @staticmethod

@@ -9,18 +9,16 @@ when front-end requests it. This makes it easy for the front-end to show
 error messages without a need to parse html.
 """
 
-from flask import current_app, request
+from flask import request
 
-from ggrc.utils import as_json
+from ggrc.utils import format_api_error_response
 
 
 def make_error_response(err, err_code, force_json=False):
   """Compose the response based on the request content_type"""
   if request.content_type == 'application/json' or force_json:
-    resp = {"code": err_code,
-            "message": getattr(err, "description", err)}
-    headers = [('Content-Type', 'application/json'), ]
-    return current_app.make_response((as_json(resp), err_code, headers), )
+    return format_api_error_response(err_code,
+                                     getattr(err, "description", err))
   if hasattr(err, "get_response"):
     return err.get_response()
   return err
