@@ -134,6 +134,7 @@ class TestWorkflowState(unittest.TestCase):
 
 @ddt.ddt
 class TestWorkflowUtils(unittest.TestCase):
+  """Test case of the workflow's utils file."""
 
   @ddt.data(
       ('Title', [], get_copy_name('Title', 1)),
@@ -142,5 +143,6 @@ class TestWorkflowUtils(unittest.TestCase):
   )
   @ddt.unpack
   def test_get_copy_title(self, current_title, used_titles, expected):
+    """Test if proper title is returned for all the cases."""
     result = get_copy_title(current_title, used_titles)
     self.assertEqual(result, expected)
