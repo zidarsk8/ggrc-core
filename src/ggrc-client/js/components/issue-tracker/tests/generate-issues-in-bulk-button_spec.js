@@ -8,6 +8,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as notifierUtils from '../../../plugins/utils/notifiers-utils';
 import * as errorsUtils from '../../../plugins/utils/errors-utils';
 import Permission from '../../../permission';
+import pubSub from '../../../pub-sub';
 
 describe('generate-issues-in-bulk-button component', () => {
   let viewModel;
@@ -149,15 +150,30 @@ describe('generate-issues-in-bulk-button component', () => {
         expect(viewModel.trackStatus).toHaveBeenCalledWith(timeout * 2);
       });
 
-      it('should notify if status is SUCCESS', () => {
-        spyOn(notifierUtils, 'notifier');
+      describe('if status is SUCCESS', () => {
+        beforeEach(() => {
+          dfd.resolve({status: 'Success'});
+          spyOn(notifierUtils, 'notifier');
+          spyOn(pubSub, 'dispatch');
+        });
 
-        viewModel.checkStatus(timeout);
-        dfd.resolve({status: 'Success'});
+        it('should notify the user regarding that', () => {
+          viewModel.checkStatus(timeout);
 
-        expect(notifierUtils.notifier)
-          .toHaveBeenCalledWith('success', jasmine.any(String));
-        expect(viewModel.attr('isGeneratingInProgress')).toBeFalsy();
+          expect(notifierUtils.notifier)
+            .toHaveBeenCalledWith('success', jasmine.any(String));
+          expect(viewModel.attr('isGeneratingInProgress')).toBeFalsy();
+        });
+
+        it('should prepare Assessments tab to be refreshed when it\'s opened',
+          () => {
+            viewModel.checkStatus(timeout);
+
+            expect(pubSub.dispatch).toHaveBeenCalledWith({
+              type: 'refetchOnce',
+              modelNames: ['Assessment'],
+            });
+          });
       });
 
       it('should notify if status is FAILURE', () => {
