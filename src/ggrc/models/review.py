@@ -220,6 +220,7 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
              rest_handable.WithPostHandable,
              rest_handable.WithPutHandable,
              rest_handable.WithPostAfterCommitHandable,
+             rest_handable.WithPutAfterCommitHandable,
              with_comment_created.WithCommentCreated,
              comment.CommentInitiator,
              roleable.Roleable,
@@ -326,15 +327,13 @@ class Review(mixins.person_relation_factory("last_reviewed_by"),
             not isinstance(self.reviewable, synchronizable.Synchronizable)):
       add_notification(self, Review.NotificationObjectTypes.REVIEW_CREATED)
 
-  def is_status_changed_to(self, required_status):
+  def is_status_changed(self):
     """Checks whether the status has changed."""
-    return (inspect(self).attrs.status.history.has_changes() and
-            self.status == required_status)
+    return inspect(self).attrs.status.history.has_changes()
 
   def handle_put(self):
     """Handle PUT request."""
-    if (not self.is_status_changed_to(Review.STATES.REVIEWED) and
-       self.email_message):
+    if not self.is_status_changed() and self.email_message:
       self._add_comment_about(self.email_message)
     self._update_reviewed_by()
 
