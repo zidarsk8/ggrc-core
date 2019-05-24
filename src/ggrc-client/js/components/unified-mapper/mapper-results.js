@@ -164,6 +164,8 @@ export default can.Component.extend({
         this.resetSearchParams();
       }
       this.attr('refreshItems', true);
+      this.setItemsDebounced();
+      this.attr('refreshItems', false);
     },
     prepareRelevantQuery: function () {
       let relevantList = this.attr('relevantTo') || [];
@@ -541,12 +543,6 @@ export default can.Component.extend({
     '{viewModel} allSelected': function (scope, ev, allSelected) {
       if (allSelected) {
         this.viewModel.loadAllItems();
-      }
-    },
-    '{viewModel} refreshItems': function (scope, ev, refreshItems) {
-      if (refreshItems) {
-        this.viewModel.setItemsDebounced();
-        this.viewModel.attr('refreshItems', false);
       }
     },
     '{viewModel.paging} current': function () {
