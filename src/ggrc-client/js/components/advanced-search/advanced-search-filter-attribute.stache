@@ -15,10 +15,10 @@
       <option value="=">Equals</option>
       <option value="!~">Does not contain</option>
       <option value="!=">Is not equal</option>
-      <option value="&lt;">Lesser than </option>
-      <option value="&lt;=">Lesser than or equals</option>
-      <option value="&gt;">Greater than</option>
-      <option value="&gt;=">Greater than or equals</option>
+      <option value="<">Lesser than </option>
+      <option value="<=">Lesser than or equals</option>
+      <option value=">">Greater than</option>
+      <option value=">=">Greater than or equals</option>
       <option value="is">Is empty</option>
     </select>
   </div>
