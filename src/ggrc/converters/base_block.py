@@ -20,6 +20,8 @@ from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
+from ggrc.models import exceptions
+from ggrc.models import all_models
 from ggrc.models import reflection
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
@@ -434,12 +436,18 @@ class ImportBlockConverter(BlockConverter):
         k for k in self.headers if k not in self.converter.priority_columns
     ]
 
-  def import_csv_data(self):
+  def import_csv_data(self):  # noqa
     """Perform import sequence for the block."""
     try:
       for row in self.row_converters_from_csv():
         try:
+          ie_status = self.converter.get_job_status()
+          if ie_status and ie_status == \
+             all_models.ImportExport.STOPPED_STATUS:
+            raise exceptions.ImportStoppedException()
           row.process_row()
+        except exceptions.ImportStoppedException:
+          raise
         except ValueError as err:
           db.session.rollback()
           msg = err.message or errors.UNEXPECTED_ERROR
@@ -451,6 +459,8 @@ class ImportBlockConverter(BlockConverter):
           logger.exception(errors.UNEXPECTED_ERROR)
         self._update_info(row)
         _app_ctx_stack.top.sqlalchemy_queries = []
+    except exceptions.ImportStoppedException:
+      raise
     except Exception:  # pylint: disable=broad-except
       logger.exception(errors.UNEXPECTED_ERROR)
     finally:

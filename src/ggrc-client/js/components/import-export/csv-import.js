@@ -39,6 +39,7 @@ import {
 } from '../../plugins/utils/errors-utils';
 import {connectionLostNotifier} from './connection-lost-notifier';
 import * as businessModels from '../../models/business-models';
+import {confirm} from '../../plugins/utils/modals';
 
 const messages = {
   INCORRECT_FORMAT: `The file is not in a recognized format.
@@ -242,21 +243,50 @@ export default can.Component.extend({
           this.trackStatusOfImport(info.id);
         });
     },
+    stopAnalysis(jobId) {
+      this.stop(jobId)
+        .then(() => {
+          this.resetFile();
+          deleteImportJob(jobId);
+        });
+    },
     stopImport(jobId) {
+      confirm({
+        modal_title: 'Warning',
+        modal_description: `The import is still in progress and only part of 
+          data is saved. To stop the import process, please click 
+          &quot;Stop Import&quot;. </br>
+          <b>Warning:</b> only partial data will be saved, if import 
+          is stopped when in progress.`,
+        button_view:
+          `${GGRC.templates_path}/modals/proceed-stop-import-buttons.stache`,
+      },
+      () => {
+        let state = this.attr('state');
+        // check if status hasn't changed
+        if (state === jobStatuses.IN_PROGRESS) {
+          this.stop(jobId)
+            .then(() => this.resetFile());
+        }
+      });
+    },
+    stop(jobId) {
       clearTimeout(this.attr('trackId'));
       const deleteJob = () => {
         this.resetFile();
         deleteImportJob(jobId);
       };
-      stopImportJob(jobId)
-        .then(deleteJob)
+      return stopImportJob(jobId)
         .fail((xhr) => {
           // Need to implement a better solution in order to identify specific
           // errors like here
           if (xhr && xhr.responseJSON && xhr.responseJSON.message &&
             xhr.responseJSON.message === 'Wrong status') {
             deleteJob();
+            return;
           }
+
+          handleAjaxError(xhr);
         });
     },
     trackStatusOfImport(jobId, timeout = PRIMARY_TIMEOUT) {
