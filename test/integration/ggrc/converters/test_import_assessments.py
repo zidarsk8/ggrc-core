@@ -825,6 +825,49 @@ class TestAssessmentImport(TestCase):
     else:
       self._check_csv_response(response, {})
 
+  def test_asmt_verified_date_update_from_none(self):
+    """Test that we able to set Verified Date if it is empty"""
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory(audit=audit)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Title", assessment.title),
+        ("Audit", audit.slug),
+        ("Creators", "user@example.com"),
+        ("Assignees", "user@example.com"),
+        ("Verifiers", "user@example.com"),
+        ("Verified Date", "01/22/2019"),
+        ("State", "Completed"),
+    ]))
+    self._check_csv_response(response, {})
+
+  def test_asmt_verified_date_readonly(self):
+    """Test that Verified Date is readonly"""
+    audit = factories.AuditFactory()
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    verified_date=datetime.datetime.now())
+    expected_warnings = {
+        'Assessment': {
+            'row_warnings': {
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=3,
+                    column_name="Verified Date"
+                )}}}
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Title", assessment.title),
+        ("Audit", audit.slug),
+        ("Creators", "user@example.com"),
+        ("Assignees", "user@example.com"),
+        ("Verifiers", "user@example.com"),
+        ("Verified Date", "01/21/2019"),
+        ("State", "Completed"),
+    ]))
+    self._check_csv_response(response, expected_warnings)
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):

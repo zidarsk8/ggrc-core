@@ -373,11 +373,11 @@ class DateColumnHandler(ColumnHandler):
         return None
 
       parsed_value = parse(value)
-      if self.key in ("last_assessment_date", "verified_date"):
-        if self.check_readonly_changes(parsed_value, self.key):
-          return None
-      if type(getattr(self.row_converter.obj, self.key, None)) is date:
-        return parsed_value.date()
+      if isinstance(getattr(self.row_converter.obj, self.key, None), date):
+        parsed_value = parsed_value.date()
+      if self.key in ("last_assessment_date", "verified_date") and \
+         self.check_readonly_changes(parsed_value, self.key):
+        return None
       return parsed_value
     except:  # pylint: disable=bare-except
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
@@ -414,10 +414,6 @@ class DateColumnHandler(ColumnHandler):
   def check_readonly_changes(self, new_date, attr_name):
     """Check if the new object don't contain changed date."""
     old_date = getattr(self.row_converter.obj, attr_name, None)
-    if hasattr(old_date, "date"):
-      old_date = old_date.date()
-    if hasattr(new_date, "date"):
-      new_date = new_date.date()
     is_modified = old_date and new_date and old_date != new_date
     if is_modified:
       self.add_warning(errors.UNMODIFIABLE_COLUMN,
