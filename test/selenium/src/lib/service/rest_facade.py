@@ -97,7 +97,7 @@ def create_gcads_for_control():
   """Creates global CADs for all types."""
   return [create_gcad(definition_type="control",
                       attribute_type=ca_type)
-          for ca_type in element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
+          for ca_type in element.AdminWidgetCustomAttributes.ALL_GCA_TYPES]
 
 
 def create_issue(obj=None):

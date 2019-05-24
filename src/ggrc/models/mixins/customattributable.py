@@ -291,7 +291,9 @@ class CustomAttributable(object):
         CustomAttributeDefinition)
 
     data = {fname: definition.get(fname) for fname in field_names}
-    data["definition_type"] = self._inflector.table_singular
+    data.pop("definition_type", None)
+    data.pop("definition_id", None)
+    data["definition"] = self
     cad = CustomAttributeDefinition(**data)
     db.session.add(cad)
 

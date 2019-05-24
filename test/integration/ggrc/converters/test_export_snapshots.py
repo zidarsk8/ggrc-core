@@ -67,8 +67,6 @@ class TestExportSnapshots(TestCase):
           cad(title="date", definition_type=type_, attribute_type="Date"),
           cad(title="checkbox", definition_type=type_,
               attribute_type="Checkbox"),
-          cad(title="person", definition_type=type_,
-              attribute_type="Map:Person"),
           cad(title="RT", definition_type=type_, attribute_type="Rich Text"),
           cad(title="dropdown",
               definition_type=type_,
@@ -116,7 +114,6 @@ class TestExportSnapshots(TestCase):
             "checkbox": self._get_cav(control, "checkbox"),
             "date": self._get_cav(control, "date"),
             "dropdown": self._get_cav(control, "dropdown"),
-            "person": self._get_cav(control, "person"),
             # Special snapshot export fields
             "Audit": audit.slug,
             "Document File": u"\n".join(c.link + " " + c.title for c in
@@ -243,7 +240,6 @@ class TestExportSnapshots(TestCase):
             "checkbox": u"no",
             "date": u"",
             "dropdown": u"",
-            "person": u"",
 
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u",".join(json.loads(control.assertions)),
@@ -320,9 +316,6 @@ class TestExportSnapshots(TestCase):
     """
     # pylint: disable=too-many-locals
     self._create_cads("product")
-    self.import_file("product_snapshot_data_multiple.csv")
-    # Duplicate import because we have a bug in logging revisions and this
-    # makes sure that the fixture created properly.
     self.import_file("product_snapshot_data_multiple.csv")
 
     product = models.Product.query.all()
