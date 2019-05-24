@@ -290,7 +290,6 @@ class AssessmentTrackerHandler(object):
       return
 
     if not self._is_issue_on_create_enabled(assessment, assessment_src):
-      self._create_disabled_record(assessment, assessment_src)
       return
 
     issue_id = assessment_src.get("issue_tracker", {}).get("issue_id")
@@ -315,15 +314,6 @@ class AssessmentTrackerHandler(object):
           assessment,
           issue_info
       )
-
-  @staticmethod
-  def _create_disabled_record(assessment, assessment_src):
-    """Create IssueTrackerIssue model for assessment with default values"""
-    integration_utils.set_values_for_missed_fields(assessment, assessment_src)
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        assessment,
-        assessment_src,
-    )
 
   def handle_assessment_delete(self, assessment):
     """Handle assessment issue delete.
