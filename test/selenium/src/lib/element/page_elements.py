@@ -110,6 +110,21 @@ class Datepicker(object):
     self._root.element(class_name="ui-state-active").click()
 
 
+class AssertionsDropdown(object):
+  """Assertions Dropdown element."""
+  def __init__(self, container):
+    self.text = "Assertions"
+    self._root = container.element(
+        class_name="custom-attr-wrap").element(text=self.text)
+    self.assertions_values = self._root.parent().text.splitlines()[1:]
+    self._inline_edit = InlineEdit(self._root)
+    self.input = self._root.select(class_name="input-block-level")
+
+  def open_inline_edit(self):
+    """Open element for editing."""
+    self._inline_edit.open()
+
+
 class RelatedPeopleList(object):
   """Represents related people element"""
 
