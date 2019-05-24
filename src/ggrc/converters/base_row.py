@@ -546,8 +546,6 @@ class ImportRowConverter(RowConverter):
     signals.Restful.model_put_before_commit.send(
         self.object_class, obj=self.obj, src={}, service=service_class,
         event=event, initial_state=self.initial_state)
-    signals.Restful.model_put.send(
-        self.object_class, obj=self.obj, src={}, service=service_class)
 
   def send_pre_commit_signals(self):
     """Send before commit signals for all objects.
