@@ -20,7 +20,8 @@ class FetchServiceMock(apiproxy_stub.APIProxyStub):
     super(FetchServiceMock, self).__init__(service_name)
     dirname = os.path.dirname(os.path.realpath(__file__))
     json_file = os.path.join(dirname, 'response.json')
-    self.mock_response_issue = open(json_file).read()
+    with open(json_file) as issue_mock:
+      self.mock_response_issue = issue_mock.read()
 
   # pylint: disable=invalid-name
   def _Dynamic_Fetch(self, request, response):
@@ -43,5 +44,22 @@ class FetchServiceMock(apiproxy_stub.APIProxyStub):
 
 
 def init_issue_tracker_mock():
+  """Initialize stub for Issue Tracker response mocking"""
   fetch_mock = FetchServiceMock()
   apiproxy_stub_map.apiproxy.RegisterStub('urlfetch', fetch_mock)
+
+
+def init_gae_issue_tracker_mock():
+  """Initialize stub for Issue Tracker response mocking
+  when launched using 'launch_gae_ggrc'."""
+  # pylint: disable=protected-access
+
+  from ggrc.utils.issue_tracker_mock import remote_stub
+
+  urlfetch_stub = apiproxy_stub_map.apiproxy.GetStub('urlfetch')
+  issue_tracker_stub = remote_stub.RemoteStub(
+      urlfetch_stub._server,
+      urlfetch_stub._path,
+      urlfetch_stub._test_stub_map
+  )
+  apiproxy_stub_map.apiproxy.ReplaceStub('urlfetch', issue_tracker_stub)
