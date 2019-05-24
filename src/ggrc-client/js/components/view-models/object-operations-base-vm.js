@@ -137,10 +137,12 @@ const ObjectOperationsBaseVM = can.Map.extend({
   options: [],
   newEntries: [],
   relevant: [],
-  submitCbs: $.Callbacks(),
   useSnapshots: false,
+  onSearchCallback: $.noop(),
   onSubmit: function () {
-    this.attr('submitCbs').fire();
+    if (this.onSearchCallback) {
+      this.onSearchCallback();
+    }
   },
   onLoaded(element) {
     // set focus on the top modal window

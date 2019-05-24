@@ -19,16 +19,14 @@ describe('assessment-template-clone component', () => {
     describe('inserted handler', () => {
       beforeEach(() => {
         vm = new can.Map({
-          submitCbs: {
-            fire: jasmine.createSpy(),
-          },
+          onSubmit: jasmine.createSpy(),
         });
         handler = events.inserted.bind({viewModel: vm});
       });
 
-      it('calls fire() of submitCbs attribute', () => {
+      it('calls onSubmit()', () => {
         handler();
-        expect(vm.submitCbs.fire).toHaveBeenCalled();
+        expect(vm.onSubmit).toHaveBeenCalled();
       });
     });
 

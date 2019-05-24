@@ -25,23 +25,10 @@ describe('mapper-results component', function () {
     viewModel.attr('mapper', {
       type: 'Control',
     });
-    viewModel.attr('submitCbs', $.Callbacks());
     viewModel.attr('paging',
       new Pagination({pageSizeSelect: [5, 10, 15]}));
     Component.prototype.viewModel.prototype.init = init;
     viewModel.init = init;
-  });
-
-  describe('destroy() method', function () {
-    beforeEach(function () {
-      spyOn(viewModel.attr('submitCbs'), 'remove');
-    });
-
-    it('removes function from viewModel.submitCbs', function () {
-      viewModel.destroy();
-      expect(viewModel.attr('submitCbs').remove)
-        .toHaveBeenCalledWith(jasmine.any(Function));
-    });
   });
 
   describe('setItems() method', function () {

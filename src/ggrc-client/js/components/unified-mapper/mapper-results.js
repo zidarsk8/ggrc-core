@@ -73,7 +73,6 @@ export default can.Component.extend({
     statusItem: {},
     selected: [],
     refreshItems: false,
-    submitCbs: null,
     disableColumnsConfiguration: false,
     applyOwnedFilter: false,
     objectsPlural: false,
@@ -92,12 +91,6 @@ export default can.Component.extend({
     deferredList: [],
     disabledIds: [],
     megaRelationObj: {},
-    init: function () {
-      this.attr('submitCbs').add(this.onSearch.bind(this));
-    },
-    destroy: function () {
-      this.attr('submitCbs').remove(this.onSearch.bind(this));
-    },
     setItems: function () {
       const stopFn = tracker.start(this.attr('type'),
         tracker.USER_JOURNEY_KEYS.NAVIGATION,

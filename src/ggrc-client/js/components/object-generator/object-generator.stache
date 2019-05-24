@@ -86,7 +86,7 @@
                       object:from="object"
                       type:from="type"
                       selected:from="selected"
-                      submitCbs:from="submitCbs"
+                      @onSearch:to="onSearchCallback"
                       paging.total:to="scope.vars.totalObjects"
                       useSnapshots:from="useSnapshots"
                       entries:bind="entries"
