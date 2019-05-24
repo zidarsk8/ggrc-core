@@ -150,3 +150,70 @@ class TestFilterResource(TestCase):
                                  depth=1,
                                  user_permissions=object())
     self.assertIsNone(res)
+
+
+class TestRelationship(TestCase):
+  """Tests for relationship in common."""
+
+  def setUp(self):
+    """Test set up for relationships."""
+    # pylint: disable=protected-access
+
+    self.resource = common.Resource()
+    self.resource._model = mock.MagicMock()
+
+  def test_get_relationship(self):
+    """Test for get relationship with direct type."""
+    # pylint: disable=protected-access
+
+    self.resource._model.source_id = 1
+    self.resource._model.source_type = "Control"
+    self.resource._model.destination_id = 2
+    self.resource._model.destination_type = "Risk"
+    src = {
+        "source": {
+            "type": "Control",
+            "id": 1
+        },
+        "destination": {
+            "id": 2,
+            "type": "Risk"
+        },
+    }
+
+    self.resource._get_relationship(src)
+
+    self.resource._model.query.filter.assert_called_once_with(
+        self.resource._model.source_id == src["source"]["id"],
+        self.resource._model.source_type == src["source"]["type"],
+        self.resource._model.destination_id == src["destination"]["id"],
+        self.resource._model.destination_type == src["destination"]["type"]
+    )
+
+  def test_get_relationship_reversed(self):
+    """Test for get relationship with reversed type."""
+    # pylint: disable=protected-access
+
+    self.resource._model.source_id = 1
+    self.resource._model.source_type = "AccountBalance"
+    self.resource._model.destination_id = 2
+    self.resource._model.destination_type = "Risk"
+    src = {
+        "source": {
+            "type": "account_balance",
+            "id": 1
+        },
+        "destination": {
+            "id": 2,
+            "type": "risk"
+        },
+    }
+
+    self.resource._get_relationship(src)
+
+    self.resource._model.query.filter.assert_called_once_with(
+        self.resource._model.source_id == src["source"]["id"],
+        self.resource._model.source_type != src["source"]["type"],
+        self.resource._model.destination_id == src["destination"]["id"],
+        self.resource._model.destination_type != src["destination"]["type"]
+    )
