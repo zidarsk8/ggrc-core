@@ -89,7 +89,6 @@
                       submitCbs:from="submitCbs"
                       paging.total:to="scope.vars.totalObjects"
                       useSnapshots:from="useSnapshots"
-                      afterSearch:bind="afterSearch"
                       entries:bind="entries"
                       relevantTo:from="relevantTo"
                       objectGenerator:from="true"

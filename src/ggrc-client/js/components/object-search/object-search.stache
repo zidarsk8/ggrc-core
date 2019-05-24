@@ -86,7 +86,6 @@
                         paging.total:to="scope.vars.totalObjects"
                         searchOnly:from="true"
                         useSnapshots:from="useSnapshots"
-                        afterSearch:bind="afterSearch"
                         entries:bind="entries"
                         filterItems:from="scope.vars.filterItems"
                         mappingItems:from="scope.vars.mappingItems"
