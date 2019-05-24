@@ -216,17 +216,17 @@ describe('mapper-results component', function () {
   describe('onSearch() method', function () {
     beforeEach(function () {
       spyOn(viewModel, 'resetSearchParams');
+      spyOn(viewModel, 'setItemsDebounced');
     });
 
-    it('calls resetSearchParams() if resetParams defined', function () {
-      viewModel.onSearch({});
+    it('calls resetSearchParams()', function () {
+      viewModel.onSearch();
       expect(viewModel.resetSearchParams).toHaveBeenCalled();
     });
 
-    it('sets viewModel.refreshItems to true', function () {
-      viewModel.attr('refreshItems', false);
+    it('calls setItemsDebounced()', () => {
       viewModel.onSearch();
-      expect(viewModel.attr('refreshItems')).toEqual(true);
+      expect(viewModel.setItemsDebounced).toHaveBeenCalled();
     });
   });
 
@@ -867,31 +867,6 @@ describe('mapper-results component', function () {
         handler({}, {}, false);
         expect(viewModel.loadAllItems).not.toHaveBeenCalled();
       });
-    });
-
-    describe('"{viewModel} refreshItems" event', function () {
-      let handler;
-
-      beforeEach(function () {
-        spyOn(viewModel, 'setItemsDebounced');
-        handler = events['{viewModel} refreshItems'].bind({
-          viewModel: viewModel,
-        });
-      });
-      it('calls setItemsDebounced() if refreshItems is truly', function () {
-        handler({}, {}, true);
-        expect(viewModel.setItemsDebounced).toHaveBeenCalled();
-      });
-      it('sets false to viewModel.refreshItems if refreshItems is truly',
-        function () {
-          handler({}, {}, true);
-          expect(viewModel.setItemsDebounced).toHaveBeenCalled();
-        });
-      it('does not call setItemsDebounced() if refreshItems is falsy',
-        function () {
-          handler({}, {}, false);
-          expect(viewModel.setItemsDebounced).not.toHaveBeenCalled();
-        });
     });
 
     describe('"{viewModel.paging} current" event', function () {
