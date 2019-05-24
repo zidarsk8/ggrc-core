@@ -834,15 +834,11 @@ class TestAssessmentImport(TestCase):
         ("Code", assessment.slug),
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/22/2019"),
-        ("State", all_models.Assessment.DONE_STATE),
     ]))
     self._check_csv_response(response, {})
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).verified_date,
         datetime.datetime(2019, 1, 22))
-    self.assertEqual(
-        all_models.Assessment.query.get(assessment.id).status,
-        all_models.Assessment.DONE_STATE)
 
   def test_asmt_verified_date_readonly(self):
     """Test that Verified Date is readonly"""
@@ -863,15 +859,36 @@ class TestAssessmentImport(TestCase):
         ("Code", assessment.slug),
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/21/2019"),
-        ("State", all_models.Assessment.DONE_STATE),
     ]))
     self._check_csv_response(response, expected_warnings)
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).verified_date,
         date)
+
+  @ddt.data("user@example.com", "--")
+  def test_asmt_state_after_updating_verifiers(self, new_verifier):
+    """Test that after updating Verifiers assessment became In Progress"""
+    audit = factories.AuditFactory()
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    status=all_models.Assessment.DONE_STATE,
+                                    )
+    person = factories.PersonFactory(email="verifier@example.com")
+    factories.AccessControlPersonFactory(
+        ac_list=assessment.acr_name_acl_map["Verifiers"],
+        person=person,
+    )
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.DONE_STATE)
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", new_verifier),
+    ]))
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.PROGRESS_STATE)
 
 
 @ddt.ddt
