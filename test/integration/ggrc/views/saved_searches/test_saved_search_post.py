@@ -160,3 +160,42 @@ class TestSavedSearchPost(TestCase):
 
     self.assertIn("Malformed query", data["message"])
     self.assertEqual(data["code"], 400)
+
+  def test_5_successful_creation_of_saved_search_with_filters(self):
+    """Test that we able to write and read values to filters field"""
+    _filter = {"expression":
+               {"left":
+                {"left": "Title",
+                 "op": {"name": "~"},
+                 "right": "one"
+                 },
+                "op": {"name": "AND"},
+                "right": {"left": "Status",
+                          "op": {"name": "IN"},
+                          "right": ["Active", "Draft", "Deprecated"]
+                          }
+                }
+               }
+    response = self._client.post(
+        "/api/saved_searches",
+        data=json.dumps({
+            "name": "test_ss_5",
+            "object_type": "Assessment",
+            "query": self._valid_query,
+            "filters": _filter
+        }),
+        headers=self._headers,
+    )
+
+    self.assertEqual(response.status, "200 OK")
+
+    response = self._client.get(
+        "/api/saved_searches/Assessment",
+        headers=self._headers,
+    )
+
+    data = json.loads(response.data)
+
+    for saved_search in data["values"]:
+      if saved_search["name"] == "test_ss_5":
+        self.assertEqual(json.loads(saved_search["filters"]), _filter)

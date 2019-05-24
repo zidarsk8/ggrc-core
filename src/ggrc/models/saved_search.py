@@ -45,8 +45,10 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
   object_type = db.Column(db.String, nullable=False)
   query = db.Column(db.Text, nullable=False)
   person_id = db.Column(db.Integer, db.ForeignKey("people.id"))
+  filters = db.Column(db.Text, nullable=True)
 
-  def __init__(self, query, name, object_type, user):
+  # pylint: disable-msg=too-many-arguments
+  def __init__(self, query, name, object_type, user, filters=""):
     self.validate_name_uniqueness_for_user(user, name)
 
     super(SavedSearch, self).__init__(
@@ -54,6 +56,7 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
         name=name,
         object_type=object_type,
         person_id=user.id,
+        filters=filters,
     )
 
   def validate_name_uniqueness_for_user(self, user, name):
@@ -104,3 +107,12 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
       )
 
     return object_type
+
+  @validates("filters")
+  def validate_filters(self, _, filters):
+    """
+      Validate correctness of supplied search filters.
+    """
+    if filters:
+      return json.dumps(filters)
+    return None

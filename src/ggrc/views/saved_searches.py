@@ -73,6 +73,7 @@ def create_saved_search():
         data.get("name"),
         data.get("object_type"),
         user,
+        data.get("filters"),
     )
   except ValidationError as error:
     return make_error_response(error.message, 400, force_json=True)
