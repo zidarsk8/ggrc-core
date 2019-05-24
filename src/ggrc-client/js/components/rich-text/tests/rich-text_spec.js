@@ -266,5 +266,33 @@ describe('rich-text component', () => {
         expect(viewModel.attr('showAlert')).toBe(false);
       });
     });
+
+    describe('buildLinkOps method', () => {
+      it('should return ops without "retain". startIndex = 0', () => {
+        const ops = viewModel.buildLinkOps('text', 'href', 0);
+        expect(ops.length).toBe(2);
+        expect(ops[0].hasOwnProperty('retain')).toBeFalsy();
+      });
+
+      it('should return ops with "retain". startIndex > 0', () => {
+        const startIndex = 5;
+        const ops = viewModel.buildLinkOps('text', 'href', startIndex);
+        expect(ops.length).toBe(3);
+        expect(ops[0].hasOwnProperty('retain')).toBeTruthy();
+        expect(ops[0].retain).toBe(startIndex);
+      });
+
+      it('should return correct ops for link', () => {
+        const text = 'ggrc.com';
+        const href = 'https://ggrc.com';
+        const startIndex = 5;
+        const ops = viewModel.buildLinkOps(text, href, startIndex);
+        expect(ops.length).toBe(3);
+        expect(ops[0].retain).toBe(5);
+        expect(ops[1].delete).toBe(text.length);
+        expect(ops[2].insert).toEqual(text);
+        expect(ops[2].attributes.link).toEqual(href);
+      });
+    });
   });
 });
