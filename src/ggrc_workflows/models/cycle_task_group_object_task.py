@@ -22,6 +22,8 @@ from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import types
 from ggrc.models.mixins import base
+from ggrc.models.mixins import with_last_comment
+
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.workflow import Workflow
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
@@ -32,6 +34,7 @@ LOGGER = getLogger(__name__)
 
 
 class CycleTaskGroupObjectTask(roleable.Roleable,
+                               with_last_comment.WithLastComment,
                                wf_mixins.CycleTaskStatusValidatedMixin,
                                wf_mixins.WorkflowCommentable,
                                mixins.WithLastDeprecatedDate,
@@ -86,6 +89,8 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
                                  lambda x: x.cycle.contact,
                                  ['email', 'name'],
                                  False),
+      ft_attributes.FullTextAttr("last_comment", "last_comment",
+                                 with_template=False),
       ft_attributes.DateFullTextAttr(
           "group due date",
           lambda x: x.cycle_task_group.next_due_date,

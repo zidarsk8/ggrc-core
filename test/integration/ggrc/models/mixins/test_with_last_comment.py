@@ -17,13 +17,17 @@ from integration.ggrc import TestCase, generator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.query_helper import WithQueryApi
 from integration.ggrc.models import factories
+from integration.ggrc_workflows.models import factories as wf_factories
 
 
-class TestWithLastAssessmentDate(TestCase, WithQueryApi):
-  """Integration test suite for WithLastComment functionality."""
+class TestWithLastCommentAssessment(TestCase, WithQueryApi):
+  """
+      Integration test suite for WithLastComment functionality
+      for Assessments.
+  """
 
   def setUp(self):
-    super(TestWithLastAssessmentDate, self).setUp()
+    super(TestWithLastCommentAssessment, self).setUp()
     self.client.get("/login")
     self.api = Api()
     self.gen = generator.ObjectGenerator()
@@ -92,7 +96,7 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
     self.assertEqual(result, [i.id for i in sorted_asmnts])
 
   def test_export_last_comment(self):
-    """Test export Last Assessment Date."""
+    """Test export Last Comment for Assessments."""
     search_request = [{
         "object_name": "Assessment",
         "filters": {
@@ -107,7 +111,7 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
     self.assertEqual(exported_comments, db_comments)
 
   def test_import_last_comment(self):
-    """Test Last Assessment Date field read only on import."""
+    """Test Last Comment field read only on import Assessments."""
     audit = factories.AuditFactory()
     response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
@@ -198,3 +202,129 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
         "Assessment", self.asmnt_comments.keys()
     )
     self.assertEqual(last_comment_attrs.count(), 2)
+
+
+class TestWithLastCommentCycleTask(TestCase, WithQueryApi):
+  """
+      Integration test suite for WithLastComment functionality
+      for Cycle Tasks.
+  """
+  def setUp(self):
+    super(TestWithLastCommentCycleTask, self).setUp()
+    self.client.get("/login")
+    self.api = Api()
+
+  def compute_attributes(self):
+    """Method for computed_attributes job"""
+    query = all_models.Revision.query.filter_by(resource_type="Comment")
+    revision_ids = [revision.id for revision in query]
+    self.api.send_request(
+        self.api.client.post,
+        api_link="/admin/compute_attributes",
+        data={"revision_ids": revision_ids}
+    )
+
+  @staticmethod
+  def get_model_fulltext(model_name, property, ids):
+    """Get fulltext records for model."""
+    # pylint: disable=redefined-builtin
+    return db.session.query(mysql.MysqlRecordProperty).filter(
+        mysql.MysqlRecordProperty.type == model_name,
+        mysql.MysqlRecordProperty.property == property,
+        mysql.MysqlRecordProperty.key.in_(ids),
+    )
+
+  def test_last_comment_value(self):
+    """Test proper value in last_comment field"""
+    with factories.single_commit():
+      c_task = wf_factories.CycleTaskGroupObjectTaskFactory()
+      c_task_id = c_task.id
+      comment_1 = factories.CommentFactory(description=factories.random_str())
+      comment_2 = factories.CommentFactory(description=factories.random_str())
+      comment_2_id = comment_2.id
+      factories.RelationshipFactory(source=c_task, destination=comment_1)
+      factories.RelationshipFactory(source=c_task, destination=comment_2)
+
+    self.compute_attributes()
+    comment_2 = all_models.Comment.query.get(comment_2_id)
+    c_task = all_models.CycleTaskGroupObjectTask.query.get(c_task_id)
+
+    self.assertEqual(c_task.last_comment, comment_2.description)
+
+  def test_last_comment_filter(self):
+    """Test filtration by last comment."""
+    with factories.single_commit():
+      for _ in range(2):
+        c_task = wf_factories.CycleTaskGroupObjectTaskFactory()
+        comment = factories.CommentFactory(
+            description=factories.random_str()
+        )
+        factories.RelationshipFactory(source=c_task, destination=comment)
+
+    self.compute_attributes()
+
+    c_task = all_models.CycleTaskGroupObjectTask.query.first()
+    result = self._get_first_result_set(
+        self._make_query_dict(
+            "CycleTaskGroupObjectTask",
+            expression=("Last Comment", "=", c_task.last_comment),
+            type_="ids",
+        ),
+        "CycleTaskGroupObjectTask",
+    )
+
+    self.assertEqual(result["count"], 1)
+    self.assertEqual(result["ids"], [c_task.id])
+
+  def test_ca_cleanup_on_obj_delete(self):
+    """Test cleaning of fulltext and attributes tables on obj delete"""
+    with factories.single_commit():
+      for _ in range(2):
+        c_task = wf_factories.CycleTaskGroupObjectTaskFactory()
+        comment = factories.CommentFactory(
+            description=factories.random_str()
+        )
+        factories.RelationshipFactory(source=c_task, destination=comment)
+
+    self.compute_attributes()
+
+    c_task = all_models.CycleTaskGroupObjectTask.query.first()
+
+    last_comment_records = self.get_model_fulltext(
+        "CycleTaskGroupObjectTask", "last_comment", [c_task.id]
+    )
+    last_comment_attrs = self.get_model_ca(
+        "CycleTaskGroupObjectTask",
+        [c_task.id]
+    )
+    self.assertEqual(last_comment_records.count(), 1)
+    self.assertEqual(last_comment_attrs.count(), 1)
+
+    response = self.api.delete(c_task)
+    self.assert200(response)
+
+    last_comment_records = self.get_model_fulltext(
+        "CycleTaskGroupObjectTask", "last_comment", [c_task.id]
+    )
+
+    last_comment_attrs = self.get_model_ca(
+        "CycleTaskGroupObjectTask",
+        [c_task.id]
+    )
+    self.assertEqual(last_comment_attrs.count(), 0)
+    self.assertEqual(last_comment_records.count(), 0)
+
+    # Check that other records weren't affected
+    task_ids = [task.id for task in
+                all_models.CycleTaskGroupObjectTask.query.all()]
+
+    last_comment_records = self.get_model_fulltext(
+        "CycleTaskGroupObjectTask", "last_comment", task_ids
+    )
+    last_comment_attrs = self.get_model_ca(
+        "CycleTaskGroupObjectTask",
+        task_ids,
+    )
+
+    self.assertEqual(last_comment_records.count(), 1)
+    self.assertEqual(last_comment_attrs.count(), 1)
