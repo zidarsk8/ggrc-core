@@ -7,7 +7,7 @@ When Audit-Snapshottable Relationship is POSTed, a Snapshot should be created
 instead.
 """
 
-from werkzeug.exceptions import MethodNotAllowed
+from werkzeug.exceptions import MethodNotAllowed, Forbidden
 
 from ggrc.builder import json as json_builder
 from ggrc import db
@@ -16,6 +16,7 @@ from ggrc.models.snapshot import Snapshot
 from ggrc.models import relationship
 from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
 from ggrc.login import get_current_user
+from ggrc.rbac import permissions
 from ggrc.utils import referenced_objects
 
 
@@ -116,3 +117,13 @@ class RelationshipResource(ggrc.services.common.Resource):
   def put(self, id):  # pylint: disable=redefined-builtin
     """Disable ability to make PUT operation handler."""
     raise MethodNotAllowed()
+
+  def _check_post_permissions(self, objects):
+    for obj in objects:
+      if obj.type == "Snapshot" and\
+         not permissions.is_allowed_update(obj.child_type,
+                                           obj.child_id,
+                                           obj.context_id):
+        db.session.expunge_all()
+        raise Forbidden()
+    super(RelationshipResource, self)._check_post_permissions(objects)
