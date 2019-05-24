@@ -17,7 +17,6 @@ from ggrc.models import utils
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import synchronizable
 from ggrc.models.object_document import PublicDocumentable
-from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 
 
@@ -25,7 +24,6 @@ class Risk(synchronizable.Synchronizable,
            synchronizable.RoleableSynchronizable,
            mixins.CustomAttributable,
            Relatable,
-           Personable,
            PublicDocumentable,
            comment.ExternalCommentable,
            mixins.TestPlanned,
