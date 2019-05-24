@@ -1,0 +1,40 @@
+# Copyright (C) 2019 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""This module contains constants for services."""
+
+OBJECT_TYPES_RELATIONSHIPS = {
+    "access_group": "AccessGroup",
+    "account_balance": "AccountBalance",
+    "assessment": "Assessment",
+    "assessment_template": "AssessmentTemplate",
+    "audit": "Audit",
+    "contract": "Contract",
+    "control": "Control",
+    "data_asset": "DataAsset",
+    "document": "Document",
+    "evidence": "Evidence",
+    "facility": "Facility",
+    "issue": "Issue",
+    "market": "Market",
+    "metric": "Metric",
+    "objective": "Objective",
+    "org_group": "OrgGroup",
+    "person": "Person",
+    "policy": "Policy",
+    "process": "Process",
+    "product": "Product",
+    "product_group": "ProductGroup",
+    "program": "Program",
+    "project": "Project",
+    "regulation": "Regulation",
+    "requirement": "Requirement",
+    "risk": "Risk",
+    "standard": "Standard",
+    "system": "System",
+    "technology_environment": "TechnologyEnvironment",
+    "threat": "Threat",
+    "vendor": "Vendor",
+    "workflow": "Workflow",
+    "key_report": "KeyReport",
+}
