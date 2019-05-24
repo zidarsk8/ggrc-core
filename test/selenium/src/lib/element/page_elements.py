@@ -316,6 +316,11 @@ class CustomAttribute(object):
     else:
       self._ca_strategy.set_gcas_from_popup(value)
 
+  def open_edit(self):
+    """Opens edit form for custom attribute."""
+    self._ca_strategy.open_gcas_from_inline()
+    return self._ca_strategy
+
 
 class CAActionsStrategy(object):
   """Parent class for custom attribute actions."""
@@ -323,6 +328,10 @@ class CAActionsStrategy(object):
     self._root = root
     self._label_el = label_el
     self._inline_edit = InlineEdit(self._root)
+
+  def open_gcas_from_inline(self):
+    """Opens GCA inline field for editing."""
+    self._inline_edit.open()
 
   def get_gcas_from_inline(self):
     """Gets value of inline GCA field."""
@@ -370,6 +379,11 @@ class RichTextCAActionsStrategy(CAActionsStrategy):
   def __init__(self, *args):
     super(RichTextCAActionsStrategy, self).__init__(*args)
     self._input = self._root.element(class_name="ql-editor")
+
+  @property
+  def is_inline_edit_opened(self):
+    """Checks if input opened."""
+    return self._input.exists
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""

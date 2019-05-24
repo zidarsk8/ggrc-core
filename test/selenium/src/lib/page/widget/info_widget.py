@@ -283,6 +283,17 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     if not is_inline:
       self.edit_popup.save_and_close()
 
+  def has_ca_inline_edit(self, attr_title):
+    """Tries to open edit form for CA by its title
+    and returns bool if edit exists."""
+    ca_manager = page_elements.CustomAttributeManager(
+        self._browser,
+        obj_type=self.child_cls_name.lower(),
+        is_global=True,
+        is_inline=True)
+    return ca_manager.find_ca_elem_by_title(
+        attr_title).open_edit().is_inline_edit_opened
+
   def obj_scope(self):
     """Returns dict of object."""
     scope = {

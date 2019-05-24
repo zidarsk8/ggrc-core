@@ -93,7 +93,7 @@ def create_gcad(**attrs):
       factory_params=attrs)
 
 
-def create_gcad_for_control():
+def create_gcads_for_control():
   """Creates global CADs for all types."""
   return [create_gcad(definition_type="control",
                       attribute_type=ca_type)
