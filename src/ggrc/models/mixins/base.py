@@ -410,10 +410,9 @@ class Base(Dictable, ChangeTracked, Identifiable):
         name, filter_by = value, None
       if not name:
         continue
-      if name.lower() != "last comment":
+      if name.lower() not in getattr(cls, 'IGNORE_TEMPLATE_ATTRIBUTES', []):
         tmp = getattr(cls, "PROPERTY_TEMPLATE", "{}")
         name = tmp.format(name)
         key = tmp.format(key)
       cls.CACHED_ATTRIBUTE_MAP[name.lower()] = (key.lower(), filter_by)
-
     return cls.CACHED_ATTRIBUTE_MAP

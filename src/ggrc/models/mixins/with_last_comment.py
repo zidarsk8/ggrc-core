@@ -17,6 +17,9 @@ class WithLastComment(attributable.Attributable):
   """Defines logic to get last comment for object."""
   # pylint: disable=too-few-public-methods
 
+  # Constant for attribute map that ignore class attr template
+  IGNORE_TEMPLATE_ATTRIBUTES = ('last comment', )
+
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute("last_comment", create=False, update=False),
       reflection.Attribute("last_comment_id", create=False, update=False),
@@ -29,7 +32,8 @@ class WithLastComment(attributable.Attributable):
       },
   }
 
-  _fulltext_attrs = [attributes.FullTextAttr("last_comment", "last_comment")]
+  _fulltext_attrs = [attributes.FullTextAttr("last_comment", "last_comment",
+                                             with_template=False)]
 
   @simple_property
   def last_comment(self):

@@ -139,6 +139,11 @@ export default Cacheable.extend({
         attr_name: 'is_verification_needed',
         attr_sort_field: 'needs verification',
       },
+      {
+        attr_title: 'Last Comment',
+        attr_name: 'last_comment',
+        attr_sort_field: 'last comment',
+      },
     ],
     display_attr_names: ['title',
       'status',

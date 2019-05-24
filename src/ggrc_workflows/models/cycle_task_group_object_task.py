@@ -89,8 +89,6 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
                                  lambda x: x.cycle.contact,
                                  ['email', 'name'],
                                  False),
-      ft_attributes.FullTextAttr("last_comment", "last_comment",
-                                 with_template=False),
       ft_attributes.DateFullTextAttr(
           "group due date",
           lambda x: x.cycle_task_group.next_due_date,
