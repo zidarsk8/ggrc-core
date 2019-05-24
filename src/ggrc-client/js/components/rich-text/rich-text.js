@@ -181,7 +181,6 @@ export default can.Component.extend('richText', {
       if (textLength &&
         delta.ops.length === 2 &&
         delta.ops[0].retain &&
-        !delta.ops[1].delete &&
         !this.isWhitespace(delta.ops[1].insert)) {
         let text = editor.getText();
         let startIdx = delta.ops[0].retain;
