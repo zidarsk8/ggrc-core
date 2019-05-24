@@ -93,7 +93,7 @@ export default can.Component.extend({
     disabledIds: [],
     megaRelationObj: {},
     init: function () {
-      this.attr('submitCbs').add(this.onSearch.bind(this, true));
+      this.attr('submitCbs').add(this.onSearch.bind(this));
     },
     destroy: function () {
       this.attr('submitCbs').remove(this.onSearch.bind(this));
@@ -159,10 +159,8 @@ export default can.Component.extend({
       this.attr('paging.pageSize', DEFAULT_PAGE_SIZE);
       this.setSortingConfiguration();
     },
-    onSearch: function (resetParams) {
-      if (resetParams) {
-        this.resetSearchParams();
-      }
+    onSearch: function () {
+      this.resetSearchParams();
       this.attr('refreshItems', true);
       this.setItemsDebounced();
       this.attr('refreshItems', false);
