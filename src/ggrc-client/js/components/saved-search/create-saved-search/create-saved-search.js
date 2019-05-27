@@ -4,6 +4,8 @@
 */
 
 import SavedSearch from '../../../models/service-models/saved-search';
+import { notifierXHR } from '../../../plugins/utils/notifiers-utils';
+import { handleAjaxError } from '../../../plugins/utils/errors-utils';
 
 export default can.Component.extend({
   tag: 'create-saved-search',
@@ -33,8 +35,10 @@ export default can.Component.extend({
         object_type: this.attr('objectType'),
         filters,
       })
-      savedSearch.save().then(() => {
+      return savedSearch.save().then(() => {
         this.dispatch('created');
+      }, (err) => {
+        handleAjaxError(err);
       });
     },
   }),
