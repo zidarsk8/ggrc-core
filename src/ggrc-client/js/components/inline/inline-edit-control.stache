@@ -69,7 +69,7 @@
           {{/case}}
         {{/switch}}
 
-        <ul class="inline__controls">
+        <ul class="inline__controls {{#is(type, "multiselect")}}ms-controls{{/is}}">
           <li class="inline__controls-item">
             <a class="inline__controls-link" href="javascript://" on:el:click="save()">
               <i class="fa fa-check"></i>

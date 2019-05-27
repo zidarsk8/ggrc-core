@@ -4,7 +4,9 @@
  */
 
 .multiselect-dropdown {
-  max-width: 350px;
+  &:not(.inline) {
+    max-width: 350px;
+  }
   min-width: 150px;
 
   .dropdown-focus {
@@ -43,6 +45,8 @@
   }
 
   label.multiselect-dropdown__label {
+    display: flex;
+    word-break: break-word;
     width: 96%;
     margin: 0;
     padding: 2px 0 2px 5px;
@@ -55,6 +59,8 @@
   }
 
   input[type="checkbox"].multiselect-dropdown__checkbox {
+    position: relative;
+    top: 2px;
     margin: 0 3px;
   }
 

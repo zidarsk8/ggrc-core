@@ -39,7 +39,7 @@
 
   {{#default}}
     {{#if withReadMore}}
-      <div class="inline-edit__text {{#is(type, "multiselect")}}single-line{{/is}}">
+      <div class="inline-edit__text">
         <read-more text:from="{{#is(type, "multiselect")}}items{{else}}value{{/is}}"
           handleMarkdown:from="instance.constructor.isChangeableExternally">
         </read-more>

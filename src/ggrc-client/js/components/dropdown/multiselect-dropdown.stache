@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="multiselect-dropdown flex-box flex-col">
+<div class="multiselect-dropdown flex-box flex-col {{#if isInlineMode}}inline{{/if}}">
   <!-- HACK: using of tabindex can set styles on focus -->
   {{^if isInlineMode}}
     <div tabindex="-1" class="multiselect-dropdown__input-container {{#disabled}}disabled{{/disabled}}" on:el:click="openDropdown()">
@@ -36,7 +36,7 @@
         </li>
         {{#options}}
         <li class="multiselect-dropdown__element">
-          <label class="multiselect-dropdown__label single-line">
+          <label class="multiselect-dropdown__label">
             <input type="checkbox"
               el:checked:bind="checked"
               on:el:click="optionChange(.)"
