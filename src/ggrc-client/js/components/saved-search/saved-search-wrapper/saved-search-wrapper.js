@@ -4,6 +4,7 @@
 */
 
 import SavedSearch from '../../../models/service-models/saved-search';
+import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'saved-search-wrapper',
@@ -19,11 +20,24 @@ export default can.Component.extend({
       },
     },
     searches: [],
-    filterItems: [],
+    filtersToApply: null,
     applySearch({search}) {
-      const query = JSON.parse(search.query)[0];
-      const filters = query.filters;
-      console.log(filters);
+      try {
+        const {
+          filterItems,
+          mappingItems,
+          statusItem,
+        } = JSON.parse(search.filters);
+
+        this.attr('filtersToApply', {
+          filterItems,
+          mappingItems,
+          statusItem,
+        });
+      } catch (e) {
+        notifier('error',
+          `"${search.name}" is broken somehow. Sorry for any inconvenience.`);
+      }
     },
     init() {
       this.loadSavedSearches();

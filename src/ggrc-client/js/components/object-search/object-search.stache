@@ -13,7 +13,7 @@
 </div>
 
 <saved-search-wrapper
-  {object-type}="{model.model_singular}">
+  objectType:from="model.model_singular">
 <div class="modal-body-wrapper">
   <aside>
     <saved-search-list
@@ -28,10 +28,12 @@
       <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
         <advanced-search-wrapper modelName:from="model.model_singular"
                                 modelDisplayName:from="model.title_plural"
+                                filtersToApply:from="filtersToApply"
                                 mappingItems:to="scope.vars.mappingItems"
                                 filterItems:to="scope.vars.filterItems"
                                 statusItem:to="scope.vars.statusItem"
                                 on:el:enter="onSubmit()"
+                                on:submit="onSubmit()"
                                 query:bind="query">
           <div class="object-controls">
             <div class="object-controls__row">
@@ -82,6 +84,9 @@
               </div>
               <div class="object-controls__actions-search">
                 <create-saved-search
+                  filterItems:from="filterItems"
+                  mappingItems:from="mappingItems"
+                  statusItem:from="statusItem"
                   query:from="query"
                   objectType:from="modelName"
                   on:created="loadSavedSearches()"

@@ -14,15 +14,24 @@ export default can.Component.extend({
   leakScope: false,
   viewModel: can.Map.extend({
     query: null,
+    filterItems: null,
+    mappingItems: null,
+    statusItem: null,
     searchName: '',
     objectType: '',
     saveSearch() {
       const query = this.attr('query').serialize();
+      const filters = {
+        filterItems: this.attr('filterItems').serialize(),
+        mappingItems: this.attr('mappingItems').serialize(),
+        statusItem: this.attr('statusItem').serialize(),
+      };
 
       const savedSearch = new SavedSearch({
         name: this.attr('searchName'),
-        query: query,
+        query,
         object_type: this.attr('objectType'),
+        filters,
       })
       savedSearch.save().then(() => {
         this.dispatch('created');
