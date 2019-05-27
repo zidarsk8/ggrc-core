@@ -141,18 +141,16 @@ describe('object-bulk-update component', function () {
     beforeEach(function () {
       context = {
         viewModel: new can.Map({
-          submitCbs: {
-            fire: jasmine.createSpy(),
-          },
+          onSubmit: jasmine.createSpy(),
         }),
       };
       event = events.inserted.bind(context);
     });
 
-    it('calls fire() of submitCbs attribute', function () {
+    it('calls onSubmit()', function () {
       event();
 
-      expect(context.viewModel.submitCbs.fire).toHaveBeenCalled();
+      expect(context.viewModel.onSubmit).toHaveBeenCalled();
     });
   });
 });

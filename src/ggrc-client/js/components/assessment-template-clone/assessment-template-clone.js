@@ -34,7 +34,7 @@ export default can.Component.extend({
   },
   events: {
     inserted() {
-      this.viewModel.attr('submitCbs').fire();
+      this.viewModel.onSubmit();
     },
     closeModal() {
       if (this.element) {

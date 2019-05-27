@@ -73,7 +73,6 @@ export default can.Component.extend({
     statusItem: {},
     selected: [],
     refreshItems: false,
-    submitCbs: null,
     disableColumnsConfiguration: false,
     applyOwnedFilter: false,
     objectsPlural: false,
@@ -92,12 +91,6 @@ export default can.Component.extend({
     deferredList: [],
     disabledIds: [],
     megaRelationObj: {},
-    init: function () {
-      this.attr('submitCbs').add(this.onSearch.bind(this, true));
-    },
-    destroy: function () {
-      this.attr('submitCbs').remove(this.onSearch.bind(this));
-    },
     setItems: function () {
       const stopFn = tracker.start(this.attr('type'),
         tracker.USER_JOURNEY_KEYS.NAVIGATION,
@@ -159,11 +152,11 @@ export default can.Component.extend({
       this.attr('paging.pageSize', DEFAULT_PAGE_SIZE);
       this.setSortingConfiguration();
     },
-    onSearch: function (resetParams) {
-      if (resetParams) {
-        this.resetSearchParams();
-      }
+    onSearch: function () {
+      this.resetSearchParams();
       this.attr('refreshItems', true);
+      this.setItemsDebounced();
+      this.attr('refreshItems', false);
     },
     prepareRelevantQuery: function () {
       let relevantList = this.attr('relevantTo') || [];
@@ -541,12 +534,6 @@ export default can.Component.extend({
     '{viewModel} allSelected': function (scope, ev, allSelected) {
       if (allSelected) {
         this.viewModel.loadAllItems();
-      }
-    },
-    '{viewModel} refreshItems': function (scope, ev, refreshItems) {
-      if (refreshItems) {
-        this.viewModel.setItemsDebounced();
-        this.viewModel.attr('refreshItems', false);
       }
     },
     '{viewModel.paging} current': function () {
