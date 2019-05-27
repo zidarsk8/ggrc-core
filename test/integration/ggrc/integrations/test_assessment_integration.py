@@ -1272,34 +1272,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       )
       self.assertEqual(issue_obj.enabled, issue_tracker_enabled)
 
-  def test_default_values_set_correctly(self):
-    """Check audit values were set to assessment with disabled integration"""
-    with factories.single_commit():
-      audit = factories.AuditFactory()
-      audit_id = audit.id
-      factories.IssueTrackerIssueFactory(
-          issue_tracked_obj=audit,
-          component_id=self.DEFAULT_ASSESSMENT_ATTRS["component_id"],
-          hotlist_id=self.DEFAULT_ASSESSMENT_ATTRS["hotlist_id"],
-          issue_priority=self.DEFAULT_ASSESSMENT_ATTRS["issue_priority"],
-          issue_severity=self.DEFAULT_ASSESSMENT_ATTRS["issue_severity"],
-          issue_type=self.DEFAULT_ASSESSMENT_ATTRS["issue_type"],
-      )
-
-    payload = self.request_payload_builder({"enabled": False}, audit)
-    response = self.api.post(all_models.Assessment, payload)
-
-    self.assertEqual(response.status_code, 201)
-    assmt_id = response.json.get("assessment").get("id")
-    assmt_iti = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
-    audit_iti = models.IssuetrackerIssue.get_issue("Audit", audit_id)
-
-    self.assertEqual(assmt_iti.component_id, audit_iti.component_id)
-    self.assertEqual(assmt_iti.hotlist_id, audit_iti.hotlist_id)
-    self.assertEqual(assmt_iti.issue_priority, audit_iti.issue_priority)
-    self.assertEqual(assmt_iti.issue_severity, audit_iti.issue_severity)
-    self.assertEqual(assmt_iti.issue_type, audit_iti.issue_type)
-
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'
             'assessment_integration.AssessmentTrackerHandler.'
