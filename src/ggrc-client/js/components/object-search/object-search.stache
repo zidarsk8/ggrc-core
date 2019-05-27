@@ -21,6 +21,12 @@
       on:applySearch="applySearch(scope.event)"
       on:removed="loadSavedSearches()"
     ></saved-search-list>
+
+    {{#if isPagingShown}}
+      <tree-pagination
+        paging:from="searchesPaging"
+      ></tree-pagination>
+    {{/if}}
   </aside>
 
   <main>

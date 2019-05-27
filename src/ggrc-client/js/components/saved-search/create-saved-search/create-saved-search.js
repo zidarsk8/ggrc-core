@@ -22,7 +22,6 @@ export default can.Component.extend({
     searchName: '',
     objectType: '',
     saveSearch() {
-      const query = this.attr('query').serialize();
       const filters = {
         filterItems: this.attr('filterItems').serialize(),
         mappingItems: this.attr('mappingItems').serialize(),
@@ -31,7 +30,6 @@ export default can.Component.extend({
 
       const savedSearch = new SavedSearch({
         name: this.attr('searchName'),
-        query,
         object_type: this.attr('objectType'),
         filters,
       })

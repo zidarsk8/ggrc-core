@@ -19,11 +19,19 @@ export default can.Component.extend({
           this.loadSavedSearches();
         },
       },
-      paging: {
+      searchesPaging: {
         value() {
           return new Pagination({
             pageSize: 10, pageSizeSelect: [10],
           });
+        },
+      },
+      isPagingShown: {
+        get() {
+          const total = this.attr('searchesPaging.total');
+          const pageSize = this.attr('searchesPaging.pageSize');
+
+          return total > pageSize;
         },
       },
     },
@@ -52,10 +60,12 @@ export default can.Component.extend({
     },
     loadSavedSearches() {
       const type = this.attr('objectType');
-      const paging = this.attr('paging');
+      const paging = this.attr('searchesPaging');
 
       return SavedSearch.findByType(type, paging)
-        .then(({values}) => {
+        .then(({total, values}) => {
+          this.attr('searchesPaging.total', total);
+
           const searches = values.map((value) => new SavedSearch(value));
           this.attr('searches', searches);
         });
