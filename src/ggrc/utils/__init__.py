@@ -433,6 +433,16 @@ def make_simple_response(error=None):
   return app.make_response(("Success", 200, [("Content-Type", "text/html")]))
 
 
+def format_api_error_response(error_code, message):
+  """Return API response object with error"""
+
+  return flask.make_response((
+      as_json({"message": message, "code": error_code}),
+      error_code,
+      [("Content-Type", "application/json")],
+  ))
+
+
 def is_deferred_loaded(obj):
   """Check whether deferred fields of `obj` are loaded or not."""
   unloaded = sqlalchemy.inspect(obj).unloaded
