@@ -5,6 +5,7 @@
 
 import SavedSearch from '../../../models/service-models/saved-search';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
+import Pagination from '../../base-objects/pagination';
 
 export default can.Component.extend({
   tag: 'saved-search-wrapper',
@@ -16,6 +17,13 @@ export default can.Component.extend({
           setValue(newValue);
 
           this.loadSavedSearches();
+        },
+      },
+      paging: {
+        value() {
+          return new Pagination({
+            pageSize: 10, pageSizeSelect: [10],
+          });
         },
       },
     },
@@ -43,7 +51,10 @@ export default can.Component.extend({
       this.loadSavedSearches();
     },
     loadSavedSearches() {
-      return SavedSearch.findByType(this.attr('objectType'))
+      const type = this.attr('objectType');
+      const paging = this.attr('paging');
+
+      return SavedSearch.findByType(type, paging)
         .then(({values}) => {
           const searches = values.map((value) => new SavedSearch(value));
           this.attr('searches', searches);

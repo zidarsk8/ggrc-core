@@ -10,9 +10,17 @@ export default can.Model.extend({
   destroy: 'DELETE /api/saved_searches/{id}',
   create: 'POST /api/saved_searches',
   findOne: 'GET /api/saved_searches/{id}',
-  findByType(type) {
+  findByType(type, paging) {
+    let url = `/api/saved_searches/${type}`;
+
+    if (paging) {
+      const offset = (paging.current - 1) * paging.pageSize;
+      const limit = paging.pageSize;
+      url += `?offset=${offset}&limit=${limit}`;
+    }
+
     return $.ajax({
-      url: `/api/saved_searches/${type}`,
+      url,
       type: 'get',
       dataType: 'json',
     });
