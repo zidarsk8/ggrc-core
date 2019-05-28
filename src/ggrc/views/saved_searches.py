@@ -61,7 +61,7 @@ def delete_saved_search(saved_search_id):
 
 
 @app.route("/api/saved_searches", methods=["POST"])
-@validate_post_data_keys(["query", "name", "object_type"])
+@validate_post_data_keys(["name", "object_type"])
 def create_saved_search():
   user = login.get_current_user(use_external_user=False)
 
@@ -69,7 +69,6 @@ def create_saved_search():
 
   try:
     search = SavedSearch(
-        data.get("query"),
         data.get("name"),
         data.get("object_type"),
         user,

@@ -45,13 +45,6 @@ class TestSavedSearchGet(TestCase):
 
     db.session.flush()
 
-    cls._valid_query = [{
-        "object_name": "Assessment",
-        "filters": {"expression": {}},
-        "limit": [0, 10],
-        "order_by": [{"name": "updated_at", "desc": True}]
-    }]
-
     locked_time = {
         "year": 2025,
         "month": 1,
@@ -66,7 +59,6 @@ class TestSavedSearchGet(TestCase):
 
         saved_search = SavedSearch(
             name="test_ss_{}".format(i),
-            query=cls._valid_query,
             object_type="Assessment",
             user=user,
         )
@@ -136,7 +128,6 @@ class TestSavedSearchGet(TestCase):
     self.assertEqual(data["values"][0]["name"], "test_ss_2")
     self.assertEqual(data["values"][1]["name"], "test_ss_1")
     self.assertEqual(data["values"][0]["object_type"], "Assessment")
-    self.assertEqual(data["values"][0]["query"], json.dumps(self._valid_query))
     self.assertEqual(data["values"][0]["person_id"], self._person_0.id)
     self.assertIn("id", data["values"][0])
     self.assertIn("created_at", data["values"][0])

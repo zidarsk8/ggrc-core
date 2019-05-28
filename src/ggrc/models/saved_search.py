@@ -43,16 +43,14 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
 
   name = db.Column(db.String, nullable=False)
   object_type = db.Column(db.String, nullable=False)
-  query = db.Column(db.Text, nullable=False)
   person_id = db.Column(db.Integer, db.ForeignKey("people.id"))
   filters = db.Column(db.Text, nullable=True)
 
   # pylint: disable-msg=too-many-arguments
-  def __init__(self, query, name, object_type, user, filters=""):
+  def __init__(self, name, object_type, user, filters=""):
     self.validate_name_uniqueness_for_user(user, name)
 
     super(SavedSearch, self).__init__(
-        query=query,
         name=name,
         object_type=object_type,
         person_id=user.id,
@@ -78,21 +76,6 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
       raise ValidationError("Saved search name can't be blank")
 
     return name
-
-  @validates("query")
-  def validate_query(self, _, query):
-    """
-      Validate correctness of supplied search query.
-    """
-    from ggrc.query.default_handler import DefaultHandler
-    from ggrc.query.exceptions import BadQueryException
-
-    try:
-      DefaultHandler(query)
-    except BadQueryException as error:
-      raise ValidationError("Malformed query: {}".format(error.message))
-
-    return json.dumps(query)
 
   @validates("object_type")
   def validate_object_type(self, _, object_type):

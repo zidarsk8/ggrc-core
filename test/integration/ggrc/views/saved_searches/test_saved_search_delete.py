@@ -42,12 +42,6 @@ class TestSavedSearchDelete(TestCase):
 
     saved_search = SavedSearch(
         name="test_ss_1",
-        query=[{
-            "object_name": "Assessment",
-            "filters": {"expression": {}},
-            "limit": [0, 10],
-            "order_by":[{"name": "updated_at", "desc": True}]
-        }],
         object_type="Assessment",
         user=cls._person_0,
     )
