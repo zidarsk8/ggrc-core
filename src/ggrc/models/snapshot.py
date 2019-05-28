@@ -20,6 +20,7 @@ from ggrc import builder
 from ggrc import db
 from ggrc.access_control import roleable
 from ggrc.login import get_current_user_id
+from ggrc.models import inflector
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models import relationship
@@ -28,6 +29,7 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins import base
 from ggrc.models.mixins import rest_handable
 from ggrc.models.mixins import with_last_assessment_date
+from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.utils import benchmark
 from ggrc.utils import errors
 
@@ -133,8 +135,15 @@ class Snapshot(rest_handable.WithDeleteHandable,
 
   @builder.simple_property
   def original_object_deleted(self):
-    """Flag if the snapshot has the latest revision."""
-    return self.revisions and self.revisions[-1].action == "deleted"
+    """Flag if the snapshot has the last revision and action is deleted."""
+    if not self.revisions:
+      return False
+    deleted = self.revisions[-1].action == "deleted"
+    external_deleted = (
+        self.revisions[-1].content["status"] == "Deprecated" and
+        issubclass(inflector.get_model(self.child_type), Synchronizable)
+    )
+    return bool(deleted or external_deleted)
 
   @classmethod
   def eager_query(cls, **kwargs):
