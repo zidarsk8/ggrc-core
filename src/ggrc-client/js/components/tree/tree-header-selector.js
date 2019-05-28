@@ -13,7 +13,7 @@ export default can.Component.extend({
       this.viewModel.attr('$rootEl', $(element));
     },
 
-    disable_attrs: function (el, ev) {
+    disable_attrs: function () {
       let MAX_ATTR = 7;
       let $check = this.element.find('.attr-checkbox');
       let $mandatory = $check.filter('.mandatory');
@@ -45,7 +45,7 @@ export default can.Component.extend({
       this.disable_attrs(el, ev);
     },
 
-    '.set-tree-attrs,.close-dropdown click': function (el, ev) {
+    '.set-tree-attrs,.close-dropdown click': function () {
       this.viewModel.$rootEl.removeClass('open');
       this.viewModel.$rootEl.parents('.dropdown-menu')
         .parent().removeClass('open');

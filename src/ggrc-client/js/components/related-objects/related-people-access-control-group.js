@@ -118,7 +118,7 @@ export default can.Component.extend({
     },
   }),
   events: {
-    init: function ($element, options) {
+    init: function () {
       let vm = this.viewModel;
       vm.attr('backUpPeople', vm.attr('people').attr());
     },
