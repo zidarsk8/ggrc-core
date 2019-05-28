@@ -24,7 +24,7 @@ class TestSavedSearchGet(TestCase):
 
   API_URL = "/api/saved_searches/{object_type}"
 
-  def _get_saved_seach(self, object_type):
+  def _get_saved_search(self, object_type):
     response = self._client.get(self.API_URL.format(object_type=object_type),
                                 headers=self._headers)
     return json.loads(response.data)
@@ -149,8 +149,8 @@ class TestSavedSearchGet(TestCase):
 
   def test_2_get_saved_searches_total_only_type(self):
     """Test that total returns only count of specific object type objects"""
-    data_program = self._get_saved_seach(object_type="Program")
-    data_assessment = self._get_saved_seach(object_type="Assessment")
+    data_program = self._get_saved_search(object_type="Program")
+    data_assessment = self._get_saved_search(object_type="Assessment")
 
     self.assertEqual(data_program["total"], 1)
     self.assertEqual(data_assessment["total"], 3)
