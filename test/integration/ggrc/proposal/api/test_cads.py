@@ -131,24 +131,22 @@ class TestCADProposalsApi(base.BaseTestProposalApi):
       program = factories.ProgramFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
           definition_type="program",
-          attribute_type="Map:Person"
+          attribute_type="Text"
       )
-      person = factories.PersonFactory()
       cav = factories.CustomAttributeValueFactory(
           custom_attribute=cad,
           attributable=program,
-          attribute_object_id=person.id,
           attribute_value="Person",
       )
-    self.assertEqual(person,
-                     program.custom_attribute_values[0].attribute_object)
+    self.assertEqual("Person",
+                     program.custom_attribute_values[0].attribute_value)
     program_id = program.id
     proposal = factories.ProposalFactory(
         instance=program,
         content={
             "custom_attribute_values": {
                 cad.id: {
-                    "attribute_value": "Person",
+                    "attribute_value": "Person123",
                     "attribute_object": None,
                 },
             },
@@ -158,5 +156,4 @@ class TestCADProposalsApi(base.BaseTestProposalApi):
       self.apply_proposal(proposal)
     program = all_models.Program.query.get(program_id)
     cav = program.custom_attribute_values[0]
-    self.assertEqual("Person", cav.attribute_value)
-    self.assertIsNone(cav.attribute_object_id)
+    self.assertEqual("Person123", cav.attribute_value)
