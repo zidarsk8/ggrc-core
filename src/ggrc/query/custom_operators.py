@@ -531,9 +531,7 @@ def child_op(exp, object_class, *_):
   ids = exp["ids"]
   _children_ids = set()
   for _id in ids:
-    _children_ids.update(
-        all_models.Program.query.get(_id).get_relatives_ids("children")
-    )
+    _children_ids.update(object_class.get_relatives_ids(_id, "children"))
   return object_class.id.in_(_children_ids)
 
 
@@ -547,9 +545,7 @@ def parent_op(exp, object_class, target_class, query):
   ids = exp["ids"]
   _parents_ids = set()
   for _id in ids:
-    _parents_ids.update(
-        all_models.Program.query.get(_id).get_relatives_ids("parents")
-    )
+    _parents_ids.update(object_class.get_relatives_ids(_id, "parents"))
   return object_class.id.in_(_parents_ids)
 
 
