@@ -870,8 +870,8 @@ class TestAssessmentImport(TestCase):
         all_models.Assessment.query.get(assessment.id).verified_date,
         date)
     self.assertEqual(
-      all_models.Assessment.query.get(assessment.id).status,
-      all_models.Assessment.DONE_STATE)
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DONE_STATE)
 
 
 @ddt.ddt

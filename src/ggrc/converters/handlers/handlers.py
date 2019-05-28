@@ -367,9 +367,10 @@ class DateColumnHandler(ColumnHandler):
     # to 'Date' type. Remove if statement after it.
     try:
       value = value or self.get_value()
-      if not value and self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
+      if not value:
+        if self.mandatory:
+          self.add_error(errors.MISSING_VALUE_ERROR,
+                         column_name=self.display_name)
         return None
 
       parsed_value = parse(value)
