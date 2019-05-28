@@ -3,9 +3,10 @@
 
 """Module defines application settings."""
 
-import os
-import jinja2
 import datetime
+import os
+
+import jinja2
 
 DEBUG = False
 TESTING = False
