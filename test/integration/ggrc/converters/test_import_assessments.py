@@ -832,22 +832,25 @@ class TestAssessmentImport(TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
-        ("Title", assessment.title),
-        ("Audit", audit.slug),
-        ("Creators", "user@example.com"),
-        ("Assignees", "user@example.com"),
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/22/2019"),
-        ("State", "Completed"),
+        ("State", all_models.Assessment.DONE_STATE),
     ]))
     self._check_csv_response(response, {})
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).verified_date,
+        datetime.datetime(2019, 1, 22))
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DONE_STATE)
 
   def test_asmt_verified_date_readonly(self):
     """Test that Verified Date is readonly"""
     audit = factories.AuditFactory()
+    date = datetime.datetime(2019, 05, 22)
     assessment = \
         factories.AssessmentFactory(audit=audit,
-                                    verified_date=datetime.datetime.now())
+                                    verified_date=date)
     expected_warnings = {
         'Assessment': {
             'row_warnings': {
@@ -858,15 +861,17 @@ class TestAssessmentImport(TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
-        ("Title", assessment.title),
-        ("Audit", audit.slug),
-        ("Creators", "user@example.com"),
-        ("Assignees", "user@example.com"),
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/21/2019"),
-        ("State", "Completed"),
+        ("State", all_models.Assessment.DONE_STATE),
     ]))
     self._check_csv_response(response, expected_warnings)
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).verified_date,
+        date)
+    self.assertEqual(
+      all_models.Assessment.query.get(assessment.id).status,
+      all_models.Assessment.DONE_STATE)
 
 
 @ddt.ddt
