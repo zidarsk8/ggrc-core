@@ -22,6 +22,13 @@ from integration.ggrc.views.saved_searches.initializers import (
 
 class TestSavedSearchGet(TestCase):
 
+  API_URL = "/api/saved_searches/{object_type}"
+
+  def _get_saved_seach(self, object_type):
+    response = self._client.get(self.API_URL.format(object_type=object_type),
+                                headers=self._headers)
+    return json.loads(response.data)
+
   @staticmethod
   def create_app():
     return app
@@ -73,6 +80,14 @@ class TestSavedSearchGet(TestCase):
         locked_time["second"] = i
 
         frozen_time.move_to(datetime(**locked_time))
+
+      saved_search_program = SavedSearch(
+          name="test_program_ss",
+          object_type="Program",
+          user=cls._person_0,
+      )
+      cls._person_0.saved_searches.append(saved_search_program)
+      db.session.flush()
 
     cls._user_role = setup_user_role(cls._person_0)
     db.session.commit()
@@ -131,3 +146,11 @@ class TestSavedSearchGet(TestCase):
     self.assertEqual(data["values"][0]["person_id"], self._person_0.id)
     self.assertIn("id", data["values"][0])
     self.assertIn("created_at", data["values"][0])
+
+  def test_2_get_saved_searches_total_only_type(self):
+    """Test that total returns only count of specific object type objects"""
+    data_program = self._get_saved_seach(object_type="Program")
+    data_assessment = self._get_saved_seach(object_type="Assessment")
+
+    self.assertEqual(data_program["total"], 1)
+    self.assertEqual(data_assessment["total"], 3)
