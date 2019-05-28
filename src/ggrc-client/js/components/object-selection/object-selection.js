@@ -101,7 +101,7 @@ export default can.Component.extend({
     },
   }),
   events: {
-    '{viewModel} refreshSelection': function (scope, ev, refreshSelection) {
+    '{viewModel} refreshSelection': function ([scope], ev, refreshSelection) {
       if (refreshSelection) {
         this.viewModel.emptySelection();
       }
@@ -115,7 +115,7 @@ export default can.Component.extend({
     'object-selection-item deselectItem': function (el, ev, item) {
       this.viewModel.deselect(item);
     },
-    '{viewModel} selectAllCheckboxValue': function (scope, ev, value) {
+    '{viewModel} selectAllCheckboxValue': function ([scope], ev, value) {
       if (value) {
         this.viewModel.selectAll();
       } else {

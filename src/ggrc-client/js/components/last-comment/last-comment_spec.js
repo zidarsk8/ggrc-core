@@ -158,13 +158,13 @@ describe('last-comment component', () => {
         const comment = 'mockComment';
         vm.attr('comment', null);
 
-        handler({}, {comment});
+        handler([{}], {comment});
 
         expect(vm.attr('comment')).toEqual(comment);
       });
 
       it('calls getAuthor() method of viewModel', () => {
-        handler({}, {});
+        handler([{}], {});
         expect(vm.getAuthor).toHaveBeenCalled();
       });
     });

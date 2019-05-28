@@ -703,7 +703,7 @@ export default can.Component.extend({
       ev.stopPropagation();
       this.reloadTree();
     },
-    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`](scope, ev) {
+    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`]([scope], ev) {
       const vm = this.viewModel;
       let currentModelName;
 
@@ -731,7 +731,7 @@ export default can.Component.extend({
       this.viewModel.closeInfoPane();
       this.viewModel.loadItems();
     },
-    '{viewModel.parent_instance} displayTree'(scope, event) {
+    '{viewModel.parent_instance} displayTree'([scope], event) {
       const {viewModel} = this;
       const currentModelName = viewModel.attr('model').model_singular;
 

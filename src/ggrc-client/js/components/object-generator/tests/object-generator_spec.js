@@ -216,19 +216,19 @@ describe('object-generator component', function () {
 
     it('sets false to block_type_change if value is empty',
       function () {
-        handler.call({viewModel: viewModel});
+        handler.call({viewModel: viewModel}, []);
         expect(viewModel.attr('block_type_change'))
           .toEqual(false);
       });
     it('sets true to block_type_change if value is not empty',
       function () {
-        handler.call({viewModel: viewModel}, viewModel, {}, 'mock-value');
+        handler.call({viewModel: viewModel}, [viewModel], {}, 'mock-value');
         expect(viewModel.attr('block_type_change'))
           .toEqual(true);
       });
     it('sets type to type if value is not empty',
       function () {
-        handler.call({viewModel: viewModel}, viewModel, {}, 'mock-value');
+        handler.call({viewModel: viewModel}, [viewModel], {}, 'mock-value');
         expect(viewModel.attr('type'))
           .toEqual('value');
       });

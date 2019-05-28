@@ -84,7 +84,7 @@ export default can.Component.extend({
         context: this,
       });
     },
-    '{viewModel} assessmentTemplate': function (viewModel, ev, val, oldVal) {
+    '{viewModel} assessmentTemplate': function ([viewModel], ev, val) {
       let type;
       if (_.isEmpty(val)) {
         return this.viewModel.attr('block_type_change', false);

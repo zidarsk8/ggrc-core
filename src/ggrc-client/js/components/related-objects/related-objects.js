@@ -168,7 +168,7 @@ export default can.Component.extend({
     '{viewModel.orderBy} changed': function () {
       this.viewModel.setRelatedItems();
     },
-    [`{viewModel.relatedObjects} ${RELATED_ADDED.type}`](scope, event) {
+    [`{viewModel.relatedObjects} ${RELATED_ADDED.type}`]([scope], event) {
       let vm = this.viewModel;
 
       if (vm.attr('relatedItemsType') !== event.model) {
@@ -183,7 +183,7 @@ export default can.Component.extend({
         paging.attr('current', 1);
       }
     },
-    [`{viewModel.relatedObjects} ${ADD_RELATED.type}`](scope, event) {
+    [`{viewModel.relatedObjects} ${ADD_RELATED.type}`]([scope], event) {
       const vm = this.viewModel;
       const relatedObjects = vm.attr('relatedObjects');
       relatedObjects.unshift({instance: event.object});

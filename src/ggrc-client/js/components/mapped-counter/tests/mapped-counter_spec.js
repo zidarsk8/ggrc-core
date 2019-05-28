@@ -87,7 +87,7 @@ describe('mapped-counter component', () => {
           const type = 'SomeType';
 
           viewModel.attr('type', type);
-          handler({}, {modelType: type});
+          handler([{}], {modelType: type});
 
           expect(viewModel.deferredUpdateCounter).toHaveBeenCalled();
         });
@@ -95,7 +95,7 @@ describe('mapped-counter component', () => {
         it('doesn\'t call deferredUpdateCounter() method when viewModel\'s ' +
         'type doesn\'t equal to passed type of the model', () => {
           viewModel.attr('type', 'Type1');
-          handler({}, {modelType: 'Type2'});
+          handler([{}], {modelType: 'Type2'});
 
           expect(viewModel.deferredUpdateCounter).not.toHaveBeenCalled();
         });

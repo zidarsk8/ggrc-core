@@ -187,7 +187,7 @@ export default can.Component.extend({
   },
 
   events: {
-    [`{parentInstance} ${MAP_OBJECTS.type}`](instance, event) {
+    [`{parentInstance} ${MAP_OBJECTS.type}`]([instance], event) {
       // this event is called when objects just created and should be mapped
       // so object-mapper modal should be closed and removed from DOM
       this.closeModal();

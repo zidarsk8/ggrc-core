@@ -1675,7 +1675,7 @@ describe('assessment-info-pane component', () => {
 
         it('assigns loaded snapshots to vm.mappedSnapshots field',
           function () {
-            event({}, evObject);
+            event([{}], evObject);
             const result = vm.attr('mappedSnapshots').serialize();
             expect(vm.loadSnapshots).toHaveBeenCalled();
             expect(result).toEqual([snapshots]);
@@ -1685,7 +1685,7 @@ describe('assessment-info-pane component', () => {
           function () {
             const dispatch = spyOn(vm.attr('instance'), 'dispatch');
             evObject.destinationType = 'Type';
-            event({}, evObject);
+            event([{}], evObject);
             expect(dispatch).toHaveBeenCalledWith({
               ...REFRESH_RELATED,
               model: evObject.destinationType,

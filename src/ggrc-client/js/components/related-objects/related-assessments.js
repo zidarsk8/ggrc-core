@@ -183,7 +183,7 @@ export default can.Component.extend({
     '{viewModel.orderBy} changed'() {
       this.viewModel.loadRelatedAssessments();
     },
-    [`{viewModel.instance} ${REFRESH_RELATED.type}`](scope, event) {
+    [`{viewModel.instance} ${REFRESH_RELATED.type}`]([scope], event) {
       if (event.model === 'Related Assessments') {
         this.viewModel.loadRelatedAssessments();
       }

@@ -135,7 +135,7 @@ export default can.Component.extend({
         this.viewModel.setStatesRoute(defaultStates);
       }
     },
-    '{viewModel.router} state'(router, event, newStatuses) {
+    '{viewModel.router} state'([router], event, newStatuses) {
       let isCurrent = this.viewModel.attr('widgetId') === router.attr('widget');
       let isEnabled = !this.viewModel.attr('disabled');
 
@@ -151,7 +151,7 @@ export default can.Component.extend({
         this.viewModel.dispatch('filter');
       }
     },
-    '{viewModel.router} widget'(router) {
+    '{viewModel.router} widget'([router]) {
       let isCurrent = this.viewModel.attr('widgetId') === router.attr('widget');
       let isEnabled = !this.viewModel.attr('disabled');
       let routeStatuses = router.attr('state');

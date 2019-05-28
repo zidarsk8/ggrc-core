@@ -860,11 +860,11 @@ describe('mapper-results component', function () {
         });
       });
       it('calls loadAllItems() if allSelected is truly', function () {
-        handler({}, {}, true);
+        handler([{}], {}, true);
         expect(viewModel.loadAllItems).toHaveBeenCalled();
       });
       it('does not call loadAllItems() if allSelected is falsy', function () {
-        handler({}, {}, false);
+        handler([{}], {}, false);
         expect(viewModel.loadAllItems).not.toHaveBeenCalled();
       });
     });

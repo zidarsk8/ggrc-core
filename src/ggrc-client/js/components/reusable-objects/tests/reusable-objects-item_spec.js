@@ -24,7 +24,7 @@ describe('reusable-object-item component', () => {
       it('pushes instance to the list if isChecked is true', () => {
         viewModel.attr('selectedList', []);
 
-        handler(viewModel, null, true);
+        handler([viewModel], null, true);
 
         let index = viewModel.attr('selectedList')
           .indexOf(viewModel.attr('instance'));
@@ -38,7 +38,7 @@ describe('reusable-object-item component', () => {
         ];
         viewModel.attr('selectedList', selectedList);
 
-        handler(viewModel, null, false);
+        handler([viewModel], null, false);
 
         let index = viewModel.attr('selectedList')
           .indexOf(viewModel.attr('instance'));
