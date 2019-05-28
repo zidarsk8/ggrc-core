@@ -79,6 +79,7 @@ describe('request-review-modal component', () => {
 
       viewModel.attr('review', review);
       viewModel.attr('modalState.open', true);
+      viewModel.attr('parentInstance', {dispatch: () => {}});
     });
 
     it('should not save review in case of empty ACL', () => {
