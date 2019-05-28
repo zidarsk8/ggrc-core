@@ -36,6 +36,10 @@ import '../dropdown/multiselect-dropdown';
 import '../dropdown/dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
+import '../saved-search/saved-search-list/saved-search-list';
+import '../saved-search/saved-search-wrapper/saved-search-wrapper';
+import '../saved-search/create-saved-search/create-saved-search';
+
 import template from './templates/tree-widget-container.stache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {

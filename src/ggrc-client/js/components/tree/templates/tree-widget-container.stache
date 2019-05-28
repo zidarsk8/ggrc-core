@@ -49,8 +49,26 @@
     <simple-modal state:from="advancedSearch"
                   modalTitle:from="'{{model.title_singular}} Advanced Search'"
                   extraCssClass:from="'advanced-search'">
+      <saved-search-wrapper
+        objectType:from="modelName">
+      <aside>
+        <saved-search-list
+          modalTitle:from="model.title_singular"
+          searches:from="searches"
+          on:applySearch="applySearch(scope.event)"
+          on:removed="loadSavedSearches()"
+        ></saved-search-list>
+
+        {{#if isPagingShown}}
+          <tree-pagination
+            paging:from="searchesPaging"
+          ></tree-pagination>
+        {{/if}}
+      </aside>
+      <main>
       <div class="advanced-search__content">
         <div class="simple-modal__body">
+
           <advanced-search-filter-container items:bind="advancedSearch.filterItems"
                                             availableAttributes:from="columns.available"
                                             modelName:from="modelName"
@@ -68,11 +86,20 @@
         </div>
       </div>
       <div class="simple-modal__footer">
+        <create-saved-search
+          filterItems:from="advancedSearch.filterItems"
+          mappingItems:from="advancedSearch.mappingItems"
+          parentItem:from="advancedSearch.parent"
+          objectType:from="modelName"
+          on:created="loadSavedSearches()"
+        ></create-saved-search>
         <div class="advanced-search__controls">
           <button type="reset" class="btn btn-white" on:el:click="resetAdvancedFilters()">Reset to Defaults</button>
           <button type="submit" class="btn btn-lightBlue" on:el:click="applyAdvancedFilters()">Apply</button>
         </div>
       </div>
+      </main>
+      </saved-search-wrapper>
     </simple-modal>
 
     <tree-header selectedColumns:from="columns.selected"
