@@ -52,6 +52,9 @@ class FullInstanceContentFased(utils.FasadeProperty):
     if 'mapping_list_fields' in content:
       content['mapping_list_fields'].pop('object_people', None)
       content['mapping_list_fields'].pop('task_group_objects', None)
+    # pop out unused service field context out of mapping_fields
+    if 'mapping_fields' in content:
+      content['mapping_fields'].pop('context', None)
     return content
 
 
