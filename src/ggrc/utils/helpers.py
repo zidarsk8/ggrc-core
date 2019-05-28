@@ -3,6 +3,7 @@
 
 """Helper methods."""
 
+from functools import wraps
 from flask import _app_ctx_stack
 
 from ggrc.utils import structures
@@ -16,6 +17,7 @@ def without_sqlalchemy_cache(func):
   SQLALCHEMY_RECORD_QUERIES config variable is set to True.
   This decorator make the cache empty everywhere in wrapped function.
   """
+  @wraps(func)
   def wrapper(*args, **kwargs):
     """Wrapper function."""
     # Running migration can trigger this decorator, but in such case
