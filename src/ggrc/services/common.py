@@ -52,7 +52,6 @@ from ggrc.models.mixins.with_readonly_access import WithReadOnlyAccess
 from ggrc.rbac import permissions
 from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.services import signals
-from ggrc.services import constants
 from ggrc.models.background_task import BackgroundTask, create_task
 from ggrc.query import utils as query_utils
 from ggrc import settings
@@ -1000,16 +999,12 @@ class Resource(ModelView):
 
   def _get_relationship(self, src):
     """Get existing relationship if exists, and update updated_at"""
-    source_type = constants.OBJECT_TYPES_RELATIONSHIPS.get(
-        src["source"]["type"], src["source"]["type"])
-    destination_type = constants.OBJECT_TYPES_RELATIONSHIPS.get(
-        src["destination"]["type"], src["destination"]["type"])
 
     relationship = self.model.query.filter(
         self.model.source_id == src["source"]["id"],
-        self.model.source_type == source_type,
+        self.model.source_type == src["source"]["type"],
         self.model.destination_id == src["destination"]["id"],
-        self.model.destination_type == destination_type
+        self.model.destination_type == src["destination"]["type"]
     ).first()
     if relationship:
       # Manually trigger relationship update in order for revisions and
