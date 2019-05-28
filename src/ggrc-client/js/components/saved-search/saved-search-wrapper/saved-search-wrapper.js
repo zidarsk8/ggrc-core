@@ -37,6 +37,9 @@ export default can.Component.extend({
     },
     searches: [],
     filtersToApply: null,
+    init() {
+      this.loadSavedSearches();
+    },
     applySearch({search}) {
       try {
         const {
@@ -55,9 +58,6 @@ export default can.Component.extend({
           `"${search.name}" is broken somehow. Sorry for any inconvenience.`);
       }
     },
-    init() {
-      this.loadSavedSearches();
-    },
     loadSavedSearches() {
       const type = this.attr('objectType');
       const paging = this.attr('searchesPaging');
@@ -71,4 +71,9 @@ export default can.Component.extend({
         });
     },
   }),
+  events: {
+    '{viewModel.searchesPaging} current'() {
+      this.viewModel.loadSavedSearches();
+    },
+  },
 });
