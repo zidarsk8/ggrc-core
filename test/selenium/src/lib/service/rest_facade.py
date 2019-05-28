@@ -28,6 +28,11 @@ def create_control(**attrs):
   return _create_obj_in_program_scope("Controls", None, **attrs)
 
 
+def create_product(**attrs):
+  """Create a product."""
+  return _create_obj_in_program_scope("Products", None, **attrs)
+
+
 def create_control_mapped_to_program(program, **attrs):
   """Create a control (optionally map to a `program`)"""
   # pylint: disable=invalid-name
@@ -137,8 +142,22 @@ def create_access_control_role(**attrs):
 
 def map_objs(src_obj, dest_obj):
   """Map two objects to each other"""
+
+  def _is_external(src_obj, dest_obj):
+    """Check if one of objects to map is external."""
+    singular_title_external_objs = [
+        objects.get_singular(x, title=True) for x in objects.EXTERNAL_OBJECTS]
+    objects_list = [src_obj, ]
+    dest_ojbect_list = dest_obj if isinstance(dest_obj,
+                                              (tuple, list)) else [dest_obj, ]
+    objects_list.extend(dest_ojbect_list)
+    if [x for x in objects_list if x.type in singular_title_external_objs]:
+      return True
+    return False
+
   return rest_service.RelationshipsService().map_objs(
-      src_obj=src_obj, dest_objs=dest_obj)
+      src_obj=src_obj, dest_objs=dest_obj,
+      is_external=_is_external(src_obj, dest_obj))
 
 
 def get_obj(obj):

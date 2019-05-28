@@ -35,17 +35,35 @@ class RestClient(object):
         self.is_external_user_needed(obj_dict)) else (
         session_pool.get_session(users.current_user()))
 
+  def is_endpoint_external(self):
+    """Checks if endpoint is external."""
+    return self.endpoint in objects.SINGULAR_EXTERNAL_OBJS
+
+  def is_cad_external(self, obj_dict):
+    """Checks if cad is external."""
+    return (self.endpoint == objects.get_singular(
+        objects.CUSTOM_ATTRIBUTES) and
+        obj_dict["definition_type"] in objects.SINGULAR_EXTERNAL_OBJS)
+
+  def is_relationship_types_external(self, obj_dict):
+    """Check if source or destination objects type is external."""
+    return (self.endpoint == objects.get_singular(objects.RELATIONSHIPS) and
+            (any(x for x in objects.SINGULAR_TITLE_EXTERNAL_OBJS
+                 if x in (obj_dict["source"]["type"],
+                          obj_dict["destination"]["type"]))))
+
   def is_external_user_needed(self, obj_dict):
     """Return True if request related to controls or GCAs for controls."""
+    # pylint: disable=invalid-name
     if not self.is_api:
       return False
+
     obj_dict = obj_dict[0][obj_dict[0].keys()[0]] if isinstance(
         obj_dict, list) else obj_dict[obj_dict.keys()[0]]
-    return (self.endpoint == objects.get_singular(objects.CONTROLS) or
-            (self.endpoint == objects.get_singular(
-                objects.CUSTOM_ATTRIBUTES) and
-             obj_dict["definition_type"] == objects.get_singular(
-                 objects.CONTROLS)))
+
+    return (self.is_endpoint_external() or
+            self.is_cad_external(obj_dict) or
+            self.is_relationship_types_external(obj_dict))
 
   def send_get(self, url, **kwargs):
     """Send GET request to `url`"""

@@ -379,6 +379,24 @@ class ProgramsFactory(EntitiesFactory):
     return program_obj
 
 
+class ProductsFactory(EntitiesFactory):
+  """Factory class for Products entities."""
+  def __init__(self):
+    super(ProductsFactory, self).__init__(objects.PRODUCTS)
+    self._acl_roles = [
+        ("managers",
+         roles.ACLRolesIDs.PRODUCT_MANAGERS,
+         [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create Product entity."""
+    product_object = self.obj_inst().update_attrs(
+        title=self.obj_title
+    )
+    return product_object
+
+
 class ControlsFactory(EntitiesFactory):
   """Factory class for Controls entities."""
   def __init__(self):

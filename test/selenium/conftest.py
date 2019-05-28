@@ -551,14 +551,28 @@ def login_as_creator(creator):
 
 @pytest.fixture()
 def program():
-  """Create a program"""
+  """Create a program."""
   return rest_facade.create_program()
 
 
 @pytest.fixture()
 def programs():
-  """Create a program"""
+  """Create a program."""
   return [rest_facade.create_program() for _ in xrange(2)]
+
+
+@pytest.fixture()
+def product():
+  """Creates a product."""
+  return rest_facade.create_product()
+
+
+@pytest.fixture()
+def product_mapped_to_control(product):
+  """Creates a product mapped to control."""
+  control = rest_facade.create_control()
+  rest_facade.map_objs(product, control)
+  return product
 
 
 @pytest.fixture()

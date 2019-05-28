@@ -644,7 +644,9 @@ class Entity(Representation):
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
-        RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity)
+        RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
+        ProductEntity
+    )
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -742,6 +744,12 @@ class ProgramEntity(Entity):
     self.set_attrs(
         "managers", "editors", "readers", "primary_contacts",
         "secondary_contacts", "review", **attrs)
+
+
+class ProductEntity(Entity):
+  """Class that represent model for Product entity."""
+  def __init__(self, **attrs):
+    super(ProductEntity, self).__init__()
 
 
 class ControlEntity(Entity):
