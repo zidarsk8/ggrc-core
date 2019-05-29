@@ -8,264 +8,327 @@ import sqlalchemy as sa
 from ggrc.migrations import utils
 
 
-def _get_comments_ids_by_obj_type(connection, obj_type, is_external=False):
-  """Returns comments ids by object type.
+def _get_comments_by_object_type(connection, obj_type):
+  """Returns comments by object type.
 
   Args:
     connection: An instance of SQLAlchemy connection.
     obj_type: String representation of object type.
-    is_external: Boolean indicator for ExternalComment/Comment.
+  Returns:
+    List of comments by object type.
   """
-  comment_type = 'ExternalComment' if is_external else 'Comment'
   result = connection.execute(
       sa.text("""
-          SELECT source_id
-          FROM relationships
-          WHERE source_type = :comment_type AND
-          destination_type = :obj_type
-
-          UNION
-
-          SELECT destination_id
-          FROM relationships
-          WHERE source_type = :obj_type AND
-          destination_type = :comment_type
-          """),
-      comment_type=comment_type,
+            SELECT comments.*
+            FROM comments
+            INNER JOIN
+              relationships ON
+              relationships.source_id = comments.id
+            WHERE
+              relationships.source_type = 'Comment' AND
+              relationships.destination_type = :obj_type
+            UNION
+            SELECT comments.*
+            FROM comments
+            INNER JOIN
+              relationships ON
+              relationships.destination_id = comments.id
+            WHERE
+              relationships.destination_type = 'Comment' AND
+              relationships.source_type = :obj_type
+            """),
       obj_type=obj_type).fetchall()
 
   return result
 
 
-def _get_comments_relationships_ids(connection, obj_type):
-  """Returns comments relationship ids by object type.
+def _get_rel_by_comment_id(connection, comment_id):
+  """Returns relationship by comment id.
 
   Args:
     connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
+    comment_id: Id of comment.
+  Returns:
+    Data of comment relationship.
   """
-  old_rels = connection.execute(
+  result = connection.execute(
       sa.text("""
-          SELECT id, source_type, source_id,
-          destination_type, destination_id
-          FROM relationships
-          WHERE (source_type = 'Comment' AND destination_type = :obj_type) OR
-                (destination_type = 'Comment' AND source_type = :obj_type)
-      """),
-      obj_type=obj_type).fetchall()
+            SELECT * FROM relationships
+            WHERE (source_id = :comment_id
+                  AND source_type = 'Comment') OR
+                  (destination_id = :comment_id
+                  AND destination_type = 'Comment')
+            """),
+      comment_id=comment_id).fetchone()
 
-  return old_rels
+  return result
 
 
-def _move_to_external_comments(connection, obj_type):
+def _add_ext_comment_rel_rev(connection, rel_id):
+  """Adds relationships revision for external comments.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    rel_id: Id of relationship for comment.
+  Returns:
+    -
+  """
+  utils.add_to_objects_without_revisions(
+      connection,
+      rel_id,
+      "Relationship",
+  )
+
+
+def _add_ext_comment_rev(connection, comment_id):
+  """Adds revision for external comment.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    comment_id: Id of comment.
+  """
+  utils.add_to_objects_without_revisions(
+      connection,
+      comment_id,
+      "ExternalComment",
+  )
+
+
+def _remove_comment_rel(connection, rel_id):
+  """Removes comments relationship.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    rel_id: Id of comment relationship.
+  Returns:
+    -
+  """
+  connection.execute(
+      sa.text("""
+              DELETE FROM relationships
+              WHERE id = :rel_id
+          """),
+      rel_id=rel_id,
+  )
+
+
+def _remove_comment_rel_rev(connection, rel_id):
+  """Removes relationships revision for comment.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    rel_id: Id of comment relationship.
+  Returns:
+    -
+  """
+  utils.add_to_objects_without_revisions(
+      connection,
+      rel_id,
+      "Relationship",
+      action="deleted",
+  )
+
+
+def _remove_comment_rev(connection, comment_id):
+  """Removes comment revision.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    comment_id: Id of comment.
+  Returns:
+    -
+  """
+  utils.add_to_objects_without_revisions(
+      connection,
+      comment_id,
+      "Comment",
+      action="deleted",
+  )
+
+
+def _move_comments_to_ext_comments(connection, comments):
   """Moves comments for certain object type to external comments table.
 
   Args:
     connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
+    comments: List of comments.
+  """
+  for comment in comments:
+    if _is_comment_id_exists_in_ext(connection, comment.id):
+      max_comment_id = _get_last_ext_comment_id(connection)
+      current_id = max_comment_id + 1
+    else:
+      current_id = comment.id
+
+    _add_ext_comment(connection, current_id, comment)
+    _add_ext_comment_rev(connection, current_id)
+
+    rel = _get_rel_by_comment_id(connection, comment.id)
+    rel_id = _add_ext_comment_rel(connection, current_id, rel)
+    _add_ext_comment_rel_rev(connection, rel_id)
+
+    _remove_comment_rel(connection, rel.id)
+    _remove_comment_rel_rev(connection, rel.id)
+
+    _remove_comment(connection, comment.id)
+    _remove_comment_rev(connection, comment.id)
+
+
+def _add_ext_comment(connection, comment_id, comment):
+  """Adds external comment.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    comment_id: Id of object from Comment table.
+    comment: An instance of Comment model.
+  Returns:
+    -
   """
   connection.execute(
       sa.text("""
-          INSERT INTO external_comments(
-              id, description, assignee_type, created_at, updated_at,
-              modified_by_id
-          )
-          SELECT id, description, assignee_type, created_at, updated_at,
-                modified_by_id
-          FROM
-          (
-              SELECT c.id, c.description, c.assignee_type,
-                    c.created_at, c.updated_at, c.modified_by_id
-              FROM comments c
-              JOIN relationships r ON r.source_type = 'Comment' AND
-                  r.source_id = c.id AND
-                  r.destination_type = :obj_type
+            INSERT INTO external_comments (
+              id,
+              description,
+              assignee_type,
+              context_id,
+              created_at,
+              updated_at,
+              modified_by_id)
+            VALUES (
+              :id,
+              :description,
+              :assignee_type,
+              :context_id,
+              :created_at,
+              :updated_at,
+              :modified_by_id
+            )
+            """),
+      id=comment_id,
+      description=comment.description,
+      assignee_type=comment.assignee_type,
+      context_id=comment.context_id,
+      created_at=comment.created_at,
+      updated_at=comment.updated_at,
+      modified_by_id=comment.modified_by_id)
 
-              UNION
 
-              SELECT c.id, c.description, c.assignee_type,
-                    c.created_at, c.updated_at, c.modified_by_id
-              FROM comments c
-              JOIN relationships r ON r.destination_type = 'Comment' AND
-                  r.destination_id = c.id AND
-                  r.source_type = :obj_type
-          ) tmp;
-      """),
-      obj_type=obj_type
+def _remove_comment(connection, comment_id):
+  """Removes comment from Comment table.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+    comment_id: Id of comment in Comment table.
+  Returns:
+    -
+  """
+  connection.execute(
+      sa.text("""
+            DELETE FROM comments
+            WHERE id = :comment_id
+            """),
+      comment_id=comment_id)
+  utils.add_to_objects_without_revisions(
+      connection,
+      comment_id,
+      "Comment",
+      action="deleted",
   )
 
 
-def _delete_relationships_comments(connection, obj_type):
-  """Removes comments relationships.
+def _add_ext_comment_rel(connection, comment_id, rel):
+  """Adds relationships for external comment.
 
   Args:
     connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
-  """
-  old_rels = _get_comments_relationships_ids(connection, obj_type)
-
-  if old_rels:
-    old_rel_ids = [rel.id for rel in old_rels]
-    connection.execute(
-        sa.text("""
-            DELETE FROM relationships
-            WHERE id IN :relationship_ids
-        """),
-        relationship_ids=old_rel_ids,
-    )
-    utils.add_to_objects_without_revisions_bulk(
-        connection,
-        old_rel_ids,
-        "Relationship",
-        action="deleted",
-    )
-
-
-def _delete_control_comments(connection, obj_type):
-  """Removes comments for certain object type.
-
-  Args:
-    connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
+    comment_id: Id of comment in Comment table.
+    rel: An instance of relationship object for comment.
+  Returns:
+    Id of last inserted relationship for comment.
   """
   connection.execute(
       sa.text("""
-          DELETE comments
-          FROM comments
-          JOIN relationships r ON r.source_type = 'Comment' AND
-              r.source_id = comments.id AND
-              r.destination_type = :obj_type
-          """),
-      obj_type=obj_type)
-  connection.execute(
+            INSERT INTO relationships (
+              modified_by_id,
+              created_at,
+              updated_at,
+              source_id,
+              source_type,
+              destination_id,
+              destination_type,
+              context_id,
+              parent_id,
+              automapping_id,
+              is_external)
+            VALUES (
+              :modified_by_id,
+              :created_at,
+              :updated_at,
+              :source_id,
+              :source_type,
+              :destination_id,
+              :destination_type,
+              :context_id,
+              :parent_id,
+              :automapping_id,
+              :is_external)
+            """),
+      modified_by_id=rel.modified_by_id,
+      created_at=rel.created_at,
+      updated_at=rel.updated_at,
+      source_id=comment_id if rel.source_type == 'Comment'
+      else rel.source_id,
+      source_type='ExternalComment' if rel.source_type == 'Comment'
+      else rel.source_type,
+      destination_id=comment_id if rel.destination_type == 'Comment'
+      else rel.destination_id,
+      destination_type='ExternalComment' if rel.destination_type == 'Comment'
+      else rel.destination_type,
+      context_id=rel.context_id,
+      parent_id=rel.parent_id,
+      automapping_id=rel.automapping_id,
+      is_external=rel.is_external)
+
+  rel_id = utils.last_insert_id(connection)
+  return rel_id
+
+
+def _get_last_ext_comment_id(connection):
+  """Returns last external comment id.
+
+  Args:
+    connection: An instance of SQLAlchemy connection.
+  Returns:
+    Integer of last comment id from external model.
+  """
+  result = connection.execute(
       sa.text("""
-          DELETE comments
-          FROM comments
-          JOIN relationships r ON r.destination_type = 'Comment' AND
-               r.destination_id = comments.id AND
-               r.source_type = :obj_type
-          """),
-      obj_type=obj_type)
+            SELECT
+              MAX(id)
+            FROM external_comments
+            """)).fetchone()[0]
+
+  return result
 
 
-def _update_comment_relationships(connection, obj_type):
-  """Replaces 'Comment' object_type with 'ExternalComment' for relationships.
-
-  Args:
-    connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
-  """
-  old_rels = _get_comments_relationships_ids(connection, obj_type)
-
-  if old_rels:
-    migrator_id = utils.get_migration_user_id(connection)
-    for _, s_type, s_id, d_type, d_id in old_rels:
-      connection.execute(
-          sa.text("""
-              INSERT INTO relationships(
-                source_type, source_id, destination_type, destination_id,
-                modified_by_id, created_at, updated_at, is_external
-              )
-              VALUES(
-                :source_type, :source_id, :dest_type, :dest_id,
-                :modified_by_id, NOW(), NOW(), TRUE
-              );
-          """),
-          source_type='ExternalComment' if s_type == 'Comment' else s_type,
-          source_id=s_id,
-          dest_type='ExternalComment' if d_type == 'Comment' else d_type,
-          dest_id=d_id,
-          modified_by_id=migrator_id,
-      )
-
-    new_rels = connection.execute(
-        sa.text("""
-            SELECT id
-            FROM relationships
-            WHERE (source_type = 'ExternalComment' AND
-                   destination_type = :obj_type) OR
-                  (destination_type = 'ExternalComment' AND
-                   source_type = :obj_type)
-        """),
-        obj_type=obj_type).fetchall()
-
-    new_rel_ids = [rel.id for rel in new_rels]
-    utils.add_to_objects_without_revisions_bulk(
-        connection,
-        new_rel_ids,
-        "Relationship",
-    )
-
-
-def _create_comments_revisions(connection, obj_type):
-  """Creates delete revisions for comments.
+def _is_comment_id_exists_in_ext(connection, comment_id):
+  """Checks that comment id exists in external comment.
 
   Args:
     connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
+    comment_id: Id of comment.
+  Returns:
+    Indicator that comment id exists in external comment
   """
-  result = _get_comments_ids_by_obj_type(connection, obj_type)
-
-  if result:
-    result = [row[0] for row in result]
-    utils.add_to_objects_without_revisions_bulk(
-        connection,
-        result,
-        "Comment",
-        action="deleted",
-    )
-
-
-def _create_external_comments_revs(connection, obj_type):
-  """Creates revisions for external comments.
-
-  Args:
-    connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
-  """
-  result = _get_comments_ids_by_obj_type(
-      connection, obj_type, is_external=True)
-
-  if result:
-    result = [row[0] for row in result]
-    utils.add_to_objects_without_revisions_bulk(
-        connection,
-        result,
-        "ExternalComment"
-    )
-
-
-def _update_comments_acl(connection, obj_type):
-  """Updates object_type in ACR and ACL for ExternalComments.
-
-  Args:
-    connection: An instance of SQLAlchemy connection.
-    obj_type: String representation of object type.
-  """
-  ext_admin_id = connection.execute(
+  result = connection.execute(
       sa.text("""
-          SELECT id FROM access_control_roles
-          WHERE name = 'Admin' AND object_type = 'ExternalComment'
-      """)
-  ).fetchone()[0]
+            SELECT 1
+            FROM external_comments
+            WHERE id = :comment_id
+            """),
+      comment_id=comment_id).fetchone()
 
-  result = _get_comments_ids_by_obj_type(
-      connection, obj_type, is_external=True)
-
-  if result:
-    obj_ids = [row[0] for row in result]
-    connection.execute(
-        sa.text("""
-            UPDATE access_control_list
-            SET object_type = 'ExternalComment',
-                ac_role_id = :acr_id
-            WHERE object_type = 'Comment' AND
-                  object_id IN :obj_ids AND
-                  parent_id IS NULL;
-        """),
-        obj_ids=obj_ids,
-        acr_id=ext_admin_id
-    )
+  return bool(result)
 
 
 def move_to_external_comments(connection, obj_type):
@@ -275,10 +338,5 @@ def move_to_external_comments(connection, obj_type):
     connection: An instance of SQLAlchemy connection.
     obj_type: String representation of object type.
   """
-  _move_to_external_comments(connection, obj_type)
-  _update_comment_relationships(connection, obj_type)
-  _create_comments_revisions(connection, obj_type)
-  _create_external_comments_revs(connection, obj_type)
-  _update_comments_acl(connection, obj_type)
-  _delete_control_comments(connection, obj_type)
-  _delete_relationships_comments(connection, obj_type)
+  comments = _get_comments_by_object_type(connection, obj_type)
+  _move_comments_to_ext_comments(connection, comments)
