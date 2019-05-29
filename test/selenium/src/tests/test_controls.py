@@ -23,6 +23,16 @@ class TestControls(base.Test):
   # pylint: disable=invalid-name
   # pylint: disable=unused-argument
 
+  def test_user_cannot_edit_or_del_control_from_info_page(self, control,
+                                                          controls_service):
+    """Confirm that user cannot edit or delete Control from info page."""
+    three_bbs = controls_service.open_info_page_of_obj(control).three_bbs
+    expected_options = {"can_edit": False,
+                        "can_delete": False}
+    actual_options = {"can_edit": three_bbs.edit_option.exists,
+                      "can_delete": three_bbs.delete_option.exists}
+    assert actual_options == expected_options
+
   def test_user_cannot_add_person_to_custom_role(self, control,
                                                  controls_service):
     """Tests that user cannot add a person to custom Role."""
