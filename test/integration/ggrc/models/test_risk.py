@@ -7,9 +7,10 @@ import datetime
 
 from ggrc import db
 from ggrc.models import all_models
-from integration.ggrc import TestCase
+from integration.ggrc import TestCase, Api
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
+from integration.ggrc.query_helper import WithQueryApi
 
 
 class TestRiskGGRC(TestCase):
@@ -282,3 +283,29 @@ class TestRiskGGRCQ(TestCase):
     response_data = response.json[0]["ExternalComment"]
     self.assertEqual(response_data["count"], 1)
     self.assertEqual(response_data["values"][0]["description"], "comment")
+
+
+class TestRiskQueryApi(WithQueryApi, TestCase):
+  """Tests for query Api."""
+
+  # pylint: disable=invalid-name
+  def setUp(self):
+    super(TestRiskQueryApi, self).setUp()
+    self.client.get("/login")
+    self.api = Api()
+
+  def test_review_status_search(self):
+    """Review status search.
+
+    The query should take data form review_status_display_name field
+    """
+    risk_id = factories.RiskFactory(
+        review_status_display_name="Review Needed"
+    ).id
+
+    risk_by_review_status = self.simple_query(
+        "Risk",
+        expression=["Review Status", "=", "Review Needed"]
+    )
+    self.assertEquals(1, len(risk_by_review_status))
+    self.assertEquals(risk_id, risk_by_review_status[0]["id"])
