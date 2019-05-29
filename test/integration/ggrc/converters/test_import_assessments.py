@@ -368,6 +368,10 @@ class TestAssessmentImport(TestCase):
                     column_name="State",
                     value="open",
                 ),
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=22,
+                    column_name="Verified Date"
+                ),
             },
         }
     }
@@ -820,6 +824,54 @@ class TestAssessmentImport(TestCase):
       self._check_csv_response(response, expected_warnings)
     else:
       self._check_csv_response(response, {})
+
+  def test_asmt_verified_date_update_from_none(self):
+    """Test that we able to set Verified Date if it is empty"""
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory(audit=audit)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", "user@example.com"),
+        ("Verified Date", "01/22/2019"),
+        ("State", all_models.Assessment.DONE_STATE),
+    ]))
+    self._check_csv_response(response, {})
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).verified_date,
+        datetime.datetime(2019, 1, 22))
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DONE_STATE)
+
+  def test_asmt_verified_date_readonly(self):
+    """Test that Verified Date is readonly"""
+    audit = factories.AuditFactory()
+    date = datetime.datetime(2019, 05, 22)
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    verified_date=date)
+    expected_warnings = {
+        'Assessment': {
+            'row_warnings': {
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=3,
+                    column_name="Verified Date"
+                )}}}
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", "user@example.com"),
+        ("Verified Date", "01/21/2019"),
+        ("State", all_models.Assessment.DONE_STATE),
+    ]))
+    self._check_csv_response(response, expected_warnings)
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).verified_date,
+        date)
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DONE_STATE)
 
 
 @ddt.ddt
