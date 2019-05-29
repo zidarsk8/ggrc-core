@@ -180,6 +180,9 @@ INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
 # GGRC user account to be used by external application auth
 EXTERNAL_APP_USER = os.environ.get('EXTERNAL_APP_USER', '')
 
+# Sync Service account to validate requests from sync service
+SYNC_SERVICE_USER = os.environ.get('SYNC_SERVICE_USER', '')
+
 # Integration service mandatory header value
 URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
 
