@@ -69,6 +69,8 @@ export default Cacheable.extend({
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active', 'Fixed', 'Fixed and Verified'],
+  unchangeableIssueTrackerIdStatuses:
+    ['Fixed', 'Fixed and Verified', 'Deprecated'],
   buildIssueTrackerConfig(instance) {
     return {
       hotlist_id: '1498476',
@@ -99,7 +101,9 @@ export default Cacheable.extend({
       validate: {
         validateIssueTracker: true,
         validateIssueTrackerTitle: true,
-        validateIssueTrackerIssueId: true,
+        validateIssueTrackerIssueId() {
+          return this.constructor.unchangeableIssueTrackerIdStatuses;
+        },
       },
     },
   },

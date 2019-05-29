@@ -70,11 +70,21 @@ WRONG_REQUIRED_VALUE = (u"Line {line}: Required field {column_name} contains"
                         u" invalid data '{value}'. The default value will be"
                         u" used.")
 
-WRONG_TICKET_STATUS = (u"Line {line}: You are not allowed to autogenerate "
-                       u"tickets at Ticket Tracker for Issues at statuses "
-                       u"'Fixed', 'Fixed and Verified' and 'Deprecated'. "
-                       u"Column '{column_name}' will be set to 'Off'. Please "
-                       u"use a manual linking option instead.")
+WRONG_ISSUE_TICKET_STATUS = (u"Line {line}: You are not allowed to "
+                             u"autogenerate tickets at Ticket Tracker for "
+                             u"Issues at statuses 'Fixed', 'Fixed and "
+                             u"Verified' and 'Deprecated'. Column "
+                             u"'{column_name}' will be set to 'Off'. Please "
+                             u"use a manual linking option instead.")
+
+WRONG_ASSESSMENT_TICKET_STATUS = (u"Line {line}: You are not allowed to "
+                                  u"autogenerate tickets at Ticket Tracker "
+                                  u"for Assessments at statuses 'In Review', "
+                                  u"'Completed (no verification)', 'Completed "
+                                  u"and Verified' and 'Deprecated' statuses. "
+                                  u"Column '{column_name}' will be ignored. "
+                                  u"Please use a manual linking option "
+                                  u"instead.")
 
 MISSING_VALUE_WARNING = (u"Line {line}: Field '{column_name}' is required. "
                          u"The default value '{default_value}' will be used.")

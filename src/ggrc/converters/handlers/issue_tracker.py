@@ -118,7 +118,11 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
   TRUE_VALUES = {_true, }
   FALSE_VALUES = {_false, }
 
-  NOT_ALLOWED_STATUSES = {"Fixed", "Fixed and Verified", "Deprecated"}
+  RESTRICTED_MODELS = (all_models.Issue, all_models.Assessment)
+  NOT_ALLOWED_STATUSES = {
+      "Assessment": {"In Review", "Completed", "Deprecated", "Verified"},
+      "Issue": {"Fixed", "Fixed and Verified", "Deprecated"},
+  }
 
   def get_value(self):
     """Get value for current column."""
@@ -130,11 +134,13 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
     """Check if we should check status before turn integration on.
 
     According to our business rules we shouldn't generate tickets for Issues
-    in some statuses. We can turn integration On for all already linked Issues.
+    and Assessments in some statuses.
+    We can turn integration On for all already linked Issues.
     """
-    is_issue = isinstance(self.row_converter.obj, all_models.Issue)
     has_issue_id = self.row_converter.obj.issue_tracker.get("issue_id")
-    if is_issue and not has_issue_id:
+    restricted_instance = isinstance(self.row_converter.obj,
+                                     self.RESTRICTED_MODELS)
+    if restricted_instance and not has_issue_id:
       return True
     return False
 
@@ -148,15 +154,28 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
     attrs_status_value = imported_status.value if imported_status else None
     return attrs_status_value or self.row_converter.obj.status
 
+  def _wrong_status(self):
+    """Check if not status correct for setting integration On"""
+    status = self._get_status()
+    disallowed_statuses = self.NOT_ALLOWED_STATUSES.get(
+        self.row_converter.obj.__class__.__name__,
+        {}
+    )
+    return status in disallowed_statuses
+
+  def _get_err_message(self):
+    """Return error message template for wrong status"""
+    if isinstance(self.row_converter.obj, all_models.Issue):
+      return errors.WRONG_ISSUE_TICKET_STATUS
+    return errors.WRONG_ASSESSMENT_TICKET_STATUS
+
   def parse_item(self):
     value = self.raw_value.strip().lower()
     if value in self.TRUE_VALUES:
-      if self._needs_status_check():
-        status = self._get_status()
-        if status in self.NOT_ALLOWED_STATUSES:
-          self.add_warning(errors.WRONG_TICKET_STATUS,
-                           column_name=self.display_name)
-          return False
+      if self._needs_status_check() and self._wrong_status():
+        self.add_warning(self._get_err_message(),
+                         column_name=self.display_name)
+        return False
       return True
     if value in self.FALSE_VALUES:
       return False

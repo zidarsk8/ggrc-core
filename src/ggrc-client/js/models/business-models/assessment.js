@@ -45,6 +45,8 @@ export default Cacheable.extend({
   },
   statuses: ['Not Started', 'In Progress', 'In Review',
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
+  unchangeableIssueTrackerIdStatuses: ['In Review', 'Verified', 'Completed',
+    'Deprecated'],
   tree_view_options: {
     add_item_view: 'assessments/tree_add_item',
     attr_list: [{
@@ -228,6 +230,9 @@ export default Cacheable.extend({
       validate: {
         validateAssessmentIssueTracker: true,
         validateIssueTrackerTitle: true,
+        validateIssueTrackerIssueId() {
+          return this.constructor.unchangeableIssueTrackerIdStatuses;
+        },
       },
     },
   },

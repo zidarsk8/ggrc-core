@@ -145,6 +145,10 @@ simple-modal {
     color: $infoWidgetHeader;
   }
 
+  &__note {
+    font-size: 13px;
+  }
+
   &__footer {
     border-top: 1px solid $border-color;
     box-sizing: border-box;
