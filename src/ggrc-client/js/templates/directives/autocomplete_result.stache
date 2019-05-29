@@ -3,16 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#each items}}
-<li {{canData 'ui-autocomplete-item'}} class="ui-menu-item">
-  <a
-    href="javascript://" class='show-extended' {{canData 'model'}}>
-    <i class="fa fa-{{class.table_singular}} color"></i>
-    {{firstnonempty title name email}}
-  </a>
-</li>
-{{/each}}
-{{^items}}
+{{#items}}
+  <li {{canData 'ui-autocomplete-item'}} class="ui-menu-item">
+    <a
+      href="javascript://" class='show-extended' {{canData 'model'}}>
+      <i class="fa fa-{{class.table_singular}} color"></i>
+      {{firstnonempty title name email}}
+    </a>
+  </li>
+{{else}}
   <li class="ui-menu-item" data-ui-autocomplete-item="">
     No results
   </li>

@@ -20,7 +20,7 @@ const hideTemplates = [
 const isHidden = function (text) {
   let matched = _.filter(
     hideTemplates,
-    (template) => text.includes(template)
+    (template) => text.includes && text.includes(template)
   );
 
   return !!matched.length;
