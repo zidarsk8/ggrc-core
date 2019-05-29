@@ -1,4 +1,4 @@
 Object type,,,,,,,,
-Program,Code*,Title*,Program Managers,map:objective,map:person
-,p1,p 2,user@example.com,,user@example.com
-,p2,p 1,user@example.com,objective1,user@example.com
+Program,Code*,Title*,Program Managers,map:objective
+,p1,p 2,user@example.com,
+,p2,p 1,user@example.com,objective1
