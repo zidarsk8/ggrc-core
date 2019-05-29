@@ -143,7 +143,7 @@ inline-edit-control {
 
     &--invalid {
       .inline__content-input {
-        border: solid 1px red;
+        outline: solid 1px red;
         border-radius: 2px;
       }
     }

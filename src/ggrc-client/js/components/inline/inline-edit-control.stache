@@ -43,7 +43,7 @@
           {{#case "multiselect"}}
             <multiselect-form-field value:from="value"
               class="inline__content-input"
-              options:from="multiChoiceOptions"
+              options:from="dropdownOptions"
               on:valueChanged="fieldValueChanged(scope.event)"
               isInlineMode:from="true"
             ></multiselect-form-field>
@@ -89,6 +89,7 @@
     <div class="inline__content-wrapper">
         <readonly-inline-content value:from="value"
           class="inline__content {{#if editMode}}inline--hidden{{/if}}"
+          options:from="dropdownOptions"
           withReadMore:from="withReadMore">
         </readonly-inline-content>
     </div>
