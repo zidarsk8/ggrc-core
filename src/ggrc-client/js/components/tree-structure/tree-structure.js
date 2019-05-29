@@ -39,9 +39,13 @@ const viewModel = can.Map.extend({
       $trigger,
     });
 
-    $target.on('modal:success', (e, instance) => {
-      this.addItem(instance);
-    });
+    $target
+      .on('modal:success', (e, instance) => {
+        this.addItem(instance);
+      })
+      .on('hidden', () => {
+        $target.remove();
+      });
     $trigger.on('modal:added', (e, instance) => {
       this.addItem(instance);
     });
