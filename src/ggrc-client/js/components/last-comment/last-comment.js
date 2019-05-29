@@ -73,7 +73,7 @@ export default can.Component.extend({
           }
         });
     },
-    [`{instance} ${COMMENT_CREATED.type}`](instance, {comment}) {
+    [`{instance} ${COMMENT_CREATED.type}`]([instance], {comment}) {
       this.viewModel.attr('comment', comment);
       this.viewModel.getAuthor();
     },

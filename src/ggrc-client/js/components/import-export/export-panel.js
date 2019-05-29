@@ -68,7 +68,7 @@ export default can.Component.extend({
     },
   }),
   events: {
-    '[data-action=select_toggle] click': function (el, ev) {
+    '[data-action=select_toggle] click': function (el) {
       let type = el.data('type');
       let value = el.data('value');
       let targetList;

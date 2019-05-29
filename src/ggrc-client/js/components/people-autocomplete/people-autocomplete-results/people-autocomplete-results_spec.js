@@ -118,7 +118,7 @@ describe('people-autocomplete-results component', () => {
       'and removes "active" from others', () => {
         const items = element.find('.autocomplete-item');
 
-        handler({}, {element: items[2]});
+        handler([{}], {element: items[2]});
 
         const activeIndex = _.findIndex(items,
           (item) => $(item).hasClass('active'));

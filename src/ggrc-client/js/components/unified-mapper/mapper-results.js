@@ -531,7 +531,7 @@ export default can.Component.extend({
     },
   }),
   events: {
-    '{viewModel} allSelected': function (scope, ev, allSelected) {
+    '{viewModel} allSelected': function ([scope], ev, allSelected) {
       if (allSelected) {
         this.viewModel.loadAllItems();
       }

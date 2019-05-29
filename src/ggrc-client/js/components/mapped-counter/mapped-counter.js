@@ -111,7 +111,7 @@ export default can.Component.extend({
         vm.addContent(promise);
       }
     },
-    [`{viewModel.instance} ${REFRESH_MAPPED_COUNTER.type}`](instance, {
+    [`{viewModel.instance} ${REFRESH_MAPPED_COUNTER.type}`]([instance], {
       modelType,
     }) {
       const viewModel = this.viewModel;

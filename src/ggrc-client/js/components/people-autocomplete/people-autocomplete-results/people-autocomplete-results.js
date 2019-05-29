@@ -43,7 +43,7 @@ export default can.Component.extend({
         (item) => $(item).hasClass('active'));
       this.viewModel.selectItem(activeIndex);
     },
-    '{viewModel} highlightElement'(viewModel, {element}) {
+    '{viewModel} highlightElement'([viewModel], {element}) {
       this.removeActive();
       $(element).closest('.autocomplete-item').addClass('active');
     },

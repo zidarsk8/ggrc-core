@@ -643,7 +643,7 @@ export default can.Component.extend({
     inserted() {
       this.viewModel.resetCurrentState();
     },
-    [`{viewModel.instance} ${REFRESH_MAPPING.type}`](scope, event) {
+    [`{viewModel.instance} ${REFRESH_MAPPING.type}`]([scope], event) {
       const viewModel = this.viewModel;
       viewModel.attr('mappedSnapshots')
         .replace(this.viewModel.loadSnapshots());
