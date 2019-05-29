@@ -143,17 +143,15 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
       return ""
     if self.row_converter.obj.type == models.Audit.__name__ and \
        self.mapping_object.__name__ in Types.all:
-      # Audit should have the same mappings as Assessment. Mapped objects
-      # will be loaded from snapshots.
-      mapped_snapshots = self.row_converter.block_converter.mapped_snapshots
-      snapshot_slugs = mapped_snapshots[self.row_converter.obj.id][
-          self.mapping_object.__name__
-      ]
-      human_readable_ids = sorted(list(snapshot_slugs))
+      mapped_snapshots = self.row_converter.block_converter.audit_snapshots
     else:
-      objects = self.snapshoted_instances_query.all()
-      human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
-                            for i in objects]
+      mapped_snapshots = self.row_converter.block_converter.related_snapshots
+
+    snapshot_slugs = mapped_snapshots[self.row_converter.obj.id].get(
+        self.mapping_object.__name__,
+        set(),
+    )
+    human_readable_ids = sorted(snapshot_slugs)
     return "\n".join(human_readable_ids)
 
   def is_valid_creation(self, to_append_ids):
