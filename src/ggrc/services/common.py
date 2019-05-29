@@ -547,16 +547,21 @@ class Resource(ModelView):
           "Missing headers: " + ", ".join(missing_headers)
       )
 
+    # Validate we have up to date object state according to Etag
     object_etag = etag(self.modified_at(obj), get_info(obj))
     object_timestamp = self.http_timestamp(self.modified_at(obj))
     if (request.headers["If-Match"] != object_etag or
             request.headers["If-Unmodified-Since"] != object_timestamp):
-      return format_api_error_response(
-          409,
-          "The resource could not be updated due to a conflict "
-          "with the current state on the server. Please "
-          "resolve the conflict by refreshing the resource."
-      )
+
+      headers = [('Last-Modified', object_timestamp),
+                 ('Etag', object_etag),
+                 ("Content-Type", "application/json")]
+      error_message = ("The resource could not be updated due to a conflict "
+                       "with the current state on the server. Please "
+                       "resolve the conflict by refreshing the resource.")
+      body = {"message": error_message, "code": 409}
+      body.update(self.object_for_json(obj))
+      return flask.make_response((as_json(body), 409, headers))
     return None
 
   @staticmethod
