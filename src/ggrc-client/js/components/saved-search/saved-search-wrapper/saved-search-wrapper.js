@@ -37,6 +37,7 @@ export default can.Component.extend({
     },
     searches: [],
     filtersToApply: null,
+    advancedSearch: null,
     init() {
       this.loadSavedSearches();
     },
@@ -48,11 +49,17 @@ export default can.Component.extend({
           statusItem,
         } = JSON.parse(search.filters);
 
-        this.attr('filtersToApply', {
-          filterItems,
-          mappingItems,
-          statusItem,
-        });
+        const advancedSearch = this.attr('advancedSearch');
+        if (advancedSearch) {
+          advancedSearch.attr('filterItems', filterItems);
+          advancedSearch.attr('mappingItems', mappingItems);
+        } else {
+          this.attr('filtersToApply', {
+            filterItems,
+            mappingItems,
+            statusItem,
+          });
+        }
       } catch (e) {
         notifier('error',
           `"${search.name}" is broken somehow. Sorry for any inconvenience.`);

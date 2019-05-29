@@ -50,7 +50,8 @@
                   modalTitle:from="'{{model.title_singular}} Advanced Search'"
                   extraCssClass:from="'advanced-search'">
       <saved-search-wrapper
-        objectType:from="modelName">
+        objectType:from="modelName"
+        advancedSearch:from="advancedSearch">
       <aside>
         <saved-search-list
           modalTitle:from="model.title_singular"
