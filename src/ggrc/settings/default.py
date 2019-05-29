@@ -3,7 +3,9 @@
 
 """Module defines application settings."""
 
+import datetime
 import os
+
 import jinja2
 
 DEBUG = False
@@ -89,6 +91,8 @@ else:
 # Initialize from environment if present
 SQLALCHEMY_DATABASE_URI = os.environ.get('GGRC_DATABASE_URI', '')
 SECRET_KEY = os.environ.get('GGRC_SECRET_KEY', 'Replace-with-something-secret')
+PERMANENT_SESSION_LIFETIME = os.environ.get('GGRC_PERMANENT_SESSION_LIFETIME',
+                                            datetime.timedelta(days=365))
 
 MEMCACHE_MECHANISM = True
 
