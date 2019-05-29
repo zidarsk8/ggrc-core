@@ -185,6 +185,8 @@
 
 .ggrc-form {
   &.ggrc-form-multiple-columns {
+    max-width: 960px;
+
     .ggrc-form-item {
       &--column {
         flex-basis: 200px;
@@ -197,10 +199,20 @@
         width: 100%;
       }
 
+      &--short-row {
+        max-width: 720px;
+      }
+
       assessment-inline-item,
       .inline-edit-control,
       .expanded-area {
         width: 100%;
+      }
+
+      .inline-edit-control {
+        &--input {
+          max-width: 720px;
+        }
       }
     }
   }
