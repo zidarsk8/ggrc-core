@@ -6,7 +6,7 @@
 import datetime
 import collections
 import string
-from mock import MagicMock
+from mock import MagicMock, patch
 
 import ddt
 
@@ -256,6 +256,24 @@ class TestCloneWorkflow(TestCase):
         all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
     self.assertEqual(unit, clone_wf.unit)
     self.assertEqual(repeat_every, clone_wf.repeat_every)
+
+  @patch("ggrc_workflows.get_copy_title")
+  def test_workflow_copy_title(self, get_copy_title_patch):
+    """Check if get_copy_title is called with proper arguments."""
+    expected_title = 'Copy Title'
+    get_copy_title_patch.return_value = expected_title
+
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      cloned_workflow = wf_factories.WorkflowFactory(parent_id=workflow.id)
+      cloned_title = cloned_workflow.title
+
+    _, clone_wf = self.object_generator.generate_object(
+        all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
+    get_copy_title_patch.assert_called_once_with(
+        workflow.title, [cloned_title])
+    self.assertEqual(clone_wf.title, expected_title)
+    self.assertEqual(clone_wf.parent_id, workflow.id)
 
 
 @ddt.ddt
