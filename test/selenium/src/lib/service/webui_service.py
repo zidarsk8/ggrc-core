@@ -762,3 +762,9 @@ class ProgramsService(BaseWebUiService):
     obj_modal = unified_mapper.CommonUnifiedMapperModal(
         self.driver, obj).click_create_and_map_obj()
     return obj_modal
+
+
+class ProductsService(BaseWebUiService):
+  """Class for Programs business layer's services objects."""
+  def __init__(self, driver):
+    super(ProductsService, self).__init__(driver, objects.PRODUCTS)

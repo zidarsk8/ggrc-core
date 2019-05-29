@@ -155,6 +155,10 @@ class ACLRolesIDsMetaClass(type):
     return cls.id_of_role(object_type="Program", name="Program Managers")
 
   @property
+  def PRODUCT_MANAGERS(cls):
+    return cls.id_of_role(object_type="Product", name="Product Managers")
+
+  @property
   def REVIEWERS(cls):
     return cls.id_of_role(object_type="Review", name="Reviewers")
 
