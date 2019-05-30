@@ -3,17 +3,21 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <div class="document-object-item {{#if iconCls}}document-object-item__with-icon{{/if}}">
-    {{#if iconCls}}<i class="fa {{iconCls}}"></i>{{/if}}
-    <div class="document-object-item__body">
-        <a class="link"
-           href="{{normalizeLink itemData.link}}"
-           target="_blank"
-           rel="tooltip"
-           data-original-title="{{itemTitle}}">{{itemTitle}}</a>
-        {{#if itemCreationDate}}
-            <span class="date">{{localize_date itemCreationDate}}</span>
-        {{else}}
-            <spinner-component toggle:from="true"></spinner-component>
-        {{/if}}
-    </div>
+  {{#if iconCls}}
+    <i class="fa {{iconCls}}"></i>
+  {{/if}}
+  <div class="document-object-item__body">
+    <a class="link {{^if isItemValid}}deprecated{{/if}}"
+      href="{{normalizeLink itemData.link}}"
+      target="_blank"
+      rel="tooltip"
+      data-original-title="{{itemTitle}}">
+      {{itemTitle}}{{^if isItemValid}} ({{itemStatus}}){{/if}}
+    </a>
+    {{#if itemCreationDate}}
+      <span class="date">{{localize_date itemCreationDate}}</span>
+    {{else}}
+      <spinner-component toggle:from="true"></spinner-component>
+    {{/if}}
+  </div>
 </div>

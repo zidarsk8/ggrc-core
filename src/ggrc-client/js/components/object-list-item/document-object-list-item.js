@@ -28,18 +28,28 @@ export default can.Component.extend({
         },
       },
       itemData: {
-        get: function () {
+        get() {
           return this.attr('instance');
         },
       },
       itemTitle: {
-        get: function () {
+        get() {
           return this.attr('itemData.title') || this.attr('itemData.link');
         },
       },
       itemCreationDate: {
-        get: function () {
+        get() {
           return this.attr('itemData.created_at');
+        },
+      },
+      itemStatus: {
+        get() {
+          return this.attr('itemData.status');
+        },
+      },
+      isItemValid: {
+        get() {
+          return this.attr('itemStatus').toLowerCase() !== 'deprecated';
         },
       },
     },

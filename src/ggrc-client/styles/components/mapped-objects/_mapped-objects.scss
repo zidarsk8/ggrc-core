@@ -143,6 +143,9 @@
     min-width: 0;
 
     .link {
+      &.deprecated {
+        color: $status-deprecated;
+      }
       font-style: italic;
       font-size: 13px;
       display: inline-block;
