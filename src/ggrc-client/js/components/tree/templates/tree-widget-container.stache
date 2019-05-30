@@ -52,6 +52,7 @@
       <saved-search-wrapper
         objectType:from="modelName"
         advancedSearch:from="advancedSearch">
+      <div class="advanced-search__wrapper">
       <aside>
         <saved-search-list
           modalTitle:from="model.title_singular"
@@ -100,6 +101,7 @@
         </div>
       </div>
       </main>
+      </div>
       </saved-search-wrapper>
     </simple-modal>
 

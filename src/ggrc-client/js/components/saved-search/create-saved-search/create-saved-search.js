@@ -46,6 +46,7 @@ export default can.Component.extend({
       })
       return savedSearch.save().then(() => {
         this.dispatch('created');
+        this.attr('searchName', '');
       }, (err) => {
         handleAjaxError(err);
       });
