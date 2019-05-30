@@ -61,6 +61,7 @@ describe('bulk-update-button component', function () {
 
       viewModel.attr('model', {
         name_singular: 'Some Model',
+        name_plural: 'Some Models',
       });
       resMessage = 'items updated';
       updateDfd = $.Deferred();

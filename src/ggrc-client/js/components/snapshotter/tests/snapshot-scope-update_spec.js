@@ -109,9 +109,9 @@ describe('snapshot-scope-update component', function () {
     });
 
     it('does not set refresh flag for each tree-widget-container that does ' +
-    'not contain snapshots', function () {
+    'not contain snapshots', async function () {
       _.assign(containerVM.model, {model_singular: 'Something'});
-      method();
+      await method();
       $('tree-widget-container').each(function () {
         let viewModel = $(this).viewModel();
         expect(viewModel.setRefreshFlag).not.toHaveBeenCalled();
