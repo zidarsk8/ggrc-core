@@ -4,6 +4,13 @@
  */
 
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import {
+  notifier,
+} from './notifiers-utils';
+import {
+  isConnectionLost,
+  handleAjaxError,
+} from './errors-utils';
 /**
  * Util methods for work with QueryAPI.
  */
@@ -243,6 +250,13 @@ function _resolveBatch(queue) {
 
       req.dfd.resolve(info);
     });
+  }).catch((jqxhr, textStatus, exception) => {
+    if (isConnectionLost()) {
+      notifier('error', 'Internet connection was lost.');
+    } else {
+      handleAjaxError(jqxhr, exception);
+    }
+    queue.forEach((req) => req.dfd.reject());
   });
 }
 
