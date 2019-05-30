@@ -10,6 +10,7 @@ import caUpdate from '../mixins/ca-update';
 import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import programNotifications from '../mixins/notifications/program-notifications';
+import proposable from '../mixins/proposable';
 import megaObject from '../mixins/mega-object';
 import Stub from '../stub';
 
@@ -28,6 +29,7 @@ export default Cacheable.extend({
     timeboxed,
     accessControlList,
     programNotifications,
+    proposable,
     megaObject,
   ],
   is_custom_attributable: true,
