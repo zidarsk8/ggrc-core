@@ -622,32 +622,6 @@ can.stache.registerHelper('debugger', function () {
   return options.fn(options.contexts);
 });
 
-can.stache.registerHelper('pretty_role_name', function (name) {
-  name = isFunction(name) ? name() : name;
-  let ROLE_LIST = {
-    ProgramOwner: 'Program Manager',
-    ProgramEditor: 'Program Editor',
-    ProgramReader: 'Program Reader',
-    WorkflowOwner: 'Workflow Manager',
-    WorkflowMember: 'Workflow Member',
-    Mapped: 'No Role',
-    Owner: 'Manager',
-  };
-  if (ROLE_LIST[name]) {
-    return ROLE_LIST[name];
-  }
-  return name;
-});
-
-can.stache.registerHelper('role_scope', function (scope) {
-  scope = isFunction(scope) ? scope() : scope;
-
-  if (scope === 'Private Program') {
-    return 'Program';
-  }
-  return scope;
-});
-
 /*
 Add new variables to current scope. This is useful for passing variables
 to initialize a tree view.
