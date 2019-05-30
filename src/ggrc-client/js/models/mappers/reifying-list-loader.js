@@ -4,7 +4,6 @@
 */
 
 import RefreshQueue from '../refresh_queue';
-import Mappings from './mappings';
 
 (function (GGRC, can) {
   GGRC.ListLoaders.ReifyingListLoader =
@@ -33,14 +32,7 @@ import Mappings from './mappings';
       },
       init_listeners: function (binding) {
         let self = this;
-
-        if (this.source_binding) {
-          binding.source_binding = this.source_binding;
-        } else {
-          binding.source_binding = Mappings.getBinding(
-            this.source,
-            binding.instance);
-        }
+        binding.source_binding = this.source_binding;
 
         this.insert_from_source_binding(binding,
           binding.source_binding.list, 0);

@@ -749,21 +749,9 @@ describe('mappers', function () {
         binding = new LL.ListBinding();
       });
       it('sets up source_binding on the binding from the ' +
-         'ReifyingListLoader\'s source_binding, if it exists', function () {
+         'ReifyingListLoader\'s source_binding', function () {
         rll = new LL.ReifyingListLoader(sourceBinding);
         spyOn(rll, 'insert_from_source_binding');
-        rll.init_listeners(binding);
-        expect(binding.source_binding).toBe(sourceBinding);
-        expect(rll.insert_from_source_binding)
-          .toHaveBeenCalledWith(binding, sourceBinding.list, 0);
-      });
-
-      it('sets up source_binding from the binding via getBinding, ' +
-         'if the source_binding property does not exist', function () {
-        rll = new LL.ReifyingListLoader('dummy_binding');
-        spyOn(rll, 'insert_from_source_binding');
-        binding = {};
-        spyOn(Mappings, 'getBinding').and.returnValue(sourceBinding);
         rll.init_listeners(binding);
         expect(binding.source_binding).toBe(sourceBinding);
         expect(rll.insert_from_source_binding)
