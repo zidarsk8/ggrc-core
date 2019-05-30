@@ -18,6 +18,13 @@
                    isLoading:from="isLoading"
                    showNoItemsText:from="isDeniedToAddComment">
   </mapped-comments>
+  <comments-paging comments:from="comments"
+                  total:from="totalCount"
+                  pageSize:from="pageSize"
+                  isLoading:from="isLoading"
+                  on:showMore="loadMoreComments()"
+                  on:showLess="hideComments()">
+  </comments-paging>
   {{#if isAllowedToAddCommentExternally}}
     <questionnaire-link instance:from="instance"
       linkType:from="'comment'"
