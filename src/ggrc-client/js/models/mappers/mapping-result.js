@@ -11,11 +11,6 @@
    *      list.  This may be an instance of can.Model or a pair containing
    *      (binding, result) in the case of a chained ListLoader.
    *
-   *  For FilteredListLoader, the mappings are (`result`, `binding`), where
-   *    `binding` is the binding in which the result appears, and thus,
-   *    `binding.loader` contains information about the filter.
-   *    `binding.instance`, then, is the instance on which the original,
-   *    unfiltered list is specified.
    */
   GGRC.ListLoaders.MappingResult = can.Map.extend({}, {
     init: function (instance, mappings, binding) {

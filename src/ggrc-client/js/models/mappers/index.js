@@ -8,7 +8,6 @@ import './mapping-result';
 import './list-binding';
 import './base-list-loader';
 import './direct-list-loader';
-import './search-list-loader';
 import './reifying-list-loader';
 import './mapper-helpers';
 import './mappings';

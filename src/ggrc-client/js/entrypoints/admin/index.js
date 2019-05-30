@@ -20,6 +20,7 @@ import '../../components/page-header/page-header';
 import '../../components/user-roles-selector-button/user-roles-selector-button';
 import '../../components/events/event-item';
 import '../../components/inner-nav/inner-nav';
+import '../../components/tree-structure/tree-structure';
 
 import '../../common-handlers';
 
