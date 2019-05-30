@@ -245,5 +245,4 @@ export default TreeLoader.extend({
   },
 
   '.search-filters button[type=reset] click': 'reset_search',
-  '.btn-add modal:success': 'reset_search',
 });
