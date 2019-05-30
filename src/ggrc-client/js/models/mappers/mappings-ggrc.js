@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {Direct} from '../mappers/mapper-helpers';
 import Mappings from './mappings';
 
 import {
@@ -246,12 +245,6 @@ new Mappings({
   },
 
   // Other
-  UserRole: {
-    mappers: {
-      person: Direct('Person', 'user_roles', 'person'),
-      role: Direct('Role', 'user_roles', 'role'),
-    },
-  },
   MultitypeSearch: {
     map: [
       'AccessGroup', 'AccountBalance', 'Assessment', 'AssessmentTemplate',
