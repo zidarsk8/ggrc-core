@@ -16,17 +16,6 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     instance: {},
     define: {
-      showIcon: {
-        type: 'boolean',
-        value: false,
-      },
-      iconCls: {
-        get: function () {
-          return this.attr('showIcon') ?
-            'fa-' + this.attr('itemData.title').toLowerCase() :
-            '';
-        },
-      },
       itemData: {
         get() {
           return this.attr('instance');

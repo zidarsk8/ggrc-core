@@ -1,11 +1,9 @@
 {{!
-    Copyright (C) 2019 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<div class="document-object-item {{#if iconCls}}document-object-item__with-icon{{/if}}">
-  {{#if iconCls}}
-    <i class="fa {{iconCls}}"></i>
-  {{/if}}
+
+<div class="document-object-item">
   <div class="document-object-item__body">
     <a class="link {{^if isItemValid}}deprecated{{/if}}"
       href="{{normalizeLink itemData.link}}"
