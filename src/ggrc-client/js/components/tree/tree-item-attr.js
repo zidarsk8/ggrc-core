@@ -33,6 +33,14 @@ const RICH_TEXT_ATTRS = new Set([
   'vulnerability',
 ]);
 
+// attribute names considered "default" and representing fields which contain
+// at least "email" field
+const PERSON_ATTRS = new Set([
+  'created_by',
+  'last_submitted_by',
+  'last_verified_by',
+]);
+
 export default can.Component.extend({
   tag: 'tree-item-attr',
   view: can.stache(template),
@@ -85,9 +93,14 @@ export default can.Component.extend({
       const regexNewLines = /<\/p>?/g;
 
       if (result !== undefined && result !== null) {
+        if (PERSON_ATTRS.has(attrName)) {
+          return result.attr('email');
+        }
+
         if (DATE_ATTRS.has(attrName)) {
           return formatDate(result, true);
         }
+
         if (RICH_TEXT_ATTRS.has(attrName)) {
           if (this.isMarkdown()) {
             result = convertMarkdownToHtml(result);
