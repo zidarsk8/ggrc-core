@@ -81,6 +81,11 @@
           <h4>Filter by Mapping</h4>
         </div>
         <div class="simple-modal__body">
+          {{#advancedSearch.parent}}
+            <div class="advanced-search__parent-filter">
+              <h6>Mapped to {{type}}:</h6><span>{{title}}</span>
+            </div>
+          {{/advancedSearch.parent}}
           <advanced-search-mapping-container items:bind="advancedSearch.mappingItems"
                                              modelName:from="modelName"
                                              on:el:enter="applyAdvancedFilters()">

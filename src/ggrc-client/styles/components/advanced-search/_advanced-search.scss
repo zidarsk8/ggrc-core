@@ -95,6 +95,19 @@
     }
   }
 
+  &__parent-filter {
+    margin-bottom: 20px;
+
+    h6 {
+      display: inline;
+      margin-right: 8px;
+    }
+
+    span {
+      font-size: 13px;
+    }
+  }
+
   $simple-modal-header-height: 48px;
   $simple-modal-footer-height: 64px;
 

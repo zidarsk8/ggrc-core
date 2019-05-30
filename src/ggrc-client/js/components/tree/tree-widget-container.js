@@ -49,6 +49,7 @@ import {
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   initMappedInstances,
+  isObjectContextPage,
   isAllObjects,
   isMyWork,
 } from '../../plugins/utils/current-page-utils';
@@ -500,6 +501,7 @@ let viewModel = canMap.extend({
     appliedFilterItems: canList(),
     mappingItems: canList(),
     appliedMappingItems: canList(),
+    parent: null,
   },
   openAdvancedFilter: function () {
     this.attr('advancedSearch.filterItems',
@@ -507,6 +509,10 @@ let viewModel = canMap.extend({
 
     this.attr('advancedSearch.mappingItems',
       this.attr('advancedSearch.appliedMappingItems').slice());
+
+    if (isObjectContextPage()) {
+      this.attr('advancedSearch.parent', this.attr('parent_instance'));
+    }
 
     this.attr('advancedSearch.open', true);
   },
