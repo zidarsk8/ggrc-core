@@ -81,6 +81,25 @@ export default can.Component.extend({
 
       this.attr('timeoutId', timeoutId);
     },
+    onSuccessHandler(errors) {
+      if (errors && errors.length) {
+        notifier('error', 'There were some errors in generating ' +
+          'tickets. More details will be sent by email.');
+        return;
+      }
+
+      const reloadLink = window.location.origin +
+        `/audits/${this.attr('instance.id')}#!assessment`;
+
+      notifier('success', 'Tickets were generated successfully. {reload_link}',
+        {reloadLink});
+
+      // need to refresh tree view with Ticket Tracker column
+      pubSub.dispatch({
+        type: 'refetchOnce',
+        modelNames: ['Assessment'],
+      });
+    },
     checkStatus(timeout) {
       this.getStatus()
         .done((task) => {
@@ -93,19 +112,7 @@ export default can.Component.extend({
               break;
             }
             case 'Success': {
-              let errors = task.errors;
-
-              if (errors && errors.length) {
-                notifier('error', 'There were some errors in generating ' +
-                  'tickets. More details will be sent by email.');
-              } else {
-                notifier('success', 'Tickets were generated successfully.');
-                // need to refresh tree view with Ticket Tracker column
-                pubSub.dispatch({
-                  type: 'refetchOnce',
-                  modelNames: ['Assessment'],
-                });
-              }
+              this.onSuccessHandler(task.errors);
 
               this.attr('isGeneratingInProgress', false);
               break;
