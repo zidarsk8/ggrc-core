@@ -4,6 +4,10 @@
 */
 
 import template from './templates/cycle-task-group-object-task.stache';
+import tdmTemplate from './templates/partials/three-dots-menu.stache';
+import tdmInHistoryTemplate from './templates/partials/three-dots-menu-in-history.stache';
+import restoreButtonTemplate from './templates/partials/restore-button.stache';
+
 import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown-component';
 import '../../comment/comment-data-provider';
@@ -14,13 +18,21 @@ import {getPageType} from '../../../plugins/utils/current-page-utils';
 import Permission from '../../../permission';
 
 let viewModel = can.Map.extend({
+  partials: {
+    restoreButton: can.stache(restoreButtonTemplate),
+    threeDotsMenu: can.stache(tdmTemplate),
+    threeDotsMenuInHistory: can.stache(tdmInHistoryTemplate),
+  },
   define: {
+    isAllowedToUpdate: {
+      get() {
+        return Permission.is_allowed_for('update', this.attr('instance'));
+      },
+    },
     isEditDenied: {
       get() {
-        const instance = this.attr('instance');
-        return !Permission
-          .is_allowed_for('update', instance) ||
-          instance.attr('is_in_history');
+        return !this.attr('isAllowedToUpdate') ||
+          this.attr('instance.is_in_history');
       },
     },
     showWorkflowLink: {
@@ -38,7 +50,7 @@ let viewModel = can.Map.extend({
         );
 
         return (
-          Permission.is_allowed_for('update', instance) &&
+          !this.attr('isEditDenied') &&
           hasAllowedStatus
         );
       },
