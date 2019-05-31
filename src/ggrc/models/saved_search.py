@@ -46,21 +46,22 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
   object_type = db.Column(db.String, nullable=False)
   person_id = db.Column(db.Integer, db.ForeignKey("people.id"))
   filters = db.Column(db.Text, nullable=True)
-  type = db.Column(db.String, nullable=False)
+  search_type = db.Column(db.String, nullable=False)
 
   # pylint: disable-msg=too-many-arguments
-  def __init__(self, name, object_type, user, type, filters=""):
-    self.validate_name_uniqueness_for_user(user, name)
+  def __init__(self, name, object_type, user, search_type, filters=""):
+    self.validate_name_uniqueness(user, name)
 
     super(SavedSearch, self).__init__(
         name=name,
         object_type=object_type,
         person_id=user.id,
-        type=type,
+        search_type=search_type,
         filters=filters,
     )
 
-  def validate_name_uniqueness_for_user(self, user, name):
+  @staticmethod
+  def validate_name_uniqueness(user, name):
     """
       Check that for given user there are no saved searches
       with given name.
@@ -75,6 +76,7 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
     """
       Validate that name is not blank.
     """
+    # pylint: disable=no-self-use
     if not name:
       raise ValidationError("Saved search name can't be blank")
 
@@ -85,6 +87,7 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
     """
       Validate that supplied object type supports search api filters saving.
     """
+    # pylint: disable=no-self-use
     if object_type not in SUPPORTED_OBJECT_TYPES:
       raise ValidationError(
           u"Object of type '{}' does not support search saving".format(
@@ -99,17 +102,19 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
     """
       Validate correctness of supplied search filters.
     """
+    # pylint: disable=no-self-use
     if filters:
       return json.dumps(filters)
     return None
 
-  @validates('type')
-  def validate_type(self, _, type):
-    """"""
-    if not type:
+  @validates('search_type')
+  def validate_search_type(self, _, saved_search_type):
+    """Valid that saved search type is correct"""
+    # pylint: disable=no-self-use
+    if not saved_search_type:
       raise ValidationError("Saved search type can't be blank")
 
-    if type not in self.VALID_SAVED_SEARCH_TYPES:
+    if saved_search_type not in self.VALID_SAVED_SEARCH_TYPES:
       raise ValidationError("Invalid saved search type")
 
-    return type
+    return saved_search_type

@@ -7,36 +7,20 @@ from datetime import datetime
 from random import random
 
 from freezegun import freeze_time
-from flask_testing import TestCase
 
 from ggrc import db
 from ggrc.app import app
 from ggrc.models.saved_search import SavedSearch
 from ggrc.models.person import Person
 
+from integration.ggrc.views.saved_searches.base import SavedSearchBaseTest
 from integration.ggrc.views.saved_searches.initializers import (
     setup_user_role,
     get_client_and_headers,
 )
 
 
-class TestSavedSearchGet(TestCase):
-
-  API_URL = "/api/saved_searches/{object_type}?type={type}"
-
-  SAVED_SEARCH_TYPE = "GlobalSearch"
-
-  def _get_saved_search(self, object_type):
-    response = self._client.get(
-        self.API_URL.format(object_type=object_type,
-                            type=self.SAVED_SEARCH_TYPE),
-        headers=self._headers
-    )
-    return json.loads(response.data)
-
-  @staticmethod
-  def create_app():
-    return app
+class TestSavedSearchGet(SavedSearchBaseTest):
 
   @classmethod
   def setUpClass(cls):
@@ -73,7 +57,7 @@ class TestSavedSearchGet(TestCase):
             name="test_ss_{}".format(i),
             object_type="Assessment",
             user=user,
-            type=cls.SAVED_SEARCH_TYPE
+            search_type=cls.SAVED_SEARCH_TYPE
         )
         user.saved_searches.append(saved_search)
         db.session.flush()
@@ -91,7 +75,7 @@ class TestSavedSearchGet(TestCase):
           name="test_program_ss",
           object_type="Program",
           user=cls._person_0,
-          type=cls.SAVED_SEARCH_TYPE
+          search_type=cls.SAVED_SEARCH_TYPE
       )
       cls._person_0.saved_searches.append(saved_search_program)
       db.session.flush()
@@ -102,12 +86,6 @@ class TestSavedSearchGet(TestCase):
     cls._client, cls._headers = get_client_and_headers(
         app, cls._person_0,
     )
-
-  def setUp(self):
-    self._client.get("/login", headers=self._headers)
-
-  def tearDown(self):
-    self._client.get("/logout", headers=self._headers)
 
   @classmethod
   def tearDownClass(cls):
@@ -124,9 +102,8 @@ class TestSavedSearchGet(TestCase):
 
   def test_0_get_only_user_specific_saved_searches(self):
     response = self._client.get(
-        "/api/saved_searches/Assessment?type={type}".format(
-            type=self.SAVED_SEARCH_TYPE
-        ),
+        self.API_URL.format(object_type="Assessment",
+                            search_type=self.SAVED_SEARCH_TYPE),
         headers=self._headers,
     )
 
@@ -139,12 +116,12 @@ class TestSavedSearchGet(TestCase):
 
   def test_1_get_saved_searches_with_pagination(self):
     response = self._client.get(
-        "/api/saved_searches/Assessment?offset=1&limit=2&type={type}".format(
-            type=self.SAVED_SEARCH_TYPE
+        self.SAVED_SEARCH_URI +
+        "/Assessment?offset=1&limit=2&search_type={search_type}".format(
+            search_type=self.SAVED_SEARCH_TYPE
         ),
         headers=self._headers,
     )
-
     data = json.loads(response.data)
 
     self.assertEqual(len(data["values"]), 2)

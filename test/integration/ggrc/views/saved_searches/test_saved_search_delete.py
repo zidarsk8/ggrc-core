@@ -6,24 +6,20 @@ import json
 import unittest
 
 from random import random
-from flask_testing import TestCase
 
 from ggrc import db
 from ggrc.app import app
 from ggrc.models.saved_search import SavedSearch
 from ggrc.models.person import Person
 
+from integration.ggrc.views.saved_searches.base import SavedSearchBaseTest
 from integration.ggrc.views.saved_searches.initializers import (
     setup_user_role,
     get_client_and_headers,
 )
 
 
-class TestSavedSearchDelete(TestCase):
-
-  @staticmethod
-  def create_app():
-    return app
+class TestSavedSearchDelete(SavedSearchBaseTest):
 
   @classmethod
   def setUpClass(cls):
@@ -44,7 +40,7 @@ class TestSavedSearchDelete(TestCase):
         name="test_ss_1",
         object_type="Assessment",
         user=cls._person_0,
-        type="GlobalSearch"
+        search_type="GlobalSearch"
     )
     cls._person_0.saved_searches.append(saved_search)
     db.session.flush()
@@ -57,12 +53,6 @@ class TestSavedSearchDelete(TestCase):
     )
 
     cls._saved_search_id = saved_search.id
-
-  def setUp(self):
-    self._client.get("/login", headers=self._headers)
-
-  def tearDown(self):
-    self._client.get("/logout", headers=self._headers)
 
   @classmethod
   def tearDownClass(cls):
@@ -77,10 +67,7 @@ class TestSavedSearchDelete(TestCase):
     db.session.commit()
 
   def test_0_successful_deletion_of_saved_search(self):
-    response = self._client.delete(
-        "/api/saved_searches/{}".format(self._saved_search_id),
-        headers=self._headers,
-    )
+    response = self._delete_saved_search(self._saved_search_id)
 
     data = json.loads(response.data)
 
@@ -99,10 +86,7 @@ class TestSavedSearchDelete(TestCase):
   #
   @unittest.skip("Investigate in scope of GGRC-7291")
   def test_1_deletion_failure(self):
-    response = self.client.delete(
-        "/api/saved_searches/{}".format(self._saved_search_id),
-        headers=self._headers,
-    )
+    response = self._delete_saved_search(self._saved_search_id)
 
     data = json.loads(response.data)
 

@@ -28,7 +28,7 @@ def upgrade():
   )
   op.add_column(
       'saved_searches',
-      sa.Column('type', sa.String(250), nullable=False)
+      sa.Column('search_type', sa.String(250), nullable=False)
   )
   op.drop_column('saved_searches', 'query')
 
@@ -36,7 +36,7 @@ def upgrade():
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   op.drop_column('saved_searches', 'filters')
-  op.drop_column('saved_searches', 'type')
+  op.drop_column('saved_searches', 'search_type')
   op.add_column(
       'saved_searches',
       sa.Column('query', sa.Text, nullable=False),

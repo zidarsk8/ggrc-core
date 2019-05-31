@@ -5,23 +5,18 @@
 import json
 from random import random
 
-from flask_testing import TestCase
-
 from ggrc import db
 from ggrc.app import app
 from ggrc.models.person import Person
 
+from integration.ggrc.views.saved_searches.base import SavedSearchBaseTest
 from integration.ggrc.views.saved_searches.initializers import (
     setup_user_role,
     get_client_and_headers,
 )
 
 
-class TestSavedSearchPost(TestCase):
-
-  @staticmethod
-  def create_app():
-    return app
+class TestSavedSearchPost(SavedSearchBaseTest):
 
   @classmethod
   def setUpClass(cls):
@@ -43,12 +38,6 @@ class TestSavedSearchPost(TestCase):
         app, cls._person_0,
     )
 
-  def setUp(self):
-    self._client.get("/login", headers=self._headers)
-
-  def tearDown(self):
-    self._client.get("/logout", headers=self._headers)
-
   @classmethod
   def tearDownClass(cls):
     """
@@ -67,7 +56,7 @@ class TestSavedSearchPost(TestCase):
         data=json.dumps({
             "name": "test_ss_3",
             "object_type": "Assessment",
-            "type": "AdvancedSearch"
+            "search_type": "AdvancedSearch"
         }),
         headers=self._headers,
     )
@@ -75,7 +64,7 @@ class TestSavedSearchPost(TestCase):
     self.assertEqual(response.status, "200 OK")
 
     response = self._client.get(
-        "/api/saved_searches/Assessment?limit=1&type=AdvancedSearch",
+        "/api/saved_searches/Assessment?limit=1&search_type=AdvancedSearch",
         headers=self._headers,
     )
 
@@ -85,17 +74,11 @@ class TestSavedSearchPost(TestCase):
     self.assertEqual(data["values"][0]["name"], "test_ss_3")
 
   def test_1_saved_search_creation_failure_due_not_unique_name(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "test_ss_3",
-            "object_type": "Assessment",
-            "type": "AdvancedSearch"
-        }),
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    data = self._post_saved_search({
+        "name": "test_ss_3",
+        "object_type": "Assessment",
+        "search_type": "AdvancedSearch"
+    })
 
     self.assertEqual(
         data["message"],
@@ -104,33 +87,21 @@ class TestSavedSearchPost(TestCase):
     self.assertEqual(data["code"], 400)
 
   def test_2_saved_search_creation_failure_due_to_empty_name(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "",
-            "object_type": "Assessment",
-            "type": "AdvancedSearch"
-        }),
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    data = self._post_saved_search({
+        "name": "",
+        "object_type": "Assessment",
+        "search_type": "AdvancedSearch"
+    })
 
     self.assertEqual(data["message"], "Saved search name can't be blank")
     self.assertEqual(data["code"], 400)
 
   def test_3_saved_search_creation_failure_due_invalid_object_type(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "test_ss_1",
-            "object_type": "Overwatch",
-            "type": "AdvancedSearch"
-        }),
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    data = self._post_saved_search({
+        "name": "test_ss_1",
+        "object_type": "Overwatch",
+        "search_type": "AdvancedSearch"
+    })
 
     self.assertEqual(
         data["message"],
@@ -159,36 +130,25 @@ class TestSavedSearchPost(TestCase):
             "name": "test_ss_4",
             "object_type": "Assessment",
             "filters": _filter,
-            "type": "GlobalSearch"
+            "search_type": "GlobalSearch"
         }),
         headers=self._headers,
     )
 
     self.assertEqual(response.status, "200 OK")
 
-    response = self._client.get(
-        "/api/saved_searches/Assessment",
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    data = self._get_saved_search("Assessment")
 
     for saved_search in data["values"]:
       if saved_search["name"] == "test_ss_4":
         self.assertEqual(json.loads(saved_search["filters"]), _filter)
 
   def test_5_saved_search_creation_failure_due_invalid_type(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "test_ss_1",
-            "object_type": "Assessment",
-            "type": "Invalid Type"
-        }),
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    data = self._post_saved_search({
+        "name": "test_ss_1",
+        "object_type": "Assessment",
+        "search_type": "Invalid Type"
+    })
 
     self.assertEqual(
         data["message"],

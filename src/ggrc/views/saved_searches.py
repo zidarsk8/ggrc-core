@@ -1,6 +1,8 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""This module provides endpoints to add/remove SavedSearch models"""
+
 from flask import request
 
 from ggrc import db
@@ -14,10 +16,11 @@ from ggrc.models.exceptions import ValidationError
 
 @app.route("/api/saved_searches/<string:object_type>", methods=["GET"])
 def get_saved_searches_by_type(object_type):
+  """Get SavedSearch by object type"""
   user = login.get_current_user(use_external_user=False)
   all_objects = user.saved_searches.filter(
       SavedSearch.object_type == object_type,
-      SavedSearch.type == request.args.get("type")
+      SavedSearch.search_type == request.args.get("search_type")
   ).order_by(
       SavedSearch.created_at.desc()
   )
@@ -39,6 +42,7 @@ def get_saved_searches_by_type(object_type):
 
 @app.route("/api/saved_searches/<int:saved_search_id>", methods=["DELETE"])
 def delete_saved_search(saved_search_id):
+  """Delete saved search"""
   user = login.get_current_user(use_external_user=False)
 
   saved_search = user.saved_searches.filter(
@@ -61,8 +65,9 @@ def delete_saved_search(saved_search_id):
 
 
 @app.route("/api/saved_searches", methods=["POST"])
-@validate_post_data_keys(["name", "object_type", "type"])
+@validate_post_data_keys(["name", "object_type", "search_type"])
 def create_saved_search():
+  """Create new saved search"""
   user = login.get_current_user(use_external_user=False)
 
   data = request.get_json()
@@ -72,7 +77,7 @@ def create_saved_search():
         data.get("name"),
         data.get("object_type"),
         user,
-        data.get("type"),
+        data.get("search_type"),
         data.get("filters"),
     )
   except ValidationError as error:
