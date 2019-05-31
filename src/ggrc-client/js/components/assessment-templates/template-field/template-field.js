@@ -44,7 +44,7 @@ export default can.Component.extend({
      * {value: 2, attachment: true, comment: false},
      * ]
      */
-    denormalizeMandatory: function (field, flags) {
+    denormalizeMandatory: function (field) {
       let options = _.splitTrim(field.attr('multi_choice_options'));
       let vals = _.splitTrim(field.attr('multi_choice_mandatory'));
       let isEqualLength = options.length === vals.length;
@@ -63,6 +63,7 @@ export default can.Component.extend({
       return _.zip(options, vals).map(function (zip) {
         let attr = new can.Map();
         let val = parseInt(zip[1], 10);
+        attr.attr('type', field.attr('attribute_type'));
         attr.attr('value', zip[0]);
         attr.attr(ddValidationValueToMap(val));
         return attr;

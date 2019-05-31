@@ -492,7 +492,8 @@ export default can.Control.extend({
   'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
     let instance = this.options.instance;
 
-    if (instance.attribute_type !== 'Dropdown') {
+    if (instance.attribute_type !== 'Dropdown' &&
+      instance.attribute_type !== 'Multiselect') {
       instance.attr('multi_choice_options', undefined);
     }
   },

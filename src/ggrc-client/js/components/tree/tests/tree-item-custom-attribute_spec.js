@@ -28,9 +28,9 @@ describe('tree-item-custom-attribute component', () => {
   beforeEach(() => {
     const fakeCustomAttrDefs = [{
       definition_type: 'control',
-      id: 3,
-      attribute_type: '',
       title: 'Type',
+      attribute_type: '',
+      id: 3,
     },
     {
       definition_type: 'control',
@@ -67,6 +67,12 @@ describe('tree-item-custom-attribute component', () => {
       title: 'Dropdown',
       attribute_type: 'Dropdown',
       id: 10,
+    },
+    {
+      definition_type: 'control',
+      title: 'Multiselect',
+      attribute_type: 'Multiselect',
+      id: 11,
     }];
 
     fakeInstance = makeFakeInstance({
@@ -131,6 +137,16 @@ describe('tree-item-custom-attribute component', () => {
 
           expect(viewModel.attr('value')).toEqual('No');
         });
+    });
+
+    describe('for caObject of Multiselect type', () => {
+      it('returns caObject value', function () {
+        const caId = 11;
+        const value = 'Option 1, Option 2';
+        fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
+        expect(viewModel.attr('value')).toBe(value);
+      });
     });
 
     describe('for caObject of Date type', () => {

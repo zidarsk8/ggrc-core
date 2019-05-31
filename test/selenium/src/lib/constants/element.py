@@ -123,9 +123,10 @@ class AdminWidgetCustomAttributes(object):
   RICH_TEXT = "Rich Text"
   DATE = "Date"
   CHECKBOX = "Checkbox"
+  MULTISELECT = "Multiselect"
   DROPDOWN = "Dropdown"
   PERSON = "Map:Person"
-  ALL_GCA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN)
+  ALL_GCA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, MULTISELECT, DROPDOWN)
   ALL_CA_TYPES = ALL_GCA_TYPES + (PERSON, )
 
 

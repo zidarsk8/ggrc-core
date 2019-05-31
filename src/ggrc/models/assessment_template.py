@@ -163,7 +163,7 @@ class AssessmentTemplate(assessment.AuditRelationship,
               "<attribute type>, <attribute name>, [<attribute value1>, "
               "<attribute value2>, ...]\n\n"
               "Valid attribute types: Text, Rich Text, Date, Checkbox, Person,"
-              "Dropdown.\n"
+              "Multiselect, Dropdown.\n"
               "attribute name: Any single line string without commas. Leading "
               "and trailing spaces are ignored.\n"
               "list of attribute values: Comma separated list, only used if "

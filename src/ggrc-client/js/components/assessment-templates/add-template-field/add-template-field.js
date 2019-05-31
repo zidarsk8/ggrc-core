@@ -5,16 +5,25 @@
 
 import template from './add-template-field.stache';
 
+// the field types that require a list of possible values to be defined
+const multiChoiceable = ['Dropdown', 'Multiselect'];
+
 export default can.Component.extend({
   tag: 'add-template-field',
   view: can.stache(template),
   leakScope: true,
   viewModel: can.Map.extend({
+    define: {
+      isDisplayValues: {
+        get() {
+          let type = this.attr('selected.type');
+          return _.includes(multiChoiceable, type);
+        },
+      },
+    },
     selected: [],
     fields: [],
     types: [],
-    // the field types that require a list of possible values to be defined
-    valueAttrs: ['Dropdown'],
     /*
      * Create a new field.
      *
@@ -38,7 +47,7 @@ export default can.Component.extend({
 
       let validators = this.getValidators(title, fields);
       this.validateTitle(validators);
-      this.validateValues(type, values);
+      this.validateValues(values);
 
       if (
         this.attr('selected.invalidValues') ||
@@ -58,8 +67,8 @@ export default can.Component.extend({
           selected.attr(type, '');
         });
     },
-    validateValues(type, values) {
-      let invalidValues = _.includes(this.valueAttrs, type) && !values;
+    validateValues(values) {
+      let invalidValues = this.attr('isDisplayValues') && !values;
       this.attr('selected.invalidValues', invalidValues);
     },
     validateTitle(validators) {

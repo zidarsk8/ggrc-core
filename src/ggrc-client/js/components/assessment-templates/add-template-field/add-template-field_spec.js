@@ -181,18 +181,29 @@ describe('add-template-field component', () => {
       viewModel = getComponentVM(Component);
     });
 
-    it('has to not allow to input type "Dropdown" with not set values', () => {
-      viewModel.validateValues('Dropdown', '');
-      expect(viewModel.attr('selected.invalidValues')).toBeTruthy();
+    it('has to not allow to input type "Dropdown" with positive ' +
+      '"isDisplayValues" & not set values', () => {
+      ['Dropdown', 'Multiselect'].forEach((type) => {
+        viewModel.attr('selected.type', type);
+
+        viewModel.validateValues('');
+        expect(viewModel.attr('selected.invalidValues')).toBeTruthy();
+      });
     });
 
-    it('has to allow to input type "Dropdown" with set values', () => {
-      viewModel.validateValues('DropDown', 'some values');
+    it('has to allow to input type "Dropdown" with positive ' +
+      '"isdisplayValues" & set values', () => {
+      viewModel.attr('selected.type', 'Multiselect');
+
+      viewModel.validateValues('some value');
       expect(viewModel.attr('selected.invalidValues')).toBeFalsy();
     });
 
-    it('has to allow to input type "Text" with not set values', () => {
-      viewModel.validateValues('Text', '');
+    it('has to allow to input type "Dropdown" with negative ' +
+      '"isDisplayValues" & set value', () => {
+      viewModel.attr('selected.type', 'Text');
+
+      viewModel.validateValues('any value');
       expect(viewModel.attr('selected.invalidValues')).toBeFalsy();
     });
   });

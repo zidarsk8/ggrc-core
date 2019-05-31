@@ -25,7 +25,8 @@ class TestCADReindex(query_helper.WithQueryApi, ggrc.TestCase):
 
   @staticmethod
   def _create_cad_body(title, attribute_type, definition_type, model_name):
-    return {
+    """Create body for CAD POST request"""
+    body = {
         "custom_attribute_definition": {
             "title": title,
             "attribute_type": attribute_type,
@@ -39,11 +40,16 @@ class TestCADReindex(query_helper.WithQueryApi, ggrc.TestCase):
             }
         }
     }
+    if attribute_type == "Multiselect":
+      body["custom_attribute_definition"]["multi_choice_options"] = "yes,no"
+    return body
 
   @ddt.data(
       ("assessment", "Checkbox", "no"),
+      ("assessment", "Multiselect", ""),
       ("assessment", "Text", ""),
       ("audit", "Checkbox", "no"),
+      ("audit", "Multiselect", ""),
       ("audit", "Text", ""),
   )
   @ddt.unpack
@@ -104,8 +110,10 @@ class TestCADReindex(query_helper.WithQueryApi, ggrc.TestCase):
 
   @ddt.data(
       ("assessment", "Checkbox", "no"),
+      ("assessment", "Multiselect", ""),
       ("assessment", "Text", ""),
       ("audit", "Checkbox", "no"),
+      ("audit", "Multiselect", ""),
       ("audit", "Text", ""),
   )
   @ddt.unpack

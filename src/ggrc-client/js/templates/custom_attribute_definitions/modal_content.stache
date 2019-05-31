@@ -1,6 +1,6 @@
 {{!
-    Copyright (C) 2019 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#instance}}
@@ -29,8 +29,8 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
         <dropdown-component optionsList:from="model.attributeTypes"
-                  name:bind="instance.attribute_type"
-                  dataPurpose:from="'ca-type'">
+                            name:bind="instance.attribute_type"
+                            dataPurpose:from="'ca-type'">
         </dropdown-component>
     </div>
     <div class="span2">
@@ -84,28 +84,20 @@
 
   {{#case "Dropdown"}}
     <div class="row-fluid">
-      <div
-        class="span12 {{#if instance.computed_errors.multi_choice_options}}field-failure{{/if}}">
+      <div class="span12 {{#if instance.computed_errors.multi_choice_options}}field-failure{{/if}}">
         <label class="form-label">
           Possible values (separated by comma ",")
           <i class="fa fa-asterisk"></i>
           <i class="fa fa-question-circle" rel="tooltip"
-            title="Provide a list of values from which users will be able to choose."></i>
+             title="Provide a list of values from which users will be able to choose.">
+          </i>
         </label>
-
         {{#instance.computed_errors.multi_choice_options}}
-           <label class="help-inline warning">
-               {{this}}
-           </label>
-         {{/instance.computed_errors.multi_choice_options}}
-
-        <input
-          tabindex="4"
-          class="input-block-level"
-          placeholder="Enter possible values"
-          name="multi_choice_options"
-          type="text"
-          value="{{multi_choice_options}}">
+          <label class="help-inline warning">{{this}}</label>
+        {{/instance.computed_errors.multi_choice_options}}
+        <input type="text" class="input-block-level"
+               name="multi_choice_options" value="{{multi_choice_options}}"
+               placeholder="Enter possible values" tabindex="4">
       </div>
     </div>
     <div class="row-fluid">
@@ -119,18 +111,47 @@
       </div>
     </div>
   {{/case}}
-
   {{#case "Checkbox"}}
   <div class="row-fluid">
     <div class="span6">
       <label>
         Inline help
         <i class="fa fa-question-circle" rel="tooltip"
-        title="Provide text to help users understand what this attribute is for."></i>
+           title="Provide text to help users understand what this attribute is for.">
+        </i>
       </label>
       <input tabindex="4" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
     </div>
   </div>
+  {{/case}}
+  {{#case "Multiselect"}}
+    <div class="row-fluid">
+      <div class="span12 {{#if instance.computed_errors.multi_choice_options}}field-failure{{/if}}">
+        <label class="form-label">
+          Possible values (separated by comma ",")
+          <i class="fa fa-asterisk"></i>
+          <i class="fa fa-question-circle" rel="tooltip"
+             title="Provide a list of values from which users will be able to choose.">
+          </i>
+        </label>
+        {{#instance.computed_errors.multi_choice_options}}
+          <label class="help-inline warning">{{this}}</label>
+        {{/instance.computed_errors.multi_choice_options}}
+        <input type="text" class="input-block-level"
+               name="multi_choice_options" value="{{multi_choice_options}}"
+               placeholder="Enter possible values" tabindex="4">
+      </div>
+    </div>
+    <div class='row-fluid'>
+      <div class="span6">
+        <label>
+          Inline help
+          <i class="fa fa-question-circle" rel="tooltip"
+             title="Provide text to help users understand what this attribute is for."></i>
+        </label>
+        <input tabindex="4" class="input-block-level" placeholder="Enter Help Text" name="helptext" type="text" value="{{helptext}}">
+      </div>
+    </div>
   {{/case}}
   {{#case "Date"}}
   <div class="row-fluid">

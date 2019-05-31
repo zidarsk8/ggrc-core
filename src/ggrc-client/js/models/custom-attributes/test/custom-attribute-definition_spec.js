@@ -35,11 +35,11 @@ describe('CustomAttributeDefinition model', function () {
     }
     );
 
-    it('returns an empty message for non-dropdown types', function () {
+    it('returns an empty message for non-multichoiceable types', function () {
       Model.attributeTypes.forEach(function (attrType) {
         let msg;
 
-        if (attrType === 'Dropdown') {
+        if (attrType === 'Dropdown' || attrType === 'Multiselect') {
           return;
         }
 

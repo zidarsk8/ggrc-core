@@ -370,7 +370,9 @@
         border: 1px solid $red;
       }
       label {
-        color: $red;
+        &:not(.multiselect-dropdown__label) {
+          color: $red;
+        }
       }
       select {
         border: 1px solid $red;

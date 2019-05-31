@@ -67,6 +67,8 @@ class TestExportSnapshots(TestCase):
           cad(title="date", definition_type=type_, attribute_type="Date"),
           cad(title="checkbox", definition_type=type_,
               attribute_type="Checkbox"),
+          cad(title="multiselect", definition_type=type_,
+              attribute_type="Multiselect", multi_choice_options="yes,no"),
           cad(title="RT", definition_type=type_, attribute_type="Rich Text"),
           cad(title="dropdown",
               definition_type=type_,
@@ -240,6 +242,7 @@ class TestExportSnapshots(TestCase):
             "checkbox": u"no",
             "date": u"",
             "dropdown": u"",
+            "multiselect": u"",
 
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u",".join(json.loads(control.assertions)),
