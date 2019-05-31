@@ -13,6 +13,7 @@
 </div>
 
 <saved-search-wrapper
+  searchType:from="'GlobalSearch'"
   objectType:from="model.model_singular">
 <div class="modal-body-wrapper">
   <aside>
@@ -89,6 +90,7 @@
               </div>
               <div class="object-controls__actions-search">
                 <create-saved-search
+                  type:from="'GlobalSearch'"
                   filterItems:from="filterItems"
                   mappingItems:from="mappingItems"
                   statusItem:from="statusItem"

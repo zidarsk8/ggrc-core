@@ -4,8 +4,7 @@
 */
 
 import SavedSearch from '../../../models/service-models/saved-search';
-import { notifierXHR } from '../../../plugins/utils/notifiers-utils';
-import { handleAjaxError } from '../../../plugins/utils/errors-utils';
+import {handleAjaxError} from '../../../plugins/utils/errors-utils';
 
 export default can.Component.extend({
   tag: 'create-saved-search',
@@ -22,9 +21,10 @@ export default can.Component.extend({
     statusItem: null,
     parentItems: null,
     parent: null,
+    type: null,
     searchName: '',
     objectType: '',
-    saveSearch() {
+    getFilters() {
       const filterItems = this.attr('filterItems') &&
         this.attr('filterItems').serialize();
       const mappingItems = this.attr('mappingItems') &&
@@ -44,18 +44,21 @@ export default can.Component.extend({
         }
       }
 
-      const filters = {
+      return {
         filterItems,
         mappingItems,
         statusItem,
         parentItems,
       };
-
+    },
+    saveSearch() {
+      const filters = this.getFilters();
       const savedSearch = new SavedSearch({
         name: this.attr('searchName'),
+        search_type: this.attr('type'),
         object_type: this.attr('objectType'),
         filters,
-      })
+      });
       return savedSearch.save().then(() => {
         this.dispatch('created');
         this.attr('searchName', '');

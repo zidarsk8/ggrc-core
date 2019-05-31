@@ -50,6 +50,7 @@
                   modalTitle:from="'{{model.title_singular}} Advanced Search'"
                   extraCssClass:from="'advanced-search'">
       <saved-search-wrapper
+        searchType:from="'AdvancedSearch'"
         objectType:from="modelName"
         advancedSearch:from="advancedSearch">
       <div class="advanced-search__wrapper">
@@ -99,6 +100,7 @@
       </div>
       <div class="simple-modal__footer">
         <create-saved-search
+          type:from="'AdvancedSearch'"
           filterItems:from="advancedSearch.filterItems"
           mappingItems:from="advancedSearch.mappingItems"
           parentItems:from="advancedSearch.parentItems"
