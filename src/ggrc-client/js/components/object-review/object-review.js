@@ -115,7 +115,7 @@ export default can.Component.extend({
     },
     showNotification() {
       notifier('info', notificationTemplate, {
-        revertState: this.markUnreviewed.bind(this),
+        data: {revertState: this.markUnreviewed.bind(this)},
       });
     },
     updateReview(review) {

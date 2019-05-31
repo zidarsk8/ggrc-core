@@ -225,7 +225,7 @@ export default can.Component.extend({
           if (error && error.responseJSON && error.responseJSON.message) {
             notifier('error', error.responseJSON.message);
           } else {
-            notifier('error', errorTemplate, true);
+            notifier('error', errorTemplate, {data: true});
           }
         }).always(() => {
           this.attr('isLoading', false);
@@ -253,10 +253,10 @@ export default can.Component.extend({
     stopImport(jobId) {
       confirm({
         modal_title: 'Warning',
-        modal_description: `The import is still in progress and only part of 
-          data is saved. To stop the import process, please click 
+        modal_description: `The import is still in progress and only part of
+          data is saved. To stop the import process, please click
           &quot;Stop Import&quot;. </br>
-          <b>Warning:</b> only partial data will be saved, if import 
+          <b>Warning:</b> only partial data will be saved, if import
           is stopped when in progress.`,
         button_view:
           `${GGRC.templates_path}/modals/proceed-stop-import-buttons.stache`,
