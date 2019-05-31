@@ -7,7 +7,7 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 import Control from '../../../models/business-models/control';

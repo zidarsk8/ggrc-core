@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Mappings from '../../models/mappers/mappings';
+import {getMappingTypes} from '../../models/mappers/mappings';
 import {getInstance} from '../../plugins/utils/models-utils';
 import * as businessModels from '../../models/business-models';
 
@@ -124,7 +124,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
   showResults: true,
   type: 'Control', // We set default as Control
   availableTypes: function () {
-    return Mappings.getMappingTypes(this.attr('object'));
+    return getMappingTypes(this.attr('object'));
   },
   object: '',
   bindings: {},

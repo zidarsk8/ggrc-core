@@ -6,7 +6,7 @@
 import RefreshQueue from '../../../models/refresh_queue';
 import Component from '../object-generator';
 import Program from '../../../models/business-models/program';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 
 describe('object-generator component', function () {
   'use strict';

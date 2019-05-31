@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Mappings from '../mappings';
+import * as Mappings from '../mappings';
 import Permission from '../../../permission';
 
 describe('Mappings', function () {
@@ -128,10 +128,6 @@ describe('Mappings', function () {
     });
 
     it('checks that types are mappable', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        Control: {},
-      });
-
       let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
 
       expect(result).toBeFalsy();
@@ -139,10 +135,6 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update source', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        AccessGroup: {},
-      });
-
       let result = Mappings.allowedToUnmap('DataAsset', 'AccessGroup');
 
       expect(result).toBeTruthy();
@@ -152,10 +144,6 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update target', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        AccessGroup: {},
-      });
-
       let source = new can.Map({type: 'DataAsset'});
       let target = new can.Map({type: 'AccessGroup'});
       let result = Mappings.allowedToUnmap(source, target);

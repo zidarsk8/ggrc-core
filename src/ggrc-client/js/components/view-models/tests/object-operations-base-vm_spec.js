@@ -4,7 +4,7 @@
  */
 
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import Control from '../../../models/business-models/control';
 

@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../assessment-object-type-dropdown';
 

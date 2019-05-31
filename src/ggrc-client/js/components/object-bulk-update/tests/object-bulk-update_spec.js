@@ -6,7 +6,7 @@
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 import tracker from '../../../tracker';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 
 describe('object-bulk-update component', function () {
   let events;

@@ -35,7 +35,7 @@ import {
   transformQueryForMega,
 } from './mega-object-utils';
 import {getRolesForType} from './acl-utils';
-import Mappings from '../../models/mappers/mappings';
+import {getMappingList} from '../../models/mappers/mappings';
 import {caDefTypeName} from './custom-attribute/custom-attribute-config';
 import Cacheable from '../../models/cacheable';
 import * as businessModels from '../../models/business-models';
@@ -356,7 +356,7 @@ function getModelsForSubTier(modelName) {
   if (modelName === 'CycleTaskGroupObjectTask' &&
   !orderedModelsForSubTier[modelName].length) {
     orderedModelsForSubTier[modelName] =
-    Mappings.getMappingList('CycleTaskGroupObjectTask');
+    getMappingList('CycleTaskGroupObjectTask');
   }
 
   availableModels = orderedModelsForSubTier[modelName] || [];

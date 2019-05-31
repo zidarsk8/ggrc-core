@@ -13,7 +13,7 @@ import {
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
-import Mappings from '../../models/mappers/mappings';
+import {shouldBeMappedExternally} from '../../models/mappers/mappings';
 import {
   confirm,
 } from '../../plugins/utils/modals';
@@ -62,7 +62,7 @@ export default can.Component.extend({
         get() {
           let sourceType = this.attr('sourceType');
           let destinationType = this.attr('destinationType');
-          return Mappings.shouldBeMappedExternally(sourceType, destinationType);
+          return shouldBeMappedExternally(sourceType, destinationType);
         },
       },
       isMegaMapping: {

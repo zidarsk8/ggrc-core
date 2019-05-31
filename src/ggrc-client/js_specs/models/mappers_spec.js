@@ -5,7 +5,6 @@
 
 import RefreshQueue from '../../js/models/refresh_queue';
 import Cacheable from '../../js/models/cacheable';
-import Mappings from '../../js/models/mappers/mappings';
 
 describe('mappers', function () {
   let LL;

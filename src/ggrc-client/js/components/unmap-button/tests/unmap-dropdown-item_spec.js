@@ -8,7 +8,7 @@ import {
   spyProp,
 } from '../../../../js_specs/spec_helpers';
 import Component from '../unmap-dropdown-item';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('unmap-dropdown-item component', function () {

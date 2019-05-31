@@ -13,7 +13,7 @@ import {getBulkStatesForModel} from '../../plugins/utils/state-utils';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-bulk-update.stache';
 import tracker from '../../tracker';
-import Mappings from '../../models/mappers/mappings';
+import {getMappingType} from '../../models/mappers/mappings';
 
 export default can.Component.extend({
   tag: 'object-bulk-update',
@@ -43,7 +43,7 @@ export default can.Component.extend({
       object: attrs.object,
       availableTypes: function () {
         let object = this.attr('object');
-        let type = Mappings.getMappingType(object);
+        let type = getMappingType(object);
         return type;
       },
       reduceToOwnedItems: true,

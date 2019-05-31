@@ -13,7 +13,7 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import Permission from '../../permission';
-import Mapper from '../../models/mappers/mappings';
+import {getMappingList} from '../../models/mappers/mappings';
 
 const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
 
@@ -79,7 +79,7 @@ const viewModel = can.Map.extend({
         }
 
         let denyEditAndMap = this.attr('denyEditAndMap');
-        let mappingTypes = Mapper.getMappingList(type);
+        let mappingTypes = getMappingList(type);
 
         return !denyEditAndMap && !!mappingTypes.length;
       },

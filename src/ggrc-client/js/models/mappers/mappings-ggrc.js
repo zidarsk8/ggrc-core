@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Mappings from './mappings';
-
 import {
   businessObjects,
   coreObjects,
@@ -63,7 +61,7 @@ const scopingObjectConfig = {
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
 
-new Mappings({
+export default {
   Person: {
     indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
       ...roleableObjects],
@@ -257,4 +255,5 @@ new Mappings({
       'Vendor', 'Workflow',
     ],
   },
-});
+};
+

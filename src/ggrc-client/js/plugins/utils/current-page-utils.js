@@ -11,7 +11,7 @@ import {
   isSnapshotRelated,
   transformQuery,
 } from './snapshot-utils';
-import Mappings from '../../models/mappers/mappings';
+import {getMappingList} from '../../models/mappers/mappings';
 import {inferObjectType} from './models-utils';
 import PersistentNotifier from '../persistent-notifier';
 import {changeUrl, reloadPage} from '../../router';
@@ -42,7 +42,7 @@ function getPageInstance() {
 
 function initMappedInstances() {
   let currentPageInstance = getPageInstance();
-  let models = Mappings.getMappingList(currentPageInstance.type);
+  let models = getMappingList(currentPageInstance.type);
   let reqParams = [];
 
   relatedToCurrentInstance.attr('initialized', true);

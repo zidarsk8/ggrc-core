@@ -4,7 +4,7 @@
 */
 
 import Component from '../object-search';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 
 describe('object-search component', function () {
   'use strict';

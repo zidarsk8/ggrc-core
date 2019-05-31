@@ -9,4 +9,3 @@ import './list-binding';
 import './base-list-loader';
 import './reifying-list-loader';
 import './mappings';
-import './mappings-ggrc';
