@@ -4,8 +4,6 @@
 */
 
 import canComponent from 'can-component';
-import '../people-autocomplete-results/people-autocomplete-results';
-
 import baseAutocompleteWrapper from '../../custom-autocomplete/autocomplete-wrapper';
 import {ggrcGet} from '../../../plugins/ajax_extensions';
 

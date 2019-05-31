@@ -1,0 +1,22 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<people-autocomplete-wrapper {{#if showResults}}class="shown"{{/if}}
+    currentValue:from="currentValue"
+    showResults:bind="showResults"
+    modelName:from="'Person'"
+    queryField:from="'email'"
+    actionKey:from="actionKey">
+
+  <people-autocomplete-results
+      currentValue:bind="currentValue"
+      items:from="result"
+      showResults:bind="showResults"
+      showNewValue:from="showNewValue"
+      on:addNewItem="createLabel(scope.event)"
+      on:selectItem="personSelected(scope.event)"
+      actionKey:from="actionKey"
+    ></people-autocomplete-results>
+</people-autocomplete-wrapper>

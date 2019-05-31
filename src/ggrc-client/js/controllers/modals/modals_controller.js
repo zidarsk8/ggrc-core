@@ -50,6 +50,7 @@ import '../../components/workflow/cycle-task-modal/cycle-task-modal';
 import '../../components/person-modal/person-modal';
 import '../../components/custom-attributes-modal/custom-attributes-modal';
 import '../../components/modal-autocomplete/modal-autocomplete';
+import '../../components/people-autocomplete-dropdown/people-autocomplete-dropdown';
 import {
   bindXHRToButton,
   bindXHRToDisableElement,
