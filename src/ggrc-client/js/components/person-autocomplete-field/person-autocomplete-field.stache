@@ -1,0 +1,19 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="input-wrapper">
+  <input class="person-autocomplete-field__input span12"
+    id="{{inputId}}"
+    placeholder="{{placeholder}}"
+    size="30"
+    type="text"
+    value:bind="personEmail"
+    on:el:keyup="onKeyUp(scope.event)">
+  <people-autocomplete-dropdown currentValue:from="searchValue"
+    showResults:bind="showResults"
+    actionKey:from="actionKey"
+    on:vm:personSelected="personSelected(scope.event)">
+  </people-autocomplete-dropdown>
+</div>

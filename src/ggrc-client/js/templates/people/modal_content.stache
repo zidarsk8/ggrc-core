@@ -23,7 +23,10 @@
           Email
           <i class="fa fa-asterisk"></i>
         </label>
-        <input tabindex="2" class="span12" id="person_email" name="email" placeholder="email@company.com" size="30" type="text" value="{{email}}">
+        <person-autocomplete-field personEmail:bind="email"
+          inputId:from="'person_email'"
+          placeholder:from="'email@company.com'">
+        </person-autocomplete-field>
         <span class="help-inline">
         </span>
         <br>
