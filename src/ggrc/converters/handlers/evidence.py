@@ -108,8 +108,16 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
       if old_link in new_link_map:
         continue
       if old_evidence.related_destinations:
+        signals.Restful.model_deleted.send(
+            old_evidence.__class__,
+            obj=old_evidence
+        )
         old_evidence.related_destinations.pop()
       elif old_evidence.related_sources:
+        signals.Restful.model_deleted.send(
+            old_evidence.__class__,
+            obj=old_evidence
+        )
         old_evidence.related_sources.pop()
       else:
         logger.warning("Invalid relationship state for document URLs.")
