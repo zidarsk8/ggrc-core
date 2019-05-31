@@ -20,12 +20,11 @@ describe('Cacheable conflict resolution', function () {
       staticProps: {
         ajax: $.ajax,
         update: 'PUT /api/dummy_models/{id}',
+        table_singular: 'dummy_model',
       },
     });
   });
 
-  // do not remove because this function is needed in PR #9607
-  // eslint-disable-next-line
   function _resovleDfd(obj, reject) {
     return new $.Deferred(function (dfd) {
       setTimeout(function () {
@@ -72,17 +71,32 @@ describe('Cacheable conflict resolution', function () {
   it('merges changed properties and saves', function (done) {
     let obj = new DummyModel({id: 1});
     obj.attr('foo', 'bar');
+    obj.attr('baz', 'bazz');
     obj.backup();
     expect(obj._backupStore()).toEqual(
-      jasmine.objectContaining({id: obj.id, foo: 'bar'}));
+      jasmine.objectContaining({id: obj.id, foo: 'bar', baz: 'bazz'}));
+
+    // current user changes "foo" attr
     obj.attr('foo', 'plonk');
     spyOn(obj, 'save').and.returnValue($.when(obj));
-    spyOn(obj, 'refresh').and.callFake(function () {
-      obj.attr('baz', 'quux');
-      return $.when(obj);
+
+    ajaxSpy.and.callFake(() => {
+      return _resovleDfd(
+        {
+          status: 409,
+          responseJSON: {
+            dummy_model: {
+              // updated "baz" by other user
+              baz: 'quux',
+
+              // previous value of "foo"
+              foo: 'bar',
+              id: obj.id,
+            },
+          },
+        }, true);
     });
-    ajaxSpy.and.returnValue(new $.Deferred().reject(
-      {status: 409}, 409, 'CONFLICT'));
+
     DummyModel.update(obj.id, obj.serialize()).then(function () {
       expect(obj).toEqual(jasmine.objectContaining(
         {id: obj.id, foo: 'plonk', baz: 'quux'}));

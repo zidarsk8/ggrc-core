@@ -264,13 +264,15 @@ export default can.Model.extend({
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
     this.update = function (id, params) {
+      let modelType = this.constructor.table_singular;
       let ret = _update
         .call(this, id, this.process_args(params))
         .then((obj) => obj,
           (xhr) => {
-            if (xhr.status === 409) {
+            let remoteAttrs = xhr.responseJSON && xhr.responseJSON[modelType];
+            if (xhr.status === 409 && remoteAttrs) {
               let dfd = $.Deferred();
-              resolveConflict(xhr, this.findInCacheById(id))
+              resolveConflict(xhr, this.findInCacheById(id), remoteAttrs)
                 .then(
                   (obj) => dfd.resolve(obj),
                   (xhr) => dfd.reject(xhr)
