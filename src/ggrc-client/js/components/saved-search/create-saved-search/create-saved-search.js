@@ -20,7 +20,8 @@ export default can.Component.extend({
     filterItems: null,
     mappingItems: null,
     statusItem: null,
-    parentItem: null,
+    parentItems: null,
+    parent: null,
     searchName: '',
     objectType: '',
     saveSearch() {
@@ -30,13 +31,24 @@ export default can.Component.extend({
         this.attr('mappingItems').serialize();
       const statusItem = this.attr('statusItem') &&
         this.attr('statusItem').serialize();
-      const parentItem = this.attr('parentItem') &&
-      this.attr('parentItem').serialize();
+
+      let parentItems = this.attr('parentItems') &&
+        this.attr('parentItems').serialize();
+      let parent = this.attr('parent');
+      if (parent) {
+        parent = parent.serialize();
+        if (parentItems) {
+          parentItems.push(parent);
+        } else {
+          parentItems = [parent];
+        }
+      }
+
       const filters = {
         filterItems,
         mappingItems,
         statusItem,
-        parentItem,
+        parentItems,
       };
 
       const savedSearch = new SavedSearch({

@@ -43,16 +43,26 @@ export default can.Component.extend({
     },
     applySearch({search}) {
       try {
-        const {
+        let {
           filterItems,
           mappingItems,
           statusItem,
+          parentItems,
         } = JSON.parse(search.filters);
 
         const advancedSearch = this.attr('advancedSearch');
+
+        const parent = advancedSearch && advancedSearch.attr('parent');
+        if (parent && parentItems) {
+          parentItems = parentItems.filter(
+            (item) => item.value.id !== parent.value.id
+              || item.value.type !== parent.value.type);
+        }
+
         if (advancedSearch) {
           advancedSearch.attr('filterItems', filterItems);
           advancedSearch.attr('mappingItems', mappingItems);
+          advancedSearch.attr('parentItems', parentItems);
         } else {
           this.attr('filtersToApply', {
             filterItems,

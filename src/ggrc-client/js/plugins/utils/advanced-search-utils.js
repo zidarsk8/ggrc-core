@@ -5,6 +5,7 @@
 
 import * as StateUtils from './state-utils';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import {makeRelevantFilter} from './query-api-utils';
 
 /**
  * Factory allowing to create Advanced Search Filter Items.
@@ -62,6 +63,12 @@ export const create = {
   mappingCriteria: (value) => {
     return {
       type: 'mappingCriteria',
+      value: value || { },
+    };
+  },
+  parent: (value) => {
+    return {
+      type: 'parent',
       value: value || { },
     };
   },
@@ -187,6 +194,9 @@ export const builders = {
         ids: [criteriaId],
       },
     };
+  },
+  parent: (parent) => {
+    return makeRelevantFilter(parent);
   },
 };
 

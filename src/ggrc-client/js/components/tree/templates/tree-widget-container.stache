@@ -70,7 +70,6 @@
       <main>
       <div class="advanced-search__content">
         <div class="simple-modal__body">
-
           <advanced-search-filter-container items:bind="advancedSearch.filterItems"
                                             availableAttributes:from="columns.available"
                                             modelName:from="modelName"
@@ -83,9 +82,15 @@
         <div class="simple-modal__body">
           {{#advancedSearch.parent}}
             <div class="advanced-search__parent-filter">
-              <h6>Mapped to {{type}}:</h6><span>{{title}}</span>
+              <h6>Mapped to {{value.type}}:</h6><span>{{value.title}}</span>
             </div>
           {{/advancedSearch.parent}}
+
+          {{#advancedSearch.parentItems}}
+            <div class="advanced-search__parent-filter">
+              <h6>Mapped to {{value.type}}:</h6><span>{{value.title}}</span>
+            </div>
+          {{/advancedSearch.parentItems}}
           <advanced-search-mapping-container items:bind="advancedSearch.mappingItems"
                                              modelName:from="modelName"
                                              on:el:enter="applyAdvancedFilters()">
@@ -96,7 +101,8 @@
         <create-saved-search
           filterItems:from="advancedSearch.filterItems"
           mappingItems:from="advancedSearch.mappingItems"
-          parentItem:from="advancedSearch.parent"
+          parentItems:from="advancedSearch.parentItems"
+          parent:from="advancedSearch.parent"
           objectType:from="modelName"
           on:created="loadSavedSearches()"
         ></create-saved-search>

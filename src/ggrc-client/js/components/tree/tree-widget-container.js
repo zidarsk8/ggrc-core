@@ -501,6 +501,8 @@ let viewModel = canMap.extend({
     appliedFilterItems: canList(),
     mappingItems: canList(),
     appliedMappingItems: canList(),
+    parentItems: canList(),
+    appliedParentItems: canList(),
     parent: null,
   },
   openAdvancedFilter: function () {
@@ -510,25 +512,33 @@ let viewModel = canMap.extend({
     this.attr('advancedSearch.mappingItems',
       this.attr('advancedSearch.appliedMappingItems').slice());
 
+    this.attr('advancedSearch.parentItems',
+      this.attr('advancedSearch.appliedParentItems').slice());
+
     if (isObjectContextPage()) {
-      this.attr('advancedSearch.parent', this.attr('parent_instance'));
+      this.attr('advancedSearch.parent',
+        AdvancedSearch.create.parent(this.attr('parent_instance')));
     }
 
     this.attr('advancedSearch.open', true);
   },
   applyAdvancedFilters: function () {
-    let filters = this.attr('advancedSearch.filterItems').attr();
-    let mappings = this.attr('advancedSearch.mappingItems').attr();
+    const filters = this.attr('advancedSearch.filterItems').attr();
+    const mappings = this.attr('advancedSearch.mappingItems').attr();
+    const parents = this.attr('advancedSearch.parentItems').attr();
     let request = canList();
-    let advancedFilters;
 
     this.attr('advancedSearch.appliedFilterItems', filters);
     this.attr('advancedSearch.appliedMappingItems', mappings);
+    this.attr('advancedSearch.appliedParentItems', parents);
 
-    advancedFilters = QueryParser.joinQueries(
-      AdvancedSearch.buildFilter(filters, request),
-      AdvancedSearch.buildFilter(mappings, request)
-    );
+    const builtFilters = AdvancedSearch.buildFilter(filters, request);
+    const builtMappings = AdvancedSearch.buildFilter(mappings, request);
+    const builtParents = AdvancedSearch.buildFilter(parents, request);
+    let advancedFilters =
+      QueryParser.joinQueries(builtFilters, builtMappings);
+    advancedFilters = QueryParser.joinQueries(advancedFilters, builtParents);
+
     this.attr('advancedSearch.request', request);
 
     this.attr('advancedSearch.filter', advancedFilters);
@@ -547,6 +557,7 @@ let viewModel = canMap.extend({
   resetAdvancedFilters: function () {
     this.attr('advancedSearch.filterItems', canList());
     this.attr('advancedSearch.mappingItems', canList());
+    this.attr('advancedSearch.parentItems', canList());
   },
   closeInfoPane: function () {
     $('.pin-content')
