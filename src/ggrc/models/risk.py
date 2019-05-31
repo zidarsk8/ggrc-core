@@ -177,7 +177,7 @@ class Risk(synchronizable.Synchronizable,
           "filter_only": True,
       },
       "review_status_display_name": {
-          "display_name": "Review State",
+          "display_name": "Review Status",
           "mandatory": False,
       },
   }
