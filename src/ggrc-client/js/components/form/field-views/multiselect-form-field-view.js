@@ -7,7 +7,7 @@ import template from './multiselect-form-field-view.stache';
 
 export default can.Component.extend({
   tag: 'multiselect-form-field-view',
-  template: can.stache(template),
+  view: can.stache(template),
   leakScope: false,
   viewModel: can.Map.extend({
     value: null,
