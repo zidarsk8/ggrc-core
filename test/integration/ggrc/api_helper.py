@@ -11,6 +11,7 @@ test client is not yet ready.
 This api helper also helps with delete and put requests where it fetches the
 latest etag needed for such requests.
 """
+import datetime
 import logging
 from contextlib import contextmanager
 from email import utils as email_utils
@@ -25,6 +26,7 @@ from ggrc import utils
 from ggrc import settings
 from ggrc.app import app
 from ggrc.services.common import Resource
+from integration.ggrc.models import factories
 
 
 def wrap_client_calls(client):
@@ -264,6 +266,39 @@ class Api(object):
     link = "/search?{}".format(urlencode(params))
 
     return self.client.get(link), self.headers
+
+  def run_import_job(self, user, object_type, data):
+    """Run import job.
+
+    This endpoint emulate import process in similar way as UI do.
+    It convert data into csv format, create ImportExport job in Not Started
+    state and run import with PUT on '/api/people/{}/imports/{}/start'.
+
+    Args:
+        user: Person object to be used in import
+        object_type: Type of objects that should be imported
+        data([collection.OrderedDict]): List of dicts with values for import.
+    """
+    content = ["Object type"]
+    content.append(",".join([object_type] + data[0].keys()))
+    for row in data:
+      content.append(",".join([""] + row.values()))
+
+    imp_exp = factories.ImportExportFactory(
+        job_type="Import",
+        status="Not Started",
+        created_by=user,
+        created_at=datetime.datetime.now(),
+        content="\n".join(content),
+    )
+    self.headers.update(self.user_headers)
+    return self.client.put(
+        "/api/people/{}/imports/{}/start".format(
+            user.id,
+            imp_exp.id
+        ),
+        headers=self.headers,
+    )
 
 
 class ExternalApi(object):

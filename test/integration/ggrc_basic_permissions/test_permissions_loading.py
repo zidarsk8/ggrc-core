@@ -67,6 +67,10 @@ class TestPermissionsLoading(TestMemcacheBase):
 class TestPermissionsCacheFlushing(TestMemcacheBase):
   """Test user permissions loading."""
 
+  def setUp(self):
+    super(TestPermissionsCacheFlushing, self).setUp()
+    self.api = Api()
+
   @staticmethod
   def load_perms(user_id, new_perms):
     """Emulate procedure to load permissions
@@ -114,3 +118,63 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
 
     # ensure that new permissions were returned instead of old ones
     self.assertEquals(result, {"11": "b"})
+
+  def test_permissions_flush_on_post(self):
+    """Test that permissions in memcache are cleaned after POST request."""
+    user = self.create_user_with_role("Creator")
+    self.api.set_user(user)
+    self.api.client.get("/permissions")
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertEqual(perm_ids, {'permissions:{}'.format(user.id)})
+
+    response = self.api.post(
+        all_models.Objective,
+        {"objective": {"title": "Test Objective", "context": None}}
+    )
+    self.assert_status(response, 201)
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertIsNone(perm_ids)
+
+  def test_permissions_flush_on_put(self):
+    """Test that permissions in memcache are cleaned after PUT request."""
+    with factories.single_commit():
+      user = self.create_user_with_role("Creator")
+      objective = factories.ObjectiveFactory()
+      objective_id = objective.id
+      objective.add_person_with_role_name(user, "Admin")
+
+    self.api.set_user(user)
+    self.api.client.get("/permissions")
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertEqual(perm_ids, {'permissions:{}'.format(user.id)})
+
+    objective = all_models.Objective.query.get(objective_id)
+    response = self.api.put(objective, {"title": "new title"})
+    self.assert200(response)
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertIsNone(perm_ids)
+
+  def test_permissions_flush_on_delete(self):
+    """Test that permissions in memcache are cleaned after DELETE request."""
+    with factories.single_commit():
+      user = self.create_user_with_role("Creator")
+      objective = factories.ObjectiveFactory()
+      objective.add_person_with_role_name(user, "Admin")
+      objective_id = objective.id
+
+    self.api.set_user(user)
+    self.api.client.get("/permissions")
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertEqual(perm_ids, {'permissions:{}'.format(user.id)})
+
+    objective = all_models.Objective.query.get(objective_id)
+    response = self.api.delete(objective)
+    self.assert200(response)
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertIsNone(perm_ids)
