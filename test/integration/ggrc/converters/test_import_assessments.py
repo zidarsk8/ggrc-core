@@ -264,9 +264,9 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(assessments["Assessment 64"].status,
                      all_models.Assessment.FINAL_STATE)
     self.assertEqual(assessments["Assessment 3"].status,
-                     all_models.Assessment.FINAL_STATE)
+                     all_models.Assessment.PROGRESS_STATE)
     self.assertEqual(assessments["Assessment 4"].status,
-                     all_models.Assessment.FINAL_STATE)
+                     all_models.Assessment.PROGRESS_STATE)
 
     # Check that there is only one attachment left
     asmt1 = assessments["Assessment 1"]
