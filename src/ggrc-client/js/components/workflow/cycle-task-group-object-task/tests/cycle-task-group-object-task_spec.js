@@ -12,10 +12,10 @@ import {
 } from '../../../../../js_specs/spec_helpers';
 import Permission from '../../../../permission';
 
-describe('cycle-task-group-object-task component', function () {
+describe('cycle-task-group-object-task component', () => {
   let viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     viewModel = getComponentVM(Component);
   });
 
@@ -43,7 +43,7 @@ describe('cycle-task-group-object-task component', function () {
   describe('isEditDenied get() method', () => {
     let isAllowedToUpdate;
 
-    beforeEach(function () {
+    beforeEach(() => {
       isAllowedToUpdate = spyProp(viewModel, 'isAllowedToUpdate');
     });
 
@@ -55,14 +55,14 @@ describe('cycle-task-group-object-task component', function () {
     });
 
     describe('returns true', () => {
-      it('if it is not allowed to update instance', function () {
+      it('if it is not allowed to update instance', () => {
         isAllowedToUpdate.and.returnValue(false);
         const result = viewModel.attr('isEditDenied');
 
         expect(result).toBe(true);
       });
 
-      it('if the instance is in history', function () {
+      it('if the instance is in history', () => {
         isAllowedToUpdate.and.returnValue(true);
         viewModel.attr('instance', {is_in_history: true});
 
@@ -74,18 +74,36 @@ describe('cycle-task-group-object-task component', function () {
   describe('showWorfklowLink get() method', () => {
     let getPageType;
 
-    beforeEach(function () {
+    beforeEach(() => {
       getPageType = spyOn(CurrentPageUtils, 'getPageType');
     });
 
-    it('returns true if page type is not equal to "Workflow"', function () {
+    it('returns true if page type is not equal to "Workflow"', () => {
       getPageType.and.returnValue('NotWorkflow');
       expect(viewModel.attr('showWorkflowLink')).toBe(true);
     });
 
-    it('returns false if page type equals to "Workflow"', function () {
+    it('returns false if page type equals to "Workflow"', () => {
       getPageType.and.returnValue('Workflow');
       expect(viewModel.attr('showWorkflowLink')).toBe(false);
+    });
+  });
+
+  describe('isWorkflowPage() method', () => {
+    let getPageType;
+
+    beforeEach(() => {
+      getPageType = spyOn(CurrentPageUtils, 'getPageType');
+    });
+
+    it('returns false if page type is not equal to "Workflow"', () => {
+      getPageType.and.returnValue('NotWorkflow');
+      expect(viewModel.isWorkflowPage()).toBe(false);
+    });
+
+    it('returns true if page type equals to "Workflow"', () => {
+      getPageType.and.returnValue('Workflow');
+      expect(viewModel.isWorkflowPage()).toBe(true);
     });
   });
 
@@ -100,16 +118,17 @@ describe('cycle-task-group-object-task component', function () {
     });
   });
 
-  describe('onStateChange() method', function () {
+  describe('onStateChange() method', () => {
     let event;
 
-    beforeEach(function () {
+    beforeEach(() => {
       event = {};
       viewModel.attr('instance', {});
-      spyOn(WorkflowHelpers, 'updateStatus');
+      spyOn(WorkflowHelpers, 'updateStatus').and.returnValue(new $.Deferred());
+      spyOn(CurrentPageUtils, 'getPageType').and.returnValue('');
     });
 
-    it('updates status for cycle task', function () {
+    it('updates status for cycle task', () => {
       event.state = 'New State';
       viewModel.onStateChange(event);
       expect(WorkflowHelpers.updateStatus).toHaveBeenCalledWith(
