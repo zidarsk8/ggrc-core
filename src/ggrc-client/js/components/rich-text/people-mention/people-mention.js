@@ -109,14 +109,15 @@ export default canComponent.extend({
         this.clearMention();
       }
     },
-    personSelected({item}) {
+    personSelected({person}) {
+      const {email} = person;
       const mentionValueLength =
         this.attr('mentionBeforeSelection').length +
         this.attr('mentionAfterSelection').length + 1;
-      const link = `mailto:${item.email}`;
+      const link = `mailto:${email}`;
       const retainLength = this.attr('mentionIndex');
       const retain = retainLength ? [{retain: retainLength}] : [];
-      const mention = `+${item.email}`;
+      const mention = `+${email}`;
       const ops = [
         ...retain,
         {'delete': mentionValueLength},

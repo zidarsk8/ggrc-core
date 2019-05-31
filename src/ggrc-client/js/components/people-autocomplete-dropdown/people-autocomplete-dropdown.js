@@ -20,8 +20,8 @@ export default canComponent.extend({
   viewModel: canMap.extend({
     showResults: false,
     currentValue: null,
-    personSelected({item}) {
-      this.dispatch({type: 'personSelected', item});
+    personSelected({item: person}) {
+      this.dispatch({type: 'personSelected', person});
       this.attr('showResults', false);
       this.attr('currentValue', null);
     },
