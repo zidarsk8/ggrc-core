@@ -18,14 +18,22 @@ describe('object-operations-base viewModel', function () {
   });
 
   describe('availableTypes() method', function () {
-    it('correctly calls getMappingTypes', function () {
-      let result;
-      spyOn(Mappings, 'getMappingTypes').and.returnValue('types');
+    it('calls getMappingList', function () {
+      spyOn(Mappings, 'getMappingList');
+      spyOn(Mappings, 'groupTypes');
       baseVM.attr('object', 'testObject');
 
-      result = baseVM.availableTypes();
-      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject');
-      expect(result).toEqual('types');
+      baseVM.availableTypes();
+      expect(Mappings.getMappingList).toHaveBeenCalledWith('testObject');
+    });
+
+    it('returns grouped types', () => {
+      spyOn(Mappings, 'getMappingList').and.returnValue('list');
+      spyOn(Mappings, 'groupTypes');
+      baseVM.attr('object', 'testObject');
+
+      baseVM.availableTypes();
+      expect(Mappings.groupTypes).toHaveBeenCalledWith('list');
     });
   });
 

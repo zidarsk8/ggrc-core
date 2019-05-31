@@ -171,25 +171,6 @@ function _getType(object) {
 }
 
 /**
- * Return list of allowed for mapping types.
- * Performs checks for
- * @param {String} type - base model type
- * @return {Array} - list of allowed for mapping Models
- */
-function getMappingTypes(type) {
-  let list = getMappingList(type);
-  return groupTypes(list);
-}
-
-/**
- * Return allowed for mapping type in appropriate group.
- * @param {String} type - base model type
- * @return {Array} - object with one allowed for mapping Model
- */
-function getMappingType(type) {
-  return groupTypes([type]);
-}
-/**
  * Returns the list of allowed direct mapping models
  * with possible related mapping models
  * @param {String} type - base model type
@@ -325,8 +306,6 @@ export {
   allowedToCreateOrMap,
   allowedToUnmap,
   getAllowedToUnmapModels,
-  getMappingTypes,
-  getMappingType,
   getAvailableMappings,
   groupTypes,
   shouldBeMappedExternally,

@@ -119,20 +119,6 @@ describe('Mappings', () => {
     MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup']),
   });
 
-  describe('getMappingTypes() method', () => {
-    const EXPECTED_GROUPS = ['entities', 'scope', 'governance'];
-
-    it('returns grouped mappable types', () => {
-      let result = Mappings.getMappingTypes('MultitypeSearch');
-      let resultGroups = Object.keys(result);
-
-      expect(EXPECTED_GROUPS).toEqual(resultGroups);
-      expect(result.entities.items.length).toBe(1);
-      expect(result.scope.items.length).toBe(15);
-      expect(result.governance.items.length).toBe(20);
-    });
-  });
-
   describe('getMappingList() method', () => {
     let types = allTypes.concat('MultitypeSearch');
     let modelsForTests = _.difference(types, [
@@ -267,6 +253,19 @@ describe('Mappings', () => {
   });
 
   describe('groupTypes() method', () => {
+    const EXPECTED_GROUPS = ['entities', 'scope', 'governance'];
+
+    it('returns grouped mappable types', () => {
+      let types = Mappings.getMappingList('MultitypeSearch');
+      let result = Mappings.groupTypes(types);
+      let resultGroups = Object.keys(result);
+
+      expect(EXPECTED_GROUPS).toEqual(resultGroups);
+      expect(result.entities.items.length).toBe(1);
+      expect(result.scope.items.length).toBe(15);
+      expect(result.governance.items.length).toBe(20);
+    });
+
     it('adds type to governance group if no group with category of this type',
       () => {
         spyOn(ModelsUtils, 'getModelByType').and.returnValue({

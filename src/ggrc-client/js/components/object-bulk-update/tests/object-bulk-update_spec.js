@@ -32,7 +32,7 @@ describe('object-bulk-update component', function () {
 
       spyOn(stateUtils, 'getBulkStatesForModel')
         .and.returnValue(targetStates);
-      spyOn(Mappings, 'getMappingType')
+      spyOn(Mappings, 'groupTypes')
         .and.returnValue(mappingType);
 
       result = method({type: 'some type'}, parentViewModel)();
