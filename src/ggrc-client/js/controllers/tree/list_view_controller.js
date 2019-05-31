@@ -242,4 +242,13 @@ export default TreeLoader.extend({
   },
 
   '.search-filters button[type=reset] click': 'reset_search',
+  '[data-toggle="modal-ajax-form"] modal:success'(el, ev, options) {
+    if (this.options.model.constructor.model_singular === options.type) {
+      this.fetch_list()
+        .then((list) => {
+          this.draw_list(list);
+          this.update_count();
+        });
+    }
+  },
 });
