@@ -1,6 +1,5 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-# pylint: disable=missing-docstring
 
 from flask import request
 
@@ -17,7 +16,8 @@ from ggrc.models.exceptions import ValidationError
 def get_saved_searches_by_type(object_type):
   user = login.get_current_user(use_external_user=False)
   all_objects = user.saved_searches.filter(
-      SavedSearch.object_type == object_type
+      SavedSearch.object_type == object_type,
+      SavedSearch.type == request.args.get("type")
   ).order_by(
       SavedSearch.created_at.desc()
   )
@@ -61,7 +61,7 @@ def delete_saved_search(saved_search_id):
 
 
 @app.route("/api/saved_searches", methods=["POST"])
-@validate_post_data_keys(["name", "object_type"])
+@validate_post_data_keys(["name", "object_type", "type"])
 def create_saved_search():
   user = login.get_current_user(use_external_user=False)
 
@@ -72,6 +72,7 @@ def create_saved_search():
         data.get("name"),
         data.get("object_type"),
         user,
+        data.get("type"),
         data.get("filters"),
     )
   except ValidationError as error:

@@ -22,11 +22,16 @@ from integration.ggrc.views.saved_searches.initializers import (
 
 class TestSavedSearchGet(TestCase):
 
-  API_URL = "/api/saved_searches/{object_type}"
+  API_URL = "/api/saved_searches/{object_type}?type={type}"
+
+  SAVED_SEARCH_TYPE = "GlobalSearch"
 
   def _get_saved_search(self, object_type):
-    response = self._client.get(self.API_URL.format(object_type=object_type),
-                                headers=self._headers)
+    response = self._client.get(
+        self.API_URL.format(object_type=object_type,
+                            type=self.SAVED_SEARCH_TYPE),
+        headers=self._headers
+    )
     return json.loads(response.data)
 
   @staticmethod
@@ -68,6 +73,7 @@ class TestSavedSearchGet(TestCase):
             name="test_ss_{}".format(i),
             object_type="Assessment",
             user=user,
+            type=cls.SAVED_SEARCH_TYPE
         )
         user.saved_searches.append(saved_search)
         db.session.flush()
@@ -85,6 +91,7 @@ class TestSavedSearchGet(TestCase):
           name="test_program_ss",
           object_type="Program",
           user=cls._person_0,
+          type=cls.SAVED_SEARCH_TYPE
       )
       cls._person_0.saved_searches.append(saved_search_program)
       db.session.flush()
@@ -117,7 +124,9 @@ class TestSavedSearchGet(TestCase):
 
   def test_0_get_only_user_specific_saved_searches(self):
     response = self._client.get(
-        "/api/saved_searches/Assessment",
+        "/api/saved_searches/Assessment?type={type}".format(
+            type=self.SAVED_SEARCH_TYPE
+        ),
         headers=self._headers,
     )
 
@@ -130,7 +139,9 @@ class TestSavedSearchGet(TestCase):
 
   def test_1_get_saved_searches_with_pagination(self):
     response = self._client.get(
-        "/api/saved_searches/Assessment?offset=1&limit=2",
+        "/api/saved_searches/Assessment?offset=1&limit=2&type={type}".format(
+            type=self.SAVED_SEARCH_TYPE
+        ),
         headers=self._headers,
     )
 

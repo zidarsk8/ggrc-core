@@ -67,6 +67,7 @@ class TestSavedSearchPost(TestCase):
         data=json.dumps({
             "name": "test_ss_3",
             "object_type": "Assessment",
+            "type": "AdvancedSearch"
         }),
         headers=self._headers,
     )
@@ -74,7 +75,7 @@ class TestSavedSearchPost(TestCase):
     self.assertEqual(response.status, "200 OK")
 
     response = self._client.get(
-        "/api/saved_searches/Assessment?limit=1",
+        "/api/saved_searches/Assessment?limit=1&type=AdvancedSearch",
         headers=self._headers,
     )
 
@@ -89,6 +90,7 @@ class TestSavedSearchPost(TestCase):
         data=json.dumps({
             "name": "test_ss_3",
             "object_type": "Assessment",
+            "type": "AdvancedSearch"
         }),
         headers=self._headers,
     )
@@ -107,6 +109,7 @@ class TestSavedSearchPost(TestCase):
         data=json.dumps({
             "name": "",
             "object_type": "Assessment",
+            "type": "AdvancedSearch"
         }),
         headers=self._headers,
     )
@@ -122,6 +125,7 @@ class TestSavedSearchPost(TestCase):
         data=json.dumps({
             "name": "test_ss_1",
             "object_type": "Overwatch",
+            "type": "AdvancedSearch"
         }),
         headers=self._headers,
     )
@@ -154,7 +158,8 @@ class TestSavedSearchPost(TestCase):
         data=json.dumps({
             "name": "test_ss_4",
             "object_type": "Assessment",
-            "filters": _filter
+            "filters": _filter,
+            "type": "GlobalSearch"
         }),
         headers=self._headers,
     )
@@ -171,3 +176,22 @@ class TestSavedSearchPost(TestCase):
     for saved_search in data["values"]:
       if saved_search["name"] == "test_ss_4":
         self.assertEqual(json.loads(saved_search["filters"]), _filter)
+
+  def test_5_saved_search_creation_failure_due_invalid_type(self):
+    response = self._client.post(
+        "/api/saved_searches",
+        data=json.dumps({
+            "name": "test_ss_1",
+            "object_type": "Assessment",
+            "type": "Invalid Type"
+        }),
+        headers=self._headers,
+    )
+
+    data = json.loads(response.data)
+
+    self.assertEqual(
+        data["message"],
+        u"Invalid saved search type",
+    )
+    self.assertEqual(data["code"], 400)

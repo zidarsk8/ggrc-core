@@ -44,6 +44,7 @@ class TestSavedSearchDelete(TestCase):
         name="test_ss_1",
         object_type="Assessment",
         user=cls._person_0,
+        type="GlobalSearch"
     )
     cls._person_0.saved_searches.append(saved_search)
     db.session.flush()
