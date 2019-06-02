@@ -155,7 +155,7 @@ class TestTaskGroupImport(WorkflowTestCase):
           errors.UNSUPPORTED_MAPPING.format(
               line=2,
               obj_a="Task Group",
-              obj_b=header_name,
+              obj_b=header_name.title(),
               column_name="map:{}".format(header_name)
           )
       )
