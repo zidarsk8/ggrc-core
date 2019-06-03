@@ -10,8 +10,10 @@ import { handleAjaxError } from '../../../plugins/utils/errors-utils';
 export default can.Component.extend({
   tag: 'create-saved-search',
   template: can.stache(`
-    <input {($value)}="{searchName}" type="text" placeholder="Type to Save Search">
-    <button ($click)="saveSearch()" type="button" class="btn btn-small btn-green">Save Search</button>
+    <input type="text" placeholder="Type to Save Search"
+        value:bind="searchName">
+    <button type="button" class="btn btn-small btn-green"
+        on:el:click="saveSearch()">Save Search</button>
   `),
   leakScope: false,
   viewModel: can.Map.extend({

@@ -9,11 +9,11 @@
 
 <ul>
   {{#each searches}}
-    <li ($click)="applySearch(.)"
+    <li on:el:click="applySearch(.)"
      {{#if disabled}}class="disabled"{{/if}}>
       <span>{{name}}</span>
       <i class="fa fa-trash"
-        ($click)="removeSearch(., %event)"
+        on:el:click="removeSearch(., %event)"
       ></i>
     </li>
   {{/each}}
