@@ -59,6 +59,7 @@ import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
 import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Control.extend({
   defaults: {
@@ -375,7 +376,8 @@ export default can.Control.extend({
     if (instance.form_preload) {
       preloadDfd = instance.form_preload(
         this.options.new_object_form,
-        this.options.object_params);
+        this.options.object_params,
+        getPageInstance());
       if (preloadDfd) {
         preloadDfd.then(function () {
           instance.backup();

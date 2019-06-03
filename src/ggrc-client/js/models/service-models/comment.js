@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import Cacheable from '../cacheable';
 
 export default Cacheable.extend({
@@ -23,8 +22,7 @@ export default Cacheable.extend({
       },
     },
   },
-  form_preload: function () {
-    let pageInstance = getPageInstance();
+  form_preload: function (isNew, params, pageInstance) {
     this.attr('comment', pageInstance);
   },
   /**
