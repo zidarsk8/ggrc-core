@@ -39,7 +39,7 @@
                                 filterItems:to="scope.vars.filterItems"
                                 statusItem:to="scope.vars.statusItem"
                                 on:el:enter="onSubmit()"
-                                on:submit="onSubmit()"
+                                on:applyFilters="onSubmit()"
                                 query:bind="query">
           <div class="object-controls">
             <div class="object-controls__row">

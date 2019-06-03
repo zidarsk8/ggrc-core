@@ -32,7 +32,7 @@ export default canComponent.extend({
             this.attr('mappingItems', mappingItems);
             this.attr('statusItem', statusItem);
 
-            this.dispatch('submit');
+            this.dispatch('applyFilters');
           }
         },
       },
