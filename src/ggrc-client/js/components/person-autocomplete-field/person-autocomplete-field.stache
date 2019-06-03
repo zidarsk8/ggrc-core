@@ -5,6 +5,7 @@
 
 <div class="input-wrapper">
   <input class="person-autocomplete-field__input span12"
+    tabindex="{{tabindex}}"
     id="{{inputId}}"
     placeholder="{{placeholder}}"
     size="30"

@@ -21,6 +21,7 @@ export default canComponent.extend({
     personEmail: '',
     showResults: false,
     inputId: '',
+    tabindex: -1,
     placeholder: '',
     personSelected({person}) {
       this.attr('personEmail', person.email);

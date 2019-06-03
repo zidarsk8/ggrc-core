@@ -25,7 +25,8 @@
         </label>
         <person-autocomplete-field personEmail:bind="email"
           inputId:from="'person_email'"
-          placeholder:from="'email@company.com'">
+          placeholder:from="'email@company.com'"
+          tabindex:from="2">
         </person-autocomplete-field>
         <span class="help-inline">
         </span>
