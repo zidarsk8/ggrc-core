@@ -54,6 +54,7 @@
         objectType:from="modelName"
         advancedSearch:from="advancedSearch">
       <div class="advanced-search__wrapper">
+      {{#if isShowSavedSearch}}
       <aside>
         <saved-search-list
           modalTitle:from="model.title_singular"
@@ -68,6 +69,7 @@
           ></tree-pagination>
         {{/if}}
       </aside>
+      {{/if}}
       <main>
       <div class="advanced-search__content">
         <div class="simple-modal__body">
@@ -99,6 +101,7 @@
         </div>
       </div>
       <div class="simple-modal__footer">
+        {{#if isShowSavedSearch}}
         <create-saved-search
           type:from="'AdvancedSearch'"
           filterItems:from="advancedSearch.filterItems"
@@ -108,6 +111,7 @@
           objectType:from="modelName"
           on:created="loadSavedSearches()"
         ></create-saved-search>
+        {{/if}}
         <div class="advanced-search__controls">
           <button type="reset" class="btn btn-white" on:el:click="resetAdvancedFilters()">Reset to Defaults</button>
           <button type="submit" class="btn btn-lightBlue" on:el:click="applyAdvancedFilters()">Apply</button>

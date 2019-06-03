@@ -6,17 +6,25 @@
 import SavedSearch from '../../../models/service-models/saved-search';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Pagination from '../../base-objects/pagination';
+import {isObjectContextPage, isAllObjects} from '../../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'saved-search-wrapper',
   leakScope: true,
   viewModel: can.Map.extend({
     define: {
+      isShowSavedSearch: {
+        value() {
+          return isObjectContextPage() || isAllObjects();
+        },
+      },
       objectType: {
         set(newValue, setValue) {
           setValue(newValue);
 
-          this.loadSavedSearches();
+          if (this.attr('isShowSavedSearch')) {
+            this.loadSavedSearches();
+          }
         },
       },
       searchesPaging: {
@@ -39,9 +47,6 @@ export default can.Component.extend({
     searchType: '',
     filtersToApply: null,
     advancedSearch: null,
-    init() {
-      this.loadSavedSearches();
-    },
     applySearch({search}) {
       try {
         let {
