@@ -34,13 +34,16 @@ export default canComponent.extend({
         this.attr('actionKey', null);
       }
     },
-    onKeyUp(event) {
-      const inputValue = event.target.value;
-      this.attr('personEmail', inputValue);
+    onKeyDown(event) {
       if (KEYS_TO_LISTEN.includes(event.code)) {
         this.onActionKey(event.keyCode);
         event.preventDefault();
-      } else {
+      }
+    },
+    onKeyUp(event) {
+      const inputValue = event.target.value;
+      this.attr('personEmail', inputValue);
+      if (!KEYS_TO_LISTEN.includes(event.code)) {
         this.attr('searchValue', inputValue);
       }
     },

@@ -11,6 +11,7 @@
     size="30"
     type="text"
     value:bind="personEmail"
+    on:el:keydown="onKeyDown(scope.event)"
     on:el:keyup="onKeyUp(scope.event)">
   <people-autocomplete-dropdown currentValue:from="searchValue"
     showResults:bind="showResults"
