@@ -119,7 +119,6 @@
                             isLoading:bind="is_loading"
                             type:from="type"
                             @onSearch:to="../onSearchCallback"
-                            submitCbs:from="submitCbs"
                             paging.total:to="scope.vars.totalObjects"
                             searchOnly:from="true"
                             useSnapshots:from="useSnapshots"
