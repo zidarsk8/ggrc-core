@@ -17,7 +17,6 @@ export default can.Component.extend({
   `),
   leakScope: false,
   viewModel: can.Map.extend({
-    query: null,
     filterItems: null,
     mappingItems: null,
     statusItem: null,

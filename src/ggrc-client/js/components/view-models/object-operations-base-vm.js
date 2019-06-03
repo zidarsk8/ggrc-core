@@ -127,7 +127,6 @@ const ObjectOperationsBaseVM = canMap.extend({
   entriesTotalCount: '',
   options: [],
   relevant: [],
-  query: null,
   useSnapshots: false,
   onSearchCallback: $.noop(),
   onSubmit: function () {

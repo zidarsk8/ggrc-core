@@ -37,7 +37,6 @@ export default canComponent.extend({
         },
       },
     },
-    query: null,
     modelName: null,
     modelDisplayName: null,
     filterItems: [AdvancedSearch.create.attribute()],

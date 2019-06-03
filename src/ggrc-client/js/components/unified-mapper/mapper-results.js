@@ -95,7 +95,6 @@ export default canComponent.extend({
     deferredList: [],
     disabledIds: [],
     megaRelationObj: {},
-    query: null,
     setItems: function () {
       const stopFn = tracker.start(this.attr('type'),
         tracker.USER_JOURNEY_KEYS.NAVIGATION,
@@ -395,7 +394,6 @@ export default canComponent.extend({
       const isMegaMapping = this.attr('isMegaMapping');
       const dfd = $.Deferred();
       const query = this.getQuery('values', true, isMegaMapping);
-      this.attr('query', query.request);
 
       $.when(...query.request.map((request) => batchRequests(request)))
         .done((...responseArr) => {
