@@ -38,24 +38,24 @@ class GetCycleUrlTestCase(unittest.TestCase):
   def test_generates_correct_url_for_active_cycle(self, *mocks):
     """The method should return correct URL for active Cycles."""
     workflow = models.Workflow(id=111)
-    cycle = models.Cycle(id=22, workflow=workflow)
+    cycle = models.Cycle(slug="CYCLE-22", workflow=workflow)
 
     # by default, a cycle is considered active
     expected_url = (
         u"http://www.foo.com/"
         u"workflows/111#current"
-        u"/cycle/22"
+        u"&query=%22cycle%20slug%22%3D%22CYCLE-22%22"
     )
     self.assertEqual(expected_url, cycle.cycle_url)
 
   def test_generates_correct_url_for_inactive_cycle(self, *mocks):
     """The method should return correct URL for inactive Cycles."""
     workflow = models.Workflow(id=111)
-    cycle = models.Cycle(id=22, workflow=workflow)
+    cycle = models.Cycle(slug="CYCLE-22", workflow=workflow)
 
     expected_url = (
         u"http://www.foo.com/"
         u"workflows/111#history"
-        u"/cycle/22"
+        u"&query=%22cycle%20slug%22%3D%22CYCLE-22%22"
     )
     self.assertEqual(expected_url, cycle.cycle_inactive_url)
