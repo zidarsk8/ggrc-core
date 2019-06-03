@@ -14,7 +14,7 @@ import '../../components/mapping-controls/mapping-type-selector';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import * as businessModels from '../../models/business-models';
 import template from './object-generator.stache';
-import {groupTypes} from '../../models/mappers/mappings';
+import {groupTypes} from '../../plugins/utils/models-utils';
 
 /**
  * A component implementing a modal for mapping objects to other objects,

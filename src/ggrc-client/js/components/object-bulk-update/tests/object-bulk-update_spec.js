@@ -6,7 +6,7 @@
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 import tracker from '../../../tracker';
-import * as Mappings from '../../../models/mappers/mappings';
+import * as modelsUtils from '../../../plugins/utils/models-utils';
 
 describe('object-bulk-update component', function () {
   let events;
@@ -32,7 +32,7 @@ describe('object-bulk-update component', function () {
 
       spyOn(stateUtils, 'getBulkStatesForModel')
         .and.returnValue(targetStates);
-      spyOn(Mappings, 'groupTypes')
+      spyOn(modelsUtils, 'groupTypes')
         .and.returnValue(mappingType);
 
       result = method({type: 'some type'}, parentViewModel)();

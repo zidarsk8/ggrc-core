@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import * as ModelsUtils from '../../../plugins/utils/models-utils';
 import * as Mappings from '../mappings';
 import Permission from '../../../permission';
 
@@ -249,82 +248,6 @@ describe('Mappings', () => {
         .toEqual(['update', source]);
       expect(Permission.is_allowed_for.calls.argsFor(1))
         .toEqual(['update', target]);
-    });
-  });
-
-  describe('groupTypes() method', () => {
-    const EXPECTED_GROUPS = ['entities', 'scope', 'governance'];
-
-    it('returns grouped mappable types', () => {
-      let types = Mappings.getMappingList('MultitypeSearch');
-      let result = Mappings.groupTypes(types);
-      let resultGroups = Object.keys(result);
-
-      expect(EXPECTED_GROUPS).toEqual(resultGroups);
-      expect(result.entities.items.length).toBe(1);
-      expect(result.scope.items.length).toBe(15);
-      expect(result.governance.items.length).toBe(20);
-    });
-
-    it('adds type to governance group if no group with category of this type',
-      () => {
-        spyOn(ModelsUtils, 'getModelByType').and.returnValue({
-          category: 'category',
-          title_singular: 'Model',
-          title_plural: 'Models',
-          model_singular: 'Model',
-        });
-
-        let result = Mappings.groupTypes(['Model']);
-
-        expect(result.governance.items.length).toBe(1);
-        expect(result.governance.items[0]).toEqual({
-          category: 'category',
-          name: 'Models',
-          value: 'Model',
-        });
-      });
-
-    it('adds type to group of category of this type if this group exist',
-      () => {
-        spyOn(ModelsUtils, 'getModelByType').and.returnValue({
-          category: 'scope',
-          title_singular: 'Model',
-          title_plural: 'Models',
-          model_singular: 'Model',
-        });
-
-        let result = Mappings.groupTypes(['Model']);
-
-        expect(result.scope.items.length).toBe(1);
-        expect(result.scope.items[0]).toEqual({
-          category: 'scope',
-          name: 'Models',
-          value: 'Model',
-        });
-      });
-
-    it('does nothing if cmsModel is not defined', () => {
-      spyOn(ModelsUtils, 'getModelByType').and.returnValue(null);
-
-      let result = Mappings.groupTypes(['Model']);
-
-      expect(result.entities.items.length).toBe(0);
-      expect(result.scope.items.length).toBe(0);
-      expect(result.governance.items.length).toBe(0);
-    });
-
-    it('sorts models in groups', () => {
-      spyOn(ModelsUtils, 'getModelByType').and.callFake((modelName) => ({
-        category: 'scope',
-        title_singular: modelName,
-        title_plural: `${modelName}s`,
-        model_singular: modelName,
-      }));
-
-      let result = Mappings.groupTypes(['B', 'C', 'A']);
-
-      expect(result.scope.items.map((i) => i.name)).toEqual(['As', 'Bs', 'Cs']);
     });
   });
 });

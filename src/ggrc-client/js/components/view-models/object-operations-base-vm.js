@@ -5,9 +5,11 @@
 
 import {
   getMappingList,
-  groupTypes,
 } from '../../models/mappers/mappings';
-import {getInstance} from '../../plugins/utils/models-utils';
+import {
+  getInstance,
+  groupTypes,
+} from '../../plugins/utils/models-utils';
 import * as businessModels from '../../models/business-models';
 
 /**

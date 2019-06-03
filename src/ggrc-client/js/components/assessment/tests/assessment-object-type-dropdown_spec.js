@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import * as Mappings from '../../../models/mappers/mappings';
+import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../assessment-object-type-dropdown';
 
@@ -30,7 +30,7 @@ describe('assessment-object-type-dropdown component', function () {
       },
     };
 
-    spyOn(Mappings, 'groupTypes').and.returnValue(objectTypes);
+    spyOn(modelsUtils, 'groupTypes').and.returnValue(objectTypes);
     result = viewModel.attr('objectTypes');
     expect(result).toEqual(objectTypes);
   });

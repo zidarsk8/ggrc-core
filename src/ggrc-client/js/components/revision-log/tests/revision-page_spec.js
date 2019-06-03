@@ -6,7 +6,6 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-page';
 import Person from '../../../models/business-models/person';
-import * as Mappings from '../../../models/mappers/mappings';
 
 describe('revision-page component', function () {
   let viewModel;

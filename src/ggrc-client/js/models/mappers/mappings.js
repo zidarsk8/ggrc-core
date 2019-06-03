@@ -3,37 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {getModelByType} from '../../plugins/utils/models-utils';
 import * as businessModels from '../business-models';
 import Permission from '../../permission';
 import config from './mappings-ggrc';
 
 /*
-  class Mappings
+  Mappings utils
   represents everything known about how GGRC objects connect to each other.
-
-  a Mappings instance contains the set of known mappings.
-  The set of all Mappings instances is used throughout the
-  system to build widgets, map and unmap objects, etc.
+  It contains the set of known mappings.
 */
-
-
-function getTypeGroups() {
-  return {
-    entities: {
-      name: 'People/Groups',
-      items: [],
-    },
-    scope: {
-      name: 'Scope',
-      items: [],
-    },
-    governance: {
-      name: 'Governance',
-      items: [],
-    },
-  };
-}
 
 /**
  * Return list of allowed for mapping models.
@@ -186,56 +164,6 @@ function getAvailableMappings(type) {
     allowedToMap, related, externalMap, allowedToCreate);
 }
 
-/**
- * Return grouped types.
- * @param {Array} types - array of base model types
- * @return {Array} - object with one allowed for mapping Model
- */
-function groupTypes(types) {
-  let groups = getTypeGroups();
-
-  types.forEach((modelName) => {
-    return _addFormattedType(modelName, groups);
-  });
-
-  _.forEach(groups, (group) => {
-    group.items = _.sortBy(group.items, 'name');
-  });
-
-  return groups;
-}
-
-/**
- * Returns cmsModel fields in required format.
- * @param {can.Model} cmsModel - cms model
- * @return {object} - cms model in required format
- */
-function _prepareCorrectTypeFormat(cmsModel) {
-  return {
-    category: cmsModel.category,
-    name: cmsModel.title_plural,
-    value: cmsModel.model_singular,
-  };
-}
-
-/**
- * Adds model to correct group.
- * @param {string} modelName - model name
- * @param {object} groups - type groups
- */
-function _addFormattedType(modelName, groups) {
-  let cmsModel = getModelByType(modelName);
-  if (!cmsModel || !cmsModel.title_singular) {
-    return;
-  }
-  let type = _prepareCorrectTypeFormat(cmsModel);
-  let group = !groups[type.category] ?
-    groups.governance :
-    groups[type.category];
-
-  group.items.push(type);
-}
-
 /*
   return all allowed mappings (suitable for joining) for an object type.
   object - a string representing the object type's shortName
@@ -307,7 +235,6 @@ export {
   allowedToUnmap,
   getAllowedToUnmapModels,
   getAvailableMappings,
-  groupTypes,
   shouldBeMappedExternally,
 };
 

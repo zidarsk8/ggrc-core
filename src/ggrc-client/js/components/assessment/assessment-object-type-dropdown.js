@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {groupTypes} from '../../models/mappers/mappings';
+import {groupTypes} from '../../plugins/utils/models-utils';
 
 export default can.Component.extend({
   tag: 'assessment-object-type-dropdown',

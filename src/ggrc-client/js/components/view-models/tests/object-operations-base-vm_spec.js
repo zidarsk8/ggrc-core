@@ -20,7 +20,7 @@ describe('object-operations-base viewModel', function () {
   describe('availableTypes() method', function () {
     it('calls getMappingList', function () {
       spyOn(Mappings, 'getMappingList');
-      spyOn(Mappings, 'groupTypes');
+      spyOn(modelsUtils, 'groupTypes');
       baseVM.attr('object', 'testObject');
 
       baseVM.availableTypes();
@@ -29,11 +29,11 @@ describe('object-operations-base viewModel', function () {
 
     it('returns grouped types', () => {
       spyOn(Mappings, 'getMappingList').and.returnValue('list');
-      spyOn(Mappings, 'groupTypes');
+      spyOn(modelsUtils, 'groupTypes');
       baseVM.attr('object', 'testObject');
 
       baseVM.availableTypes();
-      expect(Mappings.groupTypes).toHaveBeenCalledWith('list');
+      expect(modelsUtils.groupTypes).toHaveBeenCalledWith('list');
     });
   });
 

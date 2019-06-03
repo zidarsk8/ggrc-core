@@ -13,7 +13,7 @@ import {getBulkStatesForModel} from '../../plugins/utils/state-utils';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-bulk-update.stache';
 import tracker from '../../tracker';
-import {groupTypes} from '../../models/mappers/mappings';
+import {groupTypes} from '../../plugins/utils/models-utils';
 
 export default can.Component.extend({
   tag: 'object-bulk-update',

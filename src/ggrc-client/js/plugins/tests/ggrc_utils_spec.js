@@ -148,3 +148,4 @@ describe('getTruncatedList() util', () => {
     expect(result).toBe(expected);
   });
 });
+
