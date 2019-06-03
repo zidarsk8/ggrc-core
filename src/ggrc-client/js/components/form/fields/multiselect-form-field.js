@@ -33,7 +33,7 @@ export default can.Component.extend({
           this.attr('_options', newValue);
         },
         get() {
-          const selected = this.attr('_value');
+          const selected = this.attr('_value').split(',');
           return _.map(this.attr('_options'), (item) => {
             return {value: item, checked: selected.includes(item)};
           });
