@@ -21,13 +21,23 @@ export default can.Component.extend({
     filterItems: null,
     mappingItems: null,
     statusItem: null,
+    parentItem: null,
     searchName: '',
     objectType: '',
     saveSearch() {
+      const filterItems = this.attr('filterItems') &&
+        this.attr('filterItems').serialize();
+      const mappingItems = this.attr('mappingItems') &&
+        this.attr('mappingItems').serialize();
+      const statusItem = this.attr('statusItem') &&
+        this.attr('statusItem').serialize();
+      const parentItem = this.attr('parentItem') &&
+      this.attr('parentItem').serialize();
       const filters = {
-        filterItems: this.attr('filterItems').serialize(),
-        mappingItems: this.attr('mappingItems').serialize(),
-        statusItem: this.attr('statusItem').serialize(),
+        filterItems,
+        mappingItems,
+        statusItem,
+        parentItem,
       };
 
       const savedSearch = new SavedSearch({
