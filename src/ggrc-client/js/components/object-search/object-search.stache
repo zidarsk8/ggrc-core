@@ -118,7 +118,7 @@
                             baseInstance:from="parentInstance"
                             isLoading:bind="is_loading"
                             type:from="type"
-                            @onSearch:to="onSearchCallback"
+                            @onSearch:to="../onSearchCallback"
                             submitCbs:from="submitCbs"
                             paging.total:to="scope.vars.totalObjects"
                             searchOnly:from="true"
