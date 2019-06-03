@@ -33,12 +33,6 @@ export default can.Model.extend({
         required: true,
       },
     },
-    query: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
     object_type: {
       value: '',
       validate: {
