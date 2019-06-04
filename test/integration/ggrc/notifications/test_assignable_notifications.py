@@ -1315,6 +1315,19 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     _, _, content = send_email.call_args[0]
     self.assertIn(u"Assessments have been updated", content)
 
+  @patch("ggrc.notifications.common.send_email")
+  def test_comment_notifications_after_import_file(self, send_email):
+    """Test comment notification after importing from file"""
+    self.assertEqual(len(all_models.Comment.query.all()), 0)
+    self.import_file("import_comments.csv", safe=False)
+    self.assertNotEqual(len(all_models.Comment.query.all()), 0)
+    comments = all_models.Comment.query.all()
+    comments = [comment.description for comment in comments]
+    self.client.get("/_notifications/send_daily_digest")
+    _, _, content = send_email.call_args[0]
+    for comment in comments:
+      self.assertIn(comment, content)
+
   def test_evidence_notifications_missing_revision(self):
     """Test evidence notification after adding to assessment
     with missing revision"""

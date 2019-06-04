@@ -68,11 +68,12 @@ class CommentColumnHandler(ColumnHandler):
       db.session.add(mapping)
 
       notif_type_id = all_models.NotificationType.query.filter_by(
-        name="comment_created").one().id
+          name="comment_created"
+      ).one().id
       notification = all_models.Notification(
-        object=comment,
-        send_on=datetime.datetime.utcnow(),
-        notification_type_id=notif_type_id,
+          object=comment,
+          send_on=datetime.datetime.utcnow(),
+          notification_type_id=notif_type_id,
       )
       db.session.add(notification)
       self.row_converter.comments.append(comment)
