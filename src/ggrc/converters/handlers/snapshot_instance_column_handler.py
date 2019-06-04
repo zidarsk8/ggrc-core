@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import MappingColumnHandler
+from ggrc.services import signals
 from ggrc.snapshotter.rules import Types
 
 
@@ -132,8 +133,10 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
         mapping = models.Relationship(source=row_obj, destination=snapshot)
         relationships.append(mapping)
         db.session.add(mapping)
+        signals.Restful.model_posted.send(models.Relationship, obj=mapping)
       elif self.unmap and mapping:
         db.session.delete(mapping)
+        signals.Restful.model_deleted.send(models.Relationship, obj=mapping)
     db.session.flush(relationships)
     self.dry_run = True
 
