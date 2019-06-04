@@ -251,7 +251,7 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
     """
     self.import_file("assessment_full_no_warnings.csv")
-    self.import_file("assessment_update_intermediate.csv")
+    self.import_file("assessment_update_intermediate.csv", safe=False)
 
     assessments = {r.slug: r for r in all_models.Assessment.query.all()}
     self.assertEqual(assessments["Assessment 60"].status,
@@ -747,8 +747,6 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
-        ("Assignees", "user@example.com"),
-        ("Creators", "user@example.com"),
         ("Title", "Test title"),
         ("State", "Completed"),
         ("CAD", "Some value"),
@@ -774,8 +772,6 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
-        ("Assignees", "user@example.com"),
-        ("Creators", "user@example.com"),
         ("Title", "Test title"),
         ("State", "Completed"),
         ("CAD1", "Some value 1"),
@@ -835,7 +831,13 @@ class TestAssessmentImport(TestCase):
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/22/2019"),
     ]))
-    self._check_csv_response(response, {})
+    expected_warnings = {
+        'Assessment': {
+            'row_warnings': {
+                errors.STATE_WILL_BE_IGNORED.format(
+                    line=3
+                )}}}
+    self._check_csv_response(response, expected_warnings)
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).verified_date,
         datetime.datetime(2019, 1, 22))
@@ -853,6 +855,9 @@ class TestAssessmentImport(TestCase):
                 errors.UNMODIFIABLE_COLUMN.format(
                     line=3,
                     column_name="Verified Date"
+                ),
+                errors.STATE_WILL_BE_IGNORED.format(
+                    line=3
                 )}}}
     response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),

@@ -2,9 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Handlers for access control roles."""
-
+from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user
+from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 
 
 class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
@@ -21,10 +22,12 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     value_is_correct = self.value or self.set_empty
     if not value_is_correct:
       return
-    if self.set_empty:
-      self.acl.update_people(set())
-    else:
-      self.acl.update_people(set(self.value))
+    new_value = set() if self.set_empty else set(self.value)
+    is_updated = self.acl.update_people(new_value)
+    if isinstance(self.row_converter.obj, AutoStatusChangeable):
+      if is_updated and not self.row_converter.is_new:
+        self.add_warning(errors.STATE_WILL_BE_IGNORED,
+                         column_name=self.display_name)
 
   def get_value(self):
     """Get list of emails for people with the current AC role."""
