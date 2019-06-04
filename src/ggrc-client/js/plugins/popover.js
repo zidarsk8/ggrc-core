@@ -5,15 +5,10 @@
 
 const body = $('body');
 
-$.fn.modal_showhide = showhide('.modal', '.hidden-fields-area');
-$.fn.widget_showhide = showhide('.info', '.hidden-fields-area');
-$.fn.issue_tracker_modal_showhide = showhide('.modal',
-  '.hidden-issue-tracker-fields-area');
-
-body.on('click', '.expand-link a', $.fn.modal_showhide);
-body.on('click', '.info-expand a', $.fn.widget_showhide);
-body.on('click',
-  '.expand-issue-tracker-link a', $.fn.issue_tracker_modal_showhide);
+body.on('click', '.expand-link a', showhide('.modal', '.hidden-fields-area'));
+body.on('click', '.info-expand a', showhide('.info', '.hidden-fields-area'));
+body.on('click', '.expand-issue-tracker-link a',
+  showhide('.modal', '.hidden-issue-tracker-fields-area'));
 
 function showhide(upsel, downsel) {
   return function (command) {
