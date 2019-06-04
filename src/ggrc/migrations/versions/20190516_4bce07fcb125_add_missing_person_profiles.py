@@ -18,7 +18,7 @@ from ggrc.models import person_profile
 
 # revision identifiers, used by Alembic.
 revision = '4bce07fcb125'
-down_revision = 'b194e332fa65'
+down_revision = 'b142aacd3e9f'
 
 
 def get_people_without_profiles(conn):
