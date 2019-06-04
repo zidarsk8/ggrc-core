@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+// TODO: this import is used to correctly build assets. It should be removed and cyclic dependencies should be resolved.
+import '../../plugins/utils/models-utils';
+
 import * as businessModels from '../business-models';
 import Permission from '../../permission';
 import config from './mappings-ggrc';
