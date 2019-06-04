@@ -596,7 +596,7 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
 
   @data(
       ("updated_at", ("updated_at", "Last Updated Date", "last updated date")),
-      ("created_at", ("updated_at", "Created Date", "Created Date")),
+      ("created_at", ("created_at", "Created Date", "created date")),
   )
   @unpack
   def test_filter_by_dt_field(self, field, aliases):
