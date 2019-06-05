@@ -35,7 +35,7 @@ describe('notifiers-utils module', function () {
         it('if all parameters empty', function () {
           notifier();
           expect(trigger).toHaveBeenCalledWith('ajax:flash',
-            {warning: 'Some error!'});
+            [{warning: 'Some error!'}, null]);
         });
       });
 
@@ -44,7 +44,7 @@ describe('notifiers-utils module', function () {
           notifier('error');
 
           expect(trigger).toHaveBeenCalledWith('ajax:flash',
-            {error: 'Some error!'});
+            [{error: 'Some error!'}, null]);
         });
       });
     });
@@ -63,7 +63,7 @@ describe('notifiers-utils module', function () {
         notifierXHR('error', xhr);
 
         expect(trigger).toHaveBeenCalledWith('ajax:flash',
-          {error: 'responseJSON message'});
+          [{error: 'responseJSON message'}, null]);
       });
 
       it('and returns responseText', function () {
@@ -74,7 +74,7 @@ describe('notifiers-utils module', function () {
         notifierXHR('error', xhr);
 
         expect(trigger).toHaveBeenCalledWith('ajax:flash',
-          {error: 'responseText'});
+          [{error: 'responseText'}, null]);
       });
 
       it('and returns status text', function () {
@@ -84,7 +84,7 @@ describe('notifiers-utils module', function () {
         notifierXHR('error', xhr);
 
         expect(trigger).toHaveBeenCalledWith('ajax:flash',
-          {error: 'Mock auth invalid message'});
+          [{error: 'Mock auth invalid message'}, null]);
       });
     });
 
@@ -94,7 +94,7 @@ describe('notifiers-utils module', function () {
           notifierXHR('', {status: 666});
 
           expect(trigger).toHaveBeenCalledWith('ajax:flash',
-            {warning: 'Some error!'});
+            [{warning: 'Some error!'}, null]);
         });
       });
 
@@ -103,7 +103,7 @@ describe('notifiers-utils module', function () {
           notifierXHR('error', {status: 666});
 
           expect(trigger).toHaveBeenCalledWith('ajax:flash',
-            {error: 'Some error!'});
+            [{error: 'Some error!'}, null]);
         });
       });
     });
@@ -113,7 +113,7 @@ describe('notifiers-utils module', function () {
         notifierXHR('error', {status: 401});
 
         expect(trigger).toHaveBeenCalledWith('ajax:flash',
-          {error: 'Mock auth invalid message'});
+          [{error: 'Mock auth invalid message'}, null]);
       });
     });
   });

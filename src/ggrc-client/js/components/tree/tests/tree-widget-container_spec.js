@@ -775,7 +775,7 @@ describe('tree-widget-container component', function () {
       expect(NotifierUtils.notifier).toHaveBeenCalledWith(
         'info',
         exportMessage,
-        true);
+        {data: true});
     });
   });
 });

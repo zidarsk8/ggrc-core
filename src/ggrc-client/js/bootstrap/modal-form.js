@@ -456,12 +456,16 @@ import {trigger} from 'can-event';
                     '<a href="javascript://" class="reload-link">Show results' +
                     '</a>'
                   );
-                  $link.on('click', function () {
-                    if (redirectLink) {
-                      $('html').addClass('no-js');
-                      changeUrl(redirectLink);
+                  $link.on('click', () => {
+                    $('html').addClass('no-js');
+                    changeUrl(redirectLink);
+
+                    // If redirection url has the same pathname, redirection is
+                    // performed without reloading. Need to force reload the
+                    // page in this case.
+                    if (redirectLink.includes(window.location.pathname)) {
+                      window.location.reload();
                     }
-                    window.location.reload();
                   });
                   $html.append($link);
                 }

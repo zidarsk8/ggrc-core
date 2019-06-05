@@ -129,14 +129,14 @@ describe('object-review component', () => {
         viewModel.attr('review', review);
       });
 
-      it(`should return true if user has 
+      it(`should return true if user has
       "is_allowed_for update review" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
         expect(viewModel.attr('showButtons')).toBeTruthy();
       });
 
-      it(`should return false if user does not have 
+      it(`should return false if user does not have
       "is_allowed_for update review" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
@@ -151,14 +151,14 @@ describe('object-review component', () => {
         viewModel.attr('instance', instance);
       });
 
-      it(`should return true if user has 
+      it(`should return true if user has
       "is_allowed_for update instance" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(true);
 
         expect(viewModel.attr('showButtons')).toBeTruthy();
       });
 
-      it(`should return false if user does not have 
+      it(`should return false if user does not have
       "is_allowed_for update instance" permission`, () => {
         spyOn(Permission, 'is_allowed_for').and.returnValue(false);
 
@@ -414,9 +414,8 @@ describe('object-review component', () => {
 
       expect(NotifiersUtils.notifier).toHaveBeenCalledWith('info',
         jasmine.any(String),
-        jasmine.objectContaining({
-          revertState: jasmine.any(Function),
-        }));
+        {data: {revertState: jasmine.any(Function)}}
+      );
     });
   });
 

@@ -62,9 +62,9 @@ describe('Cacheable conflict resolution', function () {
           fail("The update handler isn't supposed to resolve here.");
           done();
         }, function () {
-          expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', {
+          expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', [{
             warning: [jasmine.any(String)],
-          });
+          }, null]);
           done();
         });
     });

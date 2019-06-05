@@ -587,7 +587,7 @@ viewModel = can.Map.extend({
       operation,
     );
 
-    notifier('info', exportMessage, true);
+    notifier('info', exportMessage, {data: true});
   },
   selectedItemHandler(itemIndex) {
     let componentSelector = 'assessment-info-pane';
