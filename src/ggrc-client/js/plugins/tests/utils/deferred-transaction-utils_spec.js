@@ -20,6 +20,7 @@ describe('DeferredTransaction module', function () {
         completeTransactionCount++;
         resolve();
       }, 100);
+    jasmine.clock().install();
   });
 
   beforeEach(function () {
@@ -27,40 +28,42 @@ describe('DeferredTransaction module', function () {
     completeActionsCount = 0;
   });
 
+  afterAll(() => {
+    jasmine.clock().uninstall();
+  });
+
   it('make several sequence transactions when actions ' +
     'were added with delay greater than configured', function (done) {
     deferredTransaction.push(action).then(function () {
       completeTransactionCount = 0;
     });
-    setTimeout(function () {
-      deferredTransaction.push(action).then(function () {
-        expect(completeTransactionCount).toBe(1);
-        expect(completeActionsCount).toBe(2);
-        done();
-      });
-    }, 150);
+    jasmine.clock().tick(101);
+    deferredTransaction.push(action).then(function () {
+      expect(completeTransactionCount).toBe(1);
+      expect(completeActionsCount).toBe(2);
+      done();
+    });
+    jasmine.clock().tick(101);
   });
 
   it('make one transaction when actions were added with delay ' +
     'less than configured', function (done) {
     deferredTransaction.push(action);
-    setTimeout(function () {
-      deferredTransaction.push(action).then(function () {
-        expect(completeTransactionCount).toBe(1);
-        expect(completeActionsCount).toBe(2);
-        done();
-      });
-    }, 50);
+    jasmine.clock().tick(50);
+    deferredTransaction.push(action).then(function () {
+      expect(completeTransactionCount).toBe(1);
+      expect(completeActionsCount).toBe(2);
+      done();
+    });
+    jasmine.clock().tick(101);
   });
 
   it('execute queue of actions with 0 timeout if "execute" method was called',
-    (done) => {
+    () => {
       deferredTransaction.push(action);
       deferredTransaction.execute(action);
-      setTimeout(() => {
-        expect(completeTransactionCount).toBe(1);
-        expect(completeActionsCount).toBe(2);
-        done();
-      }, 10);
+      jasmine.clock().tick(1);
+      expect(completeTransactionCount).toBe(1);
+      expect(completeActionsCount).toBe(2);
     });
 });
