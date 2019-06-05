@@ -305,7 +305,7 @@ class BlockConverter(object):
       else:
         if header.startswith(("map:", "unmap:")):
           obj_a = self.name
-          obj_b = header.split(":", 1)[1]
+          obj_b = header.split(":", 1)[1].title()
           self.add_warning(errors.UNSUPPORTED_MAPPING,
                            line=self.offset + 2,
                            obj_a=obj_a,

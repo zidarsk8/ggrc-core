@@ -289,7 +289,7 @@ class TestBasicCsvImport(TestCase):
                 errors.UNSUPPORTED_MAPPING.format(
                     line=18,
                     obj_a=obj_type,
-                    obj_b=warn_column.split(":", 1)[1],
+                    obj_b=warn_column.split(":", 1)[1].title(),
                     column_name=warn_column
                 )
             } for warn_column in warn_columns

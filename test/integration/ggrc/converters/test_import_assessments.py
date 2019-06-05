@@ -341,7 +341,7 @@ class TestAssessmentImport(TestCase):
                 errors.UNSUPPORTED_MAPPING.format(
                     line=2,
                     obj_a="Assessment",
-                    obj_b="project",
+                    obj_b="Project",
                     column_name="map:project"
                 ),
             },

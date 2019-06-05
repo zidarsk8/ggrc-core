@@ -297,7 +297,7 @@ class TestComprehensiveSheets(TestCase):
                 errors.UNSUPPORTED_MAPPING.format(
                     line=6,
                     obj_a="Program",
-                    obj_b="program",
+                    obj_b="Program",
                     column_name="map:program"
                 ),
             },
