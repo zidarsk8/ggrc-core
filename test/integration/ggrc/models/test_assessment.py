@@ -192,7 +192,10 @@ class TestAssessment(TestAssessmentBase):
         ("Creators", users_str),
         ("Verifiers", users_str),
     ]))
-    self._check_csv_response(response, {})
+    self._check_csv_response(response, {"Assessment": {
+        "row_warnings": {
+            errors.STATE_WILL_BE_IGNORED.format(line=3)
+        }}})
 
     # Add objects back to session to have access to their id and type
     db.session.add_all([audit, snapshot])

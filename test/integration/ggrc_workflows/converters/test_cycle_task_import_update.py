@@ -675,8 +675,6 @@ class TestCycleTaskImportComments(TestCase):
     self.import_data(OrderedDict([
         ("object_type", self.task.type),
         ("Code*", self.task.slug),
-        ("Task Assignees*", 'test@exmple.com'),
-        ("Task Type", "some data"),
         ("Comments", comment)]))
 
     new_comments_count = all_models.Relationship.query.filter_by(
