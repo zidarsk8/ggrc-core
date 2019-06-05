@@ -538,7 +538,9 @@ export default can.Component.extend({
        *   people that have a particular custom role.
        */
       function highlightBlock($block) {
-        $block.find('object-list').addClass(HIGHLIGHT_CLASS);
+        if ($block.html() && !$block.find('.object-list__item-empty').length) {
+          $block.find('object-list').addClass(HIGHLIGHT_CLASS);
+        }
       }
 
       /**
