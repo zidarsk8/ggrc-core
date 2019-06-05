@@ -6,10 +6,8 @@
 import collections
 from logging import getLogger
 
-import sqlalchemy
-from sqlalchemy import and_
+import sqlalchemy as sa
 from sqlalchemy import orm
-from sqlalchemy import or_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import foreign
@@ -57,8 +55,8 @@ class CustomAttributable(object):
       """Object and CAD join function."""
       definition_id = foreign(CustomAttributeDefinition.definition_id)
       definition_type = foreign(CustomAttributeDefinition.definition_type)
-      return and_(or_(definition_id == cls.id, definition_id.is_(None)),
-                  definition_type == cls._inflector.table_singular)
+      return sa.and_(sa.or_(definition_id == cls.id, definition_id.is_(None)),
+                     definition_type == cls._inflector.table_singular)
 
     return relationship(
         "CustomAttributeDefinition",
@@ -86,8 +84,8 @@ class CustomAttributable(object):
       """Join condition used for deletion"""
       definition_id = foreign(CustomAttributeDefinition.definition_id)
       definition_type = foreign(CustomAttributeDefinition.definition_type)
-      return and_(definition_id == cls.id,
-                  definition_type == cls._inflector.table_singular)
+      return sa.and_(definition_id == cls.id,
+                     definition_type == cls._inflector.table_singular)
 
     return relationship(
         "CustomAttributeDefinition",
@@ -343,7 +341,7 @@ class CustomAttributable(object):
         ftrp_properties.append(val.custom_attribute.title + ".email")
     db.session.query(MysqlRecordProperty)\
         .filter(
-            and_(
+            sa.and_(
                 MysqlRecordProperty.key == self.id,
                 MysqlRecordProperty.type == self.__class__.__name__,
                 MysqlRecordProperty.property.in_(ftrp_properties)))\
@@ -387,7 +385,7 @@ class CustomAttributable(object):
     #    [ {<id of attribute definition> : attribute value, ... }, ... ]
 
     # 1) Get all custom attribute values for the CustomAttributable instance
-    attr_values = db.session.query(CustomAttributeValue).filter(and_(
+    attr_values = db.session.query(CustomAttributeValue).filter(sa.and_(
         CustomAttributeValue.attributable_type == self.__class__.__name__,
         CustomAttributeValue.attributable_id == self.id)).all()
 
@@ -431,25 +429,41 @@ class CustomAttributable(object):
       # self.custom_attribute_values.append(new_value)
 
   @classmethod
-  def get_custom_attribute_definitions(cls, field_names=None):
-    """Get all applicable CA definitions (even ones without a value yet)."""
+  def get_custom_attribute_definitions(cls, field_names=None,
+                                       attributable_ids=None):
+    """Get all applicable CA definitions (even ones without a value yet).
+
+    This method returns custom attribute definitions for entire class. Returned
+    definitions can be filtered by providing `field_names` or `attributable_id`
+    argumetns. Note, that providing this arguments also improves performance.
+    Avoid getting all possible attribute definitions if possible.
+
+    Args:
+      field_names (iterable): Iterable containing names of defintions to get.
+        If None, all definitions will be returned. Defaults to None.
+      attributable_ids (iterable): Iterable containing IDs of instances whose
+        definitions to get. If None, definitions of all objects will be
+        returned. Defaults to None.
+
+    Returns:
+      Iterable of custom attribute defintions.
+    """
     from ggrc.models.custom_attribute_definition import \
         CustomAttributeDefinition as cad
 
-    if cls.__name__ == "Assessment":
-      query = cad.query.filter(or_(
-          cad.definition_type == utils.underscore_from_camelcase(cls.__name__),
-          cad.definition_type == "assessment_template",
-      ))
-    else:
-      query = cad.query.filter(
-          cad.definition_type == utils.underscore_from_camelcase(cls.__name__)
-      )
-    if field_names:
-      query = query.filter(
-          sqlalchemy.or_(cad.title.in_(field_names), cad.mandatory)
-      )
-    return query.options(
+    definition_types = [utils.underscore_from_camelcase(cls.__name__), ]
+    if cls.__name__ == "Assessment" and attributable_ids is None:
+      definition_types.append("assessment_template")
+
+    filters = [cad.definition_type.in_(definition_types), ]
+    if attributable_ids is not None:
+      filters.append(
+          sa.or_(cad.definition_id.in_(attributable_ids),
+                 cad.definition_id.is_(None)))
+    if field_names is not None:
+      filters.append(sa.or_(cad.title.in_(field_names), cad.mandatory))
+
+    return cad.query.filter(*filters).options(
         orm.undefer_group('CustomAttributeDefinition_complete')
     )
 
