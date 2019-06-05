@@ -378,9 +378,6 @@ export default can.Component.extend({
      * @param {can.List} revisions - revisions for comparing
      */
     highlightCustomAttributes($target, revisions) {
-      const titleSelector = '.info-pane__section-title';
-      const valueSelector = '.inline__content';
-
       let that = this;
       let $caPanes = $target.find('.info global-custom-attributes');
       let $oldCAs = $caPanes.eq(0).find('.ggrc-form-item');
@@ -421,24 +418,20 @@ export default can.Component.extend({
 
           if (ca0.custom_attribute_id === ca1.custom_attribute_id) {
             // same attribute
-            highlightTitle($ca0, ca0, $ca1, ca1);
-            highlightValue($ca0, ca0, $ca1, ca1);
             i++;
             j++;
           } else if (ca0.custom_attribute_id < ca1.custom_attribute_id ||
             !ca1.custom_attribute_id) {
             // attribute removed
             $ca1 = fillEmptyCA($ca1); // add empty block to the right panel
-            highlightTitle($ca0, ca0);
-            highlightValue($ca0, ca0);
             i++;
           } else {
             // attribute added
             $ca0 = fillEmptyCA($ca0); // add empty block to the left panel
-            highlightTitle($ca1, ca1);
-            highlightValue($ca1, ca1);
             j++;
           }
+          highlightTitle($ca0, ca0, $ca1, ca1);
+          highlightValue($ca0, ca0, $ca1, ca1);
           that.equalizeHeights($ca0, $ca1);
         }
       }
@@ -451,17 +444,16 @@ export default can.Component.extend({
        * @param {Object} ca1 - custom attribute object
        */
       function highlightTitle($ca0, ca0, $ca1, ca1) {
-        let title0 = ca0.def.title;
+        let title0 = ca0 && ca0.def ? ca0.def.title : null;
         let title1 = ca1 && ca1.def ? ca1.def.title : null;
         if (title0 !== title1) {
-          $ca0.find(titleSelector).addClass(HIGHLIGHT_CLASS);
-
-          if ($ca1) {
-            $ca1.find(titleSelector).addClass(HIGHLIGHT_CLASS);
-          }
+          [$ca0, $ca1].forEach(($ca) => {
+            if ($ca && $ca.html()) {
+              $ca.find('.info-pane__section-title').addClass(HIGHLIGHT_CLASS);
+            }
+          });
         }
       }
-
       /**
        * Highlights value in custom attributes
        * @param {Object} $ca0 - JQuery object
@@ -470,14 +462,14 @@ export default can.Component.extend({
        * @param {Object} ca1 - custom attribute object
        */
       function highlightValue($ca0, ca0, $ca1, ca1) {
-        let value0 = ca0.attribute_value;
+        let value0 = ca0 ? ca0.attribute_value : null;
         let value1 = ca1 ? ca1.attribute_value : null;
         if (value0 !== value1) {
-          $ca0.find(valueSelector).addClass(HIGHLIGHT_CLASS);
-
-          if ($ca1) {
-            $ca1.find(valueSelector).addClass(HIGHLIGHT_CLASS);
-          }
+          [$ca0, $ca1].forEach(($ca) => {
+            if ($ca && $ca.html() && !$ca.find('.empty-message').length) {
+              $ca.find('readonly-inline-content').addClass(HIGHLIGHT_CLASS);
+            }
+          });
         }
       }
 
@@ -487,9 +479,7 @@ export default can.Component.extend({
        * @return {Object} new empty jQuery object
        */
       function fillEmptyCA($ca) {
-        let $empty = $('<div class="ggrc-form-item"/>');
-        $empty.insertBefore($ca);
-        return $empty;
+        return $('<div class="ggrc-form-item"></div>').insertBefore($ca);
       }
     },
 
