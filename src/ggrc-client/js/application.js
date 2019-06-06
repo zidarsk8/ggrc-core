@@ -9,18 +9,6 @@ let $win = $(window);
 let $doc = $(doc);
 let $body = $(body);
 
-window.calculate_spinner_z_index = function () {
-  let zindex = 0;
-  $(this).parents().each(function () {
-    let z = parseInt($(this).css('z-index'), 10);
-    if (z) {
-      zindex = z;
-      return false;
-    }
-  });
-  return zindex + 10;
-};
-
 $doc.ready(function () {
   // monitor target, where flash messages are added
   let AUTOHIDE_TIMEOUT = 10000;
