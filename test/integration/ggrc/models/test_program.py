@@ -49,6 +49,30 @@ class TestProgram(TestCase):
     response = self.api.delete(self.program)
     self.assert200(response)
 
+  def test_create_wrong_recipients(self):
+    """Test creation of a program with a wrong recipients"""
+    data = [{
+        'program': {
+            'status': 'Draft',
+            'kind': 'Directive',
+            'send_by_default': True,
+            'managers': ['user@example.com'],
+            'recipients': 'Admin,Primary Contacts,Secondary Contacts',
+            'title': 'Program_Test',
+            'review': {
+                'status': 'Unreviewed',
+            },
+            'access_control_list': [],
+            'slug': 'program_test'
+        }
+    }]
+    response = self.api.post(all_models.Program, data=data)
+    self.assert400(response)
+    self.assertIn(
+        u"Value should be either empty or comma separated list of",
+        response.json[0][1]
+    )
+
 
 class TestMegaProgram(TestCase):
   """Mega Program test cases"""
