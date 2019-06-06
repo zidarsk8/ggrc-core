@@ -26,7 +26,12 @@ export default can.Component.extend({
   events: {
     '{viewModel.values} change': function () {
       let viewModel = this.viewModel;
-      let values = _.getExistingKeys(viewModel.attr('values').serialize());
+      let values = _.keys(
+        _.pickBy(
+          viewModel.attr('values').serialize(),
+          _.identity
+        )
+      );
       viewModel.instance.attr(viewModel.attr('property'), values.join(','));
     },
   },

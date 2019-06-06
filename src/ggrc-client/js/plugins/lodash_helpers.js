@@ -55,16 +55,6 @@ _.mixin({
     }
     return values;
   },
-  /*
-    * Get array of keys that are truthy
-    *
-    * @param {Object} object - Object with key - values
-    * @return {Array} - Returns array of truthy keys
-    */
-  getExistingKeys: function (object) {
-    return _.keys(_.pickBy(object, _.identity));
-  },
-
   /**
    *
    * @param {Array} items - array of items.
