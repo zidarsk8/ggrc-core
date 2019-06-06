@@ -221,79 +221,82 @@ export default can.Component.extend({
      * @param {jQuery} $target - the root DOM element containing the
      *   revision diff comparison
      */
-    highlightAttributes: function ($target) {
-      const emptySelector = '.empty-message';
-      const listSelector = 'ul li, .object-list-item';
-      const titleSelector = '.general-page-header .pane-header__title';
+    highlightAttributes($target) {
+      const titleSelector = '.general-page-header__title-wrapper';
       const instance = this.attr('instance');
       const isProposableExternalAttr = (
         instance.constructor.isProposable &&
         isChangeableExternally(instance)
       );
+      const tabContent = '.info-pane__main-content';
       const attributesSelector = isProposableExternalAttr ?
-        '.review-status, proposable-attribute' :
-        'object-review, .row-fluid h6 + *';
+        '.review-status, proposable-attribute > .action-toolbar-container' :
+        `object-review, ${tabContent} > .row-fluid:not(:has(custom-roles)),
+         ${tabContent} > .custom-attr-wrap .row-fluid.wrap-row > *`;
 
-      const fieldsSelector = [titleSelector, attributesSelector].join(',');
+      const fieldsSelector = [titleSelector, attributesSelector].join(', ');
       const infoPanes = $target.find('.info .tier-content');
       const valuesOld = infoPanes.eq(0).find(fieldsSelector);
       const valuesNew = infoPanes.eq(1).find(fieldsSelector);
 
-      valuesOld.each(function (index, valueOld) {
+      valuesOld.each((index, valueOld) => {
         const $valueNew = $(valuesNew[index]);
         const $valueOld = $(valueOld);
-        let listOld = [];
-        let listNew = [];
         if ($valueNew.text().replace(/\s/g, '') !==
           $valueOld.text().replace(/\s/g, '')) {
-          listOld = $valueOld.find(listSelector);
-          listNew = $valueNew.find(listSelector);
-          if (listOld.length) {
-            highlightLists(listOld, listNew);
-          } else {
-            highlightValues($valueOld);
-            highlightValues($valueNew);
-          }
+          highlightValues($valueOld, $valueNew);
           equalValuesHeight($valueOld, $valueNew);
         }
       });
 
       /**
-       * Highlight difference in two DOM lists
-       * @param {Object} listFirst - DOM object
-       * @param {Object} listLast - DOM object
+       * Highlight difference in simple values
+       * @param {Object} $value1 - jQuery object
+       * @param {Object} $value2 - jQuery object
        */
-      function highlightLists(listFirst, listLast) {
-        compareLists(listFirst, listLast);
-        compareLists(listLast, listFirst);
+      function highlightValues($value1, $value2) {
+        const listSelector = 'ul li, .object-list-item';
+        const listOld = $value1.find(listSelector);
+        const listNew = $value2.find(listSelector);
+
+        if (listOld.length || listNew.length) {
+          const diffLeft = _.differenceBy(listOld, listNew, 'innerHTML');
+          const diffRight = _.differenceBy(listNew, listOld, 'innerHTML');
+          const diffs = [
+            {attr: $value1, list: diffLeft},
+            {attr: $value2, list: diffRight},
+          ];
+
+          diffs.forEach((diff) => {
+            if (diff.list.length) {
+              highlightList(diff.list);
+            }
+          });
+        } else {
+          [$value1, $value2].forEach(($value) => {
+            highlightValue($value);
+          });
+        }
       }
 
       /**
-       * Compare DOM lists
-       * @param {Object} liFirst - DOM object
-       * @param {Object} liLast - DOM object
+       * Highlight difference in DOM list items
+       * @param {Object} list - DOM object
        */
-      function compareLists(liFirst, liLast) {
-        liFirst.each(function (i, li) {
-          let atLeastOneIsEqual = false;
-          liLast.each(function (j, li2) {
-            if (li.innerHTML === li2.innerHTML) {
-              atLeastOneIsEqual = true;
-            }
-          });
-          if (!atLeastOneIsEqual) {
-            $(li).addClass(HIGHLIGHT_CLASS);
-          }
+      function highlightList(list) {
+        list.forEach((item) => {
+          $(item).addClass(HIGHLIGHT_CLASS);
         });
       }
 
       /**
-       * Highlight difference in simple values
+       * Highlight difference in attribute value
        * @param {Object} $value - jQuery object
        */
-      function highlightValues($value) {
-        if ($value.html() && !$value.find(emptySelector).length) {
-          $value.addClass(HIGHLIGHT_CLASS);
+      function highlightValue($value) {
+        if ($value.html() && !$value.find('.empty-message').length) {
+          const title = isProposableExternalAttr ? '.action-toolbar' : 'h6';
+          $value.find(`h3, ${title} + *`).addClass(HIGHLIGHT_CLASS);
         }
       }
 

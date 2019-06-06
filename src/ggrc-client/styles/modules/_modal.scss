@@ -568,8 +568,10 @@
           margin: 0;
           padding: 0 0 0 30px;
         }
-        .diff-highlighted{
-          display: block;
+        .diff-highlighted {
+          &:not(li) {
+            display: block;
+          }
           box-sizing: border-box;
           width: 100%;
           max-width: 100%;
