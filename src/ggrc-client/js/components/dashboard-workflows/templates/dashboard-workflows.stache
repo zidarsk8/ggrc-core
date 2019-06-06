@@ -93,7 +93,7 @@
             </li>
           {{/if}}
         {{/unless}}
-      </ul><!-- tree-structure end -->
+      </ul>
 
       {{#if showToggleListButton}}
         <a
