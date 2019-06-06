@@ -3,13 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.container-fluid {
-  margin: 0 auto;
-  &.resizable {
-    @include transition(width 0.2s);
-  }
-}
-
 .row-fluid {
   .span-custom2-and-half {
     width: 19.14894%;

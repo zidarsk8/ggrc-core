@@ -131,7 +131,7 @@
     }
     .hidable {
       label {
-        display: inline-block; 
+        display: inline-block;
       }
     }
   }
@@ -559,11 +559,6 @@
         box-shadow: none;
         &:first-child{
           border-right: none;
-        }
-        .inner-count-list{
-          li:last-child{
-            margin-bottom: 0;
-          }
         }
         ul.diff-highlighted {
           margin: 0;
