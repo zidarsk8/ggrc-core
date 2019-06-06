@@ -24,6 +24,7 @@ def upgrade():
       SET name=SUBSTRING_INDEX(email, '@', 1) WHERE name=''
   """)
 
+
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   raise NotImplementedError("Downgrade is not supported")

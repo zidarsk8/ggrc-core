@@ -24,7 +24,6 @@ def upgrade():
   """)
 
 
-
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   raise NotImplementedError("Downgrade is not supported")
