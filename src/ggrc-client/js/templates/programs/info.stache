@@ -78,8 +78,8 @@
                     </div>
                   </div>
                 </div>
-                {{> /static/templates/custom_attributes/info.stache}}
               </div><!-- custom-attr-wrap end -->
+              {{> /static/templates/custom_attributes/info.stache}}
             </div>
             {{^if isSnapshot}}
               <div class="info-pane__sidebar">
