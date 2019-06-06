@@ -934,7 +934,8 @@ export default can.Control.extend({
       $.when(this.options.attr('instance', newInstance))
         .then(() => this.apply_object_params())
         .then(() => this.serialize_form())
-        .then((el) => this.autocomplete(el));
+        .then((el) => this.autocomplete(el))
+        .then(() => this.options.attr('instance').backup());
     });
 
     this.restore_ui_status();
