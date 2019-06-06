@@ -37,18 +37,18 @@ def build_address_body(proposals, review_notifications):
   people = set(
       itertools.chain(
           proposal_dict.iterkeys(),
-          review_dict["reviewers_data"].iterkeys(),
-          review_dict["owners_data"].iterkeys()
+          review_dict["review_requested_data"].iterkeys(),
+          review_dict["object_state_reverted_data"].iterkeys()
       )
   )
   for addressee in people:
-    review_reviewers_data = review_dict["reviewers_data"][addressee]
-    review_owners_data = review_dict["owners_data"][addressee]
+    review_reviewers_data = review_dict["review_requested_data"][addressee]
+    review_owners_data = review_dict["object_state_reverted_data"][addressee]
     proposals = proposal_dict[addressee]
     body = DIGEST_TMPL.render(
         proposals=proposals.values(),
-        review_reviewers=review_reviewers_data.values(),
-        review_owners=review_owners_data.values(),
+        review_requested_data=review_reviewers_data.values(),
+        object_state_reverted_data=review_owners_data.values(),
     )
     yield (addressee, body)
 
