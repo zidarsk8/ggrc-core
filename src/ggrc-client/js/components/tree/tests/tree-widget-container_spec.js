@@ -8,6 +8,7 @@ import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
+import * as MegaObjectUtils from '../../../plugins/utils/mega-object-utils';
 import tracker from '../../../tracker';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
@@ -92,26 +93,72 @@ describe('tree-widget-container component', function () {
 
   describe('loadItems() method', function () {
     let loadItems;
+    let modelName;
+    let parent;
+    let page;
+    let filter;
+    let request;
+    let loadSnapshots;
 
     beforeEach(function () {
-      vm.attr({
-        model: {model_singular: 'modelName'},
-        options: {
-          parent_instance: {},
-        },
+      modelName = 'testModelName';
+      parent = new can.Map({testParent: true});
+      page = {
+        current: 1,
+        pageSize: 10,
+        sort: [{
+          key: null,
+          direction: null,
+        }],
+      },
+      filter = new can.Map({testFilter: true});
+      request = new can.List([{testRequest: true}]);
+
+      vm.attr('model', {
+        model_singular: modelName,
       });
+      vm.attr('options', {
+        parent_instance: parent,
+      });
+      vm.attr('advancedSearch', {
+        filter,
+        request,
+      });
+
       loadItems = vm.loadItems.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
+      spyOn(MegaObjectUtils, 'getMegaObjectRelation')
+        .and.returnValue({relation: 'child'});
     });
 
-    it('', function (done) {
+    it('should call TreeViewUtils.loadFirstTierItems with specified ' +
+    'arguments if "options.megaRelated" attr is truthy', function (done) {
+      vm.attr('options.megaRelated', true);
       spyOn(TreeViewUtils, 'loadFirstTierItems')
         .and.returnValue($.Deferred().resolve({
           total: 100,
           values: [],
         }));
-
       loadItems().then(function () {
+        expect(TreeViewUtils.loadFirstTierItems).toHaveBeenCalledWith(
+          modelName, parent, page, filter, request, loadSnapshots, 'child');
+        expect(vm.attr('pageInfo.total')).toEqual(100);
+        expect(can.makeArray(vm.attr('showedItems'))).toEqual([]);
+        done();
+      });
+    });
+
+    it('should call TreeViewUtils.loadFirstTierItems with specified ' +
+    'arguments if "options.megaRelated" attr is falsy', function (done) {
+      vm.attr('options.megaRelated', false);
+      spyOn(TreeViewUtils, 'loadFirstTierItems')
+        .and.returnValue($.Deferred().resolve({
+          total: 100,
+          values: [],
+        }));
+      loadItems().then(function () {
+        expect(TreeViewUtils.loadFirstTierItems).toHaveBeenCalledWith(
+          modelName, parent, page, filter, request, loadSnapshots, null);
         expect(vm.attr('pageInfo.total')).toEqual(100);
         expect(can.makeArray(vm.attr('showedItems'))).toEqual([]);
         done();

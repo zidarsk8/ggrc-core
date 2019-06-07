@@ -179,11 +179,74 @@ describe('TreeViewUtils module', function () {
       });
   });
 
+  describe('loadFirstTierItems() method', function () {
+    let modelName;
+    let parent;
+    let pageInfo;
+    let filter;
+    let request;
+    let transformToSnapshot;
+    let operation;
+    let source;
+
+    beforeEach(() => {
+      modelName = 'Program';
+      parent = {
+        type: 'testParentType',
+        id: 123,
+      };
+      pageInfo = {};
+      filter = {testFilter: true};
+      request = new can.List();
+      transformToSnapshot = false;
+      operation = 'owned';
+      source = {type: 'Program'};
+
+      spyOn(QueryApiUtils, 'buildParam')
+        .and.returnValue({object_name: 'testName'});
+      spyOn(QueryApiUtils, 'batchRequests')
+        .and.returnValue($.Deferred().resolve({testName: {values: [source]}}));
+    });
+
+    it('returns correct result', function (done) {
+      let expectedResult = {
+        values: [jasmine.objectContaining(source)],
+      };
+      module.loadFirstTierItems(
+        modelName,
+        parent,
+        pageInfo,
+        filter,
+        request,
+        transformToSnapshot,
+        operation,
+      ).then((response) => {
+        expect(response).toEqual(expectedResult);
+        done();
+      });
+    });
+  });
+
+  describe('makeRelevantExpression() method', function () {
+    it('returns expression for load items for 1st level of tree view',
+      function () {
+        let result = module.makeRelevantExpression(
+          'Audit', 'Program', 123, 'owned');
+        expect(result).toEqual({
+          type: 'Program',
+          id: 123,
+          operation: 'owned',
+        });
+      });
+  });
+
   describe('startExport() method', () => {
     let modelName;
     let parent;
     let filter;
     let request;
+    let transformToSnapshot;
+    let operation;
 
     beforeEach(() => {
       spyOn(ImportExportUtils, 'runExport');
@@ -199,15 +262,18 @@ describe('TreeViewUtils module', function () {
       };
       filter = {testFilter: true};
       request = new can.List();
+      transformToSnapshot = '';
+      operation = 'owned';
     });
 
     it('builds request params correctly', () => {
-      module.startExport(modelName, parent, filter, request);
+      module.startExport(
+        modelName, parent, filter, request, transformToSnapshot, operation);
 
       expect(QueryApiUtils.buildParam).toHaveBeenCalledWith(
         modelName,
         {},
-        {type: parent.type, id: parent.id, operation: 'owned'},
+        {type: parent.type, id: parent.id, operation},
         'all',
         filter);
     });

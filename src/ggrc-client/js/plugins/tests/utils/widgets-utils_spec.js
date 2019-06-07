@@ -434,4 +434,73 @@ describe('GGRC Utils Widgets', function () {
         });
     });
   });
+
+  describe('getWidgetConfigs() method', function () {
+    it('should return object configs', function () {
+      const result = WidgetsUtils.getWidgetConfigs(
+        [{name: 'Program'}, {name: 'Assesment'}]);
+      expect(result).toEqual([{
+        name: 'Program',
+        widgetName: 'Program',
+        widgetId: 'Program',
+      }, {
+        name: 'Assesment',
+        widgetName: 'Assesment',
+        widgetId: 'Assesment',
+      }]);
+    });
+  });
+
+  describe('getWidgetConfig() method', function () {
+    it('should return object config if model name is Object', function () {
+      const result = WidgetsUtils.getWidgetConfig({name: 'Program'});
+      expect(result).toEqual({
+        name: 'Program',
+        widgetName: 'Program',
+        widgetId: 'Program',
+      });
+    });
+
+    it('should return object config if model name is cashed', function () {
+      WidgetsUtils.getWidgetConfig('Program_version');
+      const result = WidgetsUtils.getWidgetConfig('Program_version');
+      expect(result).toEqual({
+        name: 'Program',
+        widgetId: 'Program_version',
+        widgetName: 'Programs Versions',
+        countsName: 'Program_version',
+        isObjectVersion: true,
+        relation: undefined,
+        isMegaObject: undefined,
+      });
+    });
+
+    it('should return object config if model name contains "_version"',
+      function () {
+        const result = WidgetsUtils.getWidgetConfig('Program_version');
+        expect(result).toEqual({
+          name: 'Program',
+          widgetId: 'Program_version',
+          widgetName: 'Programs Versions',
+          countsName: 'Program_version',
+          isObjectVersion: true,
+          relation: undefined,
+          isMegaObject: undefined,
+        });
+      }
+    );
+
+    it('should return object config if model name is mega object', function () {
+      const result = WidgetsUtils.getWidgetConfig('Program_parent');
+      expect(result).toEqual({
+        name: 'Program',
+        widgetId: 'Program_parent',
+        widgetName: 'Parent Programs',
+        countsName: 'Program_parent',
+        isObjectVersion: undefined,
+        relation: 'parent',
+        isMegaObject: true,
+      });
+    });
+  });
 });

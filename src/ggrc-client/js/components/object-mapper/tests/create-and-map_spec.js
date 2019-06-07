@@ -163,4 +163,16 @@ describe('create-and-map component', () => {
       expect(viewModel.cancel).toHaveBeenCalled();
     });
   });
+
+  describe('megaRelation getter', () => {
+    it('should return the last set value', () => {
+      const lastValue = 'parent';
+      viewModel.attr('megaRelation', lastValue);
+      expect(viewModel.attr('megaRelation')).toBe(lastValue);
+    });
+
+    it('should return "child" if the value was not set before', () => {
+      expect(viewModel.attr('megaRelation')).toBe('child');
+    });
+  });
 });

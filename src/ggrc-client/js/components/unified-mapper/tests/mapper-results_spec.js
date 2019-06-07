@@ -31,6 +31,27 @@ describe('mapper-results component', function () {
     viewModel.init = init;
   });
 
+  describe('isMegaMapping getter', function () {
+    it('should return true for equal mega object', function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Program');
+      expect(viewModel.attr('isMegaMapping')).toBeTruthy();
+    });
+
+    it('should return false for different object', function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Cotrol');
+      expect(viewModel.attr('isMegaMapping')).toBeFalsy();
+    });
+  });
+
+  describe('serviceColumnsEnabled getter', function () {
+    it('should return length of columns.service attribute', function () {
+      viewModel.attr('columns.service', [1, 2]);
+      expect(viewModel.attr('serviceColumnsEnabled')).toBe(2);
+    });
+  });
+
   describe('setItems() method', function () {
     let items;
 
@@ -102,6 +123,9 @@ describe('mapper-results component', function () {
       spyOn(viewModel, 'getDisplayModel')
         .and.returnValue({
           model_singular: '',
+          tree_view_options: {
+            mega_attr_list: 'mock4',
+          },
         });
     });
 
@@ -121,6 +145,21 @@ describe('mapper-results component', function () {
       viewModel.attr('disableColumnsConfiguration', 'configuration');
       viewModel.setColumnsConfiguration();
       expect(viewModel.attr('disableColumnsConfiguration')).toEqual('mock3');
+    });
+
+    it('updates service columns if "isMegaMapping" is true', function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Program');
+      viewModel.setColumnsConfiguration();
+      expect(viewModel.attr('columns.service')).toEqual('mock4');
+    });
+
+    it('updates service columns with an empty array ' +
+    'if "isMegaMapping" is false', function () {
+      viewModel.attr('object', 'Program');
+      viewModel.attr('type', 'Control');
+      viewModel.setColumnsConfiguration();
+      expect(can.makeArray(viewModel.attr('columns.service'))).toEqual([]);
     });
   });
 
@@ -443,6 +482,19 @@ describe('mapper-results component', function () {
 
       GGRC.current_user = oldUser;
     });
+
+    it('set result if "isMegaMapping" true', function () {
+      let result = viewModel.getQuery('values', true, true);
+      expect(result).toEqual(jasmine.objectContaining({
+        parentQueryIndex: 1,
+        childQueryIndex: 2,
+      }));
+    });
+
+    it('set result if "isMegaMapping" false', function () {
+      let result = viewModel.getQuery('values', true, false);
+      expect(result).toEqual(jasmine.objectContaining({relatedQueryIndex: 1}));
+    });
   });
 
   describe('getModelKey() method', function () {
@@ -481,11 +533,13 @@ describe('mapper-results component', function () {
         id: 124,
       },
     }];
+
     let relatedData = {
       mockType: {
         ids: [123],
       },
     };
+
     let expectedResult = [{
       data: {
         id: 123,
@@ -497,6 +551,7 @@ describe('mapper-results component', function () {
       },
       isDisabled: false,
     }];
+
     let isMegaMapping = false;
     let type = 'mockType';
 
@@ -516,6 +571,37 @@ describe('mapper-results component', function () {
       });
 
     it('updates disabled items', function () {
+      viewModel.attr('searchOnly', false);
+      viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
+      expect(allItems).toEqual(expectedResult);
+    });
+
+    it('updates disabled items if "isMegaMapping" is true', function () {
+      isMegaMapping = true;
+      relatedData = {
+        parent: {
+          mockType: {
+            ids: [123],
+          },
+        },
+        child: {
+          mockType: {
+            ids: [124],
+          },
+        },
+      };
+      expectedResult = [{
+        data: {
+          id: 123,
+        },
+        isDisabled: true,
+      }, {
+        data: {
+          id: 124,
+        },
+        isDisabled: true,
+      }];
+
       viewModel.attr('searchOnly', false);
       viewModel.setDisabledItems(isMegaMapping, allItems, relatedData, type);
       expect(allItems).toEqual(expectedResult);
@@ -548,6 +634,121 @@ describe('mapper-results component', function () {
       viewModel.setSelectedItems(allItems);
       expect(allItems).toEqual(expectedResult);
       expect(viewModel.attr('prevSelected').length).toEqual(0);
+    });
+  });
+
+  describe('setMegaRelations() method', function () {
+    let allItems = [{
+      id: 123,
+    }, {
+      id: 124,
+    }, {
+      id: 234,
+    }, {
+      id: 235,
+    }];
+
+    let relatedData = {
+      parent: {
+        mockType: {
+          ids: [123],
+        },
+      },
+      child: {
+        mockType: {
+          ids: [124],
+        },
+      },
+    };
+
+    let expectedResult = [{
+      id: 123,
+      mapAsChild: false,
+    }, {
+      id: 124,
+      mapAsChild: true,
+    }, {
+      id: 234,
+      mapAsChild: false,
+    }, {
+      id: 235,
+      mapAsChild: true,
+    }];
+
+    let type = 'mockType';
+
+    it('updates mega relations items', function () {
+      viewModel.attr('megaRelationObj', {
+        '234': 'parent',
+        defaultValue: 'child',
+      });
+      viewModel.setMegaRelations(allItems, relatedData, type);
+      expect(allItems).toEqual(expectedResult);
+    });
+  });
+
+  describe('disableItself() method', function () {
+    let allItems = [{
+      type: 'mockType',
+      id: 123,
+    }, {
+      type: 'mockType',
+      id: 124,
+    }];
+    let isMegaMapping = false;
+    let expectedResult;
+
+    it('do nothing if baseInstance is undefined', function () {
+      viewModel.disableItself(isMegaMapping, allItems);
+      expect(allItems).toEqual(allItems);
+    });
+
+    it('updates "disabledIds" attr', function () {
+      viewModel.attr('baseInstance', {
+        type: 'mockType',
+        id: 123,
+      });
+      viewModel.disableItself(isMegaMapping, allItems);
+      expect(can.makeArray(viewModel.attr('disabledIds'))).toEqual([123]);
+    });
+
+    it('assigns true to "isDisabled" for allItems ' +
+    'if self is true', function () {
+      viewModel.attr('baseInstance', {
+        type: 'mockType',
+        id: 123,
+      });
+      expectedResult = [{
+        type: 'mockType',
+        id: 123,
+        isDisabled: true,
+      }, {
+        type: 'mockType',
+        id: 124,
+      }];
+      viewModel.disableItself(isMegaMapping, allItems);
+      expect(allItems).toEqual(expectedResult);
+    });
+
+    it('assigns "mapAsChild" and "isSelf" for allItems ' +
+    'if isMegaMapping is true', function () {
+      isMegaMapping = true;
+      viewModel.attr('baseInstance', {
+        type: 'mockType',
+        id: 123,
+      });
+      expectedResult = [{
+        type: 'mockType',
+        id: 123,
+        isDisabled: true,
+        mapAsChild: null,
+        isSelf: true,
+      }, {
+        type: 'mockType',
+        id: 124,
+      }];
+      viewModel.disableItself(isMegaMapping, allItems);
+      expect(allItems).toEqual(expectedResult);
     });
   });
 
@@ -626,6 +827,7 @@ describe('mapper-results component', function () {
         .and.returnValue('transformedValue');
       spyOn(viewModel, 'setSelectedItems');
       spyOn(viewModel, 'setDisabledItems');
+      spyOn(viewModel, 'setMegaRelations');
       spyOn(viewModel, 'disableItself');
       dfdRequest = $.Deferred();
       spyOn(QueryAPI, 'batchRequests');
@@ -654,6 +856,36 @@ describe('mapper-results component', function () {
         expect(viewModel.setDisabledItems)
           .toHaveBeenCalledWith(megaMapping, expectedResult, relatedData, type);
       });
+
+    it('calls viewModel.setMegaRelations() if "isMegaMapping" is true',
+      function () {
+        relatedData = {
+          parent: {
+            program: {
+              ids: [],
+            },
+          },
+          child: {
+            program: {
+              ids: [123],
+            },
+          },
+        };
+        viewModel.attr('type', 'Program');
+        spyOn(viewModel, 'getRelatedData').and.returnValue(relatedData);
+        dfdRequest.resolve(data, relatedData);
+        viewModel.load();
+        expect(viewModel.setMegaRelations)
+          .toHaveBeenCalledWith(expectedResult, relatedData, 'program');
+      });
+
+    it('calls viewModel.disableItself()', function () {
+      let isMegaMapping = false;
+      dfdRequest.resolve(data, relatedData);
+      viewModel.load();
+      expect(viewModel.disableItself)
+        .toHaveBeenCalledWith(isMegaMapping, expectedResult);
+    });
 
     it('updates paging', function () {
       dfdRequest.resolve(data, relatedData);
@@ -685,6 +917,164 @@ describe('mapper-results component', function () {
         expect(result).toEqual([]);
         done();
       });
+    });
+  });
+
+  describe('getRelatedData() method', function () {
+    let isMegaMapping;
+    let responseArray = [];
+    let query = {};
+    let modelKey = '';
+    let result;
+
+    beforeEach(function () {
+      spyOn(viewModel, 'buildMegaRelatedData')
+        .withArgs(responseArray, query, modelKey)
+        .and.returnValue({mock: 123});
+      spyOn(viewModel, 'buildRelatedData')
+        .withArgs(responseArray, query, modelKey)
+        .and.returnValue({mock: 456});
+    });
+
+    it('should return the result of buildMegaRelatedData() call' +
+    'if "isMegaMapping" is true', function () {
+      isMegaMapping = true;
+
+      result = viewModel.getRelatedData(
+        isMegaMapping, responseArray, query, modelKey);
+      expect(viewModel.buildMegaRelatedData)
+        .toHaveBeenCalledWith(responseArray, query, modelKey);
+      expect(result).toEqual({mock: 123});
+    }
+    );
+
+    it('should return the result of buildRelatedData() call ' +
+    'if "isMegaMapping" is false', function () {
+      isMegaMapping = false;
+
+      result = viewModel.getRelatedData(
+        isMegaMapping, responseArray, query, modelKey);
+      expect(viewModel.buildRelatedData)
+        .toHaveBeenCalledWith(responseArray, query, modelKey);
+      expect(result).toEqual({mock: 456});
+    }
+    );
+  });
+
+  describe('buildRelatedData() method', function () {
+    it('method should return data from "relatedData" array',
+      function () {
+        let responseArray = [
+          {
+            Snapshot: {
+              ids: [1, 2, 3],
+            },
+          },
+        ];
+        let query = {
+          relatedQueryIndex: 0,
+        };
+
+        let result = viewModel
+          .buildRelatedData(responseArray, query, 'Snapshot');
+        expect(result.Snapshot.ids.length).toEqual(3);
+        expect(result.Snapshot.ids[0]).toEqual(1);
+      }
+    );
+
+    it('method should return data from "deferred_list" array',
+      function () {
+        let responseArray = [
+          {
+            Snapshot: {
+              ids: [1, 2, 3],
+            },
+          },
+        ];
+        let query = {
+          relatedQueryIndex: 0,
+        };
+        let result;
+
+        viewModel.attr('deferredList', [
+          {id: 5, type: 'Snapshot'},
+          {id: 25, type: 'Snapshot'},
+        ]);
+
+        result = viewModel
+          .buildRelatedData(responseArray, query, 'Snapshot');
+        expect(result.Snapshot.ids.length).toEqual(2);
+        expect(result.Snapshot.ids[0]).toEqual(5);
+      }
+    );
+
+    it('return data from "deferred_list" array. RelatedData is undefined',
+      function () {
+        let result;
+        let query = {
+          relatedQueryIndex: 0,
+        };
+
+        viewModel.attr('deferredList', [
+          {id: 5, type: 'Snapshot'},
+          {id: 25, type: 'Snapshot'},
+        ]);
+
+        result = viewModel
+          .buildRelatedData([], query, 'Snapshot');
+        expect(result.Snapshot.ids.length).toEqual(2);
+        expect(result.Snapshot.ids[0]).toEqual(5);
+      }
+    );
+  });
+
+  describe('buildMegaRelatedData() method', function () {
+    let responseArray;
+    let query;
+    let result;
+
+    it('method should return data from "relatedData" array ' +
+    'if "parentQueryIndex" and "childQueryIndex" are defined', function () {
+      responseArray = [
+        {
+          Snapshot: {
+            ids: [1, 2, 3],
+          },
+        },
+        {
+          Snapshot: {
+            ids: [4, 5],
+          },
+        },
+      ];
+      query = {
+        parentQueryIndex: 0,
+        childQueryIndex: 1,
+      };
+
+      result = viewModel
+        .buildMegaRelatedData(responseArray, query, 'Snapshot');
+      expect(result.parent.Snapshot.ids.length).toEqual(3);
+      expect(result.parent.Snapshot.ids[0]).toEqual(1);
+      expect(result.child.Snapshot.ids.length).toEqual(2);
+      expect(result.child.Snapshot.ids[0]).toEqual(4);
+    });
+
+    it('method should return data from "relatedData" array ' +
+    'if "parentQueryIndex" and "childQueryIndex" are not defined', function () {
+      responseArray = [
+        {
+          Snapshot: {
+            ids: [1, 2, 3],
+          },
+        },
+      ];
+      query = {};
+
+      result = viewModel
+        .buildMegaRelatedData(responseArray, query, 'Snapshot');
+      expect(result.parent).toEqual({});
+      expect(result.child).toEqual({});
     });
   });
 
@@ -928,80 +1318,5 @@ describe('mapper-results component', function () {
         expect(viewModel.setItemsDebounced).toHaveBeenCalled();
       });
     });
-  });
-
-  describe('buildRelatedData() method', function () {
-    let viewModel;
-
-    beforeEach(function () {
-      Component.prototype.viewModel.prototype.init = undefined;
-      viewModel = getComponentVM(Component);
-      viewModel.attr({});
-    });
-
-    it('method should return data from "relatedData" array',
-      function () {
-        let responseArray = [
-          {
-            Snapshot: {
-              ids: [1, 2, 3],
-            },
-          },
-        ];
-        let query = {
-          relatedQueryIndex: 0,
-        };
-
-        let result = viewModel
-          .buildRelatedData(responseArray, query, 'Snapshot');
-        expect(result.Snapshot.ids.length).toEqual(3);
-        expect(result.Snapshot.ids[0]).toEqual(1);
-      }
-    );
-
-    it('method should return data from "deferred_list" array',
-      function () {
-        let responseArray = [
-          {
-            Snapshot: {
-              ids: [1, 2, 3],
-            },
-          },
-        ];
-        let query = {
-          relatedQueryIndex: 0,
-        };
-        let result;
-
-        viewModel.attr('deferredList', [
-          {id: 5, type: 'Snapshot'},
-          {id: 25, type: 'Snapshot'},
-        ]);
-
-        result = viewModel
-          .buildRelatedData(responseArray, query, 'Snapshot');
-        expect(result.Snapshot.ids.length).toEqual(2);
-        expect(result.Snapshot.ids[0]).toEqual(5);
-      }
-    );
-
-    it('return data from "deferred_list" array. RelatedData is undefined',
-      function () {
-        let result;
-        let query = {
-          relatedQueryIndex: 0,
-        };
-
-        viewModel.attr('deferredList', [
-          {id: 5, type: 'Snapshot'},
-          {id: 25, type: 'Snapshot'},
-        ]);
-
-        result = viewModel
-          .buildRelatedData([], query, 'Snapshot');
-        expect(result.Snapshot.ids.length).toEqual(2);
-        expect(result.Snapshot.ids[0]).toEqual(5);
-      }
-    );
   });
 });

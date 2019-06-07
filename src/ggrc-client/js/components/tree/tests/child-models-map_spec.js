@@ -4,6 +4,7 @@
 */
 
 import * as DisplayPrefs from '../../../plugins/utils/display-prefs-utils';
+import * as MegaObject from '../../../plugins/utils/mega-object-utils';
 import childModelsMap from '../child-models-map';
 
 describe('child-models-map object', () => {
@@ -11,7 +12,7 @@ describe('child-models-map object', () => {
     childModelsMap.attr('container', {});
   });
 
-  describe('getChildModels() method', () => {
+  describe('getModels() method', () => {
     let types = ['Program', 'System', 'Assessment'];
     let spy;
 
@@ -40,10 +41,13 @@ describe('child-models-map object', () => {
         expect(spy.calls.count()).toEqual(3);
       });
 
-      it('returns childModels for specified type', () => {
+      it('returns childModels for specified type and mega object', () => {
         let type = 'Program';
-        let expectedResult = ['Audit'];
+        let expectedResult = ['Audit', 'Program_child'];
+
         spy.and.returnValue(expectedResult);
+        spyOn(MegaObject, 'isMegaObjectRelated')
+          .and.returnValue(true);
 
         expect(childModelsMap.getModels(type).serialize())
           .toEqual(expectedResult);

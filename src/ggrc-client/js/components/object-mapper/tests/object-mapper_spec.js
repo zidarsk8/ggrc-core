@@ -181,6 +181,21 @@ describe('object-mapper component', function () {
       }, []);
       expect(spyObj).toHaveBeenCalledWith([]);
     });
+
+    it('calls performMegaMap to map results for mega-objects ' +
+    'if "options" and "options.megaMapping" are truthy values', function () {
+      const objects = jasmine.any(Object);
+      const options = {
+        megaMapping: true,
+        megaRelation: 'child',
+      };
+      viewModel.attr('deferred', false);
+      handler.call({
+        viewModel: viewModel,
+        performMegaMap: spyObj,
+      }, objects, options);
+      expect(spyObj).toHaveBeenCalledWith(objects, options.megaRelation);
+    });
   });
 
   describe('"create-and-map click" event', function () {
@@ -214,6 +229,29 @@ describe('object-mapper component', function () {
     });
   });
 
+  describe('"{pubSub} mapAsChild" event', function () {
+    let element = {};
+    let event;
+    let that;
+
+    beforeEach(function () {
+      event = {
+        id: 22,
+        val: 'child',
+      };
+      that = {
+        viewModel: viewModel,
+      };
+      handler = events['{pubSub} mapAsChild'];
+    });
+
+    it('assigns "event.val" to "megaRelationObj" attr by "event.id"',
+      function () {
+        handler.call(that, element, event);
+        expect(viewModel.attr('megaRelationObj')[event.id]).toBe(event.val);
+      });
+  });
+
   describe('"inserted" event', function () {
     let that;
 
@@ -238,6 +276,32 @@ describe('object-mapper component', function () {
       handler.call(that);
       expect(viewModel.attr('entries').length)
         .toEqual(0);
+    });
+  });
+
+  describe('"performMegaMap" event', function () {
+    let spyObj;
+
+    beforeEach(function () {
+      handler = events['performMegaMap'];
+      spyObj = jasmine.createSpy();
+    });
+
+    it('calls mapObjects to map results for mega-objects', function () {
+      const objects = [
+        {id: 101},
+        {id: 102},
+      ];
+      const relation = 'child';
+      const relationsObj = {
+        '101': relation,
+        '102': relation,
+      };
+
+      handler.call({
+        mapObjects: spyObj,
+      }, objects, relation);
+      expect(spyObj).toHaveBeenCalledWith(objects, true, relationsObj);
     });
   });
 
