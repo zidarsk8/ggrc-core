@@ -16,12 +16,11 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
 /*
   To configure a new mapping, use the following format :
   { <source object type> : {
-      map : [ <object name>, ...]
-      unmap : [ <object name>, ...]
-      indirectMappings: [ <object name>, ...]
-      mappers : {
-        <mapping name>: Direct(...)
-      }
+      create: [ <object name>, ...],
+      map : [ <object name>, ...],
+      externalMap: [ <object name>, ...],
+      unmap : [ <object name>, ...],
+      indirectMappings: [ <object name>, ...],
     }
   }
 
@@ -35,7 +34,6 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
   <indirectMappings> - models which cannot be directly mapped to object
     through Relationship but linked by another way. Currently used for Mapping
     Filter in Object mapper and Global Search
-  <mappers> - custom mappings
 */
 
 const roleableObjects = getRoleableModels()

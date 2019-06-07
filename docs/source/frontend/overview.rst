@@ -479,7 +479,4 @@ persistence (database). They're essentially just an abstraction over our
 database, so that you don't have to care about which tables the
 relationships are stored in.
 
-Mappings essentially turn the entire system into a
-`property graph <https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph>`_.
-
 Mappings are defined in :src:`ggrc-client/js/models/mappers/mappings-ggrc.js`.
