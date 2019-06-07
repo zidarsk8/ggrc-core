@@ -589,3 +589,13 @@ class TestCase(BaseTestCase, object):
         sorted(expected_notification_list),
         sorted([n.notification_type.name for n in active_notifications])
     )
+
+  def assert201(self, response, message=None):
+    """
+    Checks if response status code is 201
+
+    :param response: Flask response
+    :param message: Message to display on test failure
+    """
+
+    self.assertStatus(response, 201, message)

@@ -28,6 +28,7 @@ class TestRelationship(TestCase):
     super(TestRelationship, self).setUp()
     self.api = api_helper.Api()
     self.client.get("/login")
+    self.object_generator = ObjectGenerator()
     self.person = factories.PersonFactory()
     self.assessment = factories.AssessmentFactory()
 
@@ -137,6 +138,40 @@ class TestRelationship(TestCase):
     self.assert400(response)
     self.assertEqual(response.json[0][1],
                      "The mapping of object on itself is not possible")
+
+  def test_reuse_relationship_on_post_swapped(self):
+    """Test relationship is reused for 2nd POST with swapped src/dst"""
+    with factories.single_commit():
+      p1 = factories.ProgramFactory()
+      p2 = factories.ProgramFactory()
+      p1_id = p1.id
+      p2_id = p2.id
+      r1_id = factories.RelationshipFactory(source=p1, destination=p2).id
+
+    resp, r2 = self.object_generator.generate_relationship(
+        all_models.Program.query.get(p2_id),
+        all_models.Program.query.get(p1_id)
+    )
+
+    self.assert201(resp)
+    self.assertEqual(r1_id, r2.id)
+
+  def test_reuse_relationship_on_post_not_swapped(self):
+    """Test relationship is reused for 2nd POST with not swapped src/dst"""
+    with factories.single_commit():
+      p1 = factories.ProgramFactory()
+      p2 = factories.ProgramFactory()
+      p1_id = p1.id
+      p2_id = p2.id
+      r1_id = factories.RelationshipFactory(source=p1, destination=p2).id
+
+    resp, r2 = self.object_generator.generate_relationship(
+        all_models.Program.query.get(p1_id),
+        all_models.Program.query.get(p2_id)
+    )
+
+    self.assert201(resp)
+    self.assertEqual(r1_id, r2.id)
 
 
 @ddt.ddt

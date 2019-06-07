@@ -991,12 +991,14 @@ class Resource(ModelView):
   def _get_relationship(self, src):
     """Get existing relationship if exists, and update updated_at"""
 
-    relationship = self.model.query.filter(
-        self.model.source_id == src["source"]["id"],
-        self.model.source_type == src["source"]["type"],
-        self.model.destination_id == src["destination"]["id"],
-        self.model.destination_type == src["destination"]["type"]
+    relationship = self.model.get_related_query_by_type_id(
+        type1=src["source"]["type"],
+        id1=src["source"]["id"],
+        type2=src["destination"]["type"],
+        id2=src["destination"]["id"],
+        strict_id=True
     ).first()
+
     if relationship:
       # Manually trigger relationship update in order for revisions and
       # event being created. We expect positive response when POSTing

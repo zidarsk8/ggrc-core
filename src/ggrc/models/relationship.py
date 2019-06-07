@@ -7,7 +7,7 @@ import logging
 
 import collections
 import sqlalchemy as sa
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, false
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
@@ -101,17 +101,54 @@ class Relationship(base.ContextRBAC, Base, db.Model):
     return cls.get_related_query(object1, object2).first()
 
   @classmethod
-  def get_related_query(cls, object1, object2):
-    def predicate(src, dst):
-      return and_(
-          Relationship.source_type == src.type,
-          or_(Relationship.source_id == src.id, src.id == None),  # noqa
-          Relationship.destination_type == dst.type,
-          or_(Relationship.destination_id == dst.id, dst.id == None),  # noqa
-      )
+  def get_related_query_by_type_id(cls, type1, id1, type2, id2,
+                                   strict_id=True):
+    """Return query to find relationship(s)
+
+    This function prepares query for the following cases:
+    1) Find relationships between 2 objects. In this case strict_id=True
+    2) Find relationships between on object and other objects of specified type
+       In this case string_id=False
+
+    :param type1: type of first object
+    :param id1: id of first object
+    :param type2: type of second object
+    :param id2: if of second object
+    :param strict_id: True if id must be specified, else False
+    :return: prepared query
+    """
+    def predicate(src_type, src_id, dst_type, dst_id):
+      filters = [
+          Relationship.source_type == src_type,
+          Relationship.destination_type == dst_type
+      ]
+      if src_id is not None:
+        filters.append(Relationship.source_id == src_id)
+      if dst_id is not None:
+        filters.append(Relationship.destination_id == dst_id)
+
+      return and_(*filters)
+
+    if (strict_id and None in (id1, id2)) or None in (type1, type2):
+      # One of the following occurred:
+      # 1) One of ids is None, but it's requested to have ids specified
+      # 2) One of types is None
+      # Make filter to return empty list
+      return Relationship.query.filter(false())
+
     return Relationship.query.filter(
-        or_(predicate(object1, object2), predicate(object2, object1))
+        or_(predicate(type1, id1, type2, id2),
+            predicate(type2, id2, type1, id1))
     )
+
+  @classmethod
+  def get_related_query(cls, object1, object2):
+    return cls.get_related_query_by_type_id(
+        type1=object1.type,
+        id1=object1.id,
+        type2=object2.type,
+        id2=object2.id,
+        strict_id=False)
 
   @staticmethod
   def _extra_table_args(cls):
