@@ -3,8 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-text-form-field-view,
-rich-text-form-field-view {
+text-form-field-view{
   display: block;
 
   .view-wrapper {
@@ -13,8 +12,7 @@ rich-text-form-field-view {
   }
 }
 
-checkbox-form-field-view,
-multiselect-form-field-view {
+checkbox-form-field-view {
   display: block;
 }
 
