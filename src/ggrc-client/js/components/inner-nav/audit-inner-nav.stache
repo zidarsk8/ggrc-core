@@ -22,7 +22,7 @@
     <inner-nav-collapse title:from="'Show Audit Scope'">
       <nav class="internav">
         {{#notPriorityTabs}}
-          <inner-nav-item widget:from="}."
+          <inner-nav-item widget:from="{.}"
             activeWidget:from="activeWidget"
             showTitle:from="false"
             showAllTabs:from="showAllTabs"
