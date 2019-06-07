@@ -5,24 +5,28 @@
 
 {{#switch type}}
   {{#case "input"}}
-    <text-form-field-view
+    <readonly-inline-content 
       value:from="value"
-    ></text-form-field-view>
+      withReadMore:from="true">
+    </readonly-inline-content>
   {{/case}}
   {{#case "text"}}
-    <rich-text-form-field-view
+    <readonly-inline-content 
       value:from="value"
-    ></rich-text-form-field-view>
+      withReadMore:from="true">
+    </readonly-inline-content>
+  {{/case}}
+  {{#case "multiselect"}}
+    <readonly-inline-content 
+      value:from="value"
+      options:from="options"
+      withReadMore:from="true">
+    </readonly-inline-content>
   {{/case}}
   {{#case "checkbox"}}
     <checkbox-form-field-view
       value:from="value"
     ></checkbox-form-field-view>
-  {{/case}}
-  {{#case "multiselect"}}
-    <multiselect-form-field-view
-      value:from="value"
-    ></multiselect-form-field-view>
   {{/case}}
   {{#case "dropdown"}}
     <text-form-field-view

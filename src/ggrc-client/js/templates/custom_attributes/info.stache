@@ -8,7 +8,7 @@
   isAttributesDisabled:from="isAttributesDisabled"
   class="ggrc-form ggrc-form-multiple-columns">
     {{#each items}}
-      <div class="ggrc-form-item {{#if_in attributeType 'input,text'}}ggrc-form-item--row{{else}}ggrc-form-item--column{{/if}}">
+      <div class="ggrc-form-item {{#if_in attributeType 'input,text,multiselect'}}ggrc-form-item--row{{else}}ggrc-form-item--column{{/if}}">
         <inline-edit-control class="inline-edit-control inline-edit-control--{{attributeType}}"
           on:inlineSave="saveCustomAttributes(scope.event, %context)"
           instance:from="instance"
