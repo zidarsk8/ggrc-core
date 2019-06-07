@@ -5,6 +5,8 @@
 
 import datetime
 
+import ddt
+
 from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase, Api
@@ -52,6 +54,7 @@ class TestRiskGGRC(TestCase):
     self.assertIsNotNone(risk.title)
 
 
+@ddt.ddt
 class TestRiskGGRCQ(TestCase):
   """Tests for risk model for GGRCQ users."""
 
@@ -283,6 +286,84 @@ class TestRiskGGRCQ(TestCase):
     response_data = response.json[0]["ExternalComment"]
     self.assertEqual(response_data["count"], 1)
     self.assertEqual(response_data["values"][0]["description"], "comment")
+
+  @ddt.data(
+      ("Due Date", "due_date"),
+      ("Last Owner Reviewed Date", "last_submitted_at"),
+      ("Last Compliance Reviewed Date", "last_verified_at"),
+  )
+  @ddt.unpack
+  def test_search_risk_by_dates(self, field, attr):
+    """Test query endpoint for risk by dates."""
+    current_date = datetime.date.today()
+
+    with factories.single_commit():
+      factories.RiskFactory(**{attr: current_date})
+
+    request_data = [{
+        "filters": {
+            "expression": {
+                "left": {"left": field,
+                         "op": {"name": "~"},
+                         "right": current_date.strftime("%Y-%m-%d")},
+                "op": {"name": "AND"},
+                "right": {"left": "Status",
+                          "op": {"name": "IN"},
+                          "right": ["Active", "Draft", "Deprecated"]}
+            }
+        },
+        "object_name": "Risk",
+        "order_by": [{"name": "updated_at", "desc": "true"}]
+    }]
+    response = self.api.send_request(
+        self.api.client.post,
+        data=request_data,
+        api_link="/query"
+    )
+    self.assert200(response)
+    response_data = response.json[0]["Risk"]
+    self.assertEqual(response_data["count"], 1)
+    self.assertEqual(response_data["values"][0][attr],
+                     current_date.strftime("%Y-%m-%d"))
+
+  @ddt.data(
+      ("Created By", "created_by"),
+      ("Last Owner Reviewed By", "last_submitted_by"),
+      ("Last Compliance Reviewed By", "last_verified_by"),
+  )
+  @ddt.unpack
+  def test_search_risk_by_users(self, field, attr):
+    """Test query endpoint for risk by users."""
+
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      factories.RiskFactory(**{attr: person})
+
+    request_data = [{
+        "filters": {
+            "expression": {
+                "left": {"left": field,
+                         "op": {"name": "~"},
+                         "right": person.email},
+                "op": {"name": "AND"},
+                "right": {"left": "Status",
+                          "op": {"name": "IN"},
+                          "right": ["Active", "Draft", "Deprecated"]}
+            }
+        },
+        "object_name": "Risk",
+        "order_by": [{"name": "updated_at", "desc": "true"}]
+    }]
+    response = self.api.send_request(
+        self.api.client.post,
+        data=request_data,
+        api_link="/query"
+    )
+    self.assert200(response)
+    response_data = response.json[0]["Risk"]
+    self.assertEqual(response_data["count"], 1)
+    self.assertEqual(response_data["values"][0][attr]['email'],
+                     person.email)
 
 
 class TestRiskQueryApi(WithQueryApi, TestCase):
