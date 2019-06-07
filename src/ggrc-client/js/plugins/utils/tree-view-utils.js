@@ -122,7 +122,8 @@ allTypes.forEach(function (type) {
 // Define specific rules for Workflow models
 orderedModelsForSubTier.Cycle = ['CycleTaskGroup'];
 orderedModelsForSubTier.CycleTaskGroup = ['CycleTaskGroupObjectTask'];
-orderedModelsForSubTier.CycleTaskGroupObjectTask = [];
+orderedModelsForSubTier.CycleTaskGroupObjectTask =
+  getMappingList('CycleTaskGroupObjectTask');
 
 function getSubTreeFields(parent, child) {
   let noFieldsLimitOnChild = hasNoFieldsLimit(child);
@@ -348,18 +349,9 @@ function getSortingForModel(modelType) {
  */
 function getModelsForSubTier(modelName) {
   let Model = businessModels[modelName];
-  let availableModels;
   let selectedModels;
 
-  // getMappingList can't be run at once,
-  // cause Mappings is not loaded yet
-  if (modelName === 'CycleTaskGroupObjectTask' &&
-  !orderedModelsForSubTier[modelName].length) {
-    orderedModelsForSubTier[modelName] =
-    getMappingList('CycleTaskGroupObjectTask');
-  }
-
-  availableModels = orderedModelsForSubTier[modelName] || [];
+  let availableModels = orderedModelsForSubTier[modelName] || [];
 
   if (Model.sub_tree_view_options.default_filter) {
     selectedModels = Model.sub_tree_view_options.default_filter;

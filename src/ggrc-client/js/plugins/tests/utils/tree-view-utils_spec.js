@@ -7,8 +7,6 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
-import * as Mappings from '../../../models/mappers/mappings';
-
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 import Control from '../../../models/business-models/control';
 
@@ -170,13 +168,6 @@ describe('TreeViewUtils module', function () {
       expect(result.available.length).toEqual(32);
       expect(result.selected.length).toEqual(32);
     });
-
-    it('gets available models from Mappings for CycleTaskGroupObjectTask',
-      () => {
-        spyOn(Mappings, 'getMappingList').and.returnValue(['Audit', 'Control']);
-        let result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
-        expect(result.available.length).toEqual(2);
-      });
   });
 
   describe('loadFirstTierItems() method', function () {
