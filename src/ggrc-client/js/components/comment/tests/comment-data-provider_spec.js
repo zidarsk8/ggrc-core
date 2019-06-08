@@ -8,7 +8,7 @@ import {
   getComponentVM,
   makeFakeInstance,
 } from '../../../../js_specs/spec_helpers';
-import * as QueryAPI from '../../../plugins/utils/query-api-utils';
+import * as CommentsUtils from '../../../plugins/utils/comments-utils';
 import Cacheable from '../../../models/cacheable';
 
 describe('comment-data-provider component', () => {
@@ -16,86 +16,282 @@ describe('comment-data-provider component', () => {
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
+    viewModel.attr('instance', makeFakeInstance({model: Cacheable})());
   });
 
   describe('init() method', () => {
     let method;
     beforeEach(() => {
       method = Component.prototype.init.bind({viewModel});
+      spyOn(CommentsUtils, 'loadComments');
     });
 
     it('loads comments', () => {
-      spyOn(viewModel, 'loadComments');
+      spyOn(viewModel, 'loadFirstComments');
 
       method();
 
-      expect(viewModel.loadComments).toHaveBeenCalled();
-    });
-  });
-
-  describe('loadComments() method', () => {
-    beforeEach(() => {
-      spyOn(viewModel, 'buildQuery').and.returnValue('query');
-      spyOn(viewModel, 'getComments').and.returnValue(['comment']);
-      viewModel.loadComments();
+      expect(viewModel.loadFirstComments).toHaveBeenCalled();
     });
 
-    it('builds query', () => {
-      expect(viewModel.buildQuery).toHaveBeenCalled();
-    });
-
-    it('gets comments using query', () => {
-      expect(viewModel.getComments).toHaveBeenCalledWith('query');
-    });
-
-    it('sets query to "comments" propery', () => {
-      expect(viewModel.attr('comments').attr()).toEqual(['comment']);
-    });
-  });
-
-  describe('getComments() method', () => {
-    let queryDeferred;
-    let resultDeferred;
-    beforeEach(() => {
-      queryDeferred = $.Deferred();
-      spyOn(QueryAPI, 'batchRequests')
-        .and.returnValue(queryDeferred);
-
-      resultDeferred = jasmine.createSpyObj(['promise', 'resolve']);
-      spyOn($, 'Deferred')
-        .and.returnValue(resultDeferred);
-    });
-
-    it('returns can.promise', () => {
-      viewModel.getComments();
-
-      expect(resultDeferred.promise).toHaveBeenCalled();
-    });
-
-    it('turns on isLoading flag', () => {
+    it('turns on/off isLoading flag if loaded successfully', (done) => {
       viewModel.attr('isLoading', false);
 
-      viewModel.getComments();
+      CommentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+
+      method()
+        .finally(() => {
+          expect(viewModel.attr('isLoading')).toBe(false);
+          done();
+        });
 
       expect(viewModel.attr('isLoading')).toBe(true);
     });
 
-    it('resolves result deferred with items if all is OK', () => {
-      viewModel.getComments();
-      queryDeferred.resolve({
-        test: {
-          values: ['value'],
-        },
-      });
+    it('turns on/off isLoading flag if loading fails', (done) => {
+      viewModel.attr('isLoading', false);
 
-      expect(resultDeferred.resolve).toHaveBeenCalledWith(['value']);
+      CommentsUtils.loadComments
+        .and.returnValue(Promise.reject());
+
+      method()
+        .catch(() => {
+          expect(viewModel.attr('isLoading')).toBe(false);
+          done();
+        });
+
+      expect(viewModel.attr('isLoading')).toBe(true);
+    });
+  });
+
+  describe('loadFirstComments() method', () => {
+    beforeEach(() => {
+      spyOn(CommentsUtils, 'loadComments');
     });
 
-    it('resolves result deferred with epmty array if failed', () => {
-      viewModel.getComments();
-      queryDeferred.reject();
+    it('loads default comments count if not defined', () => {
+      CommentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+      viewModel.attr('pageSize', 20);
 
-      expect(resultDeferred.resolve).toHaveBeenCalledWith([]);
+      let instance = viewModel.attr('instance');
+
+      viewModel.loadFirstComments();
+
+      expect(CommentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 20);
+    });
+
+    it('loads needed comments count', () => {
+      CommentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+      let instance = viewModel.attr('instance');
+
+      viewModel.loadFirstComments(15);
+
+      expect(CommentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 15);
+    });
+
+    it('loads more comments if they are added by current user', () => {
+      CommentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+      viewModel.attr('newCommentsCount', 20);
+
+      let instance = viewModel.attr('instance');
+
+      viewModel.loadFirstComments(5);
+
+      expect(CommentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 25);
+    });
+
+    it('sets comments if loaded', async () => {
+      viewModel.attr('comments', []);
+      CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{}, {}, {}],
+        },
+      }));
+
+      await viewModel.loadFirstComments()
+
+      expect(viewModel.attr('comments').length).toBe(3);
+    });
+
+    it('replaces new comments with loaded', async () => {
+      viewModel.attr('comments', [{id: 3}, {id: 1}]);
+      viewModel.attr('newCommentsCount', 1);
+
+      let instance = viewModel.attr('instance');
+
+      CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{id: 4}, {id: 3}, {id: 2}],
+        },
+      }));
+
+      await viewModel.loadFirstComments(2);
+
+      expect(CommentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 3);
+
+      expect(viewModel.attr('comments').length).toBe(4);
+
+      viewModel.attr('comments').forEach((comment, index) => {
+        expect(comment.id).toBe(4 - index);
+      });
+    });
+
+    it('sets totalCount if comments are loaded', async () => {
+      viewModel.attr('totalCount', 0);
+      CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{}, {}, {}],
+        },
+      }));
+
+      await viewModel.loadFirstComments()
+
+      expect(viewModel.attr('totalCount')).toBe(3);
+    });
+
+    it('resets newCommentsCount', async () => {
+      CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{}, {}, {}],
+        },
+      }));
+
+      viewModel.attr('newCommentsCount', 20);
+
+      await viewModel.loadFirstComments(5);
+
+      expect(viewModel.attr('newCommentsCount')).toBe(0);
+    });
+  });
+
+  describe('loadMoreComments() method', () => {
+    beforeEach(() => {
+      spyOn(CommentsUtils, 'loadComments');
+    });
+
+    it('loads next comments', () => {
+      viewModel.attr('comments', [{}, {}]);
+      viewModel.attr('pageSize', 20);
+
+      CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 0,
+          values: [],
+        },
+      }));
+
+      let instance = viewModel.attr('instance');
+
+      viewModel.loadMoreComments();
+
+      expect(CommentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 2, 20);
+    });
+
+    it('loads comments from defined index', () => {
+      viewModel.attr('comments', [{}, {}]);
+      viewModel.attr('pageSize', 20);
+
+      CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 0,
+          values: [],
+        },
+      }));
+
+      let instance = viewModel.attr('instance');
+
+      viewModel.loadMoreComments(5);
+
+      expect(CommentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 5, 20);
+    });
+
+    it('adds loaded comments to collection if there are no new comments',
+      async () => {
+        viewModel.attr('totalCount', 2);
+        viewModel.attr('comments', []);
+
+        CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+          Comment: {
+            total: 2,
+            values: [{}, {}],
+          },
+        }));
+
+        await viewModel.loadMoreComments();
+
+        expect(viewModel.attr('comments').length).toBe(2);
+      });
+
+    it('loads new and next comments if new comments are added by another users',
+      async () => {
+        viewModel.attr('totalCount', 20);
+        viewModel.attr('comments', [{}, {}]);
+
+        spyOn(viewModel, 'loadFirstComments');
+        spyOn(viewModel, 'loadMoreComments');
+        viewModel.loadMoreComments.withArgs().and.callThrough();
+        viewModel.loadMoreComments.withArgs(jasmine.any(Number));
+
+        CommentsUtils.loadComments.and.returnValue(Promise.resolve({
+          Comment: {
+            total: 25,
+            values: [{}, {}, {}],
+          },
+        }));
+
+        await viewModel.loadMoreComments();
+
+        expect(viewModel.attr('comments').length).toBe(2);
+        expect(viewModel.loadFirstComments).toHaveBeenCalledWith(5);
+        expect(viewModel.loadMoreComments).toHaveBeenCalledWith(7);
+      });
+
+    it('turns on/off isLoading flag if loaded successfully', (done) => {
+      viewModel.attr('isLoading', false);
+
+      CommentsUtils.loadComments
+        .and.returnValue(Promise.resolve({
+          Comment: {
+            total: 0,
+            values: [],
+          },
+        }));
+
+      viewModel.loadMoreComments()
+        .finally(() => {
+          expect(viewModel.attr('isLoading')).toBe(false);
+          done();
+        });
+
+      expect(viewModel.attr('isLoading')).toBe(true);
+    });
+
+    it('turns on/off isLoading flag if loading failed', (done) => {
+      viewModel.attr('isLoading', false);
+
+      CommentsUtils.loadComments.and.returnValue(Promise.reject());
+
+      viewModel.loadMoreComments()
+        .catch(() => {
+          expect(viewModel.attr('isLoading')).toBe(false);
+          done();
+        });
+
+      expect(viewModel.attr('isLoading')).toBe(true);
     });
   });
 
@@ -155,57 +351,5 @@ describe('comment-data-provider component', () => {
 
       expect(viewModel.removeComment).toHaveBeenCalledWith('item');
     });
-  });
-
-  describe('buildQuery() method', () => {
-    it('should build query for Comment object', () => {
-      let instance = makeFakeInstance({model: Cacheable})({
-        type: 'type',
-        id: 'id',
-      });
-
-      viewModel.attr('instance', instance);
-
-      let result = viewModel.buildQuery();
-      expect(result).toEqual({
-        object_name: 'Comment',
-        filters: {
-          expression: {
-            object_name: 'type',
-            op: {name: 'relevant'},
-            ids: ['id'],
-          },
-        },
-        order_by: [{name: 'created_at', desc: true}],
-      });
-    });
-
-    it('should build query for ExternalComment for externally updated objects',
-      () => {
-        let instance = makeFakeInstance({
-          model: Cacheable,
-          staticProps: {
-            isChangeableExternally: true,
-          },
-        })({
-          type: 'type',
-          id: 'id',
-        });
-
-        viewModel.attr('instance', instance);
-
-        let result = viewModel.buildQuery();
-        expect(result).toEqual({
-          object_name: 'ExternalComment',
-          filters: {
-            expression: {
-              object_name: 'type',
-              op: {name: 'relevant'},
-              ids: ['id'],
-            },
-          },
-          order_by: [{name: 'created_at', desc: true}],
-        });
-      });
   });
 });
