@@ -324,15 +324,8 @@ export default can.Component.extend({
       }
     },
     setSelectedItems: function (allItems) {
-      let selectedItems;
+      let selectedItems = can.makeArray(this.attr('selected'));
 
-      // get items which were selected before adding of new entries
-      if (this.attr('prevSelected') && this.attr('prevSelected').length > 0) {
-        this.attr('selected', this.attr('prevSelected').slice());
-        this.attr('prevSelected', []);
-      }
-
-      selectedItems = can.makeArray(this.attr('selected'));
       allItems.forEach(function (item) {
         item.isSelected =
           selectedItems.some(function (selectedItem) {
