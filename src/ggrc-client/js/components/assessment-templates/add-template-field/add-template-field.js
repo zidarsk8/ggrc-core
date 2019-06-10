@@ -85,6 +85,7 @@ export default can.Component.extend({
     getValidators(title, fields) {
       return [
         isEmptyTitle.bind(null, title),
+        isInvalidTitle.bind(null, title),
         isDublicateTitle.bind(null, fields, title),
         isReservedByCustomAttr.bind(null, title),
         isReservedByModelAttr.bind(null, title),
@@ -136,8 +137,15 @@ const isDublicateTitle = (fields, selectedTitle) => {
 
 const isEmptyTitle = (selectedTitle) => {
   return !selectedTitle ?
-    'A custom attribute title can not be blank' :
+    'A custom attribute title cannot be blank' :
     '';
+};
+
+const isInvalidTitle = (title) => {
+  if (_.indexOf(title, '*') !== -1) {
+    return 'A custom attribute title cannot contain *';
+  }
+  return '';
 };
 
 const isReservedByCustomAttr = (title) => {
