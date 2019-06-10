@@ -1247,7 +1247,7 @@ describe('assessment-info-pane component', () => {
         },
       }));
 
-      await vm.loadFirstComments()
+      await vm.loadFirstComments();
 
       expect(vm.attr('comments').length).toBe(3);
     });
@@ -1286,7 +1286,7 @@ describe('assessment-info-pane component', () => {
         },
       }));
 
-      await vm.loadFirstComments()
+      await vm.loadFirstComments();
 
       expect(vm.attr('commentsTotalCount')).toBe(3);
     });
