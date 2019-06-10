@@ -298,6 +298,9 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     cad = all_models.CustomAttributeDefinition.query.get(cad_id)
     self.assertEqual(cad.id,
                      revision.content["custom_attribute_definitions"][0]["id"])
+    old_revision = revisions[1]
+    self.assertEqual([], old_revision.content["custom_attribute_values"])
+    self.assertEqual([], old_revision.content["custom_attribute_definitions"])
 
   @ddt.data(
       ("Text", ""),
