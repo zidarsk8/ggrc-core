@@ -8,7 +8,7 @@
             <read-more
               class="description"
               text:from="itemData.description"
-              handleMarkdown:from="instance.constructor.isChangeableExternally">
+              handleMarkdown:from="true">
             </read-more>
             <div class="more-information-wrapper">
                 <button type="button" class="btn btn-link more-information-button">More Information</button>
