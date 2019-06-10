@@ -64,6 +64,11 @@ dropdown-wrap-text {
       width: 8px;
       padding-right: 8px;
       align-self: center;
+      visibility: hidden;
+
+      &.visible {
+        visibility: visible;
+      }
     }
 
     .dropdown-wrap-text__element-title {

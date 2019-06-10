@@ -17,10 +17,8 @@
   <div class="dropdown-wrap-text__body">
     {{#options}}
       <div class="dropdown-wrap-text__element" on:el:click="onSelectOption">
-        <div class="dropdown-wrap-text__element-selected-icon">
-          {{#if isSelectedOption}}
-            ✓
-          {{/if}}
+        <div class="dropdown-wrap-text__element-selected-icon {{#if isSelectedOption}}visible{{/if}}">
+          ✓
         </div>
         <div class="dropdown-wrap-text__element-title">
           {{title}}
