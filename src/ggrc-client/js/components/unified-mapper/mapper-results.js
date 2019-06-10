@@ -529,6 +529,30 @@ export default can.Component.extend({
       this.attr('relatedAssessments.instance', ev.instance);
       this.attr('relatedAssessments.state.open', true);
     },
+    onItemDestroyed({itemId}) {
+      const selectedItems = this.attr('selected');
+      const selectedIndex = _.findIndex(selectedItems,
+        (item) => item.attr('id') === itemId);
+
+      // remove selection of destroyed item
+      // if it was selected before deletion
+      if (selectedIndex !== -1) {
+        selectedItems.splice(selectedIndex, 1);
+      }
+
+      const paging = this.attr('paging');
+      const currentPageNumber = paging.attr('current');
+      const needToGoToPrevPage = (
+        currentPageNumber > 1 &&
+        this.attr('items.length') === 1
+      );
+
+      if (needToGoToPrevPage) {
+        paging.attr('current', currentPageNumber - 1);
+      }
+
+      this.setItems();
+    },
   }),
   events: {
     '{viewModel} allSelected': function ([scope], ev, allSelected) {
