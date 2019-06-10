@@ -25,7 +25,7 @@ describe('add-template-field component', () => {
         });
         viewModel.attr('selected', selectedObj);
         viewModel.addField();
-        expect(viewModel.fields.length).toEqual(1);
+        expect(viewModel.fields.length).toBe(1);
       }
     );
     it('requires the "values" field to add a field of type Dropdown', () => {
@@ -36,7 +36,7 @@ describe('add-template-field component', () => {
       });
       viewModel.attr('selected', selectedObj);
       viewModel.addField();
-      expect(viewModel.fields.length).toEqual(1);
+      expect(viewModel.fields.length).toBe(1);
     });
     it('requires the "values" field to add a field of type Dropdown', () => {
       let selectedObj = new can.Map({
@@ -46,7 +46,7 @@ describe('add-template-field component', () => {
       });
       viewModel.attr('selected', selectedObj);
       viewModel.addField();
-      expect(viewModel.fields.length).toEqual(0);
+      expect(viewModel.fields.length).toBe(0);
     });
     it('requires the "values" field to add a field of type Text', () => {
       let selectedObj = new can.Map({
@@ -56,7 +56,7 @@ describe('add-template-field component', () => {
       });
       viewModel.attr('selected', selectedObj);
       viewModel.addField();
-      expect(viewModel.fields.length).toEqual(1);
+      expect(viewModel.fields.length).toBe(1);
     });
   });
 
@@ -71,14 +71,36 @@ describe('add-template-field component', () => {
       let selectedTitle = '';
       let result = isEmptyTitle(selectedTitle);
 
-      expect(result).toEqual('A custom attribute title can not be blank');
+      expect(result).toBe('A custom attribute title cannot be blank');
     });
 
     it('should not return error message', () => {
       let selectedTitle = 'my title';
       let result = isEmptyTitle(selectedTitle);
 
-      expect(result).toEqual('');
+      expect(result).toBe('');
+    });
+  });
+
+  describe('isInvalidTitle() method', () => {
+    let isInvalidTitle;
+
+    beforeAll(() => {
+      isInvalidTitle = Validations.isInvalidTitle;
+    });
+
+    it('should return error message', () => {
+      let selectedTitle = 'my * title';
+      let result = isInvalidTitle(selectedTitle);
+
+      expect(result).toBe('A custom attribute title cannot contain *');
+    });
+
+    it('should not return error message', () => {
+      let selectedTitle = 'my title';
+      let result = isInvalidTitle(selectedTitle);
+
+      expect(result).toBe('');
     });
   });
 
@@ -99,7 +121,7 @@ describe('add-template-field component', () => {
       const selectedTitle = 'title';
 
       expect(isDublicateTitle(fields, selectedTitle))
-        .toEqual('A custom attribute with this title already exists');
+        .toBe('A custom attribute with this title already exists');
     });
 
     it('should not return error message', () => {
@@ -111,7 +133,7 @@ describe('add-template-field component', () => {
       }];
       const selectedTitle = 'new title';
 
-      expect(isDublicateTitle(fields, selectedTitle)).toEqual('');
+      expect(isDublicateTitle(fields, selectedTitle)).toBe('');
     });
   });
 
@@ -136,12 +158,12 @@ describe('add-template-field component', () => {
     });
 
     it('should not return error message', () => {
-      expect(method('my title')).toEqual('');
+      expect(method('my title')).toBe('');
     });
 
     it('should return error message', () => {
       expect(method('new checkbox'))
-        .toEqual('Custom attribute with such name already exists');
+        .toBe('Custom attribute with such name already exists');
     });
   });
 
@@ -165,12 +187,12 @@ describe('add-template-field component', () => {
     });
 
     it('should not return error message', () => {
-      expect(method('my title')).toEqual('');
+      expect(method('my title')).toBe('');
     });
 
     it('should return error message', () => {
       expect(method('code'))
-        .toEqual('Attribute with such name already exists');
+        .toBe('Attribute with such name already exists');
     });
   });
 
@@ -227,6 +249,11 @@ describe('add-template-field component', () => {
       spyOn(Validations, 'isEmptyTitle').and
         .callFake((title) => !title ? 'empty val message' : '');
 
+      spyOn(Validations, 'isInvalidTitle').and
+        .callFake((title) => _.indexOf(title, '*') !== -1 ?
+          'invalid val message' :
+          '');
+
       spyOn(Validations, 'isDublicateTitle').and
         .callFake((fields, title) => {
           return _.includes(fields, title) ?
@@ -243,6 +270,7 @@ describe('add-template-field component', () => {
         .callFake((title, fields) => {
           return [
             Validations.isEmptyTitle.bind(null, title),
+            Validations.isInvalidTitle.bind(null, title),
             Validations.isDublicateTitle.bind(null, fields, title),
             Validations.isReservedByCustomAttr.bind(null, title),
             Validations.isReservedByModelAttr.bind(null, title),
@@ -256,8 +284,9 @@ describe('add-template-field component', () => {
       let validators = viewModel.getValidators('my title', []);
       viewModel.validateTitle(validators);
 
-      expect(getTitleError()).toEqual('');
+      expect(getTitleError()).toBe('');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).toHaveBeenCalled();
@@ -269,8 +298,23 @@ describe('add-template-field component', () => {
       let validators = viewModel.getValidators('', []);
       viewModel.validateTitle(validators);
 
-      expect(getTitleError()).toEqual('empty val message');
+      expect(getTitleError()).toBe('empty val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).not.toHaveBeenCalled();
+      expect(Validations.isDublicateTitle).not.toHaveBeenCalled();
+      expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
+      expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
+    });
+
+    it('should set "invalid value" error message', () => {
+      setupSpies('', '');
+
+      let validators = viewModel.getValidators('my * title', []);
+      viewModel.validateTitle(validators);
+
+      expect(getTitleError()).toBe('invalid val message');
+      expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).not.toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -282,8 +326,9 @@ describe('add-template-field component', () => {
       let validators = viewModel.getValidators('my title', ['my title']);
       viewModel.validateTitle(validators);
 
-      expect(getTitleError()).toEqual('duplicates val message');
+      expect(getTitleError()).toBe('duplicates val message');
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).not.toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -296,8 +341,9 @@ describe('add-template-field component', () => {
       let validators = viewModel.getValidators('new_checkbox', []);
       viewModel.validateTitle(validators);
 
-      expect(getTitleError()).toEqual(expectedMessage);
+      expect(getTitleError()).toBe(expectedMessage);
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).not.toHaveBeenCalled();
@@ -310,8 +356,9 @@ describe('add-template-field component', () => {
       let validators = viewModel.getValidators('code', []);
       viewModel.validateTitle(validators);
 
-      expect(getTitleError()).toEqual(expectedMessage);
+      expect(getTitleError()).toBe(expectedMessage);
       expect(Validations.isEmptyTitle).toHaveBeenCalled();
+      expect(Validations.isInvalidTitle).toHaveBeenCalled();
       expect(Validations.isDublicateTitle).toHaveBeenCalled();
       expect(Validations.isReservedByCustomAttr).toHaveBeenCalled();
       expect(Validations.isReservedByModelAttr).toHaveBeenCalled();

@@ -174,6 +174,7 @@ const isReservedByModelAttr = (title) => {
 export {
   isDublicateTitle,
   isEmptyTitle,
+  isInvalidTitle,
   isReservedByCustomAttr,
   isReservedByModelAttr,
 };
