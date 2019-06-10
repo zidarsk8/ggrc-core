@@ -212,6 +212,13 @@
                              isLoading:from="isLoading"
                              showNoItemsText:from="isEditDenied"
             ></mapped-comments>
+            <comments-paging comments:from="comments"
+                  total:from="totalCount"
+                  pageSize:from="pageSize"
+                  isLoading:from="isLoading"
+                  on:showMore="loadMoreComments()"
+                  on:showLess="hideComments()">
+            </comments-paging>
           </comment-data-provider>
         </div>
       </div>

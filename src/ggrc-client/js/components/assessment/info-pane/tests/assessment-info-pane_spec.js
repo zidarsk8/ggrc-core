@@ -12,6 +12,7 @@ import {
   REFRESH_RELATED,
 } from '../../../../events/eventTypes';
 import * as queryApiUtils from '../../../../plugins/utils/query-api-utils';
+import * as commentsUtils from '../../../../plugins/utils/comments-utils';
 import * as aclUtils from '../../../../plugins/utils/acl-utils';
 import * as caUtils from '../../../../plugins/utils/ca-utils';
 import * as DeferredTransactionUtil from '../../../../plugins/utils/deferred-transaction-utils';
@@ -885,6 +886,19 @@ describe('assessment-info-pane component', () => {
             done();
           });
         });
+
+      it('increases comment related counts when comment is added', (done) => {
+        vm.attr('commentsTotalCount', 0);
+        vm.attr('newCommentsCount', 0);
+
+        event.item.attr('type', 'Comment');
+        vm.addRelatedItem(event, 'comments');
+        dfd.always(() => {
+          expect(vm.attr('commentsTotalCount')).toBe(1);
+          expect(vm.attr('newCommentsCount')).toBe(1);
+          done();
+        });
+      });
     });
 
     describe('if deferredSave was rejected', () => {
@@ -1132,26 +1146,6 @@ describe('assessment-info-pane component', () => {
           });
         });
 
-      it('replaces comments list with loaded comments', function (done) {
-        data.Comment = {data: '1'};
-        vm.updateRelatedItems().then(() => {
-          expect(vm.attr('comments').serialize()).toEqual([data.Comment]);
-          done();
-        });
-      });
-
-      it('replaces files list with loaded files', function (done) {
-        let evidenceData = {data: '1'};
-        data['Evidence:FILE'] = [evidenceData];
-
-        vm.updateRelatedItems().then(() => {
-          expect(vm.attr('files')[0].serialize()).toEqual(
-            (new Evidence(evidenceData)).serialize()
-          );
-          done();
-        });
-      });
-
       it('creates Evidence model for each loaded file', function (done) {
         data['Evidence:FILE'] = [{data: '1'}, {data: '2'}];
         vm.updateRelatedItems().then(() => {
@@ -1199,6 +1193,236 @@ describe('assessment-info-pane component', () => {
           done();
         });
       });
+    });
+  });
+
+  describe('loadFirstComments() method', () => {
+    beforeEach(() => {
+      spyOn(commentsUtils, 'loadComments');
+    });
+
+    it('loads default comments count if not defined', () => {
+      commentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+      vm.attr('commentsPerPage', 20);
+
+      let instance = vm.attr('instance');
+
+      vm.loadFirstComments();
+
+      expect(commentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 20);
+    });
+
+    it('loads needed comments count', () => {
+      commentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+      let instance = vm.attr('instance');
+
+      vm.loadFirstComments(15);
+
+      expect(commentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 15);
+    });
+
+    it('loads more comments if they are added by current user', () => {
+      commentsUtils.loadComments
+        .and.returnValue(Promise.resolve({Comment: {values: []}}));
+      vm.attr('newCommentsCount', 20);
+
+      let instance = vm.attr('instance');
+
+      vm.loadFirstComments(5);
+
+      expect(commentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 25);
+    });
+
+    it('sets comments if loaded', async () => {
+      vm.attr('comments', []);
+      commentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{}, {}, {}],
+        },
+      }));
+
+      await vm.loadFirstComments()
+
+      expect(vm.attr('comments').length).toBe(3);
+    });
+
+    it('replaces new comments with loaded', async () => {
+      vm.attr('comments', [{id: 3}, {id: 1}]);
+      vm.attr('newCommentsCount', 1);
+
+      let instance = vm.attr('instance');
+
+      commentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{id: 4}, {id: 3}, {id: 2}],
+        },
+      }));
+
+      await vm.loadFirstComments(2);
+
+      expect(commentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 0, 3);
+
+      expect(vm.attr('comments').length).toBe(4);
+
+      vm.attr('comments').forEach((comment, index) => {
+        expect(comment.id).toBe(4 - index);
+      });
+    });
+
+    it('sets commentsTotalCount if comments are loaded', async () => {
+      vm.attr('commentsTotalCount', 0);
+      commentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{}, {}, {}],
+        },
+      }));
+
+      await vm.loadFirstComments()
+
+      expect(vm.attr('commentsTotalCount')).toBe(3);
+    });
+
+    it('resets newCommentsCount', async () => {
+      commentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 3,
+          values: [{}, {}, {}],
+        },
+      }));
+
+      vm.attr('newCommentsCount', 20);
+
+      await vm.loadFirstComments(5);
+
+      expect(vm.attr('newCommentsCount')).toBe(0);
+    });
+  });
+
+  describe('loadMoreComments() method', () => {
+    beforeEach(() => {
+      spyOn(commentsUtils, 'loadComments');
+    });
+
+    it('loads next comments', () => {
+      vm.attr('comments', [{}, {}]);
+      vm.attr('commentsPerPage', 20);
+
+      commentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 0,
+          values: [],
+        },
+      }));
+
+      let instance = vm.attr('instance');
+
+      vm.loadMoreComments();
+
+      expect(commentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 2, 20);
+    });
+
+    it('loads comments from defined index', () => {
+      vm.attr('comments', [{}, {}]);
+      vm.attr('commentsPerPage', 20);
+
+      commentsUtils.loadComments.and.returnValue(Promise.resolve({
+        Comment: {
+          total: 0,
+          values: [],
+        },
+      }));
+
+      let instance = vm.attr('instance');
+
+      vm.loadMoreComments(5);
+
+      expect(commentsUtils.loadComments)
+        .toHaveBeenCalledWith(instance, 'Comment', 5, 20);
+    });
+
+    it('adds loaded comments to collection if there are no new comments',
+      async () => {
+        vm.attr('commentsTotalCount', 2);
+        vm.attr('comments', []);
+
+        commentsUtils.loadComments.and.returnValue(Promise.resolve({
+          Comment: {
+            total: 2,
+            values: [{}, {}],
+          },
+        }));
+
+        await vm.loadMoreComments();
+
+        expect(vm.attr('comments').length).toBe(2);
+      });
+
+    it('loads new and next comments if new comments are added by another users',
+      async () => {
+        vm.attr('commentsTotalCount', 20);
+        vm.attr('comments', [{}, {}]);
+
+        spyOn(vm, 'loadFirstComments');
+        spyOn(vm, 'loadMoreComments');
+        vm.loadMoreComments.withArgs().and.callThrough();
+        vm.loadMoreComments.withArgs(jasmine.any(Number));
+
+        commentsUtils.loadComments.and.returnValue(Promise.resolve({
+          Comment: {
+            total: 25,
+            values: [{}, {}, {}],
+          },
+        }));
+
+        await vm.loadMoreComments();
+
+        expect(vm.attr('comments').length).toBe(2);
+        expect(vm.loadFirstComments).toHaveBeenCalledWith(5);
+        expect(vm.loadMoreComments).toHaveBeenCalledWith(7);
+      });
+
+    it('turns on/off isLoadingComments flag if loaded successfully', (done) => {
+      vm.attr('isLoading', false);
+
+      commentsUtils.loadComments
+        .and.returnValue(Promise.resolve({
+          Comment: {
+            total: 0,
+            values: [],
+          },
+        }));
+
+      vm.loadMoreComments()
+        .finally(() => {
+          expect(vm.attr('isLoadingComments')).toBe(false);
+          done();
+        });
+
+      expect(vm.attr('isLoadingComments')).toBe(true);
+    });
+
+    it('turns on/off isLoadingComments flag if loading failed', (done) => {
+      vm.attr('isLoading', false);
+
+      commentsUtils.loadComments.and.returnValue(Promise.reject());
+
+      vm.loadMoreComments()
+        .catch(() => {
+          expect(vm.attr('isLoadingComments')).toBe(false);
+          done();
+        });
+
+      expect(vm.attr('isLoadingComments')).toBe(true);
     });
   });
 

@@ -13,6 +13,7 @@ import '../../dropdown/dropdown-component';
 import '../../comment/comment-data-provider';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
+import '../../comment/comments-paging';
 import {countsMap} from '../../../apps/workflows';
 import {
   initCounts,

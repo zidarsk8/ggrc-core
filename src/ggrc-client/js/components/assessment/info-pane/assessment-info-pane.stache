@@ -275,8 +275,14 @@
                     </comment-add-form>
                 {{/unless}}
                 <mapped-comments mappedItems:from="comments"
-                  isLoading:from="isUpdatingRelatedItems"
                   showNoItemsText:from="isEditDenied"></mapped-comments>
+                <comments-paging comments:from="comments"
+                  total:from="commentsTotalCount"
+                  pageSize:from="commentsPerPage"
+                  isLoading:from="isLoadingComments"
+                  on:showMore="loadMoreComments()"
+                  on:showLess="hideComments()">
+                </comments-paging>
               </div>
             </div>
         </div>

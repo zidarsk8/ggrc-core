@@ -8,6 +8,7 @@ import template from './comments-section.stache';
 import './comment-data-provider';
 import './comment-add-form';
 import './mapped-comments';
+import './comments-paging';
 import Permission from '../../permission';
 
 export default can.Component.extend({

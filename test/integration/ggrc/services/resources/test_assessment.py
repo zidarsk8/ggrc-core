@@ -56,7 +56,7 @@ class TestAssessmentResource(TestCase):
         issue = factories.IssueFactory()
         factories.RelationshipFactory.randomize(assessment, issue)
 
-    expected_fields = {"Audit", "Comment", "Snapshot",
+    expected_fields = {"Audit", "Snapshot",
                        "Evidence:URL", "Evidence:FILE"}
     related_objects = self._get_related_objects(assessment)
 
