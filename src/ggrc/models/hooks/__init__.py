@@ -13,6 +13,7 @@ from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
 from ggrc.models.hooks import acl
 from ggrc.models.hooks import access_control_role
+from ggrc.models.hooks import with_action
 
 
 ALL_HOOKS = [
@@ -22,6 +23,7 @@ ALL_HOOKS = [
     comment,
     issue,
     relationship,
+    with_action,
     custom_attribute_definition,
     acl,
     common,
