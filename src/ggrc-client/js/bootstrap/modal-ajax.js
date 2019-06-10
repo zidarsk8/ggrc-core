@@ -45,7 +45,7 @@ let handlers = {
 
     modalSettings = {
       $trigger: $trigger,
-      skip_refresh: !$trigger.data('refresh'),
+      skip_refresh: true,
       new_object_form: false,
       button_view:
         GGRC.templates_path + '/modals/delete_cancel_buttons.stache',
