@@ -15,7 +15,8 @@
             isLoading:from="isLoading"
             value:from="value"
             type:from="attributeType"
-            withReadMore:from="true">
+            withReadMore:from="true"
+            mandatory:from="mandatory">
                   <confirm-edit-action
                       on:setEditMode="setEditModeInline(scope.event)"
                       on:setInProgress="setInProgressState()"
@@ -26,7 +27,12 @@
                             editMode:from="editMode"
                             isEditIconDenied:from="isEditDenied"
                             on:setEditModeInline="confirmEdit()">
-                          <div class="ggrc-form__title">{{title}}</div>
+                          <div class="ggrc-form__title">
+                            {{title}}
+                            {{#if mandatory}}
+                              <i class="fa fa-asterisk"></i>
+                            {{/if}}
+                          </div>
                         </base-inline-control-title>
                   </confirm-edit-action>
                   {{#if helptext}}
