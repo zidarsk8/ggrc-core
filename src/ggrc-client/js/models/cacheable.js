@@ -273,7 +273,7 @@ export default can.Model.extend({
               resolveConflict(xhr, this.findInCacheById(id))
                 .then(
                   (obj) => dfd.resolve(obj),
-                  (obj, xhr) => dfd.reject(xhr)
+                  (xhr) => dfd.reject(xhr)
                 );
               return dfd;
             }

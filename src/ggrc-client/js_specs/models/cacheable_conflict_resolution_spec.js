@@ -24,6 +24,8 @@ describe('Cacheable conflict resolution', function () {
     });
   });
 
+  // do not remove because this function is needed in PR #9607
+  // eslint-disable-next-line
   function _resovleDfd(obj, reject) {
     return new $.Deferred(function (dfd) {
       setTimeout(function () {
@@ -35,38 +37,6 @@ describe('Cacheable conflict resolution', function () {
       }, 10);
     });
   }
-
-  it('triggers error flash when one property has an update conflict',
-    function (done) {
-      let obj = new DummyModel({id: 1});
-      obj.attr('foo', 'bar');
-      obj.backup();
-
-      expect(obj._backupStore()).toEqual(
-        jasmine.objectContaining({id: obj.id, foo: 'bar'}));
-      obj.attr('foo', 'plonk');
-      spyOn($.fn, 'trigger').and.callThrough();
-      spyOn(obj, 'save').and.callFake(function () {
-        return _resovleDfd(obj);
-      });
-      spyOn(obj, 'refresh').and.callFake(function () {
-        obj.attr('foo', 'thud'); // uh-oh!  The same attr has been changed locally and remotely!
-        return _resovleDfd(obj);
-      });
-      ajaxSpy.and.callFake(function () {
-        return _resovleDfd({status: 409}, true);
-      });
-      DummyModel.update(obj.id.toString(), obj.serialize()).then(
-        function () {
-          fail("The update handler isn't supposed to resolve here.");
-          done();
-        }, function () {
-          expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', [{
-            warning: [jasmine.any(String)],
-          }, null]);
-          done();
-        });
-    });
 
   it('does not refresh model', function (done) {
     let obj = new DummyModel({id: 1});
