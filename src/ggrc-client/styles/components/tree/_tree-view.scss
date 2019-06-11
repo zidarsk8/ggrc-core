@@ -168,7 +168,7 @@ tree-item {
 
   .tree-item-content {
     line-height: 16px;
-    border-bottom: 1px solid $items-separator-color;
+    border-bottom: 1px solid $itemBorder;
     align-items: center;
 
     &:hover {
