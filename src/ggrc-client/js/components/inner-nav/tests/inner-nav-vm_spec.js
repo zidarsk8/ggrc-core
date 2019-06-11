@@ -12,7 +12,7 @@ import * as ObjectVersionsUtils
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import Cacheable from '../../../models/cacheable';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 
 describe('inner-nav view model', () => {
   let viewModel;

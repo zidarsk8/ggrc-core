@@ -4,7 +4,6 @@
  */
 
 import Cacheable from '../cacheable';
-import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import Stub from '../stub';
@@ -103,10 +102,13 @@ export default Cacheable.extend({
    * dropdown menu on the form.
    * It also deserializes the default people settings so that those form
    * fields are correctly populated.
+   *
+   * @param {Boolean} isNew - whether instance is new
+   * @param {*} params - additional params
+   * @param {*} pageInstance - current page instance
    */
-  form_preload: function () {
-    const pageInstance = getPageInstance();
-    if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
+  form_preload: function (isNew, params, pageInstance) {
+    if (!this.audit || !this.audit.id || !this.audit.type) {
       if (pageInstance.type === 'Audit') {
         this.attr('audit', pageInstance);
       }

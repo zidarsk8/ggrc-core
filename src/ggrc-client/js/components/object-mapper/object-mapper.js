@@ -31,7 +31,10 @@ import {
   OBJECTS_MAPPED_VIA_MAPPER,
   DEFERRED_MAP_OBJECTS,
 } from '../../events/eventTypes';
-import Mappings from '../../models/mappers/mappings';
+import {
+  allowedToMap,
+  shouldBeMappedExternally,
+} from '../../models/mappers/mappings';
 import {mapObjects as mapObjectsUtil} from '../../plugins/utils/mapper-utils';
 import * as businessModels from '../../models/business-models';
 import TreeViewConfig from '../../apps/base_widgets';
@@ -174,7 +177,7 @@ export default can.Component.extend({
 
         let source = this.attr('object');
         let destination = this.attr('type');
-        if (Mappings.shouldBeMappedExternally(source, destination)) {
+        if (shouldBeMappedExternally(source, destination)) {
           this.attr('isMappableExternally', true);
           return;
         } else {
@@ -261,7 +264,7 @@ export default can.Component.extend({
     deferredSave: function (objects) {
       let source = this.viewModel.attr('deferred_to').instance;
       const deferredObjects = objects
-        .filter((destination) => Mappings.allowedToMap(source, destination))
+        .filter((destination) => allowedToMap(source, destination))
         .map((object) => {
           object.isNeedRefresh = true;
           return object;

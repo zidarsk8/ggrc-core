@@ -8,7 +8,7 @@ import * as SnapshotUtils from '../../utils/snapshot-utils';
 import * as CurrentPageUtils from '../../utils/current-page-utils';
 import * as WidgetsUtils from '../../utils/widgets-utils';
 import * as QueryAPI from '../../utils/query-api-utils';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import WidgetList from '../../../modules/widget_list';
 import QueryParser from '../../../generated/ggrc_filter_query_parser';
 

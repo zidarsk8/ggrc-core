@@ -7,7 +7,7 @@ import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import template from './advanced-search-mapping-criteria.stache';
-import Mappings from '../../models/mappers/mappings';
+import {getAvailableMappings} from '../../models/mappers/mappings';
 import * as businessModels from '../../models/business-models';
 
 /**
@@ -116,7 +116,7 @@ let viewModel = can.Map.extend({
       return [businessModels[modelName]];
     }
 
-    let mappings = Mappings.getAvailableMappings(this.attr('modelName'));
+    let mappings = getAvailableMappings(this.attr('modelName'));
     let types = _.sortBy(mappings, 'model_singular');
 
     if (!this.attr('criteria.objectName')) {

@@ -16,7 +16,10 @@ import Permission from './permission';
 import _ from 'lodash';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
-import Mappings from './models/mappers/mappings';
+import {
+  allowedToMap,
+  allowedToCreate,
+} from './models/mappers/mappings';
 import {
   getFormattedLocalDate,
   formatDate,
@@ -291,7 +294,7 @@ can.stache.registerHelper('is_allowed_to_map',
 
     source = resolveComputed(source);
     target = resolveComputed(target);
-    canMap = Mappings.allowedToMap(source, target, options);
+    canMap = allowedToMap(source, target, options);
 
     if (canMap) {
       return options.fn(options.contexts || this);
@@ -304,7 +307,7 @@ can.stache.registerHelper('is_allowed_to_create', (source, target, options) => {
 
   source = resolveComputed(source);
   target = resolveComputed(target);
-  canCreate = Mappings.allowedToCreate(source, target);
+  canCreate = allowedToCreate(source, target);
 
   if (canCreate) {
     return options.fn(options.contexts);

@@ -4,7 +4,7 @@
 */
 
 import * as workflowHelpers from '../../utils/workflow-utils';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import {
   makeFakeInstance,
 } from '../../../../js_specs/spec_helpers';

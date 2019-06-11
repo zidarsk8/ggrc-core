@@ -3,11 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import * as Utils from '../../../plugins/utils/models-utils';
-import Mappings from '../mappings';
+import * as Mappings from '../mappings';
 import Permission from '../../../permission';
 
-describe('Mappings', function () {
+describe('Mappings', () => {
   let allTypes = [];
   let notMappableModels = [];
   let modules = {
@@ -66,18 +65,7 @@ describe('Mappings', function () {
     },
   };
 
-  function getModelsFromGroups(groups, groupNames) {
-    let models = [];
-    groupNames.forEach(function (groupName) {
-      let groupModels = groups[groupName].items.map(function (item) {
-        return item.value;
-      });
-      models = models.concat(groupModels);
-    });
-    return models;
-  }
-
-  Object.keys(modules).forEach(function (module) {
+  Object.keys(modules).forEach((module) => {
     allTypes = allTypes.concat(modules[module].models);
     notMappableModels = notMappableModels.concat(modules[module].notMappable);
   });
@@ -130,9 +118,7 @@ describe('Mappings', function () {
     MultitypeSearch: _.difference(allTypes, ['CycleTaskGroup']),
   });
 
-  describe('getMappingTypes() method', function () {
-    let EXPECTED_GROUPS = ['entities', 'scope', 'governance'];
-
+  describe('getMappingList() method', () => {
     let types = allTypes.concat('MultitypeSearch');
     let modelsForTests = _.difference(types, [
       'TaskGroupTask',
@@ -143,12 +129,9 @@ describe('Mappings', function () {
     modelsForTests.forEach(function (type) {
       it('returns mappable types for ' + type, function () {
         let expectedModels = mappingRules[type];
-        let result = Mappings.getMappingTypes(type);
-        let resultGroups = Object.keys(result);
-        let resultModels = getModelsFromGroups(result, EXPECTED_GROUPS);
+        let result = Mappings.getMappingList(type);
 
-        expect(EXPECTED_GROUPS).toEqual(resultGroups);
-        expect(expectedModels.sort()).toEqual(resultModels.sort());
+        expect(expectedModels.sort()).toEqual(result.sort());
       });
     });
   });
@@ -159,44 +142,34 @@ describe('Mappings', function () {
     });
 
     it('checks that types are mappable', () => {
-      spyOn(Mappings, 'getAllowedToMapModels');
-
       let result = Mappings.allowedToMap('SourceType', 'TargetType');
 
       expect(result).toBeFalsy();
       expect(Permission.is_allowed_for).not.toHaveBeenCalled();
     });
 
-    it('checks map and externalMap collections', () => {
-      spyOn(Mappings, 'getAllowedToMapModels');
-      spyOn(Mappings, 'getExternalMapModels');
+    it('checks map collection', () => {
+      let result = Mappings.allowedToMap('Program', 'Document');
+      expect(result).toBeTruthy();
+    });
 
-      Mappings.allowedToMap('SourceType', 'TargetType');
-
-      expect(Mappings.getAllowedToMapModels).toHaveBeenCalled();
-      expect(Mappings.getExternalMapModels).toHaveBeenCalled();
+    it('checks externalMap collection', () => {
+      let result = Mappings.allowedToMap('Control', 'Risk');
+      expect(result).toBeTruthy();
     });
 
     it('checks permissions to update source', () => {
-      spyOn(Mappings, 'getAllowedToMapModels').and.returnValue({
-        TargetType: {},
-      });
-
-      let result = Mappings.allowedToMap('SourceType', 'TargetType');
+      let result = Mappings.allowedToMap('Program', 'Document');
 
       expect(result).toBeTruthy();
       expect(Permission.is_allowed_for)
-        .toHaveBeenCalledWith('update', 'SourceType');
+        .toHaveBeenCalledWith('update', 'Program');
       expect(Permission.is_allowed_for.calls.count()).toEqual(1);
     });
 
     it('checks permissions to update target', () => {
-      spyOn(Mappings, 'getAllowedToMapModels').and.returnValue({
-        TargetType: {},
-      });
-
-      let source = new can.Map({type: 'SourceType'});
-      let target = new can.Map({type: 'TargetType'});
+      let source = new can.Map({type: 'Program'});
+      let target = new can.Map({type: 'Document'});
       let result = Mappings.allowedToMap(source, target);
 
       expect(result).toBeTruthy();
@@ -214,10 +187,6 @@ describe('Mappings', function () {
     });
 
     it('checks that types are mappable', () => {
-      spyOn(Mappings, 'getAllowedToCreateModels').and.returnValue({
-        anyType: {},
-      });
-
       let result = Mappings.allowedToCreate('SourceType', 'TargetType');
 
       expect(result).toBeFalsy();
@@ -225,25 +194,17 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update source', () => {
-      spyOn(Mappings, 'getAllowedToCreateModels').and.returnValue({
-        TargetType: {},
-      });
-
-      let result = Mappings.allowedToCreate('SourceType', 'TargetType');
+      let result = Mappings.allowedToCreate('Program', 'Audit');
 
       expect(result).toBeTruthy();
       expect(Permission.is_allowed_for)
-        .toHaveBeenCalledWith('update', 'SourceType');
+        .toHaveBeenCalledWith('update', 'Program');
       expect(Permission.is_allowed_for.calls.count()).toEqual(1);
     });
 
     it('checks permissions to update target', () => {
-      spyOn(Mappings, 'getAllowedToCreateModels').and.returnValue({
-        TargetType: {},
-      });
-
-      let source = new can.Map({type: 'SourceType'});
-      let target = new can.Map({type: 'TargetType'});
+      let source = new can.Map({type: 'Program'});
+      let target = new can.Map({type: 'Audit'});
       let result = Mappings.allowedToCreate(source, target);
 
       expect(result).toBeTruthy();
@@ -261,10 +222,6 @@ describe('Mappings', function () {
     });
 
     it('checks that types are unmappable', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        anyType: {},
-      });
-
       let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
 
       expect(result).toBeFalsy();
@@ -272,25 +229,17 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update source', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        TargetType: {},
-      });
-
-      let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
+      let result = Mappings.allowedToUnmap('Program', 'Document');
 
       expect(result).toBeTruthy();
       expect(Permission.is_allowed_for)
-        .toHaveBeenCalledWith('update', 'SourceType');
+        .toHaveBeenCalledWith('update', 'Program');
       expect(Permission.is_allowed_for.calls.count()).toEqual(1);
     });
 
     it('checks permissions to update target', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        TargetType: {},
-      });
-
-      let source = new can.Map({type: 'SourceType'});
-      let target = new can.Map({type: 'TargetType'});
+      let source = new can.Map({type: 'Program'});
+      let target = new can.Map({type: 'Document'});
       let result = Mappings.allowedToUnmap(source, target);
 
       expect(result).toBeTruthy();
@@ -300,90 +249,5 @@ describe('Mappings', function () {
       expect(Permission.is_allowed_for.calls.argsFor(1))
         .toEqual(['update', target]);
     });
-  });
-
-  describe('_prepareCorrectTypeFormat() method', function () {
-    let cmsModel = {
-      category: 'category',
-      title_plural: 'title_plural',
-      model_singular: 'model_singular',
-    };
-    let expectedResult = {
-      category: 'category',
-      name: 'title_plural',
-      value: 'model_singular',
-    };
-
-    it('returns specified object', function () {
-      let result;
-      result = Mappings._prepareCorrectTypeFormat(cmsModel);
-      expect(result).toEqual(expectedResult);
-    });
-
-    it('converts models plural title to a snake_case', function () {
-      let result;
-      let cmsModel1 = _.assign({}, cmsModel, {
-        title_plural: 'Title Plural',
-      });
-      result = Mappings._prepareCorrectTypeFormat(cmsModel1);
-      expect(result.plural).toEqual(expectedResult.plural);
-    });
-  });
-
-  describe('addFormattedType() method', function () {
-    let groups;
-    let type = {
-      category: 'category',
-    };
-
-    beforeEach(function () {
-      groups = {
-        governance: {
-          items: [],
-        },
-        category: {
-          items: [],
-        },
-      };
-      spyOn(Mappings, '_prepareCorrectTypeFormat')
-        .and.returnValue(type);
-    });
-
-    it('adds type to governance group if no group with category of this type',
-      function () {
-        groups.category = undefined;
-        spyOn(Utils, 'getModelByType')
-          .and.returnValue({
-            title_singular: 'title_singular',
-          });
-        Mappings._addFormattedType('name', groups);
-        expect(groups.governance.items[0]).toEqual(type);
-      });
-
-    it('adds type to group of category of this type if this group exist',
-      function () {
-        groups.governance = undefined;
-        spyOn(Utils, 'getModelByType')
-          .and.returnValue({
-            title_singular: 'title_singular',
-          });
-        Mappings._addFormattedType('name', groups);
-        expect(groups[type.category].items[0]).toEqual(type);
-      });
-
-    it('does nothing if cmsModel is not defined', function () {
-      spyOn(Utils, 'getModelByType');
-      Mappings._addFormattedType('name', groups);
-      expect(groups.governance.items.length).toEqual(0);
-      expect(groups[type.category].items.length).toEqual(0);
-    });
-    it('does nothing if singular title of cmsModel is not defined',
-      function () {
-        spyOn(Utils, 'getModelByType')
-          .and.returnValue({});
-        Mappings._addFormattedType('name', groups);
-        expect(groups.governance.items.length).toEqual(0);
-        expect(groups[type.category].items.length).toEqual(0);
-      });
   });
 });

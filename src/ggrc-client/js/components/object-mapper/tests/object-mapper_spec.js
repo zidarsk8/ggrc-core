@@ -10,7 +10,7 @@ import Component from '../object-mapper';
 import Program from '../../../models/business-models/program';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {DEFERRED_MAP_OBJECTS} from '../../../events/eventTypes';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 
 describe('object-mapper component', function () {
   let events;

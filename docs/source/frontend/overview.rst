@@ -479,19 +479,4 @@ persistence (database). They're essentially just an abstraction over our
 database, so that you don't have to care about which tables the
 relationships are stored in.
 
-Mappings essentially turn the entire system into a
-`property graph <https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph>`_.
-
 Mappings are defined in :src:`ggrc-client/js/models/mappers/mappings-ggrc.js`.
-
-"Direct" Mapping
-^^^^^^^^^^^^^^^^^
-
-There is "Direct" type of mapping. It defined with
-Mappers. Mappers are defined in :src:`ggrc-client/js/models/mappers/models/index.js`
-
--  **Direct** :src:`ggrc-client/js/models/mappers/direct-list-loader.js`:
-   A direct mapping is a relationship where one model
-   directly references another model.  E.g., Sections contain a
-   ``directive`` attribute, so Section has a Direct mapping to
-   Directive.

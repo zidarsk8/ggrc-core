@@ -179,6 +179,8 @@ describe('Assessment model', function () {
 
       // Mock out the findRoles function
       model.attr('audit', {
+        id: 1,
+        type: 'Audit',
         findRoles: (name) => {
           const roles = {
             Auditors: [
@@ -212,6 +214,8 @@ describe('Assessment model', function () {
         );
         // Mock out the findRoles function
         model.attr('audit', {
+          id: 1,
+          type: 'Audit',
           findRoles: (name) => {
             const roles = {
               Auditors: [],

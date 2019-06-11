@@ -6,7 +6,6 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-page';
 import Person from '../../../models/business-models/person';
-import Mappings from '../../../models/mappers/mappings';
 
 describe('revision-page component', function () {
   let viewModel;
@@ -17,17 +16,9 @@ describe('revision-page component', function () {
 
   describe('computeChanges() method', () => {
     beforeEach(() => {
-      spyOn(viewModel, '_computeRoleChanges').and.returnValue('roleHistory');
       spyOn(viewModel, '_loadACLPeople');
       spyOn(viewModel, '_computeObjectChanges');
       spyOn(viewModel, '_computeMappingChanges');
-    });
-
-    it('sets computed roleHistory', () => {
-      // set of 'revisions' attr calls computeChanges
-      viewModel.attr('revisions', {});
-
-      expect(viewModel.attr('roleHistory')).toBe('roleHistory');
     });
 
     it('calls _loadACLPeople', () => {
@@ -176,8 +167,6 @@ describe('revision-page component', function () {
 
     beforeEach(function () {
       spyOn(viewModel, '_objectCADiff').and.returnValue({});
-      spyOn(viewModel, '_computeRoleChanges').and.returnValue([]);
-      spyOn(viewModel, '_getRoleAtTime').and.returnValue('none');
     });
 
     beforeEach(function () {
@@ -254,8 +243,6 @@ describe('revision-page component', function () {
 
       let result = viewModel._objectChangeDiff(rev1, rev2);
       expect(result.madeBy).toBeNull();
-      expect(viewModel._getRoleAtTime)
-        .toHaveBeenCalledWith(null, rev2.updated_at);
       expect(result.role).toEqual('none');
     });
 
@@ -491,7 +478,6 @@ describe('revision-page component', function () {
         id: 123,
         type: 'ObjectFoo',
       });
-      spyOn(viewModel, '_getRoleAtTime').and.returnValue('none');
     });
 
     it('returns correct change information when the instance is at the ' +
@@ -584,8 +570,6 @@ describe('revision-page component', function () {
 
       let result = viewModel._mappingChange(revision, [revision]);
 
-      expect(viewModel._getRoleAtTime)
-        .toHaveBeenCalledWith(null, revision.updated_at);
       expect(result).toEqual({
         madeBy: null,
         role: 'none',
@@ -689,301 +673,6 @@ describe('revision-page component', function () {
           fieldName: 'Mapping to Other: OtherObject',
         },
       });
-    });
-  });
-
-  describe('_computeRoleChanges method', function () {
-    let corruptedRevision = new can.Map({
-      object: new can.List([
-        {
-          id: 10,
-          modified_by: {
-            id: 166,
-          },
-        },
-      ]),
-      mappings: new can.List([
-        {
-          id: 1,
-          modified_by: {
-            id: 166,
-          },
-          action: 'created',
-          source_type: 'Person',
-          source_id: 166,
-          destination_type: 'ObjectFoo',
-          destination_id: 123,
-          updated_at: new Date(2016, 0, 1),
-          type: 'Revision',
-          content: {
-            attrs: {},
-          },
-        },
-      ]),
-    });
-    let revisions = new can.Map({
-      object: new can.List([
-        {
-          id: 10,
-          modified_by: {
-            id: 166,
-          },
-        },
-      ]),
-      mappings: new can.List([
-        {
-          id: 1,
-          modified_by: {
-            id: 166,
-          },
-          action: 'created',
-          source_type: 'Person',
-          source_id: 166,
-          destination_type: 'ObjectFoo',
-          destination_id: 123,
-          updated_at: new Date(2016, 0, 1),
-          type: 'Revision',
-          content: {
-            attrs: {
-              AssigneeType: 'Requester,Assignee',
-            },
-          },
-        },
-        {
-          id: 2,
-          modified_by: {
-            id: 166,
-          },
-          action: 'modified',
-          source_type: 'Person',
-          source_id: 166,
-          destination_type: 'ObjectFoo',
-          destination_id: 123,
-          updated_at: new Date(2016, 0, 2),
-          type: 'Revision',
-          content: {
-            attrs: {
-              AssigneeType: 'Requester,Assignee,Verifier',
-            },
-          },
-        },
-        {
-          id: 3,
-          modified_by: {
-            id: 166,
-          },
-          action: 'modified',
-          source_type: 'Person',
-          source_id: 166,
-          destination_type: 'ObjectFoo',
-          destination_id: 123,
-          updated_at: new Date(2016, 0, 4),
-          type: 'Revision',
-          content: {
-            attrs: {
-              AssigneeType: 'Requester',
-            },
-          },
-        },
-        {
-          id: 4,
-          modified_by: {
-            id: 166,
-          },
-          action: 'deleted',
-          source_type: 'Person',
-          source_id: 166,
-          destination_type: 'ObjectFoo',
-          destination_id: 123,
-          updated_at: new Date(2016, 0, 5),
-          type: 'Revision',
-          content: {
-            attrs: {
-              AssigneeType: 'Requester',
-            },
-          },
-        },
-      ]),
-    });
-
-    beforeEach(function () {
-      viewModel.attr('instance', {
-        id: 123,
-        type: 'ObjectFoo',
-        created_at: new Date(2016, 0, 1),
-        'class': {
-          assignable_list: [{
-            type: 'requester',
-            mapping: 'related_requesters',
-          }, {
-            type: 'assignee',
-            mapping: 'related_assignees',
-          }, {
-            type: 'verifier',
-            mapping: 'related_verifiers',
-          }],
-        },
-      });
-      spyOn(Mappings, 'getBinding').and.callFake((mappingName) => {
-        let bindingData = {
-          related_requesters: {
-            list: [
-              {
-                instance: {id: 166},
-              },
-            ],
-          },
-          related_assignees: {
-            list: [
-              {
-                instance: {id: 166},
-              },
-            ],
-          },
-          related_verifiers: {
-            list: [
-              {
-                instance: {id: 166},
-              },
-            ],
-          },
-        };
-        return bindingData[mappingName];
-      });
-    });
-
-    it('returns current max role when no revisions exist', function () {
-      let roleHistory = viewModel._computeRoleChanges([]);
-      expect(roleHistory).toEqual({
-        '166': [{
-          role: 'Verifier',
-          updated_at: new Date(2016, 0, 1),
-        }],
-      });
-    });
-
-    it('returns correct full history when present', function () {
-      let roleHistory = viewModel._computeRoleChanges(revisions);
-      expect(roleHistory).toEqual({
-        '166': [
-          {
-            updated_at: new Date(2016, 0, 1),
-            role: 'Assignee',
-          },
-          {
-            updated_at: new Date(2016, 0, 2),
-            role: 'Verifier',
-          },
-          {
-            updated_at: new Date(2016, 0, 4),
-            role: 'Requester',
-          },
-          {
-            updated_at: new Date(2016, 0, 5),
-            role: 'none',
-          },
-        ],
-      });
-    });
-
-    it('builds correct full history when creation is not present', function () {
-      let roleHistory;
-      revisions.mappings.shift(); // remove first ("created") mapping
-      roleHistory = viewModel._computeRoleChanges(revisions);
-      expect(roleHistory).toEqual({
-        '166': [
-          {
-            updated_at: new Date(2016, 0, 1),
-            role: 'none',
-          },
-          {
-            updated_at: new Date(2016, 0, 2),
-            role: 'Verifier',
-          },
-          {
-            updated_at: new Date(2016, 0, 4),
-            role: 'Requester',
-          },
-          {
-            updated_at: new Date(2016, 0, 5),
-            role: 'none',
-          },
-        ],
-      });
-    });
-
-    it('builds correct history when data is corrupted', function () {
-      let roleHistory;
-
-      roleHistory = viewModel._computeRoleChanges(corruptedRevision);
-      expect(roleHistory).toEqual({
-        '166': [
-          {
-            updated_at: new Date(2016, 0, 1),
-            role: 'none',
-          },
-        ],
-      });
-    });
-  });
-
-  describe('_getRoleAtTime() method', function () {
-    beforeEach(function () {
-      viewModel.attr('roleHistory', {});
-      viewModel.attr('roleHistory')[1] =
-        [{
-          role: 'creator',
-          updated_at: new Date(2016, 0, 1),
-        }, {
-          role: 'verifier',
-          updated_at: new Date(2016, 1, 2),
-        }, {
-          role: 'assignee',
-          updated_at: new Date(2016, 2, 3),
-        }];
-    });
-
-    it('returns correct role for a given person at initial time', function () {
-      expect(viewModel
-        ._getRoleAtTime(1, new Date(2016, 0, 1))).toEqual('creator');
-    });
-    it('returns correct role for a given person on first change', function () {
-      expect(viewModel
-        ._getRoleAtTime(1, new Date(2016, 1, 2))).toEqual('verifier');
-    });
-    it('returns correct role for a given person in the middle of interval',
-      function () {
-        expect(viewModel
-          ._getRoleAtTime(1, new Date(2016, 1, 15))).toEqual('verifier');
-      });
-    it('returns correct role for a given person on third change', function () {
-      expect(viewModel
-        ._getRoleAtTime(1, new Date(2016, 2, 3))).toEqual('assignee');
-    });
-    it('returns correct role for a given person after last change',
-      function () {
-        expect(viewModel
-          ._getRoleAtTime(1, new Date(2016, 3, 1))).toEqual('assignee');
-      });
-
-    it('returns "none" if there is no known role at that time', function () {
-      expect(viewModel
-        ._getRoleAtTime(1, new Date(2015, 1, 1))).toEqual('none');
-    });
-    it('returns "none" if there is no known role if no user history exists',
-      function () {
-        expect(viewModel
-          ._getRoleAtTime(0, new Date(2016, 1, 10))).toEqual('none');
-      });
-    it('returns "none" if there is no known role and no user history ' +
-       'exists on specific dates',
-    function () {
-      expect(viewModel
-        ._getRoleAtTime(0, new Date(2016, 1, 2))).toEqual('none');
-    });
-    it('returns "none" if user does not exist', function () {
-      expect(viewModel
-        ._getRoleAtTime(null, new Date(2016, 1, 2))).toEqual('none');
     });
   });
 

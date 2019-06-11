@@ -7,6 +7,7 @@ import ModalsController from '../modals/modals_controller';
 import * as NotifiersUtils from '../../plugins/utils/notifiers-utils';
 import Person from '../../models/business-models/person';
 import * as ReifyUtils from '../../plugins/utils/reify-utils';
+import * as currentPageUtils from '../../plugins/utils/current-page-utils';
 
 describe('ModalsController', function () {
   let Ctrl; // the controller under test
@@ -195,13 +196,17 @@ describe('ModalsController', function () {
       });
 
       it('calls form_preload of instance if it is defined', () => {
+        let pageInstance = {};
+        spyOn(currentPageUtils, 'getPageInstance')
+          .and.returnValue(pageInstance);
         instance.form_preload = jasmine.createSpy();
 
         method(instance);
 
         expect(instance.form_preload).toHaveBeenCalledWith(
           ctrlInst.options.new_object_form,
-          ctrlInst.options.object_params
+          ctrlInst.options.object_params,
+          pageInstance
         );
       });
 

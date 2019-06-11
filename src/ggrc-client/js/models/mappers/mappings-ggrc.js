@@ -3,9 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {Direct} from '../mappers/mapper-helpers';
-import Mappings from './mappings';
-
 import {
   businessObjects,
   coreObjects,
@@ -19,12 +16,11 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
 /*
   To configure a new mapping, use the following format :
   { <source object type> : {
-      map : [ <object name>, ...]
-      unmap : [ <object name>, ...]
-      indirectMappings: [ <object name>, ...]
-      mappers : {
-        <mapping name>: Direct(...)
-      }
+      create: [ <object name>, ...],
+      map : [ <object name>, ...],
+      externalMap: [ <object name>, ...],
+      unmap : [ <object name>, ...],
+      indirectMappings: [ <object name>, ...],
     }
   }
 
@@ -38,7 +34,6 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
   <indirectMappings> - models which cannot be directly mapped to object
     through Relationship but linked by another way. Currently used for Mapping
     Filter in Object mapper and Global Search
-  <mappers> - custom mappings
 */
 
 const roleableObjects = getRoleableModels()
@@ -64,7 +59,7 @@ const scopingObjectConfig = {
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
 
-new Mappings({
+export default {
   Person: {
     indirectMappings: ['CycleTaskGroupObjectTask', 'TaskGroupTask', 'Workflow',
       ...roleableObjects],
@@ -246,12 +241,6 @@ new Mappings({
   },
 
   // Other
-  UserRole: {
-    mappers: {
-      person: Direct('Person', 'user_roles', 'person'),
-      role: Direct('Role', 'user_roles', 'role'),
-    },
-  },
   MultitypeSearch: {
     map: [
       'AccessGroup', 'AccountBalance', 'Assessment', 'AssessmentTemplate',
@@ -264,4 +253,5 @@ new Mappings({
       'Vendor', 'Workflow',
     ],
   },
-});
+};
+

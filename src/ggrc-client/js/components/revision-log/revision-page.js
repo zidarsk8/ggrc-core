@@ -9,7 +9,6 @@ import RefreshQueue from '../../models/refresh_queue';
 import template from './revision-page.stache';
 import Person from '../../models/business-models/person';
 import Stub from '../../models/stub';
-import Mappings from '../../models/mappers/mappings';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
@@ -50,17 +49,14 @@ export default can.Component.extend({
     changeHistory: [],
     isLoading: false,
     computeChanges() {
-      let changeHistory;
       // calculate history of role changes
       let revisions = this.attr('revisions');
-      this.attr('roleHistory',
-        this._computeRoleChanges(revisions));
 
       // load not cached people
       this._loadACLPeople(revisions.object);
 
       // combine all the changes and sort them by date descending
-      changeHistory = _([]).concat(
+      let changeHistory = _([]).concat(
         can.makeArray(this._computeObjectChanges(revisions.object,
           revisions.revisionsForCompare)),
         can.makeArray(this._computeMappingChanges(revisions.mappings)))
@@ -68,133 +64,6 @@ export default can.Component.extend({
         .reverse()
         .value();
       this.attr('changeHistory', changeHistory);
-    },
-    /**
-     * Calculate each person's role history.
-     *
-     * It groups together all people mapping changes and for each change
-     * gets the highest role at the time of change.
-     *
-     * If however the revision history isn't complete (they don't start with
-     * "created" action, e.g. old assessments) it then adds "no role" to the
-     * start of person's history.
-     *
-     * If we don't have any revisions to person mappings but they are
-     * currently an assignee, we select the highest current role.
-     *
-     * If user has no role and was not or is not an assignee, we just add a
-     * single role change ("no role").
-     *
-     * @param {Revision} revisions - a Revision object describing a
-     *   mapping between the object instance the component is handling, and an
-     *   external object
-     *
-     * @return {Object} - An object containing user IDs as keys and person's
-     *   role history through time ordered in increasing order.
-     */
-    _computeRoleChanges: function (revisions) {
-      let mappings = _.sortBy(revisions.mappings, 'updated_at');
-      let instance = this.attr('instance');
-      let assigneeList = this.attr('instance.class.assignable_list');
-      let perPersonMappings;
-      let perPersonRoleHistory;
-      let modifiers;
-      let currentAssignees;
-      let assigneeRoles;
-      let unmodifiedAssignees;
-      let unassignedPeople;
-
-      perPersonMappings = _(mappings)
-        .filter(function (rev) {
-          if (rev.source_type === 'Person' ||
-            rev.destination_type === 'Person') {
-            return rev;
-          }
-        })
-        .groupBy(function (rev) {
-          if (rev.source_type === 'Person') {
-            return rev.source_id;
-          }
-          return rev.destination_id;
-        })
-        .value();
-
-      perPersonRoleHistory = _.fromPairs(
-        _.map(perPersonMappings, (revisions, pid) => {
-          let history = _.map(revisions, (rev) => {
-            // Add extra check to fix possible issue with inconsistent data
-            if (rev.action === 'deleted' || !rev.content.attrs ||
-                !rev.content.attrs.AssigneeType) {
-              return {
-                updated_at: rev.updated_at,
-                role: 'none',
-              };
-            }
-            return {
-              updated_at: rev.updated_at,
-              role: this.getHighestAssigneeRole(
-                instance,
-                rev.content.attrs.AssigneeType.split(',')),
-            };
-          });
-
-          if (revisions[0].action !== 'created') {
-            history.unshift({
-              role: 'none',
-              updated_at: instance.created_at,
-            });
-          }
-          return [pid, history];
-        }));
-
-      modifiers = _.uniq(
-        _.map(
-          _.union(
-            revisions.object,
-            revisions.mappings),
-          'modified_by.id')).map(String);
-
-      currentAssignees = _.groupBy(
-        _.flattenDeep(_.map(assigneeList, function (assignableType) {
-          return _.map(
-            Mappings.getBinding(assignableType.mapping, instance).list,
-            function (person) {
-              return {
-                id: person.instance.id,
-                type: assignableType.type,
-              };
-            });
-        })), 'id');
-
-      assigneeRoles = _.fromPairs(
-        _.map(currentAssignees, function (rolePeople, pid) {
-          return [pid, _.map(rolePeople, 'type')];
-        }));
-
-      unmodifiedAssignees = _.difference(
-        _.keys(assigneeRoles), _.keys(perPersonRoleHistory));
-
-      _.forEach(unmodifiedAssignees, (pid) => {
-        let existingRoles = assigneeRoles[pid];
-        let role = this.getHighestAssigneeRole(
-          instance, existingRoles);
-        perPersonRoleHistory[pid] = [{
-          updated_at: instance.created_at,
-          role: role,
-        }];
-      });
-
-      unassignedPeople = _.difference(
-        modifiers, _.keys(perPersonRoleHistory));
-
-      _.forEach(unassignedPeople, function (pid) {
-        perPersonRoleHistory[pid] = [{
-          updated_at: instance.created_at,
-          role: 'none',
-        }];
-      });
-
-      return perPersonRoleHistory;
     },
     /**
      * Load to cache people from access control list
@@ -287,11 +156,10 @@ export default can.Component.extend({
         role: null,
       };
       let attrDefs = GGRC.model_attr_defs[rev2.resource_type];
-      let madeByPersonId = rev2.modified_by ? rev2.modified_by.id : null;
 
       diff.madeBy = rev2.modified_by;
       diff.updatedAt = rev2.updated_at;
-      diff.role = this._getRoleAtTime(madeByPersonId, rev2.updated_at);
+      diff.role = 'none';
 
       _.forEach(rev2.content, function (value, fieldName) {
         let origVal = rev1.content[fieldName];
@@ -366,25 +234,6 @@ export default can.Component.extend({
           rev2.content.custom_attribute_values,
           rev2.content.custom_attribute_definitions));
       return diff;
-    },
-    /**
-     * A function to return person's highest role at a certain time
-     *
-     * @param {String|Number} personId - Person ID
-     * @param {Date|Number} timePoint - Time of change
-     * @return {String} - Lowercase role string
-     */
-    _getRoleAtTime: function (personId, timePoint) {
-      let personHistory = this.attr('roleHistory')[personId] || [];
-      let role = _.last(_.takeWhile(personHistory, function (roleChange) {
-        let updateAt = new Date(roleChange.updated_at).getTime();
-        timePoint = new Date(timePoint).getTime();
-        return updateAt <= timePoint;
-      }));
-      if (role) {
-        return role.role;
-      }
-      return 'none';
     },
     /**
      * A helper function for computing the difference between the two Revisions
@@ -551,7 +400,6 @@ export default can.Component.extend({
       let origVal;
       let newVal;
       let previous;
-      let madeByPersonId;
       let automapping;
       let person;
 
@@ -615,11 +463,10 @@ export default can.Component.extend({
         };
       }
 
-      madeByPersonId = revision.modified_by ? revision.modified_by.id : null;
       return {
         madeBy: revision.modified_by,
         updatedAt: revision.updated_at,
-        role: this._getRoleAtTime(madeByPersonId, revision.updated_at),
+        role: 'none',
         changes: {
           origVal: origVal,
           newVal: newVal,
@@ -660,33 +507,6 @@ export default can.Component.extend({
       );
 
       return peopleList.length ? peopleList : [EMPTY_DIFF_VALUE];
-    },
-    /**
-     * A function that returns the highest role in an array of strings of roles
-     * or a comma-separated string of roles.
-     *
-     * @param {Cacheable} obj - Assignable object with defined
-     *   assignable_list class property holding assignable roles ordered in
-     *   increasing importance.
-     * Return highest assignee role from a list of roles
-     * @param {Array|String} roles - An Array of strings or a String with comma
-     *   separated values of roles.
-     * @return {string} - Highest role from an array of strings or 'none' if
-     *   none found.
-     */
-    getHighestAssigneeRole(obj, roles) {
-      let roleOrder = _.map(
-        _.map(obj.class.assignable_list, 'type'),
-        _.capitalize);
-
-      if (_.isString(roles)) {
-        roles = roles.split(',');
-      }
-
-      roles = _.map(roles, _.capitalize);
-
-      roles.unshift('none');
-      return _.maxBy(roles, Array.prototype.indexOf.bind(roleOrder));
     },
   }),
 });

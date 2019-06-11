@@ -7,7 +7,7 @@ import {
   buildCountParams,
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
-import Mappings from '../../models/mappers/mappings';
+import {getMappingList} from '../../models/mappers/mappings';
 import {REFRESH_MAPPED_COUNTER} from '../../events/eventTypes';
 import template from './mapped-counter.stache';
 
@@ -61,7 +61,7 @@ let viewModel = can.Map.extend({
       id: instance.id,
       type: instance.type,
     };
-    let types = type ? [type] : Mappings.getMappingList(instance.type);
+    let types = type ? [type] : getMappingList(instance.type);
     let countQuery = buildCountParams(types, relevant);
     let dfds = countQuery.map(batchRequests);
 

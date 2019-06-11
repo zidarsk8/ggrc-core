@@ -4,7 +4,6 @@
 */
 
 import Component from '../object-search';
-import Mappings from '../../../models/mappers/mappings';
 
 describe('object-search component', function () {
   'use strict';
@@ -15,18 +14,6 @@ describe('object-search component', function () {
   beforeEach(function () {
     parentViewModel = new can.Map();
     viewModel = new Component.prototype.viewModel({}, parentViewModel)();
-  });
-
-  describe('availableTypes() method', function () {
-    it('correctly calls getMappingTypes', function () {
-      let result;
-      spyOn(Mappings, 'getMappingTypes').and.returnValue('types');
-      viewModel.attr('object', 'testObject');
-
-      result = viewModel.availableTypes();
-      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject');
-      expect(result).toEqual('types');
-    });
   });
 
   describe('onSubmit() method', function () {

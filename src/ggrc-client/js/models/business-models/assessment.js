@@ -8,7 +8,6 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
-import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import caUpdate from '../mixins/ca-update';
 import autoStatusChangeable from '../mixins/auto-status-changeable';
 import timeboxed from '../mixins/timeboxed';
@@ -16,7 +15,6 @@ import accessControlList from '../mixins/access-control-list';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
-import {getInstance} from '../../plugins/utils/models-utils';
 import {REFRESH_MAPPING, REFRESHED} from '../../events/eventTypes';
 
 export default Cacheable.extend({
@@ -281,11 +279,10 @@ export default Cacheable.extend({
     this._transformBackupProperty(['design', 'operationally']);
     return this._super(checkAssociations);
   },
-  form_preload: function (newObjectForm) {
-    let pageInstance = getPageInstance();
-    let currentUser = getInstance('Person', GGRC.current_user.id);
+  form_preload: function (newObjectForm, params, pageInstance) {
+    let currentUser = GGRC.current_user;
 
-    if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
+    if (!this.audit || !this.audit.id || !this.audit.type) {
       if (pageInstance.type === 'Audit') {
         this.attr('audit', pageInstance);
       }
