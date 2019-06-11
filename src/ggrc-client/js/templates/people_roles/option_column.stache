@@ -23,9 +23,9 @@
     <li {{canData 'option' }} data-id="{{ id }}">
       <label>
         {{#is(selectedOption, id)}}
-          <input type="radio" checked="checked" name="map" rel="tooltip" title="map">
+          <input type="radio" checked="checked" name="map">
         {{else}}
-          <input type="radio" name="map" rel="tooltip" title="map">
+          <input type="radio" name="map">
         {{/is}}
         {{name}}
       </label>
