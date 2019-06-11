@@ -10,6 +10,7 @@ export default can.Model.extend({
   destroy: 'DELETE /api/saved_searches/{id}',
   create: 'POST /api/saved_searches',
   findOne: 'GET /api/saved_searches/{id}',
+  ajax: $.ajax,
   findBy(objectType, searchType, paging) {
     let url = `/api/saved_searches/${objectType}?search_type=${searchType}`;
 
