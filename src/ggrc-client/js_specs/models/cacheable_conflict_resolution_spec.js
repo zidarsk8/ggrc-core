@@ -53,10 +53,9 @@ describe('Cacheable conflict resolution', function () {
         obj.attr('foo', 'thud'); // uh-oh!  The same attr has been changed locally and remotely!
         return _resovleDfd(obj);
       });
-      ajaxSpy// .and.returnValue(new $.Deferred().reject({status: 409}, 409, "CONFLICT"));
-        .and.callFake(function () {
-          return _resovleDfd({status: 409}, true);
-        });
+      ajaxSpy.and.callFake(function () {
+        return _resovleDfd({status: 409}, true);
+      });
       DummyModel.update(obj.id.toString(), obj.serialize()).then(
         function () {
           fail("The update handler isn't supposed to resolve here.");
