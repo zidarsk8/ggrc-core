@@ -99,8 +99,16 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
 
   @validates("filters")
   def validate_filters(self, _, filters):
-    """
-      Validate correctness of supplied search filters.
+    """Validate correctness of supplied search filters.
+
+    Validates that filters is valid json formatted string.
+
+    Args:
+      filters: string value with filters
+
+    Returns:
+      JSON object with filters
+
     """
     # pylint: disable=no-self-use
     if filters:
@@ -109,7 +117,17 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
 
   @validates('search_type')
   def validate_search_type(self, _, saved_search_type):
-    """Valid that saved search type is correct"""
+    """Valid that saved search type is correct
+
+    Args: Type of saved search. Valid values are AdvancedSearch and
+    GlobalSearch
+
+    Returns:
+      Correct saved search type
+
+    Raises:
+      ValidationError: if saved_search_type is missing or not valid value
+    """
     # pylint: disable=no-self-use
     if not saved_search_type:
       raise ValidationError("Saved search type can't be blank")

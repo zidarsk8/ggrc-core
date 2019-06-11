@@ -16,7 +16,18 @@ from ggrc.models.exceptions import ValidationError
 
 @app.route("/api/saved_searches/<string:object_type>", methods=["GET"])
 def get_saved_searches_by_type(object_type):
-  """Get SavedSearch by object type"""
+  """Get SavedSearch by object type
+
+  Get SavedSearch model by object type.
+  Request object should includes search_type parameter and can includes
+   offset and limit parameters.
+
+  Args:
+    object_type: Type of object
+
+  Returns:
+    Flask Response object with object_name, count, total and values as payload
+  """
   user = login.get_current_user(use_external_user=False)
   all_objects = user.saved_searches.filter(
       SavedSearch.object_type == object_type,
@@ -42,7 +53,15 @@ def get_saved_searches_by_type(object_type):
 
 @app.route("/api/saved_searches/<int:saved_search_id>", methods=["DELETE"])
 def delete_saved_search(saved_search_id):
-  """Delete saved search"""
+  """Delete saved search
+
+    Args
+      saved_search_id: id of saved_search object that should be deleted
+
+    Returns
+      Response object with id of a deleted object or error message if object
+      did not found
+  """
   user = login.get_current_user(use_external_user=False)
 
   saved_search = user.saved_searches.filter(
