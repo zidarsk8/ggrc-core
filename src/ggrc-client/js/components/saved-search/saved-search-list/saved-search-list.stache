@@ -13,7 +13,7 @@
      {{#if disabled}}class="disabled"{{/if}}>
       <span title="{{name}}">{{name}}</span>
       <i class="fa fa-trash"
-        on:el:click="removeSearch(., %event)"
+        on:el:click="removeSearch(., scope.event)"
       ></i>
     </li>
   {{/each}}
