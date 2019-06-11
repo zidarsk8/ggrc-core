@@ -74,8 +74,8 @@
       flex-direction: column;
       flex: 1;
       min-width: 220px;
-      border-top: 1px solid #E0E0E0;
-      border-right: 1px solid #E0E0E0;
+      border-top: 1px solid $itemBorder;
+      border-right: 1px solid $itemBorder;
       padding: 20px;
     }
 
@@ -134,14 +134,14 @@
     }
   }
   &__content {
-    border-top: 1px solid #E0E0E0;
+    border-top: 1px solid $itemBorder;
     min-height: 200px;
     overflow: auto;
     flex: 1;
   }
   &__mapping-header {
     padding: 20px 16px 4px;
-    border-top: 1px solid #E0E0E0;
+    border-top: 1px solid $itemBorder;
   }
   &__controls {
     float: right;
