@@ -269,27 +269,42 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     self.assertEqual([], revision._content["custom_attribute_values"])
     self.assertEqual([], revision._content["custom_attribute_definitions"])
     self.assertIn("custom_attribute_values", revision.content)
-    self.assertEqual(
-        [{
-            'attributable_id': asmnt_id,
-            'attributable_type': 'Assessment',
-            'attribute_object': None,
-            'attribute_value': attribute_value,
-            'context_id': None,
-            'custom_attribute_id': cad_id,
-            'display_name': '',
-            'type': 'CustomAttributeValue',
-        }],
-        revision.content["custom_attribute_values"])
+    self.assertEqual([], revision.content["custom_attribute_values"])
     self.assertIn("custom_attribute_definitions", revision.content)
+    self.assertEqual([], revision.content["custom_attribute_definitions"])
+
+    self.gen.api.modify_object(
+        asmnt, {
+            "custom_attribute_values": [{
+                "attributable_id": asmnt.id,
+                "attributable_type": "assessment",
+                "attribute_value": attribute_value,
+                "custom_attribute_id": cad.id,
+            }, ],
+        },
+    )
+    revisions = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == asmnt_id,
+        ggrc.models.Revision.resource_type == "Assessment",
+    ).order_by(ggrc.models.Revision.id.desc()).all()
+    self.assertEqual(2, len(revisions))
+    revision = revisions[0]
+    self.assertEqual(1, len(revision.content["custom_attribute_values"]))
+    cav = revision.content["custom_attribute_values"][0]
+    self.assertEqual(asmnt_id, cav["attributable_id"])
+    self.assertEqual(cad_id, cav["custom_attribute_id"])
+    self.assertIn("custom_attribute_definitions", revision.content)
+    self.assertEqual(1, len(revision.content["custom_attribute_definitions"]))
     cad = all_models.CustomAttributeDefinition.query.get(cad_id)
-    self.assertEqual([cad.log_json()],
-                     revision.content["custom_attribute_definitions"])
+    self.assertEqual(cad.id,
+                     revision.content["custom_attribute_definitions"][0]["id"])
+    old_revision = revisions[1]
+    self.assertEqual([], old_revision.content["custom_attribute_values"])
+    self.assertEqual([], old_revision.content["custom_attribute_definitions"])
 
   @ddt.data(
       ("Text", ""),
       ("Rich Text", ""),
-      ("Dropdown", ""),
       ("Checkbox", "0"),
       ("Date", ""),
   )
@@ -301,7 +316,6 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
   @ddt.data(
       ("Text", ""),
       ("Rich Text", ""),
-      ("Dropdown", ""),
       ("Checkbox", "0"),
       ("Date", ""),
   )
