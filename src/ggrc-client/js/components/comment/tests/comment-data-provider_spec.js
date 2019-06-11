@@ -116,7 +116,7 @@ describe('comment-data-provider component', () => {
         },
       }));
 
-      await viewModel.loadFirstComments()
+      await viewModel.loadFirstComments();
 
       expect(viewModel.attr('comments').length).toBe(3);
     });
@@ -155,7 +155,7 @@ describe('comment-data-provider component', () => {
         },
       }));
 
-      await viewModel.loadFirstComments()
+      await viewModel.loadFirstComments();
 
       expect(viewModel.attr('totalCount')).toBe(3);
     });
