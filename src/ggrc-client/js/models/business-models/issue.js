@@ -5,7 +5,6 @@
 
 import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
-import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/notifications/base-notifications';
 import issueTracker from '../mixins/issue-tracker';
@@ -22,7 +21,6 @@ export default Cacheable.extend({
   create: 'POST /api/issues',
   mixins: [
     caUpdate,
-    timeboxed,
     accessControlList,
     baseNotifications,
     issueTracker,

@@ -10,7 +10,6 @@ import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
 import caUpdate from '../mixins/ca-update';
 import autoStatusChangeable from '../mixins/auto-status-changeable';
-import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
@@ -28,7 +27,7 @@ export default Cacheable.extend({
   create: 'POST /api/assessments',
   mixins: [
     caUpdate,
-    autoStatusChangeable, timeboxed,
+    autoStatusChangeable,
     accessControlList, refetchHash,
     assessmentIssueTracker, relatedAssessmentsLoader,
   ],

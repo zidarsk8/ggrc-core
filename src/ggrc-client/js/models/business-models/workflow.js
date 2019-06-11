@@ -6,7 +6,6 @@
 import Cacheable from '../cacheable';
 import TaskGroup from './task-group';
 import caUpdate from '../mixins/ca-update';
-import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
@@ -14,7 +13,7 @@ export default Cacheable.extend({
   root_object: 'workflow',
   root_collection: 'workflows',
   category: 'workflow',
-  mixins: [caUpdate, timeboxed, accessControlList],
+  mixins: [caUpdate, accessControlList],
   findAll: 'GET /api/workflows',
   findOne: 'GET /api/workflows/{id}',
   create: 'POST /api/workflows',
