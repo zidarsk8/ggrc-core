@@ -15,9 +15,20 @@ saved-search-list {
     padding: 0;
 
     li {
+      display: flex;
+      align-items: baseline;
+      width: 100%;
       cursor: pointer;
       opacity: 0.7;
       margin-bottom: 10px;
+
+      span {
+        display: block;
+        max-width: calc(100% - 13px);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
       .fa-trash {
         margin-left: 6px;
