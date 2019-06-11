@@ -7,7 +7,6 @@ import {
   simpleFieldResolver,
   customAttributeResolver,
 } from './conflict-resolvers';
-import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
 export function tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj) {
   let hasConflict = false;
@@ -61,9 +60,8 @@ export default function resolveConflict(xhr, obj) {
     stillHasConflict =
       tryResolveConflictValues(baseAttrs, attrs, remoteAttrs, obj);
     if (stillHasConflict) {
-      notifierXHR('warning', {status: 409});
       xhr.remoteObject = remoteAttrs;
-      return new $.Deferred().reject(xhr, 409, 'CONFLICT');
+      return new $.Deferred().reject(xhr);
     }
 
     return obj.save();
