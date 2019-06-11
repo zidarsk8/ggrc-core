@@ -122,6 +122,31 @@ def _joins_and_order(counter, clause, model, tgt_class):
   return joins, order
 
 
+def add_additional_sorting(order_by):
+  """Add additional sorting attribute
+
+  If we have equal values in sorting attributes, then this values returns
+  in random order. We add sorting by ID to additional sort such values
+
+  Args:
+    order_by: a list of dicts with keys "name" (the name of the field by
+              which to sort) and "desc" (optional; do reverse sort if True);
+
+  Returns:
+    a list of dicts with additional sorting by id if needed
+  """
+  additional_sorting = {"name": "id"}
+  # we do not need additional sorting if we sort by id
+  for order in order_by:
+    if "id" in order.values():
+      return order_by
+  for ordering in order_by:
+    if "desc" in ordering:
+      additional_sorting["desc"] = ordering["desc"]
+      break
+  return order_by + [additional_sorting]
+
+
 def apply_order_by(model, query, order_by, tgt_class):
   """Add ordering parameters to a query for objects.
 
@@ -145,10 +170,10 @@ def apply_order_by(model, query, order_by, tgt_class):
   Returns:
     the query with sorting parameters.
   """
-
+  ordering = add_additional_sorting(order_by)
   join_pairs = [
       _joins_and_order(counter, clause, model, tgt_class)
-      for counter, clause in enumerate(order_by)
+      for counter, clause in enumerate(ordering)
   ]
   join_lists, orders = zip(*join_pairs)
   join_lists = [join_list for join_list in join_lists if join_list is not None]
