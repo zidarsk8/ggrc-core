@@ -13,9 +13,15 @@ export default can.Component.extend({
   leakScope: true,
   viewModel: can.Map.extend({
     define: {
+      isGlobalSearch: {
+        value() {
+          return !this.attr('advancedSearch');
+        },
+      },
       isShowSavedSearch: {
         value() {
-          return isObjectContextPage() || isAllObjects();
+          return this.attr('isGlobalSearch')
+            || isObjectContextPage() || isAllObjects();
         },
       },
       objectType: {
