@@ -195,13 +195,13 @@ class CommentArea(object):
 
   def __init__(self, container):
     self._container = container
-    self.add_section = container.element(
-        text="Responses/Comments").parent().button(text="Add")
+    self.comments_section = container.element(text="Responses/Comments")
+    self.add_section = self.comments_section.parent().button(text="Add")
 
   @property
   def exists(self):
     """Returns whether comment area exists."""
-    return self.add_section.exists
+    return self.comments_section.exists
 
   @property
   def control_add_section(self):

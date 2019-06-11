@@ -10,6 +10,7 @@ from datetime import date, datetime
 
 from dateutil import parser, tz
 
+from lib.entities import mixin
 from lib.utils import help_utils
 from lib.utils.string_utils import StringMethods
 
@@ -735,7 +736,7 @@ class CustomAttributeValueEntity(Representation):
         "custom_attribute_id", **attrs)
 
 
-class ProgramEntity(Entity):
+class ProgramEntity(Entity, mixin.Reviewable):
   """Class that represent model for Program entity."""
 
   def __init__(self, **attrs):
