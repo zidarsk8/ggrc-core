@@ -38,6 +38,7 @@
   {{/case}}
   {{#case "dropdown"}}
     <dropdown-form-field value:from="value"
+            isLocalCa:from="isLocalCa"
 			options:from="options"
 			fieldId:from="fieldId"
 			disabled:from="disabled"

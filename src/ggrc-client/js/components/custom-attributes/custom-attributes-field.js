@@ -27,6 +27,7 @@ export default can.Component.extend({
     fieldId: null,
     placeholder: '',
     options: [],
+    isLocalCa: false,
     fieldValueChanged: function (e, scope) {
       this.dispatch({
         type: 'valueChanged',
