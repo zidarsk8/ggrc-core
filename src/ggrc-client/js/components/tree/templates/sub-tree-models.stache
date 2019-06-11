@@ -17,13 +17,10 @@
   <div class="sub-tree-models__options">
     {{#displayModelsList}}
       <div class="sub-models_item">
-          <label for="{{firstnonempty inputId ''}}" class="single-line" title="{{displayName}}">
-            <input type="checkbox"
-              id="{{firstnonempty inputId ''}}"
-              el:checked:bind="display"
-              value="{{name}}">
-            {{displayName}}
-          </label>
+        <label class="single-line" title="{{displayName}}">
+          <input type="checkbox" el:checked:bind="display" value="{{name}}">
+          {{displayName}}
+        </label>
       </div>
     {{/displayModelsList}}
   </div>
