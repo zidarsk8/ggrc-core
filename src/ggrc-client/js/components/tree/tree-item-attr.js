@@ -6,6 +6,7 @@ import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
 import template from './templates/tree-item-attr.stache';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
+import {getOnlyAnchorTags} from '../../plugins/ggrc_utils';
 
 // attribute names considered "default" and representing a date
 const DATE_ATTRS = new Set([
@@ -70,6 +71,20 @@ export default can.Component.extend({
       },
     },
     /**
+     * Transforms Rich text attribute value.
+     *
+     * @param {String} value - Rich text attribute value from DB.
+     * @return {String} - the transformed rich text attribute value.
+     */
+    getConvertedRichTextAttr(value) {
+      let result = value;
+
+      if (this.isMarkdown()) {
+        result = convertMarkdownToHtml(result);
+      }
+      return getOnlyAnchorTags(result);
+    },
+    /**
      * Retrieve the string value of an attribute.
      *
      * The method only supports instance attributes categorized as "default",
@@ -89,9 +104,6 @@ export default can.Component.extend({
 
       let result = instance.attr(attrName);
 
-      const regexTags = /<[^>]*>?/g;
-      const regexNewLines = /<\/p>?/g;
-
       if (result !== undefined && result !== null) {
         if (PERSON_ATTRS.has(attrName)) {
           return result.attr('email');
@@ -102,11 +114,7 @@ export default can.Component.extend({
         }
 
         if (RICH_TEXT_ATTRS.has(attrName)) {
-          if (this.isMarkdown()) {
-            result = convertMarkdownToHtml(result);
-          }
-          return result
-            .replace(regexNewLines, '\n').replace(regexTags, ' ').trim();
+          return this.getConvertedRichTextAttr(result);
         }
         return String(result);
       }

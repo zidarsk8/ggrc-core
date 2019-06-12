@@ -217,7 +217,7 @@
   {{/case}}
 
   {{#default}}
-    {{defaultValue}}
+    {{{defaultValue}}}
   {{/default}}
 
 {{/switch}}

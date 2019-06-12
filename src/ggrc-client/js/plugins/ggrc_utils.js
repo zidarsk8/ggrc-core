@@ -168,6 +168,27 @@ function getTruncatedList(items) {
   return mainContent + lastLine;
 }
 
+/**
+ * Remove all html tags except anchor tags from html text.
+ * @param {String} htmltext - html content
+ * @return {String} - transformed html content
+ */
+function getOnlyAnchorTags(htmltext) {
+  const regexStartTags = /<(?!a\s|\/)[^>]*>/g;
+  const regexEndTags1 = /<\/[^>]*[^a]>/g;
+  const regexEndTags2 = /<\/[^>]+a>/g;
+  const regexNewLines = /<\/p>?/g;
+
+  let anchoronlyhtml = htmltext
+    .replace(regexNewLines, '\n')
+    .replace(regexStartTags, ' ')
+    .replace(regexEndTags1, ' ')
+    .replace(regexEndTags2, ' ')
+    .trim();
+
+  return anchoronlyhtml;
+}
+
 export {
   applyTypeFilter,
   isInnerClick,
@@ -178,4 +199,5 @@ export {
   getPlainText,
   getAssigneeType,
   getTruncatedList,
+  getOnlyAnchorTags,
 };

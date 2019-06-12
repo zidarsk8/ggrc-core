@@ -7,6 +7,7 @@ import * as aclUtils from '../utils/acl-utils';
 import {
   getAssigneeType,
   getTruncatedList,
+  getOnlyAnchorTags,
 } from '../ggrc_utils';
 
 describe('getAssigneeType() method', function () {
@@ -149,3 +150,20 @@ describe('getTruncatedList() util', () => {
   });
 });
 
+describe('getOnlyAnchorTags() util', () => {
+  it('returns transformed html content having only anchor tags', () => {
+    const html = '<p>my <a href="https://www.example.com">example</a></p>';
+    const result = getOnlyAnchorTags(html);
+
+    expect(result)
+      .toBe('my <a href="https://www.example.com">example</a>');
+  });
+
+  it('returns transformed html with no html tags', () => {
+    const html = '<p><strong>sample text</strong></p>';
+    const result = getOnlyAnchorTags(html);
+
+    expect(result)
+      .toBe('sample text');
+  });
+});

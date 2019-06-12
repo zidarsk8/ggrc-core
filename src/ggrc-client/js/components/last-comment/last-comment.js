@@ -9,6 +9,7 @@ import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
 import {COMMENT_CREATED} from '../../events/eventTypes';
 import {formatDate} from '../../plugins/utils/date-utils';
 import Comment from '../../models/service-models/comment';
+import {getOnlyAnchorTags} from '../../plugins/ggrc_utils';
 
 export default can.Component.extend({
   tag: 'last-comment',
@@ -31,13 +32,7 @@ export default can.Component.extend({
         get() {
           const html = this.attr('comment.description') || '';
 
-          const regexTags = /<[^>]*>?/g;
-          const regexNewLines = /<\/p>?/g;
-
-          let lines = html
-            .replace(regexNewLines, '\n')
-            .replace(regexTags, ' ')
-            .trim();
+          let lines = getOnlyAnchorTags(html);
           return lines;
         },
       },
