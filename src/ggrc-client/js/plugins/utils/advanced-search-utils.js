@@ -245,3 +245,15 @@ export const parseFilterJson = (json) => {
     parentItems,
   };
 };
+
+/**
+ * Filter parent items to remove duplicates
+ * @param {Object} parent - parent attribute of Advanced search
+ * @param {Array} parentItems - parentItems attribute of Advanced search
+ * @return {Array} - filtered parentItems
+ */
+export const filterParentItems = (parent, parentItems) => {
+  return parentItems = parentItems.filter((item) =>
+    item.value.id !== parent.value.id ||
+    item.value.type !== parent.value.type);
+};

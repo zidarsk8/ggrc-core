@@ -7,7 +7,10 @@ import SavedSearch from '../../../models/service-models/saved-search';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Pagination from '../../base-objects/pagination';
 import {isObjectContextPage, isAllObjects} from '../../../plugins/utils/current-page-utils';
-import {parseFilterJson} from '../../../plugins/utils/advanced-search-utils';
+import {
+  parseFilterJson,
+  filterParentItems,
+} from '../../../plugins/utils/advanced-search-utils';
 
 export default can.Component.extend({
   tag: 'saved-search-wrapper',
@@ -61,9 +64,7 @@ export default can.Component.extend({
 
         const parent = advancedSearch && advancedSearch.attr('parent');
         if (parent && filter.parentItems) {
-          filter.parentItems = filter.parentItems.filter(
-            (item) => item.value.id !== parent.value.id
-              || item.value.type !== parent.value.type);
+          filter.parentItems = filterParentItems(parent, filter.parentItems);
         }
 
         if (advancedSearch) {
