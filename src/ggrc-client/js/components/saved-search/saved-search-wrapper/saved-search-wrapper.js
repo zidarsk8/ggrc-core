@@ -7,6 +7,7 @@ import SavedSearch from '../../../models/service-models/saved-search';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Pagination from '../../base-objects/pagination';
 import {isObjectContextPage, isAllObjects} from '../../../plugins/utils/current-page-utils';
+import {parseFilterJson} from '../../../plugins/utils/advanced-search-utils';
 
 export default can.Component.extend({
   tag: 'saved-search-wrapper',
@@ -55,31 +56,25 @@ export default can.Component.extend({
     advancedSearch: null,
     applySearch({search}) {
       try {
-        let {
-          filterItems,
-          mappingItems,
-          statusItem,
-          parentItems,
-        } = JSON.parse(search.filters);
-
+        const filter = parseFilterJson(search.filters);
         const advancedSearch = this.attr('advancedSearch');
 
         const parent = advancedSearch && advancedSearch.attr('parent');
-        if (parent && parentItems) {
-          parentItems = parentItems.filter(
+        if (parent && filter.parentItems) {
+          filter.parentItems = filter.parentItems.filter(
             (item) => item.value.id !== parent.value.id
               || item.value.type !== parent.value.type);
         }
 
         if (advancedSearch) {
-          advancedSearch.attr('filterItems', filterItems);
-          advancedSearch.attr('mappingItems', mappingItems);
-          advancedSearch.attr('parentItems', parentItems);
+          advancedSearch.attr('filterItems', filter.filterItems);
+          advancedSearch.attr('mappingItems', filter.mappingItems);
+          advancedSearch.attr('parentItems', filter.parentItems);
         } else {
           this.attr('filtersToApply', {
-            filterItems,
-            mappingItems,
-            statusItem,
+            filterItems: filter.filterItems,
+            mappingItems: filter.mappingItems,
+            statusItem: filter.statusItem,
           });
         }
       } catch (e) {

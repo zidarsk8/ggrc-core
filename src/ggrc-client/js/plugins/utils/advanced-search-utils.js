@@ -224,3 +224,24 @@ export const setDefaultStatusConfig = (state, modelName) => {
   state.attr('modelName', modelName);
   return state;
 };
+
+/**
+ * Convert JSON filter to Object
+ * @param {string} json - JSON string
+ * @return {Object} - parsed advanced search filter
+ */
+export const parseFilterJson = (json) => {
+  let {
+    filterItems,
+    mappingItems,
+    statusItem,
+    parentItems,
+  } = JSON.parse(json);
+
+  return {
+    filterItems,
+    mappingItems,
+    statusItem,
+    parentItems,
+  };
+};
