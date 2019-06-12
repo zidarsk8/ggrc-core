@@ -106,10 +106,9 @@ class RelationshipResource(ggrc.services.common.Resource):
       json_builder.create(obj, snapshot_data)
       obj.modified_by = get_current_user()
       obj.context = obj.parent.context
-      relationship.Relationship(
-          source=obj.parent,
-          destination=obj,
-      )
+      relationship_obj = relationship.Relationship()
+      relationship_obj.source = obj.parent
+      relationship_obj.destination = obj
       return None
 
     return super(RelationshipResource, self).json_create(obj, src)
