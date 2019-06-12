@@ -111,7 +111,6 @@ export default Cacheable.extend({
     this.attr('response_options', []);
     this.attr('start_date', startDate);
     this.attr('end_date', endDate);
-    this.attr('minStartDate', new Date());
   },
   _refresh_workflow_people: function () {
     //  TaskGroupTask assignment may add mappings and role assignments in
