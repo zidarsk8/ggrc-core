@@ -186,4 +186,26 @@ describe('mapper-results-item', function () {
       );
     });
   });
+
+  describe('"{viewModel.itemData} destroyed"() event handler', () => {
+    let handler;
+
+    beforeEach(() => {
+      handler = Component.prototype.events['{viewModel.itemData} destroyed']
+        .bind({viewModel});
+      spyOn(viewModel, 'dispatch');
+    });
+
+    it('dispatches "itemDataDestroyed" event with defined "itemId" field',
+      () => {
+        viewModel.attr('itemData', {id: 12345});
+
+        handler();
+
+        expect(viewModel.dispatch).toHaveBeenCalledWith({
+          type: 'itemDataDestroyed',
+          itemId: 12345,
+        });
+      });
+  });
 });
