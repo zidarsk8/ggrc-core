@@ -142,3 +142,14 @@ class TestSavedSearchGet(SavedSearchBaseTest):
 
     self.assertEqual(data_program["total"], 1)
     self.assertEqual(data_assessment["total"], 3)
+
+  def test_3_get_saved_search_by_id(self):
+    data_assessment = self._get_saved_search(object_type="Assessment")
+    assmt = data_assessment["values"][0]
+    response = self._client.get("{uri}/{id}".format(uri=self.SAVED_SEARCH_URI,
+                                                    id=assmt["id"]),
+                                headers=self._headers)
+    saved_search = json.loads(response.data)["SavedSearch"]
+    self.assertEqual(assmt["name"], saved_search["name"])
+    self.assertEqual(assmt["id"], saved_search["id"])
+    self.assertEqual(assmt["object_type"], saved_search["object_type"])

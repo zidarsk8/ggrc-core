@@ -14,6 +14,36 @@ from ggrc.models.saved_search import SavedSearch
 from ggrc.models.exceptions import ValidationError
 
 
+@app.route("/api/saved_searches/<int:saved_search_id>", methods=["GET"])
+def get_saved_searches_by_id(saved_search_id):
+  """
+
+  Args:
+    saved_search_id:
+
+  Returns:
+
+  """
+  user = login.get_current_user(use_external_user=False)
+  saved_search = user.saved_searches.filter(
+      SavedSearch.id == saved_search_id
+  ).first()
+
+  if saved_search:
+    response_data = {
+        SavedSearch.__name__: saved_search
+    }
+
+    return json_success_response(response_data)
+  return make_error_response(
+      "No saved search with id {} found for current user".format(
+          saved_search_id,
+      ),
+      404,
+      force_json=True,
+  )
+
+
 @app.route("/api/saved_searches/<string:object_type>", methods=["GET"])
 def get_saved_searches_by_type(object_type):
   """Get SavedSearch by object type
