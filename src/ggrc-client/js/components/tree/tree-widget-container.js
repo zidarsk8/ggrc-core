@@ -40,9 +40,14 @@ import {
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   initMappedInstances,
+  isAllObjects,
+  isMyWork,
 } from '../../plugins/utils/current-page-utils';
 import {
+  initCounts,
   getCounts,
+  refreshCounts,
+  getWidgetModels,
 } from '../../plugins/utils/widgets-utils';
 import {getMegaObjectRelation} from '../../plugins/utils/mega-object-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
@@ -57,9 +62,8 @@ import exportMessage from './templates/export-message.stache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
-let viewModel;
 
-viewModel = can.Map.extend({
+let viewModel = can.Map.extend({
   define: {
     /**
      * Condition that adds into all request to server-side Query API
@@ -197,7 +201,6 @@ viewModel = can.Map.extend({
     const stopFn = tracker.start(modelName,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
-    const countsName = this.attr('options.countsName');
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
@@ -223,12 +226,6 @@ viewModel = can.Map.extend({
         this.attr('pageInfo.total', total);
         this.attr('pageInfo.disabled', false);
         this.attr('loading', false);
-
-        if (!this._getFilterByName('custom') &&
-          !this._getFilterByName('status') &&
-          total !== getCounts().attr(countsName)) {
-          getCounts().attr(countsName, total);
-        }
       })
       .then(stopFn, stopFn.bind(null, true));
   },
@@ -326,11 +323,6 @@ viewModel = can.Map.extend({
 
     return filter;
   },
-  _getFilterByName: function (name) {
-    let filter = _.find(this.attr('filters'), {name: name});
-
-    return filter && filter.query ? filter.query : null;
-  },
   _widgetHidden: function () {
     this._triggerListeners(true);
   },
@@ -381,6 +373,8 @@ viewModel = can.Map.extend({
     function onCreated(ev, instance) {
       if (activeTabModel === instance.type) {
         _refresh(true);
+      } else if (!(instance instanceof Relationship)) {
+        _refreshCounts();
       }
     }
 
@@ -399,16 +393,16 @@ viewModel = can.Map.extend({
             current > 1 ? current - 1 : 1);
         }
 
-        if (!self._isRefreshNeeded(instance)) {
-          return;
-        }
+        if (self._isRefreshNeeded(instance)) {
+          _refresh();
 
-        _refresh();
-
-        // TODO: This is a workaround.We need to update communication between
-        //       info-pin and tree views through Observer
-        if (!self.attr('$el').closest('.pin-content').length) {
-          $('.pin-content').control().unsetInstance();
+          // TODO: This is a workaround.We need to update communication between
+          //       info-pin and tree views through Observer
+          if (!self.attr('$el').closest('.pin-content').length) {
+            $('.pin-content').control().unsetInstance();
+          }
+        } else {
+          _refreshCounts();
         }
       } else {
         // reinit mapped instances (subTree uses mapped instances)
@@ -416,7 +410,7 @@ viewModel = can.Map.extend({
       }
     }
 
-    function _refresh(sortByUpdatedAt) {
+    const _refresh = async (sortByUpdatedAt) => {
       if (self.attr('loading')) {
         return;
       }
@@ -425,9 +419,27 @@ viewModel = can.Map.extend({
         self.attr('sortingInfo.sortBy', 'updated_at');
         self.attr('pageInfo.current', 1);
       }
-      self.loadItems();
+      await self.loadItems();
+      if (self.attr('currentFilter')) {
+        _refreshCounts();
+      } else {
+        const countsName = self.attr('options.countsName');
+        const total = self.attr('pageInfo.total');
+        getCounts().attr(countsName, total);
+      }
       self.closeInfoPane();
-    }
+    };
+
+    // timeout required to let server correctly calculate changed counts
+    const _refreshCounts = _.debounce(() => {
+      if (isMyWork() || isAllObjects()) {
+        const location = window.location.pathname;
+        const widgetModels = getWidgetModels('Person', location);
+        initCounts(widgetModels, 'Person', GGRC.current_user.id);
+      } else {
+        refreshCounts();
+      }
+    }, 250);
 
     function _verifyRelationship(instance, shortName, parentInstance) {
       if (!(instance instanceof Relationship)) {
