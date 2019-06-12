@@ -132,7 +132,7 @@ describe('sub-tree-models component', function () {
       spyOn(childModelsMap, 'setModels');
     });
 
-    it('sets selectedModels ti childModelsMap', function () {
+    it('sets selectedModels to childModelsMap', function () {
       vm.setVisibility(event);
 
       expect(childModelsMap.setModels)
