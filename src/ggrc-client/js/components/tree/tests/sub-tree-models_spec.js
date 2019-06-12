@@ -191,11 +191,8 @@ describe('sub-tree-models component', function () {
   });
 
   describe('getSelectedModels() method', function () {
-    let modelsList;
-    let expectedResult;
-
     beforeEach(function () {
-      modelsList = new can.List([
+      const modelsList = new can.List([
         {name: 'Audit', display: true},
         {name: 'Control', display: true},
         {name: 'Objective', display: false},
@@ -204,9 +201,8 @@ describe('sub-tree-models component', function () {
       vm.attr('modelsList', modelsList);
     });
 
-    it('returns models names which are selected', function () {
-      expectedResult = vm.attr('modelsList').filter((model) => model.display)
-        .map((model) => model.name).serialize();
+    it('returns selected models widgetIds', function () {
+      const expectedResult = ['Audit', 'Control', 'Market'];
       expect(vm.getSelectedModels().serialize()).toEqual(expectedResult);
     });
   });
