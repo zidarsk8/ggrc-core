@@ -74,11 +74,11 @@ describe('sub-tree-models component', function () {
   });
 
   describe('get() of displayModelsList', function () {
-    it('splits model names', function () {
+    it('splits widgetNames', function () {
       let result;
       vm.attr('modelsList', new can.List([
-        {name: 'MockName'},
-        {name: 'Singlelinename'},
+        {widgetName: 'MockName'},
+        {widgetName: 'Singlelinename'},
       ]));
 
       result = vm.attr('displayModelsList');
@@ -90,10 +90,10 @@ describe('sub-tree-models component', function () {
     it('sorts model names', function () {
       let result;
       vm.attr('modelsList', new can.List([
-        {name: 'Metrics'},
-        {name: 'Control'},
-        {name: 'Risk'},
-        {name: 'Audit'},
+        {widgetName: 'Metrics'},
+        {widgetName: 'Control'},
+        {widgetName: 'Risk'},
+        {widgetName: 'Audit'},
       ]));
 
       result = vm.attr('displayModelsList');
