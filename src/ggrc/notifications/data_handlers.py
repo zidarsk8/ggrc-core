@@ -135,6 +135,7 @@ def _get_updated_fields(obj, created_at, definitions, roles):
 
   new_attrs = new_rev.content
   old_attrs = old_rev.content
+
   for attr_name, new_val in new_attrs.iteritems():
     if attr_name in notifications.IGNORE_ATTRS:
       continue
@@ -151,14 +152,19 @@ def _get_updated_fields(obj, created_at, definitions, roles):
       fields.append(attr_name)
 
   fields.extend(list(notifications.get_updated_cavs(new_attrs, old_attrs)))
-  updated_fields = []
+  updated_fields = [[], {}]
   for field in fields:
     definition = definitions.get(field, None)
     if definition:
-      updated_fields.append(definition["display_name"].upper())
+      updated_fields[0].append(definition["display_name"].upper())
+      updated_fields[1][definition["display_name"].upper()] = (
+          new_attrs[field],
+          old_attrs[field]
+      )
     else:
-      updated_fields.append(field.upper())
-  return updated_fields
+      updated_fields[0].append(field.upper())
+      updated_fields[1][field.upper()] = (new_attrs[field], old_attrs[field])
+  return updated_fields[0], updated_fields[1]
 
 
 def _get_assignable_roles(obj):
@@ -200,6 +206,15 @@ def _get_assignable_dict(people, notif, ca_cache=None):
   for person in people:
     # We should default to today() if no start date is found on the object.
     start_date = getattr(obj, "start_date", datetime.date.today())
+    if notif.notification_type.name == "assessment_updated":
+      updated_fields, updated_data = _get_updated_fields(
+          obj,
+          notif.created_at,
+          definitions,
+          roles
+      )
+    else:
+      updated_fields, updated_data = None, None
     data[person.email] = {
         "user": get_person_dict(person),
         notif.notification_type.name: {
@@ -212,12 +227,8 @@ def _get_assignable_dict(people, notif, ca_cache=None):
                     notif.id: as_user_time(notif.created_at)},
                 "notif_updated_at": {
                     notif.id: as_user_time(notif.updated_at)},
-                "updated_fields": _get_updated_fields(obj,
-                                                      notif.created_at,
-                                                      definitions,
-                                                      roles)
-                if notif.notification_type.name == "assessment_updated"
-                else None,
+                "updated_fields": updated_fields,
+                "updated_data": updated_data,
             }
         }
     }

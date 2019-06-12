@@ -117,6 +117,28 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(len(notifs), 1)
     self.assertEqual(updated[self.assessment.id]["updated_fields"], ["CA1"])
 
+  def test_description_custom_change(self):
+    """Test notification updated data when custom attribute value is changed"""
+    response = self.api.put(self.assessment, {
+        "title": "test_title",
+        "description": "test_description"
+    })
+    self.assert200(response)
+
+    notifs, notif_data = common.get_daily_notifications()
+    updated = notif_data["user@example.com"]["assessment_updated"]
+    self.assertEqual(len(notifs), 1)
+    self.assertEqual(updated[self.assessment.id]["updated_fields"],
+                     ["TITLE", "DESCRIPTION"])
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["TITLE"],
+        ("test_title", "Assessment1")
+    )
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["DESCRIPTION"],
+        ("test_description", "")
+    )
+
   def test_ca_change_by_import(self):
     """Test notification when custom attribute value is changed by import"""
 

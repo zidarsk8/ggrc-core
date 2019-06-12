@@ -1,0 +1,52 @@
+{#
+Copyright (C) 2019 Google Inc.
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+#}
+  {% import 'notifications/style.html' as style %}
+  {% import 'notifications/macros.html' as macro %}
+
+<table {{ style.body_wrap() }} >
+  <tr>
+  <td {{ style.container() }} >
+      <div {{ style.content() }} >
+        {% if digest.get('assessment_updated') %}
+          {% for assessment_id, assessment_data in digest['assessment_updated'].iteritems() %}
+            <p {{ style.notification_title() }}>Assessment "{{ assessment_data['title'] }}" has been updated</p>
+            <table {{ style.proposal_table_full() }}>
+              <thead>
+                <tr>
+                    <th {{ style.proposal_th() }}>ATTRIBUTE</th>
+                    <th {{ style.proposal_th() }}>NEW VALUE</th>
+                    <th {{ style.proposal_th() }}>OLD VALUE</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for field, value in assessment_data['updated_data'].iteritems() %}
+              <tr>
+                <td>{{ field }}</td>
+                <td>{{ value[0] }}</td>
+                <td>{{ value[1] }}</td>
+              </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+            <p {{ style.notification_body() }}>
+                Go to GGRC to check this assessment
+            </p>
+            <a href="{{ assessment_data['url'] }}" {{ style.notification_btn() }}>Open</a>
+          {% endfor %}
+        {% endif %}
+
+        {% if digest.get('assessment_open') %}
+          {% for assessment_id, assessment_data in digest['assessment_open'].iteritems() %}
+            <p {{ style.notification_title() }}>Assessment "{{ assessment_data['title'] }}" have been started</p>
+            <p {{ style.notification_body() }}>
+              Go to GGRC to check this assessment
+            </p>
+            <a href="{{ assessment_data['url'] }}" {{ style.notification_btn() }}>Open</a>
+          {% endfor %}
+        {% endif %}
+      </div>
+  </td>
+  </tr>
+</table>

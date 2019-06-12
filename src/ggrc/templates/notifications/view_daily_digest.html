@@ -13,7 +13,8 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   {% for user, digest in data.items() %}
     <hr>
     {% include 'notifications/email_header.html' %}
-    {% include 'notifications/email_digest_content.html' %}
+<!--    {% include 'notifications/email_digest_content.html' %}-->
+    {% include 'notifications/new_email_digest_content.html' %}
   {% endfor %}
 
   <hr>
