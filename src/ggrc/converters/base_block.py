@@ -12,7 +12,6 @@ from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
 
-from cached_property import cached_property
 import sqlalchemy as sa
 from sqlalchemy import or_
 from sqlalchemy import and_
@@ -231,69 +230,6 @@ class BlockConverter(object):
     if self._ticket_tracker_cache is None:
       self._ticket_tracker_cache = self._create_ticket_tracker_cache()
     return self._ticket_tracker_cache
-
-  @cached_property
-  def audit_snapshots(self):
-    """Cached property of mapped to audit snapshots"""
-    # pylint: disable=protected-access
-    with benchmark("Create cache of Audit snapshots"):
-      snapshots = defaultdict(lambda: defaultdict(set))
-      query = db.session.query(
-          models.Revision.resource_slug,
-          models.Snapshot.parent_id,
-          models.Snapshot.child_type,
-      ).join(models.Snapshot).filter(
-          models.Snapshot.parent_type == self.object_class.__name__,
-          models.Snapshot.parent_id.in_(self.object_ids),
-      )
-      for slug, parent_id, child_type in query:
-        snapshots[parent_id][child_type].add(slug)
-      return snapshots
-
-  @cached_property
-  def related_snapshots(self):
-    """Get snapshot slugs mapped to imported objects by relationship."""
-    with benchmark("Create cache of snapshots related to {}".format(
-        self.object_class.__name__
-    )):
-      snapshots = defaultdict(lambda: defaultdict(set))
-      if not self.object_ids:
-        return snapshots
-
-      query = """
-          SELECT {base_table}.id,
-                  revisions.resource_type,
-                  revisions.resource_slug
-          FROM {base_table}, relationships, snapshots, revisions
-          WHERE relationships.source_id = {base_table}.id
-              AND relationships.source_type = '{base_name}'
-              AND relationships.destination_id = snapshots.id
-              AND relationships.destination_type = 'Snapshot'
-                  AND revisions.id = snapshots.revision_id
-          AND {base_table}.id IN :object_ids
-          UNION ALL
-          SELECT {base_table}.id,
-                  revisions.resource_type,
-                  revisions.resource_slug
-          FROM {base_table}, relationships, snapshots, revisions
-          WHERE relationships.source_id = snapshots.id
-              AND relationships.source_type = 'Snapshot'
-              AND relationships.destination_id = {base_table}.id
-              AND relationships.destination_type = '{base_name}'
-                  AND revisions.id = snapshots.revision_id
-          AND {base_table}.id IN :object_ids;
-      """.format(
-          base_table=self.object_class.__table__.name,
-          base_name=self.object_class.__name__,
-      )
-      mapped_revs = db.session.execute(
-          sa.text(query),
-          {"object_ids": self.object_ids}
-      ).fetchall()
-
-      for object_id, snapshot_obj_type, snapshot_obj_slug in mapped_revs:
-        snapshots[object_id][snapshot_obj_type].add(snapshot_obj_slug)
-      return snapshots
 
   def check_for_duplicate_columns(self, raw_headers):
     """Check for duplicate column names in the current block.

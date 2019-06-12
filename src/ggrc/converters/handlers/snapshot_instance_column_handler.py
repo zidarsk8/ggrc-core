@@ -11,6 +11,7 @@ from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import MappingColumnHandler
 from ggrc.snapshotter.rules import Types
+from ggrc.utils import objects_cache
 
 
 class SnapshotInstanceColumnHandler(MappingColumnHandler):
@@ -141,11 +142,16 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     "return column value"
     if self.unmap or not self.mapping_object:
       return ""
-    if self.row_converter.obj.type == models.Audit.__name__ and \
-       self.mapping_object.__name__ in Types.all:
-      mapped_snapshots = self.row_converter.block_converter.audit_snapshots
+
+    obj_class = self.row_converter.block_converter.object_class
+    obj_ids = self.row_converter.block_converter.object_ids
+    if obj_class == models.Audit and self.mapping_object.__name__ in Types.all:
+      mapped_snapshots = objects_cache.audit_snapshot_slugs_cache(obj_ids)
     else:
-      mapped_snapshots = self.row_converter.block_converter.related_snapshots
+      mapped_snapshots = objects_cache.related_snapshot_slugs_cache(
+          obj_class,
+          obj_ids
+      )
 
     snapshot_slugs = mapped_snapshots[self.row_converter.obj.id].get(
         self.mapping_object.__name__,
