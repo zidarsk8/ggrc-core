@@ -20,13 +20,11 @@ export default Cacheable.extend({
   update: 'PUT /api/workflows/{id}',
   destroy: 'DELETE /api/workflows/{id}',
   is_custom_attributable: true,
-
   attributes: {
     task_groups: Stub.List,
     cycles: Stub.List,
     modified_by: Stub,
     context: Stub,
-    repeat_every: 'number',
   },
   default_lhn_filters: {
     Workflow: {status: 'Active'},
