@@ -71,6 +71,7 @@ import * as businessModels from '../../models/business-models';
 import exportMessage from './templates/export-message.stache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
+import SavedSearch from '../../models/service-models/saved-search';
 
 
 let viewModel = canMap.extend({
@@ -183,6 +184,7 @@ let viewModel = canMap.extend({
    * Legacy options which were built for a previous implementation of TreeView based on TreeView controller
    */
   options: {},
+  router: null,
   $el: null,
   loading: false,
   columns: {
@@ -240,6 +242,12 @@ let viewModel = canMap.extend({
       .then(stopFn, stopFn.bind(null, true));
   },
   display: function (needToRefresh) {
+    // load saved search if router has saved_search id
+    if (isLoadSavedSearch(this)) {
+      loadSavedSearch(this);
+      return;
+    }
+
     let loadedItems;
 
     if (!this.attr('loaded') || needToRefresh || router.attr('refetch')) {
@@ -518,6 +526,13 @@ let viewModel = canMap.extend({
     if (isObjectContextPage()) {
       this.attr('advancedSearch.parent',
         AdvancedSearch.create.parent(this.attr('parent_instance')));
+
+      // remove duplicates
+      const parentItems = AdvancedSearch.filterParentItems(
+        this.attr('advancedSearch.parent'),
+        this.attr('advancedSearch.parentItems'));
+
+      this.attr('advancedSearch.parentItems', parentItems);
     }
 
     this.attr('advancedSearch.open', true);
@@ -758,6 +773,7 @@ export default canComponent.extend({
     inserted() {
       let viewModel = this.viewModel;
       viewModel.attr('$el', this.element);
+      viewModel.attr('router', router);
 
       this.element.closest('.widget')
         .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
@@ -778,5 +794,60 @@ export default canComponent.extend({
         viewModel.display(forceRefresh);
       }
     },
+    '{viewModel.router} saved_search'() {
+      if (isLoadSavedSearch(this.viewModel)) {
+        loadSavedSearch(this.viewModel);
+      }
+    },
   },
 });
+
+const isLoadSavedSearch = (viewModel) => {
+  return !!viewModel.attr('router.saved_search');
+};
+
+const loadSavedSearch = (viewModel) => {
+  const searchId = viewModel.attr('router.saved_search');
+  viewModel.attr('loading', true);
+
+  SavedSearch.findOne({id: searchId}).then((response) => {
+    viewModel.attr('loading', false);
+
+    const savedSearch = response.SavedSearch;
+
+    if (savedSearch &&
+      savedSearch.object_type === viewModel.attr('modelName') &&
+      savedSearch.search_type === 'AdvancedSearch') {
+      applySavedSearch(savedSearch, viewModel);
+    } else {
+      // clear filter and apply default
+      viewModel.removeAdvancedFilters();
+    }
+  }).fail(() => {
+    viewModel.removeAdvancedFilters();
+    viewModel.attr('loading', false);
+  });
+};
+
+const applySavedSearch = (savedSearch, viewModel) => {
+  try {
+    const filter = AdvancedSearch.parseFilterJson(savedSearch.filters);
+    const advancedSearch = viewModel.attr('advancedSearch');
+    const parent = advancedSearch && advancedSearch.attr('parent');
+
+    if (parent && filter.parentItems) {
+      // remove duplicates
+      filter.parentItems = AdvancedSearch
+        .filterParentItems(parent, filter.parentItems);
+    }
+
+    advancedSearch.attr('filterItems', filter.filterItems);
+    advancedSearch.attr('mappingItems', filter.mappingItems);
+    advancedSearch.attr('parentItems', filter.parentItems);
+
+    viewModel.applyAdvancedFilters();
+  } catch (e) {
+    notifier('error',
+      `"${savedSearch.name}" is broken somehow. Sorry for any inconvenience.`);
+  }
+};
