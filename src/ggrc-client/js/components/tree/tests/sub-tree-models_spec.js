@@ -77,14 +77,16 @@ describe('sub-tree-models component', function () {
     it('splits widgetNames', function () {
       let result;
       vm.attr('modelsList', new can.List([
+        {widgetName: 'Child Programs'},
         {widgetName: 'MockName'},
         {widgetName: 'Singlelinename'},
       ]));
 
       result = vm.attr('displayModelsList');
 
-      expect(result[0].displayName).toEqual('Mock Name');
-      expect(result[1].displayName).toEqual('Singlelinename');
+      expect(result[0].displayName).toEqual('Child Programs');
+      expect(result[1].displayName).toEqual('Mock Name');
+      expect(result[2].displayName).toEqual('Singlelinename');
     });
 
     it('sorts model names', function () {
@@ -94,14 +96,16 @@ describe('sub-tree-models component', function () {
         {widgetName: 'Control'},
         {widgetName: 'Risk'},
         {widgetName: 'Audit'},
+        {widgetName: 'Child Programs'},
       ]));
 
       result = vm.attr('displayModelsList');
 
       expect(result[0].displayName).toEqual('Audit');
-      expect(result[1].displayName).toEqual('Control');
-      expect(result[2].displayName).toEqual('Metrics');
-      expect(result[3].displayName).toEqual('Risk');
+      expect(result[1].displayName).toEqual('Child Programs');
+      expect(result[2].displayName).toEqual('Control');
+      expect(result[3].displayName).toEqual('Metrics');
+      expect(result[4].displayName).toEqual('Risk');
     });
   });
 
