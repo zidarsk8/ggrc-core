@@ -947,23 +947,19 @@ export default canControl.extend({
     ajd = instance.save();
     ajd.fail(this.save_error.bind(this))
       .done(function (obj) {
-        function finish() {
-          // enable ui after clicking on save & other
-          that.disableEnableContentUI(false);
-          delete that.disable_hide;
-          if (that.options.add_more) {
-            if (that.options.$trigger && that.options.$trigger.length) {
-              that.options.$trigger.trigger('modal:added', [obj]);
-            }
-            that.new_instance();
-          } else {
-            that.element.trigger('modal:success', [obj])
-              .modal_form('hide');
-            that.update_hash_fragment();
+        // enable ui after clicking on save & other
+        that.disableEnableContentUI(false);
+        delete that.disable_hide;
+        if (that.options.add_more) {
+          if (that.options.$trigger && that.options.$trigger.length) {
+            that.options.$trigger.trigger('modal:added', [obj]);
           }
+          that.new_instance();
+        } else {
+          that.element.trigger('modal:success', [obj])
+            .modal_form('hide');
+          that.update_hash_fragment();
         }
-
-        finish();
       });
     this.save_ui_status();
     return ajd;
