@@ -203,6 +203,19 @@ class TestAudit(TestCase):
     expected_slug = "SLUG"
     self.assertEqual(current_slug, expected_slug)
 
+  def test_slug_no_update(self):
+    """Test put slug has no effect since slug became
+    not updatable API attribute"""
+    with factories.single_commit():
+      audit = factories.AuditFactory(slug="SLUG-01")
+
+    response = self.api.put(audit, {"slug": "NEW SLUG"})
+    self.assert200(response)
+    audit = db.session.query(all_models.Audit).get(audit.id)
+    current_slug = audit.slug
+    expected_slug = "SLUG-01"
+    self.assertEqual(current_slug, expected_slug)
+
 
 class TestManualAudit(TestCase):
   """ Test Audit with manual snapshot mapping"""

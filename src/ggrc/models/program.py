@@ -71,7 +71,6 @@ class Program(mega.Mega,
       'kind',
       reflection.Attribute('audits', create=False, update=False),
       reflection.Attribute('risk_assessments', create=False, update=False),
-      reflection.Attribute('folder', create=False, update=False),
   )
   _include_links = []
   _aliases = {

@@ -3,6 +3,9 @@
 
 """Integration tests for Program."""
 
+import datetime
+import ddt
+
 from ggrc.models import all_models
 from ggrc.utils import errors
 
@@ -48,6 +51,93 @@ class TestProgram(TestCase):
     self.assert200(response)
     response = self.api.delete(self.program)
     self.assert200(response)
+
+
+@ddt.ddt
+class TestProgramVersionHistory(TestCase):
+  """Test Version History for Program"""
+
+  def setUp(self):
+    super(TestProgramVersionHistory, self).setUp()
+    self.api = api_helper.Api()
+
+    with factories.single_commit():
+      self.program = factories.ProgramFactory(
+          title="Test Program",
+          description="Program Description",
+          slug="PROGRAM-2346",
+          start_date=datetime.date(2019, 6, 1),
+          end_date=datetime.date(2019, 6, 2),
+          updated_at=datetime.date(2019, 6, 2),
+          folder="Program Folder",
+          notes="Program Notes",
+          status="Draft",
+      )
+      self.cad = factories.CustomAttributeDefinitionFactory(
+          title="test cad",
+          definition_type="program",
+          definition_id=self.program.id,
+          attribute_type="Text",
+          mandatory=True,
+      )
+      self.cav = factories.CustomAttributeValueFactory(
+          custom_attribute=self.cad,
+          attributable=self.program,
+          attribute_value="Text",
+      )
+
+  @ddt.data(
+      ("title", "Prev Program Title", True),
+      ("description", "Prev Program Decription", True),
+      ("slug", "PREV-PROGRAM-SLUG", False),
+      ("folder", "Prev Program Folder", False),
+      ("status", "Active", True),
+      ("notes", "Prev Program Notes", True),
+      ("start_date", datetime.date(2019, 5, 1), True),
+      ("end_date", datetime.date(2019, 5, 2), False),
+      ("updated_at", datetime.date(2019, 5, 2), False),
+  )
+  @ddt.unpack
+  def test_restore_attr_from_history(self, attr_name,
+                                     attr_value, restored):
+    """Test only allowed fields can be restored from Version History"""
+
+    response = self.api.put(self.program, data={attr_name: attr_value})
+    self.assert200(response)
+
+    self.program = self.refresh_object(
+        all_models.Program,
+        id_=self.program.id,
+    )
+    self.assertEqual(
+        getattr(self.program, attr_name, None) == attr_value,
+        restored,
+    )
+
+  def test_restore_cav_from_history(self):
+    """Test CAV can be restored from Version History"""
+
+    prev_cav_value = "Prev Text"
+    prev_cav = self.cav.log_json()
+    prev_cav.update({"attribute_value": prev_cav_value})
+
+    response = self.api.put(
+        self.program,
+        data={
+            "custom_attribute_definitions": [self.cad.log_json()],
+            "custom_attribute_values": [prev_cav]
+        },
+    )
+    self.assert200(response)
+
+    self.program = self.refresh_object(
+        all_models.Program,
+        id_=self.program.id,
+    )
+    self.assertEqual(
+        self.program.custom_attribute_values[0].attribute_value,
+        prev_cav_value
+    )
 
 
 class TestMegaProgram(TestCase):
