@@ -50,7 +50,7 @@
   {{> /static/templates/partials/modal-ajax-test-plan.stache}}
 
   <div class="row">
-    <div class="span12 hide-wrap hidable">
+    <div class="span12 hide-wrap">
       <access-control-list-roles-helper
         instance:from="{.}"
         isNewInstance:from="new_object_form">
