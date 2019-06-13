@@ -73,7 +73,7 @@ export default canControl.extend({
     header_view: GGRC.templates_path + '/modals/modal_header.stache',
     custom_attributes_view:
     GGRC.templates_path + '/custom_attributes/modal_content.stache',
-    button_view: null,
+    button_view: BUTTON_VIEW_DONE,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
@@ -85,10 +85,6 @@ export default canControl.extend({
     afterFetch: function () {},
     isProposal: false,
     isSaving: false, // is there a save/map operation currently in progress
-  },
-
-  init: function () {
-    this.defaults.button_view = BUTTON_VIEW_DONE;
   },
 }, {
   init: function () {
