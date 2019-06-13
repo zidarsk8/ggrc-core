@@ -74,34 +74,38 @@ describe('sub-tree-models component', function () {
   });
 
   describe('get() of displayModelsList', function () {
-    it('splits model names', function () {
+    it('splits widgetNames', function () {
       let result;
       vm.attr('modelsList', new can.List([
-        {name: 'MockName'},
-        {name: 'Singlelinename'},
+        {widgetName: 'Child Programs'},
+        {widgetName: 'MockName'},
+        {widgetName: 'Singlelinename'},
       ]));
 
       result = vm.attr('displayModelsList');
 
-      expect(result[0].displayName).toEqual('Mock Name');
-      expect(result[1].displayName).toEqual('Singlelinename');
+      expect(result[0].displayName).toEqual('Child Programs');
+      expect(result[1].displayName).toEqual('Mock Name');
+      expect(result[2].displayName).toEqual('Singlelinename');
     });
 
     it('sorts model names', function () {
       let result;
       vm.attr('modelsList', new can.List([
-        {name: 'Metrics'},
-        {name: 'Control'},
-        {name: 'Risk'},
-        {name: 'Audit'},
+        {widgetName: 'Metrics'},
+        {widgetName: 'Control'},
+        {widgetName: 'Risk'},
+        {widgetName: 'Audit'},
+        {widgetName: 'Child Programs'},
       ]));
 
       result = vm.attr('displayModelsList');
 
       expect(result[0].displayName).toEqual('Audit');
-      expect(result[1].displayName).toEqual('Control');
-      expect(result[2].displayName).toEqual('Metrics');
-      expect(result[3].displayName).toEqual('Risk');
+      expect(result[1].displayName).toEqual('Child Programs');
+      expect(result[2].displayName).toEqual('Control');
+      expect(result[3].displayName).toEqual('Metrics');
+      expect(result[4].displayName).toEqual('Risk');
     });
   });
 
@@ -128,7 +132,7 @@ describe('sub-tree-models component', function () {
       spyOn(childModelsMap, 'setModels');
     });
 
-    it('sets selectedModels ti childModelsMap', function () {
+    it('sets selectedModels to childModelsMap', function () {
       vm.setVisibility(event);
 
       expect(childModelsMap.setModels)
@@ -187,11 +191,8 @@ describe('sub-tree-models component', function () {
   });
 
   describe('getSelectedModels() method', function () {
-    let modelsList;
-    let expectedResult;
-
     beforeEach(function () {
-      modelsList = new can.List([
+      const modelsList = new can.List([
         {name: 'Audit', display: true},
         {name: 'Control', display: true},
         {name: 'Objective', display: false},
@@ -200,9 +201,8 @@ describe('sub-tree-models component', function () {
       vm.attr('modelsList', modelsList);
     });
 
-    it('returns models names which are selected', function () {
-      expectedResult = vm.attr('modelsList').filter((model) => model.display)
-        .map((model) => model.name).serialize();
+    it('returns selected models widgetIds', function () {
+      const expectedResult = ['Audit', 'Control', 'Market'];
       expect(vm.getSelectedModels().serialize()).toEqual(expectedResult);
     });
   });

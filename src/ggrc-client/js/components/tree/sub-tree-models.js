@@ -21,8 +21,10 @@ let viewModel = can.Map.extend({
     displayModelsList: {
       get: function () {
         return this.attr('modelsList').map((model) => {
-          const displayName =
-            model.attr('name').split(/(?=[A-Z])/).join(' ');
+          const displayName = model.attr('widgetName')
+            .replace(' ', '')
+            .split(/(?=[A-Z])/)
+            .join(' ');
           model.attr('displayName', displayName);
           return model;
         }).sort((a, b) => {
