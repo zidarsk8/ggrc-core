@@ -195,6 +195,7 @@ let viewModel = canMap.extend({
   loaded: null,
   refreshLoaded: true,
   canOpenInfoPin: true,
+  savedSearchPermalink: '',
   loadItems: function () {
     let modelName = this.attr('modelName');
     let pageInfo = this.attr('pageInfo');
@@ -537,6 +538,23 @@ let viewModel = canMap.extend({
 
     this.attr('advancedSearch.open', true);
   },
+  clearAppliedSavedSearch() {
+    this.attr('savedSearchPermalink', null);
+    this.attr('advancedSearch.appliedSavedSearch', null);
+  },
+  checkAppliedSavedSearch(appliedSearch, appliedSavedSearch) {
+    // Check applied search.
+    // Build permalink when current applied search is saved search
+    if (AdvancedSearch.isSavedSearch(appliedSavedSearch, appliedSearch)) {
+      const modelName = this.attr('model').table_singular;
+      const permalink = AdvancedSearch
+        .buildSearchPermalink(appliedSavedSearch.id, modelName);
+
+      this.attr('savedSearchPermalink', permalink);
+    } else {
+      this.clearAppliedSavedSearch();
+    }
+  },
   applyAdvancedFilters: function () {
     const filters = this.attr('advancedSearch.filterItems').attr();
     const mappings = this.attr('advancedSearch.mappingItems').attr();
@@ -559,6 +577,18 @@ let viewModel = canMap.extend({
     this.attr('advancedSearch.filter', advancedFilters);
 
     this.attr('advancedSearch.open', false);
+
+    const appliedSavedSearch = this.attr('advancedSearch.appliedSavedSearch') &&
+      this.attr('advancedSearch.appliedSavedSearch').attr();
+
+    if (appliedSavedSearch) {
+      const appliedSearch = {
+        filterItems: filters,
+        mappingItems: mappings,
+        parentItems: parents,
+      };
+      this.checkAppliedSavedSearch(appliedSearch, appliedSavedSearch);
+    }
     this.onFilter();
   },
   removeAdvancedFilters: function () {
@@ -567,6 +597,7 @@ let viewModel = canMap.extend({
     this.attr('advancedSearch.request', canList());
     this.attr('advancedSearch.filter', null);
     this.attr('advancedSearch.open', false);
+    this.clearAppliedSavedSearch();
     this.onFilter();
   },
   resetAdvancedFilters: function () {

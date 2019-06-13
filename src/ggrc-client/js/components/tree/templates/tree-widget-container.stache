@@ -43,6 +43,7 @@
                   options:from="options"
                   model:from="model"
                   showedItems:from="showedItems"
+                  savedSearchPermalink:from="savedSearchPermalink"
                   on:export="export()">
     </tree-actions>
 

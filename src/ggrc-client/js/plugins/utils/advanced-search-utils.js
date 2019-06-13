@@ -286,3 +286,36 @@ export const applySavedSearchFilter = (advancedSearch, savedSearch) => {
   // save applied saved search
   advancedSearch.attr('appliedSavedSearch', appliedSavedSearch);
 };
+
+/**
+ * Compare applied saved search with current advanced search filter
+ * @param {Object} appliedSavedSearch - applied saved search
+ * @param {Object} searchFilter - cuurent search filter
+ * @return {Boolean} - is current advanced search filter equals to
+ * applied save search
+ */
+export const isSavedSearch = (appliedSavedSearch, searchFilter) => {
+  if (!appliedSavedSearch) {
+    return false;
+  }
+
+  return _.isEqual(appliedSavedSearch.filterItems, searchFilter.filterItems) &&
+    _.isEqual(appliedSavedSearch.mappingItems, searchFilter.mappingItems) &&
+    _.isEqual(appliedSavedSearch.parentItems, searchFilter.parentItems);
+};
+
+/**
+ * Build permalink for saved search
+ * @param {Number} searchId - saved search ID
+ * @param {String} modelName - model name
+ * @return {String} - permalink
+ */
+export const buildSearchPermalink = (searchId, modelName) => {
+  const origin = window.location.origin;
+  const pathName = window.location.pathname;
+  const url = `${origin}${pathName}`;
+  const hash = `#!${modelName}&saved_search=${searchId}`;
+  const permalink = `${url}${hash}`;
+
+  return permalink;
+};

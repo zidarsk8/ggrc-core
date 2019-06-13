@@ -43,6 +43,15 @@ tree-widget-container {
   .tree-action {
     display: flex;
     justify-content: flex-end;
+
+    .saved-search-permalink {
+      a {
+        text-decoration: none;
+        .fa-link {
+          margin-right: 4px !important;
+        }
+      }
+    }
   }
 
   .details-wrap {

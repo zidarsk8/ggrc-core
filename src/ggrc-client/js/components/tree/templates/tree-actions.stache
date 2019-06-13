@@ -41,6 +41,14 @@
           </change-request-link>
         </li>
       {{/if}}
+      {{#if savedSearchPermalink}}
+        <li>
+          <clipboard-link class="saved-search-permalink" text:from="savedSearchPermalink">
+            <i class="fa fa-fw fa-link"></i>
+            Get permalink
+          </clipboard-link>
+        </li>
+      {{/if}}
     </three-dots-menu>
   {{/if}}
 </div>
