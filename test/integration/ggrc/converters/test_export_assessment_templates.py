@@ -13,6 +13,14 @@ from integration.ggrc import TestCase
 class TestAssessmentTemplatesExport(TestCase):
   """Assessment Template export test"""
 
+  EXPORT_ALL_FIELDS_DATA = [{
+      "object_name": "AssessmentTemplate",
+      "filters": {
+          "expression": {},
+      },
+      "fields": "all",
+  }]
+
   def setUp(self):
     """Set up for Assessment Template test cases."""
     super(TestAssessmentTemplatesExport, self).setUp()
@@ -33,15 +41,8 @@ class TestAssessmentTemplatesExport(TestCase):
         title=title,
         default_people=default_people
     )
-    data = [{
-        "object_name": "AssessmentTemplate",
-        "filters": {
-            "expression": {},
-        },
-        "fields": "all",
-    }]
 
-    response = self.export_parsed_csv(data)
+    response = self.export_parsed_csv(self.EXPORT_ALL_FIELDS_DATA)
     assessment_template = response["Assessment Template"][0]
     self.assertEqual(assessment_template["Default Assignees*"], title)
     self.assertEqual(assessment_template["Default Verifiers"], title)
@@ -53,15 +54,21 @@ class TestAssessmentTemplatesExport(TestCase):
         title="Audit Lead",
         default_people=default_people
     )
-    data = [{
-        "object_name": "AssessmentTemplate",
-        "filters": {
-            "expression": {},
-        },
-        "fields": "all",
-    }]
 
-    response = self.export_parsed_csv(data)
+    response = self.export_parsed_csv(self.EXPORT_ALL_FIELDS_DATA)
     assessment_template = response["Assessment Template"][0]
     self.assertEqual(assessment_template["Default Assignees*"], "Auditors")
     self.assertEqual(assessment_template["Default Verifiers"], "--")
+
+  def test_procedure_description(self):
+    """Test correct export of Default Assessment Procedure field"""
+    proc_description = "some description"
+    factories.AssessmentTemplateFactory(
+        title="Audit Lead",
+        procedure_description=proc_description
+    )
+
+    response = self.export_parsed_csv(self.EXPORT_ALL_FIELDS_DATA)
+    assessment_template = response["Assessment Template"][0]
+    self.assertEqual(proc_description,
+                     assessment_template["Default Assessment Procedure"])

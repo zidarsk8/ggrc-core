@@ -135,7 +135,7 @@ class AssessmentTemplate(assessment.AuditRelationship,
               '\n'.join(DEFAULT_PEOPLE_LABELS.values())
           ),
       },
-      "default_test_plan": {
+      "procedure_description": {
           "display_name": "Default Assessment Procedure",
           "filter_by": "_nop_filter",
       },
@@ -240,6 +240,7 @@ class AssessmentTemplate(assessment.AuditRelationship,
     db.session.add(rel)
     db.session.flush()
 
+    # pylint: disable=not-an-iterable
     for cad in self.custom_attribute_definitions:
       # pylint: disable=protected-access
       cad._clone(assessment_template_copy)

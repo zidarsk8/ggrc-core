@@ -42,6 +42,10 @@ class TestAssessmentTemplatesImport(TestCase):
         template.default_people["verifiers"],
         [people["user3@a.com"], people["user1@a.com"]],
     )
+    self.assertEqual(
+        template.procedure_description,
+        "Some test plan"
+    )
 
   def test_modify_over_import(self):
     """Test import modifies Assessment Template and does not fail."""
