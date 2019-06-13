@@ -28,7 +28,8 @@ from lib.rest_facades import (
     control_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.service import rest_facade
 from lib.service.rest import session_pool
-from lib.utils import conftest_utils, help_utils, selenium_utils, app_utils
+from lib.utils import conftest_utils, help_utils, selenium_utils, app_utils, \
+    assert_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
 
@@ -791,3 +792,9 @@ def app_person():
 def app_control():
   """Creates a control."""
   return control_rest_facade.create_control()
+
+
+@pytest.fixture()
+def soft_assert():
+  """Fixture for soft assertations."""
+  return assert_utils.SoftAssert()
