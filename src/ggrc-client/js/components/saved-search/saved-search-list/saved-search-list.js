@@ -13,6 +13,9 @@ export default can.Component.extend({
     objectName: '',
     searches: [],
     applySearch(search) {
+      if (this.attr('disabled')) {
+        return;
+      }
       this.dispatch({
         type: 'applySearch',
         search,
