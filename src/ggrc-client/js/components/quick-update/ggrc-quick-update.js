@@ -12,12 +12,27 @@ export default can.Component.extend({
   tag: 'ggrc-quick-update',
   leakScope: true,
   viewModel: can.Map.extend({
+    define: {
+      isDisabled: {
+        get() {
+          return this.attr('instance.responseOptionsEditable') ||
+            this.attr('isSaving');
+        },
+      },
+    },
     instance: null,
+    dropdownChanged() {
+      this.attr('isSaving', true);
+
+      this.attr('instance').save()
+        .always(() => {
+          this.attr('isSaving', false);
+        });
+    },
   }),
   events: {
-    'input, select change': function (el) {
+    'input change': function (el) {
       let isCheckbox = el.is('[type=checkbox][multiple]');
-      let isDropdown = el.is('select');
       if (isCheckbox) {
         if (!this.viewModel.instance[el.attr('name')]) {
           this.viewModel.instance.attr(el.attr('name'), new can.List());
@@ -33,16 +48,10 @@ export default can.Component.extend({
         this.element.find('input:checkbox').prop('disabled', true);
       } else {
         this.viewModel.instance.attr(el.attr('name'), el.val());
-        if (isDropdown) {
-          el.closest('dropdown-component').viewModel().attr('isDisabled', true);
-        }
       }
       this.viewModel.instance.save().then(function () {
         if (isCheckbox) {
           this.element.find('input:checkbox').prop('disabled', false);
-        } else if (isDropdown) {
-          el.closest('dropdown-component').viewModel()
-            .attr('isDisabled', false);
         }
       }.bind(this));
     },

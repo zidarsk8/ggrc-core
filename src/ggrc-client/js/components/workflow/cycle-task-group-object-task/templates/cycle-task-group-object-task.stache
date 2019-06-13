@@ -149,7 +149,8 @@
                   <dropdown-component name:bind="instance.selected_response_options.0"
                             className:from="'noop'" {{! to not use default from component}}
                             optionsList:from="instance.response_options"
-                            isDisabled:from="{{#if instance.responseOptionsEditable}}{false}{{else}}{true}{{/if}}">
+                            isDisabled:from="isDisabled"
+                            on:el:change="dropdownChanged">
                   </dropdown-component>
                 </ggrc-quick-update>
               {{/is}}
