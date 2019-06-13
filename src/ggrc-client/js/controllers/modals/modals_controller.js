@@ -77,7 +77,6 @@ export default canControl.extend({
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
-    find_params: {},
     add_more: false,
     ui_array: [],
     reset_visible: false,
@@ -298,13 +297,10 @@ export default canControl.extend({
     });
   },
 
-  fetch_data: function (params) {
+  fetch_data: function () {
     let that = this;
     let dfd;
     let instance = this.options.attr('instance');
-
-    params = params || this.find_params();
-    params = params && params.serialize ? params.serialize() : params;
 
     if (this.options.skip_refresh && instance) {
       return new $.Deferred().resolve(instance);
@@ -312,6 +308,8 @@ export default canControl.extend({
       dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
+        const params = {};
+
         if (this.options.extendNewInstance) {
           let extendedInstance = this.options.extendNewInstance.attr ?
             this.options.extendNewInstance.attr() :
@@ -327,7 +325,7 @@ export default canControl.extend({
         }.bind(this));
       }
     } else {
-      this.options.attr('instance', new canMap(params));
+      this.options.attr('instance', {});
       that.on();
       dfd = new $.Deferred().resolve(instance);
     }
@@ -380,12 +378,7 @@ export default canControl.extend({
   },
 
   fetch_all: function () {
-    return this.fetch_templates(this.fetch_data(this.find_params()));
-  },
-
-  find_params: function () {
-    let findParams = this.options.find_params;
-    return findParams.serialize ? findParams.serialize() : findParams;
+    return this.fetch_templates(this.fetch_data());
   },
 
   draw: function (content, header, footer, customAttributes, context) {
@@ -936,8 +929,7 @@ export default canControl.extend({
   },
 
   prepareInstance: function () {
-    let params = this.find_params();
-    let instance = new this.options.model(params);
+    let instance = new this.options.model({});
     let saveContactModels = ['TaskGroup', 'TaskGroupTask'];
 
     instance.attr('_suppress_errors', true);
