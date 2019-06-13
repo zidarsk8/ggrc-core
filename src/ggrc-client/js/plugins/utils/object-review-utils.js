@@ -4,7 +4,7 @@
  */
 
 import Review from '../../models/service-models/review';
-import Permission from '../../permission';
+import {refreshPermissions} from '../../permission';
 
 const createReviewInstance = (reviewableInstance) => {
   return new Review({
@@ -27,7 +27,7 @@ const saveReview = (review, reviewableInstance) => {
        * ReviewableInstance should also be refreshed after POST review
        * to get review stub in properties
        */
-      return $.when(Permission.refresh(), reviewableInstance.refresh());
+      return $.when(refreshPermissions(), reviewableInstance.refresh());
     })
     /**
      * Refresh Review object to get E-tag

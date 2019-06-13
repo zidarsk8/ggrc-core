@@ -15,7 +15,7 @@ import {
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {getMappingList} from '../../models/mappers/mappings';
 
 const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
@@ -56,7 +56,7 @@ const viewModel = canMap.extend({
         let isSnapshot = this.attr('isSnapshot');
         let isArchived = instance.attr('archived');
         let isInForbiddenList = forbiddenEditList.indexOf(type) > -1;
-        return !Permission.is_allowed_for('update', instance) ||
+        return !isAllowedFor('update', instance) ||
           (isSnapshot || isInForbiddenList || isArchived);
       },
     },
@@ -76,7 +76,7 @@ const viewModel = canMap.extend({
         if (type === 'Assessment') {
           let audit = this.attr('instance.audit');
 
-          if (!Permission.is_allowed_for('read', audit)) {
+          if (!isAllowedFor('read', audit)) {
             return false;
           }
         }

@@ -5,14 +5,14 @@
 
 import canMap from 'can-map';
 import canComponent from 'can-component';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils';
 
 const viewModel = canMap.extend({
   define: {
     canEdit: {
       get() {
-        return Permission.is_allowed_for('update', this.attr('instance'));
+        return isAllowedFor('update', this.attr('instance'));
       },
     },
     showSetupRequirement: {

@@ -6,7 +6,7 @@
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import template from './attach-button.stache';
 import {
   getGDriveItemId,
@@ -24,7 +24,7 @@ export default canComponent.extend({
       hasPermissions: {
         get: function (prevValue, setValue) {
           let instance = this.attr('instance');
-          if (Permission.is_allowed_for('update', instance) &&
+          if (isAllowedFor('update', instance) &&
             !instance.attr('archived')) {
             this.checkFolder().always(function () {
               setValue(true);

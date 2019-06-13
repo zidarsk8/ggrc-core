@@ -20,7 +20,11 @@ import {
   getRole,
   isAuditor,
 } from './plugins/utils/acl-utils';
-import Permission from './permission';
+import {
+  isAllowed,
+  isAllowedFor,
+  isAllowedAny,
+} from './permission';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import {
@@ -235,18 +239,18 @@ canStache.registerHelper('is_allowed', function (...args) {
 
   // Check permissions
   actions.forEach(function (action) {
-    if (resource && Permission.is_allowed_for(action, resource)) {
+    if (resource && isAllowedFor(action, resource)) {
       passed = true;
       return;
     }
     if (contextId !== undefined) {
-      passed = passed && Permission.is_allowed(action, resourceType,
+      passed = passed && isAllowed(action, resourceType,
         contextId);
     }
     if (passed && contextOverride === 'for' && resource) {
-      passed = passed && Permission.is_allowed_for(action, resource);
+      passed = passed && isAllowedFor(action, resource);
     } else if (passed && contextOverride === 'any' && resourceType) {
-      passed = passed && Permission.is_allowed_any(action, resourceType);
+      passed = passed && isAllowedAny(action, resourceType);
     }
   });
 
@@ -260,7 +264,7 @@ canStache.registerHelper('any_allowed', function (action, data, options) {
   data = resolveComputed(data);
 
   data.forEach(function (item) {
-    passed.push(Permission.is_allowed_any(action, item.model_name));
+    passed.push(isAllowedAny(action, item.model_name));
   });
   hasPassed = passed.some(function (val) {
     return val;
@@ -379,7 +383,7 @@ canStache.registerHelper('is_dashboard_or_all', function (options) {
 });
 
 canStache.registerHelper('current_user_is_admin', function (options) {
-  if (Permission.is_allowed('__GGRC_ADMIN__')) {
+  if (isAllowed('__GGRC_ADMIN__')) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);

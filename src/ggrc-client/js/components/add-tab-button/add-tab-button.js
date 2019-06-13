@@ -11,7 +11,7 @@ import {
   isMyWork,
   isAllObjects,
 } from '../../plugins/utils/current-page-utils';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {shouldBeMappedExternally} from '../../models/mappers/mappings';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 
@@ -23,7 +23,7 @@ const viewModel = canMap.extend({
         let type = this.attr('instance.type');
         let result = (type === 'Assessment') &&
           !!audit &&
-          !Permission.is_allowed_for('read', audit);
+          !isAllowedFor('read', audit);
         return result;
       },
     },
@@ -32,7 +32,7 @@ const viewModel = canMap.extend({
         let instance = this.attr('instance');
 
         return !this.attr('isAuditInaccessibleAssessment')
-          && Permission.is_allowed_for('update', instance)
+          && isAllowedFor('update', instance)
           && !instance.attr('archived')
           && !isMyWork()
           && !isAllObjects()

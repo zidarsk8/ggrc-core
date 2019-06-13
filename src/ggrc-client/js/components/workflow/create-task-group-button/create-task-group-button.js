@@ -6,7 +6,7 @@
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {refreshTGRelatedItems} from '../../../plugins/utils/workflow-utils';
-import Permission from '../../../permission';
+import {isAllowedFor} from '../../../permission';
 
 const viewModel = canMap.extend({
   define: {
@@ -14,7 +14,7 @@ const viewModel = canMap.extend({
       get() {
         const workflow = this.attr('workflow');
         return (
-          Permission.is_allowed_for('update', workflow) &&
+          isAllowedFor('update', workflow) &&
           workflow.attr('status') !== 'Inactive'
         );
       },

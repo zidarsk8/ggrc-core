@@ -4,7 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
-import Permission from '../../permission';
+import {refreshPermissions} from '../../permission';
 import isOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 import Workflow from './workflow';
@@ -16,7 +16,7 @@ function refreshWorkflow(ev, instance) {
     return;
   }
 
-  Permission.refresh();
+  refreshPermissions();
 
   const workflowId = instance.attr('workflow.id');
   const model = Workflow.findInCacheById(workflowId);

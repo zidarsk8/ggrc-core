@@ -7,7 +7,7 @@ import loKeys from 'lodash/keys';
 import loDifference from 'lodash/difference';
 import canMap from 'can-map';
 import * as Mappings from '../mappings';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 
 describe('Mappings', function () {
   let allTypes = [];
@@ -127,23 +127,23 @@ describe('Mappings', function () {
 
   describe('allowedToUnmap() method', () => {
     beforeEach(() => {
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(true);
     });
 
     it('checks that types are mappable', () => {
       let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
 
       expect(result).toBeFalsy();
-      expect(Permission.is_allowed_for).not.toHaveBeenCalled();
+      expect(Permission.isAllowedFor).not.toHaveBeenCalled();
     });
 
     it('checks permissions to update source', () => {
       let result = Mappings.allowedToUnmap('DataAsset', 'AccessGroup');
 
       expect(result).toBeTruthy();
-      expect(Permission.is_allowed_for)
+      expect(Permission.isAllowedFor)
         .toHaveBeenCalledWith('update', 'DataAsset');
-      expect(Permission.is_allowed_for.calls.count()).toEqual(1);
+      expect(Permission.isAllowedFor.calls.count()).toEqual(1);
     });
 
     it('checks permissions to update target', () => {
@@ -152,10 +152,10 @@ describe('Mappings', function () {
       let result = Mappings.allowedToUnmap(source, target);
 
       expect(result).toBeTruthy();
-      expect(Permission.is_allowed_for.calls.count()).toEqual(2);
-      expect(Permission.is_allowed_for.calls.argsFor(0))
+      expect(Permission.isAllowedFor.calls.count()).toEqual(2);
+      expect(Permission.isAllowedFor.calls.argsFor(0))
         .toEqual(['update', source]);
-      expect(Permission.is_allowed_for.calls.argsFor(1))
+      expect(Permission.isAllowedFor.calls.argsFor(1))
         .toEqual(['update', target]);
     });
   });

@@ -19,7 +19,7 @@ import {
 import {
   isSnapshotRelated,
 } from '../../plugins/utils/snapshot-utils';
-import Permission from '../../permission';
+import {isAllowed} from '../../permission';
 import template from './templates/tree-actions.stache';
 
 export default canComponent.extend({
@@ -93,7 +93,7 @@ export default canComponent.extend({
           let model = this.attr('model');
           return !this.attr('isSnapshots') &&
             !model.isChangeableExternally &&
-            (Permission.is_allowed(
+            (isAllowed(
               'update', model.model_singular, instance.context)
               || isAuditor(instance, GGRC.current_user));
         },

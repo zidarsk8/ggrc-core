@@ -13,7 +13,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import template from './cycle-task-actions.stache';
 import {updateStatus} from '../../plugins/utils/workflow-utils';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
@@ -46,7 +46,7 @@ let viewModel = canMap.extend({
         const pageType = getPageType();
         const instance = this.attr('instance');
 
-        let showButtons = Permission.is_allowed_for('update', instance);
+        let showButtons = isAllowedFor('update', instance);
 
         if (pageType === 'Workflow') {
           return showButtons && reify(this.attr('cycle')).attr('is_current');
@@ -58,7 +58,7 @@ let viewModel = canMap.extend({
     isAllowedToUpdateWorkflow: {
       get: function () {
         const workflow = this.attr('instance.workflow');
-        return Permission.is_allowed_for('update', workflow);
+        return isAllowedFor('update', workflow);
       },
     },
   },

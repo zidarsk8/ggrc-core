@@ -11,14 +11,14 @@ import '../task-group-clone';
 import '../task-list/task-list';
 import '../task-group-objects/task-group-objects';
 import template from './templates/task-group.stache';
-import Permission from '../../../permission';
+import {isAllowedFor} from '../../../permission';
 
 const viewModel = canMap.extend({
   define: {
     canEdit: {
       get() {
         return (
-          Permission.is_allowed_for('update', this.attr('instance')) &&
+          isAllowedFor('update', this.attr('instance')) &&
           this.attr('workflow.status') !== 'Inactive'
         );
       },
