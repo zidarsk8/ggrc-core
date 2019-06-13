@@ -1852,6 +1852,7 @@ describe('assessment-info-pane component', () => {
         spyOn(vm, 'updateRelatedItems');
         spyOn(vm, 'initializeDeferredSave');
         spyOn(vm, 'setVerifierRoleId');
+        spyOn(vm, 'loadFirstComments');
       });
 
       it('calls vm.initializeFormFields method', function () {
@@ -1877,6 +1878,11 @@ describe('assessment-info-pane component', () => {
       it('calls setVerifierRoleId method', function () {
         init();
         expect(vm.setVerifierRoleId).toHaveBeenCalled();
+      });
+
+      it('calls loadFirstComments method', function () {
+        init();
+        expect(vm.loadFirstComments).toHaveBeenCalled();
       });
     });
 
@@ -2003,6 +2009,7 @@ describe('assessment-info-pane component', () => {
         spyOn(vm, 'initializeFormFields');
         spyOn(vm, 'initGlobalAttributes');
         spyOn(vm, 'updateRelatedItems');
+        spyOn(vm, 'loadFirstComments');
       });
 
       it('calls vm.initializeFormFields method', function () {
@@ -2018,6 +2025,21 @@ describe('assessment-info-pane component', () => {
       it('calls vm.updateRelatedItems method', function () {
         event();
         expect(vm.updateRelatedItems).toHaveBeenCalled();
+      });
+
+      it('calls vm.loadFirstComments method', function () {
+        event();
+        expect(vm.loadFirstComments).toHaveBeenCalled();
+      });
+
+      it('resets comments props', () => {
+        vm.attr('comments', [{}, {}]);
+        vm.attr('commentsTotalCount', 2);
+
+        event();
+
+        expect(vm.attr('comments').length).toBe(0);
+        expect(vm.attr('commentsTotalCount')).toBe(0);
       });
     });
   });
