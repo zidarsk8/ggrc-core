@@ -336,18 +336,18 @@ $.widget.bridge('ggrc_query_autocomplete', $.ggrc.query_autocomplete);
  * if such context exists.
  *
  * @param {DOM.Element} el - the element to convert
+ * @param {ModalsController} ctl
  */
-$.cms_autocomplete = function (el) {
-  let ctl = this;
+export const modalAutocomplete = function (el, ctl) {
   // Add autocomplete to the owner field
   if (!el) {
-    if (!this.element) {
+    if (!ctl.element) {
       // It can happen that this.element is already null when we want to init
       // autocomplete on it, e.g. when its containing modal form is already
       // being destroyed. In such cases we simply don't do anything.
       return;
     }
-    el = this.element.find('input[data-lookup]');
+    el = ctl.element.find('input[data-lookup]');
   } else {
     el = $(el);
   }

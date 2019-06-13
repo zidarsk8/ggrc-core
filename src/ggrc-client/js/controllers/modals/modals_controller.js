@@ -68,6 +68,7 @@ import Stub from '../../models/stub';
 import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
+import {modalAutocomplete} from '../../plugins/autocomplete';
 
 export default canControl.extend({
   defaults: {
@@ -151,7 +152,7 @@ export default canControl.extend({
           this.element.trigger('preload');
         }
       })
-      .then((el) => this.autocomplete(el))
+      .then((el) => modalAutocomplete(el, this))
       .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
@@ -190,7 +191,7 @@ export default canControl.extend({
   },
 
   'input[data-lookup] focus': function (el, ev) {
-    this.autocomplete(el);
+    modalAutocomplete(el, this);
   },
 
   'input[data-lookup] keyup': function (el, ev) {
@@ -228,10 +229,6 @@ export default canControl.extend({
     if (name.length) {
       instance.attr(['_transient'].concat(name).join('.'), value);
     }
-  },
-
-  autocomplete: function (el) {
-    $.cms_autocomplete.call(this, el);
   },
 
   autocomplete_select: function (el, event, ui) {
@@ -885,7 +882,7 @@ export default canControl.extend({
       $.when(this.options.attr('instance', newInstance))
         .then(() => this.apply_object_params())
         .then(() => this.serialize_form())
-        .then((el) => this.autocomplete(el))
+        .then((el) => modalAutocomplete(el, this))
         .then(() => this.options.attr('instance').backup());
     });
 
