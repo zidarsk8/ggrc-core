@@ -19,41 +19,39 @@ export default can.Component.extend({
             this.attr('isSaving');
         },
       },
+      checkboxOptions: {
+        get() {
+          let selectedOptions = this.attr('selectedOptions');
+
+          return _.map(this.attr('options'), (option) => ({
+            value: option,
+            isSelected: _.includes(selectedOptions, option),
+          }));
+        },
+      },
     },
     instance: null,
-    dropdownChanged() {
-      this.attr('isSaving', true);
+    options: [],
+    selectedOptions: [],
+    checkboxChanged(option) {
+      let selectedOptions = this.attr('selectedOptions');
 
+      let index = selectedOptions.indexOf(option);
+
+      if (index === -1) {
+        selectedOptions.push(option);
+      } else {
+        selectedOptions.splice(index, 1);
+      }
+
+      this.save();
+    },
+    save() {
+      this.attr('isSaving', true);
       this.attr('instance').save()
         .always(() => {
           this.attr('isSaving', false);
         });
     },
   }),
-  events: {
-    'input change': function (el) {
-      let isCheckbox = el.is('[type=checkbox][multiple]');
-      if (isCheckbox) {
-        if (!this.viewModel.instance[el.attr('name')]) {
-          this.viewModel.instance.attr(el.attr('name'), new can.List());
-        }
-        this.viewModel.instance
-          .attr(el.attr('name'))
-          .replace(
-            _.filteredMap(
-              this.element.find(
-                'input[name="' + el.attr('name') + '"]:checked'),
-              (el) => $(el).val())
-          );
-        this.element.find('input:checkbox').prop('disabled', true);
-      } else {
-        this.viewModel.instance.attr(el.attr('name'), el.val());
-      }
-      this.viewModel.instance.save().then(function () {
-        if (isCheckbox) {
-          this.element.find('input:checkbox').prop('disabled', false);
-        }
-      }.bind(this));
-    },
-  },
 });

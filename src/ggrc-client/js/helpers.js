@@ -97,14 +97,6 @@ can.stache.registerHelper('addclass', function (prefix, compute, options = {}) {
   return [prefix, classSegment].join(separator);
 });
 
-can.stache.registerHelper('in_array', function (needle, haystack, options) {
-  needle = resolveComputed(needle);
-  haystack = resolveComputed(haystack);
-
-  return options[_.includes(haystack, needle) ?
-    'fn' : 'inverse'](options.contexts);
-});
-
 // Resolve and return the first computed value from a list
 can.stache.registerHelper('firstexist', function () {
   let args = can.makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
