@@ -279,16 +279,12 @@ export default canControl.extend({
   },
 
   fetch_templates: function (dfd) {
-    dfd = dfd ? dfd.then(() => {
-      return this.options;
-    }) : $.when(this.options);
-
     return $.when(
       ggrcAjax({url: this.options.content_view, dataType: 'text'}),
       ggrcAjax({url: this.options.header_view, dataType: 'text'}),
       ggrcAjax({url: this.options.button_view, dataType: 'text'}),
       ggrcAjax({url: this.options.custom_attributes_view, dataType: 'text'}),
-      dfd,
+      dfd.then(() => this.options),
     ).then((content, header, footer, customAttributes, context) => {
       this.draw(content, header, footer, customAttributes, context);
     });
