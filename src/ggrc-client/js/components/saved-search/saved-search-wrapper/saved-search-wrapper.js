@@ -4,12 +4,11 @@
 */
 
 import SavedSearch from '../../../models/service-models/saved-search';
-import {notifier} from '../../../plugins/utils/notifiers-utils';
 import Pagination from '../../base-objects/pagination';
 import {isObjectContextPage, isAllObjects} from '../../../plugins/utils/current-page-utils';
 import {
   parseFilterJson,
-  filterParentItems,
+  applySavedSearchFilter,
 } from '../../../plugins/utils/advanced-search-utils';
 
 export default can.Component.extend({
@@ -58,29 +57,16 @@ export default can.Component.extend({
     filtersToApply: null,
     advancedSearch: null,
     applySearch({search}) {
-      try {
+      const advancedSearch = this.attr('advancedSearch');
+      if (advancedSearch) {
+        applySavedSearchFilter(advancedSearch, search);
+      } else {
         const filter = parseFilterJson(search.filters);
-        const advancedSearch = this.attr('advancedSearch');
-
-        const parent = advancedSearch && advancedSearch.attr('parent');
-        if (parent && filter.parentItems) {
-          filter.parentItems = filterParentItems(parent, filter.parentItems);
-        }
-
-        if (advancedSearch) {
-          advancedSearch.attr('filterItems', filter.filterItems);
-          advancedSearch.attr('mappingItems', filter.mappingItems);
-          advancedSearch.attr('parentItems', filter.parentItems);
-        } else {
-          this.attr('filtersToApply', {
-            filterItems: filter.filterItems,
-            mappingItems: filter.mappingItems,
-            statusItem: filter.statusItem,
-          });
-        }
-      } catch (e) {
-        notifier('error',
-          `"${search.name}" is broken somehow. Sorry for any inconvenience.`);
+        this.attr('filtersToApply', {
+          filterItems: filter.filterItems,
+          mappingItems: filter.mappingItems,
+          statusItem: filter.statusItem,
+        });
       }
     },
     loadSavedSearches() {

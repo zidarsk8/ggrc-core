@@ -830,24 +830,9 @@ const loadSavedSearch = (viewModel) => {
 };
 
 const applySavedSearch = (savedSearch, viewModel) => {
-  try {
-    const filter = AdvancedSearch.parseFilterJson(savedSearch.filters);
-    const advancedSearch = viewModel.attr('advancedSearch');
-    const parent = advancedSearch && advancedSearch.attr('parent');
-
-    if (parent && filter.parentItems) {
-      // remove duplicates
-      filter.parentItems = AdvancedSearch
-        .filterParentItems(parent, filter.parentItems);
-    }
-
-    advancedSearch.attr('filterItems', filter.filterItems);
-    advancedSearch.attr('mappingItems', filter.mappingItems);
-    advancedSearch.attr('parentItems', filter.parentItems);
-
-    viewModel.applyAdvancedFilters();
-  } catch (e) {
-    notifier('error',
-      `"${savedSearch.name}" is broken somehow. Sorry for any inconvenience.`);
-  }
+  AdvancedSearch.applySavedSearchFilter(
+    viewModel.attr('advancedSearch'),
+    savedSearch
+  );
+  viewModel.applyAdvancedFilters();
 };
