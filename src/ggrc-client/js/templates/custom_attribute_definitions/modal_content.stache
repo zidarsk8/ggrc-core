@@ -4,6 +4,7 @@
 }}
 
 {{#instance}}
+<custom-attributes-modal instance:from="instance">
 <form action="javascript://">
   <input type="hidden" name="definition_type" value="{{definition_type}}">
   <div class="row-fluid">
@@ -28,9 +29,8 @@
         <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Choose the type of attribute to create."></i>
       </label>
-        <dropdown-component optionsList:from="model.attributeTypes"
-                            name:bind="instance.attribute_type"
-                            dataPurpose:from="'ca-type'">
+        <dropdown-component optionsList:from="attributeTypes"
+                            name:bind="instance.attribute_type">
         </dropdown-component>
     </div>
     <div class="span2">
@@ -167,4 +167,5 @@
   {{/case}}
   {{/switch}}
 </form>
+</custom-attributes-modal>
 {{/instance}}

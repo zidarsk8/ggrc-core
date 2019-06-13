@@ -45,6 +45,7 @@ import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
 import '../../components/person-modal/person-modal';
+import '../../components/custom-attributes-modal/custom-attributes-modal';
 import {
   bindXHRToButton,
   BUTTON_VIEW_DONE,
@@ -460,23 +461,6 @@ export default canControl.extend({
         this.set_value_from_element(el);
       }
     },
-
-  /**
-   * The onChange handler for the custom attribute type dropdown.
-   *
-   * This handler is specific to the Custom Attribute Edit modal.
-   *
-   * @param {jQuery} $el - the dropdown DOM element
-   * @param {$.Event} ev - the event object
-   */
-  'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
-    let instance = this.options.instance;
-
-    if (instance.attribute_type !== 'Dropdown' &&
-      instance.attribute_type !== 'Multiselect') {
-      instance.attr('multi_choice_options', undefined);
-    }
-  },
 
   serialize_form: function () {
     let $form = $(this.options.contentEl).find('form');

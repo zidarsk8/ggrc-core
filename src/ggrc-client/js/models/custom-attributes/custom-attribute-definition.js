@@ -22,9 +22,6 @@ export default Cacheable.extend({
     title: '',
     attribute_type: 'Text',
   },
-  attributeTypes: ['Text', 'Rich Text', 'Date', 'Checkbox', 'Multiselect',
-    'Dropdown'],
-
   _customValidators: {
     /**
      * Validate a comma-separated list of possible values defined by the
