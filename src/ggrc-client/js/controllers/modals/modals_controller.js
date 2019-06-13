@@ -80,6 +80,7 @@ export default canControl.extend({
     add_more: false,
     ui_array: [],
     reset_visible: false,
+    // used for revision-comparer
     extraCssClass: '',
     afterFetch: function () {},
     isProposal: false,
