@@ -67,6 +67,9 @@ export default Cacheable.extend({
         required: true,
       },
     },
+    repeat_every: {
+      type: 'number',
+    },
   },
   /**
    * Saves or updates workflow
