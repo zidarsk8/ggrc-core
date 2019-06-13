@@ -210,10 +210,26 @@ const bindXHRToButton = (xhr, el, newtext, disable) => {
   });
 };
 
+// make element non-clickable when saving
+const bindXHRToDisableElement = (xhr, el) => {
+  // binding of an ajax to a click is something we do manually
+  const $el = $(el);
+
+  if (!$el.length) {
+    return;
+  }
+
+  $el.addClass('disabled');
+  xhr.always(() => {
+    $el.removeClass('disabled');
+  });
+};
+
 export {
   warning,
   confirm,
   bindXHRToButton,
+  bindXHRToDisableElement,
   BUTTON_VIEW_DONE,
   BUTTON_VIEW_CLOSE,
   BUTTON_VIEW_SAVE_CANCEL,

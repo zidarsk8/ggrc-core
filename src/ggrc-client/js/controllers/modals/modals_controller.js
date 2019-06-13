@@ -48,6 +48,7 @@ import '../../components/person-modal/person-modal';
 import '../../components/custom-attributes-modal/custom-attributes-modal';
 import {
   bindXHRToButton,
+  bindXHRToDisableElement,
   BUTTON_VIEW_DONE,
 } from '../../plugins/utils/modals';
 import {
@@ -821,20 +822,6 @@ export default canControl.extend({
       return false;
     }
   },
-  // make element non-clickable when saving
-  bindXHRToDisableElement(xhr, el) {
-    // binding of an ajax to a click is something we do manually
-    const $el = $(el);
-
-    if (!$el.length) {
-      return;
-    }
-
-    $el.addClass('disabled');
-    xhr.always(() => {
-      $el.removeClass('disabled');
-    });
-  },
 
   triggerSave(el, ev) {
     if (this.wasDestroyed()) {
@@ -878,9 +865,9 @@ export default canControl.extend({
         bindXHRToButton(ajd, saveAddmoreBtn);
       }
 
-      this.bindXHRToDisableElement(ajd, deleteBtn);
-      this.bindXHRToDisableElement(ajd, modalBackdrop);
-      this.bindXHRToDisableElement(ajd, modalCloseBtn);
+      bindXHRToDisableElement(ajd, deleteBtn);
+      bindXHRToDisableElement(ajd, modalBackdrop);
+      bindXHRToDisableElement(ajd, modalCloseBtn);
     }
   },
 
