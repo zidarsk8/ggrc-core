@@ -71,7 +71,6 @@ export default can.Component.extend({
         items: 'li.sortable-item',
         placeholder: 'sortable-placeholder',
       });
-      list.find('.sortable-item').disableSelection();
     },
     '.sortable-list sortstop': function () {
       let el = $(this.element);

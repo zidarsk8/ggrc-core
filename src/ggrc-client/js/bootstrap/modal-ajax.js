@@ -284,7 +284,17 @@ function preloadContent() {
         .css({
           width: '100px', height: '100px',
           left: '50%', top: '50%',
-          zIndex: calculate_spinner_z_index,
+          zIndex() {
+            let zindex = 0;
+            $(this).parents().each(function () {
+              let z = parseInt($(this).css('z-index'), 10);
+              if (z) {
+                zindex = z;
+                return false;
+              }
+            });
+            return zindex + 10;
+          },
         })
     ).end();
 }

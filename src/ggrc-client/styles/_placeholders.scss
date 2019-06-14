@@ -26,14 +26,6 @@
   width:100%;
 }
 
-%row-fluid-fix {
-  [class*="span"] {
-    padding-bottom:0;
-    margin-bottom:0;
-    min-height:0;
-  }
-}
-
 %input-block-level {
   @include box-sizing(border-box);
   display: block;
@@ -41,118 +33,10 @@
   min-height: 28px;
 }
 
-%default-border-bottom {
-  border-bottom: 1px solid $lightGray;
-}
-
-%default-border-top {
-  border-top: 1px solid $lightGray;
-}
-
 %reset-list {
   margin:0;
   padding:0;
   list-style:none;
-}
-
-%tab-col-general {
-  float: left;
-  padding-right: 20px;
-  box-sizing: border-box;
-}
-
-// Temporary adding sticky until resolve if we are using it or not
-%sticky {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-}
-
-// progress bar placeholder colors
-%bar-finish {
-  background: $status-completed;
-}
-%bar-verify {
-  background: $status-verified;
-}
-%bar-progress {
-  background: $status-inprogress;
-}
-%bar-pending {
-  background: $status-draft;
-}
-%bar-decline {
-  background: $status-declined;
-}
-
-// status label placeholder colors
-%status-draft {
-  background: $status-draft !important;
-}
-%status-inactive {
-  background: $status-draft !important;
-}
-%status-declined {
-  background: $yellow !important;
-}
-%status-planned {
-  background: $status-draft !important;
-}
-%status-inprogress {
-  background: $orange !important;
-}
-%status-active {
-  background: $orange !important;
-}
-%status-verified {
-  background: $lightGreen !important;
-}
-%status-accepted {
-  background: $lightGreen !important;
-}
-%status-pending {
-  background: $status-draft !important;
-}
-%status-finished {
-  background: $lightBlue !important;
-}
-%status-requested {
-  background: $orange !important;
-}
-%status-responded {
-  background: $lightBlue !important;
-}
-%status-amended-request {
-  background: $purpleRed !important;
-}
-%status-updated-response {
-  background: $lightBlue !important;
-}
-%status-assigned {
-  background: $status-draft !important;
-}
-%status-overdue {
-  background: $red !important;
-}
-
-// flat buttons color
-%btn-primary {
-  @include btnBgnd($blue);
-}
-%btn-success {
-  @include btnBgnd($btnGreen);
-}
-%btn-info {
-  @include btnBgnd($lightBlue);
-}
-%btn-warning {
-  @include btnBgnd($orange);
-}
-%btn-danger {
-  @include btnBgnd($red);
-}
-%btn-draft {
-  @include btnBgnd($lightGray);
 }
 
 // Item util wide

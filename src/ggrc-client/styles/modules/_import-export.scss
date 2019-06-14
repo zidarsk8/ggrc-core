@@ -137,13 +137,6 @@ $historyBlockWidth: 350px;
     }
   }
 
-  .btn-fixed {
-    float: left;
-    i {
-      @include opacity(1);
-      margin-top: 4px;
-    }
-  }
   .import-progress {
     float: left;
     width: 300px;
