@@ -129,7 +129,6 @@ export default can.Component.extend({
     },
 
     '{viewModel.instance} change': function () {
-      // Error recovery from previous refresh_instances error when we couldn't set up the binding.
       if (!this.viewModel.folder_error) {
         return;
       }

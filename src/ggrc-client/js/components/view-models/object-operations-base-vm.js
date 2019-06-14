@@ -133,7 +133,6 @@ const ObjectOperationsBaseVM = can.Map.extend({
     return groupTypes(list);
   },
   object: '',
-  bindings: {},
   is_loading: false,
   is_saving: false,
   assessmentTemplate: '',
