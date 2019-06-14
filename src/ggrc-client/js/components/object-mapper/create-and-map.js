@@ -157,13 +157,7 @@ export default can.Component.extend({
       }, () => {
         // close object mapper
         this.attr('element').trigger('mapExternally');
-      }, () => this.cancel())
-        .on('keyup', (ev) => {
-          // handle esc key
-          if (ev.which === 27 && $(ev.target).closest('.modal').length) {
-            this.cancel();
-          }
-        });
+      }, () => this.cancel());
     },
     cancel() {
       this.attr('element').trigger('canceled');

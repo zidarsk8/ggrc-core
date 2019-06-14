@@ -91,6 +91,13 @@ function warning(options, success, fail, extra) {
   return confirmResult;
 }
 
+function _onDismissHandler($target, dismiss) {
+  $target.modal('hide').remove();
+  if (dismiss) {
+    dismiss();
+  }
+}
+
 function confirm(options, success, dismiss) {
   let $target = $('<div class="modal hide ' +
     options.extraCssClass +
@@ -119,9 +126,14 @@ function confirm(options, success, dismiss) {
         }
       })
         .on('click.modal-form.close', '[data-dismiss="modal"]', function () {
-          $target.modal('hide').remove();
-          if (dismiss) {
-            dismiss();
+          _onDismissHandler($target, dismiss);
+        })
+        .on('keyup', function (e) {
+          const ESCAPE_KEY_CODE = 27;
+          const escapeKeyWasPressed = e.keyCode === ESCAPE_KEY_CODE;
+
+          if (escapeKeyWasPressed) {
+            _onDismissHandler($target, dismiss);
           }
         });
     });
