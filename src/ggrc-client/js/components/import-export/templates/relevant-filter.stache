@@ -40,16 +40,16 @@
         {{#model_name}}
           <div class="modal-search objective-selector">
             <input
-                {{#if readOnly}}disabled="disabled"{{/if}}
-                class="input-large search-icon search-filter-{{@index}}"
-                placeholder="Enter text to search for {{model_name}}"
-                type="text"
-                data-index="{{@index}}"
-                name="filter_list.{{@index}}.filter"
-                value="{{firstnonempty filter.name filter.email filter.title}}"
-                data-lookup="{{this}}"
-                data-template="/{{#is(model_name, 'Person')}}people{{else}}base_objects{{/is}}/autocomplete_result.stache"
-              {{ autocomplete_select true }}
+              {{#if readOnly}}disabled="disabled"{{/if}}
+              class="input-large search-icon search-filter-{{@index}}"
+              placeholder="Enter text to search for {{model_name}}"
+              type="text"
+              data-index="{{@index}}"
+              name="filter_list.{{@index}}.filter"
+              value="{{firstnonempty filter.name filter.email filter.title}}"
+              data-lookup="{{this}}"
+              data-template="/{{#is(model_name, 'Person')}}people{{else}}base_objects{{/is}}/autocomplete_result.stache"
+              {{initAutocomplete}}
             >
           </div>
         {{/model_name}}

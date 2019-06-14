@@ -111,4 +111,9 @@ export default canComponent.extend({
       item.target.attr('value', false);
     },
   },
+  helpers: {
+    initAutocomplete() {
+      return (el) => $(el).ggrc_autocomplete({disableCreate: true});
+    },
+  },
 });
