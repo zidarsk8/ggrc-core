@@ -30,7 +30,7 @@ saved-search-list {
         text-overflow: ellipsis;
       }
 
-      .fa-trash {
+      .fa-trash, .fa-link{
         margin-left: 6px;
         visibility: hidden;
       }
@@ -38,7 +38,7 @@ saved-search-list {
       &:hover {
         opacity: 1;
 
-        .fa-trash {
+        .fa-trash, .fa-link {
           opacity: 0.8;
           visibility: visible;
 

@@ -58,8 +58,9 @@
       {{#if isShowSavedSearch}}
       <aside>
         <saved-search-list
-          modalTitle:from="model.title_singular"
+          modelName:from="model.table_singular"
           searches:from="searches"
+          searchType:from="searchType"
           on:applySearch="applySearch(scope.event)"
           on:removed="loadSavedSearches()"
         ></saved-search-list>

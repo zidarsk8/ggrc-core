@@ -11,6 +11,13 @@
   {{#each searches}}
     <li {{#if disabled}}class="disabled"{{/if}}>
       <span on:el:click="applySearch(.)" title="{{name}}">{{name}}</span>
+      {{#is(searchType, 'AdvancedSearch')}}
+        {{#permalinkBuilder .}}
+          <clipboard-link text:from="permalink">
+            <i class="fa fa-link"></i>
+          </clipboard-link>
+        {{/permalinkBuilder}}
+      {{/is}}
       <i class="fa fa-trash"
         on:el:click="removeSearch(., scope.event)"
       ></i>

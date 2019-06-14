@@ -4,6 +4,11 @@
 */
 
 import template from './saved-search-list.stache';
+import {
+  buildSearchPermalink,
+} from '../../../plugins/utils/advanced-search-utils';
+import isFunction from 'can-util/js/is-function/is-function';
+import '../../clipboard-link/clipboard-link';
 
 export default can.Component.extend({
   tag: 'saved-search-list',
@@ -11,6 +16,8 @@ export default can.Component.extend({
   leakScope: false,
   viewModel: can.Map.extend({
     objectName: '',
+    modelName: '',
+    searchType: '',
     searches: [],
     applySearch(search) {
       if (this.attr('disabled')) {
@@ -30,4 +37,14 @@ export default can.Component.extend({
       });
     },
   }),
+  helpers: {
+    permalinkBuilder(savedSearch, options) {
+      if (isFunction(savedSearch)) {
+        savedSearch = savedSearch();
+      }
+
+      const link = buildSearchPermalink(savedSearch.id, this.attr('modelName'));
+      return options.fn({permalink: link});
+    },
+  },
 });

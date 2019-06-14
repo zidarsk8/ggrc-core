@@ -19,6 +19,7 @@
   <aside>
     <saved-search-list
       searches:from="searches"
+      searchType:from="searchType"
       on:applySearch="applySearch(scope.event)"
       on:removed="loadSavedSearches()"
     ></saved-search-list>
