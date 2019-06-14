@@ -65,7 +65,10 @@ import {
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
-import {getInstance} from '../../plugins/utils/models-utils';
+import {
+  getInstance,
+  initAuditTitle,
+} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {modalAutocomplete} from '../../plugins/autocomplete';
@@ -157,28 +160,13 @@ export default canControl.extend({
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
           this.restore_ui_status_from_storage();
-          if (this.is_audit_modal()) {
-            this.init_audit_title();
-          }
+          initAuditTitle(this.options.instance, this.options.new_object_form);
         }
       })
       .fail((error) => {
         notifierXHR('error', error);
         this.element.modal_form('hide');
       });
-  },
-
-  is_audit_modal: function () {
-    const {instance} = this.options;
-    return instance.constructor
-      && instance.constructor.model_singular === 'Audit';
-  },
-
-  init_audit_title: function () {
-    const {instance, new_object_form: isNewObjectForm} = this.options;
-    if (isNewObjectForm) {
-      instance.initTitle();
-    }
   },
 
   apply_object_params: function () {
@@ -267,16 +255,13 @@ export default canControl.extend({
       }, 0);
 
       instance.attr(path, null).attr(path, ui.item);
-      if (this.is_audit_modal()) {
-        this.init_audit_title();
-      }
+      initAuditTitle(instance, this.options.new_object_form);
       if (!instance._transient) {
         instance.attr('_transient', canMap());
       }
       instance.attr('_transient.' + path, ui.item);
     }
   },
-
   fetch_templates: function (dfd) {
     return $.when(
       ggrcAjax({url: this.options.content_view, dataType: 'text'}),
@@ -850,9 +835,7 @@ export default canControl.extend({
 
       ajd.always(() => {
         this.options.attr('isSaving', false);
-        if (this.is_audit_modal()) {
-          this.init_audit_title();
-        }
+        initAuditTitle(this.options.instance, this.options.new_object_form);
       });
       if (this.options.add_more) {
         bindXHRToButton(ajd, saveCloseBtn);
