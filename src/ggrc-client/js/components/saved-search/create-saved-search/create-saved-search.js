@@ -6,6 +6,7 @@
 import template from './create-saved-search.stache';
 import SavedSearch from '../../../models/service-models/saved-search';
 import {handleAjaxError} from '../../../plugins/utils/errors-utils';
+import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 export default can.Component.extend({
   tag: 'create-saved-search',
@@ -50,6 +51,11 @@ export default can.Component.extend({
     },
     saveSearch() {
       if (this.attr('isDisabled')) {
+        return;
+      }
+
+      if (!this.attr('searchName')) {
+        notifier('error', 'Saved search name can\'t be blank');
         return;
       }
 
