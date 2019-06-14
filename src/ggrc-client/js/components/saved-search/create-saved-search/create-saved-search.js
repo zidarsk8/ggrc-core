@@ -3,17 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import template from './create-saved-search.stache';
 import SavedSearch from '../../../models/service-models/saved-search';
 import {handleAjaxError} from '../../../plugins/utils/errors-utils';
 
 export default can.Component.extend({
   tag: 'create-saved-search',
-  template: can.stache(`
-    <input type="text" placeholder="Type to Save Search"
-        value:bind="searchName">
-    <button type="button" class="btn btn-small btn-green"
-        on:el:click="saveSearch()">Save Search</button>
-  `),
+  template: can.stache(template),
   leakScope: false,
   viewModel: can.Map.extend({
     filterItems: null,
@@ -24,6 +20,7 @@ export default can.Component.extend({
     type: null,
     searchName: '',
     objectType: '',
+    isDisabled: false,
     getFilters() {
       const filterItems = this.attr('filterItems') &&
         this.attr('filterItems').serialize();
@@ -52,6 +49,10 @@ export default can.Component.extend({
       };
     },
     saveSearch() {
+      if (this.attr('isDisabled')) {
+        return;
+      }
+
       const filters = this.getFilters();
       const savedSearch = new SavedSearch({
         name: this.attr('searchName'),
@@ -59,11 +60,15 @@ export default can.Component.extend({
         object_type: this.attr('objectType'),
         filters,
       });
+
+      this.attr('isDisabled', true);
       return savedSearch.save().then(() => {
         this.dispatch('created');
         this.attr('searchName', '');
       }, (err) => {
         handleAjaxError(err);
+      }).always(() => {
+        this.attr('isDisabled', false);
       });
     },
   }),
