@@ -8,7 +8,6 @@ import {getRole} from '../../plugins/utils/acl-utils';
 import accessControlList from '../mixins/access-control-list';
 import uniqueTitle from '../mixins/unique-title';
 import caUpdate from '../mixins/ca-update';
-import timeboxed from '../mixins/timeboxed';
 import issueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 import Program from './program';
@@ -28,7 +27,6 @@ export default Cacheable.extend({
     accessControlList,
     uniqueTitle,
     caUpdate,
-    timeboxed,
     issueTracker,
   ],
   is_custom_attributable: true,
@@ -38,8 +36,6 @@ export default Cacheable.extend({
     context: Stub,
     program: Stub,
     modified_by: Stub,
-    report_start_date: 'date',
-    report_end_date: 'date',
     audit_firm: Stub,
   },
   defaults: {

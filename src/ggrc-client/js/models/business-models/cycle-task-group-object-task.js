@@ -9,7 +9,6 @@ import Workflow from './workflow';
 import {REFRESH_SUB_TREE} from '../../events/eventTypes';
 import {getPageType} from '../../plugins/utils/current-page-utils';
 import {getClosestWeekday} from '../../plugins/utils/date-utils';
-import timeboxed from '../mixins/timeboxed';
 import isOverdue from '../mixins/is-overdue';
 import accessControlList from '../mixins/access-control-list';
 import caUpdate from '../mixins/ca-update';
@@ -65,7 +64,6 @@ export default Cacheable.extend({
   root_object: 'cycle_task_group_object_task',
   root_collection: 'cycle_task_group_object_tasks',
   mixins: [
-    timeboxed,
     isOverdue,
     accessControlList,
     caUpdate,

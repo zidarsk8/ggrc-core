@@ -6,7 +6,6 @@
 import Cacheable from '../cacheable';
 import TaskGroup from './task-group';
 import caUpdate from '../mixins/ca-update';
-import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
@@ -14,20 +13,18 @@ export default Cacheable.extend({
   root_object: 'workflow',
   root_collection: 'workflows',
   category: 'workflow',
-  mixins: [caUpdate, timeboxed, accessControlList],
+  mixins: [caUpdate, accessControlList],
   findAll: 'GET /api/workflows',
   findOne: 'GET /api/workflows/{id}',
   create: 'POST /api/workflows',
   update: 'PUT /api/workflows/{id}',
   destroy: 'DELETE /api/workflows/{id}',
   is_custom_attributable: true,
-
   attributes: {
     task_groups: Stub.List,
     cycles: Stub.List,
     modified_by: Stub,
     context: Stub,
-    repeat_every: 'number',
   },
   default_lhn_filters: {
     Workflow: {status: 'Active'},
