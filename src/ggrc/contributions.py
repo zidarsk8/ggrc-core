@@ -41,5 +41,5 @@ def contributed_notifications():
   return {
       "Assessment": data_handlers.get_assignable_data,
       "Comment": data_handlers.get_comment_data,
-      "Review": lambda x: {}
+      "Review": lambda x, _: {}
   }
