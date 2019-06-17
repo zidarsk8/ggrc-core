@@ -4,7 +4,6 @@
 */
 
 import loFind from 'lodash/find';
-import canConstruct from 'can-construct';
 import canList from 'can-list';
 import canMap from 'can-map';
 import {isAllowedFor} from '../../permission';
@@ -79,8 +78,9 @@ function isAuditScopeModel(model) {
  * @return {Object} The object
  */
 function toObject(instance) {
-  let content = instance.revision.content instanceof canConstruct ?
-    instance.revision.content.attr() : instance.revision.content;
+  let content = instance.revision.content.attr
+    ? instance.revision.content.attr()
+    : instance.revision.content;
 
   content.originalLink = getParentUrl(instance);
   content.snapshot = new canMap(instance);
