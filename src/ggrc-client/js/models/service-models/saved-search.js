@@ -11,13 +11,16 @@ export default can.Model.extend({
   create: 'POST /api/saved_searches',
   findOne: 'GET /api/saved_searches/{id}',
   ajax: $.ajax,
-  findBy(objectType, searchType, paging) {
-    let url = `/api/saved_searches/${objectType}?search_type=${searchType}`;
+  findBy(searchType, paging, objectType) {
+    let url = `/api/saved_searches/${searchType}`;
 
     if (paging) {
       const offset = (paging.current - 1) * paging.pageSize;
-      const limit = paging.pageSize;
-      url += `&offset=${offset}&limit=${limit}`;
+      url += `?offset=${offset}&limit=${paging.pageSize}`;
+    }
+
+    if (objectType) {
+      url += `${paging ? '&' : '?'}object_type=${objectType}`;
     }
 
     return $.ajax({

@@ -93,7 +93,7 @@ export default can.Component.extend({
       }
 
       this.attr('isLoading', true);
-      return SavedSearch.findBy(type, searchType, paging)
+      return SavedSearch.findBy(searchType, paging, type)
         .then(({total, values}) => {
           this.attr('searchesPaging.total', total);
 
