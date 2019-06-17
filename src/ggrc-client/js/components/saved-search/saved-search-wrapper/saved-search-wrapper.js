@@ -18,7 +18,7 @@ export default can.Component.extend({
     define: {
       isGlobalSearch: {
         get() {
-          return !this.attr('advancedSearch');
+          return this.attr('searchType') === 'GlobalSearch';
         },
       },
       isShowSavedSearch: {
@@ -79,7 +79,11 @@ export default can.Component.extend({
       }
     },
     loadSavedSearches() {
-      const type = this.attr('objectType');
+      // do NOT set type for global search
+      const type = this.attr('isGlobalSearch') ?
+        null :
+        this.attr('objectType');
+
       const paging = this.attr('searchesPaging');
       const searchType = this.attr('searchType');
 
