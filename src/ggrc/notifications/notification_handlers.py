@@ -65,29 +65,56 @@ def _add_notification(obj, notif_type, when=None):
   ))
 
 
-def _has_unsent_notifications(notif_type, obj):
-  """Helper for searching unsent notifications.
+def _has_unsent_notification(notif_type, obj):
+  """Check if object has unsent notification of specified type.
+
+  Check if there are unsent notification of `notif_type` type for `obj` object
+  in the DB or in current DB session.
 
   Args:
-    notify_type (NotificationType): type of the notifications we're looking
-      for.
-    obj (sqlalchemy model): Object for which we're looking for notifications.
+    notif_type (NotificationType): type of the notifications too look for.
+    obj (db.Model): Object for which to look for notifications.
 
   Returns:
-    True if there are any unsent notifications of notif_type for the given
-    object, and False otherwise.
+    True if there are unsent notifications and False otherwise.
   """
+  notification = _get_unsent_notification(notif_type, obj, for_update=False)
+  return notification is not None
+
+
+def _get_unsent_notification(notif_type, obj, for_update=True):
+  """Get object's first unsent notification of specified type.
+
+  Get first `obj` object's unsent notification of type `notif_type`. Note that
+  notification is considered unsent if it was not send or the one is repeating.
+  Unsent notification present in current DB session has priority over
+  notifications stored in DB. If there are not any unsent notifications, None
+  will be returned.
+
+  Args:
+    notif_type (NotificationType): type of the notifications too look for.
+    obj (db.Model): Object for which to look for notifications.
+    for_update (bool): Flag indicating the way notification should be selected
+      from the DB. If True, `FOR UPDATE` SQL clause will be applied. Defaults
+      to True.
+
+  Returns:
+    Notification object or None.
+  """
+
+  def _get_notif_key(notif):
+    """Return key to use during notification comparison."""
+    return notif.object_id, notif.object_type, notif.notification_type.id
+
   obj_key = (obj.id, obj.type, notif_type.id)
-  for notification in db.session:
-    if not isinstance(notification, models.Notification):
-      continue
-    notif_key = (notification.object_id,
-                 notification.object_type,
-                 notification.notification_type.id)
-    if obj_key == notif_key:
+  notifs = (o for o in db.session if isinstance(o, models.Notification))
+  for notification in notifs:
+    if obj_key == _get_notif_key(notification):
       return notification
 
-  return models.Notification.query.filter(
+  notif_q = db.session.query(
+      models.Notification,
+  ).filter(
       models.Notification.notification_type_id == notif_type.id,
       models.Notification.object_id == obj.id,
       models.Notification.object_type == obj.type,
@@ -96,7 +123,12 @@ def _has_unsent_notifications(notif_type, obj):
               models.Notification.repeating == true()
           )
       )
-  ).first()
+  )
+
+  if for_update:
+    notif_q = notif_q.with_for_update()
+
+  return notif_q.first()
 
 
 def _add_assignable_declined_notif(obj):
@@ -110,7 +142,7 @@ def _add_assignable_declined_notif(obj):
   name = "{}_declined".format(obj._inflector.table_singular)
   notif_type = models.NotificationType.query.filter_by(name=name).first()
 
-  if not _has_unsent_notifications(notif_type, obj):
+  if not _has_unsent_notification(notif_type, obj):
     _add_notification(obj, notif_type)
 
 
@@ -129,12 +161,12 @@ def _add_assessment_updated_notif(obj):
   notif_type = models.NotificationType.query.filter_by(
       name="assessment_updated").first()
 
-  notification = _has_unsent_notifications(notif_type, obj)
-  if not notification:
+  unsent_notification = _get_unsent_notification(notif_type, obj)
+  if unsent_notification is None:
     _add_notification(obj, notif_type)
   else:
-    notification.updated_at = datetime.utcnow()
-    db.session.add(notification)
+    unsent_notification.updated_at = datetime.utcnow()
+    db.session.add(unsent_notification)
 
 
 def _add_state_change_notif(obj, state_change, remove_existing=False):
@@ -171,7 +203,7 @@ def _add_state_change_notif(obj, state_change, remove_existing=False):
   notif_type = models.NotificationType.query.filter_by(
       name=state_change.value).first()
 
-  if not _has_unsent_notifications(notif_type, obj):
+  if not _has_unsent_notification(notif_type, obj):
     _add_notification(obj, notif_type)
 
 
