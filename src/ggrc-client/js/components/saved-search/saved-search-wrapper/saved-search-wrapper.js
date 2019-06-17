@@ -5,7 +5,7 @@
 
 import SavedSearch from '../../../models/service-models/saved-search';
 import Pagination from '../../base-objects/pagination';
-import {isObjectContextPage, isAllObjects} from '../../../plugins/utils/current-page-utils';
+import {isMyWork} from '../../../plugins/utils/current-page-utils';
 import {
   parseFilterJson,
   applySavedSearchFilter,
@@ -17,14 +17,22 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     define: {
       isGlobalSearch: {
-        value() {
+        get() {
           return !this.attr('advancedSearch');
         },
       },
       isShowSavedSearch: {
-        value() {
-          return this.attr('isGlobalSearch')
-            || isObjectContextPage() || isAllObjects();
+        get() {
+          if (this.attr('isGlobalSearch')) {
+            return true;
+          }
+
+          // do NOT show Advanced saved seacrhes on Dashboard tab
+          if (isMyWork()) {
+            return false;
+          }
+
+          return true;
         },
       },
       objectType: {
