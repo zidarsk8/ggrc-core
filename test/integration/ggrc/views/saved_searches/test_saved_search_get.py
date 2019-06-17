@@ -117,7 +117,7 @@ class TestSavedSearchGet(SavedSearchBaseTest):
   def test_1_get_saved_searches_with_pagination(self):
     response = self._client.get(
         self.SAVED_SEARCH_URI +
-        "/Assessment?offset=1&limit=2&search_type={search_type}".format(
+        "/{search_type}?offset=1&limit=2&object_type=Assessment".format(
             search_type=self.SAVED_SEARCH_TYPE
         ),
         headers=self._headers,

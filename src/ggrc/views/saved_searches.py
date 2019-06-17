@@ -44,8 +44,8 @@ def get_saved_searches_by_id(saved_search_id):
   )
 
 
-@app.route("/api/saved_searches/<string:object_type>", methods=["GET"])
-def get_saved_searches_by_type(object_type):
+@app.route("/api/saved_searches/<string:search_type>", methods=["GET"])
+def get_saved_searches_by_type(search_type):
   """Get SavedSearch by object type
 
   Get SavedSearch model by object type.
@@ -53,19 +53,22 @@ def get_saved_searches_by_type(object_type):
    offset and limit parameters.
 
   Args:
-    object_type: Type of object
+    search_type: Type of search
 
   Returns:
     Flask Response object with object_name, count, total and values as payload
   """
   user = login.get_current_user(use_external_user=False)
   all_objects = user.saved_searches.filter(
-      SavedSearch.object_type == object_type,
-      SavedSearch.search_type == request.args.get("search_type")
-  ).order_by(
-      SavedSearch.created_at.desc()
+      SavedSearch.search_type == search_type
   )
-  db_query_result = all_objects.offset(
+  if search_type == SavedSearch.ADVANCED_SEARCH or (search_type == SavedSearch.GLOBAL_SEARCH and "object_type" in request.args):
+    all_objects = all_objects.filter(
+        SavedSearch.object_type == request.args.get("object_type")
+    )
+  db_query_result = all_objects.order_by(
+      SavedSearch.created_at.desc()
+  ).offset(
       request.args.get("offset")
   ).limit(
       request.args.get("limit")

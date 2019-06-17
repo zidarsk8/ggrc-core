@@ -14,7 +14,7 @@ class SavedSearchBaseTest(TestCase):
 
   SAVED_SEARCH_URI = "/api/saved_searches"
 
-  API_URL = SAVED_SEARCH_URI + "/{object_type}?search_type={search_type}"
+  API_URL = SAVED_SEARCH_URI + "/{search_type}?object_type={object_type}"
 
   SAVED_SEARCH_TYPE = "GlobalSearch"
 

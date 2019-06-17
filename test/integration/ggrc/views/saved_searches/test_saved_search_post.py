@@ -64,7 +64,7 @@ class TestSavedSearchPost(SavedSearchBaseTest):
     self.assertEqual(response.status, "200 OK")
 
     response = self._client.get(
-        "/api/saved_searches/Assessment?limit=1&search_type=AdvancedSearch",
+        "/api/saved_searches/AdvancedSearch?limit=1&object_type=Assessment",
         headers=self._headers,
     )
 

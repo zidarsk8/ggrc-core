@@ -40,7 +40,9 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
       ),
   )
 
-  VALID_SAVED_SEARCH_TYPES = ["AdvancedSearch", "GlobalSearch"]
+  ADVANCED_SEARCH = "AdvancedSearch"
+  GLOBAL_SEARCH = "GlobalSearch"
+  VALID_SAVED_SEARCH_TYPES = [ADVANCED_SEARCH, GLOBAL_SEARCH]
 
   name = db.Column(db.String, nullable=False)
   object_type = db.Column(db.String, nullable=False)
@@ -88,7 +90,7 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
       Validate that supplied object type supports search api filters saving.
     """
     # pylint: disable=no-self-use
-    if object_type not in SUPPORTED_OBJECT_TYPES:
+    if object_type and object_type not in SUPPORTED_OBJECT_TYPES:
       raise ValidationError(
           u"Object of type '{}' does not support search saving".format(
               object_type,
