@@ -52,7 +52,7 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
 
   # pylint: disable-msg=too-many-arguments
   def __init__(self, name, object_type, user, search_type, filters=""):
-    self.validate_name_uniqueness(user, name)
+    self.validate_name_uniqueness(user, name, search_type, object_type)
 
     super(SavedSearch, self).__init__(
         name=name,
@@ -63,15 +63,29 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
     )
 
   @staticmethod
-  def validate_name_uniqueness(user, name):
+  def validate_name_uniqueness(user, name, search_type, object_type):
     """
       Check that for given user there are no saved searches
       with given name.
     """
-    if user.saved_searches.filter(SavedSearch.name == name).count() > 0:
-      raise ValidationError(
-          u"Saved search with name '{}' already exists".format(name)
-      )
+    if search_type == SavedSearch.GLOBAL_SEARCH:
+      if user.saved_searches.filter(
+          SavedSearch.name == name,
+          SavedSearch.search_type == search_type
+      ).count() > 0:
+        raise ValidationError(
+            u"Global Saved search with name '{}' already exists".format(name)
+        )
+    else:
+      if user.saved_searches.filter(
+          SavedSearch.name == name,
+          SavedSearch.search_type == search_type,
+          SavedSearch.object_type == object_type
+      ).count() > 0:
+        raise ValidationError(
+            u"Advanced Saved search for {} with "
+            u"name '{}' already exists".format(object_type, name)
+        )
 
   @validates("name")
   def validate_name(self, _, name):

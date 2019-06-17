@@ -82,9 +82,29 @@ class TestSavedSearchPost(SavedSearchBaseTest):
 
     self.assertEqual(
         data["message"],
-        u"Saved search with name 'test_ss_3' already exists",
+        u"Advanced Saved search for Assessment with "
+        u"name 'test_ss_3' already exists",
     )
     self.assertEqual(data["code"], 400)
+
+  def test_global_search_unique_names(self):
+    """Test that we unable to save GlobalSearch with already existing name"""
+    self._post_saved_search({
+        "name": "test_ss_3",
+        "object_type": "Assessment",
+        "search_type": "GlobalSearch"
+    })
+    glob2 = self._post_saved_search({
+        "name": "test_ss_3",
+        "object_type": "Assessment",
+        "search_type": "GlobalSearch"
+    })
+
+    self.assertEqual(
+        glob2["message"],
+        u"Global Saved search with name 'test_ss_3' already exists",
+    )
+    self.assertEqual(glob2["code"], 400)
 
   def test_2_saved_search_creation_failure_due_to_empty_name(self):
     data = self._post_saved_search({

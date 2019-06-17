@@ -31,6 +31,11 @@ def upgrade():
       sa.Column('search_type', sa.String(250), nullable=False)
   )
   op.drop_column('saved_searches', 'query')
+  op.drop_constraint(
+      "unique_pair_saved_search_name_person_id",
+      "saved_searches",
+      type_="unique"
+  )
 
 
 def downgrade():
@@ -40,4 +45,9 @@ def downgrade():
   op.add_column(
       'saved_searches',
       sa.Column('query', sa.Text, nullable=False),
+  )
+  op.create_unique_constraint(
+      "unique_pair_saved_search_name_person_id",
+      "saved_searches",
+      ["name", "person_id"],
   )

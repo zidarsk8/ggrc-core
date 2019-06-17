@@ -62,7 +62,9 @@ def get_saved_searches_by_type(search_type):
   all_objects = user.saved_searches.filter(
       SavedSearch.search_type == search_type
   )
-  if search_type == SavedSearch.ADVANCED_SEARCH or (search_type == SavedSearch.GLOBAL_SEARCH and "object_type" in request.args):
+  if search_type == SavedSearch.ADVANCED_SEARCH or \
+      (search_type == SavedSearch.GLOBAL_SEARCH and
+          "object_type" in request.args):
     all_objects = all_objects.filter(
         SavedSearch.object_type == request.args.get("object_type")
     )
