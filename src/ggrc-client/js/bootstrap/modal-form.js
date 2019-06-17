@@ -411,15 +411,4 @@ $(function () {
       }
     }
   });
-
-  $('body').on('ajax:html', '.modal > form', function (e, html, xhr) {
-    let sel = 'script[type="text/javascript"], ' +
-              'script[language="javascript"], script:not([type])';
-    let $frag = $(html);
-    $frag.filter(sel).add($frag.find(sel)).each(function () {
-      $(this).remove();
-      setTimeout($(this).html(), 10);
-    });
-    $(this).find('.modal-body').html($frag);
-  });
 });
