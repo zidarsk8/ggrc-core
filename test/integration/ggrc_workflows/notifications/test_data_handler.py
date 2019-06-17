@@ -6,6 +6,7 @@
 """Tests wf data_handler module."""
 import mock
 from ggrc import db
+from ggrc import login
 from ggrc.models.revision import Revision
 from ggrc_workflows.notification.data_handler import get_cycle_task_dict
 from integration.ggrc import TestCase
@@ -16,6 +17,11 @@ from integration.ggrc_workflows.models import factories as wf_factories
 class TestDataHandler(TestCase):
 
   """ This class test basic functions in the data_handler module """
+  def setUp(self):
+    super(TestDataHandler, self).setUp()
+    from ggrc.login import noop
+    noop.login()
+
   def test_get_cycle_task_dict(self):
     """Tests get_cycle_task_dict functionality."""
     contract = factories.ContractFactory(title=u"Contract1")
@@ -37,7 +43,7 @@ class TestDataHandler(TestCase):
                                  content='{"display_name": "Contract1"}')
     revisions = [relationship_revision, contract_revision]
     factories.EventFactory(
-        modified_by_id=None,
+        modified_by_id=login.get_current_user_id(),
         action="DELETE",
         resource_id=relationship.id,
         resource_type=relationship.type,
@@ -78,7 +84,7 @@ class TestDataHandler(TestCase):
                                      content="{}")
     revisions = [relationship_revision]
     factories.EventFactory(
-        modified_by_id=None,
+        modified_by_id=login.get_current_user_id(),
         action="DELETE",
         resource_id=relationship.id,
         resource_type=relationship.type,

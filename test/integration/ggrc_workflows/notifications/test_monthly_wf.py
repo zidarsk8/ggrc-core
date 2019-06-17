@@ -61,6 +61,8 @@ class TestMonthlyWorkflowNotification(TestCase):
 
     # cycle starts on monday - 6th, and not on 5th
     with freeze_time("2015-04-03"):
+      from ggrc.login import noop
+      noop.login()
       start_recurring_cycles()
       _, notif_data = common.get_daily_notifications()
       self.assertIn(person_1_email, notif_data)
