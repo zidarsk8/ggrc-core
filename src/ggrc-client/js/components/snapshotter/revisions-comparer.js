@@ -85,9 +85,7 @@ export default can.Component.extend({
                 fragLeft.appendChild(fragRight);
                 target.find('.modal-body').html(fragLeft);
 
-                that.highlightDifference(target);
-                that.highlightAttachments(target, revisions);
-                that.highlightCustomAttributes(target, revisions);
+                that.highlightDifference(target, revisions);
               });
             });
         },
@@ -206,14 +204,18 @@ export default can.Component.extend({
         });
     },
 
+    // debounce required to let template fully render prior comparison
     /**
      * Highlight difference
      * @param {Object} $target - jQuery object
+     * @param {can.List} revisions - revisions for comparing
      */
-    highlightDifference: function ($target) {
+    highlightDifference: _.debounce(function ($target, revisions) {
       this.highlightAttributes($target);
       this.highlightCustomRoles($target);
-    },
+      this.highlightAttachments($target, revisions);
+      this.highlightCustomAttributes($target, revisions);
+    }, 250),
 
     /**
      * Highlight difference in attributes
