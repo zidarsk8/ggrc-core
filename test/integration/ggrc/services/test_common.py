@@ -261,6 +261,8 @@ class TestServices(TestCase):
       self.assertEqual(response.status_code, 409)
       self.assertIn("message", response.json)
       self.assertIsInstance(response.json["message"], basestring)
+      self.assertIn("Etag", response.headers)
+      self.assertIn("Last-Modified", response.headers)
 
     def invalid_date():
       return format_date_time(0)  # 1970-01-01

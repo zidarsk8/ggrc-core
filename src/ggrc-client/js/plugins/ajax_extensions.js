@@ -28,6 +28,13 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 // we are not overwriting more recent data than was viewed by the user.
 const etags = {};
 
+function setupEtag(url, xhr) {
+  etags[url] = [
+    xhr.getResponseHeader('ETag'),
+    xhr.getResponseHeader('Last-Modified'),
+  ];
+}
+
 $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
   let data = originalOptions.data;
   let resourceUrl = originalOptions.url.split('?')[0];
@@ -56,25 +63,23 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
       switch (options.type.toUpperCase()) {
         case 'GET':
         case 'PUT':
-          etags[originalOptions.url] = [
-            xhr.getResponseHeader('ETag'),
-            xhr.getResponseHeader('Last-Modified'),
-          ];
+          setupEtag(originalOptions.url, xhr);
           break;
         case 'POST':
           for (let field in data) {
             if (data.hasOwnProperty(field) && data[field]
               && data[field].selfLink) {
-              etags[data[field].selfLink] = [
-                xhr.getResponseHeader('ETag'),
-                xhr.getResponseHeader('Last-Modified'),
-              ];
+              setupEtag(data[field].selfLink, xhr);
             }
           }
           break;
         case 'DELETE':
           delete etags[originalOptions.url];
           break;
+      }
+    }).fail((xhr) => {
+      if (xhr.status === 409 && options.type.toUpperCase() === 'PUT') {
+        setupEtag(originalOptions.url, xhr);
       }
     });
   }
