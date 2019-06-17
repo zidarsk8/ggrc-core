@@ -83,6 +83,15 @@ export default can.Component.extend({
       const paging = this.attr('searchesPaging');
       const searchType = this.attr('searchType');
 
+      const needToGoToPrevPage = (
+        paging.attr('current') > 1 &&
+        this.attr('searches.length') === 1
+      );
+
+      if (needToGoToPrevPage) {
+        paging.attr('current', paging.attr('current') - 1);
+      }
+
       this.attr('isLoading', true);
       return SavedSearch.findBy(type, searchType, paging)
         .then(({total, values}) => {
