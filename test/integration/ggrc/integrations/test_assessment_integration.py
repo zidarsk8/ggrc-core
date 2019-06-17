@@ -598,7 +598,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         model="Assessment",
         link=tracker_handler._get_assessment_page_url(asmt),
     )
-    kwargs = {'status': 'ASSIGNED',
+    kwargs = {'status': 'ACCEPTED',
               'component_id': 11111,
               'severity': "S2",
               'title': iti_title,
@@ -995,13 +995,13 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           'status': 'ASSIGNED'
       }),
       ('In Progress', {
-          'status': 'ASSIGNED'
+          'status': 'ACCEPTED'
       }),
       ('In Review', {
           'status': 'FIXED'
       }),
       ('Rework Needed', {
-          'status': 'ASSIGNED'
+          'status': 'ACCEPTED'
       }),
       ('Completed', {
           'status': 'VERIFIED',
