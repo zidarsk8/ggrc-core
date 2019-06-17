@@ -595,12 +595,19 @@ export default can.Component.extend({
       const deprecatedState = this.attr('deprecatedState');
       const isArchived = instance.attr('archived');
       const previousStatus = this.attr('previousStatus');
+      const doneStatuses = instance.constructor.doneStatuses;
       const stopFn = tracker.start(instance.type,
         tracker.USER_JOURNEY_KEYS.INFO_PANE,
         tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
 
       if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
         return $.Deferred().resolve();
+      }
+
+      if (doneStatuses.includes(newStatus) && !instance.validateGCAs()) {
+        notifier('error', `Please fill in the required fields at 
+          'Other Attributes' tab to complete assessment.`);
+        return $.Deferred().reject();
       }
 
       this.attr('onStateChangeDfd', $.Deferred());
