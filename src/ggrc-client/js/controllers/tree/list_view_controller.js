@@ -165,7 +165,6 @@ export default TreeLoader.extend({
     }
 
     this.context.attr(this.options);
-    this.update_count();
   },
 
   init_view: function () {
@@ -199,8 +198,6 @@ export default TreeLoader.extend({
     this.options.list.push(...items);
     return $.Deferred().resolve();
   },
-
-  '{list} change': 'update_count',
 
   '.view-more-paging click': function (el, ev) {
     let that = this;
