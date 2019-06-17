@@ -56,6 +56,7 @@ export default can.Component.extend({
     searchType: '',
     filtersToApply: null,
     advancedSearch: null,
+    isLoading: false,
     applySearch({search}) {
       const advancedSearch = this.attr('advancedSearch');
       if (advancedSearch) {
@@ -74,12 +75,15 @@ export default can.Component.extend({
       const paging = this.attr('searchesPaging');
       const searchType = this.attr('searchType');
 
+      this.attr('isLoading', true);
       return SavedSearch.findBy(type, searchType, paging)
         .then(({total, values}) => {
           this.attr('searchesPaging.total', total);
 
           const searches = values.map((value) => new SavedSearch(value));
           this.attr('searches', searches);
+        }).always(() => {
+          this.attr('isLoading', false);
         });
     },
   }),

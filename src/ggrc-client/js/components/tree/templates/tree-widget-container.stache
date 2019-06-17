@@ -61,6 +61,7 @@
           modelName:from="model.table_singular"
           searches:from="searches"
           searchType:from="searchType"
+          isLoading:from="isLoading"
           on:applySearch="applySearch(scope.event)"
           on:removed="loadSavedSearches()"
         ></saved-search-list>

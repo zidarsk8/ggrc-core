@@ -5,6 +5,7 @@
 
 <h3>
   Saved Searches
+  <spinner-component toggle:from="isLoading"></spinner-component>
 </h3>
 
 <ul>

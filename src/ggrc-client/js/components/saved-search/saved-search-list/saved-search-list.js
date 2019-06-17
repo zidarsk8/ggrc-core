@@ -19,6 +19,16 @@ export default can.Component.extend({
     modelName: '',
     searchType: '',
     searches: [],
+    disabled: false,
+    define: {
+      isLoading: {
+        set(value) {
+          // disable list while loading
+          this.attr('disabled', value);
+          return value;
+        },
+      },
+    },
     applySearch(search) {
       if (this.attr('disabled')) {
         return;
