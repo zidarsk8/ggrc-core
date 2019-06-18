@@ -260,7 +260,7 @@ class TestAssessmentNotification(TestCase):
     with mock.patch("ggrc.notifications.common.send_email") as send_email_mock:
       self.client.get("/_notifications/send_daily_digest")
       _, _, content = send_email_mock.call_args[0]
-      self.assertIn("Assessments have been updated", content)
+      self.assertIn("has been updated", content)
       self.assertIn("Reopened assessments", content)
 
   @ddt.data(

@@ -125,8 +125,9 @@ def _get_revisions(obj, created_at):
   return new_revision, old_revision
 
 
-def _get_updated_fields(obj, created_at, definitions, roles):
+def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
   """Get dict of updated  attributes of assessment"""
+  # pylint: disable=too-many-locals
   fields = []
 
   new_rev, old_rev = _get_revisions(obj, created_at)
@@ -150,21 +151,24 @@ def _get_updated_fields(obj, created_at, definitions, roles):
         fields.extend(_get_updated_roles(new_val, old_val, roles))
         continue
       fields.append(attr_name)
-
   fields.extend(list(notifications.get_updated_cavs(new_attrs, old_attrs)))
-  updated_fields = [[], {}]
+  updated_fields = []
+  updated_data = {}
   for field in fields:
     definition = definitions.get(field, None)
+    new_val, old_val = new_attrs.get(field), old_attrs.get(field)
     if definition:
-      updated_fields[0].append(definition["display_name"].upper())
-      updated_fields[1][definition["display_name"].upper()] = (
-          new_attrs[field],
-          old_attrs[field]
-      )
+      updated_fields.append(definition["display_name"].upper())
+      if new_val or old_val:
+        updated_data[definition["display_name"].upper()] = (
+            new_val,
+            old_val
+        )
     else:
-      updated_fields[0].append(field.upper())
-      updated_fields[1][field.upper()] = (new_attrs[field], old_attrs[field])
-  return updated_fields[0], updated_fields[1]
+      updated_fields.append(field.upper())
+      if new_val or old_val:
+        updated_data[field.upper()] = (new_val, old_val)
+  return updated_fields, updated_data
 
 
 def _get_assignable_roles(obj):
