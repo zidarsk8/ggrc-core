@@ -299,9 +299,21 @@ export const isSavedSearch = (appliedSavedSearch, searchFilter) => {
     return false;
   }
 
+  function getParents(parentItems) {
+    return parentItems.map((item) => {
+      return {
+        id: item.value.id,
+        type: item.value.type,
+      };
+    });
+  }
+
+  const savedSearchParents = getParents(appliedSavedSearch.parentItems);
+  const currentSearchParents = getParents(searchFilter.parentItems);
+
   return _.isEqual(appliedSavedSearch.filterItems, searchFilter.filterItems) &&
     _.isEqual(appliedSavedSearch.mappingItems, searchFilter.mappingItems) &&
-    _.isEqual(appliedSavedSearch.parentItems, searchFilter.parentItems);
+    _.isEqual(savedSearchParents, currentSearchParents);
 };
 
 /**
