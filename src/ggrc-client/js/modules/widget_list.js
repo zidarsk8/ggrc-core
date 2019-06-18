@@ -15,7 +15,6 @@ import {
   makeTreeView,
   createWidgetDescriptor,
 } from './widget_descriptor';
-import {getPageInstance} from '../plugins/utils/current-page-utils';
 
 const modules = {};
 
@@ -126,16 +125,7 @@ function getWidgetListFor(pageType) {
   return descriptors;
 }
 
-/*
-  returns a keyed object of widget descriptors that represents the current page.
-*/
-function getCurrentPageWidgets() {
-  return getWidgetListFor(
-    getPageInstance().constructor.model_singular);
-}
-
 export default WidgetList;
 export {
   getWidgetListFor,
-  getCurrentPageWidgets,
 };
