@@ -14,10 +14,8 @@ from ggrc import db, settings
 from ggrc.models import all_models
 from ggrc.utils.log_event import log_event
 from ggrc.utils.user_generator import (
-    find_or_create_ext_app_user, is_external_app_user_email,
-    parse_user_email, find_user
+    find_or_create_ext_app_user, is_app_2_app_user_email, parse_user_email
 )
-
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +57,10 @@ def check_appengine_appid(request):
   if inbound_appid not in settings.ALLOWED_QUERYAPI_APP_IDS:
     # by default, we don't allow incoming app2app connections from
     # non-whitelisted apps
-    raise exceptions.BadRequest("X-Appengine-Inbound-Appid header contains "
-                                "untrusted application id: {}"
-                                .format(inbound_appid))
+    raise exceptions.BadRequest(
+        "X-Appengine-Inbound-Appid header contains "
+        "untrusted application id: {}".format(inbound_appid)
+    )
 
   return inbound_appid
 
@@ -73,9 +72,9 @@ def get_ggrc_user(request, mandatory):
   if not email:
     return None
 
-  if is_external_app_user_email(email):
+  if is_app_2_app_user_email(email):
     # External Application User should be created if doesn't exist.
-    user = get_external_app_user(request)
+    user = get_external_app_user(email)
   else:
     user = all_models.Person.query.filter_by(email=email).first()
 
@@ -85,34 +84,11 @@ def get_ggrc_user(request, mandatory):
   return user
 
 
-def get_external_app_user(request):
+def get_external_app_user(email):
   """Find or create external app user from email in "X-GGRC-user" header."""
-  app_user = find_or_create_ext_app_user()
+  app_user = find_or_create_ext_app_user(email)
 
   if app_user.id is None:
     db.session.flush()
 
-  external_user_email = parse_user_email(
-      request, "X-external-user", mandatory=False
-  )
-
-  if external_user_email:
-    # Create external app user provided in X-external-user header.
-    try:
-      create_external_user(app_user, external_user_email)
-    except exceptions.BadRequest as exp:
-      logger.error("Creation of external user has failed. %s", exp.message)
-      raise
-
   return app_user
-
-
-def create_external_user(app_user, external_user_email):
-  """Create external user."""
-  external_user = find_user(external_user_email, modifier=app_user.id)
-
-  if external_user and external_user.id is None:
-    db.session.flush()
-    log_event(db.session, external_user, app_user.id)
-
-  return external_user

@@ -157,9 +157,7 @@ def find_or_create_user_by_email(email, name, modifier=None):
   """Generates or find user for selected email."""
   user = find_user_by_email(email)
   if not user:
-    _, app_email = parseaddr(settings.EXTERNAL_APP_USER)
-
-    if not modifier and email != app_email:
+    if not modifier and not is_app_2_app_user_email(email):
       modifier = get_current_user_id()
     user = create_user(email, name=name, modified_by_id=modifier)
   if is_authorized_domain(email) and \
@@ -185,8 +183,8 @@ def search_user(email):
 
 def find_or_create_external_user(email, name):
   """Find or generate user after verification"""
-  if is_external_app_user_email(email):
-    return find_or_create_ext_app_user()
+  if is_app_2_app_user_email(email):
+    return find_or_create_ext_app_user(email)
 
   if settings.INTEGRATION_SERVICE_URL == 'mock':
     return find_or_create_user_by_email(email, name)
@@ -196,11 +194,24 @@ def find_or_create_external_user(email, name):
   return None
 
 
-def find_or_create_ext_app_user():
+def get_external_user_name(email):
+  """Get external user name based on configured values in ggrc.settings"""
+  app_2_app_configs = (settings.SYNC_SERVICE_USER, settings.EXTERNAL_APP_USER)
+
+  for conf in app_2_app_configs:
+    config_name, config_email = parseaddr(conf)
+    if email == config_email:
+      return config_name
+  raise ValueError(
+      "No name configured for app_2_app service account: {}".format(email)
+  )
+
+
+def find_or_create_ext_app_user(email):
   """Find or generate external application user."""
-  name, email = parseaddr(settings.EXTERNAL_APP_USER)
   user = find_user_by_email(email)
   if not user:
+    name = get_external_user_name(email)
     user = create_user(email, name=name)
   return user
 
@@ -251,14 +262,14 @@ def find_user(email, modifier=None):
   the integration service. User generated based on provided info
   with Creator role.
   """
-  if is_external_app_user_email(email):
-    return find_or_create_ext_app_user()
+  if is_app_2_app_user_email(email):
+    return find_or_create_ext_app_user(email)
 
   if settings.INTEGRATION_SERVICE_URL == 'mock':
     return find_or_create_user_by_email(email, email, modifier)
 
   if settings.INTEGRATION_SERVICE_URL:
-    if is_request_from_external_app():
+    if is_app_2_app_request():
       name = get_username_from_header()
     else:
       name = search_user(email)
@@ -282,7 +293,7 @@ def find_users(emails):
   # Verify emails
   usernames = [email.split('@')[0] for email in emails
                if is_authorized_domain(email) and
-               not is_external_app_user_email(email)]
+               not is_app_2_app_user_email(email)]
 
   service = client.PersonClient()
   ldaps = service.search_persons(usernames)
@@ -328,28 +339,34 @@ def find_users(emails):
   return users
 
 
-def is_external_app_user_email(email):
+def is_app_2_app_user_email(email):
   """Checks if given user email belongs to external application.
 
   Args:
     email: A string email address of the user.
   """
-  if not settings.EXTERNAL_APP_USER:
+  return is_sync_service_app_email(email) or is_external_app_email(email)
+
+
+def extract_email_from_settings(settings_param):
+  """Extract email from given settings parameter"""
+  settings_value = getattr(settings, settings_param, "")
+  _, email = parseaddr(settings_value)
+  return email
+
+
+def is_external_app_email(email):
+  """Check if given email is settings.EXTERNAL_APP_USER"""
+  if not email:
     return False
+  return email == extract_email_from_settings("EXTERNAL_APP_USER")
 
-  _, external_app_user_email = parseaddr(settings.EXTERNAL_APP_USER)
-  if not external_app_user_email:
+
+def is_sync_service_app_email(email):
+  """Check if given email is settings.SYNC_SERVICE_USER"""
+  if not email:
     return False
-
-  return external_app_user_email == email
-
-
-def is_external_app_user(request):
-  """Checks if user in header is external_app"""
-  email = parse_user_email(request, "X-ggrc-user", mandatory=False)
-  if email:
-    return is_external_app_user_email(email)
-  return False
+  return email == extract_email_from_settings("SYNC_SERVICE_USER")
 
 
 def get_username_from_header():
@@ -365,17 +382,18 @@ def get_username_from_header():
   return ""
 
 
-def is_request_from_external_app():
+def is_app_2_app_request():
   """Checks if request from external_app by headers
 
-  X-Appengine-Inbound-Appid -> is request from app
+  X-Appengine-Inbound-Appid -> is request from ext app
   X-ggrc-user -> is request from external user
   """
   request = flask.request
   inbound_appid = request.headers.get("X-Appengine-Inbound-Appid")
+  service_acc = parse_user_email(request, "X-ggrc-user", mandatory=False)
   return (
       inbound_appid and inbound_appid in settings.ALLOWED_QUERYAPI_APP_IDS
-  ) and is_external_app_user(request)
+  ) and is_app_2_app_user_email(service_acc)
 
 
 def get_migrator_id():

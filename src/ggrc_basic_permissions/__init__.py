@@ -247,7 +247,7 @@ def load_bootstrap_admin(user, permissions):
 
 
 def load_external_app_permissions(permissions):
-  """Adds external application permissions if user is EXTERNAL_APP_USER.
+  """Adds external application permissions if user is app 2 app service acc.
 
   Args:
       permissions (dict): dict where the permissions will be stored

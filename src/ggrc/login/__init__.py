@@ -171,5 +171,5 @@ def is_external_app_user():
   if not user or user.is_anonymous():
     return False
 
-  from ggrc.utils.user_generator import is_external_app_user_email
-  return is_external_app_user_email(user.email)
+  from ggrc.utils.user_generator import is_app_2_app_user_email
+  return is_app_2_app_user_email(user.email)
