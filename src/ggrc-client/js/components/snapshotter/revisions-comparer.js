@@ -245,7 +245,7 @@ export default can.Component.extend({
         if ($valueNew.text().replace(/\s/g, '') !==
           $valueOld.text().replace(/\s/g, '')) {
           highlightValues($valueOld, $valueNew);
-          equalValuesHeight($valueOld, $valueNew);
+          this.equalizeHeights($valueOld, $valueNew);
         }
       });
 
@@ -297,21 +297,6 @@ export default can.Component.extend({
         if ($value.html() && !$value.find('.empty-message').length) {
           const title = isProposableExternalAttr ? '.action-toolbar' : 'h6';
           $value.find(`h3, ${title} + *`).addClass(HIGHLIGHT_CLASS);
-        }
-      }
-
-      /**
-       * Set max height between two jQuery objects
-       * @param {Object} $firstItem - jQuery object
-       * @param {Object} $secondItem - jQuery object
-       */
-      function equalValuesHeight($firstItem, $secondItem) {
-        let firstItemHeight = $firstItem.outerHeight();
-        let secondItemHeight = $secondItem.outerHeight();
-        if (firstItemHeight > secondItemHeight) {
-          $secondItem.outerHeight(firstItemHeight);
-        } else if (firstItemHeight < secondItemHeight) {
-          $firstItem.outerHeight(secondItemHeight);
         }
       }
     },
@@ -594,28 +579,26 @@ export default can.Component.extend({
         });
       }
     },
+
     /**
      * Adjust the heights of two DOM elements to the higher one's height.
      *
-     * @param {jQuery} $block - the first block element
-     * @param {jQuery} $block2 - the second block element
+     * @param {jQuery} $block1 - the left block element
+     * @param {jQuery} $block2 - the right block element
      */
-    equalizeHeights($block, $block2) {
-      let height;
-      let height2;
-
-      $block.css('max-width', 'none');
+    equalizeHeights($block1, $block2) {
+      $block1.css('max-width', 'none');
       $block2.css('max-width', 'none');
-      $block.css('margin-right', '0');
+      $block1.css('margin-right', '0');
       $block2.css('margin-right', '0');
 
-      height = $block.outerHeight();
-      height2 = $block2.outerHeight();
+      const block1Height = $block1.outerHeight();
+      const block2Height = $block2.outerHeight();
 
-      if (height > height2) {
-        $block2.outerHeight(height);
-      } else if (height < height2) {
-        $block.outerHeight(height2);
+      if (block1Height > block2Height) {
+        $block2.outerHeight(block1Height);
+      } else if (block2Height > block1Height) {
+        $block1.outerHeight(block2Height);
       }
     },
   }),
