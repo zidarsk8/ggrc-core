@@ -10,6 +10,7 @@ import {
   parseFilterJson,
   applySavedSearchFilter,
 } from '../../../plugins/utils/advanced-search-utils';
+import * as BusinessModels from '../../../models/business-models';
 
 export default can.Component.extend({
   tag: 'saved-search-wrapper',
@@ -35,15 +36,6 @@ export default can.Component.extend({
           return true;
         },
       },
-      objectType: {
-        set(newValue, setValue) {
-          setValue(newValue);
-
-          if (this.attr('isShowSavedSearch')) {
-            this.loadSavedSearches();
-          }
-        },
-      },
       searchesPaging: {
         value() {
           return new Pagination({
@@ -60,6 +52,7 @@ export default can.Component.extend({
         },
       },
     },
+    objectType: '',
     searches: [],
     searchType: '',
     filtersToApply: null,
@@ -71,11 +64,19 @@ export default can.Component.extend({
         applySavedSearchFilter(advancedSearch, search);
       } else {
         const filter = parseFilterJson(search.filters);
-        this.attr('filtersToApply', {
+        const model = BusinessModels[search.object_type];
+        const filtersToApply = {
           filterItems: filter.filterItems,
           mappingItems: filter.mappingItems,
           statusItem: filter.statusItem,
-        });
+        };
+
+        if (model) {
+          filtersToApply.modelName = model.model_singular;
+          filtersToApply.modelDisplayName = model.title_plural;
+        }
+
+        this.attr('filtersToApply', filtersToApply);
       }
     },
     loadSavedSearches() {
@@ -111,6 +112,11 @@ export default can.Component.extend({
   events: {
     '{viewModel.searchesPaging} current'() {
       this.viewModel.loadSavedSearches();
+    },
+    inserted() {
+      if (this.viewModel.attr('isShowSavedSearch')) {
+        this.viewModel.loadSavedSearches();
+      }
     },
   },
 });
