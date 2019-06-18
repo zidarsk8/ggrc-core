@@ -75,12 +75,11 @@ export default canComponent.extend({
         this.attr('statusItem', AdvancedSearch.create.state());
       }
     },
-  }),
-  events: {
-    '{viewModel} modelName': function () {
-      this.viewModel.resetFilters();
+    modelNameChanged(ev) {
+      this.attr('modelName', ev.modelName);
+      this.resetFilters();
     },
-  },
+  }),
   init: function () {
     this.viewModel.setDefaultStatusItem();
   },
