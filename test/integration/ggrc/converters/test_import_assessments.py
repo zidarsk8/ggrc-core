@@ -251,7 +251,7 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
     """
     self.import_file("assessment_full_no_warnings.csv")
-    self.import_file("assessment_update_intermediate.csv")
+    self.import_file("assessment_update_intermediate.csv", safe=False)
 
     assessments = {r.slug: r for r in all_models.Assessment.query.all()}
     self.assertEqual(assessments["Assessment 60"].status,
@@ -747,8 +747,6 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
-        ("Assignees", "user@example.com"),
-        ("Creators", "user@example.com"),
         ("Title", "Test title"),
         ("State", "Completed"),
         ("CAD", "Some value"),
@@ -774,8 +772,6 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
-        ("Assignees", "user@example.com"),
-        ("Creators", "user@example.com"),
         ("Title", "Test title"),
         ("State", "Completed"),
         ("CAD1", "Some value 1"),
@@ -834,15 +830,11 @@ class TestAssessmentImport(TestCase):
         ("Code", assessment.slug),
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/22/2019"),
-        ("State", all_models.Assessment.DONE_STATE),
     ]))
     self._check_csv_response(response, {})
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).verified_date,
         datetime.datetime(2019, 1, 22))
-    self.assertEqual(
-        all_models.Assessment.query.get(assessment.id).status,
-        all_models.Assessment.DONE_STATE)
 
   def test_asmt_verified_date_readonly(self):
     """Test that Verified Date is readonly"""
@@ -863,15 +855,36 @@ class TestAssessmentImport(TestCase):
         ("Code", assessment.slug),
         ("Verifiers", "user@example.com"),
         ("Verified Date", "01/21/2019"),
-        ("State", all_models.Assessment.DONE_STATE),
     ]))
     self._check_csv_response(response, expected_warnings)
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).verified_date,
         date)
+
+  @ddt.data("user@example.com", "--")
+  def test_asmt_state_after_updating_verifiers(self, new_verifier):
+    """Test that after updating Verifiers assessment became In Progress"""
+    audit = factories.AuditFactory()
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    status=all_models.Assessment.DONE_STATE,
+                                    )
+    person = factories.PersonFactory(email="verifier@example.com")
+    factories.AccessControlPersonFactory(
+        ac_list=assessment.acr_name_acl_map["Verifiers"],
+        person=person,
+    )
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.DONE_STATE)
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", new_verifier),
+    ]))
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.PROGRESS_STATE)
 
 
 @ddt.ddt

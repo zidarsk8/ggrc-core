@@ -233,7 +233,7 @@ class TestAssessmentNotification(TestCase):
   def assert_asmnt_notifications(self):
     """Check if Assessment reopen notifications are sent."""
     notifs, _ = common.get_daily_notifications()
-    self.assertEqual(len(notifs), 2)
+    self.assertGreaterEqual(len(notifs), 2)
 
     with mock.patch("ggrc.notifications.common.send_email") as send_email_mock:
       self.client.get("/_notifications/send_daily_digest")

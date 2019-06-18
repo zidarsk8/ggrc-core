@@ -422,7 +422,7 @@ class ImportRowConverter(RowConverter):
 
   def flush_object(self):
     """Flush dirty data related to the current row."""
-    if self.dry_run or self.ignore:
+    if self.dry_run or self.ignore or not self.is_new:
       return
     self.send_pre_commit_signals()
     try:
@@ -443,7 +443,7 @@ class ImportRowConverter(RowConverter):
       logger.exception("Import failed with: %s", err.message)
       self.add_error(errors.UNKNOWN_ERROR)
       return
-    if self.is_new and not self.ignore:
+    if not self.ignore:
       self.block_converter.send_collection_post_signals([self.obj])
 
   def commit_object(self):
@@ -456,6 +456,7 @@ class ImportRowConverter(RowConverter):
     try:
       if not self.is_new:
         cache.Cache.add_to_cache(self.obj)
+        self.send_pre_commit_signals()
       modified_objects = get_modified_objects(db.session)
       import_event = log_event(db.session, None)
       cache_utils.update_memcache_before_commit(
