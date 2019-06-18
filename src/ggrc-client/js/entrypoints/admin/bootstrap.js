@@ -19,7 +19,7 @@ import CustomAttributeDefinition from '../../models/custom-attributes/custom-att
 import AccessControlRole from '../../models/custom-roles/access-control-role';
 import Roleable from '../../models/custom-roles/roleable';
 import Person from '../../models/business-models/person';
-import WidgetList from '../../modules/widget_list';
+import WidgetList, {getWidgetListFor} from '../../modules/widget_list';
 import ListView from '../../controllers/tree/list_view_controller';
 import TreeViewControl from '../../controllers/tree/tree-view';
 import {DashboardControl} from '../../controllers/dashboard_controller';
@@ -198,7 +198,7 @@ new WidgetList('ggrc_admin', {
 });
 
 new DashboardControl('#pageContent', {
-  widget_descriptors: WidgetList.get_widget_list_for('admin'),
+  widget_descriptors: getWidgetListFor('admin'),
   menu_tree_spec: GGRC.admin_menu_spec,
   header_view: `${GGRC.templates_path}/base_objects/page_header.stache`,
   innernav_view: `${GGRC.templates_path}/base_objects/inner-nav.stache`,

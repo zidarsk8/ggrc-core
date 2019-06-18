@@ -62,20 +62,20 @@ Object.assign(CoreExtension, {
     // Info and summary widgets display the object information instead of listing
     // connected objects.
     if (summaryWidgetViews[objectTable]) {
-      widgetList.add_widget(object.constructor.model_singular, 'summary', {
+      widgetList.addWidget(object.constructor.model_singular, 'summary', {
         content_controller: SummaryWidgetController,
         instance: object,
         widget_view: summaryWidgetViews[objectTable],
       });
     }
     if (isDashboardEnabled(object)) {
-      widgetList.add_widget(object.constructor.model_singular, 'dashboard', {
+      widgetList.addWidget(object.constructor.model_singular, 'dashboard', {
         content_controller: DashboardWidget,
         instance: object,
         widget_view: path + '/base_objects/dashboard_widget.stache',
       });
     }
-    widgetList.add_widget(object.constructor.model_singular, 'info', {
+    widgetList.addWidget(object.constructor.model_singular, 'info', {
       content_controller: InfoWidget,
       instance: object,
       widget_view: infoWidgetViews[objectTable],
@@ -222,7 +222,7 @@ Object.assign(CoreExtension, {
       }
 
       descriptor.widgetType = 'treeview';
-      widgetList.add_widget(
+      widgetList.addWidget(
         object.constructor.model_singular, widgetId, descriptor);
     });
   },

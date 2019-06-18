@@ -10,7 +10,7 @@ import * as CurrentPageUtils from '../../utils/current-page-utils';
 import * as WidgetsUtils from '../../utils/widgets-utils';
 import * as QueryAPI from '../../utils/query-api-utils';
 import * as Mappings from '../../../models/mappers/mappings';
-import WidgetList from '../../../modules/widget_list';
+import * as WidgetList from '../../../modules/widget_list';
 import QueryParser from '../../../generated/ggrc_filter_query_parser';
 
 describe('GGRC Utils Widgets', function () {
@@ -18,7 +18,7 @@ describe('GGRC Utils Widgets', function () {
     let method;
 
     beforeEach(function () {
-      spyOn(WidgetList, 'get_widget_list_for')
+      spyOn(WidgetList, 'getWidgetListFor')
         .and.returnValue({
           control: {},
           Assessment: {},
@@ -83,7 +83,7 @@ describe('GGRC Utils Widgets', function () {
     let method;
 
     beforeEach(function () {
-      spyOn(WidgetList, 'get_widget_list_for')
+      spyOn(WidgetList, 'getWidgetListFor')
         .and.returnValue({
           Control: {
             widgetType: 'treeview',
@@ -395,7 +395,7 @@ describe('GGRC Utils Widgets', function () {
           },
         };
 
-      spyOn(WidgetList, 'get_widget_list_for')
+      spyOn(WidgetList, 'getWidgetListFor')
         .and.returnValue(widgets);
 
       spyOn(AjaxExtensions, 'ggrcAjax')
