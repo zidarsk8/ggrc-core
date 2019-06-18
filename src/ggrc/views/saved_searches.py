@@ -24,8 +24,7 @@ def get_saved_searches_by_id(saved_search_id):
   Returns:
 
   """
-  user = login.get_current_user(use_external_user=False)
-  saved_search = user.saved_searches.filter(
+  saved_search = SavedSearch.query.filter(
       SavedSearch.id == saved_search_id
   ).first()
 
@@ -36,7 +35,7 @@ def get_saved_searches_by_id(saved_search_id):
 
     return json_success_response(response_data)
   return make_error_response(
-      "No saved search with id {} found for current user".format(
+      "No saved search with id {} found".format(
           saved_search_id,
       ),
       404,
