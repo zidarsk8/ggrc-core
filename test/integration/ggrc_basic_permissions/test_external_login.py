@@ -90,6 +90,10 @@ class TestExternalPermissions(TestCase):
 
     if model_plural == "risks":
       model_data["risk_type"] = "some text"
+      model_data["external_id"] = factories.SynchronizableExternalId.next()
+      model_data["external_slug"] = factories.random_str()
+      model_data["review_status"] = all_models.Review.STATES.UNREVIEWED
+      model_data["review_status_display_name"] = "some status"
 
     if model_plural == "controls":
       model_data["assertions"] = '["test assertion"]'
@@ -97,6 +101,9 @@ class TestExternalPermissions(TestCase):
       model_data["external_slug"] = factories.random_str()
       model_data["review_status"] = all_models.Review.STATES.UNREVIEWED
       model_data["review_status_display_name"] = "some status"
+
+    if model_plural == "issues":
+      model_data["due_date"] = "10/10/2019"
 
     response = self._post(
         "api/{}".format(model_plural),

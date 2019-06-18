@@ -377,12 +377,15 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
         ggrc.models.Revision.resource_type == "Assessment",
     ).order_by(ggrc.models.Revision.id.desc()).all()
     content = revisions[0].content
-    self.assertEqual(content["custom_attribute_values"], [])
+    self.assertEqual(len(content["custom_attribute_values"]), 1)
+    cav = content["custom_attribute_values"][0]
+    self.assertEqual(cav["custom_attribute_id"], ca_def.id)
+    self.assertEqual(cav["attributable_id"], asmnt.id)
 
   def test_revision_review_stub(self):
     """ Test proper review stub population in revision content """
-    risk = factories.RiskFactory()
-    revisions = _get_revisions(risk)
+    program = factories.ProgramFactory()
+    revisions = _get_revisions(program)
     self.assertEqual(len(revisions), 1)
     self.assertEqual(revisions[0].action, "created")
 
@@ -391,8 +394,8 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
         {
             "review": {
                 "reviewable": {
-                    "type": risk.type,
-                    "id": risk.id,
+                    "type": program.type,
+                    "id": program.id,
                 },
                 "context": None,
                 "notification_type": "email",
@@ -407,7 +410,7 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
     self.assertEqual(all_models.Review.STATES.REVIEWED,
                      resp_review["status"])
 
-    revisions = _get_revisions(risk)
+    revisions = _get_revisions(program)
     self.assertEqual(len(revisions), 2)
     self.assertEqual(revisions[0].action, "created")
     self.assertEqual(revisions[1].action, "modified")

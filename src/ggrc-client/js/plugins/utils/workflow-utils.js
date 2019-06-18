@@ -8,6 +8,7 @@ import Permission from '../../permission';
 import Cycle from '../../models/business-models/cycle';
 import Stub from '../../models/stub';
 import {changeHash} from '../../router';
+import Mappings from '../../models/mappers/mappings';
 
 /**
  * A set of properties which describe minimum information
@@ -93,10 +94,30 @@ function refreshTGRelatedItems(taskGroup) {
   taskGroup.refresh_all_force('workflow', 'context');
 }
 
+function getRelevantMappingTypes(instance) {
+  const mappingTypes = Mappings.getMappingList(
+    instance.constructor.model_singular
+  );
+  const typesSet = new Set();
+  const relatedObjects = [
+    ...instance.attr('related_destinations'),
+    ...instance.attr('related_sources'),
+  ];
+
+  relatedObjects.forEach(({destination_type: type}) => {
+    if (mappingTypes.includes(type)) {
+      typesSet.add(type);
+    }
+  });
+
+  return [...typesSet];
+}
+
 export {
   createCycle,
   redirectToCycle,
   generateCycle,
   updateStatus,
   refreshTGRelatedItems,
+  getRelevantMappingTypes,
 };

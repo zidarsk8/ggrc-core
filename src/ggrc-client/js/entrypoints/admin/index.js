@@ -14,7 +14,7 @@ import '../../components/people/people-list-info';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/read-more/read-more';
 import '../../components/global-custom-attributes/global-custom-attributes';
-import '../../components/inline/inline';
+import '../../components/inline/inline-edit-control';
 import '../../components/inline/base-inline-control-title';
 import '../../components/page-header/page-header';
 import '../../components/user-roles-selector-button/user-roles-selector-button';

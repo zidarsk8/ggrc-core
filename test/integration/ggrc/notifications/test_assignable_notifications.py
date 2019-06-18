@@ -23,7 +23,6 @@ from ggrc.models import CustomAttributeValue
 from ggrc.models import Notification
 from ggrc.models import NotificationType
 from ggrc.models import Revision
-from ggrc.models import Relationship
 from ggrc.models import all_models
 from ggrc.utils import errors
 from integration.ggrc import TestCase
@@ -1178,10 +1177,9 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
 
     # assign another Assignee, change notification should be created
     person2 = factories.PersonFactory()
-    response, relationship2 = self.objgen.generate_relationship(
+    response, _ = self.objgen.generate_relationship(
         person2, asmt, attrs={"AssigneeType": "Assignees"})
     self.assertEqual(response.status_code, 201)
-    rel2_id = relationship2.id
 
     change_notifs = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(change_notifs.count(), 1)
@@ -1191,13 +1189,6 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     self.assertEqual(change_notifs.count(), 0)
     asmt = Assessment.query.get(asmts["A 5"].id)
-    relationship2 = Relationship.query.get(rel2_id)
-
-    self.api_helper.modify_object(
-        relationship2, {"AssigneeType": "Assignees,Verifiers"})
-
-    change_notifs = self._get_notifications(notif_type="assessment_updated")
-    self.assertEqual(change_notifs.count(), 1)
 
     # clear notifications, delete an Assignee, test for change notification
     self.client.get("/_notifications/send_daily_digest")
@@ -1213,14 +1204,6 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     # change notification
     self.client.get("/_notifications/send_daily_digest")
     self.assertEqual(change_notifs.count(), 0)
-    asmt = Assessment.query.get(asmts["A 5"].id)
-    relationship2 = Relationship.query.get(rel2_id)
-
-    self.api_helper.modify_object(
-        relationship2, {"AssigneeType": "Assignees"})  # not Verifier anymore
-
-    change_notifs = self._get_notifications(notif_type="assessment_updated")
-    self.assertEqual(change_notifs.count(), 1)
 
     # changing people if completed should result in "reopened" notification
 

@@ -3,14 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../related-objects/related-comments';
+import '../related-comments/related-comments';
 import '../custom-attributes/custom-attributes-field-view';
-import '../mapped-objects/mapped-objects';
 import '../object-list-item/comment-list-item';
 import '../form/form-validation-icon';
 import '../tabs/tab-container';
 import '../show-more/show-more';
-import '../related-objects/related-comments';
 import './object-popover';
 import {convertValuesToFormFields} from '../../plugins/utils/ca-utils';
 import template from './related-assessment-popover.stache';

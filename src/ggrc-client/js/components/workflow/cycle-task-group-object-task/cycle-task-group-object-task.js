@@ -5,7 +5,7 @@
 
 import template from './templates/cycle-task-group-object-task.stache';
 import '../../object-change-state/object-change-state';
-import '../../dropdown/dropdown';
+import '../../dropdown/dropdown-component';
 import '../../comment/comment-data-provider';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';

@@ -24,6 +24,7 @@ export default Cacheable.extend({
     relatedAssessmentsLoader,
     changeableExternally,
   ],
+  migrationDate: '03/26/2019',
   is_custom_attributable: true,
   isRoleable: true,
   tree_view_options: {

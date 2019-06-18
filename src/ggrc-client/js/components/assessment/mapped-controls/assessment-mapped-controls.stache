@@ -1,0 +1,90 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<object-list selectedItem:bind="selectedItem" items:from="mappedItems">
+    <business-object-list-item instance:from="instance">
+        {{^if withoutDetails}}
+            <read-more
+              class="description"
+              text:from="itemData.description"
+              handleMarkdown:from="instance.constructor.isChangeableExternally">
+            </read-more>
+            <div class="more-information-wrapper">
+                <button type="button" class="btn btn-link more-information-button">More Information</button>
+            </div>
+        {{/if}}
+    </business-object-list-item>
+</object-list>
+<simple-modal
+    instance:from="snapshot"
+    modalTitle:from="modalTitle"
+    state:from="state"
+    extraCssClass:from="'mapped-controls-info'"
+    replaceContent:from="true">
+    <div class="simple-modal__header flex-box">
+        <div class="simple-modal__header-text mapped-controls-info__header-text flex-size-1">
+            <div class="mapped-controls-info__title">
+                <span class="mapped-controls-info__title-text">{{assessmentType}}:</span>
+                {{instance.title}}
+            </div>
+            <span class="mapped-controls-info__title-state state-value snapshot">
+                {{instance.type}} version as on {{dateTime instance.updated_at}}
+            </span>
+        </div>
+          {{#if instance.originalObjectDeleted}}
+            <a class="btn btn-white btn-small disabled-original disabled" href="javascript:void(0)">
+              Original {{instance.constructor.title_singular}} is deleted
+            </a>
+          {{else}}
+            <a target="_blank" class="btn btn-white btn-small" href="{{instance.originalLink}}">
+              Open Original {{instance.constructor.title_singular}}
+            </a>
+          {{/if}}
+
+        <button type="button" class="btn btn-small btn-icon" on:el:click="hide">
+            <i class="fa fa-times black"></i>
+        </button>
+    </div>
+    <div class="simple-modal__body mapped-controls-info__body {{#if isLoading}}loading{{/if}}">
+        <spinner-component toggle:from="isLoading" class="spinner-wrapper active"
+                 extraCssClass:from="'grid-spinner'"></spinner-component>
+
+        {{^if instance.originalObjectDeleted}}
+          <questionnaire-link instance:from="instance" viewType:from="'button'">
+            Open {{instance.constructor.title_singular}} in new frontend
+          </questionnaire-link>
+        {{/if}}
+
+        {{^if withoutDetails}}
+        <collapsible-panel titleText:from="'{{assessmentType}} Info'"
+                           expanded:from="true">
+            <detailed-business-object-list-item instance:from="instance"
+                                                customAttributes:from="customAttributes"
+                                                class="mapped-object-info">
+            </detailed-business-object-list-item>
+        </collapsible-panel>
+        {{else}}
+          <div class="without-details-section">
+            <detailed-business-object-list-item instance:from="instance"
+                    customAttributes:from="customAttributes"
+                    class="mapped-object-info">
+            </detailed-business-object-list-item>
+          </div>
+        {{/if}}
+        {{^if withoutDetails}}
+          {{#is assessmentType 'Control'}}
+            <mapped-control-related-objects class="mapped-controls-info__related-objects"
+                                                       titleText:from="'Show Related Requirements ({{requirements.length}})'"
+                                                       type:from="'Requirement'"
+                                                       items:from="requirements">
+            </mapped-control-related-objects>
+            <mapped-control-related-objects class="mapped-controls-info__related-objects"
+                                                       titleText:from="'Show Related Regulations ({{regulations.length}})'"
+                                                       type:from="'Regulation'"
+                                                       items:from="regulations">
+            </mapped-control-related-objects>
+          {{/is}}
+        {{/if}}
+    </div>
+</simple-modal>

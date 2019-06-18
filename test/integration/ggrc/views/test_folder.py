@@ -92,8 +92,6 @@ class TestFolderViews(TestCase):
         url, content_type="application/json",
         data=self._get_request_data('Product', obj_id + 1, 'abc'))
 
-    print response.data
-
     self.assert404(response)
 
   @ddt.data(

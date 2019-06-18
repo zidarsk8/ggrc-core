@@ -15,6 +15,7 @@ def contributed_services():
   import ggrc.models.all_models as models
   from ggrc.access_control import role
   from ggrc.models import review
+  from ggrc.services.resources import access_controle_role
   from ggrc.services.resources import assessment
   from ggrc.services.resources import audit
   from ggrc.services.resources import external
@@ -64,7 +65,7 @@ def contributed_services():
       service('revisions', models.Revision, common.ReadOnlyResource),
       service('requirements', models.Requirement),
       service('risk_assessments', models.RiskAssessment),
-      service('risks', models.Risk),
+      service('risks', models.Risk, external.ExternalResource),
       service('threats', models.Threat),
       service('systems_or_processes',
               models.SystemOrProcess,
@@ -77,7 +78,8 @@ def contributed_services():
       service('notification_configs', models.NotificationConfig),
       service('issues', models.Issue, issue.IssueResource),
       service('snapshots', models.Snapshot, snapshot.SnapshotResource),
-      service('access_control_roles', role.AccessControlRole),
+      service('access_control_roles', role.AccessControlRole,
+              access_controle_role.AccessControlRoleResource),
       service('labels', models.Label),
       service('proposals', models.Proposal),
       service('related_assessments', None,

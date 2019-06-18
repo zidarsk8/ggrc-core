@@ -112,3 +112,7 @@ class RelationshipResource(ggrc.services.common.Resource):
       return None
 
     return super(RelationshipResource, self).json_create(obj, src)
+
+  def put(self, id):  # pylint: disable=redefined-builtin
+    """Disable ability to make PUT operation handler."""
+    raise MethodNotAllowed()

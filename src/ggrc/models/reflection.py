@@ -78,17 +78,16 @@ class ExternalUserAttribute(SerializableAttribute):
     """
     from ggrc.utils import user_generator
 
-    email = value.get("email")
-    name = value.get("name")
-
-    if not email:
-      raise ValueError("Missing mandatory \"email\" field in %s attribute" %
-                       self.attr)
-
-    if self.force_create:
-      return user_generator.find_or_create_external_user(email, name)
-
-    return user_generator.find_user_by_email(email)
+    if value.get("email"):
+      email = value.get("email")
+      name = value.get("name")
+      if self.force_create:
+        return user_generator.find_or_create_external_user(email, name)
+      return user_generator.find_user_by_email(email)
+    elif value.get("id"):
+      return user_generator.find_user_by_id(value["id"])
+    else:
+      raise ValueError("Provided data are incorrect.")
 
 
 class HybridAttribute(Attribute):

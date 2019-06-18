@@ -24,7 +24,7 @@ let viewModel = can.Map.extend({
  * Should Load on expand Related Objectives and Regulations
  */
 export default can.Component.extend({
-  tag: 'assessment-mapped-control-related-objects',
+  tag: 'mapped-control-related-objects',
   view: can.stache(template),
   leakScope: true,
   viewModel,

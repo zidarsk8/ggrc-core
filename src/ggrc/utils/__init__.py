@@ -1,7 +1,8 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""General utils module
+# pylint: disable=redefined-builtin,invalid-name,missing-docstring
+"""
+General utils module
 
 This module should contain only the most general utility function and any
 specific utilities should be in their own module.
@@ -39,7 +40,7 @@ class GrcEncoder(json.JSONEncoder):
   also consider:
      `http://hg.tryton.org/2.4/trytond/file/ade5432ac476/trytond/protocols/jsonrpc.py#l53`_
   """
-
+  # pylint: disable=arguments-differ,method-hidden,too-many-return-statements
   def default(self, obj):
     from ggrc.models import mixins
     if isinstance(obj, datetime.datetime):
@@ -54,6 +55,8 @@ class GrcEncoder(json.JSONEncoder):
       return list(obj)
     elif isinstance(obj, mixins.Base):
       return {"id": obj.id, "type": obj.type}
+    elif isinstance(obj, mixins.base.Dictable):
+      return obj.to_dict()
     elif callable(obj):
       return obj()
     else:
@@ -326,6 +329,63 @@ def create_stub(object_, context_id=None):
       'id': object_.id,
       'context_id': context_id,
       'href': url_for(object_),
+  }
+
+
+def created_by_stub(obj):
+  """Returns a stub of created_by.
+
+  Args:
+    obj: An instance of model with created_by.
+  Returns:
+    JSON with information for created_by.
+  """
+  if not obj.created_by:
+    return None
+  return {
+      'type': 'Person',
+      'id': obj.created_by.id,
+      'context_id': obj.context_id,
+      'href': '/api/people/%s' % obj.created_by.id,
+      'email': obj.created_by.email,
+  }
+
+
+def last_submitted_by_stub(obj):
+  """Returns a stub of last_submitted_by.
+
+  Args:
+    obj: An instance of model with last_submitted_by.
+  Returns:
+    JSON with information for last_submitted_by.
+  """
+  if not obj.last_submitted_by:
+    return None
+  return {
+      'type': 'Person',
+      'id': obj.last_submitted_by.id,
+      'context_id': obj.context_id,
+      'href': '/api/people/%s' % obj.last_submitted_by.id,
+      'email': obj.last_submitted_by.email,
+  }
+
+
+def last_verified_by_stub(obj):
+  """Returns a stub of last_verified_by.
+
+  Args:
+    obj: An instance of model with last_verified_by.
+  Returns:
+    JSON with information for last_verified_by.
+  """
+  if not obj.last_verified_by:
+    return None
+  return {
+      'type': 'Person',
+      'id': obj.last_verified_by.id,
+      'context_id': obj.context_id,
+      'href': '/api/people/%s' % obj.last_verified_by.id,
+      'email': obj.last_verified_by.email,
   }
 
 

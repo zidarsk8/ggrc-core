@@ -12,7 +12,7 @@
         <tab-panel panels:bind="panels" titleText:from="'Attributes'">
           <div class="info-pane__body">
             <div class="info-pane__main-content info-pane__main-content-with-sidebar">
-              <object-review instance:from="instance"></object-review>
+              {{> /static/templates/base_objects/object-review.stache}}
               {{> /static/templates/base_objects/description.stache}}
               {{> /static/templates/base_objects/notes.stache}}
               <div class="row-fluid wrap-row">

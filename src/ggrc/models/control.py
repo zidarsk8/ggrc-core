@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc import utils as ggrc_utils
 from ggrc.models import comment
 from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
@@ -89,6 +90,12 @@ class Control(synchronizable.Synchronizable,
     return utils.person_relationship(cls.__name__, "last_verified_by_id")
 
   _title_uniqueness = False
+
+  _custom_publish = {
+      'created_by': ggrc_utils.created_by_stub,
+      'last_submitted_by': ggrc_utils.last_submitted_by_stub,
+      'last_verified_by': ggrc_utils.last_verified_by_stub,
+  }
 
   # REST properties
   _api_attrs = reflection.ApiAttributes(

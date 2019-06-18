@@ -1,0 +1,148 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+inline-edit-control {
+  .inline {
+    @include action-toolbar-controls;
+
+    .inline__header {
+      display: flex;
+      align-items: center;
+      line-height: 28px;
+      min-height: 42px;
+
+      label {
+        margin: 0;
+      }
+
+      .inline__header-spinner {
+        @extend %field-spinnerable;
+      }
+    }
+
+    .inline__content-wrapper {
+      position: relative;
+    }
+
+    .inline__content {
+      border-radius: 0;
+      width: 100%;
+      box-sizing: border-box;
+      display: block;
+      min-width: 120px;
+      position: relative;
+      border: 1px solid transparent;
+
+      .disabled-dropdown {
+        .input-wrapper {
+          select {
+            border-color: transparent;
+            border-left: none;
+            outline: none;
+            opacity: 1;
+            padding-left: 0px;
+            box-shadow: none;
+            background: transparent;
+            height: 14px;
+            line-height: 14px;
+            min-height: 5px;
+          }
+
+          &.none-selected {
+            select {
+              color: #999;
+              font-style: italic;
+            }
+          }
+        }
+      }
+
+      p {
+        margin: 0;
+        padding: 0;
+      }
+
+      &.inline--hidden {
+        opacity: 0;
+        max-height: 424px;
+      }
+
+      &.inline--active {
+        padding: 0;
+        border-color: transparent;
+        position: absolute;
+        z-index: 1;
+        background: transparent;
+        line-height: 18px;
+
+        &:hover {
+          .inline__controls {
+            height: 32px;
+          }
+        }
+      }
+
+      .inline-input {
+        width: 100%;
+        margin-bottom: 0;
+        height: 26px;
+        box-sizing: border-box;
+        border: none;
+        box-shadow: none;
+      }
+
+      .inline-text-area {
+        margin-bottom: 0;
+        .rich-text__wrapper {
+          border-radius: 0;
+          border: none;
+          margin: -2px -2px -2px -4px;
+        }
+      }
+
+      select {
+        margin-bottom: 0;
+      }
+    }
+
+    .inline__controls {
+      display: block;
+      position: absolute;
+      text-align: center;
+      top: auto;
+      bottom: -31px;
+      right: 0;
+      border: 1px solid $warmGray;
+      background: $white;
+      box-sizing: border-box;
+      height: 32px;
+      line-height: 32px;
+      margin: 0;
+      padding: 0;
+      width: 70px;
+      z-index: -1;
+
+      .inline__controls-item {
+        display: inline-block;
+        box-sizing: border-box;
+        width: 32px;
+        line-height: 31px;
+      }
+      .inline__controls-link {
+        opacity: 0.6;
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
+
+    &--invalid {
+      .inline__content-input {
+        border: solid 1px red;
+        border-radius: 2px;
+      }
+    }
+  }
+}

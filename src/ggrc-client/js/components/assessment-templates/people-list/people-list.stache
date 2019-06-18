@@ -3,42 +3,52 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="span6 bottom-spacing">
-  <label>
-    {{labelName}}
-  </label>
-  <dropdown-component
-    optionsList:from="peopleValues"
-    name:bind="selectedValue"
-    on:el:change="dropdownChanged"
-    noValue:from="hasEmptyValue"
-  ></dropdown-component>
-</div>
-
-<div class="span6 {{#if validationError}}field-failure{{/if}}">
-  <label>&nbsp;</label>
-  {{#is(selectedValue, "other")}}
-    {{^if_config_exist 'external_services.Person'}}
-      <autocomplete-component searchItemsType:from="'Person'"
-                    on:itemSelected="personAdded(scope.event)"
-                    placeholder:from="'Enter text to search for {{listName}}'"
-      ></autocomplete-component>
-    {{else}}
-      <external-data-autocomplete type:from="'Person'"
-                                  placeholder:from="'Enter text to search for {{listName}}'"
-                                  minLength:from="2"
-                                  on:itemSelected="personAdded(scope.event)">
-      </external-data-autocomplete>
-    {{/if_config_exist}}
-    {{#if validationError}}
-      <label class="help-inline warning">{{validationError}}</label>
+<div {{#if hidable}} data-id="code_hidden" class="ggrc-form-item hidable" {{/if}}>
+  <div class="span6 bottom-spacing">
+    <label class="form-label">
+      {{labelName}}
+      {{#if mandatory}}
+        <i class="fa fa-asterisk"></i>
+      {{/if}}
+    </label>
+    {{#if hidable}}
+      <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">
+        hide
+      </a>
     {{/if}}
-    {{#each peopleList}}
-      <person-data personId:from="{{.}}">
-        <a href="javascript://" class="unmap" title="Remove" on:el:click="removePerson(person)">
-        <i class="fa fa-trash"></i>
-        </a>
-      </person-data>
-    {{/each}}
-  {{/is}}
+    <dropdown-component
+      optionsList:from="peopleValues"
+      name:bind="selectedValue"
+      on:el:change="dropdownChanged"
+      noValue:from="hasEmptyValue"
+    ></dropdown-component>
+  </div>
+
+  <div class="span6 {{#if validationError}}field-failure{{/if}}">
+    <label>&nbsp;</label>
+    {{#is(selectedValue, "other")}}
+      {{^if_config_exist 'external_services.Person'}}
+        <autocomplete-component searchItemsType:from="'Person'"
+                      on:itemSelected="personAdded(scope.event)"
+                      placeholder:from="'Enter text to search for {{listName}}'"
+        ></autocomplete-component>
+      {{else}}
+        <external-data-autocomplete type:from="'Person'"
+                                    placeholder:from="'Enter text to search for {{listName}}'"
+                                    minLength:from="2"
+                                    on:itemSelected="personAdded(scope.event)">
+        </external-data-autocomplete>
+      {{/if_config_exist}}
+      {{#if validationError}}
+        <label class="help-inline warning">{{validationError}}</label>
+      {{/if}}
+      {{#each peopleList}}
+        <person-data personId:from="{{.}}">
+          <a href="javascript://" class="unmap" title="Remove" on:el:click="removePerson(person)">
+          <i class="fa fa-trash"></i>
+          </a>
+        </person-data>
+      {{/each}}
+    {{/is}}
+  </div>
 </div>

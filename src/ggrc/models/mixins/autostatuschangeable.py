@@ -352,7 +352,6 @@ class AutoStatusChangeable(object):
       cls.handle_acl_edit(obj)
 
     @signals.Restful.model_posted.connect_via(relationship.Relationship)
-    @signals.Restful.model_put.connect_via(relationship.Relationship)
     @signals.Restful.model_deleted.connect_via(relationship.Relationship)
     def handle_relationship(sender, obj=None, src=None, service=None):
       """Handle creation of relationships that can change object status.

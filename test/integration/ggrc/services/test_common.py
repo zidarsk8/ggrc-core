@@ -27,6 +27,10 @@ RESOURCE_ALLOWED = ["HEAD", "GET", "PUT", "DELETE", "OPTIONS"]
 class TestServices(TestCase):
   """Integration tests suite for /api/<model> endpoints common logic."""
 
+  def setUp(self):
+    super(TestServices, self).setUp()
+    self.api = api_helper.Api()
+
   @staticmethod
   def get_location(response):
     """Ignore the `http://localhost` prefix of the Location"""
@@ -281,6 +285,24 @@ class TestServices(TestCase):
         ("If-Match", response.headers["Etag"]),
     )
     check_response_409(response_date_invalid)
+
+  def test_put_relationship_405(self):
+    """Ensures that ability to modify relationships via PUT was removed"""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      assessment_id = assessment.id
+      assessment_2 = factories.AssessmentFactory()
+      evidence = factories.EvidenceUrlFactory()
+      rel_id = factories.RelationshipFactory(source=assessment,
+                                             destination=evidence).id
+
+    relationship = all_models.Relationship.query.get(rel_id)
+    response = self.api.put(relationship, {"relationship": {
+        "source": {"id": assessment_2.id, "type": assessment_2.type},
+        "destination": {"id": evidence.id, "type": evidence.type},
+    }})
+    self.assert405(response)
+    self.assertEqual(relationship.source_id, assessment_id)
 
   def test_options(self):
     mock_obj = self.mock_model()

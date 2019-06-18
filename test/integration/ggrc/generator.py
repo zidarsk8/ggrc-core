@@ -212,6 +212,32 @@ class ObjectGenerator(Generator):
     return self.generate(models.Control, obj_name=obj_name, data=obj_dict,
                          with_background_tasks=with_background_tasks)
 
+  @generate_object.register(models.Risk)
+  def __(self, data=None, with_background_tasks=False):
+    """Handle generation of `Risk` objects."""
+    data = data if data is not None else {}
+    # pylint: disable=protected-access
+    obj_name = models.Risk._inflector.table_singular
+    # pylint: enable=protected-access
+    obj_dict = self.obj_to_dict(models.Risk(), obj_name)
+
+    defaults = {
+        obj_name: {
+            "title": factories.random_str(),
+            "context": None,
+            "recipients": "Admin,Other Contacts,Risk Owners",
+            "risk_type": "Some type",
+            "review_status": all_models.Review.STATES.UNREVIEWED,
+            "review_status_display_name": "some status",
+        }
+    }
+
+    obj_dict[obj_name].update(defaults[obj_name])
+    obj_dict[obj_name].update(self._get_synchronizable_obj_dict())
+
+    return self.generate(models.Risk, obj_name=obj_name, data=obj_dict,
+                         with_background_tasks=with_background_tasks)
+
   def generate_relationship(self, source, destination, context=None, **kwargs):
     """Create relationship between two objects.
 

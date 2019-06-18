@@ -8,7 +8,6 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {
   getInstanceView,
 } from '../../plugins/utils/object-history-utils';
-import RefreshQueue from '../../models/refresh_queue';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Revision from '../../models/service-models/revision';
 import Person from '../../models/business-models/person';
@@ -16,6 +15,9 @@ import Snapshot from '../../models/service-models/snapshot';
 import Stub from '../../models/stub';
 import * as businessModels from '../../models/business-models';
 import {getPageInstance} from '../../../js/plugins/utils/current-page-utils';
+import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
+
+const HIGHLIGHT_CLASS = 'diff-highlighted';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',
@@ -72,25 +74,21 @@ export default can.Component.extend({
                 confirmSelf.attr('leftRevisionData', leftRevisionData);
                 confirmSelf.attr('rightRevisionData', rightRevisionData);
               }
-              // people should be preloaded before highlighting differences
-              // to avoid breaking UI markup as highlightDifference
-              // sets block's height
-              that.loadACLPeople(revisions[1].instance)
-                .then(() => {
-                  $.ajax({
-                    url: view, dataType: 'text',
-                  }).then((view) => {
-                    let render = can.stache(view);
-                    let fragLeft = render(revisions[0]);
-                    let fragRight = render(revisions[1]);
 
-                    fragLeft.appendChild(fragRight);
-                    target.find('.modal-body').html(fragLeft);
+              $.ajax({
+                url: view, dataType: 'text',
+              }).then((view) => {
+                let render = can.stache(view);
+                let fragLeft = render(revisions[0]);
+                let fragRight = render(revisions[1]);
 
-                    that.highlightDifference(target);
-                    that.highlightCustomAttributes(target, revisions);
-                  });
-                });
+                fragLeft.appendChild(fragRight);
+                target.find('.modal-body').html(fragLeft);
+
+                that.highlightDifference(target);
+                that.highlightAttachments(target, revisions);
+                that.highlightCustomAttributes(target, revisions);
+              });
             });
         },
       }, this.updateRevision.bind(this));
@@ -103,27 +101,6 @@ export default can.Component.extend({
       };
 
       return revisionData;
-    },
-    /**
-     * Loads to cache people from access control list
-     *
-     * @param {Object} instance - revision
-     * @return {Promise}
-     */
-    loadACLPeople: function (instance) {
-      let refreshQueue = new RefreshQueue();
-
-      instance.attr('access_control_list').forEach((acl) => {
-        let person = Person.findInCacheById(acl.person.id) || {};
-        if (!person.email) {
-          refreshQueue.enqueue(acl.person);
-        }
-      });
-
-      if (refreshQueue.objects.length) {
-        return refreshQueue.trigger();
-      }
-      return $.Deferred().resolve();
     },
     getRevisions: function (currentRevisionID, newRevisionID) {
       let notCached = [];
@@ -246,23 +223,29 @@ export default can.Component.extend({
      */
     highlightAttributes: function ($target) {
       const emptySelector = '.empty-message';
-      const highlightClass = 'diff-highlighted';
       const listSelector = 'ul li, .object-list-item';
-      const attributesSelector = `.row-fluid h6 + *,
-        .pane-header__title-details .state-value,
-        .pane-header__title-details h3,
-        related-documents,
-        object-review`;
-      let infoPanes = $target.find('.info .tier-content');
-      let valuesOld = infoPanes.eq(0).find(attributesSelector);
-      let valuesNew = infoPanes.eq(1).find(attributesSelector);
+      const titleSelector = '.general-page-header .pane-header__title';
+      const instance = this.attr('instance');
+      const isProposableExternalAttr = (
+        instance.constructor.isProposable &&
+        isChangeableExternally(instance)
+      );
+      const attributesSelector = isProposableExternalAttr ?
+        '.review-status, proposable-attribute' :
+        'object-review, .row-fluid h6 + *';
+
+      const fieldsSelector = [titleSelector, attributesSelector].join(',');
+      const infoPanes = $target.find('.info .tier-content');
+      const valuesOld = infoPanes.eq(0).find(fieldsSelector);
+      const valuesNew = infoPanes.eq(1).find(fieldsSelector);
 
       valuesOld.each(function (index, valueOld) {
-        let $valueNew = $(valuesNew[index]);
-        let $valueOld = $(valueOld);
+        const $valueNew = $(valuesNew[index]);
+        const $valueOld = $(valueOld);
         let listOld = [];
         let listNew = [];
-        if ($valueOld.html() !== $valueNew.html()) {
+        if ($valueNew.text().replace(/\s/g, '') !==
+          $valueOld.text().replace(/\s/g, '')) {
           listOld = $valueOld.find(listSelector);
           listNew = $valueNew.find(listSelector);
           if (listOld.length) {
@@ -299,7 +282,7 @@ export default can.Component.extend({
             }
           });
           if (!atLeastOneIsEqual) {
-            $(li).addClass(highlightClass);
+            $(li).addClass(HIGHLIGHT_CLASS);
           }
         });
       }
@@ -310,7 +293,7 @@ export default can.Component.extend({
        */
       function highlightValues($value) {
         if ($value.html() && !$value.find(emptySelector).length) {
-          $value.addClass(highlightClass);
+          $value.addClass(HIGHLIGHT_CLASS);
         }
       }
 
@@ -331,6 +314,60 @@ export default can.Component.extend({
     },
 
     /**
+     * Highlights difference in 'related documents' section
+     *
+     * @param {jQuery} $target - the root DOM element containing the
+     *   revision diff comparison
+     * @param {can.List} revisions - revisions for comparing
+     */
+    highlightAttachments($target, revisions) {
+      if (!isEqual(
+        revisions[0].instance.documents_reference_url,
+        revisions[1].instance.documents_reference_url
+      )) {
+        highlightValues('.related-urls__list');
+      }
+
+      if (!isEqual(
+        revisions[0].instance.documents_file,
+        revisions[1].instance.documents_file
+      )) {
+        highlightValues('folder-attachments-list object-list');
+      }
+
+      if (revisions[0].instance.folder !== revisions[1].instance.folder) {
+        highlightValues('folder-attachments-list .mapped-folder');
+      }
+
+      /**
+       * Checks if two lists are equal.
+       * @param {can.List} left - First list to compare
+       * @param {can.List} right - Second list to compare
+       *
+       * @return {Boolean} - Returns true if lists are equal
+       */
+      function isEqual(left, right) {
+        const valueOld = Object.assign({},
+          left && left instanceof can.Map && left.attr() || []);
+        const valueNew = Object.assign({},
+          right && right instanceof can.Map && right.attr() || []);
+
+        return _.isEqual(valueOld, valueNew);
+      }
+
+      /**
+       * Highlight difference in 'related documents' section
+       * @param {string} selector - Selector of area to be highlighted
+       */
+      function highlightValues(selector) {
+        const infoPanes = $target.find('.info .tier-content');
+        _.each(infoPanes, (pane) => {
+          $(pane).find(selector).addClass(HIGHLIGHT_CLASS);
+        });
+      }
+    },
+
+    /**
      * Highlights difference in custom attributes
      *
      * @param {jQuery} $target - the root DOM element containing the
@@ -340,7 +377,6 @@ export default can.Component.extend({
     highlightCustomAttributes($target, revisions) {
       const titleSelector = '.info-pane__section-title';
       const valueSelector = '.inline__content';
-      const highlightClass = 'diff-highlighted';
 
       let that = this;
       let $caPanes = $target.find('.info global-custom-attributes');
@@ -415,10 +451,10 @@ export default can.Component.extend({
         let title0 = ca0.def.title;
         let title1 = ca1 && ca1.def ? ca1.def.title : null;
         if (title0 !== title1) {
-          $ca0.find(titleSelector).addClass(highlightClass);
+          $ca0.find(titleSelector).addClass(HIGHLIGHT_CLASS);
 
           if ($ca1) {
-            $ca1.find(titleSelector).addClass(highlightClass);
+            $ca1.find(titleSelector).addClass(HIGHLIGHT_CLASS);
           }
         }
       }
@@ -440,10 +476,10 @@ export default can.Component.extend({
           ca1.attribute_object.id : null;
 
         if (value0 !== value1 || objectId0 !== objectId1) {
-          $ca0.find(valueSelector).addClass(highlightClass);
+          $ca0.find(valueSelector).addClass(HIGHLIGHT_CLASS);
 
           if ($ca1) {
-            $ca1.find(valueSelector).addClass(highlightClass);
+            $ca1.find(valueSelector).addClass(HIGHLIGHT_CLASS);
           }
         }
       }
@@ -468,8 +504,6 @@ export default can.Component.extend({
      *   revision diff comparison pane
      */
     highlightCustomRoles: function ($target) {
-      let HIGHLIGHT_CLASS = 'diff-highlighted';
-
       let $rolesPanes = $target
         .find('related-people-access-control');
       let $roleBlocksOld = $rolesPanes.eq(0)

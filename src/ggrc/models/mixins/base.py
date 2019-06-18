@@ -69,7 +69,9 @@ class Identifiable(object):
     return self.__class__.__name__
 
   @classmethod
-  def eager_query(cls, **kwargs):
+  def eager_query(cls, **kwargs):  # pylint: disable=unused-argument
+    """Sub-query for eager loading."""
+
     mapper_class = cls._sa_class_manager.mapper.base_mapper.class_
     return db.session.query(cls).options(
         db.Load(mapper_class).undefer_group(
@@ -136,7 +138,54 @@ class ContextRBAC(object):
     )
 
 
-class ChangeTracked(object):
+class CreationTimeTracked(object):
+  """
+    Mixing for created_at column support.
+
+    `created_at` column will keep track of db record
+    creation time.
+  """
+
+  @declared_attr
+  def created_at(self):
+    """
+        Date of creation. Set to current time on object creation.
+    """
+    column = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=lambda: datetime.utcnow().replace(microsecond=0).isoformat(),
+    )
+
+    return column
+
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute('created_at', create=False, update=False),
+  )
+
+  _fulltext_attrs = [
+      attributes.DatetimeFullTextAttr('created_at', 'created_at'),
+  ]
+
+  _filterable_attrs = [
+      "created_at",
+  ]
+
+  _aliases = {
+      "created_at": {
+          "display_name": "Created Date",
+          "mandatory": False,
+      },
+  }
+
+  @classmethod
+  def indexed_query(cls):
+    return super(CreationTimeTracked, cls).indexed_query().options(
+        orm.Load(cls).load_only("created_at"),
+    )
+
+
+class ChangeTracked(CreationTimeTracked):
 
   """A model with fields to tracked the last user to modify the model, the
   creation time of the model, and the last time the model was updated.
@@ -145,16 +194,6 @@ class ChangeTracked(object):
   def modified_by_id(cls):  # pylint: disable=no-self-argument
     """Id of user who did the last modification of the object."""
     return db.Column(db.Integer)
-
-  @declared_attr
-  def created_at(cls):  # pylint: disable=no-self-argument
-    """Date of creation. Set to current time on object creation."""
-    column = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=lambda: datetime.utcnow().replace(microsecond=0).isoformat(),
-    )
-    return column
 
   @declared_attr
   def updated_at(cls):  # pylint: disable=no-self-argument
@@ -192,19 +231,18 @@ class ChangeTracked(object):
   # REST properties
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('modified_by', create=False, update=False),
-      reflection.Attribute('created_at', create=False, update=False),
       reflection.Attribute('updated_at', create=False, update=False),
   )
+
   _fulltext_attrs = [
-      attributes.DatetimeFullTextAttr('created_at', 'created_at'),
       attributes.DatetimeFullTextAttr('updated_at', 'updated_at'),
       attributes.FullTextAttr(
           "modified_by", "modified_by", ["email", "name"]
       ),
   ]
+
   _filterable_attrs = [
-      "created_at",
-      "updated_at"
+      "updated_at",
   ]
 
   _aliases = {
@@ -216,16 +254,14 @@ class ChangeTracked(object):
           "display_name": "Last Updated By",
           "mandatory": False,
       },
-      "created_at": {
-          "display_name": "Created Date",
-          "mandatory": False,
-      },
   }
 
   @classmethod
   def indexed_query(cls):
+    """Sub-query for indexed query."""
+
     return super(ChangeTracked, cls).indexed_query().options(
-        orm.Load(cls).load_only("created_at", "updated_at"),
+        orm.Load(cls).load_only("updated_at"),
         orm.Load(cls).joinedload(
             "modified_by"
         ).load_only(
@@ -234,7 +270,23 @@ class ChangeTracked(object):
     )
 
 
-class Base(ChangeTracked, Identifiable):
+class Dictable(object):
+  # pylint: disable=too-few-public-methods
+
+  """
+    Add support for model serialization to dict.
+    This allow using ggrc.utils.as_json for model
+    serialization to json (see utils.GrcEncoder).
+  """
+  def to_dict(self):
+    return {
+        column.name: getattr(self, column.name)
+        for column in self.__table__.columns
+        if hasattr(self, column.name)
+    }
+
+
+class Base(Dictable, ChangeTracked, Identifiable):
 
   """Several of the models use the same mixins. This class covers that common
   case.
@@ -264,12 +316,10 @@ class Base(ChangeTracked, Identifiable):
         "type": self.type,
     }
 
-    for column in self.__table__.columns:
-      try:
-        res[column.name] = getattr(self, column.name)
-      except AttributeError:
-        pass
+    res.update(self.to_dict())
+
     res["display_name"] = self.display_name
+
     return res
 
   def log_json(self):
@@ -301,6 +351,8 @@ class Base(ChangeTracked, Identifiable):
 
   @builder.simple_property
   def display_name(self):
+    """Returns display name of current class object."""
+
     try:
       return self._display_name()
     except:  # pylint: disable=bare-except

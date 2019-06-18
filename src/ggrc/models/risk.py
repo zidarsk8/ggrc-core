@@ -7,35 +7,66 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from ggrc.access_control.roleable import Roleable
+from ggrc import utils as ggrc_utils
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models import mixins, review
-from ggrc.models import proposal
-from ggrc.models.comment import Commentable
-from ggrc.models.deferred import deferred
-from ggrc.models.object_document import PublicDocumentable
-from ggrc.models.object_person import Personable
-from ggrc.models.relationship import Relatable
+from ggrc.models import comment
+from ggrc.models import exceptions
+from ggrc.models import mixins
 from ggrc.models import reflection
+from ggrc.models import utils
+from ggrc.models.deferred import deferred
+from ggrc.models.mixins import synchronizable
+from ggrc.models.object_document import PublicDocumentable
+from ggrc.models.relationship import Relatable
 
 
-class Risk(Roleable,
-           review.Reviewable,
+class Risk(synchronizable.Synchronizable,
+           synchronizable.RoleableSynchronizable,
            mixins.CustomAttributable,
            Relatable,
-           Personable,
            PublicDocumentable,
-           Commentable,
+           comment.ExternalCommentable,
            mixins.TestPlanned,
            mixins.LastDeprecatedTimeboxed,
            mixins.base.ContextRBAC,
            mixins.BusinessObject,
-           proposal.Proposalable,
            mixins.Folderable,
            Indexed,
            db.Model):
   """Basic Risk model."""
   __tablename__ = 'risks'
+
+  # GGRCQ attributes
+  external_id = db.Column(db.Integer, nullable=False)
+  due_date = db.Column(db.Date, nullable=True)
+  created_by_id = db.Column(db.Integer, nullable=False)
+  review_status = deferred(db.Column(db.String, nullable=True), "Risk")
+  review_status_display_name = deferred(db.Column(db.String, nullable=True),
+                                        "Risk")
+
+  # pylint: disable=no-self-argument
+  @declared_attr
+  def created_by(cls):
+    """Relationship to user referenced by created_by_id."""
+    return utils.person_relationship(cls.__name__, "created_by_id")
+
+  last_submitted_at = db.Column(db.DateTime, nullable=True)
+  last_submitted_by_id = db.Column(db.Integer, nullable=True)
+
+  @declared_attr
+  def last_submitted_by(cls):
+    """Relationship to user referenced by last_submitted_by_id."""
+    return utils.person_relationship(cls.__name__,
+                                     "last_submitted_by_id")
+
+  last_verified_at = db.Column(db.DateTime, nullable=True)
+  last_verified_by_id = db.Column(db.Integer, nullable=True)
+
+  @declared_attr
+  def last_verified_by(cls):
+    """Relationship to user referenced by last_verified_by_id."""
+    return utils.person_relationship(cls.__name__,
+                                     "last_verified_by_id")
 
   # Overriding mixin to make mandatory
   @declared_attr
@@ -44,19 +75,30 @@ class Risk(Roleable,
     return deferred(db.Column(db.Text, nullable=False, default=u""),
                     cls.__name__)
 
-  risk_type = db.Column(db.Text, nullable=False)
+  risk_type = db.Column(db.Text, nullable=True)
   threat_source = db.Column(db.Text, nullable=True)
   threat_event = db.Column(db.Text, nullable=True)
   vulnerability = db.Column(db.Text, nullable=True)
 
-  @validates("risk_type")
-  def validate_risk_type(self, key, value):
-    """Validate risk_type"""
-    #  pylint: disable=unused-argument,no-self-use
-    if value:
-      return value
-    else:
-      raise ValueError("Risk Type value shouldn't be empty")
+  @validates('review_status')
+  def validate_review_status(self, _, value):
+    """Add explicit non-nullable validation."""
+    if value is None:
+      raise exceptions.ValidationError(
+          "Review status for the object is not specified")
+
+    return value
+
+  @validates('review_status_display_name')
+  def validate_review_status_display_name(self, _, value):
+    """Add explicit non-nullable validation."""
+    # pylint: disable=no-self-use
+
+    if value is None:
+      raise exceptions.ValidationError(
+          "Review status display for the object is not specified")
+
+    return value
 
   _sanitize_html = [
       'risk_type',
@@ -69,14 +111,34 @@ class Risk(Roleable,
       'risk_type',
       'threat_source',
       'threat_event',
-      'vulnerability'
+      'vulnerability',
+      'review_status_display_name'
   ]
+
+  _custom_publish = {
+      'created_by': ggrc_utils.created_by_stub,
+      'last_submitted_by': ggrc_utils.last_submitted_by_stub,
+      'last_verified_by': ggrc_utils.last_verified_by_stub,
+  }
 
   _api_attrs = reflection.ApiAttributes(
       'risk_type',
       'threat_source',
       'threat_event',
-      'vulnerability'
+      'vulnerability',
+      'external_id',
+      'due_date',
+      reflection.ExternalUserAttribute('created_by',
+                                       force_create=True),
+      reflection.ExternalUserAttribute('last_submitted_by',
+                                       force_create=True),
+      reflection.ExternalUserAttribute('last_verified_by',
+                                       force_create=True),
+      'last_submitted_at',
+      'last_verified_at',
+      'external_slug',
+      'review_status',
+      'review_status_display_name',
   )
 
   _aliases = {
@@ -86,7 +148,7 @@ class Risk(Roleable,
       },
       "risk_type": {
           "display_name": "Risk Type",
-          "mandatory": True
+          "mandatory": False
       },
       "threat_source": {
           "display_name": "Threat Source",
@@ -106,5 +168,21 @@ class Risk(Roleable,
           "mandatory": False,
           "description": "Options are: \n {}".format('\n'.join(
               mixins.BusinessObject.VALID_STATES))
-      }
+      },
+      "review_status": {
+          "display_name": "Review State",
+          "mandatory": False,
+          "filter_only": True,
+      },
+      "review_status_display_name": {
+          "display_name": "Review Status",
+          "mandatory": False,
+      },
   }
+
+  def log_json(self):
+    res = super(Risk, self).log_json()
+    res["created_by"] = ggrc_utils.created_by_stub(self)
+    res["last_submitted_by"] = ggrc_utils.last_submitted_by_stub(self)
+    res["last_verified_by"] = ggrc_utils.last_verified_by_stub(self)
+    return res

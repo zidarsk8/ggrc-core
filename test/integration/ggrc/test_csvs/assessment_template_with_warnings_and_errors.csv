@@ -30,3 +30,5 @@ mandatory dropdown, my second dropdown, value1, value2
 Dropdown, dropdown with mandatory attachments and comments, (a) value1, (a)(c) value 2, (c)  (a)  value3, (c) value cc, valueeee"
 ,T-4,Audit,Template 3,Org Group,yes,Control test plan value will be ignored,principal assignees,primary contacts,
 ,T-5,Audit,Template 4,Control,yes,this will be ignored,Object admins,primary contacts,"Text, ASSESSMENT PROCEDURE"
+,T-6,Audit,Template 5,Control,,this will be ignored,principal assignees,primary contacts,invalid cad
+,T-7,Audit,Template 6,Control,,this will be ignored,principal assignees,primary contacts,"LCAText, invalid cad"

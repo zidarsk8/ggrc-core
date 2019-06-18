@@ -12,7 +12,7 @@
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
               {{^isScopeModel instance}}
-                <object-review instance:from="instance"></object-review>
+                {{> /static/templates/base_objects/object-review.stache}}
               {{/isScopeModel}}
               {{> /static/templates/base_objects/description.stache}}
               {{> /static/templates/base_objects/test_plan.stache}}

@@ -562,7 +562,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "mandatory": {
             "Title",
             "Admin",
-            "Code"
+            "Code",
+            "Due Date"
         },
         "unique": {
             "Code",
@@ -829,15 +830,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Admin",
         "Reference URL",
         "State",
-        "Review State",
-        "Reviewers",
         "Last Deprecated Date",
         "Title",
-        "Primary Contacts",
-        "Secondary Contacts",
-        "Recipients",
-        "Send by default",
-        "Comments",
+        "Risk Owners",
+        "Other Contacts",
         "Assessment Procedure",
         "Created Date",
         "Last Updated Date",
@@ -847,6 +843,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Vulnerability",
         "Threat Event",
         "Risk Type",
+        "Review Status",
     }
     expected_fields = {
         "mandatory": {
@@ -854,7 +851,6 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Description",
             "Admin",
             "Title",
-            "Risk Type",
         },
         "unique": {
             "Code",

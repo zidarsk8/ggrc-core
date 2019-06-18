@@ -4,7 +4,7 @@
  */
 
 import tracker from '../../tracker';
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';

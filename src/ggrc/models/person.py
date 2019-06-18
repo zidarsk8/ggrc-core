@@ -54,7 +54,11 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'Option.role == "person_language")',
       uselist=False,
   )
-
+  saved_searches = db.relationship(
+      "SavedSearch",
+      lazy="dynamic",
+      cascade="all, delete-orphan",
+  )
   profile = db.relationship(
       "PersonProfile",
       foreign_keys='PersonProfile.person_id',

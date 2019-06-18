@@ -21,7 +21,10 @@
   {{#if redirectionEnabled}}
     <div class="action-toolbar__controls">
       <div class="action-toolbar__controls-item">
-        <role-attr-names-provider roleName:from="title">
+        <role-attr-names-provider
+          modelType:from="instance.constructor.model_singular"
+          roleName:from="title"
+        >
           <proposable-control
             instance:from="instance"
             attrName:from="linkAttrName"

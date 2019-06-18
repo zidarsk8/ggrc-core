@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{^if instance.constructor.isChangeableExternally}}
+  <object-review instance:from="instance"></object-review>
+{{else}}
+  <div class="row-fluid wrap-row">
+    <div class="span12">
+      <h6>Review Status</h6>
+      <span class="state-value-dot review-status {{#if review_status}}{{addclass 'state' review_status}}{{else}}'state-unreviewed'{{/if}}">
+        {{firstnonempty review_status_display_name 'Unreviewed'}}
+      </span>
+    </div>
+  </div>
+{{/if}}

@@ -67,7 +67,7 @@ class TestEvidence(TestCase):
       evidence = factories.EvidenceFactory(
           title='Simple title',
           kind=all_models.Evidence.FILE,
-          description='mega description',
+          description='',
           source_gdrive_id='gdrive_file_id',
           parent_obj={
               'id': assessment.id,
@@ -77,12 +77,13 @@ class TestEvidence(TestCase):
 
     result = all_models.Evidence.query.filter(
         all_models.Evidence.id == evidence.id).one()
+    expected_description = 'Mapped to: {}'.format(assessment.slug.lower())
 
     self.assertEqual(result.title, COPIED_TITLE)
     self.assertEqual(result.kind, all_models.Evidence.FILE)
     self.assertFalse(result.archived)
     self.assertEqual(result.link, COPIED_LINK)
-    self.assertEqual(result.description, 'mega description')
+    self.assertEqual(result.description, expected_description)
     self.assertEqual(result.source_gdrive_id, 'gdrive_file_id')
 
   def test_create_invalid_type(self):
@@ -137,14 +138,14 @@ class TestEvidence(TestCase):
             'type': 'Audit'
         })
 
-    expected = '_ggrc_{}'.format(audit.slug).lower()
+    expected = 'Mapped to: {}'.format(audit.slug.lower())
     # pylint: disable=protected-access
-    result = evidence._build_file_name_postfix(audit)
+    result = evidence._build_mapped_to_string(audit)
     self.assertEqual(expected, result)
 
   @mock.patch('ggrc.models.evidence.Evidence.handle_before_flush',
               lambda x: '')
-  def test_evidence_postfix_one_control(self):
+  def test_evidence_description_one_control(self):
     """Test evidence postfix for assessment with one control."""
 
     with factories.single_commit():
@@ -163,15 +164,15 @@ class TestEvidence(TestCase):
             'type': 'Assessment'
         })
 
-    expected = '_ggrc_assessment-{}_control-{}'.format(assessment.id,
-                                                       control.id)
+    expected = 'Mapped to: {}, {}'.format(assessment.slug.lower(),
+                                          control.slug.lower())
     # pylint: disable=protected-access
-    result = evidence._build_file_name_postfix(assessment)
+    result = evidence._build_mapped_to_string(assessment)
     self.assertEqual(expected, result)
 
   @mock.patch('ggrc.models.evidence.Evidence.handle_before_flush',
               lambda x: '')
-  def test_evidence_postfix_two_controls(self):
+  def test_evidence_description_two_controls(self):
     """Test evidence postfix for assessment with two controls."""
 
     with factories.single_commit():
@@ -194,11 +195,11 @@ class TestEvidence(TestCase):
             'type': 'Assessment'
         })
 
-    expec = '_ggrc_assessment-{}_control-{}_control-{}'.format(assessment.id,
-                                                               control1.id,
-                                                               control2.id)
+    expec = 'Mapped to: {}, {}, {}'.format(assessment.slug.lower(),
+                                           control1.slug.lower(),
+                                           control2.slug.lower())
     # pylint: disable=protected-access
-    result = evidence._build_file_name_postfix(assessment)
+    result = evidence._build_mapped_to_string(assessment)
     self.assertEqual(expec, result)
 
   def test_evidence_acl(self):

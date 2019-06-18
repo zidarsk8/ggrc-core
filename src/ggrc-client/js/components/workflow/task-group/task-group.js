@@ -4,7 +4,7 @@
 */
 
 import '../../info-pin-buttons/info-pin-buttons';
-import '../taskgroup_clone';
+import '../task-group-clone';
 import '../task-list/task-list';
 import '../task-group-objects/task-group-objects';
 import template from './templates/task-group.stache';

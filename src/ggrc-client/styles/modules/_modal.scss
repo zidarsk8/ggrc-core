@@ -375,10 +375,13 @@
       select {
         border: 1px solid $red;
       }
+      datepicker-component ~ .help-inline {
+        margin-top: 4px;
+      }
       .help-inline {
         margin: -8px 0 8px 0;
         display: block;
-        font-size:$f-small;
+        font-size: $f-small;
         font-weight: bold;
         color: $red;
         padding: 0;
@@ -387,25 +390,7 @@
         border-color: $red;
       }
     }
-    .mandatory-dropdown {
-      &.select-failure {
-        .form-label {
-          color: $red;
-        }
 
-        .multiselect-dropdown__input  {
-          border-color: $red;
-        }
-
-        .help-inline.warning {
-          font-size: $f-small;
-          font-weight: bold;
-          color: $red;
-          margin-top: 5px;
-          padding: 0;
-        }
-      }
-    }
     .rich-text {
       margin-bottom: 20px;
     }
@@ -903,4 +888,8 @@
 
 label.second-in-column {
   margin-top:20px;
+}
+
+.control-offset {
+  margin-left: 4px;
 }

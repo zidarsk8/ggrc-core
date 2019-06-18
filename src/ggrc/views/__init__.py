@@ -31,6 +31,8 @@ from ggrc.services import common as services_common, signals
 from ggrc.snapshotter import rules, indexer as snapshot_indexer
 from ggrc.utils import benchmark, helpers, log_event, revisions
 from ggrc.utils import empty_revisions
+from ggrc.utils.contributed_objects import CONTRIBUTED_OBJECTS
+from ggrc.views import saved_searches  # noqa: F401
 from ggrc.views import converters, cron, filters, notifications, registry, \
     utils, serializers, folder
 
@@ -865,42 +867,7 @@ def get_background_task_status(object_type, object_id):
 
 def contributed_object_views():
   """Contributed object views"""
-  contributed_objects = [
-      models.AccessGroup,
-      models.AccountBalance,
-      models.Assessment,
-      models.AssessmentTemplate,
-      models.Audit,
-      models.Contract,
-      models.Control,
-      models.DataAsset,
-      models.Document,
-      models.Evidence,
-      models.Facility,
-      models.Issue,
-      models.Market,
-      models.Objective,
-      models.OrgGroup,
-      models.Person,
-      models.Policy,
-      models.Process,
-      models.Product,
-      models.Program,
-      models.Project,
-      models.Regulation,
-      models.Requirement,
-      models.Risk,
-      models.Snapshot,
-      models.Standard,
-      models.System,
-      models.TechnologyEnvironment,
-      models.Threat,
-      models.Vendor,
-      models.Metric,
-      models.ProductGroup,
-      models.KeyReport,
-  ]
-  return [registry.object_view(obj) for obj in contributed_objects]
+  return [registry.object_view(obj) for obj in CONTRIBUTED_OBJECTS]
 
 
 def all_object_views():

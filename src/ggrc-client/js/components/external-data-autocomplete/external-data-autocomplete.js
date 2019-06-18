@@ -5,7 +5,7 @@
 
 import './external-data-provider';
 import './autocomplete-results';
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 import * as businessModels from '../../models/business-models';
 import {reify, isReifiable} from '../../plugins/utils/reify-utils';
 import template from './external-data-autocomplete.stache';

@@ -19,8 +19,9 @@ def get_modal_obj(obj_type, _selenium=None):
   """Gets modal obj for `obj_type`."""
   mapping = {
       "assessment": AssessmentModal,
+      "issue": IssueModal,
       "control": ControlModal,
-      "risk": RiskModal,
+      "threat": ThreatModal,
       "workflow": WorkflowModal,
       "task_group_task": TaskGroupTaskModal,
       "task_group": TaskGroupModal
@@ -179,17 +180,12 @@ class ControlModal(BaseObjectModal):
       multi_select_root.checkbox(id=str(assertion["id"])).js_click()
 
 
-class RiskModal(BaseObjectModal):
-  """Represents risk object modal."""
+class ThreatModal(BaseObjectModal):
+  """Represents threat object modal."""
 
   def __init__(self, _driver=None):
-    super(RiskModal, self).__init__()
-    self._fields = ["title", "description", "status", "slug", "risk_type"]
-
-  def set_risk_type(self, risk_type):
-    """Set risk type."""
-    risk_type_field = self._root.div(data_placeholder="Enter Risk Type")
-    risk_type_field.send_keys(risk_type)
+    super(ThreatModal, self).__init__()
+    self._fields = ["title"]
 
 
 class AssessmentModal(BaseObjectModal):
@@ -215,6 +211,20 @@ class AssessmentModal(BaseObjectModal):
     """Gets titles of mapped snapshots."""
     els = self._root.elements(class_name="modal-mapped-objects-item")
     return [el.element(class_name="title").text for el in els]
+
+
+class IssueModal(BaseObjectModal):
+  """Represents issue object modal."""
+
+  def __init__(self):
+    super(IssueModal, self).__init__()
+    self._fields = ["title", "description", "status", "slug", "due_date"]
+    self._due_date_picker = page_elements.Datepicker(
+        self._root.element(id="issue-due-date"))
+
+  def set_due_date(self, date):
+    """Sets a date in the due date datepicker."""
+    self._due_date_picker.set_value(date)
 
 
 class WorkflowModal(BaseObjectModal):

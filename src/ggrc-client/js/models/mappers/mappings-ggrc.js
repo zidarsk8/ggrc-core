@@ -4,11 +4,8 @@
 */
 
 import {
-  Proxy,
   Direct,
   Search,
-  Multi,
-  CustomFilter,
 } from '../mappers/mapper-helpers';
 import Mappings from './mappings';
 import CustomAttributeDefinition from '../custom-attributes/custom-attribute-definition';
@@ -20,6 +17,7 @@ import {
   scopingObjects,
   snapshotableObjects,
   externalDirectiveObjects,
+  externalBusinessObjects,
 } from '../../plugins/models-types-collections';
 import {getRoleableModels} from '../../plugins/utils/models-utils';
 
@@ -30,10 +28,7 @@ import {getRoleableModels} from '../../plugins/utils/models-utils';
       unmap : [ <object name>, ...]
       indirectMappings: [ <object name>, ...]
       mappers : {
-        <mapping name> : Proxy(...) | Direct(...)
-                      | Multi(...)
-                      | CustomFilter(...),
-      ...
+        <mapping name>: Direct(...) | Search()
       }
     }
   }
@@ -68,8 +63,8 @@ const coreObjectConfig = {
 const scopingObjectConfig = {
   ...createRule,
   map: _.difference(businessObjects,
-    ['Assessment', 'Control', ...externalDirectiveObjects]),
-  externalMap: ['Control', ...externalDirectiveObjects],
+    ['Assessment', ...externalBusinessObjects, ...externalDirectiveObjects]),
+  externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
   unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
   indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
 };
@@ -112,8 +107,8 @@ new Mappings({
   Control: {
     ...createRule,
     map: _.difference(businessObjects,
-      ['Assessment', ...scopingObjects, ...externalDirectiveObjects]),
-    externalMap: [...scopingObjects, ...externalDirectiveObjects],
+      ['Assessment', ...scopingObjects, ...externalDirectiveObjects, 'Risk']),
+    externalMap: [...scopingObjects, ...externalDirectiveObjects, 'Risk'],
     unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
@@ -132,20 +127,28 @@ new Mappings({
   Regulation: {
     ...createRule,
     map: _.difference(businessObjects,
-      [...scopingObjects, 'Assessment', 'Control', 'Regulation']),
-    externalMap: [...scopingObjects, 'Control'],
+      [...scopingObjects, 'Assessment', 'Regulation',
+        ...externalBusinessObjects]),
+    externalMap: [...scopingObjects, ...externalBusinessObjects],
     unmap: _.difference(businessObjects,
       ['Assessment', 'Audit', 'Regulation']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Risk: {
-    ...coreObjectConfig,
+    ...createRule,
+    map: _.difference(businessObjects, ['Assessment',
+      ...scopingObjects,
+      ...externalDirectiveObjects, 'Control']),
+    externalMap: [...scopingObjects, ...externalDirectiveObjects, 'Control'],
+    unmap: _.difference(businessObjects, ['Assessment', 'Audit']),
+    indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
   },
   Standard: {
     ...createRule,
     map: _.difference(businessObjects,
-      [...scopingObjects, 'Assessment', 'Control', 'Standard']),
-    externalMap: [...scopingObjects, 'Control'],
+      [...scopingObjects, 'Assessment', 'Standard',
+        ...externalBusinessObjects]),
+    externalMap: [...scopingObjects, ...externalBusinessObjects],
     unmap: _.difference(businessObjects,
       ['Assessment', 'Audit', 'Standard']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
@@ -158,8 +161,11 @@ new Mappings({
   AccessGroup: {
     ...createRule,
     map: _.difference(businessObjects,
-      ['Assessment', 'AccessGroup', 'Control', ...externalDirectiveObjects]),
-    externalMap: ['Control', ...externalDirectiveObjects],
+      ['Assessment', 'AccessGroup',
+        ...externalBusinessObjects,
+        ...externalDirectiveObjects,
+      ]),
+    externalMap: [...externalBusinessObjects, ...externalDirectiveObjects],
     unmap: _.difference(businessObjects,
       ['Assessment', 'AccessGroup', 'Audit']),
     indirectMappings: ['Assessment', 'Person', 'TaskGroup', 'Workflow'],
@@ -242,48 +248,6 @@ new Mappings({
     map: [...coreObjects, 'Audit', 'Program'],
     unmap: [...coreObjects, 'Audit', 'Program'],
     indirectMappings: ['Person', 'Workflow'],
-
-    mappers: {
-      // Needed for related_objects mapper
-      related_objects_as_source: Proxy(
-        null,
-        'destination', 'Relationship',
-        'source', 'related_destinations'
-      ),
-      // Needed for related_objects mapper
-      related_objects_as_destination: Proxy(
-        null,
-        'source', 'Relationship',
-        'destination', 'related_sources'
-      ),
-      // Needed to show mapped objects for CycleTaskGroupObjectTask
-      related_objects: Multi(
-        ['related_objects_as_source', 'related_objects_as_destination']
-      ),
-      /**
-       * "cycle" mapper is needed for mapped objects under
-       * CycleTaskGroupObjectTask into cycle-task-objects component.
-       */
-      cycle: Direct(
-        'Cycle', 'cycle_task_group_object_tasks', 'cycle'),
-      /**
-       * This mapping name is needed for objects mapped to CTGOT.
-       * It helps to filter results of objects mapped to CTGOT.
-       * We can just remove some objects from results.
-       */
-      info_related_objects: CustomFilter(
-        'related_objects',
-        function (relatedObjects) {
-          return !_.includes([
-            'CycleTaskGroup',
-            'Comment',
-            'Document',
-            'Person',
-          ],
-          relatedObjects.instance.type);
-        }
-      ),
-    },
   },
 
   // Other

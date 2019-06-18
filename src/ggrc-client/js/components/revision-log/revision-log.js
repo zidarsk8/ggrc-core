@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../tree_pagination/tree_pagination';
+import '../tree-pagination/tree-pagination';
 import './revision-page';
 
 import RefreshQueue from '../../models/refresh_queue';

@@ -264,6 +264,18 @@ const OBJECTS_MAPPED_VIA_MAPPER = {
   type: 'objectsMappedViaMapper',
 };
 
+/**
+ * Notifies that some objects were mapped and/or unmapped from the instance.
+ * @event deferredMappedUnmapped
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {Cacheable[]} mapped - Mapped objects.
+ * @property {Cacheable[]} unmapped - Unmapped objects.
+ */
+const DEFERRED_MAPPED_UNMAPPED = {
+  type: 'deferredMappedUnmapped',
+};
+
 export {
   REFRESHED,
   REFRESH_SUB_TREE,
@@ -290,4 +302,5 @@ export {
   DEFERRED_MAP_OBJECTS,
   REFRESH_MAPPED_COUNTER,
   OBJECTS_MAPPED_VIA_MAPPER,
+  DEFERRED_MAPPED_UNMAPPED,
 };

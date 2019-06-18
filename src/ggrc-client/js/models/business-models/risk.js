@@ -4,11 +4,8 @@
  */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/notifications/base-notifications';
 import proposable from '../mixins/proposable';
+import changeableExternally from '../mixins/changeable-externally';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -21,12 +18,10 @@ export default Cacheable.extend({
   update: 'PUT /api/risks/{id}',
   destroy: 'DELETE /api/risks/{id}',
   mixins: [
-    uniqueTitle,
-    caUpdate,
-    accessControlList,
-    baseNotifications,
     proposable,
+    changeableExternally,
   ],
+  migrationDate: '06/13/2019',
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {
@@ -77,44 +72,14 @@ export default Cacheable.extend({
         disable_sorting: true,
         order: 105,
       }, {
-        attr_title: 'Review State',
-        attr_name: 'review_status',
+        attr_title: 'Review Status',
+        attr_name: 'external_review_status',
+        attr_sort_field: 'review_status_display_name',
         order: 80,
       }]),
   },
   sub_tree_view_options: {
     default_filter: ['Control'],
   },
-  defaults: {
-    status: 'Draft',
-  },
   statuses: ['Draft', 'Deprecated', 'Active'],
-}, {
-  define: {
-    title: {
-      value: '',
-      validate: {
-        required: true,
-        validateUniqueTitle: true,
-      },
-    },
-    _transient_title: {
-      value: '',
-      validate: {
-        validateUniqueTitle: true,
-      },
-    },
-    description: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
-    risk_type: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
-  },
-});
+}, {});

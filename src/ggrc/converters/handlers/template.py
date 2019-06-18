@@ -61,8 +61,15 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
   def _handle_ca_line(self, line):
     """Parse single custom attribute definition line."""
     parts = [part.strip() for part in line.split(",")]
-
+    if len(parts) < 2:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
     ca_type, mandatory = self._get_ca_type(parts[0])
+
+    if ca_type not in self.TYPE_MAP:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      return None
+
     ca_title = parts[1]
     multi_options, multi_mandatory = self._get_multiple_choice(parts[2:])
 
@@ -81,7 +88,9 @@ class TemplateCaColumnHandler(handlers.ColumnHandler):
     lines = [line for line in lines if line]
     custom_attributes = []
     for line in lines:
-      custom_attributes.append(self._handle_ca_line(line))
+      attribute = self._handle_ca_line(line)
+      if attribute:
+        custom_attributes.append(attribute)
     return custom_attributes
 
   def set_obj_attr(self):

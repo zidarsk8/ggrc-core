@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../spinner/spinner';
+import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
 
 /**

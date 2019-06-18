@@ -138,9 +138,7 @@
 
           <div class="row-fluid wrap-row">
             <div class="span12">
-              <h6>Mapped objects</h6>
-
-              <cycle-task-objects parentInstance:from="instance">
+              <cycle-task-objects instance:from="instance">
               </cycle-task-objects>
 
               {{#if showMapObjectsButton}}
@@ -149,6 +147,7 @@
                   href="javascript://"
                   data-placement="right"
                   data-toggle="unified-mapper"
+                  data-is-refresh-counts-needed="false"
                   data-join-object-id="{{instance.id}}"
                   data-join-object-type="{{instance.class.model_singular}}">
                   Map Objects
