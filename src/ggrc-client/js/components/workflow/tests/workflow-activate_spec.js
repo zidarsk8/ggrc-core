@@ -237,13 +237,15 @@ describe('workflow-activate component', function () {
       workflow = new can.Map();
       workflow.refresh = jasmine.createSpy('refresh');
       workflow.save = jasmine.createSpy('save');
+      spyOn(viewModel, 'updateActiveCycleCounts');
       spyOn(helpers, 'generateCycle');
     });
 
-    it('should be in waiting state while refresh is in progress', function () {
-      viewModel.repeatOffHandler(workflow);
-      expect(viewModel.attr('waiting')).toBe(true);
-    });
+    it('should be in waiting state while refresh is in progress',
+      async function () {
+        viewModel.repeatOffHandler(workflow);
+        expect(viewModel.attr('waiting')).toBe(true);
+      });
 
     it('generates cycle for passed workflow before workflow refreshing',
       async function (done) {
@@ -277,6 +279,11 @@ describe('workflow-activate component', function () {
       await viewModel.repeatOffHandler(workflow);
       expect(viewModel.attr('waiting'), false);
       done();
+    });
+
+    it('should try to update counts for active cycles tab', async function () {
+      await viewModel.repeatOffHandler(workflow);
+      expect(viewModel.updateActiveCycleCounts).toHaveBeenCalledWith(workflow);
     });
 
     it('should restore button when cycle generating fails',
