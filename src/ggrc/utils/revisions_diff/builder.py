@@ -257,8 +257,33 @@ def generate_fields(fields, proposed_content, current_data):
     proposed_val = proposed_content[field_name]
     current_val = current_data.get(field_name)
     if proposed_val != current_val:
+      if field_name == u'recipients' and not _recipients_changed(proposed_val,
+                                                                 current_val):
+        continue
       diff[field_name] = proposed_val
   return diff
+
+
+def _recipients_changed(proposed_val, current_val):
+  """Check if the recipients attribute has been semantically modified.
+
+  The recipients attribute is a comma-separated string, and the exact order of
+  the items in it does not matter, i.e. it is not considered a change.
+
+  Args:
+    proposed_val (str): recipients' proposed value
+    current_val (str): recipients' current value
+
+  Returns:
+    True if there was a (semantic) change, False otherwise
+  """
+  if current_val is None:
+    current_val = ""
+
+  if proposed_val is None:
+    proposed_val = ""
+
+  return sorted(current_val.split(",")) != sorted(proposed_val.split(","))
 
 
 def _construct_diff(meta, current_content, new_content):

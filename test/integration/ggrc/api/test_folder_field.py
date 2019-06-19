@@ -78,7 +78,8 @@ class TestFolderField(TestCase):
 
   @ddt.data(*FOLDERABLE_FACTORIES)
   def test_put_object(self, factory):
-    """Test put folder field for {0._meta.model.__name__}."""
+    """Test folder field can't be updated
+    with put for {0._meta.model.__name__}."""
     test_folder_name = "tmp_folder_put_name"
     obj = factory(folder=test_folder_name)
     update_test_folder_name = "upd_tmp_folder_put_name"
@@ -94,7 +95,7 @@ class TestFolderField(TestCase):
 
       self.api.put(obj, {"folder": update_test_folder_name})
       self.assertEqual(
-          update_test_folder_name,
+          test_folder_name,
           obj.__class__.query.get(obj_id).folder
       )
 

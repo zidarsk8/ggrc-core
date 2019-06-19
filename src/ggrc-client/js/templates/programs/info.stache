@@ -1,10 +1,10 @@
 {{!
-    Copyright (C) 2019 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#instance}}
-  <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
+  <section class="info {{#if is_info_pin}}sticky-info-panel{{/if}}">
     <div class="tier-content">
       <general-page-header instance:from="instance"></general-page-header>
 
@@ -103,6 +103,9 @@
             <related-proposals baseInstance:from="instance"
                                on:updateProposalsWarning="updateWarningState(scope.event)">
             </related-proposals>
+          </tab-panel>
+          <tab-panel panels:bind="panels" titleText:from="'Version History'">
+            <related-revisions instance:from="instance"></related-revisions>
           </tab-panel>
           <tab-panel tabId:from="'change-log'" panels:bind="panels" titleText:from="'Change Log'">
             <revision-log instance:from="instance" options:from="tabOptions"></revision-log>
