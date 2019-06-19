@@ -276,6 +276,7 @@
                     </comment-add-form>
                 {{/unless}}
                 <mapped-comments mappedItems:from="comments"
+                  baseInstance:from="instance"
                   showNoItemsText:from="isEditDenied"></mapped-comments>
                 <comments-paging comments:from="comments"
                   total:from="commentsTotalCount"

@@ -9,7 +9,7 @@ import '../object-list-item/editable-document-object-list-item';
 import '../assessment/attach-button';
 import template from './ca-object-modal-content.stache';
 import tracker from '../../tracker';
-import {getAssigneeType} from '../../plugins/ggrc_utils';
+import {getAssigneeType} from '../../plugins/utils/comments-utils';
 import pubSub from '../../pub-sub';
 
 export default can.Component.extend({
