@@ -259,11 +259,11 @@ export const filterParentItems = (parent, parentItems) => {
 };
 
 /**
- * Apply saved search filter to current advanced search
+ * Select saved search filter to current advanced search
  * @param {can.Map} advancedSearch - current advanced search
  * @param {Object} savedSearch - saved search
  */
-export const applySavedSearchFilter = (advancedSearch, savedSearch) => {
+export const selectSavedSearchFilter = (advancedSearch, savedSearch) => {
   const savedSearchFilter = parseFilterJson(savedSearch.filters);
 
   const parent = advancedSearch.attr('parent');
@@ -276,15 +276,15 @@ export const applySavedSearchFilter = (advancedSearch, savedSearch) => {
   advancedSearch.attr('mappingItems', savedSearchFilter.mappingItems);
   advancedSearch.attr('parentItems', savedSearchFilter.parentItems);
 
-  const appliedSavedSearch = {
+  const selectedSavedSearch = {
     filterItems: savedSearchFilter.filterItems,
     mappingItems: savedSearchFilter.mappingItems,
     parentItems: savedSearchFilter.parentItems,
     id: savedSearch.id,
   };
 
-  // save applied saved search
-  advancedSearch.attr('appliedSavedSearch', appliedSavedSearch);
+  // save selected saved search
+  advancedSearch.attr('selectedSavedSearch', selectedSavedSearch);
 };
 
 /**

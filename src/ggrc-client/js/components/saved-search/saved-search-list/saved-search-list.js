@@ -20,6 +20,7 @@ export default can.Component.extend({
     searchType: '',
     searches: [],
     disabled: false,
+    selectedSearchId: null,
     define: {
       isLoading: {
         set(value) {
@@ -45,6 +46,9 @@ export default can.Component.extend({
       search.destroy().then(() => {
         this.dispatch('removed');
       });
+    },
+    isAppliedSearch(search) {
+      return search.id === this.attr('selectedSearchId');
     },
   }),
   helpers: {

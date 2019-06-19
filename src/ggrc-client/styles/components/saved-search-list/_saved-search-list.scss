@@ -15,36 +15,46 @@ saved-search-list {
     padding: 0;
 
     li {
-      display: flex;
-      align-items: baseline;
-      width: 100%;
-      cursor: pointer;
-      opacity: 0.7;
-      margin-bottom: 10px;
+      .saved-search-item {
+        display: flex;
+        cursor: pointer;
+        opacity: 0.7;
+        margin-bottom: 6px;
+        padding: 1px 4px;
 
-      span {
-        display: block;
-        max-width: calc(100% - 13px);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .fa-trash, .fa-link{
-        margin-left: 6px;
-        visibility: hidden;
-      }
-
-      &:hover {
-        opacity: 1;
-
-        .fa-trash, .fa-link {
-          opacity: 0.8;
-          visibility: visible;
-
-          &:hover {
-            opacity: 1;
+        &:hover {
+          opacity: 1;
+  
+          .fa-trash, .fa-link {
+            opacity: 0.8;
+            visibility: visible;
+  
+            &:hover {
+              opacity: 1;
+            }
           }
+        }
+
+        &.applied {
+          background: $contentBgnd;
+          border-radius: 4px;
+  
+          span {
+            font-weight: bold;
+          }
+        }
+
+        .saved-search-item__title {
+          display: block;
+          max-width: calc(100% - 13px);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+  
+        .fa-trash, .fa-link{
+          margin-left: 6px;
+          visibility: hidden;
         }
       }
 

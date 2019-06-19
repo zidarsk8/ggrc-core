@@ -48,6 +48,7 @@
     </tree-actions>
 
     <simple-modal state:from="advancedSearch"
+                  on:hide="searchModalClosed"
                   modalTitle:from="'{{model.title_singular}} Advanced Search'"
                   extraCssClass:from="'advanced-search'">
       <saved-search-wrapper
@@ -62,6 +63,7 @@
           searches:from="searches"
           searchType:from="searchType"
           isLoading:from="isLoading"
+          selectedSearchId:from="selectedSavedSearchId"
           on:applySearch="applySearch(scope.event)"
           on:removed="loadSavedSearches()"
         ></saved-search-list>

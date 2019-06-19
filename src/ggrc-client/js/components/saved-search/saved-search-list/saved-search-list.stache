@@ -10,18 +10,23 @@
 
 <ul>
   {{#each searches}}
-    <li {{#if disabled}}class="disabled"{{/if}}>
-      <span on:el:click="applySearch(.)" title="{{name}}">{{name}}</span>
-      {{#is(searchType, 'AdvancedSearch')}}
-        {{#permalinkBuilder .}}
-          <clipboard-link text:from="permalink">
-            <i class="fa fa-link"></i>
-          </clipboard-link>
-        {{/permalinkBuilder}}
-      {{/is}}
-      <i class="fa fa-trash"
-        on:el:click="removeSearch(., scope.event)"
-      ></i>
+    <li class="{{#if disabled}}disabled{{/if}}"}>
+      <div on:el:click="applySearch(.)"
+        class="saved-search-item {{#if isAppliedSearch(.)}}applied{{/if}}">
+          <span class="saved-search-item__title" title="{{name}}">
+            {{name}}
+          </span>
+
+          {{#is(searchType, 'AdvancedSearch')}}
+            {{#permalinkBuilder .}}
+              <clipboard-link text:from="permalink">
+                <i class="fa fa-link"></i>
+              </clipboard-link>
+            {{/permalinkBuilder}}
+          {{/is}}
+
+          <i class="fa fa-trash" on:el:click="removeSearch(., scope.event)"></i>
+      </div>
     </li>
   {{/each}}
 </ul>

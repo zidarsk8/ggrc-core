@@ -8,7 +8,7 @@ import Pagination from '../../base-objects/pagination';
 import {isMyWork} from '../../../plugins/utils/current-page-utils';
 import {
   parseFilterJson,
-  applySavedSearchFilter,
+  selectSavedSearchFilter,
 } from '../../../plugins/utils/advanced-search-utils';
 import * as BusinessModels from '../../../models/business-models';
 
@@ -55,28 +55,29 @@ export default can.Component.extend({
     objectType: '',
     searches: [],
     searchType: '',
-    filtersToApply: null,
+    savedFiltersToApply: null,
     advancedSearch: null,
     isLoading: false,
     applySearch({search}) {
       const advancedSearch = this.attr('advancedSearch');
       if (advancedSearch) {
-        applySavedSearchFilter(advancedSearch, search);
+        selectSavedSearchFilter(advancedSearch, search);
       } else {
         const filter = parseFilterJson(search.filters);
         const model = BusinessModels[search.object_type];
-        const filtersToApply = {
+        const savedFiltersToApply = {
           filterItems: filter.filterItems,
           mappingItems: filter.mappingItems,
           statusItem: filter.statusItem,
+          savedSearchId: search.id,
         };
 
         if (model) {
-          filtersToApply.modelName = model.model_singular;
-          filtersToApply.modelDisplayName = model.title_plural;
+          savedFiltersToApply.modelName = model.model_singular;
+          savedFiltersToApply.modelDisplayName = model.title_plural;
         }
 
-        this.attr('filtersToApply', filtersToApply);
+        this.attr('savedFiltersToApply', savedFiltersToApply);
       }
     },
     loadSavedSearches() {

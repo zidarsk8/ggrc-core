@@ -163,6 +163,16 @@ let viewModel = canMap.extend({
         return newValue;
       },
     },
+    selectedSavedSearchId: {
+      get() {
+        if (this.attr('filterIsDirty')) {
+          return;
+        }
+
+        return this.attr('advancedSearch.selectedSavedSearch.id') ||
+          this.attr('appliedSavedSearch.id');
+      },
+    },
   },
   sortingInfo: {
     sortDirection: null,
@@ -516,13 +526,13 @@ let viewModel = canMap.extend({
   },
   openAdvancedFilter: function () {
     this.attr('advancedSearch.filterItems',
-      this.attr('advancedSearch.appliedFilterItems').slice());
+      this.attr('advancedSearch.appliedFilterItems').attr());
 
     this.attr('advancedSearch.mappingItems',
-      this.attr('advancedSearch.appliedMappingItems').slice());
+      this.attr('advancedSearch.appliedMappingItems').attr());
 
     this.attr('advancedSearch.parentItems',
-      this.attr('advancedSearch.appliedParentItems').slice());
+      this.attr('advancedSearch.appliedParentItems').attr());
 
     if (isObjectContextPage()) {
       this.attr('advancedSearch.parent',
@@ -537,12 +547,18 @@ let viewModel = canMap.extend({
     }
 
     this.attr('advancedSearch.open', true);
+    this.attr('filterIsDirty', false);
   },
   clearAppliedSavedSearch() {
+    this.attr('advancedSearch.selectedSavedSearch', null);
     this.attr('savedSearchPermalink', null);
-    this.attr('advancedSearch.appliedSavedSearch', null);
+    this.attr('appliedSavedSearch', null);
   },
   checkAppliedSavedSearch(appliedSearch, appliedSavedSearch) {
+    if (!appliedSavedSearch) {
+      this.clearAppliedSavedSearch();
+    }
+
     // Check applied search.
     // Build permalink when current applied search is saved search
     if (AdvancedSearch.isSavedSearch(appliedSavedSearch, appliedSearch)) {
@@ -551,6 +567,9 @@ let viewModel = canMap.extend({
         .buildSearchPermalink(appliedSavedSearch.id, modelName);
 
       this.attr('savedSearchPermalink', permalink);
+      this.attr('appliedSavedSearch', appliedSavedSearch);
+
+      this.attr('filterIsDirty', false);
     } else {
       this.clearAppliedSavedSearch();
     }
@@ -578,17 +597,15 @@ let viewModel = canMap.extend({
 
     this.attr('advancedSearch.open', false);
 
-    const appliedSavedSearch = this.attr('advancedSearch.appliedSavedSearch') &&
-      this.attr('advancedSearch.appliedSavedSearch').attr();
-
-    if (appliedSavedSearch) {
-      const appliedSearch = {
-        filterItems: filters,
-        mappingItems: mappings,
-        parentItems: parents,
-      };
-      this.checkAppliedSavedSearch(appliedSearch, appliedSavedSearch);
-    }
+    const appliedSavedSearch =
+      this.attr('advancedSearch.selectedSavedSearch') &&
+      this.attr('advancedSearch.selectedSavedSearch').attr();
+    const appliedSearch = {
+      filterItems: filters,
+      mappingItems: mappings,
+      parentItems: parents,
+    };
+    this.checkAppliedSavedSearch(appliedSearch, appliedSavedSearch);
     this.onFilter();
   },
   removeAdvancedFilters: function () {
@@ -726,6 +743,10 @@ let viewModel = canMap.extend({
         pinControl.setLoadingIndicator(componentSelector, false);
       });
   },
+  searchModalClosed() {
+    // remove advancedSearch.selectedSavedSearch attr
+    this.attr('advancedSearch.selectedSavedSearch', null);
+  },
 });
 
 /**
@@ -741,6 +762,18 @@ export default canComponent.extend({
     this.viewModel.setSortingConfiguration();
   },
   events: {
+    '{viewModel.advancedSearch} selectedSavedSearch'() {
+      // applied saved search filter. Current filter is NOT dirty
+      this.viewModel.attr('filterIsDirty', false);
+    },
+    '{viewModel.advancedSearch.filterItems} change'() {
+      // filterItems changed. Current filter is dirty
+      this.viewModel.attr('filterIsDirty', true);
+    },
+    '{viewModel.advancedSearch.mappingItems} change'() {
+      // mappingItems changed. Current filter is dirty
+      this.viewModel.attr('filterIsDirty', true);
+    },
     '{viewModel.pageInfo} current': function () {
       if (!this.viewModel.attr('loading')) {
         this.viewModel.loadItems();
@@ -861,7 +894,7 @@ const loadSavedSearch = (viewModel) => {
 };
 
 const applySavedSearch = (savedSearch, viewModel) => {
-  AdvancedSearch.applySavedSearchFilter(
+  AdvancedSearch.selectSavedSearchFilter(
     viewModel.attr('advancedSearch'),
     savedSearch
   );
