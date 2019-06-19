@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase, Api
 from integration.ggrc import api_helper
+from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 from integration.ggrc.query_helper import WithQueryApi
 
@@ -390,3 +391,50 @@ class TestRiskQueryApi(WithQueryApi, TestCase):
     )
     self.assertEquals(1, len(risk_by_review_status))
     self.assertEquals(risk_id, risk_by_review_status[0]["id"])
+
+
+class TestRiskSnapshotting(TestCase):
+  """Risk snapshot tests"""
+
+  def setUp(self):
+    """setUp, nothing else to add."""
+    super(TestRiskSnapshotting, self).setUp()
+    self.api = api_helper.Api()
+    self.api.login_as_external()
+    self.objgen = ObjectGenerator()
+
+  def test_update_risk_snapshot(self):
+    """Update risk snapshot to the latest version"""
+    with factories.single_commit():
+      program = factories.ProgramFactory(title="P1")
+      risk = factories.RiskFactory(title="R1")
+      risk_id = risk.id
+      factories.RelationshipFactory(source=program, destination=risk)
+
+    # Risk snapshot created for audit during mapping audit to program
+    self.objgen.generate_object(all_models.Audit, {
+        "title": "A1",
+        "program": {"id": program.id},
+        "status": "Planned",
+        "snapshots": {
+            "operation": "create",
+        }
+    })
+
+    # Update risk to get outdated snapshot (new risk revision)
+    risk = all_models.Risk.query.get(risk_id)
+    self.api.put(risk, {
+        "title": "New risk title"
+    })
+
+    audit = all_models.Audit.query.filter_by(title="A1").one()
+    snapshot = all_models.Snapshot.query.first()
+    self.assertEquals(audit, snapshot.parent)
+
+    # Update snapshot to the latest revision
+    res = self.api.put(snapshot, {
+        "update_revision": "latest"
+    })
+
+    self.assert200(res)
+    self.assertTrue(res.json["snapshot"]["is_latest_revision"])
