@@ -85,9 +85,7 @@ export default can.Component.extend({
                 fragLeft.appendChild(fragRight);
                 target.find('.modal-body').html(fragLeft);
 
-                that.highlightDifference(target);
-                that.highlightAttachments(target, revisions);
-                that.highlightCustomAttributes(target, revisions);
+                that.highlightDifference(target, revisions);
               });
             });
         },
@@ -206,14 +204,18 @@ export default can.Component.extend({
         });
     },
 
+    // debounce required to let template fully render prior comparison
     /**
      * Highlight difference
      * @param {Object} $target - jQuery object
+     * @param {can.List} revisions - revisions for comparing
      */
-    highlightDifference: function ($target) {
+    highlightDifference: _.debounce(function ($target, revisions) {
       this.highlightAttributes($target);
       this.highlightCustomRoles($target);
-    },
+      this.highlightAttachments($target, revisions);
+      this.highlightCustomAttributes($target, revisions);
+    }, 250),
 
     /**
      * Highlight difference in attributes
@@ -221,94 +223,82 @@ export default can.Component.extend({
      * @param {jQuery} $target - the root DOM element containing the
      *   revision diff comparison
      */
-    highlightAttributes: function ($target) {
-      const emptySelector = '.empty-message';
-      const listSelector = 'ul li, .object-list-item';
-      const titleSelector = '.general-page-header .pane-header__title';
+    highlightAttributes($target) {
+      const titleSelector = '.general-page-header__title-wrapper';
       const instance = this.attr('instance');
       const isProposableExternalAttr = (
         instance.constructor.isProposable &&
         isChangeableExternally(instance)
       );
+      const tabContent = '.info-pane__main-content';
       const attributesSelector = isProposableExternalAttr ?
-        '.review-status, proposable-attribute' :
-        'object-review, .row-fluid h6 + *';
+        '.review-status, proposable-attribute > .action-toolbar-container' :
+        `object-review, ${tabContent} > .row-fluid:not(:has(custom-roles)),
+         ${tabContent} > .custom-attr-wrap .row-fluid.wrap-row > *`;
 
-      const fieldsSelector = [titleSelector, attributesSelector].join(',');
+      const fieldsSelector = [titleSelector, attributesSelector].join(', ');
       const infoPanes = $target.find('.info .tier-content');
       const valuesOld = infoPanes.eq(0).find(fieldsSelector);
       const valuesNew = infoPanes.eq(1).find(fieldsSelector);
 
-      valuesOld.each(function (index, valueOld) {
+      valuesOld.each((index, valueOld) => {
         const $valueNew = $(valuesNew[index]);
         const $valueOld = $(valueOld);
-        let listOld = [];
-        let listNew = [];
         if ($valueNew.text().replace(/\s/g, '') !==
           $valueOld.text().replace(/\s/g, '')) {
-          listOld = $valueOld.find(listSelector);
-          listNew = $valueNew.find(listSelector);
-          if (listOld.length) {
-            highlightLists(listOld, listNew);
-          } else {
-            highlightValues($valueOld);
-            highlightValues($valueNew);
-          }
-          equalValuesHeight($valueOld, $valueNew);
+          highlightValues($valueOld, $valueNew);
+          this.equalizeHeights($valueOld, $valueNew);
         }
       });
 
       /**
-       * Highlight difference in two DOM lists
-       * @param {Object} listFirst - DOM object
-       * @param {Object} listLast - DOM object
+       * Highlight difference in simple values
+       * @param {Object} $value1 - jQuery object
+       * @param {Object} $value2 - jQuery object
        */
-      function highlightLists(listFirst, listLast) {
-        compareLists(listFirst, listLast);
-        compareLists(listLast, listFirst);
-      }
+      function highlightValues($value1, $value2) {
+        const listSelector = 'ul li, .object-list-item';
+        const listOld = $value1.find(listSelector);
+        const listNew = $value2.find(listSelector);
 
-      /**
-       * Compare DOM lists
-       * @param {Object} liFirst - DOM object
-       * @param {Object} liLast - DOM object
-       */
-      function compareLists(liFirst, liLast) {
-        liFirst.each(function (i, li) {
-          let atLeastOneIsEqual = false;
-          liLast.each(function (j, li2) {
-            if (li.innerHTML === li2.innerHTML) {
-              atLeastOneIsEqual = true;
+        if (listOld.length || listNew.length) {
+          const diffLeft = _.differenceBy(listOld, listNew, 'innerHTML');
+          const diffRight = _.differenceBy(listNew, listOld, 'innerHTML');
+          const diffs = [
+            {attr: $value1, list: diffLeft},
+            {attr: $value2, list: diffRight},
+          ];
+
+          diffs.forEach((diff) => {
+            if (diff.list.length) {
+              highlightList(diff.list);
             }
           });
-          if (!atLeastOneIsEqual) {
-            $(li).addClass(HIGHLIGHT_CLASS);
-          }
-        });
-      }
-
-      /**
-       * Highlight difference in simple values
-       * @param {Object} $value - jQuery object
-       */
-      function highlightValues($value) {
-        if ($value.html() && !$value.find(emptySelector).length) {
-          $value.addClass(HIGHLIGHT_CLASS);
+        } else {
+          [$value1, $value2].forEach(($value) => {
+            highlightValue($value);
+          });
         }
       }
 
       /**
-       * Set max height between two jQuery objects
-       * @param {Object} $firstItem - jQuery object
-       * @param {Object} $secondItem - jQuery object
+       * Highlight difference in DOM list items
+       * @param {Object} list - DOM object
        */
-      function equalValuesHeight($firstItem, $secondItem) {
-        let firstItemHeight = $firstItem.outerHeight();
-        let secondItemHeight = $secondItem.outerHeight();
-        if (firstItemHeight > secondItemHeight) {
-          $secondItem.outerHeight(firstItemHeight);
-        } else if (firstItemHeight < secondItemHeight) {
-          $firstItem.outerHeight(secondItemHeight);
+      function highlightList(list) {
+        list.forEach((item) => {
+          $(item).addClass(HIGHLIGHT_CLASS);
+        });
+      }
+
+      /**
+       * Highlight difference in attribute value
+       * @param {Object} $value - jQuery object
+       */
+      function highlightValue($value) {
+        if ($value.html() && !$value.find('.empty-message').length) {
+          const title = isProposableExternalAttr ? '.action-toolbar' : 'h6';
+          $value.find(`h3, ${title} + *`).addClass(HIGHLIGHT_CLASS);
         }
       }
     },
@@ -375,9 +365,6 @@ export default can.Component.extend({
      * @param {can.List} revisions - revisions for comparing
      */
     highlightCustomAttributes($target, revisions) {
-      const titleSelector = '.info-pane__section-title';
-      const valueSelector = '.inline__content';
-
       let that = this;
       let $caPanes = $target.find('.info global-custom-attributes');
       let $oldCAs = $caPanes.eq(0).find('.ggrc-form-item');
@@ -418,24 +405,20 @@ export default can.Component.extend({
 
           if (ca0.custom_attribute_id === ca1.custom_attribute_id) {
             // same attribute
-            highlightTitle($ca0, ca0, $ca1, ca1);
-            highlightValue($ca0, ca0, $ca1, ca1);
             i++;
             j++;
           } else if (ca0.custom_attribute_id < ca1.custom_attribute_id ||
             !ca1.custom_attribute_id) {
             // attribute removed
             $ca1 = fillEmptyCA($ca1); // add empty block to the right panel
-            highlightTitle($ca0, ca0);
-            highlightValue($ca0, ca0);
             i++;
           } else {
             // attribute added
             $ca0 = fillEmptyCA($ca0); // add empty block to the left panel
-            highlightTitle($ca1, ca1);
-            highlightValue($ca1, ca1);
             j++;
           }
+          highlightTitle($ca0, ca0, $ca1, ca1);
+          highlightValue($ca0, ca0, $ca1, ca1);
           that.equalizeHeights($ca0, $ca1);
         }
       }
@@ -448,17 +431,16 @@ export default can.Component.extend({
        * @param {Object} ca1 - custom attribute object
        */
       function highlightTitle($ca0, ca0, $ca1, ca1) {
-        let title0 = ca0.def.title;
+        let title0 = ca0 && ca0.def ? ca0.def.title : null;
         let title1 = ca1 && ca1.def ? ca1.def.title : null;
         if (title0 !== title1) {
-          $ca0.find(titleSelector).addClass(HIGHLIGHT_CLASS);
-
-          if ($ca1) {
-            $ca1.find(titleSelector).addClass(HIGHLIGHT_CLASS);
-          }
+          [$ca0, $ca1].forEach(($ca) => {
+            if ($ca && $ca.html()) {
+              $ca.find('.info-pane__section-title').addClass(HIGHLIGHT_CLASS);
+            }
+          });
         }
       }
-
       /**
        * Highlights value in custom attributes
        * @param {Object} $ca0 - JQuery object
@@ -467,14 +449,14 @@ export default can.Component.extend({
        * @param {Object} ca1 - custom attribute object
        */
       function highlightValue($ca0, ca0, $ca1, ca1) {
-        let value0 = ca0.attribute_value;
+        let value0 = ca0 ? ca0.attribute_value : null;
         let value1 = ca1 ? ca1.attribute_value : null;
         if (value0 !== value1) {
-          $ca0.find(valueSelector).addClass(HIGHLIGHT_CLASS);
-
-          if ($ca1) {
-            $ca1.find(valueSelector).addClass(HIGHLIGHT_CLASS);
-          }
+          [$ca0, $ca1].forEach(($ca) => {
+            if ($ca && $ca.html() && !$ca.find('.empty-message').length) {
+              $ca.find('readonly-inline-content').addClass(HIGHLIGHT_CLASS);
+            }
+          });
         }
       }
 
@@ -484,9 +466,7 @@ export default can.Component.extend({
        * @return {Object} new empty jQuery object
        */
       function fillEmptyCA($ca) {
-        let $empty = $('<div class="ggrc-form-item"/>');
-        $empty.insertBefore($ca);
-        return $empty;
+        return $('<div class="ggrc-form-item"></div>').insertBefore($ca);
       }
     },
 
@@ -560,7 +540,9 @@ export default can.Component.extend({
        *   people that have a particular custom role.
        */
       function highlightBlock($block) {
-        $block.find('object-list').addClass(HIGHLIGHT_CLASS);
+        if ($block.html() && !$block.find('.object-list__item-empty').length) {
+          $block.find('object-list').addClass(HIGHLIGHT_CLASS);
+        }
       }
 
       /**
@@ -601,28 +583,26 @@ export default can.Component.extend({
         });
       }
     },
+
     /**
      * Adjust the heights of two DOM elements to the higher one's height.
      *
-     * @param {jQuery} $block - the first block element
-     * @param {jQuery} $block2 - the second block element
+     * @param {jQuery} $block1 - the left block element
+     * @param {jQuery} $block2 - the right block element
      */
-    equalizeHeights($block, $block2) {
-      let height;
-      let height2;
-
-      $block.css('max-width', 'none');
+    equalizeHeights($block1, $block2) {
+      $block1.css('max-width', 'none');
       $block2.css('max-width', 'none');
-      $block.css('margin-right', '0');
+      $block1.css('margin-right', '0');
       $block2.css('margin-right', '0');
 
-      height = $block.outerHeight();
-      height2 = $block2.outerHeight();
+      const block1Height = $block1.outerHeight();
+      const block2Height = $block2.outerHeight();
 
-      if (height > height2) {
-        $block2.outerHeight(height);
-      } else if (height < height2) {
-        $block.outerHeight(height2);
+      if (block1Height > block2Height) {
+        $block2.outerHeight(block1Height);
+      } else if (block2Height > block1Height) {
+        $block1.outerHeight(block2Height);
       }
     },
   }),
