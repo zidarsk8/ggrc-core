@@ -583,6 +583,6 @@ class TestImportPermissions(TestCase):
     self.assertEqual(all_models.Objective.query.count(), 1)
 
     perm_ids = self.memcache_client.get('permissions:list')
-    self.assertIsNone(perm_ids)
+    self.assertEqual(perm_ids, set())
     user_perm = self.memcache_client.get(user_perm_key)
     self.assertIsNone(user_perm)
