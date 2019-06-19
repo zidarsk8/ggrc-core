@@ -189,7 +189,7 @@ function _setupWarning(confirm, settings) {
 }
 
 // make buttons non-clickable when saving
-const bindXHRToButton = (xhr, el, newtext, disable) => {
+const bindXHRToButton = (xhr, el, newtext) => {
   // binding of an ajax to a click is something we do manually
   let $el = $(el);
   let oldtext = $el[0] ? $el[0].innerHTML : '';
@@ -198,9 +198,7 @@ const bindXHRToButton = (xhr, el, newtext, disable) => {
     $el[0].innerHTML = newtext;
   }
   $el.addClass('disabled');
-  if (disable !== false) {
-    $el.attr('disabled', true);
-  }
+  $el.attr('disabled', true);
   xhr.always(() => {
     // If .text(str) is used instead of innerHTML, the click event may not fire depending on timing
     if ($el.length) {

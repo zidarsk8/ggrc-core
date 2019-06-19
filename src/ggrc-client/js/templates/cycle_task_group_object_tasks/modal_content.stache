@@ -106,15 +106,21 @@
             <i class="fa fa-asterisk"></i>
           </label>
           {{#if new_object_form}}
-            <input type="text" class="input-block-level required"
-                   name="workflow.id"
-                   model="Workflow"
-                   data-lookup="Workflow"
-                   data-params="Workflow:status=Active,frequency=one_time"
-                   data-lookup-cb="set_properties_from_workflow"
-                   placeholder="Select a Workflow"
-                   value="{{loadedObject.title}}"
-                   tabindex="4" />
+            <modal-autocomplete
+              instance:from="instance"
+              isNewInstance:from="new_object_form">
+              <input
+                type="text"
+                class="input-block-level required"
+                name="workflow.id"
+                model="Workflow"
+                data-lookup="Workflow"
+                data-params="Workflow:status=Active,frequency=one_time"
+                data-lookup-cb="set_properties_from_workflow"
+                placeholder="Select a Workflow"
+                value="{{loadedObject.title}}"
+                tabindex="4">
+            </modal-autocomplete>
             {{#instance.computed_errors.workflow}}
               <label class="help-inline warning">{{this}}</label>
             {{/instance.computed_errors.workflow}}
@@ -136,19 +142,23 @@
             <i class="fa fa-asterisk"></i>
           </label>
           {{#if new_object_form}}
-          <input {{^if instance.cycle}}disabled{{/if}}
-                 class="input-block-level required"
-                 name="cycle_task_group.id"
-                 data-lookup="CycleTaskGroup"
-                 data-query
-                 data-query-field="group title"
-                 data-query-relevant-type="{{instance.cycle.type}}"
-                 data-query-relevant-id="{{instance.cycle.id}}"
-                 placeholder="Select a Task Group"
-                 type="text"
-                 value="{{loadedObject.title}}"
-                 data-template="/cycle_task_groups/autocomplete_result.stache"
-                 tabindex="5" />
+            <modal-autocomplete
+              instance:from="instance"
+              isNewInstance:from="new_object_form"
+              isQueryAutocompleteEnabled:from="true">
+              <input {{^if instance.cycle}}disabled{{/if}}
+                  class="input-block-level required"
+                  name="cycle_task_group.id"
+                  data-lookup="CycleTaskGroup"
+                  data-query-field="group title"
+                  data-query-relevant-type="{{instance.cycle.type}}"
+                  data-query-relevant-id="{{instance.cycle.id}}"
+                  placeholder="Select a Task Group"
+                  type="text"
+                  value="{{loadedObject.title}}"
+                  data-template="/cycle_task_groups/autocomplete_result.stache"
+                  tabindex="5">
+            </modal-autocomplete>
             {{#instance.computed_errors.cycle_task_group}}
               <label class="help-inline warning">{{this}}</label>
             {{/instance.computed_errors.cycle_task_group}}

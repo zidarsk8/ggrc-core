@@ -24,7 +24,19 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Policy / Regulation / Standard / Contract containing this Requirement"></i>
         </label>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <input tabindex="2" class="input-block-level" name="_directive.title" data-lookup="Policy,Regulation,Standard,Contract" data-permission-type="update" data-template="/directives/autocomplete_result.stache" placeholder="Choose Policy / Regulation / Standard / Contract" type="text" />
+        <modal-autocomplete
+          instance:from="instance"
+          isNewInstance:from="new_object_form">
+          <input
+            tabindex="2"
+            class="input-block-level"
+            name="_directive.title"
+            data-lookup="Policy,Regulation,Standard,Contract"
+            data-permission-type="update"
+            data-template="/directives/autocomplete_result.stache"
+            placeholder="Choose Policy / Regulation / Standard / Contract"
+            type="text">
+        </modal-autocomplete>
       {{/if_helpers}}
     </div>
   </div>

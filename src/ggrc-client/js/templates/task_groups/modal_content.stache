@@ -25,14 +25,21 @@
       <object-loader path:from="instance.contact">
         <div class="objective-selector">
           {{^if_config_exist 'external_services.Person'}}
-            {{#if loadedObject}}
-              <input id="task_group_assignee" tabindex="2" type="text"
-                     name="contact.email" class="span10 search-icon"
-                     data-lookup="Person" placeholder="Enter text to search for Assignee"
-                     value="{{loadedObject.email}}">
-            {{else}}
-              <input disabled type="text" class="span10 search-icon" value=""/>
-            {{/if}}
+            <modal-autocomplete
+              instance:from="instance"
+              isNewInstance:from="new_object_form">
+              <input
+                id="task_group_assignee"
+                tabindex="2"
+                type="text"
+                name="contact.email"
+                class="span10 search-icon"
+                data-lookup="Person"
+                placeholder="Enter text to search for Assignee"
+                value="{{#if loadedObject}}{{loadedObject.email}}{{/if}}"
+                {{#if isObjectLoading}}disabled{{/if}}
+              >
+            </modal-autocomplete>
           {{else}}
             <inline-autocomplete-wrapper
               instance:from="instance"

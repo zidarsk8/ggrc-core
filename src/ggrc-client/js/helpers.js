@@ -585,25 +585,6 @@ canStache.registerHelper('if_config_exist', function (key, options) {
     options.inverse(options.contexts);
 });
 
-canStache.registerHelper('autocomplete_select', function (disableCreate, opt) {
-  let options = arguments[arguments.length - 1];
-  let _disableCreate = isFunction(disableCreate) ?
-    disableCreate() : disableCreate;
-
-  if (typeof (_disableCreate) !== 'boolean') {
-    _disableCreate = false;
-  }
-  return function (el) {
-    $(el).bind('inserted', function () {
-      let $ctl = $(this).parents(':data(controls)');
-      $(this).ggrc_autocomplete($.extend({}, options.hash, {
-        controller: $ctl.control(),
-        disableCreate: _disableCreate,
-      }));
-    });
-  };
-});
-
 canStache.registerHelper('debugger', function () {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Dev tools need to be open for this

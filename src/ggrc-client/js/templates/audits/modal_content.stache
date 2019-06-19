@@ -17,7 +17,17 @@
               Program
               <i class="fa fa-asterisk"></i>
             </label>
-            <input type="text" class="input-block-level" name="program.id" tabindex="1" data-permission-type="update" {{autocomplete_select}} data-lookup="Program" autofocus/>
+            <modal-autocomplete
+              instance:from="instance"
+              isNewInstance:from="new_object_form">
+              <input
+                type="text"
+                class="input-block-level"
+                name="program.id"
+                tabindex="1"
+                data-permission-type="update"
+                data-lookup="Program" autofocus>
+            </modal-autocomplete>
           </div>
           {{#instance.computed_errors.program}}
             <label class="help-inline warning">
@@ -91,12 +101,18 @@
                     Audit Firm
                   </label>
                   <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-                  <input type="text" class="span8 search-icon"
-                         name="audit_firm.title"
-                         value="{{loadedObject.title}}"
-                         data-lookup="OrgGroup"
-                         placeholder="Enter text to search for Audit Firm"
-                         tabindex="12"/>
+                  <modal-autocomplete
+                    instance:from="instance"
+                    isNewInstance:from="new_object_form">
+                    <input
+                      type="text"
+                      class="span8 search-icon"
+                      name="audit_firm.title"
+                      value="{{loadedObject.title}}"
+                      data-lookup="OrgGroup"
+                      placeholder="Enter text to search for Audit Firm"
+                      tabindex="12">
+                  </modal-autocomplete>
                 </object-loader>
                 {{#instance.computed_errors.audit_firm}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.audit_firm}}
               </div>
@@ -235,5 +251,5 @@
       </div>
     {{/if}}
   </form>
-{{/instance}}
+  {{/instance}}
 </div>

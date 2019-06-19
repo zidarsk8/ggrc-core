@@ -280,7 +280,6 @@ describe('ModalsController', function () {
           .returnValue(resetFormDfd),
         apply_object_params: jasmine.createSpy('apply_object_params'),
         serialize_form: jasmine.createSpy('serialize_form'),
-        autocomplete: jasmine.createSpy('autocomplete'),
         restore_ui_status: jasmine.createSpy('restore_ui_status'),
         options: new canMap(),
       };
@@ -330,19 +329,6 @@ describe('ModalsController', function () {
 
       jasmine.clock().tick(1);
       expect(ctrlInst.serialize_form).toHaveBeenCalled();
-      done();
-
-      jasmine.clock().uninstall();
-    });
-
-    it('calls autocomplete()', (done) => {
-      jasmine.clock().install();
-
-      resetFormDfd.resolve();
-      method();
-
-      jasmine.clock().tick(1);
-      expect(ctrlInst.autocomplete).toHaveBeenCalled();
       done();
 
       jasmine.clock().uninstall();

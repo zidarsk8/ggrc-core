@@ -64,11 +64,7 @@
     <div class="row-fluid">
       <div class="span6">
         <label>Audit</label>
-        <input type="text" class="input-block-level" tabindex="2"
-               name="instance.audit.title" data-permission-type="update"
-               data-lookup="Audit" data-template="/directives/autocomplete_result.stache"
-               placeholder="Choose Audit" null-if-empty="false"
-               value="{{instance.audit.title}}" disabled="disabled"/>
+        <input type="text" class="input-block-level" value="{{instance.audit.title}}" disabled>
       </div>
       <div class="span6">
         {{#showCaptainAlert}}

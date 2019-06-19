@@ -46,6 +46,7 @@ import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
 import '../../components/person-modal/person-modal';
 import '../../components/custom-attributes-modal/custom-attributes-modal';
+import '../../components/modal-autocomplete/modal-autocomplete';
 import {
   bindXHRToButton,
   bindXHRToDisableElement,
@@ -64,14 +65,12 @@ import {
 } from '../../plugins/utils/display-prefs-utils';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
-import Stub from '../../models/stub';
 import {
   getInstance,
   initAuditTitle,
 } from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
-import {modalAutocomplete} from '../../plugins/autocomplete';
 
 export default canControl.extend({
   defaults: {
@@ -155,7 +154,6 @@ export default canControl.extend({
           this.element.trigger('preload');
         }
       })
-      .then((el) => modalAutocomplete(el, this))
       .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
@@ -178,90 +176,6 @@ export default canControl.extend({
     }, this);
   },
 
-  'input[data-lookup] focus': function (el, ev) {
-    modalAutocomplete(el, this);
-  },
-
-  'input[data-lookup] keyup': function (el, ev) {
-    // Set the transient field for validation
-    let name;
-    let instance;
-    let value;
-
-    // * in some cases we want to disable automapping the selected item to the
-    // * modal's underlying object (e.g. we don't want to map the picked Persons
-    // * to an AssessmentTemplates object)
-    // ** does nothing after press tab to not lose deafault value in input
-    if (el.data('no-automap') || ev.keyCode === 9) {
-      return;
-    }
-
-    name = el.attr('name').split('.');
-    instance = this.options.instance;
-    value = el.val();
-
-    name.pop(); // set the owner to null, not the email
-
-    if (!instance._transient) {
-      instance.attr('_transient', new canMap({}));
-    }
-
-    _.reduce(name.slice(0, -1), function (current, next) {
-      current = current + '.' + next;
-      if (!instance.attr(current)) {
-        instance.attr(current, new canMap({}));
-      }
-      return current;
-    }, '_transient');
-
-    if (name.length) {
-      instance.attr(['_transient'].concat(name).join('.'), value);
-    }
-  },
-
-  autocomplete_select: function (el, event, ui) {
-    let path;
-    let instance;
-    let index;
-    let cb;
-    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
-
-    path = el.attr('name').split('.');
-    instance = this.options.instance;
-    index = 0;
-    path.pop(); // remove the prop
-    cb = el.data('lookup-cb');
-
-    if (cb) {
-      cb = cb.split(' ');
-      instance[cb[0]](...cb.slice(1).concat([ui.item]));
-      setTimeout(function () {
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-      }, 0);
-      return;
-    }
-
-    if (/^\d+$/.test(path[path.length - 1])) {
-      index = parseInt(path.pop(), 10);
-      path = path.join('.');
-      if (!instance.attr(path)) {
-        instance.attr(path, []);
-      }
-      instance.attr(path).splice(index, 1, new Stub(ui.item));
-    } else {
-      path = path.join('.');
-      setTimeout(function () {
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-      }, 0);
-
-      instance.attr(path, null).attr(path, ui.item);
-      initAuditTitle(instance, this.options.new_object_form);
-      if (!instance._transient) {
-        instance.attr('_transient', canMap());
-      }
-      instance.attr('_transient.' + path, ui.item);
-    }
-  },
   fetch_templates: function (dfd) {
     return $.when(
       ggrcAjax({url: this.options.content_view, dataType: 'text'}),
@@ -865,7 +779,6 @@ export default canControl.extend({
       $.when(this.options.attr('instance', newInstance))
         .then(() => this.apply_object_params())
         .then(() => this.serialize_form())
-        .then((el) => modalAutocomplete(el, this))
         .then(() => this.options.attr('instance').backup());
     });
 
