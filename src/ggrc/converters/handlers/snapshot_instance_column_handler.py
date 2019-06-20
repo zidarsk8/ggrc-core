@@ -29,6 +29,12 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
       return audit_items[0]
     return None
 
+  def disable_snapshot_map_to_issue(self, to_append_ids):
+    """Disable mapping of snapshot to Issue via import."""
+    if to_append_ids:
+      self.add_warning(errors.ISSUE_SNAPSHOT_MAP_WARNING,
+                       column_name=self.mapping_object.__name__)
+
   def get_audit_object_pool_query(self, child_ids=None):
     if isinstance(self.row_converter.obj, models.Audit):
       audit_id = self.row_converter.obj.id
@@ -187,5 +193,8 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     }
     import_ids = {i.id for i in items or []}
     to_append_ids = import_ids - exists_ids
+    if isinstance(self.row_converter.obj, models.Issue):
+      self.disable_snapshot_map_to_issue(to_append_ids)
+      return None
     self.is_valid_creation(to_append_ids)
     return items

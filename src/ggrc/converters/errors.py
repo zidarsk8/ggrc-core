@@ -162,6 +162,9 @@ ILLEGAL_APPEND_CONTROL_VALUE = (u"Line {line}: "
                                 u"{object_type}, because this {mapped_type} "
                                 u"is not mapped to the related audit.")
 
+ISSUE_SNAPSHOT_MAP_WARNING = (u"Line {line}: You cannot map {column_name} "
+                              u"snapshot to Issue directly")
+
 UNMODIFIABLE_COLUMN = (u"Line {line}: Column '{column_name}' can not be "
                        u"modified. The value will be ignored.")
 
