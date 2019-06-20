@@ -86,6 +86,7 @@ let SUB_TREE_FIELDS = Object.freeze([
   // labels for assessment templates
   'DEFAULT_PEOPLE_LABELS',
   'user_roles',
+  'readonly',
 ]);
 
 let FULL_SUB_LEVEL_LIST = Object.freeze([
