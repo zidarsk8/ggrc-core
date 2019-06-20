@@ -93,6 +93,42 @@ describe('person-modal component', () => {
     });
   });
 
+  describe('setIsNameReadOnly() method', () => {
+    it('sets true for internal emails', () => {
+      viewModel.attr('isNameReadOnly', false);
+      viewModel.attr('instance.email', 'test@google.com');
+      viewModel.setIsNameReadOnly();
+      expect(viewModel.attr('isNameReadOnly')).toBe(true);
+    });
+
+    it('sets false for external emails', () => {
+      viewModel.attr('isNameReadOnly', true);
+      viewModel.attr('instance.email', 'test@gmail.com');
+      viewModel.setIsNameReadOnly();
+      expect(viewModel.attr('isNameReadOnly')).toBe(false);
+    });
+  });
+
+  describe('personSelected() method', () => {
+    it('sets instance.email', () => {
+      viewModel.attr('instance.email', '');
+      viewModel.personSelected({person: {email: 'test@google.com'}});
+      expect(viewModel.attr('instance.email')).toBe('test@google.com');
+    });
+
+    it('sets instance.name', () => {
+      viewModel.attr('instance.name', '');
+      viewModel.personSelected({person: {name: 'Anze'}});
+      expect(viewModel.attr('instance.name')).toBe('Anze');
+    });
+
+    it('calls setIsNameReadOnly', () => {
+      const spy = spyOn(viewModel, 'setIsNameReadOnly');
+      viewModel.personSelected({person: {email: '', name: ''}});
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
   describe('events', () => {
     let events;
 

@@ -5,13 +5,31 @@
 
 import canMap from 'can-map';
 import canComponent from 'can-component';
-import {loadPersonProfile} from '../../plugins/utils/user-utils';
+import {
+  loadPersonProfile,
+} from '../../plugins/utils/user-utils';
 import PersonProfile from '../../models/service-models/person-profile';
+
+const NO_RESET_KEYS = [
+  'Control',
+  'Alt',
+  'Meta',
+  'Tab',
+  'CapsLock',
+  'Shift',
+  'Escape',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowUp',
+  'ArrowDown',
+  'Enter',
+];
 
 const viewModel = canMap.extend({
   instance: null,
   isNewInstance: false,
   turnOnCalendarEvents: true,
+  isNameReadOnly: false,
   async updatePersonProfile() {
     const instance = this.attr('instance');
     let profile = PersonProfile.findInCacheById(instance.attr('profile.id'));
@@ -34,6 +52,24 @@ const viewModel = canMap.extend({
       this.attr('instance.profile.id')
     );
     this.attr('turnOnCalendarEvents', profile.attr('send_calendar_events'));
+  },
+  setIsNameReadOnly() {
+    const email = this.attr('instance.email') || '';
+    const isEmailInternal = email.includes('@google.com');
+    this.attr('isNameReadOnly', isEmailInternal);
+  },
+  personSelected({person}) {
+    this.attr('instance.email', person.email);
+    this.attr('instance.name', person.name);
+    this.setIsNameReadOnly();
+  },
+  onEmailFieldKeyDown({key}) {
+    if (!NO_RESET_KEYS.includes(key)) {
+      this.attr('isNameReadOnly', false);
+    }
+  },
+  init() {
+    this.setIsNameReadOnly();
   },
 });
 

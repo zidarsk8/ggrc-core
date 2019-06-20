@@ -8,7 +8,7 @@ import canStache from 'can-stache';
 import template from './person-autocomplete-field.stache';
 import actionKeyable from '../view-models/action-keyable';
 
-const KEYS_TO_LISTEN = ['ArrowUp', 'ArrowDown', 'Enter'];
+const DROPDOWN_ACTION_KEYS = ['ArrowUp', 'ArrowDown', 'Enter'];
 
 /**
  * Another person autocomplete field
@@ -25,19 +25,27 @@ export default canComponent.extend({
     tabindex: -1,
     placeholder: '',
     personSelected({person}) {
-      this.attr('personEmail', person.email);
-      this.attr('personName', person.name);
+      const {name, email} = person;
+      this.attr('personEmail', email);
+      this.attr('personName', name);
+      this.dispatch({type: 'personSelected', person});
     },
     onKeyDown(event) {
-      if (KEYS_TO_LISTEN.includes(event.code)) {
+      if (DROPDOWN_ACTION_KEYS.includes(event.code)) {
         this.onActionKey(event.keyCode);
         event.preventDefault();
       }
+      this.dispatch({
+        type: 'keyDown',
+        key: event.key,
+        code: event.code,
+        keyCode: event.keyCode,
+      });
     },
     onKeyUp(event) {
       const inputValue = event.target.value;
       this.attr('personEmail', inputValue);
-      if (!KEYS_TO_LISTEN.includes(event.code)) {
+      if (!DROPDOWN_ACTION_KEYS.includes(event.code)) {
         this.attr('searchValue', inputValue);
       }
     },
