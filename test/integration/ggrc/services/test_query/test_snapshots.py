@@ -478,7 +478,8 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
                           for snap in order_by_nz_result["values"]],
                          [process_nz_core_id, process_nz_prod_id])
 
-  def _add_owner(self, ownable, person_id):
+  @classmethod
+  def _add_owner(cls, ownable, person_id):
     """Create ACL for provided object and person."""
     factories.AccessControlPersonFactory(
         ac_list=ownable.acr_name_acl_map["Admin"],
@@ -595,7 +596,7 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
 
   @data(
       ("updated_at", ("updated_at", "Last Updated Date", "last updated date")),
-      ("created_at", ("updated_at", "Created Date", "Created Date")),
+      ("created_at", ("created_at", "Created Date", "created date")),
   )
   @unpack
   def test_filter_by_dt_field(self, field, aliases):
@@ -619,74 +620,6 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
                 alias, date_string
             )
         )
-
-  def test_person_ca(self):
-    """Control Snapshots are filtered and sorted by Person CA."""
-    with factories.single_commit():
-      program = factories.ProgramFactory()
-      person1 = factories.PersonFactory(name="Ann", email="email1@example.com")
-      person2 = factories.PersonFactory(name="Bob", email="email2@example.com")
-
-    with factories.single_commit():
-      control1 = factories.ControlFactory()
-      control2 = factories.ControlFactory()
-      cad = factories.CustomAttributeDefinitionFactory(
-          definition_type="control",
-          definition_id=None,
-          attribute_type="Map:Person",
-          title="Global Person CA",
-      )
-      factories.CustomAttributeValueFactory(
-          attributable=control1,
-          custom_attribute=cad,
-          attribute_value=person2.type,
-          attribute_object_id=person2.id,
-      )
-      factories.CustomAttributeValueFactory(
-          attributable=control2,
-          custom_attribute=cad,
-          attribute_value=person1.type,
-          attribute_object_id=person1.id,
-      )
-      control1_id = control1.id
-      control2_id = control2.id
-
-      factories.RelationshipFactory(source=program, destination=control1)
-      factories.RelationshipFactory(source=program, destination=control2)
-
-    self._create_audit(program=program, title="test_person_ca")
-
-    controls_user1 = self._get_first_result_set(
-        self._make_snapshot_query_dict(
-            "Control",
-            expression=["Global Person CA", "=", "Ann"]
-        ),
-        "Snapshot", "values",
-    )
-    self.assertItemsEqual([c["child_id"] for c in controls_user1],
-                          [control2_id])
-
-    controls_user2 = self._get_first_result_set(
-        self._make_snapshot_query_dict(
-            "Control",
-            expression=["Global Person CA", "=", "email2@example.com"]
-        ),
-        "Snapshot", "values",
-    )
-    self.assertSetEqual({c["child_id"] for c in controls_user2},
-                        {control1_id})
-
-    order_by_person_ca_result = self._get_first_result_set(
-        self._make_snapshot_query_dict(
-            "Control",
-            order_by=[{"name": "Global Person CA"}]
-        ),
-        "Snapshot"
-    )
-    self.assertEqual(order_by_person_ca_result["count"], 2)
-    self.assertListEqual([snap["child_id"]
-                          for snap in order_by_person_ca_result["values"]],
-                         [control2_id, control1_id])
 
   @data(
       "Test Role Name",

@@ -23,6 +23,10 @@
   }
 }
 
+.form-label__extend {
+  margin-top: 7px;
+}
+
 .modal {
   @include border-radius(2px);
   width:700px;
@@ -131,7 +135,7 @@
     }
     .hidable {
       label {
-        display: inline-block; 
+        display: inline-block;
       }
     }
   }
@@ -370,7 +374,9 @@
         border: 1px solid $red;
       }
       label {
-        color: $red;
+        &:not(.multiselect-dropdown__label) {
+          color: $red;
+        }
       }
       select {
         border: 1px solid $red;
@@ -558,17 +564,14 @@
         &:first-child{
           border-right: none;
         }
-        .inner-count-list{
-          li:last-child{
-            margin-bottom: 0;
-          }
-        }
         ul.diff-highlighted {
           margin: 0;
           padding: 0 0 0 30px;
         }
-        .diff-highlighted{
-          display: block;
+        .diff-highlighted {
+          &:not(li) {
+            display: block;
+          }
           box-sizing: border-box;
           width: 100%;
           max-width: 100%;

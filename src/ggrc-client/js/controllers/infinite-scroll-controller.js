@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+const MOUSEENTER_THROTTLE = 300;
+
 const InfiniteScrollControl = can.Control.extend({}, {
   init: function () {},
   ' DOMMouseScroll': 'prevent_overscroll',
@@ -89,7 +91,7 @@ const LhnTooltipsControl = can.Control.extend({
   '{trigger_selector} mouseleave': 'on_mouseleave',
   '{extended} mouseleave': 'on_mouseleave',
   '{extended} mouseenter': 'on_tooltip_mouseenter',
-  on_mouseenter: function (el, ev) {
+  on_mouseenter: _.debounce(function (el) {
     let instance = el.closest('[data-model]').data('model') ||
         el.closest(':data(model)').data('model');
     let delay = this.options.fade_in_delay;
@@ -108,7 +110,7 @@ const LhnTooltipsControl = can.Control.extend({
       clearTimeout(this.fade_out_timeout);
       this.fade_out_timeout = null;
     }
-  },
+  }, MOUSEENTER_THROTTLE),
   ensure_tooltip_visibility: function () {
     let offset = this.options.$extended.offset().top;
     let height = this.options.$extended.height();

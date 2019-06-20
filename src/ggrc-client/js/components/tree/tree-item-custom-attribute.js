@@ -3,11 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import template from './templates/tree-item-custom-attribute.stache';
-import isFunction from 'can-util/js/is-function/is-function';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
 import {formatDate} from '../../plugins/utils/date-utils';
-import {reify} from '../../plugins/utils/reify-utils';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
 
 const formatValueMap = {
@@ -21,13 +18,7 @@ const formatValueMap = {
 
     return formatDate(date, true);
   },
-  [CONTROL_TYPE.PERSON](caObject, options) {
-    const attr = caObject.attributeObject;
-    return options.fn(options.contexts.add({
-      object: attr ? reify(attr) : null,
-    }));
-  },
-  [CONTROL_TYPE.TEXT](caObject, options, isMarkdown) {
+  [CONTROL_TYPE.TEXT](caObject, isMarkdown) {
     let value = caObject.value;
 
     return isMarkdown ? convertMarkdownToHtml(value) : value;
@@ -37,14 +28,10 @@ const formatValueMap = {
 /*
   Used to get the string value for custom attributes
 */
-const getCustomAttrValue = (instance, customAttributeId, options) => {
-  let caObject;
+const getCustomAttrValue = (instance, customAttributeId) => {
   let hasHandler = false;
   let customAttrValue = null;
-  instance = isFunction(instance) ? instance() : instance;
-  customAttributeId = isFunction(customAttributeId) ?
-    customAttributeId() : customAttributeId;
-  caObject = instance.customAttr(customAttributeId);
+  let caObject = instance.customAttr(customAttributeId);
 
   if (caObject) {
     hasHandler = _.has(formatValueMap, caObject.attributeType);
@@ -55,25 +42,29 @@ const getCustomAttrValue = (instance, customAttributeId, options) => {
     const handler = formatValueMap[caObject.attributeType];
     const isMarkdown = instance.constructor.isChangeableExternally;
 
-    customAttrValue = handler(caObject, options, isMarkdown);
+    customAttrValue = handler(caObject, isMarkdown);
   }
 
   return customAttrValue || '';
 };
 
-export const viewModel = can.Map.extend({
+const viewModel = can.Map.extend({
+  define: {
+    value: {
+      get() {
+        let instance = this.attr('instance');
+        let attrId = this.attr('customAttributeId');
+        return getCustomAttrValue(instance, attrId);
+      },
+    },
+  },
   instance: null,
   customAttributeId: null,
 });
 
-export const helpers = {
-  getCustomAttrValue,
-};
-
 export default can.Component.extend({
   tag: 'tree-item-custom-attribute',
-  view: can.stache(template),
+  view: can.stache('{{{value}}}'),
   leakScope: true,
   viewModel,
-  helpers,
 });

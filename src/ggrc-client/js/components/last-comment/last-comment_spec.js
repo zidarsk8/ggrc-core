@@ -9,6 +9,7 @@ import * as Utils from '../../plugins/utils/acl-utils.js';
 import RefreshQueue from '../../models/refresh_queue';
 import {COMMENT_CREATED} from '../../events/eventTypes';
 import {formatDate} from '../../plugins/utils/date-utils';
+import * as GgrcUtils from '../../plugins/ggrc_utils';
 
 describe('last-comment component', () => {
   let vm;
@@ -23,10 +24,17 @@ describe('last-comment component', () => {
       vm.attr('comment', {});
     });
 
-    it('returns comment description without tags', () => {
-      vm.attr('comment.description', '<a>ara</a>');
+    it('uses getOnlyAnchorTags util to get comment\'s text', () => {
+      const commentText =
+        '<p>my <a href="https://www.example.com">example</a></p>';
+      const expectedText = 'my <a href="https://www.example.com">example</a>';
 
-      expect(vm.attr('commentText')).toBe('ara');
+      vm.attr('comment.description', commentText);
+
+      spyOn(GgrcUtils, 'getOnlyAnchorTags')
+        .withArgs(commentText).and.returnValue(expectedText);
+      expect(vm.attr('commentText'))
+        .toBe(expectedText);
     });
 
     it('returns empty string if no description in comment', () => {
@@ -158,13 +166,13 @@ describe('last-comment component', () => {
         const comment = 'mockComment';
         vm.attr('comment', null);
 
-        handler({}, {comment});
+        handler([{}], {comment});
 
         expect(vm.attr('comment')).toEqual(comment);
       });
 
       it('calls getAuthor() method of viewModel', () => {
-        handler({}, {});
+        handler([{}], {});
         expect(vm.getAuthor).toHaveBeenCalled();
       });
     });

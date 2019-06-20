@@ -174,7 +174,7 @@
         {{/instance.computed_errors.start_date}}
       </div>
       <div class="{{#instance.computed_errors.end_date}}field-failure{{/instance.computed_errors.end_date}}">
-        <label class="form-label">
+        <label class="form-label form-label__extend">
             Due Date
             <i class="fa fa-asterisk"></i>
         </label>

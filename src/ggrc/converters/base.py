@@ -3,6 +3,7 @@
 
 """Base objects for csv file converters."""
 
+import logging
 from collections import defaultdict
 
 import sqlalchemy as sa
@@ -25,17 +26,58 @@ from ggrc.utils import benchmark
 from ggrc.utils import structures
 
 
+logger = logging.getLogger(__name__)
+
+
 class BaseConverter(object):
   """Base class for csv converters."""
   # pylint: disable=too-few-public-methods
-  def __init__(self):
+  def __init__(self, ie_job):
     self.new_objects = defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
+    self.cache_manager = cache_utils.get_cache_manager()
+    self.ie_job = ie_job
     self.exportable = get_exportables()
 
   def get_info(self):
     raise NotImplementedError()
+
+  def _add_ie_status_to_cache(self, status):
+    """Add export job status to memcache"""
+    cache_key = cache_utils.get_ie_cache_key(self.ie_job)
+    self.cache_manager.cache_object.memcache_client.add(cache_key, status)
+
+  def get_job_status(self):
+    """Get export job status from cache if exists and from DB otherwise"""
+    if not self.ie_job:
+      return None
+    status = self._get_ie_status_from_cache()
+    if not status:
+      status = self._get_ie_status_from_db()
+      self._add_ie_status_to_cache(status)
+    return status
+
+  def _get_ie_status_from_cache(self):
+    """Get export job status from memcache if exists, from DB otherwise."""
+    if not self.ie_job:
+      return None
+    cache_key = cache_utils.get_ie_cache_key(self.ie_job)
+    ie_status = self.cache_manager.cache_object.memcache_client.get(cache_key)
+    return ie_status
+
+  def _get_ie_status_from_db(self):
+    """Get status of current ImportExport job."""
+    if not self.ie_job:
+      return None
+    return db.engine.execute(
+        sa.text("""
+                SELECT status
+                FROM import_exports
+                WHERE id = :ie_id
+        """),
+        {"ie_id": self.ie_job.id},
+    ).fetchone()[0]
 
 
 class ImportConverter(BaseConverter):
@@ -59,11 +101,10 @@ class ImportConverter(BaseConverter):
 
   def __init__(self, ie_job, dry_run=True, csv_data=None):
     self.user = getattr(g, '_current_user', None)
-    self.ie_job = ie_job
     self.dry_run = dry_run
     self.csv_data = csv_data or []
     self.indexer = get_indexer()
-    super(ImportConverter, self).__init__()
+    super(ImportConverter, self).__init__(ie_job)
 
   def get_info(self):
     return self.response_data
@@ -93,7 +134,10 @@ class ImportConverter(BaseConverter):
     revision_ids = []
     for converter in self.initialize_block_converters():
       if not converter.ignore:
-        converter.import_csv_data()
+        try:
+          converter.import_csv_data()
+        except exceptions.ImportStoppedException:
+          raise
         revision_ids.extend(converter.revision_ids)
       self.response_data.append(converter.get_info())
     self._start_compute_attributes_job(revision_ids)
@@ -142,13 +186,11 @@ class ExportConverter(BaseConverter):
   """
 
   def __init__(self, ids_by_type, exportable_queries=None, ie_job=None):
-    super(ExportConverter, self).__init__()
+    super(ExportConverter, self).__init__(ie_job)
     self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
     self.block_converters = []
     self.ids_by_type = ids_by_type
     self.exportable_queries = exportable_queries or []
-    self.ie_job = ie_job
-    self.cache_manager = cache_utils.get_cache_manager()
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
@@ -214,7 +256,8 @@ class ExportConverter(BaseConverter):
 
       for line in block_converter.generate_row_data():
         ie_status = self.get_job_status()
-        if ie_status and ie_status == all_models.ImportExport.STOPPED_STATUS:
+        if ie_status and ie_status == \
+           all_models.ImportExport.STOPPED_STATUS:
           raise exceptions.ExportStoppedException()
         line.insert(0, "")
         csv_string_builder.append_line(line)
@@ -223,29 +266,6 @@ class ExportConverter(BaseConverter):
       csv_string_builder.append_line([])
 
     return csv_string_builder.get_csv_string()
-
-  def _add_ie_status_to_cache(self, status):
-    """Add export job status to memcache"""
-    cache_key = cache_utils.get_ie_cache_key(self.ie_job)
-    self.cache_manager.cache_object.memcache_client.add(cache_key, status)
-
-  def get_job_status(self):
-    """Get export job status from cache if exists and from DB otherwise"""
-    if not self.ie_job:
-      return None
-    status = self._get_ie_status_from_cache()
-    if not status:
-      status = self._get_ie_status_from_db()
-      self._add_ie_status_to_cache(status)
-    return status
-
-  def _get_ie_status_from_cache(self):
-    """Get export job status from memcache if exists, from DB otherwise."""
-    if not self.ie_job:
-      return None
-    cache_key = cache_utils.get_ie_cache_key(self.ie_job)
-    ie_status = self.cache_manager.cache_object.memcache_client.get(cache_key)
-    return ie_status
 
   def _get_exportable_queries(self):
     """Get a list of filtered object queries regarding exportable items.
@@ -267,16 +287,3 @@ class ExportConverter(BaseConverter):
     else:
       queries = self.ids_by_type
     return queries
-
-  def _get_ie_status_from_db(self):
-    """Get status of current ImportExport job."""
-    if not self.ie_job:
-      return None
-    return db.engine.execute(
-        sa.text("""
-                SELECT status
-                FROM import_exports
-                WHERE id = :ie_id
-        """),
-        {"ie_id": self.ie_job.id},
-    ).fetchone()[0]

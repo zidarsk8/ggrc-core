@@ -42,7 +42,7 @@ describe('Model states test', function () {
 describe('Model "status" attr test', function () {
   const objectsWithState = ['Assessment', 'AssessmentTemplate', 'Audit',
     'Contract', 'Control', 'Cycle', 'Document', 'Evidence', 'Issue',
-    'Objective', 'Policy', 'Program', 'Regulation', 'Risk', 'RiskAssessment',
+    'Objective', 'Policy', 'Program', 'Regulation', 'Risk',
     'Requirement', 'Standard', 'Threat', 'Workflow'];
   const objectsWithLaunchStatus = ['AccessGroup', 'AccountBalance',
     'DataAsset', 'Facility', 'KeyReport', 'Market', 'Metric', 'OrgGroup',

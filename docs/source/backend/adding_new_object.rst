@@ -98,10 +98,7 @@ Create a Cacheable object
    parameters for some of the widgets ie. their content controller,
    icon, widget name etc.
 
-3. Add ``new_object`` to ``mappings-ggrc.js``
-
-   Add the object to the list of mappings:
-   ``Mappings({NewObject: {...}}``.
+3. Add ``new_object`` to the list of mappings in ``mappings-ggrc.js``.
 
 Extending
 ~~~~~~~~~

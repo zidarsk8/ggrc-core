@@ -69,37 +69,44 @@ class TestImportExportBase(TestCase):
     )
 
 
+@ddt.ddt
 @base.with_memcache
 class TestImportExportExceptions(TestImportExportBase):
   """Test exceptions Import Export jobs produce"""
 
-  def test_handle_stop_raises_warning(self):
-    """Test handle_export_stop method raises STOPPED_WARNING"""
+  @ddt.data(("Export", "exports", app_errors.EXPORT_STOPPED_WARNING),
+            ("Import", "imports", app_errors.IMPORT_STOPPED_WARNING))
+  @ddt.unpack
+  def test_handle_stop_raises_warning(self, job, url, error):
+    """Test handle_export_stop method raises EXPORT_STOPPED_WARNING"""
     user = all_models.Person.query.first()
     ie_job = factories.ImportExportFactory(
-        job_type="Export",
+        job_type=job,
         created_at=datetime.now(),
         created_by=user,
         status="Stopped",
     )
     response = self.client.put(
-        "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+        "/api/people/{}/{}/{}/stop".format(user.id, url, ie_job.id),
         headers=self.headers
     )
     self.assert400(response)
-    self.assertEqual(response.json['message'], app_errors.STOPPED_WARNING)
+    self.assertEqual(response.json['message'], error)
 
-  def test_handle_stop_raises_wrong(self):
+  @ddt.data(("Export", "exports"),
+            ("Import", "imports"))
+  @ddt.unpack
+  def test_handle_stop_raises_wrong(self, job, url):
     """Test handle_export_stop method raises wrong status exception"""
     user = all_models.Person.query.first()
     ie_job = factories.ImportExportFactory(
-        job_type="Export",
+        job_type=job,
         created_at=datetime.now(),
         created_by=user,
         status="Finished",
     )
     response = self.client.put(
-        "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+        "/api/people/{}/{}/{}/stop".format(user.id, url, ie_job.id),
         headers=self.headers
     )
     self.assert400(response)
@@ -399,37 +406,25 @@ class TestImportExports(TestImportExportBase):
           headers=self.headers)
       self.assert400(response)
 
-  def test_import_stop(self):
-    """Test import stop"""
-    user = all_models.Person.query.first()
-    ie1 = factories.ImportExportFactory(
-        job_type="Import",
-        status="Analysis",
-        created_at=datetime.now(),
-        created_by=user,
-        title="test.csv",
-        content="test content",
-    )
-    response = self.client.put(
-        "/api/people/{}/imports/{}/stop".format(user.id, ie1.id),
-        headers=self.headers
-    )
-    self.assert200(response)
-    self.assertEqual(json.loads(response.data)["status"], "Stopped")
-
-  def test_export_stop(self):
+  @ddt.data(("In Progress", "test export", "export",
+             "Export", "/api/people/{}/exports/{}/stop"),
+            ("Analysis", "test import", "import",
+             "Import", "/api/people/{}/imports/{}/stop"))
+  @ddt.unpack
+  def test_import_export_stop(self, status, bg_task_name,
+                              bgo_type_name, job_type, stop_url):
     """Test export stop"""
+    # pylint: disable=too-many-arguments
     user = all_models.Person.query.first()
-    bg_task_name = "test export"
     instance_name = "test instance"
-    export_op_type = all_models.BackgroundOperationType.query.filter_by(
-        name="export"
+    op_type = all_models.BackgroundOperationType.query.filter_by(
+        name=bgo_type_name
     ).first()
 
     with factories.single_commit():
       ie_job = factories.ImportExportFactory(
-          job_type="Export",
-          status="In Progress",
+          job_type=job_type,
+          status=status,
           created_at=datetime.now(),
           created_by=user,
           title="test.csv",
@@ -440,13 +435,13 @@ class TestImportExports(TestImportExportBase):
           object_type=ie_job.type,
           object_id=ie_job.id,
           bg_task_id=bg_task.id,
-          bg_operation_type=export_op_type,
+          bg_operation_type=op_type,
       )
 
     with mock.patch("ggrc.settings.APPENGINE_INSTANCE", new=instance_name):
       with mock.patch("ggrc.cloud_api.task_queue.delete_task") as delete_task:
         response = self.client.put(
-            "/api/people/{}/exports/{}/stop".format(user.id, ie_job.id),
+            stop_url.format(user.id, ie_job.id),
             headers=self.headers
         )
         self.assert200(response)
@@ -454,14 +449,22 @@ class TestImportExports(TestImportExportBase):
         task_name = "projects/{}/locations/{}/queues/{}/tasks/{}".format(
             instance_name, "us-central1", "ggrcImport", bg_task_name
         )
-        delete_task.assert_called_once_with(task_name)
         bg_task = all_models.BackgroundTask.query.filter_by(
             name=bg_task_name
         ).first()
-        self.assertEqual(
-            bg_task.status,
-            all_models.BackgroundTask.STOPPED_STATUS
-        )
+        ie_object = all_models.ImportExport.query.filter_by(
+            id=ie_job.id
+        ).first()
+
+    delete_task.assert_called_once_with(task_name)
+    self.assertEqual(
+        bg_task.status,
+        all_models.BackgroundTask.STOPPED_STATUS
+    )
+    self.assertEqual(
+        ie_object.status,
+        "Stopped"
+    )
 
   @ddt.data(("Not Started", True),
             ("Blocked", True),

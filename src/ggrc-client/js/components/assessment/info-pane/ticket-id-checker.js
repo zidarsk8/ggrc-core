@@ -10,6 +10,15 @@ export default can.Component.extend({
   view: can.stache(template),
   leakScope: true,
   viewModel: can.Map.extend({
+    define: {
+      mandatory: {
+        get() {
+          let instance = this.attr('instance');
+          return instance.constructor.unchangeableIssueTrackerIdStatuses
+            .includes(instance.attr('status'));
+        },
+      },
+    },
     instance: null,
     ticketId: null,
     isValid: true,

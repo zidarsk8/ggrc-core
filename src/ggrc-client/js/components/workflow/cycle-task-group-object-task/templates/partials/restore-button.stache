@@ -1,0 +1,12 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<object-change-state toState:from="initialState"
+                      on:onStateChange="onStateChange(scope.event)">
+  <a href="javascript:void(0)">
+    <i class="fa fa-reply"></i>
+    Restore
+  </a>
+</object-change-state>

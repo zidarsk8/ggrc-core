@@ -235,12 +235,12 @@ export default can.Component.extend({
     }
   },
   events: {
-    [`{viewModel.instance} ${REFRESH_MAPPING.type}`](instance, event) {
+    [`{viewModel.instance} ${REFRESH_MAPPING.type}`]([instance], event) {
       if (this.viewModel.attr('modelType') === event.destinationType) {
         this.viewModel.refreshRelatedDocuments();
       }
     },
-    [`{viewModel.instance} ${DESTINATION_UNMAPPED.type}`](instance, event) {
+    [`{viewModel.instance} ${DESTINATION_UNMAPPED.type}`]([instance], event) {
       let item = event.item;
       let viewModel = this.viewModel;
 

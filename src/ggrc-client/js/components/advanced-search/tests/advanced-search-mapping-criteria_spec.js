@@ -7,7 +7,7 @@ import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-mapping-criteria';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import Audit from '../../../models/business-models/audit';
 
 describe('advanced-search-mapping-criteria component', function () {

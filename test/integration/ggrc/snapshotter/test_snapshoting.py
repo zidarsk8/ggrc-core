@@ -908,3 +908,57 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     self.assertIsNotNone(models.Relationship.find_related(program, objective))
     self.assertIsNotNone(models.Relationship.find_related(program, control))
+
+  def test_original_object_deleted_external(self):
+    """
+        Test original_object_deleted status after
+        deleting object in GGRCQ side
+    """
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      assessment_id = assessment.id
+
+      control = factories.ControlFactory()
+      revision = models.Revision.query.filter(
+          models.Revision.resource_type == "Assessment",
+          models.Revision.resource_id == assessment_id,
+      ).first()
+      snapshot = factories.SnapshotFactory(
+          parent=assessment.audit,
+          child_type=control.type,
+          child_id=control.id,
+          revision=revision,
+      )
+      factories.RelationshipFactory(
+          source=assessment,
+          destination=snapshot,
+      )
+
+      revision_id = revision.id
+      snapshot_id = snapshot.id
+
+    self.client.get("/login")
+
+    response_data = self.client.get(
+        '/api/assessments/{}/related_objects'.format(assessment_id)
+    ).json
+
+    snapshot = models.Snapshot.query.get(snapshot_id)
+    self.assertIn('original_object_deleted', response_data['Snapshot'][0])
+    self.assertFalse(snapshot.original_object_deleted)
+    self.assertEqual(
+        response_data['Snapshot'][0]['original_object_deleted'],
+        snapshot.original_object_deleted,
+    )
+
+    control = models.Control.query.first()
+    with self.api.as_external():
+      response = self.api.put(control, {'status': 'Deprecated'})
+    self.assert200(response)
+
+    response_data = self.client.get(
+        '/api/assessments/{}/related_objects'.format(assessment_id)
+    ).json
+    snapshot = models.Snapshot.query.get(snapshot_id)
+    self.assertTrue(snapshot.original_object_deleted)
+    self.assertEqual(revision_id, response_data['Snapshot'][0]['revision_id'])

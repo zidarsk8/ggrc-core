@@ -110,6 +110,21 @@ class Datepicker(object):
     self._root.element(class_name="ui-state-active").click()
 
 
+class AssertionsDropdown(object):
+  """Assertions Dropdown element."""
+  def __init__(self, container):
+    self.text = "Assertions"
+    self._root = container.element(
+        class_name="custom-attr-wrap").element(text=self.text)
+    self.assertions_values = self._root.parent().text.splitlines()[1:]
+    self._inline_edit = InlineEdit(self._root)
+    self.input = self._root.select(class_name="input-block-level")
+
+  def open_inline_edit(self):
+    """Open element for editing."""
+    self._inline_edit.open()
+
+
 class RelatedPeopleList(object):
   """Represents related people element"""
 
@@ -180,13 +195,13 @@ class CommentArea(object):
 
   def __init__(self, container):
     self._container = container
-    self.add_section = container.element(
-        text="Responses/Comments").parent().button(text="Add")
+    self.comments_section = container.element(text="Responses/Comments")
+    self.add_section = self.comments_section.parent().button(text="Add")
 
   @property
   def exists(self):
     """Returns whether comment area exists."""
-    return self.add_section.exists
+    return self.comments_section.exists
 
   @property
   def control_add_section(self):
@@ -252,6 +267,7 @@ class CustomAttribute(object):
         AdminWidgetCustomAttributes.RICH_TEXT: RichTextCAActionsStrategy,
         AdminWidgetCustomAttributes.DATE: DateCAActionsStrategy,
         AdminWidgetCustomAttributes.CHECKBOX: CheckboxCAActionsStrategy,
+        AdminWidgetCustomAttributes.MULTISELECT: MultiselectCAActionsStrategy,
         AdminWidgetCustomAttributes.DROPDOWN: DropdownCAActionsStrategy,
         AdminWidgetCustomAttributes.PERSON: PersonCAActionsStrategy
     }[self.ca_type](self._root, self._label_el)
@@ -282,6 +298,7 @@ class CustomAttribute(object):
         "text": AdminWidgetCustomAttributes.RICH_TEXT,
         "date": AdminWidgetCustomAttributes.DATE,
         "checkbox": AdminWidgetCustomAttributes.CHECKBOX,
+        "multiselect": AdminWidgetCustomAttributes.MULTISELECT,
         "dropdown": AdminWidgetCustomAttributes.DROPDOWN,
         "person": AdminWidgetCustomAttributes.PERSON
     }[js_type]
@@ -294,7 +311,7 @@ class CustomAttribute(object):
       value = self._ca_strategy.get_lcas_from_inline()
     empty_string_strategies = (
         TextCAActionsStrategy, RichTextCAActionsStrategy,
-        DropdownCAActionsStrategy)
+        MultiselectCAActionsStrategy, DropdownCAActionsStrategy)
     if isinstance(self._ca_strategy, empty_string_strategies) and value == "":
       return None
     elif (isinstance(self._ca_strategy, DateCAActionsStrategy) and
@@ -316,6 +333,11 @@ class CustomAttribute(object):
     else:
       self._ca_strategy.set_gcas_from_popup(value)
 
+  def open_edit(self):
+    """Opens edit form for custom attribute."""
+    self._ca_strategy.open_gcas_from_inline()
+    return self._ca_strategy
+
 
 class CAActionsStrategy(object):
   """Parent class for custom attribute actions."""
@@ -323,6 +345,10 @@ class CAActionsStrategy(object):
     self._root = root
     self._label_el = label_el
     self._inline_edit = InlineEdit(self._root)
+
+  def open_gcas_from_inline(self):
+    """Opens GCA inline field for editing."""
+    self._inline_edit.open()
 
   def get_gcas_from_inline(self):
     """Gets value of inline GCA field."""
@@ -370,6 +396,11 @@ class RichTextCAActionsStrategy(CAActionsStrategy):
   def __init__(self, *args):
     super(RichTextCAActionsStrategy, self).__init__(*args)
     self._input = self._root.element(class_name="ql-editor")
+
+  @property
+  def is_inline_edit_opened(self):
+    """Checks if input opened."""
+    return self._input.exists
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
@@ -432,28 +463,63 @@ class CheckboxCAActionsStrategy(CAActionsStrategy):
     self._input.set(value)
 
 
-class DropdownCAActionsStrategy(CAActionsStrategy):
-  """Actions for Dropown CA."""
+class MultiselectCAActionsStrategy(CAActionsStrategy):
+  """Actions for Multiselect CA."""
 
   def __init__(self, *args):
-    super(DropdownCAActionsStrategy, self).__init__(*args)
-    self._input = self._root.select(class_name="input-block-level")
-
-  def get_gcas_from_inline(self):
-    """Gets value of inline GCA field."""
-    return self._input.value
+    super(MultiselectCAActionsStrategy, self).__init__(*args)
+    self._dropdown = self._root.element(class_name="multiselect-dropdown")
 
   def get_lcas_from_inline(self):
     """Gets value of inline LCA field."""
-    return self._input.value
+    return self._dropdown.input().value
 
   def set_lcas_from_inline(self, value):
     """Sets value of inline LCA field."""
-    self._input.select(value)
+    self._set_value(value)
+
+  def set_gcas_from_popup(self, value):
+    """Sets value of GCA field."""
+    self._set_value(value)
+
+  def _set_value(self, value):
+    """Sets value of CA field."""
+    self._dropdown.click()
+    self._fill_input_field(value)
 
   def _fill_input_field(self, value):
     """Fills input field."""
-    self._input.select(value)
+    self._dropdown.label(text=value).click()
+
+
+class DropdownCAActionsStrategy(CAActionsStrategy):
+  """Actions for Dropown CA."""
+
+  def _gcas_input(self):
+    """Gets global custom attribute input element."""
+    return self._root.select(class_name="input-block-level")
+
+  def _lcas_input(self):
+    """Gets local custom attribute input element."""
+    return self._root.input(class_name="dropdown-wrap-text__input")
+
+  def get_gcas_from_inline(self):
+    """Gets value of inline GCA field."""
+    return self._gcas_input().value
+
+  def get_lcas_from_inline(self):
+    """Gets value of inline LCA field."""
+    return self._lcas_input().value
+
+  def set_lcas_from_inline(self, value):
+    """Sets value of inline LCA field."""
+    dropdown = self._root.element(tag_name="dropdown-wrap-text")
+    dropdown.click()
+    dropdown.div(text=value).click()
+
+  def _fill_input_field(self, value):
+    """Fills input field."""
+    self._gcas_input().select(value)
 
 
 class PersonCAActionsStrategy(CAActionsStrategy):

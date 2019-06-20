@@ -4,6 +4,7 @@
 */
 
 import * as workflowHelpers from '../../utils/workflow-utils';
+import * as Mappings from '../../../models/mappers/mappings';
 import {
   makeFakeInstance,
 } from '../../../../js_specs/spec_helpers';
@@ -11,7 +12,7 @@ import Workflow from '../../../models/business-models/workflow';
 import Context from '../../../models/service-models/context';
 
 describe('Workflow helpers', () => {
-  describe('createCycle() method', () => {
+  describe('createCycle() util', () => {
     describe('returns cycle instance which contains', () => {
       let workflow;
 
@@ -49,7 +50,7 @@ describe('Workflow helpers', () => {
     });
   });
 
-  describe('updateStatus() method', () => {
+  describe('updateStatus() util', () => {
     let instance;
     let refreshedInstance;
 
@@ -87,6 +88,37 @@ describe('Workflow helpers', () => {
       const result = await workflowHelpers.updateStatus(instance);
       expect(result).toBe(saved);
       done();
+    });
+  });
+
+  describe('getRelevantMappingTypes() util', () => {
+    beforeEach(() => {
+      spyOn(Mappings, 'getMappingList');
+    });
+
+    it('returns filtered list of related sources/destinations items ' +
+    'by mapping list of instance', () => {
+      const instance = new can.Map({
+        related_sources: [
+          {destination_type: 'FakeType1'},
+          {destination_type: 'FakeType2'},
+          {destination_type: 'FakeType3'},
+        ],
+        related_destinations: [
+          {destination_type: 'FakeType3'},
+          {destination_type: 'FakeType2'},
+          {destination_type: 'FakeType1'},
+        ],
+      });
+      const typesCollection = {
+        FakeType777: ['FakeType1', 'FakeType3'],
+      };
+      Mappings.getMappingList.and.callFake((type) => typesCollection[type]);
+      instance.constructor = {model_singular: 'FakeType777'};
+
+      const result = workflowHelpers.getRelevantMappingTypes(instance);
+
+      expect(result.sort()).toEqual(['FakeType1', 'FakeType3']);
     });
   });
 });

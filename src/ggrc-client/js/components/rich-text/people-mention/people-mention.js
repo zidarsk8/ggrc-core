@@ -8,7 +8,10 @@ import '../../people-autocomplete/people-autocomplete-wrapper/people-autocomplet
 import template from './people-mention.stache';
 import {KEY_MAP} from '../../custom-autocomplete/autocomplete-input';
 
-const MENTION_REGEX = /(^.*[\s]|^)[@+]([\S]*)$/s;
+const MENTION_REGEX = {
+  BEFORE_SELECTION: /(^.*[\s]|^)[@+]([\S]*)$/s,
+  AFTER_SELECTION: /(^\S*|^)@?\S*\.?\S+\s?/s,
+};
 
 /**
  * Supporting component for rich-text to handle mentions of people
@@ -46,11 +49,13 @@ export default can.Component.extend({
     // two way bound attribute to child components
     // to define if "results" is shown.
     showResults: false,
-    mentionValue: null,
+    mentionBeforeSelection: null,
+    mentionAfterSelection: null,
     mentionIndex: null,
     actionKey: null,
     clearMention() {
-      this.attr('mentionValue', null);
+      this.attr('mentionBeforeSelection', null);
+      this.attr('mentionAfterSelection', null);
       this.attr('mentionIndex', null);
     },
     onActionKey(keyCode) {
@@ -78,24 +83,33 @@ export default can.Component.extend({
         // on mention insert focus is lost
         return;
       }
+
       const selectionIndex = selection.index;
       const editorText = editor.getText();
       const textBeforeSelection = editorText.substring(0, selectionIndex);
+      const textAfterSelection = editorText.substring(selectionIndex);
 
-      const groups = MENTION_REGEX.exec(textBeforeSelection);
-      if (groups) {
-        const textBeforeMention = groups[1];
-        const mentionValue = groups[2];
+      const mentionsBeforeSelection =
+        MENTION_REGEX.BEFORE_SELECTION.exec(textBeforeSelection);
+      const mentionsAfterSelection =
+        MENTION_REGEX.AFTER_SELECTION.exec(textAfterSelection);
+      if (mentionsBeforeSelection) {
+        const textBeforeMention = mentionsBeforeSelection[1];
+        const mentionBeforeSelection = mentionsBeforeSelection[2];
+        const mentionAfterSelection =
+          mentionsAfterSelection && mentionsAfterSelection[0] || '';
 
-        this.attr('mentionValue', mentionValue);
+        this.attr('mentionBeforeSelection', mentionBeforeSelection);
+        this.attr('mentionAfterSelection', mentionAfterSelection);
         this.attr('mentionIndex', textBeforeMention.length);
       } else {
         this.clearMention();
       }
     },
     personSelected({item}) {
-      const editor = this.attr('editor');
-      const mentionValueLength = this.attr('mentionValue').length + 1;
+      const mentionValueLength =
+        this.attr('mentionBeforeSelection').length +
+        this.attr('mentionAfterSelection').length + 1;
       const link = `mailto:${item.email}`;
       const retainLength = this.attr('mentionIndex');
       const retain = retainLength ? [{retain: retainLength}] : [];
@@ -107,6 +121,7 @@ export default can.Component.extend({
         {insert: ' '},
       ];
 
+      const editor = this.attr('editor');
       editor.updateContents({ops});
       editor.setSelection(retainLength + mention.length + 1);
       this.clearMention();

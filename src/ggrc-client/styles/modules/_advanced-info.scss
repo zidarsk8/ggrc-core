@@ -51,14 +51,6 @@
   }
 }
 
-.info-expand-custom {
-  @extend .info-expand;
-}
-
-.info-expand-mapped {
-  @extend .info-expand;
-}
-
 .expand-link {
   a.show-hidden-fields {
     outline: none;
@@ -87,8 +79,7 @@
   }
 }
 
-.hidden-fields-area,
-.hidden-fields-area-custom {
+.hidden-fields-area {
   padding-top: 15px;
   padding-left: 28px;
   border-bottom: 1px solid $itemBorder;

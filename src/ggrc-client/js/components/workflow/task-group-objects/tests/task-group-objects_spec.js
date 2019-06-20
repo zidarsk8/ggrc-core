@@ -6,7 +6,7 @@
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import Component from '../task-group-objects';
 import * as Stub from '../../../../models/stub';
-import Mappings from '../../../../models/mappers/mappings';
+import * as Mappings from '../../../../models/mappers/mappings';
 import * as QueryApiUtils from '../../../../plugins/utils/query-api-utils';
 import * as MapperUtils from '../../../../plugins/utils/mapper-utils';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';

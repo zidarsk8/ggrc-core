@@ -190,7 +190,11 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
     Args:
       new_people: set of people objects. Any existing person missing from that
         set will be removed. Any new people will be added.
+
+    Returns:
+      True - if values was updated, and False - if we didn't update any people
     """
     existing_people = {acp.person for acp in self.access_control_people}
     self._remove_people(existing_people - new_people)
     self._add_people(new_people - existing_people)
+    return existing_people != new_people

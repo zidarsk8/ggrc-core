@@ -9,6 +9,7 @@ import template from './rich-text.stache';
 
 const URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
 const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
+const EMAIL_REGEX = /^[+|@]\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+/;
 
 export default can.Component.extend('richText', {
   tag: 'rich-text',
@@ -160,6 +161,17 @@ export default can.Component.extend('richText', {
 
       this.attr('editorHasFocus', false);
     },
+    buildLinkOps(text, href, startIdx) {
+      let ops = [];
+      if (startIdx !== 0) {
+        ops.push({retain: startIdx});
+      }
+      ops = ops.concat([
+        {'delete': text.length},
+        {insert: text, attributes: {link: href}},
+      ]);
+      return ops;
+    },
     onChange(delta, oldDelta) {
       let editor = this.attr('editor');
 
@@ -169,7 +181,6 @@ export default can.Component.extend('richText', {
       if (textLength &&
         delta.ops.length === 2 &&
         delta.ops[0].retain &&
-        !delta.ops[1].delete &&
         !this.isWhitespace(delta.ops[1].insert)) {
         let text = editor.getText();
         let startIdx = delta.ops[0].retain;
@@ -181,20 +192,25 @@ export default can.Component.extend('richText', {
           endIdx++;
         }
 
-        let match = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
-        if (match !== null) {
-          let url = match[0];
-          let ops = [];
-          if (startIdx !== 0) {
-            ops.push({retain: startIdx});
+        const urlMatch = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
+        const emailMatch = text.substring(startIdx, endIdx).match(EMAIL_REGEX);
+        const withMentions = this.attr('withMentions');
+        if (urlMatch !== null || (emailMatch !== null && withMentions)) {
+          let linkText;
+          let href;
+
+          if (urlMatch !== null) {
+            linkText = urlMatch[0];
+            href = linkText;
+          } else {
+            // remove '+' or '@' character
+            let email = emailMatch[0].substr(1);
+            linkText = `+${email}`;
+            href = `mailto:${email}`;
           }
-          ops = ops.concat([
-            {'delete': url.length},
-            {insert: url, attributes: {link: url}},
-          ]);
-          editor.updateContents({
-            ops: ops,
-          });
+
+          const ops = this.buildLinkOps(linkText, href, startIdx);
+          editor.updateContents({ops});
         }
       }
 

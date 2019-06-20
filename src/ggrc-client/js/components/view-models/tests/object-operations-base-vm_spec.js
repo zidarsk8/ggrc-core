@@ -4,7 +4,7 @@
  */
 
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
-import Mappings from '../../../models/mappers/mappings';
+import * as Mappings from '../../../models/mappers/mappings';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import Control from '../../../models/business-models/control';
 
@@ -18,14 +18,22 @@ describe('object-operations-base viewModel', function () {
   });
 
   describe('availableTypes() method', function () {
-    it('correctly calls getMappingTypes', function () {
-      let result;
-      spyOn(Mappings, 'getMappingTypes').and.returnValue('types');
+    it('calls getMappingList', function () {
+      spyOn(Mappings, 'getMappingList');
+      spyOn(modelsUtils, 'groupTypes');
       baseVM.attr('object', 'testObject');
 
-      result = baseVM.availableTypes();
-      expect(Mappings.getMappingTypes).toHaveBeenCalledWith('testObject');
-      expect(result).toEqual('types');
+      baseVM.availableTypes();
+      expect(Mappings.getMappingList).toHaveBeenCalledWith('testObject');
+    });
+
+    it('returns grouped types', () => {
+      spyOn(Mappings, 'getMappingList').and.returnValue('list');
+      spyOn(modelsUtils, 'groupTypes');
+      baseVM.attr('object', 'testObject');
+
+      baseVM.availableTypes();
+      expect(modelsUtils.groupTypes).toHaveBeenCalledWith('list');
     });
   });
 

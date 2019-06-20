@@ -28,7 +28,8 @@ from lib.rest_facades import (
     control_rest_facade, person_rest_facade, workflow_rest_facade)
 from lib.service import rest_facade
 from lib.service.rest import session_pool
-from lib.utils import conftest_utils, help_utils, selenium_utils, app_utils
+from lib.utils import conftest_utils, help_utils, selenium_utils, app_utils, \
+    assert_utils
 from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
 
@@ -544,6 +545,24 @@ def creator():
 
 
 @pytest.fixture()
+def second_creator():
+  """Create user with role 'Creator'."""
+  return rest_facade.create_user_with_role(roles.CREATOR)
+
+
+@pytest.fixture()
+def third_creator():
+  """Create user with role 'Creator'."""
+  return rest_facade.create_user_with_role(roles.CREATOR)
+
+
+@pytest.fixture()
+def editor():
+  """Create user with role 'Editor'."""
+  return rest_facade.create_user_with_role(roles.EDITOR)
+
+
+@pytest.fixture()
 def login_as_creator(creator):
   """Login by user with role 'Creator'."""
   users.set_current_user(creator)
@@ -551,14 +570,28 @@ def login_as_creator(creator):
 
 @pytest.fixture()
 def program():
-  """Create a program"""
+  """Create a program."""
   return rest_facade.create_program()
 
 
 @pytest.fixture()
 def programs():
-  """Create a program"""
+  """Create a program."""
   return [rest_facade.create_program() for _ in xrange(2)]
+
+
+@pytest.fixture()
+def product():
+  """Creates a product."""
+  return rest_facade.create_product()
+
+
+@pytest.fixture()
+def product_mapped_to_control(product):
+  """Creates a product mapped to control."""
+  control = rest_facade.create_control()
+  rest_facade.map_objs(product, control)
+  return product
 
 
 @pytest.fixture()
@@ -682,13 +715,13 @@ def gcads_for_asmt():
   """Creates GCADs of all types for Assessment."""
   return [rest_facade.create_gcad(definition_type="assessment",
                                   attribute_type=ca_type)
-          for ca_type in element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
+          for ca_type in element.AdminWidgetCustomAttributes.ALL_GCA_TYPES]
 
 
 @pytest.fixture()
 def gcads_for_control():
   """Creates GCADs of all types for Control."""
-  return rest_facade.create_gcad_for_control()
+  return rest_facade.create_gcads_for_control()
 
 
 @pytest.fixture()
@@ -765,3 +798,9 @@ def app_person():
 def app_control():
   """Creates a control."""
   return control_rest_facade.create_control()
+
+
+@pytest.fixture()
+def soft_assert():
+  """Fixture for soft assertations."""
+  return assert_utils.SoftAssert()

@@ -22,8 +22,8 @@ export default Cacheable.extend({
     title: '',
     attribute_type: 'Text',
   },
-  attributeTypes: ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
-    'Map:Person'],
+  attributeTypes: ['Text', 'Rich Text', 'Date', 'Checkbox', 'Multiselect',
+    'Dropdown'],
 
   _customValidators: {
     /**
@@ -43,30 +43,27 @@ export default Cacheable.extend({
      *   is returned if the validation passes.
      */
     multiChoiceOptions: function (newVal, propName) {
-      let choices;
-      let nonBlanks;
-      let uniques;
-
       if (propName !== 'multi_choice_options') {
         return ''; // nothing  to validate here
       }
 
-      if (this.attribute_type !== 'Dropdown') {
+      if (this.attribute_type !== 'Dropdown' &&
+        this.attribute_type !== 'Multiselect') {
         return ''; // all ok, the value of multi_choice_options not needed
       }
 
-      choices = _.splitTrim(newVal, ',');
+      const choices = _.splitTrim(newVal, ',');
 
       if (!choices.length) {
         return 'At least one possible value required.';
       }
 
-      nonBlanks = _.compact(choices);
+      const nonBlanks = _.compact(choices);
       if (nonBlanks.length < choices.length) {
         return 'Blank values not allowed.';
       }
 
-      uniques = _.uniq(nonBlanks);
+      const uniques = _.uniq(nonBlanks);
       if (uniques.length < nonBlanks.length) {
         return 'Duplicate values found.';
       }

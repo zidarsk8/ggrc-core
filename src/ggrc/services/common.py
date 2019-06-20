@@ -57,6 +57,7 @@ from ggrc.query import utils as query_utils
 from ggrc import settings
 from ggrc.cache import utils as cache_utils
 from ggrc.utils import errors as ggrc_errors
+from ggrc.utils import format_api_error_response
 
 
 # pylint: disable=invalid-name
@@ -465,11 +466,7 @@ class Resource(ModelView):
           if code < 500:
             alternative_message = ggrc_errors.BAD_REQUEST_MESSAGE
           message = error.description or alternative_message
-          return current_app.make_response((
-              json.dumps({"message": message, "code": code}),
-              code,
-              [("Content-Type", "application/json")],
-          ))
+          return format_api_error_response(code, message)
         except Exception as err:  # pylint: disable=broad-except
           logger.exception(err)
           err.message = ggrc_errors.INTERNAL_SERVER_ERROR
@@ -545,27 +542,26 @@ class Resource(ModelView):
     missing_headers = required_headers.difference(
         set(self.request.headers.keys()))
     if missing_headers:
-      return current_app.make_response((
-          json.dumps({
-              "message": "Missing headers: " + ", ".join(missing_headers),
-          }),
+      return format_api_error_response(
           428,
-          [("Content-Type", "application/json")],
-      ))
+          "Missing headers: " + ", ".join(missing_headers)
+      )
 
+    # Validate we have up to date object state according to Etag
     object_etag = etag(self.modified_at(obj), get_info(obj))
     object_timestamp = self.http_timestamp(self.modified_at(obj))
     if (request.headers["If-Match"] != object_etag or
             request.headers["If-Unmodified-Since"] != object_timestamp):
-      return current_app.make_response((
-          json.dumps({
-              "message": "The resource could not be updated due to a conflict "
-                         "with the current state on the server. Please "
-                         "resolve the conflict by refreshing the resource.",
-          }),
-          409,
-          [("Content-Type", "application/json")]
-      ))
+
+      headers = [('Last-Modified', object_timestamp),
+                 ('Etag', object_etag),
+                 ("Content-Type", "application/json")]
+      error_message = ("The resource could not be updated due to a conflict "
+                       "with the current state on the server. Please "
+                       "resolve the conflict by refreshing the resource.")
+      body = {"message": error_message, "code": 409}
+      body.update(self.object_for_json(obj))
+      return flask.make_response((as_json(body), 409, headers))
     return None
 
   @staticmethod
@@ -1000,12 +996,14 @@ class Resource(ModelView):
   def _get_relationship(self, src):
     """Get existing relationship if exists, and update updated_at"""
 
-    relationship = self.model.query.filter(
-        self.model.source_id == src["source"]["id"],
-        self.model.source_type == src["source"]["type"],
-        self.model.destination_id == src["destination"]["id"],
-        self.model.destination_type == src["destination"]["type"]
+    relationship = self.model.get_related_query_by_type_id(
+        type1=src["source"]["type"],
+        id1=src["source"]["id"],
+        type2=src["destination"]["type"],
+        id2=src["destination"]["id"],
+        strict_id=True
     ).first()
+
     if relationship:
       # Manually trigger relationship update in order for revisions and
       # event being created. We expect positive response when POSTing

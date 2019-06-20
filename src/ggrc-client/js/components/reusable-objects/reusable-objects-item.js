@@ -27,7 +27,7 @@ export default can.Component.extend({
     init() {
       this.viewModel.setIsChecked();
     },
-    '{viewModel} isChecked'(viewModel, ev, isChecked) {
+    '{viewModel} isChecked'([viewModel], ev, isChecked) {
       let list = viewModel.attr('selectedList');
       let instance = viewModel.attr('instance');
       let index = list.indexOf(instance);

@@ -1,7 +1,7 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-# pylint: disable=maybe-no-member, invalid-name
+# pylint: disable=maybe-no-member, invalid-name, too-many-lines
 
 """Test request import and updates."""
 
@@ -13,6 +13,7 @@ import ddt
 import freezegun
 
 from ggrc import db
+from ggrc import utils
 from ggrc.models import all_models
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.converters import errors
@@ -219,7 +220,7 @@ class TestAssessmentImport(TestCase):
         "user 2": {"Assignees", "Creators"}
     }
     self._test_assessment_users(asmt_1, users)
-    self.assertEqual(asmt_1.status, all_models.Assessment.START_STATE)
+    self.assertEqual(asmt_1.status, all_models.Assessment.PROGRESS_STATE)
 
     # Test second Assessment line in the CSV file
     asmt_2 = all_models.Assessment.query.filter_by(slug="Assessment 2").first()
@@ -250,7 +251,7 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
     """
     self.import_file("assessment_full_no_warnings.csv")
-    self.import_file("assessment_update_intermediate.csv")
+    self.import_file("assessment_update_intermediate.csv", safe=False)
 
     assessments = {r.slug: r for r in all_models.Assessment.query.all()}
     self.assertEqual(assessments["Assessment 60"].status,
@@ -264,9 +265,9 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(assessments["Assessment 64"].status,
                      all_models.Assessment.FINAL_STATE)
     self.assertEqual(assessments["Assessment 3"].status,
-                     all_models.Assessment.FINAL_STATE)
+                     all_models.Assessment.PROGRESS_STATE)
     self.assertEqual(assessments["Assessment 4"].status,
-                     all_models.Assessment.FINAL_STATE)
+                     all_models.Assessment.PROGRESS_STATE)
 
     # Check that there is only one attachment left
     asmt1 = assessments["Assessment 1"]
@@ -340,7 +341,7 @@ class TestAssessmentImport(TestCase):
                 errors.UNSUPPORTED_MAPPING.format(
                     line=2,
                     obj_a="Assessment",
-                    obj_b="project",
+                    obj_b="Project",
                     column_name="map:project"
                 ),
             },
@@ -366,6 +367,10 @@ class TestAssessmentImport(TestCase):
                     line=20,
                     column_name="State",
                     value="open",
+                ),
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=22,
+                    column_name="Verified Date"
                 ),
             },
         }
@@ -742,14 +747,43 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
-        ("Assignees", "user@example.com"),
-        ("Creators", "user@example.com"),
         ("Title", "Test title"),
         ("State", "Completed"),
         ("CAD", "Some value"),
     ])
     response = self.import_data(data)
     self._check_csv_response(response, {})
+
+  def test_import_asmnt_rev_query_count(self):
+    """Test only one revisions insert query should occur while importing."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      cad_names = ("CAD1", "CAD2", "CAD3")
+      for name in cad_names:
+        factories.CustomAttributeDefinitionFactory(
+            title=name,
+            definition_type="assessment",
+            definition_id=asmnt.id,
+            attribute_type="Text",
+            mandatory=True,
+        )
+    data = OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+        ("CAD1", "Some value 1"),
+        ("CAD2", "Some value 2"),
+        ("CAD3", "Some value 3"),
+    ])
+    with utils.QueryCounter() as counter:
+      response = self.import_data(data)
+    self._check_csv_response(response, {})
+    rev_insert_queries = [query for query in counter.queries
+                          if 'INSERT INTO revisions' in query]
+    self.assertEqual(len(rev_insert_queries), 1)
 
   @ddt.data(
       ("", "In Review", "", True),
@@ -786,6 +820,71 @@ class TestAssessmentImport(TestCase):
       self._check_csv_response(response, expected_warnings)
     else:
       self._check_csv_response(response, {})
+
+  def test_asmt_verified_date_update_from_none(self):
+    """Test that we able to set Verified Date if it is empty"""
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory(audit=audit)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", "user@example.com"),
+        ("Verified Date", "01/22/2019"),
+    ]))
+    self._check_csv_response(response, {})
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).verified_date,
+        datetime.datetime(2019, 1, 22))
+
+  def test_asmt_verified_date_readonly(self):
+    """Test that Verified Date is readonly"""
+    audit = factories.AuditFactory()
+    date = datetime.datetime(2019, 05, 22)
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    verified_date=date)
+    expected_warnings = {
+        'Assessment': {
+            'row_warnings': {
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=3,
+                    column_name="Verified Date"
+                )}}}
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", "user@example.com"),
+        ("Verified Date", "01/21/2019"),
+    ]))
+    self._check_csv_response(response, expected_warnings)
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).verified_date,
+        date)
+
+  @ddt.data("user@example.com", "--")
+  def test_asmt_state_after_updating_verifiers(self, new_verifier):
+    """Test that after updating Verifiers assessment became In Progress"""
+    audit = factories.AuditFactory()
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    status=all_models.Assessment.DONE_STATE,
+                                    )
+    person = factories.PersonFactory(email="verifier@example.com")
+    factories.AccessControlPersonFactory(
+        ac_list=assessment.acr_name_acl_map["Verifiers"],
+        person=person,
+    )
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DONE_STATE)
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", new_verifier),
+    ]))
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.PROGRESS_STATE)
 
 
 @ddt.ddt

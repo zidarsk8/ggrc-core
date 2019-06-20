@@ -13,6 +13,23 @@ export default can.Component.extend({
   leakScope: true,
   viewModel: can.Map.extend({
     withReadMore: false,
+    options: [],
     value: '',
+    define: {
+      items: {
+        get() {
+          const options = this.attr('options');
+          const value = this.attr('value');
+
+          if (options.length && value && typeof(value) === 'string') {
+            return value.split(',')
+              .filter((item) => _.includes(options, item))
+              .map((item) => `<p><i class="fa fa-circle"></i>${item}</p>`)
+              .join('');
+          }
+          return '';
+        },
+      },
+    },
   }),
 });

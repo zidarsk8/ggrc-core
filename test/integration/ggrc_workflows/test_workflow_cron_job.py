@@ -48,6 +48,8 @@ class TestWorkflowCron(workflow_test_case.WorkflowTestCase):
         })
 
     with freezegun.freeze_time(datetime.date(2017, 10, 25)):
+      from ggrc.login import noop
+      noop.login()
       start_recurring_cycles()
 
     workflow_without_admin = all_models.Workflow.query.filter_by(

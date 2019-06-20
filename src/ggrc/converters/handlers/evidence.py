@@ -10,6 +10,7 @@ from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
 from ggrc.converters.handlers.file_handler import FileHandler
+from ggrc.services import signals
 
 
 logger = getLogger(__name__)
@@ -95,8 +96,11 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
 
     for new_link, new_evidence in new_link_map.iteritems():
       if new_link not in old_link_map:
-        all_models.Relationship(source=self.row_converter.obj,
-                                destination=new_evidence)
+        rel_obj = all_models.Relationship(
+            source=self.row_converter.obj,
+            destination=new_evidence
+        )
+        signals.Restful.model_posted.send(rel_obj.__class__, obj=rel_obj)
       else:
         db.session.expunge(new_evidence)
 
@@ -104,8 +108,16 @@ class EvidenceUrlHandler(handlers.ColumnHandler):
       if old_link in new_link_map:
         continue
       if old_evidence.related_destinations:
+        signals.Restful.model_deleted.send(
+            old_evidence.__class__,
+            obj=old_evidence
+        )
         old_evidence.related_destinations.pop()
       elif old_evidence.related_sources:
+        signals.Restful.model_deleted.send(
+            old_evidence.__class__,
+            obj=old_evidence
+        )
         old_evidence.related_sources.pop()
       else:
         logger.warning("Invalid relationship state for document URLs.")

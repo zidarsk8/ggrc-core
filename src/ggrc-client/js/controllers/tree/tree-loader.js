@@ -13,13 +13,9 @@ export default can.Control.extend({
     if (this.element) {
       $footer = this.element.children('.tree-item-add').first();
 
-      if (this.options.is_subtree) {
-        $wrapper = $('<li class="tree-item tree-spinner"/>');
-      } else {
-        $wrapper = $('<div class="tree-spinner"/>');
-      }
+      $wrapper = $('<div class="tree-spinner"/>');
 
-      if (!this.options.is_subtree && !this.element.next().length) {
+      if (!this.element.next().length) {
         $wrapper.css('height', '40px');
       }
 
@@ -60,15 +56,9 @@ export default can.Control.extend({
     return this._prepare_deferred;
   },
 
-  display: function (refetch) {
+  display() {
     let that = this;
     let loader = this.fetch_list.bind(this);
-
-    if (refetch) {
-      this._draw_list_deferred = null;
-      this._display_deferred = null;
-      this.element.slideUp('fast').empty().slideDown();
-    }
 
     if (this._display_deferred) {
       return this._display_deferred;
@@ -79,21 +69,18 @@ export default can.Control.extend({
     this._display_deferred = this._display_deferred
       .then(this._ifNotRemoved(function () {
         let dfds = [loader()];
-        if (that._init_view_deferred) {
-          dfds.push(that._init_view_deferred);
-        } else {
-          dfds.push(that.init_view());
-        }
+
+        dfds.push(that.init_view());
+
         return $.when(...dfds);
       }))
-      .then(that._ifNotRemoved((list, forcePrepareChildren) =>
-        this.draw_list(list, forcePrepareChildren)));
+      .then(that._ifNotRemoved((list) => this.draw_list(list)));
     return this._display_deferred;
   },
 
-  draw_list: function (list, forcePrepareChildren) {
+  draw_list: function (list) {
     // TODO figure out why this happens and fix the root of the problem
-    if (!list && !this.options.list) {
+    if (!list) {
       return undefined;
     }
     if (this._draw_list_deferred) {
@@ -102,12 +89,6 @@ export default can.Control.extend({
     this._draw_list_deferred = $.Deferred();
     if (this.element && !this.element.closest('body').length) {
       return undefined;
-    }
-
-    if (list) {
-      list = list.length === null ? new can.List([list]) : list;
-    } else {
-      list = this.options.list;
     }
 
     // make attributes queue is correct.
@@ -122,11 +103,10 @@ export default can.Control.extend({
     this.clearList();
 
     this.options.attr('original_list', list);
-    this.options.attr('list', []);
     this.on();
 
     this._draw_list_deferred =
-      this.enqueue_items(list, forcePrepareChildren);
+      this.enqueue_items(list);
     return this._draw_list_deferred;
   },
 
@@ -168,40 +148,25 @@ export default can.Control.extend({
     }
   },
 
-  enqueue_items: function (items, forcePrepareChildren) {
+  enqueue_items: function (items) {
     if (!this._pending_items) {
       this._pending_items = [];
       this._loading_started();
     }
 
-    this.insert_items(items, forcePrepareChildren)
+    this.insert_items(items)
       .then(this._ifNotRemoved(() => this._loading_finished()));
 
     return this._loading_deferred;
   },
 
-  insert_items: function (items, forcePrepareChildren) {
+  insert_items: function (items) {
     let that = this;
     let preppedItems = [];
-    let idMap = {};
-    let toInsert;
     let dfd;
 
-    if (this.options.attr('is_subtree')) {
-      // Check the list of items to be inserted for any duplicate items.
-
-      _.forEach(this.options.list, function (item) {
-        idMap[item.instance.type + item.instance.id] = true;
-      });
-      toInsert = _.filter(items, function (item) {
-        return !idMap[item.instance.type + item.instance.id];
-      });
-    } else {
-      toInsert = items;
-    }
-
-    _.forEach(toInsert, function (item) {
-      let prepped = that.prepare_child_options(item, forcePrepareChildren);
+    _.forEach(items, function (item) {
+      let prepped = that.prepare_child_options(item);
       // Should we skip items without selfLink?
       if (prepped.instance.selfLink) {
         preppedItems.push(prepped);
@@ -209,7 +174,6 @@ export default can.Control.extend({
     });
 
     if (preppedItems.length > 0) {
-      this.options.list.push(...preppedItems);
       dfd = this.add_child_lists(preppedItems);
     } else {
       dfd = $.Deferred().resolve();

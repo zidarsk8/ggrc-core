@@ -3,10 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Mappings from '../mappings';
+import * as Mappings from '../mappings';
+import MappingsConfig from '../mappings-ggrc';
 
 describe('Mappings', () => {
-  const types = Mappings.getAllowedToMapModels('MultitypeSearch');
+  const types = MappingsConfig.MultitypeSearch.map;
 
   let modules = {
     core: [
@@ -97,7 +98,7 @@ describe('Mappings', () => {
   };
 
   describe('getAvailableMappings() method', () => {
-    Object.keys(types).forEach(function (type) {
+    types.forEach(function (type) {
       it('returns available types for ' + type, function () {
         let expectedModels = mappingRules[type];
         let result = Mappings.getAvailableMappings(type);

@@ -213,7 +213,7 @@ const DashboardControl = can.Control.extend({
       control.prepare();
     }
 
-    // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
+    // FIXME: Abstraction violation: Sortable/DashboardWidget
     //   controllers should maybe handle this?
     $container = this.get_active_widget_containers().eq(0);
     $lastWidget = $container.find('section.widget').last();

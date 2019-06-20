@@ -9,9 +9,7 @@ import {getCustomAttributableModels} from '../../plugins/utils/models-utils';
 /* class CustomAttributable
   *
   * CustomAttributable does not query the backend, it is used to display a
-  * list of objects in the custom attributes widget. It inherits from
-  * cacheable because it needs getBinding to properly display
-  * CustomAttributeDefinitions as children
+  * list of objects in the custom attributes widget.
   *
   */
 export default Cacheable.extend({

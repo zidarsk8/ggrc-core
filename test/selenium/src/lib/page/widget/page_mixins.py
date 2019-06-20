@@ -42,6 +42,10 @@ class WithPageElements(base.WithBrowser):
     """Returns AssessmentFormField page element."""
     return page_elements.AssessmentFormField(self._browser, label)
 
+  def _assertions_dropdown(self):
+    """Returns AssertionsDropdown page element."""
+    return page_elements.AssertionsDropdown(self._browser)
+
 
 class WithAssignFolder(base.WithBrowser):
   """A mixin for `Assign Folder`"""

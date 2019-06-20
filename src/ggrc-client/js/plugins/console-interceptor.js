@@ -20,7 +20,7 @@ const hideTemplates = [
 const isHidden = function (text) {
   let matched = _.filter(
     hideTemplates,
-    (template) => text.includes(template)
+    (template) => text.includes && text.includes(template)
   );
 
   return !!matched.length;
@@ -35,8 +35,8 @@ console.warn = function (text) {
   originalWarn.apply(this, arguments);
 };
 
-console.log = function (text) {
-  if (isHidden(text)) {
+console.log = function (object) {
+  if (isHidden(String(object))) {
     hiddenLogs.push(arguments);
     return;
   }

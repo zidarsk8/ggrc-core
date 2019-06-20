@@ -1,0 +1,14 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="row-fluid">
+  <div class="span12">
+    <div class="confirm-buttons">
+      <a class="btn btn-small btn-green" data-dismiss="modal" href="javascript://">{{firstnonempty modal_proceed 'Proceed Import'}}</a>
+      <a class="btn btn-small btn-white" data-toggle="confirm" href="javascript://">{{firstnonempty modal_stop 'Stop Import'}}</a>
+    </div>
+  </div>
+</div>
+

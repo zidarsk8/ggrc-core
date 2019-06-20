@@ -4,7 +4,7 @@
 }}
 
 {{#column}}
-  <label class="checkbox-inline" title="{{title}}">
+  <label class="checkbox-inline" title="{{title viewType}}">
     {{#if selected}}
       <input type="checkbox"
         checked="checked"
@@ -19,7 +19,6 @@
         value="{{name}}"
         class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
     {{/if}}
-
-    {{title}}
+    {{title viewType}}
   </label>
 {{/column}}

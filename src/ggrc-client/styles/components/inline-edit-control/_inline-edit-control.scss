@@ -108,11 +108,14 @@ inline-edit-control {
     }
 
     .inline__controls {
+      &.ms-controls {
+        bottom: -30px;
+      }
+      bottom: -31px;
       display: block;
       position: absolute;
       text-align: center;
       top: auto;
-      bottom: -31px;
       right: 0;
       border: 1px solid $warmGray;
       background: $white;
@@ -140,7 +143,7 @@ inline-edit-control {
 
     &--invalid {
       .inline__content-input {
-        border: solid 1px red;
+        outline: solid 1px red;
         border-radius: 2px;
       }
     }

@@ -16,10 +16,8 @@ from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin, environment, browsers
 from lib.constants import messages
-from lib.constants.element import MappingStatusAttrs
-from lib.constants.locator import CommonDropdownMenu
 from lib.decorator import lazy_property
-from lib.entities.entity import Representation
+from lib.entities import entity
 from lib.utils import selenium_utils, help_utils
 
 
@@ -59,7 +57,7 @@ class Test(InstanceRepresentation):
     names (compare objects' collections w/ attributes' values set to None).
     """
     expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
-        Representation.extract_objs(
+        entity.Representation.extract_objs(
             help_utils.convert_to_list(expected_objs),
             help_utils.convert_to_list(actual_objs), *exclude_attrs))
     assert (expected_objs_wo_excluded_attrs ==
@@ -75,10 +73,10 @@ class Test(InstanceRepresentation):
     (compare objects' collections w/ attributes' values set to None).
     """
     expected_obj_wo_excluded_attrs = (
-        Representation.extract_objs_wo_excluded_attrs(
+        entity.Representation.extract_objs_wo_excluded_attrs(
             help_utils.convert_to_list(expected_obj), *exclude_attrs)[0])
     actual_objs_wo_excluded_attrs = (
-        Representation.extract_objs_wo_excluded_attrs(
+        entity.Representation.extract_objs_wo_excluded_attrs(
             help_utils.convert_to_list(actual_objs), *exclude_attrs))
     assert (expected_obj_wo_excluded_attrs in
             actual_objs_wo_excluded_attrs), (
@@ -95,13 +93,13 @@ class Test(InstanceRepresentation):
     pytest's xfail, else pytest's fail.
     """
     expected_excluded_attrs, actual_excluded_attrs = (
-        Representation.extract_simple_collections(
+        entity.Representation.extract_simple_collections(
             help_utils.convert_to_list(expected_objs),
             help_utils.convert_to_list(actual_objs), *exclude_attrs))
     assert_msg = messages.AssertionMessages.format_err_msg_equal(
         expected_excluded_attrs, actual_excluded_attrs)
     is_list_excluded_attrs_equal = (
-        Representation.is_list_of_attrs_equal(
+        entity.Representation.is_list_of_attrs_equal(
             expected_excluded_attrs, actual_excluded_attrs))
     Test.check_xfail_or_fail(
         is_condition=is_list_excluded_attrs_equal, issue_msg=issue_msg,
@@ -332,7 +330,8 @@ class DropdownStatic(Element):
 
   def find_options(self):
     """Find all options of dropdown by options locator"""
-    return self.element.find_elements(*CommonDropdownMenu.DROPDOWN_OPTIONS)
+    return self.element.find_elements(
+        *constants.locator.CommonDropdownMenu.DROPDOWN_OPTIONS)
 
   def select(self, member_name):
     """Selects dropdown element based on dropdown element value."""
@@ -839,9 +838,21 @@ class CommentsPanel(Element):
     self._items = [
         CommentItem(self._driver, element) for element in
         self.element.find_elements(*self._locators.ITEMS_CSS)]
-    return [
-        {"modified_by": item.author.text, "created_at": item.datetime,
-         "description": item.content.text} for item in self._items]
+    comments = []
+    for item in self._items:
+      description = item.content.text
+      # reviewers emails in review comment message need to be sorted as they
+      # are displayed in UI in random order
+      if (re.compile(constants.element.Common.REVIEW_COMMENT_REGEXP).
+         match(description)):
+        splited_description = description.split('\n')
+        splited_description[1] = ', '.join(
+            sorted(splited_description[1].split(', ')))
+        description = '\n'.join(splited_description)
+      comments.append({"modified_by": item.author.text,
+                       "created_at": item.datetime,
+                       "description": description})
+    return comments
 
   @property
   def count(self):
@@ -950,7 +961,8 @@ class ListCheckboxes(Component):
     objs_titles = self._driver.find_elements(*self.locator_titles)
     objs_checkboxes = self._driver.find_elements(*self.locator_checkboxes)
     objs = [
-        MappingStatusAttrs(obj[0], obj[1][0], obj[1][1]) for obj in zip(
+        constants.element.MappingStatusAttrs(
+            obj[0], obj[1][0], obj[1][1]) for obj in zip(
             [obj.text for obj in objs_titles],
             [[obj.is_selected(),
               not obj.is_enabled()]
@@ -999,9 +1011,10 @@ class ElementsList(Component):
     "self.item_class" property.
     """
     if not self._items:
-      self._items = [self.item_class(self._driver, el) for el in
-                     self.list_element.find_elements(
-                         *CommonDropdownMenu.DROPDOWN_ITEMS_CSS)]
+      self._items = [
+          self.item_class(self._driver, el) for el in
+          self.list_element.find_elements(
+              *constants.locator.CommonDropdownMenu.DROPDOWN_ITEMS_CSS)]
     return self._items
 
   def get_item(self, text):

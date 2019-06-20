@@ -15,8 +15,9 @@ from ggrc import db
 from ggrc.utils import errors
 from ggrc.models.mixins import attributevalidator
 from ggrc import builder
-from ggrc.models.mixins import base
 from ggrc.models import mixins
+from ggrc.models.mixins import after_flush_handleable
+from ggrc.models.mixins import base
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.access_control import role as acr
 from ggrc.models.exceptions import ValidationError
@@ -39,6 +40,7 @@ def get_inflector_model_name_dict():
 
 class CustomAttributeDefinition(attributevalidator.AttributeValidator,
                                 base.ContextRBAC, mixins.Base, mixins.Titled,
+                                after_flush_handleable.AfterFlushHandleable,
                                 db.Model):
   """Custom attribute definition model.
 
@@ -106,6 +108,16 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     """Check if CAD is Global CAD"""
     return not self.is_lca
 
+  def validate_gca_person_type(self):
+    """Custom attributes with Person type not allowed for GCA"""
+    if self.is_gca and self.attribute_type == "Map:Person":
+      raise ValidationError("Invalid attribute_type: 'Map:Person' "
+                            "is not allowed for Global Custom Attributes")
+
+  def handle_after_flush(self):
+    """Validate object 'after flash' sqlalchemy event"""
+    self.validate_gca_person_type()
+
   _extra_table_args = (
       UniqueConstraint('definition_type', 'definition_id', 'title',
                        name='uq_custom_attribute'),
@@ -165,11 +177,13 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     RICH_TEXT = "Rich Text"
     DROPDOWN = "Dropdown"
     CHECKBOX = "Checkbox"
+    MULTISELECT = "Multiselect"
     DATE = "Date"
     MAP = "Map"
 
     DEFAULT_VALUE = {
         CHECKBOX: "0",
+        MULTISELECT: "",
         RICH_TEXT: "",
         TEXT: "",
         DROPDOWN: "",
@@ -197,6 +211,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       "Rich Text": "Rich Text",
       "Dropdown": "Dropdown",
       "Checkbox": "Checkbox",
+      "Multiselect": "Multiselect",
       "Date": "Date",
       "Person": "Map:Person",
   }
@@ -220,10 +235,10 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       value_list = [part.strip() for part in value.split(",")]
       value_set = set(value_list)
       if len(value_set) != len(value_list):
-        raise ValidationError("Duplicate dropdown options are not allowed: "
+        raise ValidationError("Duplicate attribute options are not allowed: "
                               "'{}'".format(value))
       if "" in value_set:
-        raise ValidationError("Empty dropdown options are not allowed: '{}'"
+        raise ValidationError("Empty attribute options are not allowed: '{}'"
                               .format(value))
       value = ",".join(value_list)
 

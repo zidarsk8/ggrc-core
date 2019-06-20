@@ -120,7 +120,6 @@
     .header,
     .filter,
     .headline,
-    .pbc-one-row,
     .tree-structure .item-main {
       .row-fluid {
         [class*="span"] {
@@ -189,42 +188,6 @@
           [class*="span"] + [class*="span"] {
             margin-left: 2.127659574468085%;
           }
-        }
-      }
-    }
-  }
-
-  .widget-filters {
-    select {
-      margin-bottom: 20px;
-    }
-    input {
-      margin-bottom: 20px;
-    }
-    .btn-reset {
-      float: none;
-      clear: both;
-      display: block;
-    }
-    label {
-      &.label-title {
-        float: none;
-        clear: both;
-        padding-bottom: 10px;
-      }
-    }
-  }
-
-  .pbc-ca {
-    .ca-fields {
-      a {
-        display: inline-block;
-      }
-      span {
-        // @extend %oneline;
-        display: block;
-        &.left-space {
-          margin-right: 0;
         }
       }
     }

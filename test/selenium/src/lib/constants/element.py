@@ -123,9 +123,11 @@ class AdminWidgetCustomAttributes(object):
   RICH_TEXT = "Rich Text"
   DATE = "Date"
   CHECKBOX = "Checkbox"
+  MULTISELECT = "Multiselect"
   DROPDOWN = "Dropdown"
   PERSON = "Map:Person"
-  ALL_CA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
+  ALL_GCA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, MULTISELECT, DROPDOWN)
+  ALL_CA_TYPES = ALL_GCA_TYPES + (PERSON, )
 
 
 class Base(object):
@@ -140,6 +142,7 @@ class Base(object):
 class Common(object):
   """Common elements' labels and properties for objects."""
   TITLE = "Title"
+  TITLE_EDITED_PART = "[EDITED]"
   DESCRIPTION = "Description"
   CODE = "Code"
   STATE = Base.STATE
@@ -153,8 +156,11 @@ class Common(object):
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   OTHERS = "Others"
   OBJECT_REVIEW = "Object review"
-  APPROVED_DATE_REGEX = r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M " \
-                        r"(\+|\-)\d{2}:\d{2}"
+  REVIEW_COMMENT_PATTERN = (
+      "Review requested from\n{emails}\nwith a comment: {comment}")
+  REVIEW_COMMENT_REGEXP = r"Review requested from\n.*\nwith a comment: .*"
+  APPROVED_DATE_REGEX = (
+      r"\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2} (A|P)M (\+|\-)\d{2}:\d{2}")
 
 
 class CommonModalCreate(object):
@@ -302,7 +308,6 @@ class ControlInfoWidget(CommonControl):
 class AssessmentInfoWidget(CommonAssessment):
   """Elements' labels and properties for Assessments Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAssessment.ASMT)
-  TITLE_EDITED_PART = "[EDITED]"
 
 
 class IssueInfoWidget(CommonIssue):

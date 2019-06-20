@@ -21,7 +21,6 @@ export default Cacheable.extend({
     workflow: Stub,
     modified_by: Stub,
     context: Stub,
-    end_date: 'date',
   },
 
   tree_view_options: {

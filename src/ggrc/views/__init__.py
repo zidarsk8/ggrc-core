@@ -279,6 +279,7 @@ def _merge_errors(create_errors, update_errors):
 
 @app.route("/_background_tasks/update_cad_related_objects", methods=["POST"])
 @background_task.queued_task
+@helpers.without_sqlalchemy_cache
 def update_cad_related_objects(task):
   """Update CAD related objects"""
   event_id = task.parameters.get("event_id")

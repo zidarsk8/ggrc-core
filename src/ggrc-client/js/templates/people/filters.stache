@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="tree-filter__inline-filtering sticky-filter search-filters">
+<div class="tree-filter__inline-filtering search-filters">
   <form onsubmit="return false" autocomplete="off">
     <div class="row-fluid">
       <div class="span3">
@@ -53,7 +53,7 @@
     </div>
     <div class="span2">
       <div class="oneline">
-        Authorizations
+        System Authorizations
       </div>
     </div>
     <div class="span2">

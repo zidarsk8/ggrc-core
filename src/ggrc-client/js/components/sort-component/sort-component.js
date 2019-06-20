@@ -19,7 +19,7 @@ export default can.Component.extend({
     '{viewModel.items} change'() {
       this.viewModel.sort();
     },
-    inserted() {
+    init() {
       this.viewModel.sort();
     },
   },

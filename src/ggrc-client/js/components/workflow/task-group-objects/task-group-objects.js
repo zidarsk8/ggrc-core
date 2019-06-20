@@ -13,7 +13,7 @@ import {
 } from '../../../plugins/utils/query-api-utils';
 
 import Stub from '../../../models/stub';
-import Mappings from '../../../models/mappers/mappings';
+import {getMappingList} from '../../../models/mappers/mappings';
 import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const requiredObjectsFields = ['id', 'type', 'title'];
@@ -35,7 +35,7 @@ const viewModel = can.Map.extend({
     };
   },
   async initTaskGroupItems() {
-    const mappingTypes = Mappings.getMappingList('TaskGroup');
+    const mappingTypes = getMappingList('TaskGroup');
     const mappedObjects = await loadObjectsByTypes(
       this.attr('taskGroup'),
       mappingTypes,

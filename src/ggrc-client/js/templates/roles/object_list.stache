@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{! dashboard object listing}}
 <ul class="tree-structure new-tree">
   {{#list}}
     <li class="tree-item role" data-model="true" {{canData 'model'}}>
@@ -14,7 +13,7 @@
               <div class="row-fluid">
                 <div class="span8">
                   <div class="title tree-title-area">
-                    {{pretty_role_name name}}
+                    {{name}}
                   </div>
                 </div>
                 <div class="span4">

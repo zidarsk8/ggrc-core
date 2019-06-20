@@ -40,7 +40,7 @@ class TestRevisionHistory(TestCase):
       factories.AccessControlRoleFactory(
           name="ACL_Editor",
           object_type="Control"
-      ),
+      )
 
     with factories.single_commit():
       self.control = factories.ControlFactory()
@@ -180,9 +180,9 @@ class TestRevisionHistory(TestCase):
     person = factories.PersonFactory()
     cad = factories.CustomAttributeDefinitionFactory(
         definition_type="control",
-        definition_id=None,
+        definition_id=self.control.id,
         attribute_type="Map:Person",
-        title="Global Person CA",
+        title="Local Person CA",
     )
     factories.CustomAttributeValueFactory(
         attributable=self.control,
@@ -239,10 +239,10 @@ class TestRevisionHistory(TestCase):
   @ddt.data(
       {"factory": factories.ControlFactory,
        "fields": ['test_plan', 'status', 'notes',
-                  'description', 'title', 'slug', 'folder']},
+                  'description', 'title']},
       {"factory": factories.RiskFactory,
        "fields": ['test_plan', 'status', 'description', 'external_id',
-                  'notes', 'title', 'slug', 'folder']},
+                  'notes', 'title']},
   )
   @ddt.unpack
   def test_get_mandatory_fields(self, factory, fields):

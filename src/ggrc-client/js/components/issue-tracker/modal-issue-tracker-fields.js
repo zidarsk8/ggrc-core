@@ -15,15 +15,16 @@ export default can.Component.extend({
     instance: {},
     note: '',
     linkingNote: '',
+    mandatoryTicketIdNote: '',
     setIssueTitle: false,
     allowToChangeId: false,
     isTicketIdMandatory: false,
     setTicketIdMandatory() {
       let instance = this.attr('instance');
 
-      if (instance.class.model_singular === 'Issue') {
+      if (instance.class.unchangeableIssueTrackerIdStatuses) {
         this.attr('isTicketIdMandatory',
-          ['Fixed', 'Fixed and Verified', 'Deprecated']
+          instance.class.unchangeableIssueTrackerIdStatuses
             .includes(instance.attr('status')));
       }
     },

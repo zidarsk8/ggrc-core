@@ -105,7 +105,7 @@ describe('advanced-search-filter-attribute component', function () {
     function () {
       viewModel.attr('attribute.value', 'value');
 
-      handler.call(that, viewModel.attribute, {}, 'is');
+      handler.call(that, [viewModel.attribute], {}, 'is');
 
       let result = viewModel.attr('attribute.value');
       expect(result).toEqual('empty');
@@ -116,7 +116,7 @@ describe('advanced-search-filter-attribute component', function () {
     function () {
       viewModel.attr('attribute.value', 'value');
 
-      handler.call(that, viewModel.attribute, {}, 'val', 'is');
+      handler.call(that, [viewModel.attribute], {}, 'val', 'is');
 
       let result = viewModel.attr('attribute.value');
       expect(result).toEqual('');

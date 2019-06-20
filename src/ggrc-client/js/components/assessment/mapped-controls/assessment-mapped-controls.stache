@@ -8,7 +8,7 @@
             <read-more
               class="description"
               text:from="itemData.description"
-              handleMarkdown:from="instance.constructor.isChangeableExternally">
+              handleMarkdown:from="true">
             </read-more>
             <div class="more-information-wrapper">
                 <button type="button" class="btn btn-link more-information-button">More Information</button>
@@ -25,7 +25,7 @@
     <div class="simple-modal__header flex-box">
         <div class="simple-modal__header-text mapped-controls-info__header-text flex-size-1">
             <div class="mapped-controls-info__title">
-                <span class="mapped-controls-info__title-text">{{assessmentType}}:</span>
+                <span class="mapped-controls-info__title-text">{{instance.constructor.title_singular}}:</span>
                 {{instance.title}}
             </div>
             <span class="mapped-controls-info__title-state state-value snapshot">
@@ -57,7 +57,7 @@
         {{/if}}
 
         {{^if withoutDetails}}
-        <collapsible-panel titleText:from="'{{assessmentType}} Info'"
+        <collapsible-panel titleText:from="'{{instance.constructor.title_singular}} Info'"
                            expanded:from="true">
             <detailed-business-object-list-item instance:from="instance"
                                                 customAttributes:from="customAttributes"
@@ -73,7 +73,7 @@
           </div>
         {{/if}}
         {{^if withoutDetails}}
-          {{#is assessmentType 'Control'}}
+          {{#is instance.type 'Control'}}
             <mapped-control-related-objects class="mapped-controls-info__related-objects"
                                                        titleText:from="'Show Related Requirements ({{requirements.length}})'"
                                                        type:from="'Requirement'"

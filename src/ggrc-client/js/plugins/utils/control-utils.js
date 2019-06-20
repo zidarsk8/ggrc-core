@@ -14,5 +14,6 @@ export const CONTROL_TYPE = {
   DATE: 'date',
   PERSON: 'person',
   CHECKBOX: 'checkbox',
+  MULTISELECT: 'multiselect',
   DROPDOWN: 'dropdown',
 };

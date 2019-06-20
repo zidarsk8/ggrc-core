@@ -6,7 +6,7 @@
 import RefreshQueue from '../../../models/refresh_queue';
 import Component from '../object-generator';
 import Program from '../../../models/business-models/program';
-import Mappings from '../../../models/mappers/mappings';
+import * as modelsUtils from '../../../plugins/utils/models-utils';
 
 describe('object-generator component', function () {
   'use strict';
@@ -74,14 +74,14 @@ describe('object-generator component', function () {
         });
 
         it('returns grouped snapshotable objects', () => {
-          spyOn(Mappings, 'groupTypes')
+          spyOn(modelsUtils, 'groupTypes')
             .and.returnValue('grouped snapshotable objects');
 
           expect(viewModel.availableTypes())
             .toEqual('grouped snapshotable objects');
-          expect(Mappings.groupTypes)
+          expect(modelsUtils.groupTypes)
             .toHaveBeenCalledWith(GGRC.config.snapshotable_objects);
-          expect(Mappings.groupTypes).toHaveBeenCalledTimes(1);
+          expect(modelsUtils.groupTypes).toHaveBeenCalledTimes(1);
         });
       });
     });
@@ -216,19 +216,19 @@ describe('object-generator component', function () {
 
     it('sets false to block_type_change if value is empty',
       function () {
-        handler.call({viewModel: viewModel});
+        handler.call({viewModel: viewModel}, []);
         expect(viewModel.attr('block_type_change'))
           .toEqual(false);
       });
     it('sets true to block_type_change if value is not empty',
       function () {
-        handler.call({viewModel: viewModel}, viewModel, {}, 'mock-value');
+        handler.call({viewModel: viewModel}, [viewModel], {}, 'mock-value');
         expect(viewModel.attr('block_type_change'))
           .toEqual(true);
       });
     it('sets type to type if value is not empty',
       function () {
-        handler.call({viewModel: viewModel}, viewModel, {}, 'mock-value');
+        handler.call({viewModel: viewModel}, [viewModel], {}, 'mock-value');
         expect(viewModel.attr('type'))
           .toEqual('value');
       });

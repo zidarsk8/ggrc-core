@@ -102,7 +102,7 @@ export default can.Component.extend({
         this.viewModel.attr('attribute.field', attributes[0].attr_title);
       }
     },
-    '{viewModel.attribute} operator'(attribute, ev, newValue, oldValue) {
+    '{viewModel.attribute} operator'([attribute], ev, newValue, oldValue) {
       if (newValue === 'is') {
         attribute.attr('value', 'empty');
         return;

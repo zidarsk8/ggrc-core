@@ -20,6 +20,10 @@ $historyBlockWidth: 350px;
   background: $white;
 }
 
+.margin-top-20 {
+  margin-top: 20px;
+}
+
 .csv-import {
   @include box-shadow(0 3px 3px -3px rgba(0,0,0, 0.3));
   font-size: 13px;
@@ -133,17 +137,6 @@ $historyBlockWidth: 350px;
     }
   }
 
-  .margin-top-20 {
-    margin-top: 20px;
-  }
-
-  .btn-fixed {
-    float: left;
-    i {
-      @include opacity(1);
-      margin-top: 4px;
-    }
-  }
   .import-progress {
     float: left;
     width: 300px;
@@ -294,10 +287,6 @@ $historyBlockWidth: 350px;
     &__item {
       padding: 20px 30px;
       border-bottom: 1px solid $itemBorder;
-
-      .btn-stop {
-        margin-left: 10px;
-      }
 
       &.disabled {
         @include opacity(0.5);

@@ -128,8 +128,7 @@ export default can.Component.extend({
       viewModel.setRevisionFolder();
     },
 
-    '{viewModel.instance} change': function (inst, ev, attr) {
-      // Error recovery from previous refresh_instances error when we couldn't set up the binding.
+    '{viewModel.instance} change': function () {
       if (!this.viewModel.folder_error) {
         return;
       }
@@ -146,7 +145,7 @@ export default can.Component.extend({
      * @param {Object} ev - The event object.
      * @return {Object} - Deferred chain.
      */
-    'a[data-toggle=gdrive-remover] click': function (el, ev) {
+    'a[data-toggle=gdrive-remover] click': function () {
       let viewModel = this.viewModel;
       let dfd;
 
@@ -159,7 +158,7 @@ export default can.Component.extend({
 
       return dfd.then(viewModel.unsetCurrent.bind(viewModel));
     },
-    'a[data-toggle=gdrive-picker] click': function (el, ev) {
+    'a[data-toggle=gdrive-picker] click': function (el) {
       uploadFiles({
         parentId: el.data('folder-id'),
         pickFolder: el.data('type') === 'folders',

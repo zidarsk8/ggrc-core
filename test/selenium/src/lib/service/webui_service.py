@@ -467,6 +467,15 @@ class BaseWebUiService(object):
     obj_page = self.open_info_page_of_obj(obj)
     obj_page.fill_global_cas_inline(custom_attributes)
 
+  def has_gca_inline_edit(self, obj, ca_type):
+    """Checks if edit_inline is open for selected gca."""
+    obj_page = self.open_info_page_of_obj(obj)
+    ca_title = next(
+        x for x in obj_page.get_custom_attributes().keys()
+        if ca_type.lower() in x.lower()
+    )
+    return obj_page.has_ca_inline_edit(ca_title)
+
   def edit_obj_via_edit_modal_from_info_page(self, obj):
     """Open generic widget of object, open edit modal from drop down menu.
     Modify current title and code and then apply changes by pressing
@@ -700,8 +709,7 @@ class AssessmentsService(BaseWebUiService):
   def choose_and_fill_dropdown_lca(self, asmt, dropdown, **kwargs):
     """Fill dropdown LCA for Assessment."""
     asmt_info = self.open_info_page_of_obj(asmt)
-    asmt_info.choose_and_fill_dropdown_lca(
-        dropdown.id, dropdown.multi_choice_options, **kwargs)
+    asmt_info.choose_and_fill_dropdown_lca(dropdown, **kwargs)
 
 
 class ControlsService(SnapshotsWebUiService):
@@ -753,3 +761,9 @@ class ProgramsService(BaseWebUiService):
     obj_modal = unified_mapper.CommonUnifiedMapperModal(
         self.driver, obj).click_create_and_map_obj()
     return obj_modal
+
+
+class ProductsService(BaseWebUiService):
+  """Class for Programs business layer's services objects."""
+  def __init__(self, driver):
+    super(ProductsService, self).__init__(driver, objects.PRODUCTS)

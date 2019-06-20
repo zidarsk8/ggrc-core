@@ -13,6 +13,7 @@ export default can.Component.extend({
   view: can.stache(template),
   leakScope: true,
   viewModel: can.Map.extend({
+    isLocalCa: false,
     fields: [],
     editMode: false,
     fieldValueChanged: function (e, field) {

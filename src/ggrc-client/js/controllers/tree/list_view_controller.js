@@ -34,7 +34,6 @@ export default TreeLoader.extend({
     list_view: null,
     list_objects: null,
     list_loader: null,
-    tooltip_view: '/static/templates/dashboard/object_tooltip.stache',
   },
 }, {
   init: function () {

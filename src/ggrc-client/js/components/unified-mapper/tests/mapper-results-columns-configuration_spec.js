@@ -50,6 +50,20 @@ describe('mapper-results-columns-configuration component', function () {
       });
   });
 
+  describe('set() of viewModel.serviceColumns', function () {
+    beforeEach(function () {
+      spyOn(TreeViewUtils, 'getVisibleColumnsConfig').and.returnValue(456);
+    });
+
+    it('updates value of viewModel.serviceColumns with the result of ' +
+    'TreeViewUtils.getVisibleColumnsConfig function', function () {
+      viewModel.attr('serviceColumns', 123);
+      expect(TreeViewUtils.getVisibleColumnsConfig)
+        .toHaveBeenCalledWith(123, 123);
+      expect(viewModel.serviceColumns).toEqual(456);
+    });
+  });
+
   describe('init() method', function () {
     beforeEach(function () {
       spyOn(viewModel, 'initializeColumns');

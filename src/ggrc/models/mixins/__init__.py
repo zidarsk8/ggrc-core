@@ -468,7 +468,9 @@ class Slugged(Base):
     return ()
 
   # REST properties
-  _api_attrs = reflection.ApiAttributes('slug')
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute('slug', update=False)
+  )
   _fulltext_attrs = ['slug']
   _sanitize_html = ['slug']
   _aliases = {
@@ -716,7 +718,9 @@ class Folderable(WithProtectedAttributes):
         orm.Load(cls).load_only("folder"),
     )
 
-  _api_attrs = reflection.ApiAttributes('folder')
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute('folder', update=False),
+  )
   _fulltext_attrs = ['folder']
   _aliases = {"folder": "Folder"}
 

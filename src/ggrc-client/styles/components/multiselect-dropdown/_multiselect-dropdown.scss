@@ -4,7 +4,9 @@
  */
 
 .multiselect-dropdown {
-  max-width: 350px;
+  &:not(.inline) {
+    max-width: 350px;
+  }
   min-width: 150px;
 
   .dropdown-focus {
@@ -25,12 +27,12 @@
     cursor: pointer;
     user-select: none;
     text-overflow: ellipsis;
-    background-color: white;
+    background-color: $white;
     border-radius: 2px;
     color: rgb(85, 85, 85);
     font-size: 12px;
 
-    &:focus {
+    &.highlightable:focus {
       @extend .dropdown-focus;
     }
     &[disabled] {
@@ -43,6 +45,8 @@
   }
 
   label.multiselect-dropdown__label {
+    display: flex;
+    word-break: break-word;
     width: 96%;
     margin: 0;
     padding: 2px 0 2px 5px;
@@ -55,11 +59,17 @@
   }
 
   input[type="checkbox"].multiselect-dropdown__checkbox {
+    position: relative;
+    top: 2px;
     margin: 0 3px;
   }
 
   .multiselect-dropdown {
     &__body {
+      &.inline {
+        position: initial;
+        box-shadow: none;
+      }
       position: absolute;
       box-sizing: border-box;
       width: 100%;
@@ -84,7 +94,7 @@
 
     &__element {
       &:hover {
-        background-color: #4599FE;
+        background-color: $dropdown-element-hover;
       }
     }
 

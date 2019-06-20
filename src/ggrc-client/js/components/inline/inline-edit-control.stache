@@ -40,17 +40,19 @@
               on:valueChanged="fieldValueChanged(scope.event)"
             ></checkbox-form-field>
           {{/case}}
+          {{#case "multiselect"}}
+            <multiselect-form-field value:from="value"
+              class="inline__content-input"
+              options:from="dropdownOptions"
+              on:valueChanged="fieldValueChanged(scope.event)"
+              isInlineMode:from="true"
+            ></multiselect-form-field>
+          {{/case}}
            {{#case "date"}}
             <date-form-field value:from="value"
               class="inline__content-input"
               on:valueChanged="fieldValueChanged(scope.event)"
             ></date-form-field>
-          {{/case}}
-          {{#case "person"}}
-            <person-form-field value:from="value"
-              class="inline__content-input"
-              on:valueChanged="fieldValueChanged(scope.event)"
-            ></person-form-field>
           {{/case}}
           {{#case "number"}}
             <numberbox-form-field value:from="value"
@@ -67,7 +69,7 @@
           {{/case}}
         {{/switch}}
 
-        <ul class="inline__controls">
+        <ul class="inline__controls {{#is(type, "multiselect")}}ms-controls{{/is}}">
           <li class="inline__controls-item">
             <a class="inline__controls-link" href="javascript://" on:el:click="save()">
               <i class="fa fa-check"></i>
@@ -87,6 +89,7 @@
     <div class="inline__content-wrapper">
         <readonly-inline-content value:from="value"
           class="inline__content {{#if editMode}}inline--hidden{{/if}}"
+          options:from="dropdownOptions"
           withReadMore:from="withReadMore">
         </readonly-inline-content>
     </div>

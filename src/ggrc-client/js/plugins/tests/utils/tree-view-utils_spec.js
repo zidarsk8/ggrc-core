@@ -7,8 +7,6 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
-import Mappings from '../../../models/mappers/mappings';
-
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 import Control from '../../../models/business-models/control';
 
@@ -170,12 +168,66 @@ describe('TreeViewUtils module', function () {
       expect(result.available.length).toEqual(32);
       expect(result.selected.length).toEqual(32);
     });
+  });
 
-    it('gets available models from Mappings for CycleTaskGroupObjectTask',
-      () => {
-        spyOn(Mappings, 'getMappingList').and.returnValue(['Audit', 'Control']);
-        let result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
-        expect(result.available.length).toEqual(2);
+  describe('loadFirstTierItems() method', function () {
+    let modelName;
+    let parent;
+    let pageInfo;
+    let filter;
+    let request;
+    let transformToSnapshot;
+    let operation;
+    let source;
+
+    beforeEach(() => {
+      modelName = 'Program';
+      parent = {
+        type: 'testParentType',
+        id: 123,
+      };
+      pageInfo = {};
+      filter = {testFilter: true};
+      request = new can.List();
+      transformToSnapshot = false;
+      operation = 'owned';
+      source = {type: 'Program'};
+
+      spyOn(QueryApiUtils, 'buildParam')
+        .and.returnValue({object_name: 'testName'});
+      spyOn(QueryApiUtils, 'batchRequests')
+        .and.returnValue($.Deferred().resolve({testName: {values: [source]}}));
+    });
+
+    it('returns correct result', function (done) {
+      let expectedResult = {
+        values: [jasmine.objectContaining(source)],
+      };
+      module.loadFirstTierItems(
+        modelName,
+        parent,
+        pageInfo,
+        filter,
+        request,
+        transformToSnapshot,
+        operation,
+      ).then((response) => {
+        expect(response).toEqual(expectedResult);
+        done();
+      });
+    });
+  });
+
+  describe('makeRelevantExpression() method', function () {
+    it('returns expression for load items for 1st level of tree view',
+      function () {
+        let result = module.makeRelevantExpression(
+          'Audit', 'Program', 123, 'owned');
+        expect(result).toEqual({
+          type: 'Program',
+          id: 123,
+          operation: 'owned',
+        });
       });
   });
 
@@ -184,6 +236,8 @@ describe('TreeViewUtils module', function () {
     let parent;
     let filter;
     let request;
+    let transformToSnapshot;
+    let operation;
 
     beforeEach(() => {
       spyOn(ImportExportUtils, 'runExport');
@@ -199,15 +253,18 @@ describe('TreeViewUtils module', function () {
       };
       filter = {testFilter: true};
       request = new can.List();
+      transformToSnapshot = '';
+      operation = 'owned';
     });
 
     it('builds request params correctly', () => {
-      module.startExport(modelName, parent, filter, request);
+      module.startExport(
+        modelName, parent, filter, request, transformToSnapshot, operation);
 
       expect(QueryApiUtils.buildParam).toHaveBeenCalledWith(
         modelName,
         {},
-        {type: parent.type, id: parent.id, operation: 'owned'},
+        {type: parent.type, id: parent.id, operation},
         'all',
         filter);
     });

@@ -7,7 +7,15 @@ from lib.page.widget import object_modal
 from lib.utils import selenium_utils
 
 
-class CommonUnifiedMapperModal(object_modal.BaseObjectModal):
+class BaseUnifiedMapperModal(object_modal.BaseObjectModal):
+  """Represents unified mapper object modal."""
+
+  def __init__(self, driver=None):
+    super(BaseUnifiedMapperModal, self).__init__(driver)
+    self._root = self._browser.element(css=locator.Common.MODAL_MAPPER)
+
+
+class CommonUnifiedMapperModal(BaseUnifiedMapperModal):
   """Common unified mapper modal."""
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=inconsistent-return-statements
@@ -34,6 +42,9 @@ class CommonUnifiedMapperModal(object_modal.BaseObjectModal):
     self.open_in_new_frontend_btn = self._browser.link(
         class_name=["btn", "btn-small", "btn-white"],
         text="Open in new frontend")
+    self._create_and_map_obj_btn = self._browser.element(
+        class_name="modal-header").button(text="Create and map new object")
+    self._obj_type_select = self._browser.element(name="type-select")
 
   def get_available_to_map_obj_aliases(self):
     """Return texts of all objects available to map via UnifiedMapper."""
@@ -172,10 +183,11 @@ class CommonUnifiedMapperModal(object_modal.BaseObjectModal):
   def click_create_and_map_obj(self):
     """Clicks `Create and map new object` link
     and returns new modal for object."""
-    self._browser.element(class_name="modal-header").button(
-        text="Create and map new object").click()
+    _selected_obj_type = next(
+        x.label for x in self._obj_type_select.options() if x.selected)
+    self._create_and_map_obj_btn.click()
     return object_modal.get_modal_obj(
-        obj_type=objects.get_singular(self.tree_view.obj_name))
+        obj_type=objects.get_singular(_selected_obj_type))
 
 
 class MapObjectsModal(CommonUnifiedMapperModal):

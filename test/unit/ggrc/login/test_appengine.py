@@ -37,7 +37,7 @@ class TestAppengineLogin(unittest.TestCase):
     self.person_mock = self.person_patcher.start()
 
     self.is_ext_user_email_patcher = mock.patch(
-        "ggrc.login.common.is_external_app_user_email")
+        "ggrc.login.common.is_app_2_app_user_email")
     self.is_ext_user_email_mock = self.is_ext_user_email_patcher.start()
 
     self.find_or_create_ext_app_user_patcher = mock.patch(
@@ -77,30 +77,6 @@ class TestAppengineLogin(unittest.TestCase):
 
     with self.assertRaises(exceptions.BadRequest):
       login_appengine.request_loader(self.request)
-
-  @ddt.data("X-ggrc-user", "X-external-user")
-  def test_request_loader_user_invalid_json(self, header):
-    """HTTP400 if user header contains invalid json."""
-    self.request.headers[header] = "not a valid json"
-
-    with self.assertRaises(exceptions.BadRequest):
-      login_appengine.request_loader(self.request)
-
-  @ddt.data("X-ggrc-user", "X-external-user")
-  def test_request_loader_user_incomplete_json(self, header):
-    """HTTP400 if user header contains json with no email."""
-    self.request.headers[header] = "{}"
-
-    with self.assertRaises(exceptions.BadRequest):
-      login_appengine.request_loader(self.request)
-
-  @ddt.data("X-ggrc-user", "X-external-user")
-  def test_request_loader_user_non_dict_json(self, header):
-    """HTTP400 if user header contains json with not a dict."""
-    for value in ("[]", "12"):
-      self.request.headers[header] = value
-      with self.assertRaises(exceptions.BadRequest):
-        login_appengine.request_loader(self.request)
 
   def test_request_loader_user_not_registered(self):
     """HTTP400 if user header contains json with unknown user."""

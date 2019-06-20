@@ -6,7 +6,10 @@
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 import '../issue/issue-unmap-item';
 import template from './unmap-dropdown-item.stache';
-import Mappings from '../../models/mappers/mappings';
+import {
+  allowedToUnmap,
+  shouldBeMappedExternally,
+} from '../../models/mappers/mappings';
 import {
   isAllObjects,
   isMyWork,
@@ -52,7 +55,7 @@ export default can.Component.extend({
           let destination = this.attr('instance');
           let options = this.attr('options');
 
-          return Mappings.allowedToUnmap(source, destination)
+          return allowedToUnmap(source, destination)
             && !(isAllObjects() || isMyWork())
             && options.attr('isDirectlyRelated')
             && !this.attr('denyIssueUnmap')
@@ -64,7 +67,7 @@ export default can.Component.extend({
           let source = this.attr('page_instance.type');
           let destination = this.attr('instance.type');
 
-          return Mappings.shouldBeMappedExternally(source, destination);
+          return shouldBeMappedExternally(source, destination);
         },
       },
     },

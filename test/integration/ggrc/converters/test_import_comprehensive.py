@@ -210,7 +210,7 @@ class TestComprehensiveSheets(TestCase):
     self.assertEqual(prog.description, "test")
 
     custom_vals = [v.attribute_value for v in prog.custom_attribute_values]
-    expected_custom_vals = ['0', 'a', '2015-12-12', 'test1']
+    expected_custom_vals = ['0', 'a', '2015-12-12', 'test1', u'']
     self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
   @unittest.skip("unskip when import/export fixed for workflows")
@@ -297,7 +297,7 @@ class TestComprehensiveSheets(TestCase):
                 errors.UNSUPPORTED_MAPPING.format(
                     line=6,
                     obj_a="Program",
-                    obj_b="program",
+                    obj_b="Program",
                     column_name="map:program"
                 ),
             },
@@ -352,6 +352,8 @@ class TestComprehensiveSheets(TestCase):
     gen("program", title="my_checkbox", attribute_type="Checkbox")
     gen("program", title="my_dropdown", attribute_type="Dropdown",
         options="a,b,c,d")
+    gen("program", title="my_multiselect", attribute_type="Multiselect",
+        options="yes,no")
     # gen("program", title="my_description", attribute_type="Rich Text")
 
   def test_case_sensitive_slugs(self):

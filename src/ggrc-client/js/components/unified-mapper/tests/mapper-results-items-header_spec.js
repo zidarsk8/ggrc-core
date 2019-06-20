@@ -15,6 +15,15 @@ describe('mapper-results-items-header component', function () {
     viewModel = getComponentVM(Component);
   });
 
+  describe('aggregatedColumns()', () => {
+    it('should concat columns and serviceColumns attributes', () => {
+      viewModel.attr('columns', [0, 1]);
+      viewModel.attr('serviceColumns', [2]);
+      const result = viewModel.aggregatedColumns();
+      expect(can.makeArray(result)).toEqual([0, 1, 2]);
+    });
+  });
+
   describe('isSorted() method', function () {
     let attr = new can.Map({
       attr_sort_field: 'Title',

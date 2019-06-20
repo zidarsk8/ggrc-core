@@ -8,6 +8,7 @@ from selenium.common import exceptions
 
 from lib import base, factory
 from lib.constants import locator, regex, element, counters, messages, objects
+from lib.element import three_bbs
 from lib.page.modal import unified_mapper
 from lib.utils import selenium_utils
 
@@ -36,6 +37,9 @@ class Widget(base.Widget):
       self.dropdown_states = base.DropdownStatic(
           driver, self._locators_filter.DD_CSS)
     super(Widget, self).__init__(driver)
+    self._root = self._browser.element(
+        class_name="widget governance treeview",
+        id=objects.get_singular(self.obj_name))
     # Tree View
     self.tree_view = TreeView(driver, self.info_widget_cls, self.obj_name)
     # Tab count
@@ -139,6 +143,11 @@ class Widget(base.Widget):
       # sometimes the click to the listed member results in hover
       return self.select_member_by_num(num)
     return self.info_widget_cls(self._driver)
+
+  @property
+  def three_bbs(self):
+    """ThreeBbs objcect on widget."""
+    return three_bbs.ThreeBbs(self._root)
 
 
 class TreeView(base.TreeView):

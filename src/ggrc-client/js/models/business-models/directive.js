@@ -5,7 +5,6 @@
 
 import Cacheable from '../cacheable';
 import uniqueTitle from '../mixins/unique-title';
-import timeboxed from '../mixins/timeboxed';
 import caUpdate from '../mixins/ca-update';
 import baseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
@@ -18,7 +17,7 @@ export default Cacheable.extend({
   root_model: 'Directive',
   findAll: '/api/directives',
   findOne: '/api/directives/{id}',
-  mixins: [uniqueTitle, timeboxed, caUpdate, baseNotifications],
+  mixins: [uniqueTitle, caUpdate, baseNotifications],
   tree_view_options: {
     attr_list: Cacheable.attr_list.concat([
       {

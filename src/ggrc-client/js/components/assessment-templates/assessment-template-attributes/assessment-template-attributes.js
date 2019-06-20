@@ -31,6 +31,10 @@ export default can.Component.extend({
       name: 'Checkbox',
       text: '',
     }, {
+      type: 'Multiselect',
+      name: 'Multiselect',
+      text: 'Enter values separated by comma',
+    }, {
       type: 'Dropdown',
       name: 'Dropdown',
       text: 'Enter values separated by comma',
@@ -67,7 +71,6 @@ export default can.Component.extend({
         items: 'li.sortable-item',
         placeholder: 'sortable-placeholder',
       });
-      list.find('.sortable-item').disableSelection();
     },
     '.sortable-list sortstop': function () {
       let el = $(this.element);

@@ -4,11 +4,14 @@
 """Integration test for WithAction mixin"""
 
 import copy
+import datetime
+from urlparse import urljoin
 
 from mock import patch
 
-from ggrc import db
+from ggrc import db, settings, utils
 from ggrc.models import all_models
+from ggrc.utils import get_url_root
 
 from integration.ggrc import api_helper
 
@@ -599,6 +602,44 @@ class TestCommentWithActionMixin(TestCase):
     comment = all_models.Comment.query.get(relationship.destination_id)
     self.assertEqual(comment.description, "comment")
     self.assertEqual(comment.custom_attribute_definition_id, ca_def.id)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_comment_people_mentioned(self, send_email_mock):
+    """Test handling of mapped comment with mentioned people"""
+    person = factories.PersonFactory(email="author@example.com")
+    comment = factories.CommentFactory(
+        description=u"One <a href=\"mailto:user@example.com\"></a>",
+        modified_by_id=person.id,
+        created_at=datetime.datetime(2018, 1, 10, 7, 31, 42)
+    )
+    assessment = factories.AssessmentFactory()
+    response = self.api.put(assessment, {"actions": {"add_related": [
+        {
+            "id": comment.id,
+            "type": comment.__class__.__name__,
+        }
+    ]}})
+    url = urljoin(get_url_root(), utils.view_url_for(assessment))
+    self.assert200(response)
+    relationship = _get_relationship(
+        "Assessment", response.json["assessment"]["id"])
+    self.assertIsNotNone(relationship)
+
+    expected_title = (u"author@example.com mentioned you "
+                      u"on a comment within {}".format(assessment.title))
+    expected_body = (
+        u"author@example.com mentioned you on a comment within {} "
+        u"at 01/09/2018 23:31:42 PST:\n"
+        u"One <a href=\"mailto:user@example.com\"></a>\n".format(
+            assessment.title
+        )
+    )
+    body = settings.EMAIL_MENTIONED_PERSON.render(person_mention={
+        "comments": [expected_body],
+        "url": url,
+    })
+    send_email_mock.assert_called_once_with(u"user@example.com",
+                                            expected_title, body)
 
   def test_custom_comment_value(self):
     """Test add custom attribute value comment action."""

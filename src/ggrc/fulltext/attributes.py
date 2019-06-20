@@ -356,7 +356,7 @@ class DatetimeFullTextAttr(TimezonedDatetimeValue, FullTextAttr):
 
     accorging to the FullTextAttr rules
     """
-    if self.prop_getter in content:
+    if self.prop_getter in content and content[self.alias]:
       return content[self.alias].replace("T", " ")
     return None
 

@@ -119,23 +119,6 @@
   margin: 0 0 16px;
   min-width: 0;
 
-  &.document-object-item__with-icon {
-    position: relative;
-    padding-left: 32px;
-
-    .fa {
-      position: absolute;
-      display: flex;
-      left: 0;
-      top: 4px;
-      width: 32px;
-      height: 20px;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-  }
-
   .document-object-item__body {
     text-overflow: ellipsis;
     overflow: hidden;
@@ -143,6 +126,9 @@
     min-width: 0;
 
     .link {
+      &.deprecated {
+        color: $status-deprecated;
+      }
       font-style: italic;
       font-size: 13px;
       display: inline-block;

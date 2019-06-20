@@ -401,17 +401,24 @@ class AttributeInfo(object):
     """Get column definitions for custom attributes on object_class.
 
     Args:
-      object_class: Model for which we want the attribute definitions.
-      ca_cache: dictionary containing custom attribute definitions. If it's set
-        this function will not look for CAD in the database. This should be
-        used for bulk operations, and eventually replaced with memcache.
+      object_class (db.Model): Model whose attribute definitions to get.
+      ca_cache (dict): Dictionary containing custom attribute definitions. If
+        it's set this function will not look for CAD in the database. This
+        should be used for bulk operations, and eventually replaced with
+        memcache.
+      fields (iterable): Iterable containing names of custom attribute
+        definitions to get. If None, all definitions for passed object class
+        will be returned. Defaults to None.
 
-    returns:
-      dict of custom attribute definitions.
+    Returns:
+      A dict of custom attribute definitions.
     """
+    from ggrc.models import mixins
+
     definitions = {}
-    if not hasattr(object_class, "get_custom_attribute_definitions"):
+    if not issubclass(object_class, mixins.CustomAttributable):
       return definitions
+
     object_name = underscore_from_camelcase(object_class.__name__)
     if isinstance(ca_cache, dict) and object_name:
       custom_attributes = ca_cache.get(object_name, [])
@@ -459,18 +466,27 @@ class AttributeInfo(object):
 
   @classmethod
   def get_object_attr_definitions(cls, object_class, ca_cache=None,
-                                  fields=None, include_hidden=False):
+                                  ca_fields=None, include_hidden=False):
     """Get all column definitions for object_class.
 
     This function joins custom attribute definitions, mapping definitions and
-    the extra delete column.
+    the extra delete column. For better performance consider to provide one or
+    all of the following arguments: `ca_fields` or `ca_cache`.
 
     Args:
-      object_class: Model for which we want the attribute definitions.
-      ca_cache: dictionary containing custom attribute definitions.
+      object_class (db.Model): Model whose attribute definitions to get.
+      ca_cache (dict): Dictionary containing custom attribute definitions
+        grouped by their definitions_type. If None, definitions will be queried
+        from the DB. Defaults to None.
+      ca_fields (iterable): Iterable of custom attribute field names to include
+        in returned attribute definitions list. If None, all custom attributes
+        will be included. Defaults to None.
       include_hidden (bool): Flag which specifies if we should include
         attribute definition for hidden attributes (they marked as 'hidden'
         in _aliases dict).
+
+    Returns:
+      A dict of attribute definitions.
     """
     definitions = {}
 
@@ -513,7 +529,7 @@ class AttributeInfo(object):
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(cls.get_custom_attr_definitions(
-          object_class, ca_cache=ca_cache, fields=fields
+          object_class, ca_cache=ca_cache, fields=ca_fields
       ))
 
     if object_class.__name__ not in EXCLUDE_MAPPINGS:

@@ -8,6 +8,7 @@ import inflection
 
 
 # objects
+RELATIONSHIPS = "relationships"
 PROGRAMS = "programs"
 WORKFLOWS = "workflows"
 AUDITS = "audits"
@@ -39,7 +40,6 @@ KEY_REPORTS = "key_reports"
 MARKETS = "markets"
 RISKS = "risks"
 THREATS = "threats"
-RISK_ASSESSMENTS = "risk_assessments"
 CUSTOM_ATTRIBUTES = "custom_attribute_definitions"
 COMMENTS = "comments"
 SNAPSHOTS = "snapshots"
@@ -58,18 +58,20 @@ REVIEWS = "reviews"
 EDITABLE_GGRC_OBJ = (
     ACCESS_GROUPS, CONTRACTS, DATA_ASSETS, FACILITIES,
     METRICS, MARKETS, OBJECTIVES, ORG_GROUPS, POLICIES, PROCESSES, PRODUCTS,
-    REGULATIONS, REQUIREMENTS, STANDARDS, SYSTEMS, VENDORS, RISKS, THREATS,
+    REGULATIONS, REQUIREMENTS, STANDARDS, SYSTEMS, VENDORS, THREATS,
     TECHNOLOGY_ENVIRONMENTS, PRODUCT_GROUPS, KEY_REPORTS, ACCOUNT_BALANCES,
 )
 
-ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJ + (CONTROLS, )
+EXTERNAL_OBJECTS = (CONTROLS, RISKS)
 
-NOT_YET_SNAPSHOTABLE = (RISK_ASSESSMENTS, PROJECTS)
+ALL_SNAPSHOTABLE_OBJS = EDITABLE_GGRC_OBJ + EXTERNAL_OBJECTS
+
+NOT_YET_SNAPSHOTABLE = (PROJECTS, )
 
 EDITABLE_CA_OBJS = EDITABLE_GGRC_OBJ + NOT_YET_SNAPSHOTABLE + (
     WORKFLOWS, PROGRAMS, AUDITS, ISSUES, ASSESSMENTS, PEOPLE)
 
-ALL_CA_OBJS = EDITABLE_CA_OBJS + (CONTROLS, )
+ALL_CA_OBJS = EDITABLE_CA_OBJS + EXTERNAL_OBJECTS
 
 ALL_OBJS_WO_STATE_FILTERING = (
     PEOPLE, WORKFLOWS, TASK_GROUPS, CYCLES, CYCLE_TASK_GROUP_OBJECT_TASKS)
@@ -77,7 +79,7 @@ ALL_OBJS_WO_STATE_FILTERING = (
 EDITABLE_OBJS_W_CUSTOM_ROLES = EDITABLE_GGRC_OBJ + (
     PROJECTS, ASSESSMENTS, DOCUMENTS, EVIDENCE, ISSUES, AUDITS, PROGRAMS)
 
-ALL_OBJS_W_CUSTOM_ROLES = EDITABLE_OBJS_W_CUSTOM_ROLES + (CONTROLS, )
+ALL_OBJS_W_CUSTOM_ROLES = EDITABLE_OBJS_W_CUSTOM_ROLES + EXTERNAL_OBJECTS
 
 
 def _get_singular(plurals):
@@ -124,7 +126,7 @@ def _get_plural(singulars):
 
 def get_singular(plural, title=False):
   """Transform object name to singular and lower or title form.
- Example: risk_assessments -> risk_assessment
+ Example: product_groups -> product_group
  """
   _singular = _get_singular([plural])[0]
   if title:
@@ -136,7 +138,7 @@ def get_singular(plural, title=False):
 
 def get_plural(singular, title=False):
   """Transform object name to plural and lower form or title form.
-  Example: risk_assessment -> risk_assessments
+  Example: product_group -> product_groups
   """
   _plural = _get_plural([singular])[0]
   if title:
@@ -148,7 +150,7 @@ def get_plural(singular, title=False):
 
 def get_normal_form(obj_name):
   """Transforms object name to title form
-  (risk_assessments -> Risk Assessments).
+  (product_groups -> Product Groups).
   """
   return obj_name.replace("_", " ").title()
 
@@ -165,3 +167,9 @@ ALL_OBJS = [obj for obj in [getattr(sys.modules[__name__], _obj) for _obj in
 def get_obj_type(obj_name):
   """Get object's type based on object's name."""
   return get_singular(obj_name, title=obj_name != CUSTOM_ATTRIBUTES)
+
+
+SINGULAR_EXTERNAL_OBJS = [get_singular(x) for x in EXTERNAL_OBJECTS]
+
+SINGULAR_TITLE_EXTERNAL_OBJS = [
+    get_singular(x, title=True) for x in EXTERNAL_OBJECTS]

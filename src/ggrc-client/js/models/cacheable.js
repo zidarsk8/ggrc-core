@@ -18,81 +18,6 @@ import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
 
-function dateConverter(date, oldValue, fn, key) {
-  let conversion = 'YYYY-MM-DD\\THH:mm:ss\\Z';
-  let ret;
-  if (typeof date === 'object' && date) {
-    date = date.getTime();
-  }
-  if (typeof date === 'number') {
-    date /= 1000;
-    conversion = 'X';
-  }
-  if (typeof date === 'string' && ~date.indexOf('/')) {
-    conversion = 'MM/DD/YYYY';
-  }
-  date = date ? date.toString() : null;
-  ret = moment(date, conversion);
-  if (!ret.unix()) {
-    // invalid date computed. Result of unix() is NaN.
-    return undefined;
-  }
-
-  if (typeof date === 'string' && ret &&
-      //  Don't correct timezone for dates
-      !/^\d+-\d+-\d+$/.test(date) && !/^\d+\/\d+\/\d+$/.test(date) &&
-      //  Don't correct timezone if `moment.js` has already done it
-      !/[-+]\d\d:?\d\d/.test(date)) {
-    // Use the UTC offset that was active at the moment in time to correct
-    // the date's timezone.
-    ret.add(ret.utcOffset(), 'minute');
-  }
-
-  if (oldValue && oldValue.getTime &&
-    ret && ret.toDate().getTime() === oldValue.getTime()) {
-    // avoid changing to new Date object if the value is the same.
-    return oldValue;
-  }
-  return ret ? ret.toDate() : undefined;
-}
-
-function makeDateUnpacker(keys) {
-  return function (date, oldValue, fn, attr) {
-    return _.reduce(keys, function (curr, key) {
-      return curr || (date[key] && dateConverter(
-        date[key], oldValue, fn, attr));
-    }, null) || date;
-  };
-}
-
-function makeDateSerializer(type, key) {
-  let conversion = type === 'date' ?
-    'YYYY-MM-DD' :
-    'YYYY-MM-DD\\THH:mm:ss\\Z';
-  return function (date) {
-    let retstr;
-    let retval;
-    if (date === null || date === undefined) {
-      return '';
-    }
-    if (typeof date !== 'number') {
-      date = date.getTime();
-    }
-    retstr = moment((date / 1000).toString(), 'X');
-    if (type !== 'date') {
-      retstr = retstr.utc();
-    }
-    retstr = retstr.format(conversion);
-    if (key) {
-      retval = {};
-      retval[key] = retstr;
-    } else {
-      retval = retstr;
-    }
-    return retval;
-  };
-}
-
 export default can.Model.extend({
   ajax: $.ajax,
   root_object: '',
@@ -227,15 +152,7 @@ export default can.Model.extend({
       delete this.mixins;
     }
 
-    let ret = this._super(...arguments);
-
-    // set up default attribute converters/serializers for all classes
-    Object.assign(this.attributes, {
-      created_at: 'datetime',
-      updated_at: 'datetime',
-    });
-
-    return ret;
+    return this._super(...arguments);
   },
 
   init: function () {
@@ -264,16 +181,18 @@ export default can.Model.extend({
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
     this.update = function (id, params) {
+      let modelType = this.constructor.table_singular;
       let ret = _update
         .call(this, id, this.process_args(params))
         .then((obj) => obj,
           (xhr) => {
-            if (xhr.status === 409) {
+            let remoteAttrs = xhr.responseJSON && xhr.responseJSON[modelType];
+            if (xhr.status === 409 && remoteAttrs) {
               let dfd = $.Deferred();
-              resolveConflict(xhr, this.findInCacheById(id))
+              resolveConflict(xhr, this.findInCacheById(id), remoteAttrs)
                 .then(
                   (obj) => dfd.resolve(obj),
-                  (obj, xhr) => dfd.reject(xhr)
+                  (xhr) => dfd.reject(xhr)
                 );
               return dfd;
             }
@@ -428,16 +347,6 @@ export default can.Model.extend({
       model = this._super(params);
     }
     return model;
-  },
-
-  convert: {
-    date: dateConverter,
-    packaged_datetime: makeDateUnpacker(['dateTime', 'date']),
-  },
-  serialize: {
-    datetime: makeDateSerializer('datetime'),
-    date: makeDateSerializer('date'),
-    packaged_datetime: makeDateSerializer('datetime', 'dateTime'),
   },
   tree_view_options: {
     display_attr_names: ['title', 'status', 'updated_at'],

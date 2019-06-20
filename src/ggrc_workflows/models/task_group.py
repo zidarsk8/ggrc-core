@@ -36,6 +36,11 @@ class TaskGroup(roleable.Roleable,
   __tablename__ = 'task_groups'
   _title_uniqueness = False
 
+  parent_id = db.Column(
+      db.Integer,
+      db.ForeignKey('task_groups.id', ondelete="SET NULL"),
+      nullable=True,
+  )
   workflow_id = db.Column(
       db.Integer,
       db.ForeignKey('workflows.id', ondelete="CASCADE"),
@@ -100,9 +105,10 @@ class TaskGroup(roleable.Roleable,
 
   def copy(self, _other=None, **kwargs):
     columns = [
-        'title', 'description', 'workflow', 'modified_by',
+        'title', 'description', 'parent_id', 'workflow', 'modified_by',
         'context'
     ]
+    kwargs['parent_id'] = self.id
 
     if kwargs.get('clone_people', False) and getattr(self, "contact"):
       columns.append("contact")

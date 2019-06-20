@@ -5,32 +5,63 @@
 
 import itertools
 
+from datetime import datetime
 from logging import getLogger
 from flask import request
 
+from ggrc import db
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.login import get_current_user_id
+from ggrc.utils.revisions_diff import builder as revisions_diff
 
 logger = getLogger(__name__)
 
 
 def _revision_generator(user_id, action, objects):
-  """Geberate and return revisions for objects."""
+  """Generate and return revisions bodies for objects."""
+  from ggrc.utils import revisions
   for obj in objects:
-    revision = Revision(obj, user_id, action, obj.log_json())
-
+    content = obj.log_json()
+    if "access_control_list" in content and content["access_control_list"]:
+      for acl in content["access_control_list"]:
+        acl["person"] = {
+            "id": acl["person_id"],
+            "type": "Person",
+            "href": "/api/people/{}".format(acl["person_id"]),
+        }
+    rev = revisions.build_revision_body(
+        obj.id,
+        obj.__class__.__name__,
+        content,
+        None,
+        action,
+        user_id
+    )
     if isinstance(obj, Synchronizable):
-      revision.created_at = obj.updated_at
-      revision.updated_at = obj.updated_at
-
-    yield revision
+      rev["created_at"] = obj.updated_at
+      rev["updated_at"] = obj.updated_at
+    else:
+      rev["created_at"] = datetime.utcnow().replace(microsecond=0).isoformat()
+      rev["updated_at"] = datetime.utcnow().replace(microsecond=0).isoformat()
+    for attr in ["source_type",
+                 "source_id",
+                 "destination_type",
+                 "destination_id"]:
+      rev[attr] = getattr(obj, attr, None)
+    if action in ("created", "deleted"):
+      rev["is_empty"] = False
+    else:
+      rev["is_empty"] = bool(
+          obj and not revisions_diff.changes_present(obj, rev["content"])
+      )
+    yield rev
 
 
 def _get_log_revisions(current_user_id, obj=None, force_obj=False):
-  """Generate and return revisions for all cached objects."""
+  """Generate and return revisions bodies for all cached objects."""
   revisions = []
   cache = Cache.get_cache()
   if not cache:
@@ -66,8 +97,8 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
     # been changed, then this object will not be added into
     # ``cache.dirty set``. So that its revision will not be created.
     # The ``force_obj`` flag solves the issue, but in a bit dirty way.
-    revision = Revision(obj, current_user_id, 'modified', obj.log_json())
-    revisions.append(revision)
+    rev = _revision_generator(current_user_id, "modified", (obj,))
+    revisions.extend(rev)
   revisions.extend(_revision_generator(
       current_user_id, "deleted", cache.deleted
   ))
@@ -111,21 +142,24 @@ def log_event(session, obj=None, current_user_id=None, flush=True,
   if not revisions:
     return event
   if event is None:
-    event = Event(
+    event_id_query = Event.__table__.insert().values(
         modified_by_id=current_user_id,
         action=action,
         resource_id=resource_id,
         resource_type=resource_type,
     )
-    session.add(event)
-  event.revisions.extend(revisions)
+    event_id = db.session.execute(event_id_query).inserted_primary_key[0]
+    event = Event.query.get(event_id)
+  for rev in revisions:
+    rev["event_id"] = event.id
+  db.session.execute(Revision.__table__.insert(), revisions)
   return event
 
 
 def sort_relationship_revisions(revisions):
   """Sort revisions of relationships to create automapping relationships
   after original mapping"""
-  other = [rev for rev in revisions if rev.resource_type != "Relationship"]
-  rels = [rev for rev in revisions if rev.resource_type == "Relationship"]
-  rels.sort(key=lambda obj: obj.content["automapping_id"])
+  other = [rev for rev in revisions if rev["resource_type"] != "Relationship"]
+  rels = [rev for rev in revisions if rev["resource_type"] == "Relationship"]
+  rels.sort(key=lambda obj: obj["content"]["automapping_id"])
   return other + rels

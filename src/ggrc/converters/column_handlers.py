@@ -96,6 +96,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "network_zone": handlers.OptionColumnHandler,
     "notes": handlers.TextColumnHandler,
     "operationally": handlers.ConclusionColumnHandler,
+    "procedure_description": handlers.TextColumnHandler,
     "review_status": handlers.ExportOnlyColumnHandler,
     "reviewers": handlers.ReviewersColumnHandler,
     "readonly": boolean.AdminCheckboxColumnHandler,

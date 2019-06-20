@@ -6,6 +6,8 @@
 import collections
 import functools
 
+from ggrc.utils import helpers
+
 
 class ImmutableDict(collections.Mapping):
   """An immutable wrapper for defaultdict with False by default."""
@@ -122,21 +124,7 @@ def wrap_rules(func):
   return inner
 
 
-def cached(func):
-  """Memoize the return value of a function with zero arguments."""
-  @functools.wraps(func)
-  def inner():
-    """Get memoized result or calculate and memoize it."""
-    try:
-      result = func.result
-    except AttributeError:
-      result = func.result = func()
-    return result
-
-  return inner
-
-
-@cached
+@helpers.cached
 @wrap_rules
 def _all_rules():
   """Get mapping, unmapping and snapshot mapping rules.
@@ -149,7 +137,7 @@ def _all_rules():
 
   all_models = {'AccessGroup', 'Contract', 'Control',
                 'CycleTaskGroupObjectTask', 'DataAsset', 'Facility', 'Issue',
-                'Market', 'Objective', 'OrgGroup', 'Person',
+                'Market', 'Objective', 'OrgGroup',
                 'Policy', 'Process', 'Product', 'Program', 'Project',
                 'Regulation', 'Risk', 'Requirement', 'Standard',
                 'System', 'Threat', 'Vendor', 'Metric', 'ProductGroup',
@@ -200,7 +188,7 @@ def _all_rules():
           StaticSnapshotMappingRule(type_) for type_ in snapshots
       },
       "Issue": {"Assessment", "Audit", "CycleTaskGroupObjectTask", "Issue",
-                "Person", "Program", "Project", "RiskAssessment"} | {
+                "Program", "Project", "RiskAssessment"} | {
           IssueMappingRule(type_) for type_ in snapshots
       },
   })
@@ -214,17 +202,17 @@ def _filter_rules(rules, flag):
           for (key, value) in rules.iteritems()}
 
 
-@cached
+@helpers.cached
 def get_mapping_rules():
   return _filter_rules(_all_rules(), Labels.MAP)
 
 
-@cached
+@helpers.cached
 def get_unmapping_rules():
   return _filter_rules(_all_rules(), Labels.UNMAP)
 
 
-@cached
+@helpers.cached
 def get_snapshot_mapping_rules():
   return _filter_rules(_all_rules(), Labels.MAP_SNAPSHOT)
 

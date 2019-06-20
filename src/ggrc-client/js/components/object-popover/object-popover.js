@@ -54,13 +54,13 @@ export default can.Component.extend({
     },
   }),
   events: {
-    '{viewModel.item} el': function (scope, ev, el) {
+    '{viewModel.item} el': function ([scope], ev, el) {
       this.viewModel.setStyle(el);
     },
     '.object-popover-wrapper click': function (el, event) {
       event.stopPropagation();
     },
-    '{viewModel} expanded': function (scope, ev, isExpanded) {
+    '{viewModel} expanded': function ([scope], ev, isExpanded) {
       // Double max height property in case additional content is expanded and visible
       let maxInnerHeight = isExpanded ?
         defaultMaxInnerHeight * 2 :

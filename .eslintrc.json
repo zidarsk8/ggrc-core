@@ -24,7 +24,6 @@
     "MutationObserver": false,
     "Spinner": false,
     "Clipboard": false,
-    "calculate_spinner_z_index": false,
     "ga": false,
     "gapi": false,
     "google": false,

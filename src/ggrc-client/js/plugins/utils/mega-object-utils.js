@@ -36,7 +36,7 @@ function isMegaObjectRelated(widgetName) {
  * @return {Boolean} True or False
  */
 function isMegaMapping(model1, model2) {
-  return model1 === model2 && businessModels[model1].isMegaObject;
+  return model1 === model2 && !!businessModels[model1].isMegaObject;
 }
 
 /**

@@ -276,7 +276,7 @@ export default can.Component.extend({
     '.tree-filter__expression-holder input keyup': function (el, ev) {
       this.toggleIndicator(QueryParser.parse(el.val()));
     },
-    '.option-type-selector change': function (el, ev) {
+    '.option-type-selector change': function () {
       this.viewModel.attr('isFilterActive', false);
     },
   },
