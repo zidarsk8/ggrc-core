@@ -8,6 +8,9 @@ import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
 import * as QueryApiUtils from '../../../plugins/utils/query-api-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import * as MegaObjectUtils from '../../../plugins/utils/mega-object-utils';
 import CycleTaskGroupObjectTask from '../../../models/business-models/cycle-task-group-object-task';
 import Control from '../../../models/business-models/control';
 
@@ -283,6 +286,191 @@ describe('TreeViewUtils module', function () {
         objects: ['testRequest1', 'testRequest2'],
         current_time: 'testFileSafeCurrentDate',
         exportable_objects: [1],
+      });
+    });
+  });
+
+  describe('loadItemsForSubTier() method', () => {
+    beforeEach(() => {
+      spyOn(QueryApiUtils, 'batchRequests');
+      spyOn(CurrentPageUtils, 'initMappedInstances')
+        .and.returnValue($.Deferred().resolve());
+      spyOn(SnapshotUtils, 'isSnapshotRelated');
+      spyOn(MegaObjectUtils, 'isMegaObjectRelated');
+    });
+
+    describe('for Cycle, CycleTaskGroup, CycleTaskGroupObjectTask', () => {
+      ['Cycle', 'CycleTaskGroup', 'CycleTaskGroupObjectTask']
+        .forEach((model) => {
+          it(`should not make counts requests (${model})`, (done) => {
+            QueryApiUtils.batchRequests
+              .and.callFake((params) => {
+                return $.Deferred().resolve({
+                  [params.object_name]: {
+                    total: 0,
+                    values: [],
+                  },
+                });
+              });
+
+            module.loadItemsForSubTier(['Metric', 'Policy'], model, 1, null, {})
+              .then(() => {
+                let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+                queries.forEach((args) => {
+                  expect(args[0].type).not.toBe('count');
+                });
+
+                done();
+              });
+          });
+        });
+    });
+
+    describe('for object versions objects (Issue)', () => {
+      it('should make correct counts request', (done) => {
+        QueryApiUtils.batchRequests
+          .and.callFake((params) => {
+            if (params.type === 'count') {
+              return $.Deferred().resolve({
+                [params.object_name]: {
+                  total: 0,
+                },
+              });
+            }
+          });
+
+        let models = ['Metric', 'Metric_version'];
+        module.loadItemsForSubTier(models, 'Issue', 1, null, {})
+          .then(() => {
+            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+            expect(queries.length).toBe(2);
+
+            expect(queries[0][0]).toEqual({
+              object_name: 'Metric',
+              type: 'count',
+              filters: {
+                expression: {
+                  object_name: 'Issue',
+                  op: {name: 'relevant'},
+                  ids: ['1'],
+                },
+              },
+            });
+
+            // makes Snapshot request for *_version model
+            expect(queries[1][0]).toEqual({
+              object_name: 'Snapshot',
+              type: 'count',
+              filters: {
+                expression: {
+                  left: {left: 'child_type', op: {name: '='}, right: 'Metric'},
+                  op: {name: 'AND'},
+                  right: {
+                    object_name: 'Issue',
+                    op: {name: 'relevant'},
+                    ids: ['1']},
+                },
+              },
+            });
+
+            done();
+          });
+      });
+    });
+
+    describe('for snapshot related objects', () => {
+      it('should make correct counts request', (done) => {
+        QueryApiUtils.batchRequests
+          .and.callFake((params) => {
+            if (params.type === 'count') {
+              return $.Deferred().resolve({
+                [params.object_name]: {
+                  total: 0,
+                },
+              });
+            }
+          });
+
+        SnapshotUtils.isSnapshotRelated.and.returnValue(true);
+
+        module.loadItemsForSubTier(['Metric'], 'Audit', 1, null, {})
+          .then(() => {
+            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+            expect(queries.length).toBe(1);
+
+            expect(queries[0][0]).toEqual({
+              object_name: 'Snapshot',
+              type: 'count',
+              filters: {
+                expression: {
+                  left: {left: 'child_type', op: {name: '='}, right: 'Metric'},
+                  op: {name: 'AND'},
+                  right: {
+                    object_name: 'Audit',
+                    op: {name: 'relevant'},
+                    ids: ['1'],
+                  },
+                },
+              },
+            });
+
+            done();
+          });
+      });
+    });
+
+    describe('for mega objects', () => {
+      it('should make correct counts request', (done) => {
+        QueryApiUtils.batchRequests
+          .and.callFake((params) => {
+            if (params.type === 'count') {
+              return $.Deferred().resolve({
+                [params.object_name]: {
+                  total: 0,
+                },
+              });
+            }
+          });
+
+        MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
+
+        let models = ['Program_child', 'Program_parent'];
+        module.loadItemsForSubTier(models, 'Program', 1, null, {})
+          .then(() => {
+            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+            expect(queries.length).toBe(2);
+
+            expect(queries[0][0]).toEqual({
+              object_name: 'Program',
+              type: 'count',
+              filters: {
+                expression: {
+                  object_name: 'Program',
+                  op: {name: 'child'},
+                  ids: ['1'],
+                },
+              },
+            });
+
+            // makes Snapshot request for *_version model
+            expect(queries[1][0]).toEqual({
+              object_name: 'Program',
+              type: 'count',
+              filters: {
+                expression: {
+                  object_name: 'Program',
+                  op: {name: 'parent'},
+                  ids: ['1'],
+                },
+              },
+            });
+
+            done();
+          });
       });
     });
   });
