@@ -42,7 +42,8 @@ class PersonSetup(object):
         Generated person.
     """
     email = self._gen_email(g_rname, m_rname)
-    person = factories.PersonFactory(email=email)
+    name = email.split("@")[0]
+    person = factories.PersonFactory(email=email, name=name)
     bp_factories.UserRoleFactory(person=person,
                                  role=rbac_helper.G_ROLES[g_rname])
     return person

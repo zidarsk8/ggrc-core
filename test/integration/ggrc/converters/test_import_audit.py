@@ -139,3 +139,39 @@ class TestAuditImport(TestCase):
         }
     }
     self._check_csv_response(response, expected_warnings)
+
+  def test_invalid_audit_import(self):
+    """Test audit import with invalid user"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+
+    response = self.import_data(*[
+        OrderedDict([
+            ("object_type", "Person"),
+            ("Name", ""),
+            ("Email", "bad@example.com"),
+            ("Company", "Google"),
+            ("Role", "Administrator"),
+        ]),
+        OrderedDict([
+            ("object_type", "Audit"),
+            ("Code", ""),
+            ("Title", "Audit-import-3"),
+            ("State", "Planned"),
+            ("Audit Captains", "bad@example.com"),
+            ("Program", program.slug),
+        ])
+    ])
+    expected_messages = {
+        "Audit": {
+            "row_errors": {
+                errors.UNKNOWN_ERROR.format(line=7),
+            },
+        },
+        "Person": {
+            "row_errors": {
+                errors.MISSING_VALUE_ERROR.format(line=3, column_name="Name"),
+            },
+        },
+    }
+    self._check_csv_response(response, expected_messages)
