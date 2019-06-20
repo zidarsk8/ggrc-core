@@ -67,7 +67,6 @@ class ModelRefreshQueue {
 
 class RefreshQueueManager {
   constructor() {
-    this.null_queue = new ModelRefreshQueue(null);
     this.queues = [];
   }
 
