@@ -202,8 +202,6 @@
   </div>
   <div class="row-fluid hidden">
     <input type="hidden" name="task_group" model="TaskGroup" value="{{firstnonempty object_params.task_group instance.task_group.id}}" />
-    <input type="hidden" name="cycle" model="Cycle" value="{{instance.cycle.id}}" data-populated-in-callback />
-    <input type="hidden" name="context" model="Context" value="{{firstnonempty object_params.context instance.context.id}}" data-populated-in-callback />
     <input type="hidden" name="status" value="{{firstnonempty instance.status 'Assigned'}}" />
   </div>
 </form>
