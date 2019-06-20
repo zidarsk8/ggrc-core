@@ -161,7 +161,6 @@ function getAvailableAttributes(modelType) {
     !!Model.tree_view_options.disable_columns_configuration;
 
   let attrs = makeArray(
-    Model.tree_view_options.mapper_attr_list ||
     Model.tree_view_options.attr_list ||
     Cacheable.attr_list
   ).filter(function (attr) {
