@@ -406,7 +406,6 @@ function loadFirstTierItems(modelName,
     makeRelevantExpression(modelName, parent.type, parent.id, operation),
     null,
     filter,
-    operation,
   );
   let requestedType;
   let requestData = request.slice() || canList();
