@@ -65,7 +65,6 @@ def build_op_shortcut(predicate):
   def decorated(exp, object_class, target_class, query):
     """decorator for sended predicate"""
     key = exp['left'].lower()
-
     key, filter_by = target_class.attributes_map().get(key, (key, None))
     if callable(filter_by):
       return filter_by(lambda x: predicate(x, exp['right']))
@@ -118,6 +117,7 @@ def is_filter(exp, object_class, target_class, query):
     raise BadQueryException(
         u"Invalid operator near 'is': {}".format(exp['right']))
   left = exp['left'].lower()
+  left = getattr(target_class, "PROPERTY_TEMPLATE", "{}").format(left)
   left, _ = target_class.attributes_map().get(left, (left, None))
   subquery = db.session.query(Record.key).filter(
       Record.type == object_class.__name__,

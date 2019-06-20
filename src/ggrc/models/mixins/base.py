@@ -407,12 +407,12 @@ class Base(Dictable, ChangeTracked, Identifiable):
         if value.get("filter_by"):
           filter_by = getattr(cls, value["filter_by"], None)
       else:
-        name = value
-        filter_by = None
+        name, filter_by = value, None
       if not name:
         continue
-      tmp = getattr(cls, "PROPERTY_TEMPLATE", "{}")
-      name = tmp.format(name)
-      key = tmp.format(key)
+      if name.lower() not in getattr(cls, 'IGNORE_TEMPLATE_ATTRIBUTES', []):
+        tmp = getattr(cls, "PROPERTY_TEMPLATE", "{}")
+        name = tmp.format(name)
+        key = tmp.format(key)
       cls.CACHED_ATTRIBUTE_MAP[name.lower()] = (key.lower(), filter_by)
     return cls.CACHED_ATTRIBUTE_MAP
