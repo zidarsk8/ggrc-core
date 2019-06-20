@@ -26,11 +26,12 @@
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
         <modal-autocomplete
           instance:from="instance"
-          isNewInstance:from="new_object_form">
+          isNewInstance:from="new_object_form"
+          pathToField:from="'_directive.title'">
           <input
             tabindex="2"
             class="input-block-level"
-            name="_directive.title"
+            name="{{pathToField}}"
             data-lookup="Policy,Regulation,Standard,Contract"
             data-permission-type="update"
             data-template="/directives/autocomplete_result.stache"

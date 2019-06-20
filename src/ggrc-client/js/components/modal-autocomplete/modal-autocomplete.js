@@ -14,12 +14,15 @@ const viewModel = canMap.extend({
   instance: null,
   isNewInstance: false,
   isQueryAutocompleteEnabled: false,
+  pathToField: '',
+  useInstanceInputHandler: false,
   initAutocomplete() {
     const $autocompleteInput = this.attr('element').find('[data-lookup]');
     const options = {
       onSelectCallback: onAutocompleteSelect(
         this.attr('instance'),
         this.attr('isNewInstance'),
+        this.attr('useInstanceInputHandler')
       ),
     };
 
@@ -47,10 +50,31 @@ const events = {
   'input[data-lookup] keyup'(el, ev) {
     onAutocompleteKeyup(this.viewModel.attr('instance'), el, ev);
   },
+  'input[data-lookup] change'([el]) {
+    const viewModel = this.viewModel;
+    const instance = viewModel.attr('instance');
+
+    // when input's value is changed, validation should be triggered
+    instance.removeAttr('_suppress_errors');
+
+    // if input should be processed by instance's handler, we should use it
+    // (for now, only cycle task has it)
+    if (viewModel.attr('useInstanceInputHandler')) {
+      instance.setValueFromInput(el.value);
+    } else if (el.value === '') {
+      // if nothing was typed in input, it's an empty string by default.
+      // But for instance in order to send an empty stub (null) to the server,
+      // this empty string should be converted to null.
+
+      const [stubName] = viewModel.attr('pathToField').split('.');
+      instance.attr(stubName, null);
+    }
+  },
 };
 
 export default canComponent.extend({
   tag: 'modal-autocomplete',
+  leakScope: true,
   viewModel,
   events,
 });

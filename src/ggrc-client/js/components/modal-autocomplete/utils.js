@@ -40,21 +40,19 @@ export const onAutocompleteKeyup = (instance, el, ev) => {
 };
 
 export const onAutocompleteSelect = (
-  instance, isNewInstance
+  instance, isNewInstance, useInstanceInputHandler = false
 ) => (el, ui) => {
   let path;
   let index;
-  let cb;
   $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
 
   path = el.attr('name').split('.');
   index = 0;
   path.pop(); // remove the prop
-  cb = el.data('lookup-cb');
 
-  if (cb) {
-    cb = cb.split(' ');
-    instance[cb[0]](...cb.slice(1).concat([ui.item]));
+
+  if (useInstanceInputHandler) {
+    instance.setValueFromInput(ui.item);
     setTimeout(function () {
       el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
     }, 0);

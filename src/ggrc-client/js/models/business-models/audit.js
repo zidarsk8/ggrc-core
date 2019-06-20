@@ -142,6 +142,9 @@ export default Cacheable.extend({
         validateIssueTracker: true,
       },
     },
+    audit_firm: {
+      value: null,
+    },
   },
   clone: function (options) {
     let cloneModel = new this.constructor({

@@ -108,15 +108,17 @@
           {{#if new_object_form}}
             <modal-autocomplete
               instance:from="instance"
-              isNewInstance:from="new_object_form">
+              isNewInstance:from="new_object_form"
+              pathToField:from="'workflow.id'"
+              useInstanceInputHandler:from="true"
+            >
               <input
                 type="text"
                 class="input-block-level required"
-                name="workflow.id"
+                name="{{pathToField}}"
                 model="Workflow"
                 data-lookup="Workflow"
                 data-params="Workflow:status=Active,frequency=one_time"
-                data-lookup-cb="set_properties_from_workflow"
                 placeholder="Select a Workflow"
                 value="{{loadedObject.title}}"
                 tabindex="4">
@@ -145,10 +147,11 @@
             <modal-autocomplete
               instance:from="instance"
               isNewInstance:from="new_object_form"
-              isQueryAutocompleteEnabled:from="true">
+              isQueryAutocompleteEnabled:from="true"
+              pathToField:from="'cycle_task_group.id'">
               <input {{^if instance.cycle}}disabled{{/if}}
                   class="input-block-level required"
-                  name="cycle_task_group.id"
+                  name="{{pathToField}}"
                   data-lookup="CycleTaskGroup"
                   data-query-field="group title"
                   data-query-relevant-type="{{instance.cycle.type}}"

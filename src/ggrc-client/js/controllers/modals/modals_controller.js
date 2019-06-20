@@ -328,7 +328,7 @@ export default canControl.extend({
     }
   },
 
-  'input, textarea, select change':
+  'input:not([data-lookup]), textarea, select change':
     function (el) {
       const instance = this.options.instance;
       if (instance.isNew && instance.isNew()) {
@@ -362,30 +362,22 @@ export default canControl.extend({
   serialize_form: function () {
     let $form = $(this.options.contentEl).find('form');
     let $elements = $form
-      .find(':input');
+      .find(':input:not([data-lookup])');
 
     $elements.toArray().forEach((el) => this.set_value_from_element(el));
   },
   set_value_from_element: function (el) {
-    let name;
-    let value;
-    let cb;
-    let instance = this.options.instance;
-    el = el instanceof jQuery ? el : $(el);
-    name = el.attr('name');
-    value = el.val();
-    cb = el.data('lookup-cb');
-
     // If no model is specified, short circuit setting values
     // Used to support ad-hoc form elements in confirmation dialogs
     if (!this.options.model) {
       return;
     }
-    if (cb) {
-      cb = cb.split(' ');
-      instance[cb[0]](...cb.slice(1).concat([value]));
-    } else if (name) {
-      this.set_value({name: name, value: value});
+
+    const $el = $(el);
+    const name = $el.attr('name');
+
+    if (name) {
+      this.set_value({name, value: $el.val()});
     }
   },
   set_value: function (item) {
@@ -427,13 +419,6 @@ export default canControl.extend({
       if (Array.isArray(value)) {
         value = new canList(_.filteredMap(value,
           (v) => new canMap({}).attr(name.slice(1).join('.'), v)));
-      } else if ($elem.is('[data-lookup]')) {
-        if (!value) {
-          value = null;
-        } else {
-          // Setting a "lookup field is handled in the autocomplete() method"
-          return;
-        }
       } else {
         value = new canMap({}).attr(name.slice(1).join('.'), value);
       }
