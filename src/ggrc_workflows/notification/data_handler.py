@@ -363,21 +363,6 @@ def cycle_tasks_cache(notifications):
   return {task.id: task for task in results}
 
 
-def custom_attributes_cache():
-  """Compile and return Custom Attributes
-
-  Returns:
-    Dictionary containing all custom attributes with a definition type as a key
-  """
-  ca_cache = defaultdict(list)
-  definitions = models.CustomAttributeDefinition.eager_query().group_by(
-      models.CustomAttributeDefinition.title,
-      models.CustomAttributeDefinition.definition_type)
-  for attr in definitions:
-    ca_cache[attr.definition_type].append(attr)
-  return ca_cache
-
-
 def deleted_task_rels_cache(task_ids):
   """Compile and return deleted Relationships information for given Tasks.
 

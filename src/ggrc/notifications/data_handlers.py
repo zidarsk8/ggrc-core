@@ -522,3 +522,25 @@ def get_comment_data(notif, **_):
       data[person.email] = generate_comment_notification(
           comment_obj, comment, person)
   return data
+
+
+def custom_attributes_cache(notifications):
+  """Compile and return Custom Attributes
+
+  Args:
+    notifications: a list of Notification instances for which to fetch the
+      corresponding CAds instances
+  Returns:
+    Dictionary containing all custom attributes with a definition type as a key
+  """
+  objects_ids = [notification.object_id for notification in notifications]
+  ca_cache = defaultdict(list)
+  definitions = models.CustomAttributeDefinition.eager_query().filter(
+      models.CustomAttributeDefinition.definition_id.in_(objects_ids)
+  ).group_by(
+      models.CustomAttributeDefinition.title,
+      models.CustomAttributeDefinition.definition_type)
+  for attr in definitions:
+    ca_cache[attr.definition_type].append(attr)
+
+  return ca_cache

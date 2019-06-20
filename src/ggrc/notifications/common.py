@@ -31,6 +31,7 @@ from ggrc.gcalendar import calendar_event_sync
 from ggrc.models import Person
 from ggrc.models import Notification, NotificationHistory
 from ggrc.models import background_task
+from ggrc.notifications.data_handlers import custom_attributes_cache
 from ggrc.notifications.unsubscribe import unsubscribe_url
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
@@ -42,8 +43,7 @@ from ggrc_workflows.notification.notification_handler \
     import done_tasks_notify, not_done_tasks_notify
 
 from ggrc_workflows.notification.data_handler import (
-    cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data,
-    custom_attributes_cache)
+    cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data)
 
 
 # pylint: disable=invalid-name
@@ -162,7 +162,7 @@ def get_notification_data(notifications):
 
   tasks_cache = cycle_tasks_cache(notifications)
   deleted_rels_cache = deleted_task_rels_cache(tasks_cache.keys())
-  ca_cache = custom_attributes_cache()
+  ca_cache = custom_attributes_cache(notifications)
 
   for notification in notifications:
     filtered_data = get_filter_data(
