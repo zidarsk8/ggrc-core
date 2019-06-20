@@ -200,10 +200,10 @@ def submit_obj_for_review(selenium, obj, reviewer):
   review_comment = string_utils.StringMethods.random_string()
   _get_ui_service(selenium, obj).submit_for_review(
       obj, reviewer.email, review_comment)
-  obj = obj.update_review(entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
-      reviewers=reviewer,
-      status=element.ReviewStates.UNREVIEWED))
+  obj.update_attrs(
+      review=entities_factory.ReviewsFactory().create(
+          reviewers=reviewer,
+          status=element.ReviewStates.UNREVIEWED))
   exp_comment = entities_factory.CommentsFactory().create(
       description=element.Common.REVIEW_COMMENT_PATTERN.format(
           # reviewers emails in review comment message need to be sorted
@@ -220,26 +220,36 @@ def approve_obj_review(selenium, obj):
   """Approve obj review.
   Returns obj with approved review."""
   _get_ui_service(selenium, obj).approve_review(obj)
-  obj = obj.update_review(entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
-      status=element.ReviewStates.REVIEWED,
-      last_reviewed_by=users.current_user().email,
-      last_reviewed_at=rest_facade.get_last_review_date(obj),
-      reviewers=users.current_user()))
-  return obj
+  return obj.update_attrs(
+      review=entities_factory.ReviewsFactory().create(
+          status=element.ReviewStates.REVIEWED,
+          last_reviewed_by=users.current_user().email,
+          last_reviewed_at=rest_facade.get_last_review_date(obj),
+          reviewers=users.current_user()))
 
 
 def undo_obj_review_approval(selenium, obj):
   """Cancel approved obj review.
   Returns obj with reverted to unreviewed status review."""
   _get_ui_service(selenium, obj).undo_review_approval(obj)
-  obj = obj.update_review(entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
+  return obj.update_attrs(review=entities_factory.ReviewsFactory().create(
       status=element.ReviewStates.UNREVIEWED,
       last_reviewed_by=users.current_user().email,
       last_reviewed_at=rest_facade.get_last_review_date(obj),
       reviewers=users.current_user()))
-  return obj
+
+
+def cancel_review_by_editing_obj(selenium, obj):
+  """Edit obj title and revert obj review to unreviewed state.
+  Returns updated obj with reverted to unreviewed status review."""
+  new_title = element.Common.TITLE_EDITED_PART + obj.title
+  _get_ui_service(selenium, obj).edit_obj(obj, title=new_title)
+  return obj.update_attrs(
+      title=new_title,
+      updated_at=rest_facade.get_obj(obj).updated_at,
+      modified_by=users.current_user().email,
+      review=entities_factory.ReviewsFactory().create(
+          status=element.ReviewStates.UNREVIEWED))
 
 
 def get_object(selenium, obj):

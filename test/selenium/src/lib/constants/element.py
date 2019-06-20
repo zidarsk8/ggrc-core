@@ -142,6 +142,7 @@ class Base(object):
 class Common(object):
   """Common elements' labels and properties for objects."""
   TITLE = "Title"
+  TITLE_EDITED_PART = "[EDITED]"
   DESCRIPTION = "Description"
   CODE = "Code"
   STATE = Base.STATE
@@ -307,7 +308,6 @@ class ControlInfoWidget(CommonControl):
 class AssessmentInfoWidget(CommonAssessment):
   """Elements' labels and properties for Assessments Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAssessment.ASMT)
-  TITLE_EDITED_PART = "[EDITED]"
 
 
 class IssueInfoWidget(CommonIssue):

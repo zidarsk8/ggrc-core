@@ -8,15 +8,13 @@ class Reviewable(object):
   """A mixin for reviewable objects."""
 
   def update_review(self, new_review):
-    """Update obj review dict and status with new values.
-    Returns obj with updated review dict."""
+    """Update obj review dict and status with new values."""
     upd_review = new_review.convert_review_to_dict()
     self.review["status"] = upd_review["status"]
     if upd_review["last_reviewed_by"]:
       self.review["last_reviewed_by"] = upd_review["last_reviewed_by"]
     self._upd_reviewers(upd_review["reviewers"])
     self.update_attrs(review_status=upd_review["status"])
-    return self
 
   def _upd_reviewers(self, new_reviewers):
     """Update object review `reviewers` with new values if needed."""
