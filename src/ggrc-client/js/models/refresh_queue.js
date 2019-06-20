@@ -219,7 +219,7 @@ function refreshAll(instance, props, force) {
     }
 
     if (deferred) {
-      deferred.then(function (refreshedItems) {
+      deferred.then((refreshedItems) => {
         if (nextProps.length) {
           loForEach(refreshedItems, function (item) {
             let df = new $.Deferred();
@@ -228,10 +228,10 @@ function refreshAll(instance, props, force) {
           });
           // Resolve the original deferred only when all list deferreds
           //   have been resolved
-          $.when(...dfds).then(function (items) {
+          $.when(...dfds).then((items) => {
             dfd.resolve(items);
-          }, function () {
-            dfd.reject.apply(this, arguments);
+          }, () => {
+            dfd.reject(...arguments);
           });
           return;
         }
@@ -242,8 +242,8 @@ function refreshAll(instance, props, force) {
         }
         // Last refreshed property was a single instance, return it as such
         dfd.resolve(refreshedItems[0]);
-      }, function () {
-        dfd.reject.apply(this, arguments);
+      }, () => {
+        dfd.reject(...arguments);
       });
     } else {
       console.warn('refreshAll failed at', prop);
