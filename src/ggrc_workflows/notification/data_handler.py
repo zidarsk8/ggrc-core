@@ -652,6 +652,8 @@ def get_cycle_dict(cycle, manual=False):
       "cycle_slug": cycle.slug,
       "cycle_title": cycle.title,
       "cycle_url": cycle.cycle_url,
+      "workflow_title": cycle.workflow.title,
+      "workflow_url": get_workflow_url(cycle.workflow, "info"),
       "cycle_inactive_url": cycle.cycle_inactive_url,
   }
 
