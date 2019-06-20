@@ -87,6 +87,12 @@ let SUB_TREE_FIELDS = Object.freeze([
   'DEFAULT_PEOPLE_LABELS',
   'user_roles',
   'readonly',
+
+  // CTGOT
+  'end_date',
+  'next_due_date',
+  'isOverdue',
+  'is_verification_needed',
 ]);
 
 let FULL_SUB_LEVEL_LIST = Object.freeze([
