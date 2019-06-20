@@ -64,33 +64,35 @@ let orderedModelsForSubTier = {};
 
 let SUB_TREE_ELEMENTS_LIMIT = 20;
 let SUB_TREE_FIELDS = Object.freeze([
+  'id',
+  'type',
+  'selfLink',
+  'viewLink',
+
+  // title fields
+  'title',
+  'email',
+  'name',
+
+  // snapshot fields
+  'revision',
   'child_id',
   'child_type',
-  'context',
-  'email',
-  'id',
   'is_latest_revision',
-  'name',
-  'revision',
-  'revisions',
-  'selfLink',
-  'slug',
-  'status',
-  'title',
-  'type',
-  'viewLink',
-  'workflow_state',
+
+  // edit rights
   'archived',
-  // label for Audit
-  'program',
-  // labels for assessment templates
-  'DEFAULT_PEOPLE_LABELS',
-  'user_roles',
   'readonly',
 
-  // CTGOT
-  'end_date',
+  // AT fields
+  'DEFAULT_PEOPLE_LABELS',
+
+  // Workflow fields
+  'workflow_state',
+
+  // CTGOT fields
   'next_due_date',
+  'end_date',
   'isOverdue',
   'is_verification_needed',
 ]);
