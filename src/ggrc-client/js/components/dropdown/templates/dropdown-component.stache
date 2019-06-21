@@ -8,7 +8,6 @@
   class="{{firstnonempty className 'input-block-level'}}"
   el:value:bind="name"
   on:el:change="onChange"
-  null-if-empty="null-if-empty"
   {{#isDisabled}}disabled="disabled"{{/isDisabled}}
   {{#controlId}}id="{{controlId}}"{{/controlId}}
   >

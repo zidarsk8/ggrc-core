@@ -339,10 +339,7 @@ export default canControl.extend({
         instance.removeAttr('_suppress_errors');
       }
       // Set the value if it isn't a search field
-      if (!el.hasClass('search-icon') ||
-        el.is('[null-if-empty]') &&
-        (!el.val() || !el.val().length)
-      ) {
+      if (!el.hasClass('search-icon')) {
         this.set_value_from_element(el);
       }
     },
@@ -409,10 +406,6 @@ export default canControl.extend({
       value = $elem.is(':checked');
     } else {
       value = item.value;
-    }
-
-    if ($elem.is('[null-if-empty]') && (!value || !value.length)) {
-      value = null;
     }
 
     if (name.length > 1) {
