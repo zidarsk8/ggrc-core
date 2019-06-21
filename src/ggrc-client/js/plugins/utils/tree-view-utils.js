@@ -10,7 +10,6 @@ import {
   isSnapshot,
   isSnapshotModel,
   isSnapshotRelated,
-  isSnapshotScope,
   toObject,
   transformQueryToSnapshot,
 } from './snapshot-utils';
@@ -31,7 +30,6 @@ import {
   getWidgetConfig,
 } from './widgets-utils';
 import {
-  isMegaObjectRelated,
   transformQueryForMega,
 } from './mega-object-utils';
 import {getRolesForType} from './acl-utils';
@@ -408,7 +406,7 @@ function loadFirstTierItems(modelName,
   let requestData = request.slice() || canList();
 
   if (transformToSnapshot ||
-    (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
+    isSnapshotRelated(parent.type, modelName)) {
     params = transformQueryToSnapshot(params);
   }
 
@@ -689,8 +687,7 @@ function startExport(
     filter
   );
 
-  if (transformToSnapshot ||
-    (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
+  if (transformToSnapshot || isSnapshotRelated(parent.type, modelName)) {
     params = transformQueryToSnapshot(params);
   }
 

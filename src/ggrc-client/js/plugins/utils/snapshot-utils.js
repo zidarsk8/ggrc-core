@@ -6,12 +6,8 @@
 import canConstruct from 'can-construct';
 import canList from 'can-list';
 import canMap from 'can-map';
-import {
-  buildParam,
-} from './query-api-utils';
 import Permission from '../../permission';
 import {hasRelatedAssessments} from './models-utils';
-import {getPageInstance} from '../utils/current-page-utils';
 import Person from '../../models/business-models/person';
 import Audit from '../../models/business-models/audit';
 import Stub from '../../models/stub';
@@ -26,36 +22,12 @@ import {ggrcGet} from '../ajax_extensions';
 const auditScopeModels = ['Assessment', 'AssessmentTemplate'];
 
 /**
- * Set extra attrs for snapshoted objects or snapshots
- * @param {Object} instance - Object instance
- */
-function setAttrs(instance) {
-  // Get list of objects that supports 'snapshot scope' from config
-  let className = instance.type;
-  if (isSnapshotParent(className)) {
-    instance.attr('is_snapshotable', true);
-  }
-}
-
-/**
  * Check whether object is snapshot
  * @param {Object} instance - Object instance
  * @return {Boolean} True or False
  */
 function isSnapshot(instance) {
   return instance && (instance.snapshot || instance.isRevision);
-}
-
-/**
- * Check whether object is in spanshot scope
- * @param {Object} parentInstance - Object (parent) instance
- * @return {Boolean} True or False
- */
-function isSnapshotScope(parentInstance) {
-  let instance = parentInstance || getPageInstance();
-  return instance ?
-    instance.is_snapshotable || isAuditScopeModel(instance.type) :
-    false;
 }
 
 /**
@@ -262,7 +234,6 @@ function getSnapshotsCounts(widgets, instance) {
 
 export {
   isSnapshot,
-  isSnapshotScope,
   isSnapshotParent,
   isSnapshotRelated,
   isSnapshotRelatedType,
@@ -271,7 +242,6 @@ export {
   toObject,
   toObjects,
   transformQueryToSnapshot,
-  setAttrs,
   isSnapshotType,
   getParentUrl,
   getSnapshotsCounts,
