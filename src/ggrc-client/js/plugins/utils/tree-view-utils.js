@@ -428,14 +428,14 @@ function loadFirstTierItems(modelName,
 
 /**
  *
- * @param {Array} models - Array of models for load in sub tree
+ * @param {Array} widgetIds - Array of models for load in sub tree
  * @param {String} type - Type of parent object.
  * @param {Number} id - ID of parent object.
  * @param {String} filter - Filter.
  * @param {Object} pageInfo - Information about pagination, sorting and filtering
  * @return {Promise} - Items for sub tier.
  */
-function loadItemsForSubTier(models, type, id, filter, pageInfo) {
+function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
   let relevant = {
     type: type,
     id: id,
@@ -444,17 +444,12 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
   let showMore = false;
   let loadedModelObjects = [];
 
-  return _buildSubTreeCountMap(models, relevant, filter)
+  return _buildSubTreeCountMap(widgetIds, relevant, filter)
     .then(function (result) {
-      let countMap = result.countsMap;
-      let dfds;
-      let mappedDfd;
-      let resultDfd;
-
-      loadedModelObjects = getWidgetConfigs(Object.keys(countMap));
+      loadedModelObjects = getWidgetConfigs(Object.keys(result.countsMap));
       showMore = result.showMore;
 
-      dfds = loadedModelObjects.map(function (modelObject) {
+      let dfds = loadedModelObjects.map(function (modelObject) {
         let subTreeFields = getSubTreeFields(type, modelObject.name);
 
         let params = buildParam(
@@ -475,10 +470,10 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
         return batchRequests(params);
       });
 
-      resultDfd = $.when(...dfds).promise();
+      let resultDfd = $.when(...dfds).promise();
 
       if (!related.initialized) {
-        mappedDfd = initMappedInstances();
+        let mappedDfd = initMappedInstances();
 
         return $.when(mappedDfd, dfds).then(function () {
           return resultDfd;
@@ -577,20 +572,20 @@ function isDirectlyRelated(instance) {
 
 /**
  *
- * @param {Array} models - Type of model.
+ * @param {Array} widgetIds - selected widget id.
  * @param {Object} relevant - Relevant description
  * @param {String} filter - Filter string.
  * @return {Promise} - Counts for limitation load items for sub tier
  * @private
  */
-function _buildSubTreeCountMap(models, relevant, filter) {
+function _buildSubTreeCountMap(widgetIds, relevant, filter) {
   let countQuery = [];
   let result;
   let countMap = {};
 
   if (_isFullSubTree(relevant.type)) {
-    models.forEach(function (model) {
-      countMap[model] = false;
+    widgetIds.forEach(function (widgetId) {
+      countMap[widgetId] = false;
     });
     return $.Deferred().resolve({
       countsMap: countMap,
@@ -598,8 +593,8 @@ function _buildSubTreeCountMap(models, relevant, filter) {
     });
   }
 
-  models.forEach((model) => {
-    let widgetConfig = getWidgetConfig(model);
+  widgetIds.forEach((widgetId) => {
+    let widgetConfig = getWidgetConfig(widgetId);
     let modelName = widgetConfig.name;
 
     let query = buildCountParams([modelName], relevant, filter);
@@ -613,7 +608,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
 
     if (widgetConfig.isMegaObject) {
       let transformedQuery =
-        transformQueryForMega(query[0], model);
+        transformQueryForMega(query[0], widgetId);
       countQuery.push(transformedQuery);
       return;
     }
@@ -624,7 +619,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
   result = $.when(...countQuery.map((query) => batchRequests(query)))
     .then((...response) => {
       let total = 0;
-      let showMore = models.some(function (model, index) {
+      let showMore = widgetIds.some(function (model, index) {
         const count = Object.values(response[index])[0].total;
 
         if (!count) {
