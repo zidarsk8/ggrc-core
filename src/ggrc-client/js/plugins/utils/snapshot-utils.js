@@ -215,38 +215,6 @@ function isSnapshotType(instance) {
 }
 
 /**
- * build query for getting a snapshot.
- * @param {String} instance - Relevant instance
- * @param {String} childId - Child id of snapshot
- * @param {String} childType - Child type of snapshot
- * @return {Object} Query object
- */
-function getSnapshotItemQuery(instance, childId, childType) {
-  let relevantFilters = [{
-    type: instance.type,
-    id: instance.id,
-    operation: 'relevant',
-  }];
-  let filters = {
-    expression: {
-      left: {
-        left: 'child_type',
-        op: {name: '='},
-        right: childType,
-      },
-      op: {name: 'AND'},
-      right: {
-        left: 'child_id',
-        op: {name: '='},
-        right: childId,
-      },
-    },
-  };
-  let query = buildParam('Snapshot', {}, relevantFilters, [], filters);
-  return {data: [query]};
-}
-
-/**
  * get snapshot counts
  * @param {Array} widgets - available widgets names
  * @param {Object} instance - Object instance
@@ -304,7 +272,6 @@ export {
   toObjects,
   transformQueryToSnapshot,
   setAttrs,
-  getSnapshotItemQuery,
   isSnapshotType,
   getParentUrl,
   getSnapshotsCounts,
