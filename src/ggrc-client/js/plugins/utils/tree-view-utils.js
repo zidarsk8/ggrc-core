@@ -27,9 +27,6 @@ import {
   buildCountParams,
 } from './query-api-utils';
 import {
-  parentHasObjectVersions,
-} from './object-versions-utils';
-import {
   getWidgetConfigs,
   getWidgetConfig,
 } from './widgets-utils';
@@ -407,7 +404,7 @@ function loadFirstTierItems(modelName,
     null,
     filter,
   );
-  let requestedType;
+
   let requestData = request.slice() || canList();
 
   if (transformToSnapshot ||
@@ -415,7 +412,7 @@ function loadFirstTierItems(modelName,
     params = transformQuery(params);
   }
 
-  requestedType = params.object_name;
+  let requestedType = params.object_name;
   requestData.push(params);
   return $.when(...requestData.attr().map((el) => batchRequests(el)))
     .then((...response) => {
@@ -468,17 +465,11 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
           filter
         );
 
-        const isMegaRelated = isMegaObjectRelated(modelObject.countsName);
-
-        if (isMegaRelated) {
-          params.object_name = modelObject.countsName;
-        }
-
         if (isSnapshotRelated(relevant.type, params.object_name) ||
           modelObject.isObjectVersion) {
           params = transformQuery(params);
-        } else if (isMegaRelated) {
-          params = transformQueryForMega(params);
+        } else if (isMegaObjectRelated(modelObject.countsName)) {
+          params = transformQueryForMega(params, modelObject.countsName);
         }
 
         return batchRequests(params);
@@ -589,37 +580,11 @@ function isDirectlyRelated(instance) {
  * @param {Array} models - Type of model.
  * @param {Object} relevant - Relevant description
  * @param {String} filter - Filter string.
- * @return {Array} - List of queries
- * @private
- */
-function _getQuerryObjectVersion(models, relevant, filter) {
-  let countQuery = [];
-  models.forEach(function (model) {
-    let widgetConfig = getWidgetConfig(model);
-    let name = widgetConfig.name;
-    let query = buildCountParams([name], relevant, filter);
-
-    if (widgetConfig.isObjectVersion) {
-      query = transformQuery(query[0]);
-      countQuery.push(query);
-    } else {
-      countQuery.push(query[0]);
-    }
-  });
-
-  return countQuery;
-}
-
-/**
- *
- * @param {Array} models - Type of model.
- * @param {Object} relevant - Relevant description
- * @param {String} filter - Filter string.
  * @return {Promise} - Counts for limitation load items for sub tier
  * @private
  */
 function _buildSubTreeCountMap(models, relevant, filter) {
-  let countQuery;
+  let countQuery = [];
   let result;
   let countMap = {};
 
@@ -627,54 +592,61 @@ function _buildSubTreeCountMap(models, relevant, filter) {
     models.forEach(function (model) {
       countMap[model] = false;
     });
-    result = $.Deferred().resolve({
+    return $.Deferred().resolve({
       countsMap: countMap,
       showMore: false,
     });
-  } else {
-    if (parentHasObjectVersions(relevant.type)) {
-      countQuery = _getQuerryObjectVersion(models, relevant, filter);
-    } else {
-      countQuery = buildCountParams(models, relevant, filter)
-        .map(function (param) {
-          if (isSnapshotRelated(
-            relevant.type,
-            param.object_name)) {
-            param = transformQuery(param);
-          } else if (isMegaObjectRelated(param.object_name)) {
-            param = transformQueryForMega(param);
-          }
-          return param;
-        });
+  }
+
+  models.forEach((model) => {
+    let widgetConfig = getWidgetConfig(model);
+    let modelName = widgetConfig.name;
+
+    let query = buildCountParams([modelName], relevant, filter);
+
+    if (widgetConfig.isObjectVersion ||
+      isSnapshotRelated(relevant.type, query.object_name)) {
+      let transformedQuery = transformQuery(query[0]);
+      countQuery.push(transformedQuery);
+      return;
     }
 
-    result = $.when(...countQuery.map((query) => batchRequests(query)))
-      .then((...response) => {
-        let total = 0;
-        let showMore = models.some(function (model, index) {
-          const count = Object.values(response[index])[0].total;
+    if (widgetConfig.isMegaObject) {
+      let transformedQuery =
+        transformQueryForMega(query[0], model);
+      countQuery.push(transformedQuery);
+      return;
+    }
 
-          if (!count) {
-            return false;
-          }
+    countQuery.push(query[0]);
+  });
 
-          if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
-            countMap[model] = count;
-          } else {
-            countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
-          }
+  result = $.when(...countQuery.map((query) => batchRequests(query)))
+    .then((...response) => {
+      let total = 0;
+      let showMore = models.some(function (model, index) {
+        const count = Object.values(response[index])[0].total;
 
-          total += count;
+        if (!count) {
+          return false;
+        }
 
-          return total >= SUB_TREE_ELEMENTS_LIMIT;
-        });
+        if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
+          countMap[model] = count;
+        } else {
+          countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
+        }
 
-        return {
-          countsMap: countMap,
-          showMore: showMore,
-        };
+        total += count;
+
+        return total >= SUB_TREE_ELEMENTS_LIMIT;
       });
-  }
+
+      return {
+        countsMap: countMap,
+        showMore: showMore,
+      };
+    });
 
   return result;
 }

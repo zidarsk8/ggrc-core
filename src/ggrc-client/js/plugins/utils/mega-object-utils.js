@@ -74,13 +74,12 @@ function getMegaObjectRelation(modelName = '') {
 /**
  * Transform query for objects into query for mega object
  * @param {Object} query - original query
+ * @param {string} modelName - related to mega object model (has child/parent postfix)
  * @return {Object} The transformed query
  */
-function transformQueryForMega(query) {
+function transformQueryForMega(query, modelName) {
   const expression = query.filters.expression;
-  const relation = getMegaObjectRelation(query.object_name);
-
-  query.object_name = relation.source;
+  const relation = getMegaObjectRelation(modelName);
 
   if (expression) {
     expression.op = {

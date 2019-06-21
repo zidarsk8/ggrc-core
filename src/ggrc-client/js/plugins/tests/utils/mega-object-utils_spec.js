@@ -78,9 +78,9 @@ describe('transformQueryForMega method', () => {
   it('should return transformed query if query.filters.expression and ' +
   'query.fields are not defined', () => {
     const result = megaObjectUtils.transformQueryForMega({
-      object_name: 'Program_parent',
+      object_name: 'Program',
       filters: {},
-    });
+    }, 'Program_parent');
     expect(result).toEqual({
       object_name: 'Program',
       filters: {},
@@ -90,11 +90,11 @@ describe('transformQueryForMega method', () => {
   it('should return transformed query if query.filters.expression is defined',
     () => {
       const result = megaObjectUtils.transformQueryForMega({
-        object_name: 'Program_parent',
+        object_name: 'Program',
         filters: {
           expression: {},
         },
-      });
+      }, 'Program_parent');
       expect(result).toEqual({
         object_name: 'Program',
         filters: {
@@ -110,10 +110,10 @@ describe('transformQueryForMega method', () => {
   it('should return transformed query if query.fields is defined ' +
   'and does not contain "is_mega"', () => {
     const result = megaObjectUtils.transformQueryForMega({
-      object_name: 'Program_parent',
+      object_name: 'Program',
       filters: {},
       fields: 'field',
-    });
+    }, 'Program_parent');
     expect(result).toEqual({
       object_name: 'Program',
       filters: {},
@@ -124,12 +124,12 @@ describe('transformQueryForMega method', () => {
   it('should return transformed query if query.filters.expression, ' +
   'query.fields are defined and does not contain "is_mega"', () => {
     const result = megaObjectUtils.transformQueryForMega({
-      object_name: 'Program_parent',
+      object_name: 'Program',
       filters: {
         expression: {},
       },
       fields: 'field',
-    });
+    }, 'Program_parent');
     expect(result).toEqual({
       object_name: 'Program',
       filters: {
