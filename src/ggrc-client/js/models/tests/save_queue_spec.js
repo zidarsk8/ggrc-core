@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import SaveQueue from '../save_queue';
+import {_processSaveResponses} from '../save_queue';
 
 describe('SaveQueue module', function () {
   'use strict';
@@ -15,7 +15,7 @@ describe('SaveQueue module', function () {
     beforeEach(function () {
       let thisContext = {};
 
-      method = SaveQueue._process_save_responses.bind(thisContext);
+      method = _processSaveResponses.bind(thisContext);
 
       bucket = {
         objs: [],

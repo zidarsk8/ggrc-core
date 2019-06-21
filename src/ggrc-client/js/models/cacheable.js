@@ -24,7 +24,7 @@ import {
 } from '../plugins/utils/snapshot-utils';
 import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent-notifier';
-import SaveQueue from './save_queue';
+import enqueue from './save_queue';
 import {refreshAll} from './refresh_queue';
 import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
@@ -774,7 +774,7 @@ export default canModel.extend({
     this._dfd = new $.Deferred();
     delayLeavingPageUntil(this._dfd);
 
-    SaveQueue.enqueue(this, this._super);
+    enqueue(this, this._super);
 
     return this._dfd;
   },
