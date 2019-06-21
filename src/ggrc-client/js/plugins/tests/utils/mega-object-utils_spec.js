@@ -80,7 +80,7 @@ describe('transformQueryForMega method', () => {
     const result = megaObjectUtils.transformQueryForMega({
       object_name: 'Program',
       filters: {},
-    }, 'Program_parent');
+    }, 'parent');
     expect(result).toEqual({
       object_name: 'Program',
       filters: {},
@@ -94,7 +94,7 @@ describe('transformQueryForMega method', () => {
         filters: {
           expression: {},
         },
-      }, 'Program_parent');
+      }, 'parent');
       expect(result).toEqual({
         object_name: 'Program',
         filters: {
@@ -113,7 +113,7 @@ describe('transformQueryForMega method', () => {
       object_name: 'Program',
       filters: {},
       fields: 'field',
-    }, 'Program_parent');
+    }, 'parent');
     expect(result).toEqual({
       object_name: 'Program',
       filters: {},
@@ -129,7 +129,7 @@ describe('transformQueryForMega method', () => {
         expression: {},
       },
       fields: 'field',
-    }, 'Program_parent');
+    }, 'parent');
     expect(result).toEqual({
       object_name: 'Program',
       filters: {

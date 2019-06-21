@@ -460,12 +460,7 @@ function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
           filter
         );
 
-        if (isSnapshotRelated(relevant.type, params.object_name) ||
-          modelObject.isObjectVersion) {
-          params = transformQueryToSnapshot(params);
-        } else if (isMegaObjectRelated(modelObject.countsName)) {
-          params = transformQueryForMega(params, modelObject.countsName);
-        }
+        params = _transformQuery(params, relevant, modelObject);
 
         return batchRequests(params);
       });
@@ -518,6 +513,24 @@ function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
         total: total,
       };
     });
+}
+
+/**
+ * Transforms query params for Snapshots and Mega related objects
+ * @param {Object} params query params
+ * @param {Object} relevant parent object
+ * @param {Object} widgetConfig initial config for query
+ * @return {Object} query params
+ */
+function _transformQuery(params, relevant, widgetConfig) {
+  if (isSnapshotRelated(relevant.type, params.object_name) ||
+    widgetConfig.isObjectVersion) {
+    params = transformQueryToSnapshot(params);
+  } else if (widgetConfig.isMegaObject) {
+    params = transformQueryForMega(params, widgetConfig.relation);
+  }
+
+  return params;
 }
 
 /**
@@ -598,22 +611,7 @@ function _buildSubTreeCountMap(widgetIds, relevant, filter) {
     let modelName = widgetConfig.name;
 
     let query = buildCountParams([modelName], relevant, filter);
-
-    if (widgetConfig.isObjectVersion ||
-      isSnapshotRelated(relevant.type, query.object_name)) {
-      let transformedQuery = transformQueryToSnapshot(query[0]);
-      countQuery.push(transformedQuery);
-      return;
-    }
-
-    if (widgetConfig.isMegaObject) {
-      let transformedQuery =
-        transformQueryForMega(query[0], widgetId);
-      countQuery.push(transformedQuery);
-      return;
-    }
-
-    countQuery.push(query[0]);
+    countQuery.push(_transformQuery(query[0], relevant, widgetConfig));
   });
 
   result = $.when(...countQuery.map((query) => batchRequests(query)))
