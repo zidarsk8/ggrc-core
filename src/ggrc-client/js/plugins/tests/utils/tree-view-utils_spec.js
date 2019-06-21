@@ -299,6 +299,39 @@ describe('TreeViewUtils module', function () {
       spyOn(MegaObjectUtils, 'isMegaObjectRelated');
     });
 
+    function notEmptyBatchResponse(params) {
+      if (params.type === 'count') {
+        return $.Deferred().resolve({
+          [params.object_name]: {
+            total: 1,
+          },
+        });
+      }
+
+      if (params.object_name === 'Snapshot') {
+        return $.Deferred().resolve({
+          [params.object_name]: {
+            total: 1,
+            values: [{
+              id: 1,
+              type: 'Snapshot',
+              child_type: params.filters.expression.left.right,
+              revision: {content: {}},
+            }],
+          }});
+      }
+
+      return $.Deferred().resolve({
+        [params.object_name]: {
+          total: 1,
+          values: [{
+            id: 1,
+            type: params.object_name,
+            revision: {content: {}},
+          }],
+        }});
+    }
+
     describe('for Cycle, CycleTaskGroup, CycleTaskGroupObjectTask', () => {
       ['Cycle', 'CycleTaskGroup', 'CycleTaskGroupObjectTask']
         .forEach((model) => {
@@ -324,6 +357,45 @@ describe('TreeViewUtils module', function () {
                 done();
               });
           });
+
+          it(`should make correct objects requests (${model})`, (done) => {
+            QueryApiUtils.batchRequests
+              .and.callFake((params) => {
+                if (params.type === 'count') {
+                  return $.Deferred().resolve({
+                    [params.object_name]: {
+                      total: 1,
+                    },
+                  });
+                }
+
+                return $.Deferred().resolve({
+                  [params.object_name]: {
+                    total: 1,
+                    values: [{id: 1, type: params.object_name}],
+                  },
+                });
+              });
+
+            module.loadItemsForSubTier(['Metric'], model, 1, null, {})
+              .then(() => {
+                let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+                expect(queries[0][0]).toEqual({
+                  object_name: 'Metric',
+                  filters: {
+                    expression: {
+                      object_name: model,
+                      op: {name: 'relevant'},
+                      ids: ['1'],
+                    },
+                  },
+                  fields: [],
+                });
+
+                done();
+              });
+          });
         });
     });
 
@@ -340,12 +412,10 @@ describe('TreeViewUtils module', function () {
             }
           });
 
-        let models = ['Metric', 'Metric_version'];
-        module.loadItemsForSubTier(models, 'Issue', 1, null, {})
+        let widgetIds = ['Metric', 'Metric_version'];
+        module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
           .then(() => {
             let queries = QueryApiUtils.batchRequests.calls.allArgs();
-
-            expect(queries.length).toBe(2);
 
             expect(queries[0][0]).toEqual({
               object_name: 'Metric',
@@ -373,6 +443,50 @@ describe('TreeViewUtils module', function () {
                     ids: ['1']},
                 },
               },
+            });
+
+            done();
+          });
+      });
+
+      it('should make correct objects requests', (done) => {
+        QueryApiUtils.batchRequests
+          .and.callFake(notEmptyBatchResponse);
+
+        let widgetIds = ['Metric', 'Metric_version'];
+        module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
+          .then(() => {
+            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+            expect(queries.length).toBe(4);
+
+            expect(queries[2][0]).toEqual({
+              object_name: 'Metric',
+              filters: {
+                expression: {
+                  object_name: 'Issue',
+                  op: {name: 'relevant'},
+                  ids: ['1'],
+                },
+              },
+              fields: jasmine.any(Array),
+            });
+
+            // makes Snapshot request for *_version model
+            expect(queries[3][0]).toEqual({
+              object_name: 'Snapshot',
+
+              filters: {
+                expression: {
+                  left: {left: 'child_type', op: {name: '='}, right: 'Metric'},
+                  op: {name: 'AND'},
+                  right: {
+                    object_name: 'Issue',
+                    op: {name: 'relevant'},
+                    ids: ['1']},
+                },
+              },
+              fields: jasmine.any(Array),
             });
 
             done();
@@ -420,6 +534,39 @@ describe('TreeViewUtils module', function () {
             done();
           });
       });
+
+      it('should make correct objects requests', (done) => {
+        QueryApiUtils.batchRequests
+          .and.callFake(notEmptyBatchResponse);
+
+        SnapshotUtils.isSnapshotRelated.and.returnValue(true);
+
+        let widgetIds = ['Metric'];
+        module.loadItemsForSubTier(widgetIds, 'Audit', 1, null, {})
+          .then(() => {
+            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+            expect(queries.length).toBe(2);
+
+            expect(queries[1][0]).toEqual({
+              object_name: 'Snapshot',
+
+              filters: {
+                expression: {
+                  left: {left: 'child_type', op: {name: '='}, right: 'Metric'},
+                  op: {name: 'AND'},
+                  right: {
+                    object_name: 'Audit',
+                    op: {name: 'relevant'},
+                    ids: ['1']},
+                },
+              },
+              fields: jasmine.any(Array),
+            });
+
+            done();
+          });
+      });
     });
 
     describe('for mega objects', () => {
@@ -437,8 +584,8 @@ describe('TreeViewUtils module', function () {
 
         MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
 
-        let models = ['Program_child', 'Program_parent'];
-        module.loadItemsForSubTier(models, 'Program', 1, null, {})
+        let widgetIds = ['Program_child', 'Program_parent'];
+        module.loadItemsForSubTier(widgetIds, 'Program', 1, null, {})
           .then(() => {
             let queries = QueryApiUtils.batchRequests.calls.allArgs();
 
@@ -467,6 +614,48 @@ describe('TreeViewUtils module', function () {
                   ids: ['1'],
                 },
               },
+            });
+
+            done();
+          });
+      });
+
+      it('should make correct objects requests', (done) => {
+        QueryApiUtils.batchRequests
+          .and.callFake(notEmptyBatchResponse);
+
+        MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
+
+        let widgetIds = ['Program_child', 'Program_parent'];
+        module.loadItemsForSubTier(widgetIds, 'Program', 1, null, {})
+          .then(() => {
+            let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+            expect(queries.length).toBe(4);
+
+            expect(queries[2][0]).toEqual({
+              object_name: 'Program',
+              filters: {
+                expression: {
+                  object_name: 'Program',
+                  op: {name: 'child'},
+                  ids: ['1'],
+                },
+              },
+              fields: jasmine.any(Array),
+            });
+
+            // makes Snapshot request for *_version model
+            expect(queries[3][0]).toEqual({
+              object_name: 'Program',
+              filters: {
+                expression: {
+                  object_name: 'Program',
+                  op: {name: 'parent'},
+                  ids: ['1'],
+                },
+              },
+              fields: jasmine.any(Array),
             });
 
             done();
