@@ -68,8 +68,11 @@ export default can.Component.extend({
       });
 
       this.attr('isDisabled', true);
-      return savedSearch.save().then(() => {
-        this.dispatch('created');
+      return savedSearch.save().then((savedSearch) => {
+        this.dispatch({
+          type: 'savedSearchCreated',
+          search: savedSearch,
+        });
         this.attr('searchName', '');
       }, (err) => {
         handleAjaxError(err);

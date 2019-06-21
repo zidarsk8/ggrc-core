@@ -114,7 +114,7 @@
           parentItems:from="advancedSearch.parentItems"
           parent:from="advancedSearch.parent"
           objectType:from="modelName"
-          on:created="loadSavedSearches()"
+          on:savedSearchCreated="savedSearchCreated(scope.event)"
         ></create-saved-search>
         {{/if}}
         <div class="advanced-search__controls">

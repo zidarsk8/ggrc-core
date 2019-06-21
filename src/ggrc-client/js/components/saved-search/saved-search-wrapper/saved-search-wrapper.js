@@ -109,6 +109,11 @@ export default can.Component.extend({
           this.attr('isLoading', false);
         });
     },
+    savedSearchCreated(ev) {
+      this.loadSavedSearches().then(() => {
+        this.applySearch(ev);
+      });
+    },
   }),
   events: {
     '{viewModel.searchesPaging} current'() {
