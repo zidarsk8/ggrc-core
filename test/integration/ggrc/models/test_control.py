@@ -1129,3 +1129,37 @@ class TestSyncServiceControl(TestCase):
         control,
         {"Admin": [{"name": "user1", "email": "user1@example.com"}]}
     )
+
+  def test_json_deserialization(self):
+    """Created_by attribute should contain person stub"""
+    with factories.single_commit():
+      creator_email = "creator@example.com"
+      creator = factories.PersonFactory(email=creator_email)
+      creator_id = creator.id
+      control = factories.ControlFactory(
+          title="Test control", created_by=creator,
+          last_submitted_by=creator,
+          last_verified_by=creator
+      )
+    json_representation = control.log_json()
+    self.assertTrue(isinstance(json_representation["created_by"], dict))
+    self.assertTrue(
+        isinstance(json_representation["last_submitted_by"], dict)
+    )
+    self.assertTrue(isinstance(json_representation["last_verified_by"], dict))
+    self.assertEquals(
+        json_representation["created_by"]["email"], creator_email
+    )
+    self.assertEquals(
+        json_representation["last_submitted_by"]["email"], creator_email
+    )
+    self.assertEquals(
+        json_representation["last_verified_by"]["email"], creator_email
+    )
+    self.assertEquals(json_representation["created_by"]["id"], creator_id)
+    self.assertEquals(
+        json_representation["last_submitted_by"]["id"], creator_id
+    )
+    self.assertEquals(
+        json_representation["last_verified_by"]["id"], creator_id
+    )

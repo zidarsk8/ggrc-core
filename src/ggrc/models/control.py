@@ -189,9 +189,9 @@ class Control(synchronizable.Synchronizable,
 
   def log_json(self):
     out_json = super(Control, self).log_json()
-    out_json["created_by"] = self.created_by
-    out_json["last_submitted_by"] = self.last_submitted_by
-    out_json["last_verified_by"] = self.last_verified_by
+    out_json["created_by"] = ggrc_utils.created_by_stub(self)
+    out_json["last_submitted_by"] = ggrc_utils.last_submitted_by_stub(self)
+    out_json["last_verified_by"] = ggrc_utils.last_verified_by_stub(self)
     # so that event log can refer to deleted directive
     if self.directive:
       out_json["mapped_directive"] = self.directive.display_name
