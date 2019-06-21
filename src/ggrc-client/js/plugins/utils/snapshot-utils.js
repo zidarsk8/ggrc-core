@@ -189,7 +189,7 @@ function toObjects(values) {
  * @param {Object} query - original query
  * @return {Object} The transformed query
  */
-function transformQuery(query) {
+function transformQueryToSnapshot(query) {
   let type = query.object_name;
   let expression = query.filters.expression;
   query.object_name = 'Snapshot';
@@ -302,7 +302,7 @@ export {
   isAuditScopeModel,
   toObject,
   toObjects,
-  transformQuery,
+  transformQueryToSnapshot,
   setAttrs,
   getSnapshotItemQuery,
   isSnapshotType,

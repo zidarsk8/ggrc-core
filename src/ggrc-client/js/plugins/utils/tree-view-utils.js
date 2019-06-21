@@ -12,7 +12,7 @@ import {
   isSnapshotRelated,
   isSnapshotScope,
   toObject,
-  transformQuery,
+  transformQueryToSnapshot,
 } from './snapshot-utils';
 import {
   related,
@@ -409,7 +409,7 @@ function loadFirstTierItems(modelName,
 
   if (transformToSnapshot ||
     (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
-    params = transformQuery(params);
+    params = transformQueryToSnapshot(params);
   }
 
   let requestedType = params.object_name;
@@ -462,7 +462,7 @@ function loadItemsForSubTier(widgetIds, type, id, filter, pageInfo) {
 
         if (isSnapshotRelated(relevant.type, params.object_name) ||
           modelObject.isObjectVersion) {
-          params = transformQuery(params);
+          params = transformQueryToSnapshot(params);
         } else if (isMegaObjectRelated(modelObject.countsName)) {
           params = transformQueryForMega(params, modelObject.countsName);
         }
@@ -601,7 +601,7 @@ function _buildSubTreeCountMap(widgetIds, relevant, filter) {
 
     if (widgetConfig.isObjectVersion ||
       isSnapshotRelated(relevant.type, query.object_name)) {
-      let transformedQuery = transformQuery(query[0]);
+      let transformedQuery = transformQueryToSnapshot(query[0]);
       countQuery.push(transformedQuery);
       return;
     }
@@ -693,7 +693,7 @@ function startExport(
 
   if (transformToSnapshot ||
     (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
-    params = transformQuery(params);
+    params = transformQueryToSnapshot(params);
   }
 
   let requestData = request.slice() || canList();
