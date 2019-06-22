@@ -484,6 +484,7 @@ class ImportRowConverter(RowConverter):
     else:
       self.send_comment_notifications()
       self.send_post_commit_signals(event=import_event)
+    self.create_comment_notifications()
 
   def _setup_object(self):
     """ Set the object values or relate object values
@@ -506,6 +507,22 @@ class ImportRowConverter(RowConverter):
     if self.comments:
       people_mentions.handle_comment_mapped(obj=self.obj,
                                             comments=self.comments)
+
+  def create_comment_notifications(self):
+    """Create comment notifications."""
+    import datetime
+
+    if self.comments:
+      notif_type_id = all_models.NotificationType.query.filter_by(
+          name="comment_created"
+      ).one().id
+      for comment in self.comments:
+        notification = all_models.Notification(
+            object=comment,
+            send_on=datetime.datetime.utcnow(),
+            notification_type_id=notif_type_id,
+        )
+        db.session.add(notification)
 
   def send_post_commit_signals(self, event=None):
     """Send after commit signals for all objects
