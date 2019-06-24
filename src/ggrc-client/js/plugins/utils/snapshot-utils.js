@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canConstruct from 'can-construct';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import {
@@ -104,7 +105,7 @@ function isAuditScopeModel(model) {
  * @return {Object} The object
  */
 function toObject(instance) {
-  let content = instance.revision.content instanceof can.Construct ?
+  let content = instance.revision.content instanceof canConstruct ?
     instance.revision.content.attr() : instance.revision.content;
 
   content.originalLink = getParentUrl(instance);

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canConstruct from 'can-construct';
 import {getPageInstance} from './plugins/utils/current-page-utils';
 import Stub from '../js/models/stub';
 import {getInstance} from '../js/plugins/utils/models-utils';
@@ -54,7 +55,7 @@ let _CONDITIONS_MAP = {
 };
 let permissionsCompute = can.compute(GGRC.permissions);
 
-const Permission = can.Construct.extend({
+const Permission = canConstruct.extend({
   _admin_permission_for_context: function (contextId) {
     return new Permission(
       ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, contextId);
