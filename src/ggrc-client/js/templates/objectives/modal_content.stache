@@ -22,7 +22,7 @@
   </div>
 
   <div class="row-fluid">
-    <div data-id="description_hidden" class="span6 hidable">
+    <div class="span6 hidable">
       <label>
         Description
         <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>

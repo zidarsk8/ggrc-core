@@ -65,7 +65,7 @@
     </div>
     <div>
       <div class="row-fluid">
-        <div data-id="description_hidden" class="span6 hidable">
+        <div class="span6 hidable">
           <label>
             Description
             <i class="fa fa-question-circle" rel="tooltip" title="Describe reason and purpose of the Audit."></i>
