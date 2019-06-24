@@ -39,7 +39,7 @@
   </div>
 
   <div class="row-fluid">
-    <div data-id="test_plan_hidden" class="span6 hidable">
+    <div class="span6 hidable">
       <label>
         Remediation Plan
         <i class="fa fa-question-circle" rel="tooltip" title="Provide a remediation plan for this {{model.model_singular}}."></i>
