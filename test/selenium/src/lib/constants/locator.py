@@ -251,11 +251,6 @@ class ExtendedInfo(object):
  member object."""
   # labels
   TITLE = (By.CSS_SELECTOR, "#extended-info .main-title")
-  # user input elements
-  BUTTON_MAP_TO = (
-      By.CSS_SELECTOR, '[data-test-id="extended_info_button_map"]')
-  ALREADY_MAPPED = (
-      By.CSS_SELECTOR, '[data-test-id="extended_info_object_already_mapped"]')
 
 
 class CommonModalUnifiedMapper(object):
@@ -341,24 +336,10 @@ class ModalCreateNewPerson(BaseModalCreateNew):
 
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for Create new object modals."""
-  MODAL = Common.MODAL_CREATE
-  # user input elements
-  UI_TITLE = (By.CSS_SELECTOR, MODAL + ' [placeholder="Enter Title"]')
-  CODE = (By.CSS_SELECTOR, MODAL + ' [name="slug"]')
-  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
-                           MODAL + ' [data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (
-      By.CSS_SELECTOR, '{} [data-toggle="modal-submit-addmore"]'.format(MODAL))
 
 
 class ModalCreateNewProgram(BaseModalCreateNew):
   """Locators for Create new Program modals."""
-  # user input elements
-  UI_STATE = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_dropdown_state_036a1fa6"]')
-  BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
-  BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  PRIVACY = (By.CSS_SELECTOR, '[data-test-id="label_privacy_2c925d94"]')
 
 
 class ModalCreateNewOrgGroup(BaseModalCreateNew):
@@ -367,8 +348,6 @@ class ModalCreateNewOrgGroup(BaseModalCreateNew):
 
 class ModalCreateNewRisk(BaseModalCreateNew):
   """Locators for Create new Risk modals."""
-  UI_DESCRIPTION = (
-      By.CSS_SELECTOR, '[tabindex="2"] .ql-editor')
 
 
 class ModalCreateNewDataAsset(BaseModalCreateNew):
@@ -393,63 +372,6 @@ class ModalCreateNewProduct(BaseModalCreateNew):
 
 class ModalCreateNewControl(BaseModalCreateNew):
   """Locators for Create new Control modals."""
-  class _Locator(object):
-    """Locators for Create new Control modals visible when creating from LHN.
-    """
-    @staticmethod
-    def get_assignee_row(first_id, second_id):
-      return (
-          By.CSS_SELECTOR,
-          '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
-          'label'.format(first_id, second_id))
-
-    @staticmethod
-    def get_dropdown_item(first_id, second_id):
-      return (
-          By.CSS_SELECTOR,
-          '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
-          'select'.format(first_id, second_id))
-  DESCRIPTION = (
-      By.CSS_SELECTOR, '[data-test-id="control_description-label_9cc51ca3"]')
-  UI_DESCRIPTION = (
-      By.CSS_SELECTOR,
-      '[data-test-id="control_description-text_9cc51ca3"] .ql-editor')
-  TEST_PLAN = (
-      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] label')
-  UI_TEST_PLAN = (
-      By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] '
-                       '.ql-editor')
-  KIND_OR_NATURE = (
-      By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] label')
-  DROPDOWN_KIND_OR_NATURE = (
-      By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] select')
-  FRAUD_RELATED = (
-      By.CSS_SELECTOR, '[data-test-id="control_fraud_9cc51ca3"] label')
-  DROPDOWN_FRAUD_RELATED = (
-      By.CSS_SELECTOR, '[data-test-id="control_fraud_9cc51ca3"] select')
-  FREQUENCY = (
-      By.CSS_SELECTOR, '[data-test-id="control_frequency_fb20318a"] label')
-  DROPDOWN_FREQUENCY = (
-      By.CSS_SELECTOR, '[data-test-id="control_frequency_fb20318a"] select')
-  ASSERTIONS = (
-      By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
-  ADMIN = (
-      By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
-  SIGNIFICANCE = (
-      By.CSS_SELECTOR, '[data-test-id="control_significance_18f15545"] label')
-  DROPDOWN_SIGNIFICANCE = (
-      By.CSS_SELECTOR, '[data-test-id="control_significance_18f15545"] select')
-  TYPE_OR_MEANS = (
-      By.CSS_SELECTOR, '[data-test-id="control_type_means_2ffa1b64"] label')
-  DROPDOWN_TYPE_OR_MEANS = (
-      By.CSS_SELECTOR, '[data-test-id="control_type_means_2ffa1b64"] select')
-  CATEGORIES = (
-      By.CSS_SELECTOR, '[data-test-id="control_categories_1eb33246"] label')
-  STATE = (
-      By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] label')
-  DROPDOWN_STATE = (
-      By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
-  BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
 class ModalCreateNewObjective(BaseModalCreateNew):
