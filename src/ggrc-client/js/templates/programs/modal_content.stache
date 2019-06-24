@@ -97,7 +97,7 @@
 
   {{^if isProposal}}
     <div class="row-fluid">
-      <div data-id="folder_hidden" class="span6 hidable">
+      <div class="span6 hidable">
         <ggrc-gdrive-folder-picker instance:from="instance" deferred:from="true" tabindex="7">
         </ggrc-gdrive-folder-picker>
       </div>
