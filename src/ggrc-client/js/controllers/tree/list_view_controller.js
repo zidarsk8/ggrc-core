@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canCompute from 'can-compute';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import CanMap from 'can-map';
@@ -56,11 +57,11 @@ export default TreeLoader.extend({
         },
       },
     });
-    this.context.attr('has_next_page', can.compute(() => {
+    this.context.attr('has_next_page', canCompute(() => {
       let pager = this.context.attr('pager');
       return pager && pager.has_next && pager.has_next();
     }));
-    this.context.attr('has_prev_page', can.compute(() => {
+    this.context.attr('has_prev_page', canCompute(() => {
       let pager = this.context.attr('pager');
       return pager && pager.has_prev && pager.has_prev();
     }));

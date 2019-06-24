@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canCompute from 'can-compute';
 import canList from 'can-list';
 import CanMap from 'can-map';
 const MAX_COLUMNS_COUNT = 1000;
@@ -30,7 +31,7 @@ export default CanMap.extend({
   type: 'Program',
   filter: '',
   maxAttributesCount: MAX_COLUMNS_COUNT,
-  relevant: can.compute(() => {
+  relevant: canCompute(() => {
     return new canList();
   }),
   attributes: new canList(),

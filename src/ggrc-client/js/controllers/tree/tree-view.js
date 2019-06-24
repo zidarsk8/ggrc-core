@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canCompute from 'can-compute';
 import makeArray from 'can-util/js/make-array/make-array';
 import canModel from 'can-model';
 import canStache from 'can-stache';
@@ -139,7 +140,7 @@ const TreeViewControl = TreeLoader.extend({
     if (this.options.list_loader) {
       this.options.list_loader(this.options.parent_instance)
         .then(function (list) {
-          return can.compute(function () {
+          return canCompute(function () {
             return list.attr('length');
           });
         })
