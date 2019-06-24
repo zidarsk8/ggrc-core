@@ -16,7 +16,7 @@
               {{> /static/templates/base_objects/description.stache}}
               {{> /static/templates/base_objects/notes.stache}}
               <div class="row-fluid wrap-row">
-                <div data-test-id="title_manager_7a906d2e">
+                <div>
                   <custom-roles readOnly:from="instance.readOnlyProgramRoles"
                                 includeRoles:from="instance.class.programRoles"
                                 instance:from="instance">

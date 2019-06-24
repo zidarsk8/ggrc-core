@@ -206,7 +206,6 @@ class LhnMenu(object):
   FILTER_SUBMIT_BUTTON = (By.CSS_SELECTOR, ".lhs-search>.widgetsearch-submit")
   FILTER_CLEAR_BUTTON = (
       By.CSS_SELECTOR, '.lhs-search [data-title="Clear filters"]')
-  LHS_ITEM = (By.CSS_SELECTOR, '[test-data-id="lhs-item_3ad27b8b"]')
   ALL_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="all_objects_e0345ec4"]')
   MY_OBJECTS = (By.CSS_SELECTOR, '[data-test-id="my_objects_6fa95ae1"]')
   PIN = (By.CSS_SELECTOR, ".lhn-pin")
@@ -753,12 +752,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
       By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
   TOGGLE_SHOW_ADVANCED_ACTIVATED = (
       By.CSS_SELECTOR, "{} .show-hidden-fields.active".format(WIDGET))
-  DESCRIPTION = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_description_7a906d2e"] h6'.format(WIDGET))
-  DESCRIPTION_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_description_content_7a906d2e"]'.format(WIDGET))
   NOTES_ENTERED = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_notes_content_ef5bc3a71e88"]'.format(WIDGET))
@@ -1124,9 +1117,6 @@ class AdminCustomAttributes(object):
   FILTER_BUTTON_RESET = (By.CSS_SELECTOR,
                          '.tree-filter__button>[type="reset"]')
   # programs dropdown
-  BUTTON_ADD_CUSTOM_PROGRAM_ATTR = (
-      By.CSS_SELECTOR,
-      '.tree-item:nth-child(5) [data-test-id="button_add-86eaf948"]')
   PROGRAMS_LABEL_ATTRIBUTE_NAME = _Locator.get_programs_label(1)
   PROGRAMS_LABEL_ATTRIBUTE_TYPE = _Locator.get_programs_label(2)
   PROGRAMS_LABEL_MANDATORY = _Locator.get_programs_label(3)
