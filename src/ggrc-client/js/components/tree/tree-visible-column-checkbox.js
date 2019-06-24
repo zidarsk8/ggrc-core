@@ -20,8 +20,5 @@ export default can.Component.extend({
         return item.title;
       }
     },
-    onChange(attr) {
-      attr.attr('selected', !attr.attr('selected'));
-    },
   }),
 });

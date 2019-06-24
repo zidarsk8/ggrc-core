@@ -6,9 +6,8 @@
 {{#column}}
   <label class="checkbox-inline" title="{{getTitle(.)}}">
     <input type="checkbox"
-      checked:from="selected"
+      checked:bind="selected"
       {{#mandatory}}disabled{{/mandatory}}
-      on:el:change="onChange"
       value="{{name}}"
       class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
     {{getTitle(.)}}
