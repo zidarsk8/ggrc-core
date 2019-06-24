@@ -324,15 +324,8 @@ export default can.Component.extend({
       }
     },
     setSelectedItems: function (allItems) {
-      let selectedItems;
+      let selectedItems = can.makeArray(this.attr('selected'));
 
-      // get items which were selected before adding of new entries
-      if (this.attr('prevSelected') && this.attr('prevSelected').length > 0) {
-        this.attr('selected', this.attr('prevSelected').slice());
-        this.attr('prevSelected', []);
-      }
-
-      selectedItems = can.makeArray(this.attr('selected'));
       allItems.forEach(function (item) {
         item.isSelected =
           selectedItems.some(function (selectedItem) {
@@ -528,6 +521,30 @@ export default can.Component.extend({
     showRelatedAssessments: function (ev) {
       this.attr('relatedAssessments.instance', ev.instance);
       this.attr('relatedAssessments.state.open', true);
+    },
+    onItemDestroyed({itemId}) {
+      const selectedItems = this.attr('selected');
+      const selectedIndex = _.findIndex(selectedItems,
+        (item) => item.attr('id') === itemId);
+
+      // remove selection of destroyed item
+      // if it was selected before deletion
+      if (selectedIndex !== -1) {
+        selectedItems.splice(selectedIndex, 1);
+      }
+
+      const paging = this.attr('paging');
+      const currentPageNumber = paging.attr('current');
+      const needToGoToPrevPage = (
+        currentPageNumber > 1 &&
+        this.attr('items.length') === 1
+      );
+
+      if (needToGoToPrevPage) {
+        paging.attr('current', currentPageNumber - 1);
+      }
+
+      this.setItems();
     },
   }),
   events: {

@@ -319,20 +319,6 @@ export default can.Control.extend({
         )).then(function () {
           instance = this.options.attr('instance');
         }.bind(this));
-      } else {
-        dfd = this.options.model.findAll(params).then(function (data) {
-          if (data.length) {
-            that.options.attr('instance', data[0]);
-            return data[0].refresh(); // have to refresh (get ETag) to be editable.
-          }
-          that.options.attr('new_object_form', true);
-          that.options.attr('instance', new that.options.model(params));
-          return instance;
-        }).done(function () {
-          if (!that.wasDestroyed()) {
-            that.on(); // listen to instance.
-          }
-        });
       }
     } else {
       this.options.attr('instance', new can.Map(params));

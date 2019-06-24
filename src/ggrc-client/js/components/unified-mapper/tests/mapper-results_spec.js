@@ -628,13 +628,6 @@ describe('mapper-results component', function () {
       viewModel.setSelectedItems(allItems);
       expect(allItems).toEqual(expectedResult);
     });
-
-    it('uses prevSelected if prevSelected.length > 0', function () {
-      viewModel.attr('prevSelected', [{id: 123}]);
-      viewModel.setSelectedItems(allItems);
-      expect(allItems).toEqual(expectedResult);
-      expect(viewModel.attr('prevSelected').length).toEqual(0);
-    });
   });
 
   describe('setMegaRelations() method', function () {
@@ -1230,6 +1223,65 @@ describe('mapper-results component', function () {
       });
       expect(viewModel.attr('relatedAssessments.state.open'))
         .toEqual(true);
+    });
+  });
+
+  describe('onItemDestroyed() method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'setItems');
+    });
+
+    it('removes selected item based on passed item\'s id from "selected" ' +
+    'collection', () => {
+      viewModel.attr('selected', [
+        {id: 123},
+        {id: 1234},
+        {id: 12345},
+      ]);
+
+      viewModel.onItemDestroyed({itemId: 1234});
+
+      expect(viewModel.attr('selected').serialize()).toEqual([
+        {id: 123},
+        {id: 12345},
+      ]);
+    });
+
+    it('sets previous page if destroyed item was single on the page', () => {
+      viewModel.attr('items', [{}]);
+      viewModel.attr('paging', {current: 3});
+
+      viewModel.onItemDestroyed({itemId: 1});
+
+      expect(viewModel.attr('paging.current')).toBe(2);
+    });
+
+    describe('doesn\'t set previous page', () => {
+      it('if destroyed item was single on the page and current page is ' +
+      'first', () => {
+        viewModel.attr('items', [{}]);
+        viewModel.attr('paging', {current: 1});
+
+        viewModel.onItemDestroyed({itemId: 1});
+
+        expect(viewModel.attr('paging.current')).toBe(1);
+      });
+
+      it('if count of items placed on the page without destroyed item is ' +
+      'more than 1', () => {
+        viewModel.attr('items', [{}, {}]);
+        viewModel.attr('paging', {current: 3});
+
+        viewModel.onItemDestroyed({itemId: 1});
+
+        expect(viewModel.attr('paging.current')).toBe(3);
+      });
+    });
+
+    it('refreshes the list of items', () => {
+      viewModel.onItemDestroyed({itemId: 1});
+
+      expect(viewModel.setItems).toHaveBeenCalled();
     });
   });
 
