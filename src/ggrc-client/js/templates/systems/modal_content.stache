@@ -122,7 +122,7 @@
         Launch Status
         <i class="fa fa-question-circle" rel="tooltip" title="Indicates the status of this object."></i>
       </label>
-      <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <dropdown-component optionsList:from="model.statuses"
                 name:bind="instance.status"
                 tabindex="23">
