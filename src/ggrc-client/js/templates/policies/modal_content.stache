@@ -92,7 +92,7 @@
       <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <input {{^if new_object_form}} disabled {{/if}} tabindex="7" class="input-block-level" name="slug" placeholder="POLICY-XXX" type="text" value="{{slug}}">
     </div>
-    <div data-id="kind_type_hidden" class="span6 hidable">
+    <div class="span6 hidable">
       <label>
         Kind/Type
         <i class="fa fa-question-circle" rel="tooltip" title="Choose from the options in the drop down list, or leave this set to None."></i>
