@@ -77,7 +77,7 @@
         <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
       </label>
       <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <div class="rich-text" data-test-id="new_program_field_notes_75b8bc05">
+      <div class="rich-text">
           <rich-text
             tabindex="6"
             hiddenToolbar:from="true"

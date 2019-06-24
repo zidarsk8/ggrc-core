@@ -358,9 +358,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"] '
                     '.ql-editor')
-  UI_NOTES = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_field_notes_75b8bc05"] '
-              '.ql-editor')
   UI_STATE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
@@ -429,7 +426,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
   UI_TEST_PLAN = (
       By.CSS_SELECTOR, '[data-test-id="control_test_plan_d8b5a2f4"] '
                        '.ql-editor')
-  NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] label')
   KIND_OR_NATURE = (
       By.CSS_SELECTOR, '[data-test-id="control_kind_nature_dadc232f"] label')
   DROPDOWN_KIND_OR_NATURE = (
@@ -460,7 +456,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] label')
   DROPDOWN_STATE = (
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
-  UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] .ql-editor')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
@@ -764,8 +759,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
   DESCRIPTION_ENTERED = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_description_content_7a906d2e"]'.format(WIDGET))
-  NOTES = (By.CSS_SELECTOR,
-           '{} [data-test-id="title_notes_ef5bc3a71e88"] h6'.format(WIDGET))
   NOTES_ENTERED = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_notes_content_ef5bc3a71e88"]'.format(WIDGET))

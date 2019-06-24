@@ -53,7 +53,7 @@
 
   <!-- Notes & Process/Reference url block -->
   <div class="row-fluid">
-    <div data-id="note_hidden" class="span6 hidable">
+    <div class="span6 hidable">
       <label>
         Notes
         <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
@@ -97,8 +97,8 @@
         Kind/Type
         <i class="fa fa-question-circle" rel="tooltip" title="Choose from the options in the drop down list, or leave this set to None."></i>
       </label>
-      <a data-id="hide_kind_type_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      <select data-id="kind_type_dd" class="input-block-level" name="kind" tabindex="9">
+      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <select class="input-block-level" name="kind" tabindex="9">
         <option {{^kind}}selected="selected"{{/kind}} {{^if kind}}selected="selected"{{/if}} value="">---</option>
         <option {{#is(kind, "Company Policy")}}selected="selected"{{/is}} value="Company Policy">Company Policy</option>
         <option {{#is(kind, "Org Group Policy")}}selected="selected"{{/is}} value="Org Group Policy">Org Group Policy</option>

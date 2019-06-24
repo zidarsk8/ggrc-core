@@ -53,7 +53,7 @@
 
   <!-- Notes & Process/Reference url block -->
   <div class="row-fluid">
-    <div data-id="note_hidden" class="span6 hidable">
+    <div class="span6 hidable">
       <label>
         Notes
         <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
