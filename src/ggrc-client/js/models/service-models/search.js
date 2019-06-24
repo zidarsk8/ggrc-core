@@ -3,8 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
 import canList from 'can-list';
-export default can.Model.extend({
+export default canModel.extend({
   ajax: $.ajax,
   root_object: 'search',
   findOne: 'GET /search',

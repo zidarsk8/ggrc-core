@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
 import canList from 'can-list';
 import canControl from 'can-control';
 const originalControlSetup = canControl.setup;
@@ -11,8 +12,8 @@ const defaultValidator = can.validate.validator();
 const originalOnce = defaultValidator.once;
 
 // Set "attributes" field
-if (!can.Model.attributes) {
-  can.Model.attributes = {};
+if (!canModel.attributes) {
+  canModel.attributes = {};
 }
 
 // Returns a function which will be halted unless `this.element` exists

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
 import canList from 'can-list';
 import CanMap from 'can-map';// Disabling some minor eslint rules until major refactoring
 /* eslint-disable no-console, id-length */
@@ -20,7 +21,7 @@ import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
 
-export default can.Model.extend({
+export default canModel.extend({
   ajax: $.ajax,
   root_object: '',
   attr_list: [

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import allModels from '../../models/all-models';
@@ -25,7 +26,7 @@ function reifyMap(obj) {
   const type = obj.type;
   const model = allModels[type];
 
-  if (obj instanceof can.Model) {
+  if (obj instanceof canModel) {
     return obj;
   }
 

@@ -279,7 +279,7 @@ async function loadObjectsByStubs(stubs, fields) {
  * Loads objects based on passed types. If objects with passed type weren't
  * found then the results won't contain objects with mentioned type.
  * @async
- * @param {can.Model.Cacheable|Stub} relevant - Information about relevant
+ * @param {canModel.Cacheable|Stub} relevant - Information about relevant
  * object
  * @param {object|Stub[]} types Array of types for which objects
  * should be loaded

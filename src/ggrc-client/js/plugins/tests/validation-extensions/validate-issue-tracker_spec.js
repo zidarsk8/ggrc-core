@@ -3,14 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanModel from 'can-model/src/can-model';
+import canModel from 'can-model/src/can-model';
 import CanMap from 'can-map/can-map';
 
 describe('validateIssueTracker extension', () => {
   let TestModel;
 
   beforeAll(() => {
-    TestModel = CanModel.extend({}, {
+    TestModel = canModel.extend({}, {
       define: {
         issue_tracker: {
           value: {},

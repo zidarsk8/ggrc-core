@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import * as ReifyUtils from '../../utils/reify-utils';
@@ -11,8 +12,8 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('reify-utils', () => {
   describe('reify() method', () => {
-    it('should return passed obj when it is can.Model', () => {
-      const obj = new can.Model({});
+    it('should return passed obj when it is canModel', () => {
+      const obj = new canModel({});
       const model = ReifyUtils.reify(obj);
 
       expect(model).toBe(obj);
@@ -37,7 +38,7 @@ describe('reify-utils', () => {
       expect(result.serialize()).toEqual(audits.serialize());
     });
 
-    it(`should return can.Model's instance
+    it(`should return canModel's instance
       when passed object is CanMap`, () => {
       const obj = new CanMap({type: 'Audit', id: 1});
       const audit = makeFakeInstance({model: Audit})(
@@ -54,7 +55,7 @@ describe('reify-utils', () => {
 
   describe('isReifiable() method', () => {
     it('should return true when obj is the instance of CanMap', () => {
-      const obj = new can.Model({});
+      const obj = new canModel({});
       const result = ReifyUtils.isReifiable(obj);
 
       expect(result).toBe(true);
@@ -71,7 +72,7 @@ describe('reify-utils', () => {
       expect(console.warn).toHaveBeenCalled();
     });
 
-    it('should return instance can.Model when model is recognized type', () => {
+    it('should return instance canModel when model is recognized type', () => {
       const obj = new CanMap({type: 'Audit', id: 1});
       const audit = makeFakeInstance({model: Audit})(
         {id: 1, data: 'Test data'}

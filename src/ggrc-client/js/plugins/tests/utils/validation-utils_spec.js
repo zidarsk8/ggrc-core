@@ -5,7 +5,7 @@
 
 import CanMap from 'can-map/can-map';
 import canList from 'can-list/can-list';
-import CanModel from 'can-model/src/can-model';
+import canModel from 'can-model/src/can-model';
 
 import {isValidAttr, validateAttr} from '../../utils/validation-utils';
 
@@ -14,7 +14,7 @@ describe('validation utils', () => {
     let testModel;
 
     beforeAll(() => {
-      testModel = new CanModel();
+      testModel = new canModel();
     });
 
     it('should return undefined. model is valid', () => {
@@ -88,7 +88,7 @@ describe('validation utils', () => {
     let testModel;
 
     beforeAll(() => {
-      testModel = new CanModel();
+      testModel = new canModel();
     });
 
     it('should return TRUE. model is valid', () => {

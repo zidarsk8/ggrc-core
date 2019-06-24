@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import Cacheable from '../../js/models/cacheable';
@@ -126,7 +127,7 @@ describe('Cacheable model', () => {
     });
 
     it('sets findAll to default based on root_collection if not set', () => {
-      spyOn(can.Model, 'setup');
+      spyOn(canModel, 'setup');
       let DummyFind = Cacheable.extend({root_collection: 'foos'}, {});
       expect(DummyFind.findAll).toBe('GET /api/foos');
     });

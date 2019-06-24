@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canModel from 'can-model';
 import canStache from 'can-stache';
 import CanMap from 'can-map';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -221,8 +222,8 @@ const TreeViewControl = TreeLoader.extend({
         }
       });
     }
-    if (!(v.instance instanceof can.Model)) {
-      if (v.instance.instance instanceof can.Model) {
+    if (!(v.instance instanceof canModel)) {
+      if (v.instance.instance instanceof canModel) {
         v.attr('result', v.instance);
         v.attr('mappings', v.instance.mappings_compute());
         v.attr('instance', v.instance.instance);

@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list/can-list';
-import CanModel from 'can-model/src/can-model';
+import canModel from 'can-model/src/can-model';
 
 import * as aclUtils from '../../utils/acl-utils';
 
@@ -12,7 +12,7 @@ describe('validateAssignee extension', () => {
   let TestModel;
 
   beforeAll(() => {
-    TestModel = CanModel.extend({}, {
+    TestModel = canModel.extend({}, {
       define: {
         access_control_list: {
           value: new canList([]),

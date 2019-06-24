@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list/can-list';
-import CanModel from 'can-model/src/can-model';
+import canModel from 'can-model/src/can-model';
 import CanMap from 'can-map/can-map';
 
 describe('validateDefaultPeople extensions.', () => {
@@ -12,7 +12,7 @@ describe('validateDefaultPeople extensions.', () => {
     let TestModel;
 
     beforeAll(() => {
-      TestModel = CanModel.extend({}, {
+      TestModel = canModel.extend({}, {
         define: {
           default_people: {
             value: new CanMap([]),
@@ -77,7 +77,7 @@ describe('validateDefaultPeople extensions.', () => {
     let TestModel;
 
     beforeAll(() => {
-      TestModel = CanModel.extend({}, {
+      TestModel = canModel.extend({}, {
         define: {
           default_people: {
             value: new CanMap([]),
