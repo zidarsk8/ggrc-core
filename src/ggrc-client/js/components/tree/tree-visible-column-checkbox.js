@@ -12,6 +12,14 @@ export default can.Component.extend({
   viewModel: can.Map.extend({
     column: {},
     viewType: null,
+    getTitle(item) {
+      if (_.isFunction(item.title)) {
+        // case for person name item
+        return item.title(this.viewType);
+      } else {
+        return item.title;
+      }
+    },
     onChange(attr) {
       attr.attr('selected', !attr.attr('selected'));
     },
