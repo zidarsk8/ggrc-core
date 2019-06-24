@@ -354,16 +354,10 @@ class ModalCreateNewObject(BaseModalCreateNew):
 class ModalCreateNewProgram(BaseModalCreateNew):
   """Locators for Create new Program modals."""
   # user input elements
-  UI_DESCRIPTION = (By.CSS_SELECTOR,
-                    '[data-test-id="new_program_field_description_1fb8bc06"] '
-                    '.ql-editor')
   UI_STATE = (By.CSS_SELECTOR,
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  TITLE = (By.CSS_SELECTOR, '[data-test-id="label_title_2c925d94"]')
-  DESCRIPTION = (
-      By.CSS_SELECTOR, '[data-test-id="label_description_2c925d94"]')
   PRIVACY = (By.CSS_SELECTOR, '[data-test-id="label_privacy_2c925d94"]')
 
 
@@ -752,16 +746,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
       By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
   TOGGLE_SHOW_ADVANCED_ACTIVATED = (
       By.CSS_SELECTOR, "{} .show-hidden-fields.active".format(WIDGET))
-  CODE = (By.CSS_SELECTOR,
-          '{} [data-test-id="title_code_cf47bc01"] h6'.format(WIDGET))
-  CODE_ENTERED = (By.CSS_SELECTOR,
-                  '{} [data-test-id="title_code_cf47bc01"] p'.format(WIDGET))
-  EFFECTIVE_DATE = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_effective_date_cf47bc01"] h6'.format(WIDGET))
-  EFFECTIVE_DATE_ENTERED = (
-      By.CSS_SELECTOR,
-      '[data-test-id="title_effective_date_cf47bc01"] p'.format(WIDGET))
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
