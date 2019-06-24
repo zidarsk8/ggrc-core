@@ -51,7 +51,8 @@ class AutomapperGenerator(object):
     self.automapping_ids = set()
     self.related_cache = RelationshipsCache()
 
-  def related(self, obj):
+  def related(self, obj, of_types=None):
+    # type: (models.relationship.Stub, Optional[List[str]]) ->  set
     """Return obj's relationship stubs"""
     if obj in self.related_cache.cache:
       return self.related_cache.cache[obj]
@@ -60,7 +61,7 @@ class AutomapperGenerator(object):
     # results in a few steps. This drastically reduces number of queries.
     stubs = {s for rel in self.queue for s in rel}
     stubs.add(obj)
-    self.related_cache.populate_cache(stubs)
+    self.related_cache.populate_cache(stubs, of_types=of_types)
 
     return self.related_cache.cache[obj]
 
@@ -206,7 +207,7 @@ class AutomapperGenerator(object):
     """Step through the automapping rules tree."""
     mappings = rules.rules[src.type, dst.type]
     if mappings:
-      dst_related = (o for o in self.related(dst)
+      dst_related = (o for o in self.related(dst, of_types=mappings)
                      if o.type in mappings and o != src)
       dst_model = models.get_model(dst.type)
       for related in dst_related:

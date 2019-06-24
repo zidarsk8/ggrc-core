@@ -403,30 +403,55 @@ class RelationshipsCache(object):
   def __init__(self):
     self.cache = collections.defaultdict(set)
 
-  def populate_cache(self, stubs):
-    """Fetch all mappings for objects in stubs, cache them in self.cache."""
+  def populate_cache(self, stubs, of_types=None):
+    # type: (List[Stub], Optional[List[str]]) -> None
+    """Fetch all mappings for objects in stubs, cache them in self.cache.
+
+    Fetch all mappings for objects represented by stubs and cache them in
+    self.cache. Additional filtering of fetched mappings could be provided by
+    using `of_types` argument.
+
+    Args:
+      stubs (list): List of stubs representing objects for which mappings
+        should be cached.
+      of_types (list): List of type names describing mappings to which objects
+        should be cached. If empty or None, all mappings would be cached.
+        Defaults to None.
+    """
     # Union is here to convince mysql to use two separate indices and
     # merge te results. Just using `or` results in a full-table scan
     # Manual column list avoids loading the full object which would also try to
     # load related objects
     cols = db.session.query(
-        Relationship.source_type, Relationship.source_id,
-        Relationship.destination_type, Relationship.destination_id)
+        Relationship.source_type,
+        Relationship.source_id,
+        Relationship.destination_type,
+        Relationship.destination_id,
+    )
+
+    if of_types:
+      src_types_filter = Relationship.source_type.in_(of_types)
+      dst_types_filter = Relationship.destination_type.in_(of_types)
+    else:
+      src_types_filter = dst_types_filter = sa.true()
+
     relationships = cols.filter(
+        dst_types_filter,
         sa.tuple_(
             Relationship.source_type,
             Relationship.source_id
         ).in_(
             [(s.type, s.id) for s in stubs]
-        )
+        ),
     ).union_all(
         cols.filter(
+            src_types_filter,
             sa.tuple_(
                 Relationship.destination_type,
                 Relationship.destination_id
             ).in_(
                 [(s.type, s.id) for s in stubs]
-            )
+            ),
         )
     ).all()
     for (src_type, src_id, dst_type, dst_id) in relationships:
