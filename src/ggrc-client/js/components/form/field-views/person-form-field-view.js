@@ -3,10 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../../person/person-data';
 import template from './person-form-field-view.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'person-form-field-view',
   view: can.stache(template),
   leakScope: true,

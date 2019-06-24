@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../../plugins/utils/controllers';
 import {
   jobStatuses,
@@ -66,7 +67,7 @@ const messages = {
   },
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'csv-import',
   view: can.stache(template),
   requestData: null,

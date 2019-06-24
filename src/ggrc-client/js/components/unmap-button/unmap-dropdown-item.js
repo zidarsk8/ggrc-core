@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 import '../issue/issue-unmap-item';
 import template from './unmap-dropdown-item.stache';
@@ -15,7 +16,7 @@ import {
   isMyWork,
 } from '../../plugins/utils/current-page-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'unmap-dropdown-item',
   view: can.stache(template),
   leakScope: false,

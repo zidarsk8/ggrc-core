@@ -3,12 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {generateCycle} from '../../plugins/utils/workflow-utils';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {initCounts} from '../../plugins/utils/widgets-utils';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'workflow-start-cycle',
   content: '<content></content>',
   events: {

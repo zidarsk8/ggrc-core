@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {trigger} from 'can-event';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'map-button-using-assessment-type',
   leakScope: true,
   viewModel: can.Map.extend({

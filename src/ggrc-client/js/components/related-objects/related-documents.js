@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -27,7 +28,7 @@ let DOCUMENT_KIND_MAP = {
   REFERENCE_URL: 'documents_reference_url',
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-documents',
   leakScope: true,
   viewModel: can.Map.extend({

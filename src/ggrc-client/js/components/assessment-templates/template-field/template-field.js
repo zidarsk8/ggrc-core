@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   ddValidationValueToMap,
   ddValidationMapToValue,
@@ -14,7 +15,7 @@ import template from './template-field.stache';
  *
  * Represents each `field` passed from assessment-template-attributes `fields`
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'template-field',
   view: can.stache(template),
   leakScope: true,

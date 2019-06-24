@@ -3,10 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../person/person-data';
 import template from './templates/people-group-modal.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'people-group-modal',
   view: can.stache(template),
   leakScope: true,

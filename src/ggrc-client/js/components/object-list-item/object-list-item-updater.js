@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../object-list-item/business-object-list-item';
 import '../read-more/read-more';
 import RefreshQueue from '../../models/refresh_queue';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'object-list-item-updater',
   leakScope: true,
   viewModel: can.Map.extend({

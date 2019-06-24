@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
 import Directive from '../../models/business-models/directive';
@@ -178,7 +179,7 @@ let viewModel = can.Map.extend({
   instance: null,
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-item-extra-info',
   view: can.stache(template),
   leakScope: true,

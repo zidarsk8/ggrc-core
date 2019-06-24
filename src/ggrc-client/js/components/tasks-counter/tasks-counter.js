@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import Person from '../../models/business-models/person';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 
@@ -10,7 +11,7 @@ import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-gr
  *  Component to show number of Tasks Owned by Person
  *
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tasks-counter',
   view: can.stache(
     '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>'

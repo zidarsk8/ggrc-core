@@ -2,6 +2,8 @@
  Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import CanComponent from 'can-component';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
 import template from './templates/tree-item-attr.stache';
@@ -42,7 +44,7 @@ const PERSON_ATTRS = new Set([
   'last_verified_by',
 ]);
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-item-attr',
   view: can.stache(template),
   leakScope: true,

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import template from './templates/task-group-objects.stache';
 import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../events/eventTypes';
 import {unmapObjects} from '../../../plugins/utils/mapper-utils';
@@ -88,7 +89,7 @@ const init = function () {
   this.viewModel.initTaskGroupItems();
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'task-group-objects',
   view: can.stache(template),
   leakScope: true,

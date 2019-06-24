@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './templates/tree-filter-input.stache';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
@@ -73,7 +74,7 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-filter-input',
   view: can.stache(template),
   leakScope: true,

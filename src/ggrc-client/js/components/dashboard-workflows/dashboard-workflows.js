@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import template from './templates/dashboard-workflows.stache';
 import isFunction from 'can-util/js/is-function/is-function';
 import {DATE_FORMAT, getFormattedLocalDate} from '../../plugins/utils/date-utils';
@@ -74,7 +75,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'dashboard-workflows',
   leakScope: true,
   view: can.stache(template),

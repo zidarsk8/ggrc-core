@@ -3,11 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import './export-panel';
 import template from './templates/export-group.stache';
 import panelModel from './panel';
 
-export default can.Component.extend('exportGroup', {
+export default CanComponent.extend('exportGroup', {
   tag: 'export-group',
   view: can.stache(template),
   leakScope: true,

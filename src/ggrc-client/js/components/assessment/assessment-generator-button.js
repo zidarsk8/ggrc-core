@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import tracker from '../../tracker';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './templates/assessment-generator-button.stache';
@@ -10,7 +11,7 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import BackgroundTask from '../../models/service-models/background-task';
 import Assessment from '../../models/business-models/assessment';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-generator-button',
   view: can.stache(template),
   leakScope: true,

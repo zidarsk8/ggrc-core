@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../../info-pin-buttons/info-pin-buttons';
 import '../task-group-clone';
 import '../task-list/task-list';
@@ -35,7 +36,7 @@ const init = function () {
   this.viewModel.loadWorkflow();
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'task-group',
   view: can.stache(template),
   leakScope: true,

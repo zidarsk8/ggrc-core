@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import baseAutocompleteWrapper from './../custom-autocomplete/autocomplete-wrapper';
 import Label from '../../models/service-models/label';
 
@@ -17,7 +18,7 @@ let viewModel = baseAutocompleteWrapper.extend({
   showNewValue: false,
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'label-autocomplete-wrapper',
   view: can.stache('<content/>'),
   leakScope: true,

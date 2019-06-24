@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../tree/tree-header-selector';
 import '../tree/tree-visible-column-checkbox';
 import template from './templates/mapper-results-columns-configuration.stache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import * as businessModels from '../../models/business-models';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'mapper-results-columns-configuration',
   view: can.stache(template),
   leakScope: true,

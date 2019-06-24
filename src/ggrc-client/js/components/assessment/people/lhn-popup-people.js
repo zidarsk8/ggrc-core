@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../../related-objects/related-people-access-control';
 import '../../related-objects/related-people-access-control-group';
 import '../../people/deletable-people-group';
 
 import template from './templates/lhn-popup-people.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'lhn-popup-people',
   view: can.stache(template),
   leakScope: true,

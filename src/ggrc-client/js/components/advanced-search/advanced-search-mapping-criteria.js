@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
@@ -178,7 +179,7 @@ let viewModel = can.Map.extend({
 /**
  * Mapping Criteria is specific kind of Filter Item.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'advanced-search-mapping-criteria',
   view: can.stache(template),
   leakScope: false,

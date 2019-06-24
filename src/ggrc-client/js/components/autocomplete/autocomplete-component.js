@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import template from './autocomplete-component.stache';
 
 /**
@@ -69,4 +70,4 @@ let component = {
   },
 };
 
-export default can.Component.extend(component);
+export default CanComponent.extend(component);

@@ -3,7 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Component.extend({
+import CanComponent from 'can-component';
+export default CanComponent.extend({
   tag: 'user-roles-selector-button',
   leakScope: true,
   viewModel: can.Map.extend({

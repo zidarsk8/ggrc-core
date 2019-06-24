@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {
   CUSTOM_ATTRIBUTE_TYPE,
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
@@ -13,7 +14,7 @@ import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 /**
  * Global Custom Attributes is a component representing custom attributes.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'global-custom-attributes',
   leakScope: true,
   viewModel: can.Map.extend({

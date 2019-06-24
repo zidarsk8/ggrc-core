@@ -3,12 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 /**
  * The component is used to load data for autocomplete component from external sources.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'external-data-provider',
   leakScope: true,
   viewModel: can.Map.extend({

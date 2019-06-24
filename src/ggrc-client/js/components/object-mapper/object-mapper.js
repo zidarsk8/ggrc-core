@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-mapping-container';
@@ -88,7 +89,7 @@ let getDefaultType = function (type, object) {
  * A component implementing a modal for mapping objects to other objects,
  * taking the object type mapping constraints into account.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'object-mapper',
   view: can.stache(template),
   leakScope: true,

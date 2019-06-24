@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../../dropdown/dropdown-component';
 import '../../dropdown/dropdown-wrap-text';
 import template from './dropdown-form-field.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'dropdown-form-field',
   view: can.stache(template),
   leakScope: true,

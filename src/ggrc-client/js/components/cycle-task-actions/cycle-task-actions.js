@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import tracker from '../../tracker';
 import '../spinner-component/spinner-component';
 import {
@@ -110,7 +111,7 @@ let viewModel = can.Map.extend({
 /**
  *
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'cycle-task-actions',
   view: can.stache(template),
   leakScope: true,

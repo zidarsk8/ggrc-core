@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../object-list-item/business-object-list-item';
 import template from './issue-unmap-item.stache';
 import Pagination from '../base-objects/pagination';
@@ -18,7 +19,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'issue-unmap-item',
   view: can.stache(template),
   leakScope: true,

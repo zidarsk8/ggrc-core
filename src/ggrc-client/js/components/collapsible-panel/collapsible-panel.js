@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './collapsible-panel-header';
 import './collapsible-panel-body';
 import template from './collapsible-panel.stache';
@@ -27,7 +28,7 @@ let viewModel = can.Map.extend({
 /**
  * Collapsible Panel component to add expand/collapse behavior
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'collapsible-panel',
   view: can.stache(template),
   leakScope: false,

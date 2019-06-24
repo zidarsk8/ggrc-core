@@ -3,13 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   hasQuestions,
   getQuestionsUrl,
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questions-link.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'questions-link',
   view: can.stache(template),
   leakScope: true,

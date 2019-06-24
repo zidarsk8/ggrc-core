@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 import '../change-request-link/change-request-link';
 import {
@@ -19,7 +20,7 @@ import {
 import Permission from '../../permission';
 import template from './templates/tree-actions.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-actions',
   view: can.stache(template),
   leakScope: true,

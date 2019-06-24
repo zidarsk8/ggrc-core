@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './simple-modal.stache';
 
 /**
@@ -12,7 +13,7 @@ import template from './simple-modal.stache';
  * Simple Modal provides only logic less basic markup. All business logic should be placed on the level of inner components.
  * To simplify styling additional helper CSS classes were created: 'simple-modal__footer', 'simple-modal__body' and 'simple-modal__header'
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'simple-modal',
   view: can.stache(template),
   leakScope: true,

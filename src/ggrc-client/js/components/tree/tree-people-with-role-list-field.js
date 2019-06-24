@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
@@ -27,7 +28,7 @@ const viewModel = can.Map.extend({
   type: Person,
 });
 
-export default can.Component.extend('treePeopleWithRoleListField', {
+export default CanComponent.extend('treePeopleWithRoleListField', {
   tag: 'tree-people-with-role-list-field',
   view: can.stache(template),
   leakScope: true,

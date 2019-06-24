@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './text-form-field-view.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'text-form-field-view',
   view: can.stache(template),
   leakScope: true,

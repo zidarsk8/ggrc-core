@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './templates/related-proposals.stache';
 import {
   PROPOSAL_CREATED,
@@ -12,7 +13,7 @@ import {
 } from '../../../events/eventTypes';
 
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-proposals',
   view: can.stache(template),
   leakScope: true,

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   uploadFiles,
 } from '../../plugins/utils/gdrive-picker-utils';
@@ -140,7 +141,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'create-document-button',
   view: can.stache(template),
   leakScope: true,

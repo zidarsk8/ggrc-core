@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import './relevant-filter';
 import './export-group';
 import template from './templates/csv-export.stache';
@@ -32,7 +33,7 @@ import {connectionLostNotifier} from './connection-lost-notifier';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'csv-export',
   view: can.stache(template),
   leakScope: true,

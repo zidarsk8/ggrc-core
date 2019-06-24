@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import template from './mapped-control-related-objects.stache';
 
@@ -23,7 +24,7 @@ let viewModel = can.Map.extend({
  * Specific Wrapper Component to present Controls only inner popover data.
  * Should Load on expand Related Objectives and Regulations
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'mapped-control-related-objects',
   view: can.stache(template),
   leakScope: true,

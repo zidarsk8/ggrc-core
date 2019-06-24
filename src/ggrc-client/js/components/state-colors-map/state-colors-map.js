@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 /* Default Sate for Assessment should be 'Not Started' */
 const defaultState = 'Not Started';
 
@@ -32,7 +33,7 @@ let viewModel = can.Map.extend({
 /**
  * Simple Component to add color indication for Assessment State Name
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'state-colors-map',
   view: can.stache(
     '<span class="state-value-dot state-{{suffix}} {{verified}}">' +

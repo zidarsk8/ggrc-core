@@ -54,7 +54,7 @@ function makeFakeInstance({
  * viewModel.attr(property), viewModel.attr(property, someValue).
  * get/set of this 'property' should be defined in viewModel through define plugin.
 
- * @param {can.Component.viewModel} viewModel
+ * @param {CanComponent.viewModel} viewModel
  * @param {string} property
  *
  * @returns {jasmine.Spy}

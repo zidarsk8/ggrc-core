@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './document-object-list-item.stache';
 import '../spinner-component/spinner-component';
 
 /**
  * Simple component to show Document-like Objects
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'document-object-list-item',
   view: can.stache(template),
   leakScope: true,

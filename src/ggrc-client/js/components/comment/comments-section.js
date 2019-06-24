@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 import template from './comments-section.stache';
 import './comment-data-provider';
@@ -11,7 +12,7 @@ import './mapped-comments';
 import './comments-paging';
 import Permission from '../../permission';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'comments-section',
   view: can.stache(template),
   leakScope: true,

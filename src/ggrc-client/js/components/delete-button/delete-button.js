@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   confirm,
   BUTTON_VIEW_CLOSE,
@@ -12,7 +13,7 @@ import {handleAjaxError} from '../../plugins/utils/errors-utils';
 import {Snapshot} from '../../models/service-models';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'delete-button',
   view: can.stache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,

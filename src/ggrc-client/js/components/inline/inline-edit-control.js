@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import './readonly-inline-content';
 import '../form/fields/checkbox-form-field';
 import '../form/fields/multiselect-form-field';
@@ -15,7 +16,7 @@ import '../form/fields/numberbox-form-field';
 import {isInnerClick, getPlainText} from '../../plugins/ggrc_utils';
 import template from './inline-edit-control.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'inline-edit-control',
   view: can.stache(template),
   leakScope: true,

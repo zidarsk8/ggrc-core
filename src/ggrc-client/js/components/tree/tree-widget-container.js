@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './tree-header-selector';
 import './sub-tree-expander';
 import './sub-tree-wrapper';
@@ -659,7 +660,7 @@ let viewModel = can.Map.extend({
 /**
  *
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-widget-container',
   view: can.stache(template),
   leakScope: true,

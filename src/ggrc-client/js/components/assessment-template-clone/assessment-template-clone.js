@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-wrapper';
@@ -12,7 +13,7 @@ import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './assessment-template-clone.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-template-clone',
   view: can.stache(template),
   leakScope: true,

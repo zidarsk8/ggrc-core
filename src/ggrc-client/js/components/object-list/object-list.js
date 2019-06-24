@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../show-more/show-more';
 import '../spinner-component/spinner-component';
 import template from './object-list.stache';
@@ -10,7 +11,7 @@ import template from './object-list.stache';
 /**
  * Object List component
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'object-list',
   view: can.stache(template),
   leakScope: true,

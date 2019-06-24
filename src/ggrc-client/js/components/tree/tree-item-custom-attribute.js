@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
@@ -62,7 +63,7 @@ const viewModel = can.Map.extend({
   customAttributeId: null,
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-item-custom-attribute',
   view: can.stache('{{{value}}}'),
   leakScope: true,

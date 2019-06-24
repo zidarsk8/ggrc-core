@@ -3,10 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './templates/repeat-on-summary.stache';
 import {unitOptions as workflowUnitOptions} from '../../apps/workflow-config';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'repeat-on-summary',
   view: can.stache(template),
   leakScope: true,

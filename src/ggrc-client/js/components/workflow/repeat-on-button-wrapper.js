@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './repeat-on-button';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'repeat-on-button-wrapper',
   view: can.stache(
     '<repeat-on-button unit:from="instance.unit"' +

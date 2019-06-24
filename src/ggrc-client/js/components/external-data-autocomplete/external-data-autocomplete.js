@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './external-data-provider';
 import './autocomplete-results';
 import '../spinner-component/spinner-component';
@@ -14,7 +15,7 @@ import template from './external-data-autocomplete.stache';
  * The autocomplete component used to load data from external sources.
  * When user picks an external item, system will create corresponding item in database.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'external-data-autocomplete',
   view: can.stache(template),
   leakScope: true,

@@ -3,11 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
 import '../redirects/role-attr-names-provider/role-attr-names-provider';
 import template from './editable-people-group-header.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'editable-people-group-header',
   view: can.stache(template),
   leakScope: true,

@@ -3,12 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
+
 /*
   This component is for quickly updating the properties of an object through form fields.
 
   Field updates trigger updates to the model automatically, even on the server.
 */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'ggrc-quick-update',
   leakScope: true,
   viewModel: can.Map.extend({

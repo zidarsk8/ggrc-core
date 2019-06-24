@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import template from './templates/dropdown-component.stache';
 
 /*
@@ -11,7 +12,7 @@ import template from './templates/dropdown-component.stache';
   It receives `name` of the attribute that should be set and `optionsList`
   with titles and values
 */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'dropdown-component',
   view: can.stache(template),
   leakScope: true,

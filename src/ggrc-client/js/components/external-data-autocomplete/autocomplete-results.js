@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
 
 /**
  * The component is used to show autocomplete results and handle user's clicks.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'autocomplete-results',
   view: can.stache(template),
   leakScope: true,

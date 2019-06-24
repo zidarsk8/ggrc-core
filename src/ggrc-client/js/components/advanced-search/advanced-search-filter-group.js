@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import template from './advanced-search-filter-group.stache';
@@ -31,7 +32,7 @@ let viewModel = AdvancedSearchContainer.extend({
 /**
  * Filter Group is a component allowing to compose Filter Attributes and Operators.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'advanced-search-filter-group',
   view: can.stache(template),
   leakScope: true,

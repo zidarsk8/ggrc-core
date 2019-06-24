@@ -3,13 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 
 import Permission from '../../permission';
 import template from './templates/related-urls.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {sanitizer} from '../../plugins/utils/url-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-urls',
   view: can.stache(template),
   leakScope: true,

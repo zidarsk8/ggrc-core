@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
@@ -25,7 +26,7 @@ import {trigger} from 'can-event';
  *
  */
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'cycle-end-cycle',
   viewModel: can.Map.extend({
     cycle: null,

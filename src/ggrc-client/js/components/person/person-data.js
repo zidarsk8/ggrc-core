@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './person-data.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
@@ -11,7 +12,7 @@ import Person from '../../models/business-models/person';
 /**
  * Person List Item Component
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'person-data',
   view: can.stache(template),
   leakScope: true,

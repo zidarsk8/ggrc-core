@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.stache';
@@ -49,7 +50,7 @@ const viewModel = DiffBaseVM.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'instance-fields-diff',
   view: can.stache(template),
   leakScope: true,

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.stache';
 
@@ -91,7 +92,7 @@ let viewModel = can.Map.extend({
  * Criterion has the following form:
  * field - operator - value
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'advanced-search-filter-attribute',
   view: can.stache(template),
   leakScope: true,

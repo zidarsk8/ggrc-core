@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './advanced-search-mapping-group';
 import './advanced-search-mapping-criteria';
 import './advanced-search-filter-operator';
@@ -65,7 +66,7 @@ let viewModel = AdvancedSearchContainer.extend({
 /**
  * Mapping Container is a component allowing to compose Mapping Criteria, Groups and Operators.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'advanced-search-mapping-container',
   view: can.stache(template),
   leakScope: true,

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './revision-log-data';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
@@ -28,7 +29,7 @@ let LIST_FIELDS = {
   recipients: 1,
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'revision-page',
   view: can.stache(template),
   leakScope: true,

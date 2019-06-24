@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './read-more.stache';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
 
@@ -68,7 +69,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'read-more',
   view: can.stache(template),
   leakScope: true,

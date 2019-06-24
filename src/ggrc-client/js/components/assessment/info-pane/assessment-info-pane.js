@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../controls-toolbar/assessment-controls-toolbar';
 import '../assessment-local-ca';
 import '../assessment-custom-attributes';
@@ -73,7 +74,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 /**
  * Assessment Specific Info Pane View Component
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-info-pane',
   view: can.stache(template),
   leakScope: true,

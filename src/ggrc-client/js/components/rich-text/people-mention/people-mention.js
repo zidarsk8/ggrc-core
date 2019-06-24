@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../../people-autocomplete/people-autocomplete-wrapper/people-autocomplete-wrapper';
 
 import template from './people-mention.stache';
@@ -16,7 +17,7 @@ const MENTION_REGEX = {
 /**
  * Supporting component for rich-text to handle mentions of people
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'people-mention',
   view: can.stache(template),
   leakScope: false,

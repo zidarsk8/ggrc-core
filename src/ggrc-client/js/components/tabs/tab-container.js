@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import './tab-panel';
 import './tab-link/tab-link';
 import '../questionnaire-link/questionnaire-link';
 import template from './tab-container.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tab-container',
   view: can.stache(template),
   leakScope: true,

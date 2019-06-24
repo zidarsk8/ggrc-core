@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './loading-status.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'loading-status',
   view: can.stache(template),
   leakScope: true,

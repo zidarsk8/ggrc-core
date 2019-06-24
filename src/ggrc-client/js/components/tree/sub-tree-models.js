@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './templates/sub-tree-models.stache';
 import childModelsMap from '../tree/child-models-map';
 import {
@@ -110,7 +111,7 @@ let events = {
   },
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'sub-tree-models',
   view: can.stache(template),
   leakScope: true,

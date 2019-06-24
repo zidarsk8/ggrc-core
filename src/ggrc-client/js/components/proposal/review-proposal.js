@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {
   buildModifiedACL,
   buildModifiedListField,
@@ -12,7 +13,7 @@ import Revision from '../../models/service-models/revision';
 
 import template from './templates/review-proposal.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'review-proposal',
   view: can.stache(template),
   leakScope: true,

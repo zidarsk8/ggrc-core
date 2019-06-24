@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../simple-modal/simple-modal';
 import '../gca-controls/gca-controls';
 import template from './templates/mandatory-fields-modal.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'mandatory-fields-modal',
   view: can.stache(template),
   leakScope: true,

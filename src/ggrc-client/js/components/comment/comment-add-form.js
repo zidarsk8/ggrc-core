@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import './comment-input';
 import './comment-add-button';
 import template from './comment-add-form.stache';
@@ -15,7 +16,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
  * A component that takes care of adding comments
  *
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'comment-add-form',
   view: can.stache(template),
   leakScope: true,

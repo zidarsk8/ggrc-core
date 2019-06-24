@@ -3,12 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './inner-nav.stache';
 import './inner-nav-item';
 import '../add-tab-button/add-tab-button';
 import InnerNavVM from './inner-nav-vm';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'inner-nav',
   view: can.stache(template),
   viewModel: InnerNavVM,

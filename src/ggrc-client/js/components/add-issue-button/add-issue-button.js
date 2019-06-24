@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.stache';
 import {
@@ -11,7 +12,7 @@ import {
 import {initCounts} from '../../plugins/utils/widgets-utils';
 import Issue from '../../models/business-models/issue';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'add-issue-button',
   view: can.stache(template),
   leakScope: true,

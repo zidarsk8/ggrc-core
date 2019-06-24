@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {SWITCH_TO_ERROR_PANEL, SHOW_INVALID_FIELD} from '../../events/eventTypes';
 import template from './object-state-toolbar.stache';
 
 /**
  * Object State Toolbar Component allowing Object state modification
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'object-state-toolbar',
   view: can.stache(template),
   leakScope: true,

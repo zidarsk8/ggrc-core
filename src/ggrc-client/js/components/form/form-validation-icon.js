@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 /**
  * State object to present possible icons for validation
  */
@@ -16,7 +17,7 @@ const icons = {
 /**
  * Form validation icon component
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'form-validation-icon',
   view: can.stache(
     '<i class="fa form-validation-icon__body {{iconCls}}"></i>'

@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {groupTypes} from '../../plugins/utils/models-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-object-type-dropdown',
   leakScope: true,
   viewModel: can.Map.extend({

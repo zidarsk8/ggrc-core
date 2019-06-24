@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../object-list-item/editable-document-object-list-item';
 import {
   BEFORE_MAPPING,
@@ -17,7 +18,7 @@ import template from './folder-attachments-list.stache';
  * Wrapper Component for rendering and managing of folder and
  * attachments lists
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'folder-attachments-list',
   view: can.stache(template),
   leakScope: true,

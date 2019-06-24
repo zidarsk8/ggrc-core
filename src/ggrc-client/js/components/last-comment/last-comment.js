@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import template from './last-comment.stache';
 import RefreshQueue from '../../models/refresh_queue';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
@@ -11,7 +12,7 @@ import {formatDate} from '../../plugins/utils/date-utils';
 import Comment from '../../models/service-models/comment';
 import {getOnlyAnchorTags} from '../../plugins/ggrc_utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'last-comment',
   view: can.stache(template),
   leakScope: true,

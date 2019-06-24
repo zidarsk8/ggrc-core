@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './templates/generate-issues-in-bulk-button.stache';
 import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
@@ -13,7 +14,7 @@ import pubSub from '../../pub-sub';
 const DEFAULT_TIMEOUT = 2000;
 const MAX_TIMEOUT = 60000;
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'generate-issues-in-bulk-button',
   view: can.stache(template),
   leakScope: true,

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../tree-pagination/tree-pagination';
 import './revision-page';
 
@@ -21,7 +22,7 @@ import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Pagination from '../base-objects/pagination';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'revision-log',
   view: can.stache(template),
   leakScope: true,

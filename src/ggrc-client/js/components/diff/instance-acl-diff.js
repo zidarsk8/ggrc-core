@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {buildModifiedACL} from '../../plugins/utils/object-history-utils';
 import {getRoleById} from '../../plugins/utils/acl-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
@@ -64,7 +65,7 @@ const viewModel = DiffBaseVM.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'instance-acl-diff',
   view: can.stache(template),
   leakScope: true,

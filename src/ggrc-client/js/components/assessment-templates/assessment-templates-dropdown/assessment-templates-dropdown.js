@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../../dropdown/dropdown-component';
 import {
   buildParam,
@@ -11,7 +12,7 @@ import {
 import template from './assessment-templates-dropdown.stache';
 import tracker from '../../../tracker';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-templates-dropdown',
   view: can.stache(template),
   leakScope: true,
@@ -53,7 +54,7 @@ export default can.Component.extend({
      */
     _selectInitialTemplate(templates) {
       const WARN_EMPTY_GROUP = [
-        'can.Component.assessmentTemplates: ',
+        'CanComponent.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
       ].join('');
       let initialTemplate;

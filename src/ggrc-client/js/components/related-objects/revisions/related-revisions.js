@@ -3,12 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import Pagination from '../../base-objects/pagination';
 import template from './templates/related-revisions.stache';
 import './related-revisions-item';
 import Revision from '../../../models/service-models/revision.js';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-revisions',
   view: can.stache(template),
   leakScope: true,

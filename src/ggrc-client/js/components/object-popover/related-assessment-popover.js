@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../related-comments/related-comments';
 import '../custom-attributes/custom-attributes-field-view';
 import '../object-list-item/comment-list-item';
@@ -16,7 +17,7 @@ import template from './related-assessment-popover.stache';
 /**
  * Simple wrapper component to load Related to Parent Object Snapshots of Controls and Objectives
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-assessment-popover',
   view: can.stache(template),
   leakScope: true,

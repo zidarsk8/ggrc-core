@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
@@ -21,7 +22,7 @@ const VISIBLE_ROLES = {
 /**
  * Assessment specific mapped objects popover view component
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'detailed-business-object-list-item',
   view: can.stache(template),
   leakScope: true,

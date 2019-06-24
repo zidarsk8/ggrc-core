@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {
   applyChangesToCAValue,
   isEvidenceRequired,
@@ -16,7 +17,7 @@ import isFunction from 'can-util/js/is-function/is-function';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {getPlainText} from '../../plugins/ggrc_utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-local-ca',
   leakScope: true,
   viewModel: can.Map.extend({

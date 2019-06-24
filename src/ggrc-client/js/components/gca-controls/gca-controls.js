@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './gca-controls.stache';
 import '../custom-attributes/custom-attributes-field';
 import isFunction from 'can-util/js/is-function/is-function';
@@ -18,7 +19,7 @@ const errorMessages = {
  * This component renders edit controls for Global Custom Attributes
  */
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'gca-controls',
   view: can.stache(template),
   leakScope: true,

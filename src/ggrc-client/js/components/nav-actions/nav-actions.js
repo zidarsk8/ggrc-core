@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import Permission from '../../permission';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils';
 
@@ -51,7 +52,7 @@ const viewModel = can.Map.extend({
   instance: null,
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'nav-actions',
   leakScope: true,
   viewModel,

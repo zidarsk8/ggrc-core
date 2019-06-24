@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../object-list-item/comment-list-item';
 import '../object-list/object-list';
 import template from './mapped-comments.stache';
@@ -10,7 +11,7 @@ import template from './mapped-comments.stache';
 /**
  * Assessment specific mapped controls view component
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'mapped-comments',
   view: can.stache(template),
   leakScope: false,

@@ -3,12 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-people-access-control-group',
   leakScope: true,
   viewModel: can.Map.extend({

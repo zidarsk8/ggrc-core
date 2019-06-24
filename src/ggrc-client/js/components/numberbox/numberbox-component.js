@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './templates/numberbox-component.stache';
 
 const FLOAT_NUMBER_PATTERN = '([0-9]+([.][0-9]+){0,1})';
 const INT_NUMBER_PATTERN = '([0-9]+)';
 const NEGATIVE_NUMBER_PATTERN = '([-]{0,1})';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'numberbox-component',
   view: can.stache(template),
   leakScope: true,

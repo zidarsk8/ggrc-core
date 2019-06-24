@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -49,7 +50,7 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'object-tasks',
   view: can.stache(template),
   leakScope: true,

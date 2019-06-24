@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 const peopleTitlesList = [
   'Auditors', 'Principal Assignees', 'Secondary Assignees',
   'Primary Contacts', 'Secondary Contacts', 'Control Operators',
@@ -42,7 +43,7 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
   ],
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'wrapper-assessment-template',
   leakScope: true,
   viewModel: can.Map.extend({

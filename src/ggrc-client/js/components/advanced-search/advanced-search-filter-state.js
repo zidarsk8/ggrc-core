@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import template from './advanced-search-filter-state.stache';
@@ -106,7 +107,7 @@ let viewModel = can.Map.extend({
 /**
  * Filter State is a specific kind of Advanced Search Filter items.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'advanced-search-filter-state',
   view: can.stache(template),
   leakScope: true,

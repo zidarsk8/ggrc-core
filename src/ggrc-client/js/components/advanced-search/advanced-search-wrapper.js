@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'advanced-search-wrapper',
   leakScope: true,
   viewModel: can.Map.extend({

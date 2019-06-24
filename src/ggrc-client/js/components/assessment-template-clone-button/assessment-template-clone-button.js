@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './assessment-template-clone-button.stache';
 import router from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'assessment-template-clone-button',
   view: can.stache(template),
   leakScope: true,

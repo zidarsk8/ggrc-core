@@ -80,7 +80,7 @@ describe('assessment-templates-dropdown component', () => {
 
     it('issues a warning if an empty group is encountered', () => {
       const expectedMsg = [
-        'can.Component.assessmentTemplates: ',
+        'CanComponent.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
       ].join('');
 

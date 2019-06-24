@@ -3,12 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../people-autocomplete-results/people-autocomplete-results';
 
 import baseAutocompleteWrapper from '../../custom-autocomplete/autocomplete-wrapper';
 import PersonModel from '../../../models/business-models/person';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'people-autocomplete-wrapper',
   leakScope: true,
   viewModel: baseAutocompleteWrapper.extend({

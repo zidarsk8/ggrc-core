@@ -3,10 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
 import template from './base-inline-control-title.stache';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'base-inline-control-title',
   view: can.stache(template),
   leakScope: false,

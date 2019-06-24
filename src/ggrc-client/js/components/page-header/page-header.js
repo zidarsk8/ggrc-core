@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
 import '../tooltip-content/tooltip-content';
@@ -163,7 +164,7 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'page-header',
   view: can.stache(template),
   leakScope: true,

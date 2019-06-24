@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './tree-pagination.stache';
 
 /**
@@ -10,7 +11,7 @@ import template from './tree-pagination.stache';
  * Usage: <tree-pagination paging:from="paging"></tree-pagination>
  * Optional parameter: placement:from="'top'" - to display content above the control
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'tree-pagination',
   view: can.stache(template),
   init: function () {

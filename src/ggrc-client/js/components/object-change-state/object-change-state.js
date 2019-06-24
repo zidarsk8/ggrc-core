@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 let viewModel = can.Map.extend({
   toState: '',
   changeState: function (newState) {
@@ -21,7 +22,7 @@ let events = {
   },
 };
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'object-change-state',
   leakScope: true,
   viewModel,

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import {loadComments} from '../../plugins/utils/comments-utils';
 import {
   REFRESH_COMMENTS,
@@ -11,7 +12,7 @@ import {
 import Relationship from '../../models/service-models/relationship';
 import Context from '../../models/service-models/context';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'comment-data-provider',
   leakScope: true,
   viewModel: can.Map.extend({

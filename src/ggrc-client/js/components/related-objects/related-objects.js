@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import {
   REFRESH_RELATED,
@@ -17,7 +18,7 @@ import Pagination from '../base-objects/pagination';
 
 let defaultOrderBy = 'created_at';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-objects',
   leakScope: true,
   viewModel: can.Map.extend({

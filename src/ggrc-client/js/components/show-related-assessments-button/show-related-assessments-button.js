@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../related-objects/related-assessments';
 import template from './show-related-assessments-button.stache';
 import {hasRelatedAssessments} from '../../plugins/utils/models-utils';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'show-related-assessments-button',
   view: can.stache(template),
   leakScope: true,

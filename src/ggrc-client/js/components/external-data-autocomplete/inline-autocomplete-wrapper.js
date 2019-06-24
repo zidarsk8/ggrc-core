@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 /**
  * The component is used to integrate separate autocomplete component
  * with some old pards of code which are working with autocomplete plugin
@@ -10,7 +11,7 @@
  *
  * Generally it emulates autocomplete_select handlers from several controllers.
  */
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'inline-autocomplete-wrapper',
   leakScope: true,
   viewModel: can.Map.extend({

@@ -3,12 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanComponent from 'can-component';
 import template from './templates/dropdown-wrap-text.stache';
 import {isInnerClick} from '../../plugins/ggrc_utils';
 
 const DefaultNoValueLabel = '--';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'dropdown-wrap-text',
   view: can.stache(template),
   leakScope: true,

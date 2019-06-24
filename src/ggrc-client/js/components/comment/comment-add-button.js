@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'comment-add-button',
   view: can.stache(
     '<button type="button" class="btn btn-small btn-gray"' +

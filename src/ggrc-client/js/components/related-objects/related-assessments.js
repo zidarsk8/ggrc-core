@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import '../object-list/object-list';
 import '../object-list-item/business-object-list-item';
@@ -28,7 +29,7 @@ const defaultOrderBy = [
   {field: 'created_at', direction: 'desc'},
 ];
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'related-assessments',
   view: can.stache(template),
   leakScope: true,

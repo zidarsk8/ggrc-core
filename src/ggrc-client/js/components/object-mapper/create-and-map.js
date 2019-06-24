@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanComponent from 'can-component';
 import template from './create-and-map.stache';
 import {
   MAP_OBJECTS,
@@ -25,7 +26,7 @@ import {isMegaMapping} from '../../plugins/utils/mega-object-utils';
 import * as businessModels from '../../models/business-models';
 import {externalBusinessObjects} from '../../plugins/models-types-collections';
 
-export default can.Component.extend({
+export default CanComponent.extend({
   tag: 'create-and-map',
   view: can.stache(template),
   leakScope: false,
