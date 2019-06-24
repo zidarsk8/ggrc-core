@@ -1,43 +1,60 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Proposals digest."""
+"""Fast emails digest."""
 
-from lib import base, environment
+from lib import base, url, environment
 from lib.entities import entity
 from lib.utils import selenium_utils
 
 
-class ProposalDigest(base.WithBrowser):
-  """Proposals digest page."""
+class FastEmailsDigest(base.WithBrowser):
+  """Fast emails digest page."""
   def __init__(self, driver=None):
-    super(ProposalDigest, self).__init__(driver)
-    self.proposal_digest_url = (environment.app_url +
-                                "_notifications/show_fast_digest")
-    self._elements = self._browser.elements(
+    super(FastEmailsDigest, self).__init__(driver)
+    self.emails_url = (environment.app_url + url.NOTIFICATIONS +
+                       "/show_fast_digest")
+    self._review_requests = self._browser.elements(
+        xpath="//title/following-sibling::div/div"
+              "[contains(., 'review was requested')]")
+    self._proposals = self._browser.elements(
         xpath="//title/following-sibling::div/div"
               "[contains(., 'proposed changes')]")
 
-  def open_proposal_digest(self):
-    """Open page with proposal emails."""
-    selenium_utils.open_url(self.proposal_digest_url)
+  def open_digest_page(self):
+    """Open page with fast emails digest."""
+    selenium_utils.open_url(self.emails_url)
+
+  def get_review_request_emails(self):
+    """Get all review request notification emails."""
+    return [ReviewNotificationItem(element).get_notification_email() for
+            element in self._review_requests]
 
   def get_proposal_emails(self):
     """Get all proposal notification emails."""
     return [ProposalDigestItem(element).get_proposal_email() for element in
-            self._elements]
+            self._proposals]
 
   def click_proposal_email_open_btn(self, proposal_email):
     """Click on the proposal email open button."""
     proposal_emails = self.get_proposal_emails()
     index = proposal_emails.index(proposal_email)
-    ProposalDigestItem(self._elements[index]).open_btn_click()
+    ProposalDigestItem(self._proposals[index]).open_btn_click()
     selenium_utils.wait_for_js_to_load(self._driver)
 
 
-class ProposalDigestItem(object):
-  """Proposal notification email."""
+class BaseEmailItem(object):
+  """Base class for notification emails."""
   def __init__(self, root_element):
     self._root_element = root_element
+
+  def get_recipient_email(self):
+    """Get email recipient."""
+    return self._root_element.parent().previous_sibling(
+        tag_name="h1").text.replace("email to ", "")
+
+
+class ProposalDigestItem(BaseEmailItem):
+  """Proposal notification email."""
 
   def get_proposal_email(self):
     """Get proposal email."""
@@ -48,11 +65,6 @@ class ProposalDigestItem(object):
         changes=self.get_changes(),
         comment=self.get_comment()
     )
-
-  def get_recipient_email(self):
-    """Get email recipient."""
-    return self._root_element.parent().previous_sibling(
-        tag_name="h1").text.replace("email to ", "")
 
   def get_proposal_author(self):
     """Get proposal author."""
@@ -82,3 +94,28 @@ class ProposalDigestItem(object):
   def open_btn_click(self):
     """Click on the open button in email."""
     self._root_element.link().click()
+
+
+class ReviewNotificationItem(BaseEmailItem):
+  """Review notification email."""
+
+  def get_notification_email(self):
+    """Get review request notification email entity."""
+    return entity.ReviewEmailUI(
+        recipient_email=self.get_recipient_email(),
+        obj_type=self.get_obj_type(),
+        obj_title=self.get_obj_title(),
+        comment=self.get_email_message())
+
+  def get_obj_type(self):
+    """Get reviewable object type."""
+    return self._root_element.element(tag_name="ul").text.split()[0]
+
+  def get_obj_title(self):
+    """Get reviewable object title."""
+    return self._root_element.link().text
+
+  def get_email_message(self):
+    """Get email notification message."""
+    message_element = self._root_element.element(tag_name="p")
+    return message_element.text if message_element.exists else None

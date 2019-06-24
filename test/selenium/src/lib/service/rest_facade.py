@@ -246,9 +246,7 @@ def request_obj_review(obj, reviewer):
       {"reviewers": reviewer,
        "reviewable": obj.repr_min_dict()})
   return obj.update_attrs(
-      review=entities_factory.ReviewsFactory().create(
-          status=element.ReviewStates.UNREVIEWED,
-          reviewers=reviewer))
+      review=entities_factory.ReviewsFactory().create(reviewers=reviewer))
 
 
 def approve_obj_review(obj):
