@@ -4,7 +4,7 @@
 }}
 
 <div data-id="effective_date_hidden">
-  <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+  <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
   <datepicker-component
       tabindex="20"
       label:from="configStartDate.label"
