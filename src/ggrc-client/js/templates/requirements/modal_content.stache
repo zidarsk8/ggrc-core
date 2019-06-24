@@ -15,7 +15,7 @@
         <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip" title="Enter Title"></i>
       </label>
-      <input data-id="title_txtbx" tabindex="1" id="requirement-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+      <input tabindex="1" id="requirement-title" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
     </div>
     <div data-id="pol_reg_std" class="span6 hidable">
       {{#if_helpers '\n ^if' instance.id '\n and ^if' object_params.directive}}
