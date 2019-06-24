@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canBatch from 'can-event/batch/batch';
 import CanMap from 'can-map';
 import {
   getMappingList,
@@ -165,7 +166,7 @@ const ObjectOperationsBaseVM = CanMap.extend({
    * @param {Object} config - Plain object with values for updating
    */
   update: function (config) {
-    can.batch.start();
+    canBatch.start();
 
     // do not update fields with the same values in VM and config
     _.forEach(config, (value, key) => {
@@ -181,7 +182,7 @@ const ObjectOperationsBaseVM = CanMap.extend({
       }
     });
 
-    can.batch.stop();
+    canBatch.stop();
   },
 });
 

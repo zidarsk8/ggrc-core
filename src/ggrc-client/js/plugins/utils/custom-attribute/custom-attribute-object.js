@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canBatch from 'can-event/batch/batch';
 import CanMap from 'can-map';
 import StateValidator from '../state-validator-utils';
 import {
@@ -263,7 +264,7 @@ export default class CustomAttributeObject {
     };
     const caValueKeys = CanMap.keys(caValue);
 
-    can.batch.start();
+    canBatch.start();
     // set for caValue requiered fields if they were missed
     _.forEach(requiredDefaultFields, (requiredValue, key) => {
       const hasMissedRequieredField = !caValueKeys.includes(key);
@@ -271,7 +272,7 @@ export default class CustomAttributeObject {
         caValue.attr(key, requiredValue);
       }
     });
-    can.batch.stop();
+    canBatch.stop();
   }
 
   /**

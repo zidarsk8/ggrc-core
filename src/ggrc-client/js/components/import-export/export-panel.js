@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
@@ -58,11 +59,11 @@ export default CanComponent.extend({
         return;
       }
 
-      can.batch.start();
+      canBatch.start();
       items.forEach(function (item) {
         item.attr('isSelected', isSelected);
       });
-      can.batch.stop();
+      canBatch.stop();
     },
     setSelected: function () {
       this.attr('showMappings', true);

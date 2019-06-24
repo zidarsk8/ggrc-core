@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canBatch from 'can-event/batch/batch';
 import canModel from 'can-model';
 import canList from 'can-list';
 import CanMap from 'can-map';// Disabling some minor eslint rules until major refactoring
@@ -278,16 +279,16 @@ export default canModel.extend({
 
       start = Date.now();
       while (sourceData.length > index && (Date.now() - start) < ms) {
-        can.batch.start();
+        canBatch.start();
         item = sourceData[index];
         index += 1;
         models = self.models([item]);
         instances.push(...models);
-        can.batch.stop();
+        canBatch.stop();
       }
-      can.batch.start();
+      canBatch.start();
       obsList.push(...instances);
-      can.batch.stop();
+      canBatch.stop();
     }
 
     // Trigger a setTimeout loop to modelize remaining objects
