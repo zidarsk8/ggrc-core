@@ -84,7 +84,7 @@
         </label>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </div>
-      <input {{^if new_object_form}} disabled {{/if}} data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="TASKGROUP-XXX" type="text" value="{{instance.slug}}">
+      <input {{^if new_object_form}} disabled {{/if}} tabindex="8" class="input-block-level" name="slug" placeholder="TASKGROUP-XXX" type="text" value="{{instance.slug}}">
     </div>
   </div>
 </form>
