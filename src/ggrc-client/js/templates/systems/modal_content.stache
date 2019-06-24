@@ -84,7 +84,7 @@
 
   <!-- Code & network block -->
   <div class="row-fluid">
-    <div data-id="code_hidden" class="span6 hidable">
+    <div class="span6 hidable">
       <label>
         Code
         <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
