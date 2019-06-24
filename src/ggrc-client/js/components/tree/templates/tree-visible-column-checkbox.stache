@@ -5,20 +5,12 @@
 
 {{#column}}
   <label class="checkbox-inline" title="{{getTitle(.)}}">
-    {{#if selected}}
-      <input type="checkbox"
-        checked="checked"
-        {{#mandatory}}disabled{{/mandatory}}
-        on:el:change="onChange"
-        value="{{name}}"
-        class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
-    {{else}}
-      <input type="checkbox"
-        {{#mandatory}}disabled{{/mandatory}}
-        on:el:change="onChange"
-        value="{{name}}"
-        class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
-    {{/if}}
+    <input type="checkbox"
+      checked:from="selected"
+      {{#mandatory}}disabled{{/mandatory}}
+      on:el:change="onChange"
+      value="{{name}}"
+      class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
     {{getTitle(.)}}
   </label>
 {{/column}}
