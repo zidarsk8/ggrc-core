@@ -21,11 +21,11 @@ $.fn.extend({
 
   /*
   * @function jQuery.fn.controls jQuery.fn.controls
-  * @parent can.Control.plugin
+  * @parent can-control.plugin
   * @description Get the Controls associated with elements.
   * @signature `jQuery.fn.controls([type])`
-  * @param {String|can.Control} [control] The type of Controls to find.
-  * @return {can.Control} The controls associated with the given elements.
+  * @param {String|can-control} [control] The type of Controls to find.
+  * @return {can-control} The controls associated with the given elements.
   *
   * @body
   * When the widget is initialized, the plugin control creates an array
@@ -57,11 +57,11 @@ $.fn.extend({
 
   /*
    * @function jQuery.fn.control jQuery.fn.control
-   * @parent can.Control.plugin
+   * @parent can-control.plugin
    * @description Get the Control associated with elements.
    * @signature `jQuery.fn.control([type])`
-   * @param {String|can.Control} [control] The type of Control to find.
-   * @return {can.Control} The first control found.
+   * @param {String|can-control} [control] The type of Control to find.
+   * @return {can-control} The first control found.
    *
    * @body
    * This is the same as [jQuery.fn.controls $().controls] except that

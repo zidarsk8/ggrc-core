@@ -3,7 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-const originalControlSetup = can.Control.setup;
+import canControl from 'can-control';
+const originalControlSetup = canControl.setup;
 const originListReplace = can.List.prototype.replace;
 const defaultValidator = can.validate.validator();
 const originalOnce = defaultValidator.once;
@@ -15,7 +16,7 @@ if (!can.Model.attributes) {
 
 // Returns a function which will be halted unless `this.element` exists
 // - useful for callbacks which depend on the controller's presence in the DOM
-can.Control.prototype._ifNotRemoved = function (fn) {
+canControl.prototype._ifNotRemoved = function (fn) {
   let isPresent = this.element;
   return function () {
     return isPresent ? fn.apply(this, arguments) : null;
@@ -23,7 +24,7 @@ can.Control.prototype._ifNotRemoved = function (fn) {
 };
 
 // Insert current Control instance into element's data
-can.Control.setup = function () {
+canControl.setup = function () {
   let originalInit = this.prototype.init;
   let init = function (el) {
     let $el = $(el);

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canControl from 'can-control';
 import TreeViewControl from './tree-view';
 import TreeViewOptions from './tree-view-options';
 import {reify} from '../../plugins/utils/reify-utils';
@@ -20,7 +21,7 @@ function _firstElementChild(el) {
   }
 }
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     model: null,
     parent: null,

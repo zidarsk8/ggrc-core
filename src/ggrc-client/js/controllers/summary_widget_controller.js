@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canControl from 'can-control';
 import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
 import {
@@ -18,7 +19,7 @@ import {loadScript} from '../plugins/ggrc_utils';
 import Relationship from '../models/service-models/relationship';
 import Assessment from '../models/business-models/assessment';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     Assessment,
     Relationship,

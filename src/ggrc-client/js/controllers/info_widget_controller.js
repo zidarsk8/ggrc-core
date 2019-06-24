@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canControl from 'can-control';
 import '../components/comment/comments-section';
 import '../components/related-objects/proposals/related-proposals';
 import '../components/related-objects/proposals/related-proposals-item';
@@ -17,7 +18,7 @@ import {getCreateObjectUrl} from '../plugins/utils/ggrcq-utils';
 import Cacheable from '../models/cacheable';
 import {refreshCounts} from '../plugins/utils/widgets-utils';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),

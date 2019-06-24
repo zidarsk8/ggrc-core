@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canControl from 'can-control';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access-control-list/access-control-list-roles-helper';
@@ -61,7 +62,7 @@ import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     preload_view: GGRC.templates_path + '/dashboard/modal_preload.stache',
     header_view: GGRC.templates_path + '/modals/modal_header.stache',

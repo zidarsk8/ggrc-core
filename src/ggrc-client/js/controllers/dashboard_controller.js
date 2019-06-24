@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canControl from 'can-control';
 import DashboardWidgets from './dashboard_widgets_controller';
 import InfoPin from './info_pin_controller';
 import {
@@ -14,7 +15,7 @@ import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 import TreeViewConfig from '../apps/base_widgets';
 import pubSub from '../pub-sub';
 
-const DashboardControl = can.Control.extend({
+const DashboardControl = canControl.extend({
   defaults: {
     widget_descriptors: null,
     innerNavDescriptors: [],

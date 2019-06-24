@@ -3,9 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canControl from 'can-control';
 const MOUSEENTER_THROTTLE = 300;
 
-const InfiniteScrollControl = can.Control.extend({}, {
+const InfiniteScrollControl = canControl.extend({}, {
   init: function () {},
   ' DOMMouseScroll': 'prevent_overscroll',
   ' mousewheel': 'prevent_overscroll',
@@ -60,7 +61,7 @@ const InfiniteScrollControl = can.Control.extend({}, {
   },
 });
 
-const LhnTooltipsControl = can.Control.extend({
+const LhnTooltipsControl = canControl.extend({
   defaults: {
     tooltip_view: GGRC.templates_path + '/base_objects/extended_info.stache',
     trigger_selector: '.show-extended',

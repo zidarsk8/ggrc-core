@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canControl from 'can-control';
 import './infinite-scroll-controller';
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
@@ -21,7 +22,7 @@ import '../components/questionnaire-create-link/questionnaire-create-link';
 import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 import * as canBatch from 'can-event/batch/batch';
 
-const LhnControl = can.Control.extend({}, {
+const LhnControl = canControl.extend({}, {
   init: function () {
     this.obs = new can.Map();
 
@@ -351,7 +352,7 @@ const LhnControl = can.Control.extend({}, {
   },
 });
 
-const LhnSearchControl = can.Control.extend({
+const LhnSearchControl = canControl.extend({
   defaults: {
     list_view: 'base_objects/search_result',
     actions_view: 'base_objects/search_actions',
