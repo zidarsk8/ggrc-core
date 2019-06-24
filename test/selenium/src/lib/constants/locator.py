@@ -365,7 +365,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  REF_URL_CSS = (By.CSS_SELECTOR, '[data-id="reference_url_hidden"]')
   UI_EFFECTIVE_DATE = (By.CSS_SELECTOR,
                        '[test-id="new_program_field_effective_date_f2783a28"] '
                        '[data-id="effective_date_hidden"] .datepicker__input')
@@ -454,7 +453,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
   ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
-  REF_URL_CSS = (By.CSS_SELECTOR, '[data-id="reference_url_hidden"]')
   SIGNIFICANCE = (
       By.CSS_SELECTOR, '[data-test-id="control_significance_18f15545"] label')
   DROPDOWN_SIGNIFICANCE = (
@@ -786,9 +784,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
   NOTES_ENTERED = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_notes_content_ef5bc3a71e88"]'.format(WIDGET))
-  REF_URL_CSS = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_reference_url_aa7d1a65"]'.format(WIDGET))
   CODE = (By.CSS_SELECTOR,
           '{} [data-test-id="title_code_cf47bc01"] h6'.format(WIDGET))
   CODE_ENTERED = (By.CSS_SELECTOR,
