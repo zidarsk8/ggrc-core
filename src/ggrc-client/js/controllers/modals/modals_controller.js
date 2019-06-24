@@ -397,16 +397,16 @@ export default canControl.extend({
     let isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
       modalTitle.indexOf('New') === 0);
 
-    if (can.isArray(content)) {
+    if (Array.isArray(content)) {
       content = content[0];
     }
-    if (can.isArray(header)) {
+    if (Array.isArray(header)) {
       header = header[0];
     }
-    if (can.isArray(footer)) {
+    if (Array.isArray(footer)) {
       footer = footer[0];
     }
-    if (can.isArray(customAttributes)) {
+    if (Array.isArray(customAttributes)) {
       customAttributes = customAttributes[0];
     }
     if (header !== null) {
@@ -568,7 +568,7 @@ export default canControl.extend({
     }
 
     if (name.length > 1) {
-      if (can.isArray(value)) {
+      if (Array.isArray(value)) {
         value = new canList(_.filteredMap(value,
           (v) => new CanMap({}).attr(name.slice(1).join('.'), v)));
       } else if ($elem.is('[data-lookup]')) {
