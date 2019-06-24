@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import {
@@ -23,7 +24,7 @@ export default CanMap.extend({
     showTabs: {
       get() {
         let counts = this.attr('counts');
-        let isEmptyCounts = can.isEmptyObject(counts.attr());
+        let isEmptyCounts = isEmptyObject(counts.attr());
         return !isEmptyCounts || isAdmin();
       },
     },

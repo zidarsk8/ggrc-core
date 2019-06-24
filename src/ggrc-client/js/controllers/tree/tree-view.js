@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import canCompute from 'can-compute';
 import makeArray from 'can-util/js/make-array/make-array';
 import canModel from 'can-model';
@@ -160,7 +161,7 @@ const TreeViewControl = TreeLoader.extend({
       //  Skip, because already done, e.g., display() already called
       return this.find_all_deferred;
     }
-    if (can.isEmptyObject(this.options.find_params.serialize())) {
+    if (isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr(
         'id', this.options.parent_instance ?
           this.options.parent_instance.id : undefined);
