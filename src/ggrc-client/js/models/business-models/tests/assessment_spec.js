@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import Assessment from '../assessment';
 import Program from '../program';
 import Audit from '../audit';
@@ -156,7 +157,7 @@ describe('Assessment model', function () {
     });
 
     function checkAcRoles(model, roleId, peopleIds) {
-      const res = can.makeArray(model.access_control_list).filter((acl) => {
+      const res = makeArray(model.access_control_list).filter((acl) => {
         return acl.ac_role_id === roleId;
       }).map((acl) => {
         return acl.person.id;

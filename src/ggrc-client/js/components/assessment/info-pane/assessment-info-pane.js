@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -316,7 +317,7 @@ export default CanComponent.extend({
       return this.requestQuery(query, 'urls');
     },
     updateItems: function () {
-      can.makeArray(arguments).forEach(function (type) {
+      makeArray(arguments).forEach(function (type) {
         this.attr(type).replace(this['load' + _.capitalize(type)]());
       }.bind(this));
     },
@@ -337,7 +338,7 @@ export default CanComponent.extend({
     addItems: function (event, type) {
       let items = event.items;
       this.attr('isUpdating' + _.capitalize(type), true);
-      return this.attr(type).unshift(...can.makeArray(items));
+      return this.attr(type).unshift(...makeArray(items));
     },
     getEvidenceAdditionFilter: function (kind) {
       return kind ?

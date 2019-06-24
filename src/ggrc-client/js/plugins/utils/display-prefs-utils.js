@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import * as LocalStorage from './local-storage-utils';
@@ -57,7 +58,7 @@ function clearPreferences() {
  * The other should be parts of path in preferences object
  */
 function saveObject() {
-  let args = can.makeArray(arguments);
+  let args = makeArray(arguments);
 
   let keyArgs = args.slice(0, args.length - 1);
   let value = args[args.length - 1];

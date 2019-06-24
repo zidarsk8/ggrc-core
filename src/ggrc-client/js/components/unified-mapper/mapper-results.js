@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
@@ -328,7 +329,7 @@ export default CanComponent.extend({
       }
     },
     setSelectedItems: function (allItems) {
-      let selectedItems = can.makeArray(this.attr('selected'));
+      let selectedItems = makeArray(this.attr('selected'));
 
       allItems.forEach(function (item) {
         item.isSelected =

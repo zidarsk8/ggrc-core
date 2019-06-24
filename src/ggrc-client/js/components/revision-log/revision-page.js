@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
@@ -60,9 +61,9 @@ export default CanComponent.extend({
 
       // combine all the changes and sort them by date descending
       let changeHistory = _([]).concat(
-        can.makeArray(this._computeObjectChanges(revisions.object,
+        makeArray(this._computeObjectChanges(revisions.object,
           revisions.revisionsForCompare)),
-        can.makeArray(this._computeMappingChanges(revisions.mappings)))
+        makeArray(this._computeMappingChanges(revisions.mappings)))
         .sortBy('updatedAt')
         .reverse()
         .value();

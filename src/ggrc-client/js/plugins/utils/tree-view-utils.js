@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import {
@@ -150,7 +151,7 @@ function getAvailableAttributes(modelType) {
   let disableConfiguration =
     !!Model.tree_view_options.disable_columns_configuration;
 
-  let attrs = can.makeArray(
+  let attrs = makeArray(
     Model.tree_view_options.mapper_attr_list ||
     Model.tree_view_options.attr_list ||
     Cacheable.attr_list
@@ -306,8 +307,8 @@ function setColumnsForModel(modelType, columnNames, modelName) {
  * @return {Array} Array of columns configs.
  */
 function getVisibleColumnsConfig(available, selected) {
-  const selectedColumns = can.makeArray(selected);
-  const availableColumns = can.makeArray(available);
+  const selectedColumns = makeArray(selected);
+  const availableColumns = makeArray(available);
   const columns = [];
 
   availableColumns.forEach(function (attr) {
@@ -491,7 +492,7 @@ function loadItemsForSubTier(models, type, id, filter, pageInfo) {
     .then(function () {
       let directlyRelated = [];
       let notRelated = [];
-      let response = can.makeArray(arguments);
+      let response = makeArray(arguments);
       let total;
 
       loadedModelObjects.forEach(function (modelObject, index) {

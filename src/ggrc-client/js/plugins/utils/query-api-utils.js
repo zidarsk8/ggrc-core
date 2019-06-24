@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {
   notifier,
@@ -218,7 +219,7 @@ function _makeFilter(filter, relevant) {
   if (relevant) {
     relevant = Array.isArray(relevant) ?
       relevant :
-      can.makeArray(relevant);
+      makeArray(relevant);
     relevantFilters = relevant.map(function (filter) {
       return _makeRelevantFilter(filter);
     });
@@ -228,7 +229,7 @@ function _makeFilter(filter, relevant) {
   if (filter) {
     filter = Array.isArray(filter) ?
       filter :
-      can.makeArray(filter);
+      makeArray(filter);
     filterList = filterList.concat(filter);
   }
   if (filterList.length) {

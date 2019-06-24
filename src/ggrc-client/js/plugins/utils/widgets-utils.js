@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import CanMap from 'can-map';
 import * as TreeViewUtils from './tree-view-utils';
 import {
@@ -114,7 +115,7 @@ function getCounts() {
 function initWidgetCounts(widgets, type, id) {
   let resultsArray = [];
 
-  let widgetConfigs = getWidgetConfigs(can.makeArray(widgets));
+  let widgetConfigs = getWidgetConfigs(makeArray(widgets));
 
   // custom endpoint we use only in order to initialize counts for all tabs.
   // In order to update counter for individual tab need to use Query API

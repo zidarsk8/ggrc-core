@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canModel from 'can-model';
 import canStache from 'can-stache';
 import CanMap from 'can-map';
@@ -243,7 +244,7 @@ const TreeViewControl = TreeLoader.extend({
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   add_child_lists: function (list) {
     let that = this;
-    let currentList = can.makeArray(list);
+    let currentList = makeArray(list);
     let listWindow = [];
     let finalDfd;
     let queue = [];
@@ -294,7 +295,7 @@ const TreeViewControl = TreeLoader.extend({
     let drawItemsDfds = [];
     let res;
 
-    items = can.makeArray(optionsList);
+    items = makeArray(optionsList);
 
     items = _.map(items, function (options) {
       let elem = document.createElement('li');

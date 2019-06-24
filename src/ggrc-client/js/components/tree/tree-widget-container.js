@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import CanMap from 'can-map';
@@ -85,7 +86,7 @@ let viewModel = CanMap.extend({
     currentFilter: {
       type: String,
       get: function () {
-        let filters = can.makeArray(this.attr('filters'));
+        let filters = makeArray(this.attr('filters'));
         let additionalFilter = this.attr('additionalFilter');
 
         if (this.attr('advancedSearch.filter')) {
@@ -290,7 +291,7 @@ let viewModel = CanMap.extend({
     this.closeInfoPane();
   },
   getDepthFilter: function (deepLevel) {
-    let filters = can.makeArray(this.attr('filters'));
+    let filters = makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
       return options.query &&

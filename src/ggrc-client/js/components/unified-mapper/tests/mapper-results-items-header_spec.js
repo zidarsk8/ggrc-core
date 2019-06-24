@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-items-header';
@@ -21,7 +22,7 @@ describe('mapper-results-items-header component', function () {
       viewModel.attr('columns', [0, 1]);
       viewModel.attr('serviceColumns', [2]);
       const result = viewModel.aggregatedColumns();
-      expect(can.makeArray(result)).toEqual([0, 1, 2]);
+      expect(makeArray(result)).toEqual([0, 1, 2]);
     });
   });
 

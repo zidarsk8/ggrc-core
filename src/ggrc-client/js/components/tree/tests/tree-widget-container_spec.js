@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
@@ -145,7 +146,7 @@ describe('tree-widget-container component', function () {
         expect(TreeViewUtils.loadFirstTierItems).toHaveBeenCalledWith(
           modelName, parent, page, filter, request, loadSnapshots, 'child');
         expect(vm.attr('pageInfo.total')).toEqual(100);
-        expect(can.makeArray(vm.attr('showedItems'))).toEqual([]);
+        expect(makeArray(vm.attr('showedItems'))).toEqual([]);
         done();
       });
     });
@@ -162,7 +163,7 @@ describe('tree-widget-container component', function () {
         expect(TreeViewUtils.loadFirstTierItems).toHaveBeenCalledWith(
           modelName, parent, page, filter, request, loadSnapshots, null);
         expect(vm.attr('pageInfo.total')).toEqual(100);
-        expect(can.makeArray(vm.attr('showedItems'))).toEqual([]);
+        expect(makeArray(vm.attr('showedItems'))).toEqual([]);
         done();
       });
     });

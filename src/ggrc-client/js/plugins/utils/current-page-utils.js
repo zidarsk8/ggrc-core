@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import CanMap from 'can-map';
 import {
   buildRelevantIdsQuery,
@@ -47,7 +48,7 @@ function initMappedInstances() {
   let reqParams = [];
 
   relatedToCurrentInstance.attr('initialized', true);
-  models = can.makeArray(models);
+  models = makeArray(models);
 
   models.forEach(function (model) {
     let query = buildRelevantIdsQuery(
@@ -66,7 +67,7 @@ function initMappedInstances() {
 
   return $.when(...reqParams)
     .then(function () {
-      let response = can.makeArray(arguments);
+      let response = makeArray(arguments);
 
       models.forEach(function (model, idx) {
         let ids = response[idx][model] ?
