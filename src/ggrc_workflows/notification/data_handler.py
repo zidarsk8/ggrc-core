@@ -6,8 +6,6 @@
 """A module with functions for retrieving workflow objects data used in emails.
 """
 
-import urllib
-
 from collections import defaultdict
 from copy import deepcopy
 from datetime import date
@@ -19,6 +17,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import utils
 from ggrc import models
+from ggrc.gcalendar.utils import get_cycle_tasks_url_by_slug
 from ggrc.models.relationship import Relationship
 from ggrc.models.revision import Revision
 from ggrc.notifications import data_handlers
@@ -149,16 +148,13 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
   due = "due_today" if notif_name == "cycle_task_due_today" else "due_in"
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
 
-  url_filter_exp = u"id={}".format(cycle_task.cycle_id)
   task_info = get_cycle_task_dict(cycle_task, del_rels_cache=del_rels_cache)
 
   task_info["task_group"] = cycle_task.cycle_task_group
-  task_info["task_group_url"] = cycle_task_group_url(
-      cycle_task, filter_exp=url_filter_exp)
 
   task_info["workflow"] = cycle_task.cycle.workflow
-  task_info["workflow_cycle_url"] = cycle_task_workflow_cycle_url(
-      cycle_task, filter_exp=url_filter_exp)
+  task_info["workflow_url"] = get_workflow_url(cycle_task.cycle.workflow,
+                                               "info")
 
   result = {}
   for person in task_assignees:
@@ -218,16 +214,13 @@ def get_cycle_task_overdue_data(
 
   # the filter expression to be included in the cycle task's URL and
   # automatically applied when user visits it
-  url_filter_exp = u"id=" + unicode(cycle_task.cycle_id)
   task_info = get_cycle_task_dict(cycle_task, del_rels_cache=del_rels_cache)
 
   task_info['task_group'] = cycle_task.cycle_task_group
-  task_info['task_group_url'] = cycle_task_group_url(
-      cycle_task, filter_exp=url_filter_exp)
 
   task_info['workflow'] = cycle_task.cycle.workflow
-  task_info['workflow_cycle_url'] = cycle_task_workflow_cycle_url(
-      cycle_task, filter_exp=url_filter_exp)
+  task_info["workflow_url"] = get_workflow_url(cycle_task.cycle.workflow,
+                                               "info")
   result = {}
   for person in assignees:
     person_dict = {
@@ -458,7 +451,7 @@ def get_workflow_starts_in_data(notification, workflow):
         },
         "cycle_starts_in": {
             workflow.id: {
-                "workflow_url": get_workflow_url(workflow),
+                "workflow_url": get_workflow_url(workflow, "info"),
                 "start_date": workflow.next_cycle_start_date,
                 "start_date_statement": utils.get_digest_date_statement(
                     workflow.next_cycle_start_date, "start", True),
@@ -490,7 +483,7 @@ def get_cycle_start_failed_data(notification, workflow):
         },
         "cycle_start_failed": {
             workflow.id: {
-                "workflow_url": get_workflow_url(workflow),
+                "workflow_url": get_workflow_url(workflow, "info"),
                 "start_date": workflow.next_cycle_start_date,
                 "start_date_statement": utils.get_digest_date_statement(
                     workflow.next_cycle_start_date, "start", True),
@@ -647,7 +640,7 @@ def get_cycle_task_dict(cycle_task, del_rels_cache=None):
       "end_date": cycle_task.end_date.strftime("%m/%d/%Y"),
       "due_date_statement": utils.get_digest_date_statement(
           cycle_task.end_date, "due"),
-      "cycle_task_url": get_cycle_task_url(),
+      "cycle_task_url": get_cycle_tasks_url_by_slug(cycle_task.slug),
   }
 
 
@@ -659,67 +652,21 @@ def get_cycle_dict(cycle, manual=False):
       "cycle_slug": cycle.slug,
       "cycle_title": cycle.title,
       "cycle_url": cycle.cycle_url,
+      "workflow_title": cycle.workflow.title,
+      "workflow_url": get_workflow_url(cycle.workflow, "info"),
       "cycle_inactive_url": cycle.cycle_inactive_url,
-      "workflow_id": cycle.workflow_id,
   }
 
 
-def get_workflow_url(workflow):
+def get_workflow_url(workflow, widget_name="current"):
   """Get URL to workflow object."""
-  url = "workflows/{}#current".format(workflow.id)
+  url = "workflows/{workflow_id}#{widget_name}".format(
+      workflow_id=workflow.id,
+      widget_name=widget_name,
+  )
   return urljoin(get_url_root(), url)
 
 
 def get_cycle_task_url():
   """Get CycleTask notification url."""
   return urljoin(get_url_root(), u"dashboard#!task")
-
-
-def cycle_task_group_url(cycle_task, filter_exp=u""):
-  """Build the URL to a particular cycle task.
-
-  Args:
-    cycle_task: The cycle task instance to build the URL for.
-    filter_exp:
-        An optional query filter expression to be included in the URL.
-        Defaults to an empty string.
-  Returns:
-    Full cycle task URL (as a string).
-  """
-  if filter_exp:
-    filter_exp = u"?filter=" + urllib.quote(filter_exp)
-
-  url = (u"/workflows/{workflow_id}"
-         u"{filter_exp}"
-         u"#current/cycle/{cycle_id}"
-         u"/cycle_task_group/{cycle_task_group_id}").format(
-      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
-      filter_exp=filter_exp,
-      cycle_id=cycle_task.cycle_task_group.cycle.id,
-      cycle_task_group_id=cycle_task.cycle_task_group.id,
-  )
-  return urljoin(get_url_root(), url)
-
-
-def cycle_task_workflow_cycle_url(cycle_task, filter_exp=u""):
-  """Build the URL to the given task's workflow cycle.
-
-  Args:
-    cycle_task: The cycle task instance to build the URL for.
-    filter_exp:
-        An optional query filter expression to be included in the URL.
-        Defaults to an empty string.
-  Returns:
-    Full workflow cycle URL (as a string).
-  """
-  if filter_exp:
-    filter_exp = u"?filter=" + urllib.quote(filter_exp)
-
-  url = (u"/workflows/{workflow_id}"
-         u"{filter_exp}"
-         u"#current/cycle/{cycle_id}").format(
-      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
-      filter_exp=filter_exp,
-      cycle_id=cycle_task.cycle_task_group.cycle.id,
-  )
-  return urljoin(get_url_root(), url)
