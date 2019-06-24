@@ -365,13 +365,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  UI_EFFECTIVE_DATE = (By.CSS_SELECTOR,
-                       '[test-id="new_program_field_effective_date_f2783a28"] '
-                       '[data-id="effective_date_hidden"] .datepicker__input')
-  EFFECTIVE_DATE_DATEPICKER = (
-      By.CSS_SELECTOR,
-      '[test-id="new_program_field_effective_date_f2783a28"] '
-      '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
   TITLE = (By.CSS_SELECTOR, '[data-test-id="label_title_2c925d94"]')
   DESCRIPTION = (
       By.CSS_SELECTOR, '[data-test-id="label_description_2c925d94"]')
@@ -468,14 +461,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
   DROPDOWN_STATE = (
       By.CSS_SELECTOR, '[data-test-id="control_state_5d184456"] select')
   UI_NOTES = (By.CSS_SELECTOR, '[data-id="note_hidden"] .ql-editor')
-  UI_EFFECTIVE_DATE = (
-      By.CSS_SELECTOR,
-      '[test-id="control_effective_dates_0376cf90"] '
-      '[data-id="effective_date_hidden"] .datepicker__input')
-  EFFECTIVE_DATE_DATEPICKER = (
-      By.CSS_SELECTOR,
-      '[test-id="control_effective_dates_0376cf90"] '
-      '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
