@@ -29,7 +29,7 @@ export default can.Component.extend({
         get() {
           let showResults = this.attr('showResults');
           let minLength = this.attr('minLength');
-          let searchCriteria = this.attr('searchCriteria');
+          let searchCriteria = this.attr('searchCriteria') || '';
 
           let result = showResults && searchCriteria.length >= minLength;
 
