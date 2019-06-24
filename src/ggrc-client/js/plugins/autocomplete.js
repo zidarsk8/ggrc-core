@@ -29,15 +29,9 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
     },
     minLength: 0,
     source: _.debounce(function (request, response) {
-      // Search based on the term
-      let query = request.term || '';
       let queue = new RefreshQueue();
       let isNextPage = _.isNumber(request.start);
       let dfd;
-
-      if (query.indexOf('@') > -1) {
-        query = '"' + query + '"';
-      }
 
       this.last_request = request;
       if (isNextPage) {
