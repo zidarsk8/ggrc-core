@@ -118,7 +118,6 @@ module.exports = function (env) {
     resolve: {
       modules: [nodeModulesDir, vendorDir],
       alias: {
-        can: 'can-util/namespace',
         entrypoints: './js/entrypoints',
       },
     },
@@ -132,7 +131,6 @@ module.exports = function (env) {
         'window.jQuery': 'jquery',
         _: 'lodash',
         moment: 'moment',
-        can: 'can',
       }),
       new webpack.DefinePlugin({
         GOOGLE_ANALYTICS_ID: JSON.stringify(ENV.GOOGLE_ANALYTICS_ID),

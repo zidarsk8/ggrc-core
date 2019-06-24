@@ -30,25 +30,11 @@ import 'quill/dist/quill.core.css';
 import 'quill/dist/quill.snow.css';
 
 /* canjs v3 */
-import can3 from 'can-util/namespace';
-
-import 'can-component';
-import 'can-route';
-import 'can-stache';
 import 'can-stache-bindings';
-import 'can-event';
-import 'can-view-model';
-import 'can-map';
-import 'can-list';
-import 'can-model';
 import 'can-map-backup';
-import 'can-control';
-import 'can-construct';
 import 'can-construct-super';
 import 'can-validate-legacy/map/validate/validate';
 import 'can-validate-legacy/shims/validatejs';
-import 'can-map-define';
 import 'can-jquery';
 import 'can-jquery/legacy';
-
-window.can = can3;
+import 'can-map-define';
