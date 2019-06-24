@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import template from './issue-tracker-enable.stache';
 import logger from './issue-tracker-log';
@@ -256,7 +257,7 @@ GGRC.enableIssueTracker = () => {
   } else {
     isButtonActivated = true;
 
-    let renderer = can.stache(template);
+    let renderer = canStache(template);
     let fragment = renderer(new IssueTrackerEnabler());
 
     $('section.footer').append(fragment);

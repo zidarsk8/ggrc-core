@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
@@ -16,7 +17,7 @@ import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
 export default CanComponent.extend({
   tag: 'delete-button',
-  view: can.stache('<span><i class="fa fa-trash"/>Delete</span>'),
+  view: canStache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,
   viewModel: CanMap.extend({
     define: {

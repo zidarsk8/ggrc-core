@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import Person from '../../models/business-models/person';
@@ -14,7 +15,7 @@ import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-gr
  */
 export default CanComponent.extend({
   tag: 'tasks-counter',
-  view: can.stache(
+  view: canStache(
     '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>'
   ),
   leakScope: true,

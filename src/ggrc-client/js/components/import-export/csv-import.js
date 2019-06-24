@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../plugins/utils/controllers';
@@ -70,7 +71,7 @@ const messages = {
 
 export default CanComponent.extend({
   tag: 'csv-import',
-  view: can.stache(template),
+  view: canStache(template),
   requestData: null,
   leakScope: true,
   viewModel: CanMap.extend({

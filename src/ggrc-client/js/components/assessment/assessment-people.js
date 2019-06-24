@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {ROLES_CONFLICT} from '../../events/eventTypes';
@@ -12,7 +13,7 @@ import template from './templates/assessment-people.stache';
 
 export default CanComponent.extend({
   tag: 'assessment-people',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: false,
   viewModel: CanMap.extend({
     define: {

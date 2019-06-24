@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
@@ -66,7 +67,7 @@ const viewModel = CanMap.extend({
 
 export default CanComponent.extend({
   tag: 'tree-item-custom-attribute',
-  view: can.stache('{{{value}}}'),
+  view: canStache('{{{value}}}'),
   leakScope: true,
   viewModel,
 });

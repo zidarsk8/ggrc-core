@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../tree-pagination/tree-pagination';
@@ -25,7 +26,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 
 export default CanComponent.extend({
   tag: 'revision-log',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   /**
    * The component's entry point. Invoked when a new component instance has

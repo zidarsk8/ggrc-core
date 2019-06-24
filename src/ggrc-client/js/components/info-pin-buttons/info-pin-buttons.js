@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './info-pin-buttons.stache';
@@ -10,7 +11,7 @@ import isFunction from 'can-util/js/is-function/is-function';
 
 export default CanComponent.extend({
   tag: 'info-pin-buttons',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: CanMap.extend({
     onChangeMaximizedState: null,

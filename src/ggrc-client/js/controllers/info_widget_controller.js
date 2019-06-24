@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import canControl from 'can-control';
 import '../components/comment/comments-section';
@@ -51,7 +52,7 @@ export default canControl.extend({
           url: this.get_widget_view(this.element),
           dataType: 'text',
         }).then((view) => {
-          let frag = can.stache(view)(this.options.context);
+          let frag = canStache(view)(this.options.context);
           this.element.html(frag);
         });
       });

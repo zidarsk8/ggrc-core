@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import canControl from 'can-control';
 const MOUSEENTER_THROTTLE = 300;
 
@@ -155,7 +156,7 @@ const LhnTooltipsControl = canControl.extend({
         url: tooltipView,
         dataType: 'text',
       }).then((view) => {
-        let frag = can.stache(view)({instance: instance});
+        let frag = canStache(view)({instance: instance});
         let tooltipWidth = this.options.$extended.outerWidth();
         let offset = el.parent().offset();
         let elLeft = offset ? offset.left : 0;

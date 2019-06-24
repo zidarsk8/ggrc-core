@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/text-form-field.stache';
@@ -63,7 +64,7 @@ const TEXT_FORM_FIELD_VM = CanMap.extend({
 });
 
 export default CanComponent.extend({
-  view: can.stache(template),
+  view: canStache(template),
   tag: 'text-form-field',
   leakScope: true,
   viewModel: TEXT_FORM_FIELD_VM,

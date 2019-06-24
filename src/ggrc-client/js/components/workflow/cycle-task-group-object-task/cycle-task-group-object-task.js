@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/cycle-task-group-object-task.stache';
@@ -33,9 +34,9 @@ import Permission from '../../../permission';
 
 let viewModel = CanMap.extend({
   partials: {
-    restoreButton: can.stache(restoreButtonTemplate),
-    threeDotsMenu: can.stache(tdmTemplate),
-    threeDotsMenuInHistory: can.stache(tdmInHistoryTemplate),
+    restoreButton: canStache(restoreButtonTemplate),
+    threeDotsMenu: canStache(tdmTemplate),
+    threeDotsMenuInHistory: canStache(tdmInHistoryTemplate),
   },
   define: {
     isAllowedToUpdate: {
@@ -119,7 +120,7 @@ let viewModel = CanMap.extend({
 
 export default CanComponent.extend({
   tag: 'cycle-task-group-object-task',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
 });

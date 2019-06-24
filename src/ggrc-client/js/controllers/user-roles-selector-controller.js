@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import canControl from 'can-control';
@@ -50,7 +51,7 @@ const userRolesModalSelector = canControl.extend({
       url: this.options.base_modal_view,
       dataType: 'text',
     }).then((view) => {
-      let frag = can.stache(view)(this.context);
+      let frag = canStache(view)(this.context);
       $(this.element).html(frag);
       $(this.element).trigger('loaded');
       deferred.resolve();

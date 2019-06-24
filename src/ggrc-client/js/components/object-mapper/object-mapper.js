@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
@@ -91,7 +92,7 @@ let getDefaultType = function (type, object) {
  */
 export default CanComponent.extend({
   tag: 'object-mapper',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: function (attrs, parentViewModel) {
     let config = {

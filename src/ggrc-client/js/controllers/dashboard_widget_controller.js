@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import canControl from 'can-control';
 import {getDashboards} from '../plugins/utils/dashboards-utils';
@@ -37,7 +38,7 @@ export default canControl.extend({
       url: options.widget_view,
       dataType: 'text',
     }).then((view) => {
-      let frag = can.stache(view)(options.context);
+      let frag = canStache(view)(options.context);
       $element.html(frag);
     });
     return 0;

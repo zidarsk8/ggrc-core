@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanComponent from 'can-component';
 import template from './inner-nav.stache';
 import './inner-nav-item';
@@ -11,7 +12,7 @@ import InnerNavVM from './inner-nav-vm';
 
 export default CanComponent.extend({
   tag: 'inner-nav',
-  view: can.stache(template),
+  view: canStache(template),
   viewModel: InnerNavVM,
   events: {
     inserted() {

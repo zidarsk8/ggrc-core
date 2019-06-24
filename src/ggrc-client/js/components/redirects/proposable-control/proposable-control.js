@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/proposable-control.stache';
@@ -23,6 +24,6 @@ const viewModel = CanMap.extend({
 export default CanComponent.extend({
   tag: 'proposable-control',
   leakScope: false,
-  view: can.stache(template),
+  view: canStache(template),
   viewModel,
 });

@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
 
 export default CanComponent.extend({
   tag: 'comment-add-button',
-  view: can.stache(
+  view: canStache(
     '<button type="button" class="btn btn-small btn-gray"' +
     ' on:el:click="createComment()">' +
     '<content/></button>'

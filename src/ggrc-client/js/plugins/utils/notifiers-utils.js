@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 const messages = {
   'default': 'There was an error!',
   '401': 'The server says you are not authorized. Are you logged in?',
@@ -29,7 +30,7 @@ function notifier(type, message, {data = null, reloadLink = null} = {}) {
   let props = {};
 
   if ( message && data ) {
-    message = can.stache(message);
+    message = canStache(message);
     props.data = data;
   }
 

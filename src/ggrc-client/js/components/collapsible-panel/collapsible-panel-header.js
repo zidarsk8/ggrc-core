@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './collapsible-panel-header.stache';
@@ -12,7 +13,7 @@ import template from './collapsible-panel-header.stache';
  */
 export default CanComponent.extend({
   tag: 'collapsible-panel-header',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: CanMap.extend({
     titleIcon: null,

@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('can.stache.helper.localize_date', () => {
+import canStache from 'can-stache';
+describe('canStache.helper.localize_date', () => {
   let helper;
   let testDate;
   let fakeOptions;
 
   beforeAll(() => {
-    helper = can.stache.getHelper('localize_date').fn;
+    helper = canStache.getHelper('localize_date').fn;
     fakeOptions = {};
   });
 

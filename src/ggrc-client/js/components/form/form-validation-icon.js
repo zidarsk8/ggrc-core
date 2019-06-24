@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 /**
@@ -20,7 +21,7 @@ const icons = {
  */
 export default CanComponent.extend({
   tag: 'form-validation-icon',
-  view: can.stache(
+  view: canStache(
     '<i class="fa form-validation-icon__body {{iconCls}}"></i>'
   ),
   leakScope: true,

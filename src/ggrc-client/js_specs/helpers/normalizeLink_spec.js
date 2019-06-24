@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('can.stache.helper.normalizeLink', () => {
+import canStache from 'can-stache';
+describe('canStache.helper.normalizeLink', () => {
   let helper;
 
   beforeEach(() => {
-    helper = can.stache.getHelper('normalizeLink').fn;
+    helper = canStache.getHelper('normalizeLink').fn;
   });
 
   describe('normalizeUrl(url) method', () => {

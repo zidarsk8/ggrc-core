@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/dropdown-component';
@@ -11,7 +12,7 @@ import template from './templates/modal-issue-tracker-fields.stache';
 
 export default CanComponent.extend({
   tag: 'modal-issue-tracker-fields',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: CanMap.extend({
     instance: {},

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
@@ -15,7 +16,7 @@ import Permission from '../../permission';
 
 export default CanComponent.extend({
   tag: 'comments-section',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: CanMap.extend({
     define: {

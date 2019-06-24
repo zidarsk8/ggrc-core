@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import canControl from 'can-control';
@@ -99,7 +100,7 @@ export default canControl.extend({
       url: this.options.show_view,
       dataType: 'text',
     }).then((view) => {
-      return can.stache(view)(this.options);
+      return canStache(view)(this.options);
     }).then(this._ifNotRemoved((frag) => {
       this.replace_element(frag);
       this.add_control();

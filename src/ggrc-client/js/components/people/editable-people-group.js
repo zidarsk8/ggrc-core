@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanComponent from 'can-component';
 import './people-group-modal';
 import './editable-people-group-header';
@@ -100,7 +101,7 @@ let viewModel = peopleGroupVM.extend({
 
 export default CanComponent.extend({
   tag: 'editable-people-group',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

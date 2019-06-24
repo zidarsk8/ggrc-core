@@ -3,13 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './clipboard-link';
 
 export default CanComponent.extend({
   tag: 'shortlink-component',
-  view: can.stache(
+  view: canStache(
     '<clipboard-link text:from="text">' +
     '<i class="fa fa-google"/>Get Short Url</clipboard-link>'
   ),

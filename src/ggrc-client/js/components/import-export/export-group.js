@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './export-panel';
@@ -11,7 +12,7 @@ import panelModel from './panel';
 
 export default CanComponent.extend('exportGroup', {
   tag: 'export-group',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: CanMap.extend({
     define: {

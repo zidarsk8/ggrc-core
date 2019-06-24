@@ -3,13 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './clipboard-link';
 
 export default CanComponent.extend({
   tag: 'permalink-component',
-  view: can.stache(
+  view: canStache(
     '<clipboard-link text:from="text">' +
     '<i class="fa fa-link"></i>Get permalink</clipboard-link>'
   ),

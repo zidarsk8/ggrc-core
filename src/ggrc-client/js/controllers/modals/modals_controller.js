@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import canList from 'can-list';
 import CanMap from 'can-map';
 import canControl from 'can-control';
@@ -100,7 +101,7 @@ export default canControl.extend({
         url: this.options.preload_view,
         dataType: 'text',
       }).then((view) => {
-        let frag = can.stache(view)();
+        let frag = canStache(view)();
         this.after_preload(frag);
       });
       return;
@@ -408,19 +409,19 @@ export default canControl.extend({
       customAttributes = customAttributes[0];
     }
     if (header !== null) {
-      header = can.stache(header)(context);
+      header = canStache(header)(context);
       $(this.options.headerEl).find('h2').html(header);
     }
     if (content !== null) {
-      content = can.stache(content)(context);
+      content = canStache(content)(context);
       $(this.options.contentEl).html(content).removeAttr('style');
     }
     if (footer !== null) {
-      footer = can.stache(footer)(context);
+      footer = canStache(footer)(context);
       $(this.options.footerEl).html(footer);
     }
     if (customAttributes !== null && (isObjectModal || isProposal)) {
-      customAttributes = can.stache(customAttributes)(context);
+      customAttributes = canStache(customAttributes)(context);
       $(this.options.contentEl).append(customAttributes);
     }
 

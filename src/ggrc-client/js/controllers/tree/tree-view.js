@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getCounts} from '../../plugins/utils/widgets-utils';
@@ -114,7 +115,7 @@ const TreeViewControl = TreeLoader.extend({
           url: this.options.header_view,
           dataType: 'text',
         })).then((ctx, view) => {
-          return can.stache(view[0])(ctx);
+          return canStache(view[0])(ctx);
         }).then(
           this._ifNotRemoved((frag) => {
             this.element.before(frag);

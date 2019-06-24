@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './people-mention/people-mention';
@@ -15,7 +16,7 @@ const EMAIL_REGEX = /^[+|@]\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+/;
 
 export default CanComponent.extend('richText', {
   tag: 'rich-text',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: CanMap.extend({
     define: {

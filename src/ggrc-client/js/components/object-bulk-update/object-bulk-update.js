@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import CanComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
@@ -18,7 +19,7 @@ import {groupTypes} from '../../plugins/utils/models-utils';
 
 export default CanComponent.extend({
   tag: 'object-bulk-update',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: function (attrs, parentViewModel) {
     let type = attrs.type;

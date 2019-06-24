@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import canControl from 'can-control';
 import '../../components/assessment-template-clone/assessment-template-clone';
 import '../../components/object-bulk-update/object-bulk-update';
@@ -196,7 +197,7 @@ const ObjectMapper = canControl.extend({
   },
 }, {
   init: function () {
-    let frag = can.stache(this.options.component)(this.options);
+    let frag = canStache(this.options.component)(this.options);
     this.element.html(frag);
   },
 });
