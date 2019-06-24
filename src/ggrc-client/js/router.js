@@ -3,21 +3,22 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canRoute from 'can-route';
 import CanMap from 'can-map';
 const router = new CanMap();
 
 class RouterConfig {
   static setupRoutes(routes) {
     routes.forEach((route) => {
-      can.route(route.template, route.defaults);
+      canRoute(route.template, route.defaults);
     });
-    can.route.data = router;
-    can.route.start();
+    canRoute.data = router;
+    canRoute.start();
   }
 }
 
 const buildUrl = (data) => {
-  let url = can.route.url(data);
+  let url = canRoute.url(data);
   return url;
 };
 
@@ -26,12 +27,12 @@ const getUrlParams = (data) => {
     let widget;
 
     // trim first and last slashes if so
-    // so can.route.deparam can parse it
+    // so canRoute.deparam can parse it
     let params = _.compact(data.split('/'));
 
     // if params missing 'widget' part
     if (params.length === 2) {
-      widget = can.route.attr('widget');
+      widget = canRoute.attr('widget');
 
       if (widget) {
         params.unshift(widget);
@@ -40,12 +41,12 @@ const getUrlParams = (data) => {
 
     data = params.join('/');
 
-    return can.route.deparam(data);
+    return canRoute.deparam(data);
   }
 };
 
 const changeHash = (data) => {
-  can.route.attr(data);
+  canRoute.attr(data);
 };
 
 const changeUrl = (url) => {
