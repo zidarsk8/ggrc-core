@@ -752,9 +752,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
       By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
   TOGGLE_SHOW_ADVANCED_ACTIVATED = (
       By.CSS_SELECTOR, "{} .show-hidden-fields.active".format(WIDGET))
-  NOTES_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_notes_content_ef5bc3a71e88"]'.format(WIDGET))
   CODE = (By.CSS_SELECTOR,
           '{} [data-test-id="title_code_cf47bc01"] h6'.format(WIDGET))
   CODE_ENTERED = (By.CSS_SELECTOR,

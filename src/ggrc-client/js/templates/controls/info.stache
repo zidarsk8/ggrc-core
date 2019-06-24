@@ -55,7 +55,7 @@
                     title:from="'Notes'"
                     attrName:from="'notes'"
                   >
-                    <div data-test-id="title_notes_content_ef5bc3a71e88" class="rtf-block">
+                    <div class="rtf-block">
                       <read-more
                         text:from="notes"
                         handleMarkdown:from="instance.constructor.isChangeableExternally">
