@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -123,14 +122,6 @@ canStache.registerHelper('firstnonempty', function () {
       .trim().replace(/&nbsp;|\s|<br *\/?>/g, '')) return v.toString();
   }
   return '';
-});
-
-canStache.registerHelper('is_empty', (data, options) => {
-  data = resolveComputed(data);
-  const result = isEmptyObject(
-    can.isPlainObject(data) ? data : data.attr()
-  );
-  return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
