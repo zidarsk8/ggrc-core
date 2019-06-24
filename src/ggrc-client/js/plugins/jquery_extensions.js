@@ -32,7 +32,7 @@ $.fn.extend({
   * @body
   * When the widget is initialized, the plugin control creates an array
   * of control instance(s) with the DOM element it was initialized on using
-  * [can.data] method.
+  * [canData] helper.
   *
   * The `controls` method allows you to get the control instance(s) for any element
   * either by their type or pluginName.

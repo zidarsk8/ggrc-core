@@ -126,7 +126,7 @@ export default CanComponent.extend({
     /**
      * Creates new model or returns existing from cache.
      * @param {Object} item - model data.
-     * @return {can.promise} - promise indicates state of operation.
+     * @return {Promise} - promise indicates state of operation.
      */
     createOrGet(item) {
       const type = this.attr('type');
