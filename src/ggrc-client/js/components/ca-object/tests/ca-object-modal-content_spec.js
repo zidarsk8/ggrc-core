@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../ca-object-modal-content';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as Utils from '../../../plugins/utils/comments-utils';
@@ -19,7 +20,7 @@ describe('ca-object-modal-content component', () => {
 
     beforeEach(() => {
       viewModel.attr({
-        instance: new can.Map(),
+        instance: new CanMap(),
         state: {},
         content: {
           contextScope: {
@@ -29,7 +30,7 @@ describe('ca-object-modal-content component', () => {
           },
         },
       });
-      comment = new can.Map();
+      comment = new CanMap();
     });
 
     it('call "addComment" when saveDfd resolved', (done) => {

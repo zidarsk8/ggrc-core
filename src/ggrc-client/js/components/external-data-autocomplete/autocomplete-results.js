@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
@@ -14,7 +15,7 @@ export default CanComponent.extend({
   tag: 'autocomplete-results',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       /**
        * Collection containing a list of results.

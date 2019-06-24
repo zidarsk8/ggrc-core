@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import canControl from 'can-control';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
@@ -89,8 +90,8 @@ export default canControl.extend({
   init: function () {
     let userFetch;
 
-    if (!(this.options instanceof can.Map)) {
-      this.options = new can.Map(this.options);
+    if (!(this.options instanceof CanMap)) {
+      this.options = new CanMap(this.options);
     }
 
     if (!this.element.find('.modal-body').length) {
@@ -211,13 +212,13 @@ export default canControl.extend({
     name.pop(); // set the owner to null, not the email
 
     if (!instance._transient) {
-      instance.attr('_transient', new can.Map({}));
+      instance.attr('_transient', new CanMap({}));
     }
 
     _.reduce(name.slice(0, -1), function (current, next) {
       current = current + '.' + next;
       if (!instance.attr(current)) {
-        instance.attr(current, new can.Map({}));
+        instance.attr(current, new CanMap({}));
       }
       return current;
     }, '_transient');
@@ -271,7 +272,7 @@ export default canControl.extend({
         this.init_audit_title();
       }
       if (!instance._transient) {
-        instance.attr('_transient', can.Map());
+        instance.attr('_transient', CanMap());
       }
       instance.attr('_transient.' + path, ui.item);
     }
@@ -322,7 +323,7 @@ export default canControl.extend({
         }.bind(this));
       }
     } else {
-      this.options.attr('instance', new can.Map(params));
+      this.options.attr('instance', new CanMap(params));
       that.on();
       dfd = new $.Deferred().resolve(instance);
     }
@@ -358,7 +359,7 @@ export default canControl.extend({
       this.element.trigger('loaded');
     }
     if (!instance._transient) {
-      instance.attr('_transient', new can.Map({}));
+      instance.attr('_transient', new CanMap({}));
     }
     if (instance.form_preload) {
       preloadDfd = instance.form_preload(
@@ -566,7 +567,7 @@ export default canControl.extend({
     if (name.length > 1) {
       if (can.isArray(value)) {
         value = new can.List(_.filteredMap(value,
-          (v) => new can.Map({}).attr(name.slice(1).join('.'), v)));
+          (v) => new CanMap({}).attr(name.slice(1).join('.'), v)));
       } else if ($elem.is('[data-lookup]')) {
         if (!value) {
           value = null;
@@ -575,7 +576,7 @@ export default canControl.extend({
           return;
         }
       } else {
-        value = new can.Map({}).attr(name.slice(1).join('.'), value);
+        value = new CanMap({}).attr(name.slice(1).join('.'), value);
       }
     }
 

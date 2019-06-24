@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import ModalsController from '../modals/modals_controller';
 import * as NotifiersUtils from '../../plugins/utils/notifiers-utils';
 import Person from '../../models/business-models/person';
@@ -37,7 +38,7 @@ describe('ModalsController', function () {
       let $el = $(html);
 
       ctrlInst = {
-        options: new can.Map({}),
+        options: new CanMap({}),
         element: $el,
         after_preload: jasmine.createSpy(),
       };
@@ -49,7 +50,7 @@ describe('ModalsController', function () {
       function (done) {
         let userId = GGRC.current_user.id;
         let dfdFetch = new $.Deferred();
-        let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
+        let fetchedUser = new CanMap({id: userId, email: 'john@doe.com'});
 
         spyOn(Person, 'findOne').and.returnValue(dfdFetch.promise());
         delete Person.cache[userId];
@@ -68,9 +69,9 @@ describe('ModalsController', function () {
       function (done) {
         let userId = GGRC.current_user.id;
         let dfdRefresh = new $.Deferred();
-        let fetchedUser = new can.Map({id: userId, email: 'john@doe.com'});
+        let fetchedUser = new CanMap({id: userId, email: 'john@doe.com'});
 
-        let partialUser = new can.Map({
+        let partialUser = new CanMap({
           id: userId,
           email: '', // simulate user object only partially loaded
           refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
@@ -96,7 +97,7 @@ describe('ModalsController', function () {
         let dfdRefresh = new $.Deferred();
         let userId = GGRC.current_user.id;
 
-        let fullUser = new can.Map({
+        let fullUser = new CanMap({
           id: userId,
           email: 'john@doe.com',
           refresh: jasmine.createSpy().and.returnValue(dfdRefresh.promise()),
@@ -162,7 +163,7 @@ describe('ModalsController', function () {
     let setFieldsCb;
 
     beforeEach(function () {
-      instance = new can.Map();
+      instance = new CanMap();
       ctrlInst = {
         wasDestroyed: jasmine.createSpy('wasDestroyed'),
         element: {
@@ -243,13 +244,13 @@ describe('ModalsController', function () {
       });
     });
 
-    it('sets new can.Map object into _transient ' +
+    it('sets new CanMap object into _transient ' +
     'if it is not defined', () => {
       instance.attr('_transient', undefined);
 
       method(instance);
 
-      expect(instance.attr('_transient') instanceof can.Map).toBe(true);
+      expect(instance.attr('_transient') instanceof CanMap).toBe(true);
       expect(instance.attr('_transient').serialize()).toEqual({});
     });
 
@@ -270,7 +271,7 @@ describe('ModalsController', function () {
     let resetFormDfd;
 
     beforeEach(function () {
-      newInstance = new can.Map();
+      newInstance = new CanMap();
       resetFormDfd = $.Deferred();
       ctrlInst = {
         prepareInstance: jasmine.createSpy('prepareInstance').and
@@ -281,7 +282,7 @@ describe('ModalsController', function () {
         serialize_form: jasmine.createSpy('serialize_form'),
         autocomplete: jasmine.createSpy('autocomplete'),
         restore_ui_status: jasmine.createSpy('restore_ui_status'),
-        options: new can.Map(),
+        options: new CanMap(),
       };
       method = Ctrl.prototype.new_instance.bind(ctrlInst);
     });

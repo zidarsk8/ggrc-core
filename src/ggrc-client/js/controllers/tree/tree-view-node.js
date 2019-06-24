@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import canControl from 'can-control';
 import TreeViewControl from './tree-view';
 import TreeViewOptions from './tree-view-options';
@@ -38,7 +39,7 @@ export default canControl.extend({
     if (typeof this._super === 'function') {
       this._super(el);
     }
-    if (opts instanceof can.Map) {
+    if (opts instanceof CanMap) {
       this.options = opts;
       _.forEach(this.constructor.defaults, function (v, k) {
         if (!that.options.hasOwnProperty(k)) {
@@ -124,7 +125,7 @@ export default canControl.extend({
     }
 
     _.forEach(originalChildList, function (data, i) {
-      let options = new can.Map();
+      let options = new CanMap();
       data.each(function (v, k) {
         options.attr(k, v);
       });
@@ -180,7 +181,7 @@ export default canControl.extend({
       } else {
         findParams['parent.id'] = item.instance.id;
       }
-      data.attr('find_params', new can.Map(findParams));
+      data.attr('find_params', new CanMap(findParams));
     }
   },
 

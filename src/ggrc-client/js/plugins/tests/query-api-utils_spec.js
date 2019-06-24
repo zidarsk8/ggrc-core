@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import * as QueryAPI from '../utils/query-api-utils';
 
 describe('QueryAPI utils', function () {
@@ -137,11 +138,11 @@ describe('QueryAPI utils', function () {
       jasmine.clock().install();
 
       const stubs = [
-        new can.Map({id: 123, type: 'Type1'}),
-        new can.Map({id: 223, type: 'Type1'}),
-        new can.Map({id: 323, type: 'Type1'}),
-        new can.Map({id: 423, type: 'Type2'}),
-        new can.Map({id: 523, type: 'Type2'}),
+        new CanMap({id: 123, type: 'Type1'}),
+        new CanMap({id: 223, type: 'Type1'}),
+        new CanMap({id: 323, type: 'Type1'}),
+        new CanMap({id: 423, type: 'Type2'}),
+        new CanMap({id: 523, type: 'Type2'}),
       ];
       const fields = ['id', 'type', 'title'];
       const expectedQuery = [
@@ -182,11 +183,11 @@ describe('QueryAPI utils', function () {
 
     it('returns flatten result of query', (done) => {
       const stubs = [
-        new can.Map({id: 123, type: 'Type1'}),
-        new can.Map({id: 223, type: 'Type1'}),
-        new can.Map({id: 323, type: 'Type1'}),
-        new can.Map({id: 423, type: 'Type2'}),
-        new can.Map({id: 523, type: 'Type2'}),
+        new CanMap({id: 123, type: 'Type1'}),
+        new CanMap({id: 223, type: 'Type1'}),
+        new CanMap({id: 323, type: 'Type1'}),
+        new CanMap({id: 423, type: 'Type2'}),
+        new CanMap({id: 523, type: 'Type2'}),
       ];
       const fields = ['id', 'type', 'title'];
       const generateObject = (type, fields, id) => ({
@@ -260,7 +261,7 @@ describe('QueryAPI utils', function () {
     });
 
     it('returns flatten result of query', (done) => {
-      const object = new can.Map({id: 12345, type: 'FakeType'});
+      const object = new CanMap({id: 12345, type: 'FakeType'});
       const types = ['Type1', 'Type2', 'Type3'];
       const fields = ['id', 'type', 'title'];
       const generateObject = (type, fields) => fields.reduce((res, prop) => ({

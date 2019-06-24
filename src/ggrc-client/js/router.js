@@ -3,7 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-const router = new can.Map();
+import CanMap from 'can-map';
+const router = new CanMap();
 
 class RouterConfig {
   static setupRoutes(routes) {

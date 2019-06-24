@@ -3,6 +3,7 @@ Copyright (C) 2019 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CustomAttributeObject from '../custom-attribute-object';
 import {caDefTypeName} from '../custom-attribute-config';
 import {CONTROL_TYPE} from '../../control-utils.js';
@@ -16,26 +17,26 @@ describe('CustomAttributeObject module', () => {
   let caValue;
 
   beforeEach(function () {
-    instance = new can.Map();
-    caDef = new can.Map();
-    caValue = new can.Map();
+    instance = new CanMap();
+    caDef = new CanMap();
+    caValue = new CanMap();
     caObject = new CustomAttributeObject(instance, caDef, caValue);
   });
 
   describe('constructor', () => {
     it('sets instance for caObject', function () {
-      const instance = new can.Map();
+      const instance = new CanMap();
       const caObject = new CustomAttributeObject(
         instance,
-        new can.Map()
+        new CanMap()
       );
       expect(caObject._instance).toBe(instance);
     });
 
     it('sets custom attribute definition for caObject', function () {
-      const caDef = new can.Map();
+      const caDef = new CanMap();
       const caObject = new CustomAttributeObject(
-        new can.Map(),
+        new CanMap(),
         caDef
       );
       expect(caObject._caDefinition).toBe(caDef);
@@ -46,29 +47,29 @@ describe('CustomAttributeObject module', () => {
         spyOn(CustomAttributeObject.prototype, '_setupCaValue');
       });
 
-      it('with empty can.Map if caValue was not passed via params',
+      it('with empty CanMap if caValue was not passed via params',
         function () {
           let caObject;
           let caValue;
 
           caObject = new CustomAttributeObject(
-            new can.Map(),
-            new can.Map()
+            new CanMap(),
+            new CanMap()
           );
           caValue = caObject._setupCaValue.calls.argsFor(0)[0];
 
-          expect(caValue).toEqual(jasmine.any(can.Map));
+          expect(caValue).toEqual(jasmine.any(CanMap));
           expect(caValue.attr()).toEqual({});
         });
 
       it('with passed caValue if it was provided', function () {
-        const caValue = new can.Map({
+        const caValue = new CanMap({
           field1: 1,
           field2: 2,
         });
         const caObject = new CustomAttributeObject(
-          new can.Map(),
-          new can.Map(),
+          new CanMap(),
+          new CanMap(),
           caValue
         );
         expect(caObject._setupCaValue).toHaveBeenCalledWith(caValue);
@@ -79,8 +80,8 @@ describe('CustomAttributeObject module', () => {
       let caObject;
       spyOn(CustomAttributeObject.prototype, '_buildStateValidator');
       caObject = new CustomAttributeObject(
-        new can.Map(),
-        new can.Map()
+        new CanMap(),
+        new CanMap()
       );
       expect(caObject._buildStateValidator).toHaveBeenCalled();
     });
@@ -196,7 +197,7 @@ describe('CustomAttributeObject module', () => {
 
   describe('attributeObject getter', () => {
     it('returns custom attribute object', function () {
-      const attributeObject = new can.Map();
+      const attributeObject = new CanMap();
       caValue.attr('attribute_object', attributeObject);
       expect(caObject.attributeObject).toBe(attributeObject);
     });
@@ -241,7 +242,7 @@ describe('CustomAttributeObject module', () => {
 
   describe('validationState getter', () => {
     it('returns validation state', function () {
-      const state = new can.Map();
+      const state = new CanMap();
       caObject._validationState = state;
       expect(caObject.validationState).toBe(state);
     });
@@ -253,8 +254,8 @@ describe('CustomAttributeObject module', () => {
         spyOn(caObject, '_setupCaValue');
       });
 
-      it('though passed can.Map instance', function () {
-        const caValue = new can.Map({prop: 1});
+      it('though passed CanMap instance', function () {
+        const caValue = new CanMap({prop: 1});
         caObject.updateCaValue(caValue);
         const wrappedCaValue = caObject._setupCaValue.calls.argsFor(0)[0];
         expect(wrappedCaValue.attr())
@@ -271,7 +272,7 @@ describe('CustomAttributeObject module', () => {
     });
 
     it('updates current CAV object', function () {
-      const caValue = new can.Map({attribute_value: 'Some value'});
+      const caValue = new CanMap({attribute_value: 'Some value'});
       caObject.updateCaValue(caValue);
       expect(caObject.value).toBe(caValue.attr('attribute_value'));
     });
@@ -295,7 +296,7 @@ describe('CustomAttributeObject module', () => {
       let caValue;
 
       beforeEach(function () {
-        caValue = new can.Map();
+        caValue = new CanMap();
       });
 
       it('attribute_object field then set it to null', function () {
@@ -320,7 +321,7 @@ describe('CustomAttributeObject module', () => {
 
       it('context field then set it to context owned by instance which ' +
       'contains current caObject data', function () {
-        const context = new can.Map();
+        const context = new CanMap();
         instance.attr('context', context);
         caObject._setupCaValue(caValue);
         expect(caValue.attr('context')).toBe(context);
@@ -338,14 +339,14 @@ describe('CustomAttributeObject module', () => {
 
   describe('_initCaValue() method', () => {
     it('setups passed CAV object', function () {
-      const caValue = new can.Map({prop: 1});
+      const caValue = new CanMap({prop: 1});
       spyOn(caObject, '_setupCaValue');
       caObject._initCaValue(caValue);
       expect(caObject._setupCaValue).toHaveBeenCalledWith(caValue);
     });
 
     it('sets CAV object', function () {
-      const caValue = new can.Map({attribute_value: 'Some value'});
+      const caValue = new CanMap({attribute_value: 'Some value'});
       caObject.updateCaValue(caValue);
       expect(caObject.value).toBe(caValue.attr('attribute_value'));
     });
@@ -476,9 +477,9 @@ describe('CustomAttributeObject module', () => {
       caObject.validate();
     });
 
-    it('creates _validationState as an empty can.Map', function () {
+    it('creates _validationState as an empty CanMap', function () {
       caObject._buildStateValidator();
-      expect(caObject._validationState).toEqual(jasmine.any(can.Map));
+      expect(caObject._validationState).toEqual(jasmine.any(CanMap));
       expect(caObject._validationState.attr()).toEqual({});
     });
   });

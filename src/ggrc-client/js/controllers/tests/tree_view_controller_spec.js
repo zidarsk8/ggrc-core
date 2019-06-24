@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import Ctrl from '../tree/tree-view';
 
 describe('TreeView Controller', function () {
@@ -25,7 +26,7 @@ describe('TreeView Controller', function () {
 
     it('should tree view\'s node from DOM based on passed item.id',
       () => {
-        const item = new can.Map({id: 2});
+        const item = new CanMap({id: 2});
 
         method(item);
 

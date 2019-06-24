@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-items-header';
 
@@ -25,7 +26,7 @@ describe('mapper-results-items-header component', function () {
   });
 
   describe('isSorted() method', function () {
-    let attr = new can.Map({
+    let attr = new CanMap({
       attr_sort_field: 'Title',
     });
 
@@ -68,7 +69,7 @@ describe('mapper-results-items-header component', function () {
 
     it('toggles sort direction if sorted by current attribute',
       function () {
-        let attr = new can.Map({
+        let attr = new CanMap({
           attr_sort_field: 'Title',
         });
         viewModel.applySort(attr);
@@ -77,7 +78,7 @@ describe('mapper-results-items-header component', function () {
 
     it('changes sortKey if sorted by another attribute',
       function () {
-        let attr = new can.Map({
+        let attr = new CanMap({
           attr_sort_field: 'State',
         });
         viewModel.applySort(attr);
@@ -86,7 +87,7 @@ describe('mapper-results-items-header component', function () {
 
     it('sets sortDirection to "asc" if sorted by another attribute',
       function () {
-        let attr = new can.Map({
+        let attr = new CanMap({
           attr_sort_field: 'State',
         });
         viewModel.applySort(attr);

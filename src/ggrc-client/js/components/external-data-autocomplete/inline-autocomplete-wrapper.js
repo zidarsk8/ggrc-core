@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 /**
  * The component is used to integrate separate autocomplete component
@@ -14,7 +15,7 @@ import CanComponent from 'can-component';
 export default CanComponent.extend({
   tag: 'inline-autocomplete-wrapper',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     /**
      * Contains a model.
      * @type {Can.Map}
@@ -79,7 +80,7 @@ export default CanComponent.extend({
       let instance = this.attr('instance');
       let path = this.attr('path');
       if (!instance.attr('_transient')) {
-        instance.attr('_transient', can.Map());
+        instance.attr('_transient', CanMap());
       }
       instance.attr('_transient.' + path, value);
     },

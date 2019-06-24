@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './external-data-provider';
 import './autocomplete-results';
@@ -19,7 +20,7 @@ export default CanComponent.extend({
   tag: 'external-data-autocomplete',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       /**
        * The flag indicating that results will be rendered.

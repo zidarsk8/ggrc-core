@@ -3,7 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-let Stub = can.Map.extend({
+import CanMap from 'can-map';
+let Stub = CanMap.extend({
   setup(model) {
     let type = (model instanceof can.Model)
       ? model.constructor.model_singular

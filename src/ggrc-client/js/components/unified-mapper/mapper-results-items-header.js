@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/mapper-results-items-header.stache';
 
@@ -10,7 +11,7 @@ export default CanComponent.extend({
   tag: 'mapper-results-items-header',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     columns: [],
     serviceColumns: [],
     sortKey: '',

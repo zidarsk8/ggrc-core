@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {
   getMappingList,
 } from '../../models/mappers/mappings';
@@ -28,7 +29,7 @@ import * as businessModels from '../../models/business-models';
  *  @property {Object} config - Has fields with special values for viewModel.
  */
 
-const ObjectOperationsBaseVM = can.Map.extend({
+const ObjectOperationsBaseVM = CanMap.extend({
   /**
    * Extract certain config for passed type from config.
    * If there is special config for type then return it else return

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/task-group-objects.stache';
 import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../events/eventTypes';
@@ -19,7 +20,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const requiredObjectsFields = ['id', 'type', 'title'];
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   canEdit: false,
   taskGroup: null,
   items: [],

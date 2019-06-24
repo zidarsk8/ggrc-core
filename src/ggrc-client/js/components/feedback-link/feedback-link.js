@@ -3,10 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/feedback-link.stache';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     link: {
       get() {

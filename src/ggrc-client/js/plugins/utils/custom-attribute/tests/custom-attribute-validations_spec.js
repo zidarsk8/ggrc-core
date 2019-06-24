@@ -3,6 +3,7 @@ Copyright (C) 2019 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as validationActions from '../custom-attribute-validations';
 import CustomAttributeObject from '../custom-attribute-object';
 
@@ -11,12 +12,12 @@ describe('hasEmptyMandatoryValue() function', () => {
   let caDef;
 
   beforeEach(function () {
-    caDef = new can.Map();
+    caDef = new CanMap();
     injected = {
       currentCaObject: new CustomAttributeObject(
-        new can.Map(),
+        new CanMap(),
         caDef,
-        new can.Map()
+        new CanMap()
       ),
     };
   });
@@ -48,11 +49,11 @@ describe('hasGCAErrors() function', () => {
   let caValue;
 
   beforeEach(function () {
-    caValue = new can.Map();
-    caDef = new can.Map();
+    caValue = new CanMap();
+    caDef = new CanMap();
     injected = {
       currentCaObject: new CustomAttributeObject(
-        new can.Map(),
+        new CanMap(),
         caDef,
         caValue
       ),

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import TreeLoader from './tree-loader';
 import {getCounts} from '../../plugins/utils/widgets-utils';
 
@@ -43,9 +44,9 @@ export default TreeLoader.extend({
     if (!this.options.search_params) {
       this.options.search_params = {};
     }
-    this.options.state = new can.Map();
+    this.options.state = new CanMap();
 
-    this.context = new can.Map({
+    this.context = new CanMap({
       // FIXME: Needed?  Default `pager` to avoid binding issues.
       pager: {
         has_next: function () {

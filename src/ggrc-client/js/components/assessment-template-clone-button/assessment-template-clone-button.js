@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './assessment-template-clone-button.stache';
 import router from '../../router';
@@ -12,7 +13,7 @@ export default CanComponent.extend({
   tag: 'assessment-template-clone-button',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     model: null,
     text: null,
     parentId: null,

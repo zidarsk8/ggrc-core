@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {
   isSnapshot,
   isSnapshotModel,
@@ -311,7 +312,7 @@ function getVisibleColumnsConfig(available, selected) {
   availableColumns.forEach(function (attr) {
     const isSelected = selectedColumns
       .some((selectedAttr) => selectedAttr.attr_name === attr.attr_name);
-    columns.push(new can.Map({
+    columns.push(new CanMap({
       title: attr.attr_title,
       name: attr.attr_name,
       mandatory: attr.mandatory,

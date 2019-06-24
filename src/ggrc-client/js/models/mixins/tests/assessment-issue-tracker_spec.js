@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
@@ -18,7 +19,7 @@ describe('assessmentIssueTracker mixin', () => {
     GGRC.ISSUE_TRACKER_ENABLED = true;
     Mixin = assessmentIssueTracker;
 
-    audit = new can.Map({
+    audit = new CanMap({
       id: 123,
       title: 'Audit',
       type: 'Audit',
@@ -59,7 +60,7 @@ describe('assessmentIssueTracker mixin', () => {
     let assessment;
 
     beforeEach(function () {
-      assessment = new can.Map({
+      assessment = new CanMap({
         audit,
       });
       method = Mixin.prototype.ensureParentAudit;
@@ -115,14 +116,14 @@ describe('assessmentIssueTracker mixin', () => {
     });
 
     beforeEach(() => {
-      fakeAudit = new can.Map({
+      fakeAudit = new CanMap({
         id: 1,
         type: 'Audit',
         issue_tracker: {
           enabled: true,
         },
       });
-      fakeAssessment = new can.Map({
+      fakeAssessment = new CanMap({
         audit: fakeAudit,
         issue_tracker: {
           enabled: null,
@@ -187,14 +188,14 @@ describe('assessmentIssueTracker mixin', () => {
       });
 
       beforeEach(() => {
-        fakeAudit = new can.Map({
+        fakeAudit = new CanMap({
           id: 1,
           type: 'Audit',
           issue_tracker: {
             enabled: true,
           },
         });
-        fakeAssessment = new can.Map({
+        fakeAssessment = new CanMap({
           id: 123,
           audit: fakeAudit,
           issue_tracker: {

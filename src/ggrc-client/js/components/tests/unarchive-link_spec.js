@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../unarchive-link';
 
 describe('unarchive-link component', function () {
@@ -19,7 +20,7 @@ describe('unarchive-link component', function () {
     beforeEach(function () {
       pendingSave = new $.Deferred();
 
-      instance = new can.Map({
+      instance = new CanMap({
         save: jasmine.createSpy('save')
           .and.returnValue(pendingSave.promise()),
         display_name: function () {
@@ -27,7 +28,7 @@ describe('unarchive-link component', function () {
         },
       });
 
-      viewModel = new can.Map({
+      viewModel = new CanMap({
         instance: instance,
         notifyText: notifyText,
       });

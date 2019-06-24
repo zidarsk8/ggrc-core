@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../deferred-mapper';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import * as ReifyUtils from '../../plugins/utils/reify-utils';
@@ -26,7 +27,7 @@ describe('deferred-mapper component', function () {
 
   describe('setter of "instance"', () => {
     it('sets new instance', () => {
-      const newInstance = new can.Map({});
+      const newInstance = new CanMap({});
       vm.attr('instance', newInstance);
 
       expect(vm.attr('instance')).toEqual(newInstance);
@@ -34,7 +35,7 @@ describe('deferred-mapper component', function () {
 
     it('assigns empty array to _pendingJoins of instance ' +
     'if it is not defined', () => {
-      const newInstance = new can.Map({});
+      const newInstance = new CanMap({});
       vm.attr('instance', newInstance);
 
       expect(vm.attr('instance._pendingJoins').serialize()).toEqual([]);
@@ -119,8 +120,8 @@ describe('deferred-mapper component', function () {
     it('calls MapperUtils.mapObjects with specified arguments', (done) => {
       const instance = {};
       const objects = [
-        new can.Map({id: 0}),
-        new can.Map({id: 1}),
+        new CanMap({id: 0}),
+        new CanMap({id: 1}),
       ];
       vm.attr('useSnapshots', {});
 
@@ -152,8 +153,8 @@ describe('deferred-mapper component', function () {
     it('calls MapperUtils.unmapObjects with specified arguments', (done) => {
       const instance = {};
       const objects = [
-        new can.Map({id: 0}),
-        new can.Map({id: 1}),
+        new CanMap({id: 0}),
+        new CanMap({id: 1}),
       ];
 
       vm.performUnmapActions(instance, objects)
@@ -178,13 +179,13 @@ describe('deferred-mapper component', function () {
     let pageInstance;
 
     beforeEach(() => {
-      instance = new can.Map({
+      instance = new CanMap({
         type: 'instanceType',
       });
       vm.attr('instance', instance);
       spyOn(instance, 'dispatch');
 
-      pageInstance = new can.Map({
+      pageInstance = new CanMap({
         id: 711,
         type: 'pageInstanceType',
       });
@@ -330,12 +331,12 @@ describe('deferred-mapper component', function () {
 
     it('calls afterDeferredUpdate for all pending objects', async (done) => {
       const expectedMapped = [
-        new can.Map({type: 'Type1'}),
-        new can.Map({type: 'Type3'}),
+        new CanMap({type: 'Type1'}),
+        new CanMap({type: 'Type3'}),
       ];
       const expectedUnmapped = [
-        new can.Map({type: 'Type2'}),
-        new can.Map({type: 'Type4'}),
+        new CanMap({type: 'Type2'}),
+        new CanMap({type: 'Type4'}),
       ];
 
       vm.attr('instance._pendingJoins', [
@@ -493,7 +494,7 @@ describe('deferred-mapper component', function () {
     it('pushes reified "item" into "list" if "item" is not of snapshot type',
       () => {
         let reifiedItem = {id: 1};
-        let item = new can.Map({});
+        let item = new CanMap({});
 
         isSnapshotTypeSpy.and.returnValue(false);
         spyOn(ReifyUtils, 'isReifiable').and.returnValue(true);
@@ -518,7 +519,7 @@ describe('deferred-mapper component', function () {
         let item = {snapshotObject};
         vm.attr('list', []);
 
-        vm.addListItem(new can.Map(item));
+        vm.addListItem(new CanMap(item));
 
         let expected = jasmine.objectContaining({
           title: snapshotObject.title,

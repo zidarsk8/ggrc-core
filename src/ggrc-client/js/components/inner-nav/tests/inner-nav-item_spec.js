@@ -2,6 +2,8 @@
  Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import CanMap from 'can-map';
 import Component from '../inner-nav-item';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -179,7 +181,7 @@ describe('inner-nav-item component', () => {
   describe('closeTab() method', () => {
     it('should dispatch close event', () => {
       spyOn(viewModel, 'dispatch');
-      let widget = new can.Map();
+      let widget = new CanMap();
       viewModel.attr('widget', widget);
 
       viewModel.closeTab();

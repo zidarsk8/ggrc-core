@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import canControl from 'can-control';
 import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
@@ -60,7 +61,7 @@ export default canControl.extend({
       .on('widget_shown', this.widget_shown.bind(this));
     this.element.closest('.widget')
       .on('widget_hidden', this.widget_hidden.bind(this));
-    this.options.context = new can.Map({
+    this.options.context = new CanMap({
       model: this.options.model,
       instance: this.options.instance,
       error_msg: '',

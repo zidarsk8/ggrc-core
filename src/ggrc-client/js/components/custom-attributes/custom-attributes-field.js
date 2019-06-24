@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../form/fields/checkbox-form-field';
 import '../form/fields/multiselect-form-field';
@@ -17,7 +18,7 @@ export default CanComponent.extend({
   tag: 'custom-attributes-field',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       disabled: {
         type: 'htmlbool',

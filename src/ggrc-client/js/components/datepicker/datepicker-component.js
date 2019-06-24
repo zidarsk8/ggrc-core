@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   inViewport,
@@ -15,7 +16,7 @@ export default CanComponent.extend({
   tag: 'datepicker-component',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     format: '',
     helptext: '',
     label: '',

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './people-list.stache';
 import {validateAttr} from '../../../plugins/utils/validation-utils';
@@ -13,7 +14,7 @@ export default CanComponent.extend({
   tag: 'people-list',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     peopleList: [],
     instance: null,
     hasEmptyValue: false,
@@ -83,7 +84,7 @@ export default CanComponent.extend({
     /**
      * Remove user from people list
      *
-     * @param {can.Map} user - user which should be removed
+     * @param {CanMap} user - user which should be removed
      */
     removePerson({id}) {
       const peopleList = this.attr('peopleList');

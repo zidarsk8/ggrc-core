@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import {sanitizer} from '../../../plugins/utils/url-utils';
@@ -13,7 +14,7 @@ import pubSub from '../../../pub-sub';
 export default CanComponent.extend({
   tag: 'create-url',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     value: null,
     context: null,
     create: function () {

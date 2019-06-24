@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {sortByName} from '../../plugins/utils/label-utils';
 import template from './templates/multi-select-label.stache';
@@ -15,7 +16,7 @@ export default CanComponent.extend({
   tag: 'multi-select-label',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       onlyEditMode: {
         type: 'boolean',

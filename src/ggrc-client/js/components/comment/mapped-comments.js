@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-list-item/comment-list-item';
 import '../object-list/object-list';
@@ -15,7 +16,7 @@ export default CanComponent.extend({
   tag: 'mapped-comments',
   view: can.stache(template),
   leakScope: false,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       noItemsText: {
         type: 'string',

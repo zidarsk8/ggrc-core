@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
 
@@ -14,7 +15,7 @@ export default CanComponent.extend({
     '<content/></button>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       disabled: {
         get: function () {

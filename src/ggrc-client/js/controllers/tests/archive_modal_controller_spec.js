@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Ctrl from '../modals/archive_modal_controller';
 
 describe('ToggleArchive modal', function () {
@@ -25,7 +26,7 @@ describe('ToggleArchive modal', function () {
       $element = $('<div data-modal_form="">' +
         '<a data-dismiss="modal"></a>' +
         '</div>');
-      instance = new can.Map({
+      instance = new CanMap({
         save: jasmine.createSpy('save')
           .and.returnValue(pendingSave.promise()),
         refresh: jasmine.createSpy('save')

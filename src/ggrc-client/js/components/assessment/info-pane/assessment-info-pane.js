@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../controls-toolbar/assessment-controls-toolbar';
 import '../assessment-local-ca';
@@ -78,7 +79,7 @@ export default CanComponent.extend({
   tag: 'assessment-info-pane',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       verifiers: {
         get: function () {
@@ -651,7 +652,7 @@ export default CanComponent.extend({
     showRequiredInfoModal: function (e, field) {
       let scope = field || e.field;
       let errors = scope.attr('errorsMap');
-      let errorsList = can.Map.keys(errors)
+      let errorsList = CanMap.keys(errors)
         .map(function (error) {
           return errors[error] ? error : null;
         })

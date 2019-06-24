@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/relevant-filter.stache';
 import * as businessModels from '../../models/business-models';
@@ -12,7 +13,7 @@ export default CanComponent.extend({
   tag: 'relevant-filter',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     relevant_menu_item: '',
     operators: [{title: 'AND', value: 'AND'}, {title: 'OR', value: 'OR'}],
     addFilter: function () {
@@ -29,7 +30,7 @@ export default CanComponent.extend({
 
       this.attr('relevant').push({
         value: false,
-        filter: new can.Map(),
+        filter: new CanMap(),
         textValue: '',
         menu: menu,
         model_name: menu[0].model_singular,
@@ -39,7 +40,7 @@ export default CanComponent.extend({
     menu() {
       const workflowRelatedTypes = ['Cycle', 'CycleTaskGroup',
         'CycleTaskGroupObjectTask', 'TaskGroup', 'Workflow'];
-      const baseWidgetsTypes = can.Map.keys(
+      const baseWidgetsTypes = CanMap.keys(
         TreeViewConfig.attr('base_widgets_by_type')
       );
 
@@ -104,7 +105,7 @@ export default CanComponent.extend({
       if (!/model_name/gi.test(which)) {
         return;
       }
-      item.target.attr('filter', new can.Map());
+      item.target.attr('filter', new CanMap());
       item.target.attr('value', false);
     },
   },

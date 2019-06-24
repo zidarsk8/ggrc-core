@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../person-modal';
 import PersonProfile from '../../../models/service-models/person-profile';
@@ -20,7 +21,7 @@ describe('person-modal component', () => {
 
     beforeEach(() => {
       viewModel.attr('instance', {});
-      profile = new can.Map({
+      profile = new CanMap({
         save: jasmine.createSpy('save'),
       });
       spyOn(PersonProfile, 'findInCacheById').and.returnValue(profile);
@@ -69,7 +70,7 @@ describe('person-modal component', () => {
     let profile;
 
     beforeEach(() => {
-      profile = new can.Map();
+      profile = new CanMap();
       spyOn(PersonProfile, 'findInCacheById').and.returnValue(profile);
     });
 

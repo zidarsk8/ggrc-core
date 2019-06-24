@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import Permission from '../../permission';
 import template from './attach-button.stache';
@@ -17,7 +18,7 @@ export default CanComponent.extend({
   view: can.stache(template),
   confirmationCallback: '',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       hasPermissions: {
         get: function (prevValue, setValue) {

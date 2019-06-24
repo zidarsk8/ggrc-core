@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import RefreshQueue from '../../../models/refresh_queue';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
@@ -26,7 +27,7 @@ describe('object-mapper component', function () {
   describe('viewModel() method', function () {
     let parentViewModel;
     beforeEach(function () {
-      parentViewModel = new can.Map({
+      parentViewModel = new CanMap({
         general: {
           useSnapshots: false,
         },
@@ -391,7 +392,7 @@ describe('object-mapper component', function () {
       });
       viewModel.attr('deferred', false);
 
-      instance = new can.Map({
+      instance = new CanMap({
         refresh: $.noop,
       });
       spyOn(Program, 'findInCacheById')

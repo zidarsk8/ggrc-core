@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import * as TreeViewUtils from './tree-view-utils';
 import {
   batchRequests,
@@ -29,7 +30,7 @@ import {
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Person from '../../models/business-models/person';
 
-let widgetsCounts = new can.Map({});
+let widgetsCounts = new CanMap({});
 let cachedObjects = {};
 
 let CUSTOM_COUNTERS = {
@@ -104,7 +105,7 @@ function getDefaultWidgets(widgetList, path) {
 /**
  * Counts for related objects.
  *
- * @return {can.Map} Promise which return total count of objects.
+ * @return {CanMap} Promise which return total count of objects.
  */
 function getCounts() {
   return widgetsCounts;

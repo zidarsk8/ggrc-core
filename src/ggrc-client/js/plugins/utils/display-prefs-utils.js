@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as LocalStorage from './local-storage-utils';
 
 const localStorageKey = 'display_prefs';
@@ -23,7 +24,7 @@ let preferences = null;
 /**
  * Creates new preferences object if nothing is saved
  * or reads existing preferences and caches them
- * @return {can.Map} user display preferences
+ * @return {CanMap} user display preferences
  */
 function getPreferences() {
   if (preferences) {
@@ -33,9 +34,9 @@ function getPreferences() {
   let prefs = LocalStorage.get(localStorageKey);
 
   if (!prefs.length) {
-    preferences = new can.Map(LocalStorage.create(localStorageKey, {}));
+    preferences = new CanMap(LocalStorage.create(localStorageKey, {}));
   } else {
-    preferences = new can.Map(prefs[0]);
+    preferences = new CanMap(prefs[0]);
   }
 
   return preferences;
@@ -73,7 +74,7 @@ function saveObject() {
 
 /**
  * Creates nesting objects when there are several key args
- * @param {can.Map} prefs preferences object
+ * @param {CanMap} prefs preferences object
  * @param  {Array} keyArgs key parts
  */
 function createNestedProps(prefs, keyArgs) {
@@ -81,7 +82,7 @@ function createNestedProps(prefs, keyArgs) {
   keyArgs.forEach(function (arg) {
     let value = _.get(object, arg);
     if (!value) {
-      value = new can.Map();
+      value = new CanMap();
       object.attr(arg, value);
     }
     object = value;
@@ -91,13 +92,13 @@ function createNestedProps(prefs, keyArgs) {
 /**
  * Gets saved preferences.
  * It accepts any string parameters which are parts of path in preferences object
- * @return {can.Map} required preferences
+ * @return {CanMap} required preferences
  */
 function getObject(...args) {
   let prefs = getPreferences();
 
   let object = _.get(prefs, args) || {};
-  return new can.Map(object);
+  return new CanMap(object);
 }
 
 /**

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import tracker from '../../tracker';
 import '../spinner-component/spinner-component';
@@ -15,7 +16,7 @@ import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     cycle: {
       get: function () {

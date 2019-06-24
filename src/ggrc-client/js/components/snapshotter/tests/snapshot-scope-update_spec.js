@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -36,7 +37,7 @@ describe('snapshot-scope-update component', function () {
       },
     };
     _.assign(updaterViewModel, {
-      instance: new can.Map({
+      instance: new CanMap({
         title: 'TITLE',
         refresh: jasmine
           .createSpy('refresh'),

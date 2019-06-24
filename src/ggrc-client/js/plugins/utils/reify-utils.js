@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import allModels from '../../models/all-models';
 
 function reify(obj) {
@@ -10,13 +11,13 @@ function reify(obj) {
     return reifyList(obj);
   }
 
-  if (obj instanceof can.Map) {
+  if (obj instanceof CanMap) {
     return reifyMap(obj);
   }
 }
 
 function isReifiable(obj) {
-  return obj instanceof can.Map;
+  return obj instanceof CanMap;
 }
 
 function reifyMap(obj) {

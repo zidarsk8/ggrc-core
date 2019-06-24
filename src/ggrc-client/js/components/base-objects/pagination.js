@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 /**
  * A component that unifies pagination API
  * Usage: new Pagination()
  */
-export default can.Map.extend({
+export default CanMap.extend({
   define: {
     current: {
       type: 'number',

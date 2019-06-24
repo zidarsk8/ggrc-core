@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import Component from '../task-group-objects';
 import * as Stub from '../../../../models/stub';
@@ -77,7 +78,7 @@ describe('task-group-objects component', function () {
     'title and type fields', () => {
       const mappingList = ['Type1', 'Type2', 'Type3'];
       Mappings.getMappingList.and.returnValues(mappingList);
-      const taskGroup = new can.Map({id: 12345, type: 'FakeTaskGroup'});
+      const taskGroup = new CanMap({id: 12345, type: 'FakeTaskGroup'});
       viewModel.attr('taskGroup', taskGroup);
       spyOn(viewModel, 'addToList');
 
@@ -179,13 +180,13 @@ describe('task-group-objects component', function () {
         new Promise(() => {})
       );
       viewModel.attr('items', [
-        new can.Map({id: 1}),
+        new CanMap({id: 1}),
       ]);
     });
 
     it('sets "disabled" flag to true for certain item based on passed ' +
     'itemIndex before unmapping object from task group', () => {
-      const item = new can.Map({id: 2});
+      const item = new CanMap({id: 2});
       viewModel.attr('items').push(item);
       const itemIndex = 1;
       item.attr('disabled', false);
@@ -199,11 +200,11 @@ describe('task-group-objects component', function () {
       () => {
         const itemIndex = 0;
         const item = viewModel.attr('items')[itemIndex];
-        const taskGroup = new can.Map({
+        const taskGroup = new CanMap({
           id: 12345,
           type: 'FakeTaskGroupType',
         });
-        const stub = new can.Map({
+        const stub = new CanMap({
           id: 234435,
           type: 'FakeObjectType',
         });
@@ -226,7 +227,7 @@ describe('task-group-objects component', function () {
 
       it('sets "disabled" flag to false for certain item based on passed ' +
       'itemIndex', async (done) => {
-        const item = new can.Map({id: 2});
+        const item = new CanMap({id: 2});
         viewModel.attr('items').push(item);
         const itemIndex = 1;
         item.attr('disabled', true);
@@ -239,12 +240,12 @@ describe('task-group-objects component', function () {
 
       it('removes unmapped object from the "items" list', async (done) => {
         const itemIndex = 2;
-        const removingObject = new can.Map({id: 50});
+        const removingObject = new CanMap({id: 50});
         viewModel.attr('items').replace([
-          new can.Map({id: 30}),
-          new can.Map({id: 40}),
+          new CanMap({id: 30}),
+          new CanMap({id: 40}),
           removingObject,
-          new can.Map({id: 60}),
+          new CanMap({id: 60}),
         ]);
 
         await viewModel.unmapByItemIndex(itemIndex);
@@ -298,7 +299,7 @@ describe('task-group-objects component', function () {
 
       it('sets "disabled" flag to false for certain item based on passed ' +
       'itemIndex', async (done) => {
-        const item = new can.Map({id: 2});
+        const item = new CanMap({id: 2});
         viewModel.attr('items').push(item);
         const itemIndex = 1;
         item.attr('disabled', true);

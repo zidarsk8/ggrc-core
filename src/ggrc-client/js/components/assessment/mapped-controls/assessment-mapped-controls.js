@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import '../../object-list-item/business-object-list-item';
@@ -25,9 +26,9 @@ import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 /**
  * ViewModel for Assessment Mapped Controls Popover.
- * @type {can.Map}
+ * @type {CanMap}
  */
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     /**
      * Private Attribute defining array of requested Objects, Types and Fields of Objects

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   peopleWithRoleName,
@@ -13,7 +14,7 @@ const template = '<tree-field-wrapper source:from="peopleList"' +
 ' type:from="type" field:from="\'email\'">' +
 '<tree-field source:from="items"/></tree-field-wrapper>';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     peopleList: {
       get() {

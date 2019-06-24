@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './clipboard-link';
 
@@ -13,7 +14,7 @@ export default CanComponent.extend({
     '<i class="fa fa-link"></i>Get permalink</clipboard-link>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     instance: null,
     define: {
       text: {

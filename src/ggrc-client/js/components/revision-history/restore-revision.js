@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './mandatory-fields-modal';
 import {
@@ -15,7 +16,7 @@ export default CanComponent.extend({
   tag: 'restore-revision',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     instance: {},
     restoredRevision: {},
     loading: false,
@@ -64,7 +65,7 @@ export default CanComponent.extend({
       });
     },
     applyFields(instance, modifiedFields) {
-      const fieldNames = can.Map.keys(modifiedFields);
+      const fieldNames = CanMap.keys(modifiedFields);
 
       fieldNames.forEach((fieldName) => {
         const modifiedField = modifiedFields[fieldName];
@@ -76,7 +77,7 @@ export default CanComponent.extend({
       instance.attr('access_control_list', modifiedACL);
     },
     applyListFields(instance, modifiedFields) {
-      const fieldNames = can.Map.keys(modifiedFields);
+      const fieldNames = CanMap.keys(modifiedFields);
       fieldNames.forEach((fieldName) => {
         const items = instance.attr(fieldName);
         const modifiedItems = modifiedFields.attr(fieldName);

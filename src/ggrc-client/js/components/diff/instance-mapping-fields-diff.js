@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {getModelInstance} from '../../plugins/utils/models-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
@@ -14,7 +15,7 @@ const viewModel = DiffBaseVM.extend({
   modifiedFields: {},
 
   buildDiffObject() {
-    const fieldsKeys = can.Map.keys(this.attr('modifiedFields'));
+    const fieldsKeys = CanMap.keys(this.attr('modifiedFields'));
     const diffPromises = fieldsKeys.map(async (key) => {
       return await this.buildFieldDiff(key);
     });

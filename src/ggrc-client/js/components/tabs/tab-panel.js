@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../lazy-render/lazy-render';
 import template from './tab-panel.stache';
@@ -13,7 +14,7 @@ export default CanComponent.extend({
   tag: 'tab-panel',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       cssClasses: {
         type: 'string',

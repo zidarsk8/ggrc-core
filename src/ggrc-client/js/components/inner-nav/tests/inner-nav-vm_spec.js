@@ -2,6 +2,8 @@
  Copyright (C) 2019 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import CanMap from 'can-map';
 import InnerNavVM from '../inner-nav-vm';
 import {
   makeFakeInstance,
@@ -59,21 +61,21 @@ describe('inner-nav view model', () => {
 
     it('returns TRUE when on Admin page', () => {
       isAdminSpy.and.returnValue(true);
-      getCountsSpy.and.returnValue(new can.Map());
+      getCountsSpy.and.returnValue(new CanMap());
 
       expect(viewModel.attr('showTabs')).toBe(true);
     });
 
     it('returns FALSE when counts is empty and not Admin page', () => {
       isAdminSpy.and.returnValue(false);
-      getCountsSpy.and.returnValue(new can.Map());
+      getCountsSpy.and.returnValue(new CanMap());
 
       expect(viewModel.attr('showTabs')).toBe(false);
     });
 
     it('returns TRUE when counts is not empty and not Admin page', () => {
       isAdminSpy.and.returnValue(false);
-      getCountsSpy.and.returnValue(new can.Map({
+      getCountsSpy.and.returnValue(new CanMap({
         Assessment: 10,
       }));
 
@@ -360,7 +362,7 @@ describe('inner-nav view model', () => {
     it('should do nothing if widget is in forceShowList', () => {
       showAllTabs(false);
 
-      let widget = new can.Map({
+      let widget = new CanMap({
         inForceShowList: true,
         model: {},
       });
@@ -374,7 +376,7 @@ describe('inner-nav view model', () => {
     it('should do nothing if widget has version type', () => {
       showAllTabs(false);
 
-      let widget = new can.Map({
+      let widget = new CanMap({
         type: 'version',
         model: {},
       });
@@ -388,7 +390,7 @@ describe('inner-nav view model', () => {
     it('should do nothing if widget is uncountable', () => {
       showAllTabs(false);
 
-      let widget = new can.Map({
+      let widget = new CanMap({
         uncountable: true,
         model: {},
       });
@@ -403,7 +405,7 @@ describe('inner-nav view model', () => {
       () => {
         showAllTabs(false);
 
-        let widget = new can.Map({
+        let widget = new CanMap({
           uncountable: false,
           type: '',
           inForceShowList: false,
@@ -422,7 +424,7 @@ describe('inner-nav view model', () => {
       () => {
         showAllTabs(false);
 
-        let widget = new can.Map({
+        let widget = new CanMap({
           count: 5,
           forceShow: false,
           model: {},
@@ -438,7 +440,7 @@ describe('inner-nav view model', () => {
       () => {
         showAllTabs(false);
 
-        let widget = new can.Map({
+        let widget = new CanMap({
           count: 0,
           forceShow: true,
           model: {},
@@ -454,7 +456,7 @@ describe('inner-nav view model', () => {
         'forceShow is false', () => {
       showAllTabs(false);
 
-      let widget = new can.Map({
+      let widget = new CanMap({
         count: 0,
         forceShow: false,
         model: {},
@@ -470,7 +472,7 @@ describe('inner-nav view model', () => {
     it('should add widget if not in the list', () => {
       viewModel.attr('hiddenWidgets', []);
 
-      let widget = new can.Map();
+      let widget = new CanMap();
       viewModel.addToHiddenWidgets(widget);
 
       expect(viewModel.attr('hiddenWidgets').length).toBe(1);
@@ -478,7 +480,7 @@ describe('inner-nav view model', () => {
     });
 
     it('should not add widget if already in the list', () => {
-      let widget = new can.Map({id: '1'});
+      let widget = new CanMap({id: '1'});
       viewModel.attr('hiddenWidgets', [widget]);
 
       viewModel.addToHiddenWidgets(widget);
@@ -490,7 +492,7 @@ describe('inner-nav view model', () => {
 
   describe('removeFromHiddenWidgets(widget) method', () => {
     it('should remove widget if it is in the list', () => {
-      let widget = new can.Map({id: '1'});
+      let widget = new CanMap({id: '1'});
       viewModel.attr('hiddenWidgets', [widget]);
 
       viewModel.removeFromHiddenWidgets(widget);
@@ -499,7 +501,7 @@ describe('inner-nav view model', () => {
     });
 
     it('should not remove widget if it is not in the list', () => {
-      let widget = new can.Map({id: '1'});
+      let widget = new CanMap({id: '1'});
       viewModel.attr('hiddenWidgets', [widget]);
 
       viewModel.removeFromHiddenWidgets({id: '2'});
@@ -527,7 +529,7 @@ describe('inner-nav view model', () => {
     });
 
     it('should set forceShow TRUE for widget', () => {
-      let widget = new can.Map({id: '1', forceShow: false});
+      let widget = new CanMap({id: '1', forceShow: false});
       findWidgetByIdSpy.and.returnValue(widget);
 
       viewModel.route('1');
@@ -536,7 +538,7 @@ describe('inner-nav view model', () => {
     });
 
     it('should set activeWidget if widget is in widgetList ', () => {
-      let widget = new can.Map({id: '1'});
+      let widget = new CanMap({id: '1'});
       findWidgetByIdSpy.and.returnValue(widget);
       viewModel.attr('activeWidget', null);
 
@@ -549,7 +551,7 @@ describe('inner-nav view model', () => {
     it('should dispatch "activeChanged" event if widget is in widgetList',
       () => {
         spyOn(viewModel, 'dispatch');
-        let widget = new can.Map({id: '1'});
+        let widget = new CanMap({id: '1'});
         findWidgetByIdSpy.and.returnValue(widget);
 
         viewModel.route('1');
@@ -561,7 +563,7 @@ describe('inner-nav view model', () => {
       });
 
     it('should update hiddenWidgets list', () => {
-      let widget = new can.Map({id: '1'});
+      let widget = new CanMap({id: '1'});
       findWidgetByIdSpy.and.returnValue(widget);
 
       viewModel.route('1');
@@ -617,7 +619,7 @@ describe('inner-nav view model', () => {
   describe('setWidgetCount(name, count) method', () => {
     it('should set count to widget', () => {
       spyOn(viewModel, 'updateHiddenWidgets');
-      let widget = new can.Map();
+      let widget = new CanMap();
       spyOn(viewModel, 'findWidgetByCountsName').and.returnValue(widget);
 
       viewModel.setWidgetCount('name', 5);
@@ -627,7 +629,7 @@ describe('inner-nav view model', () => {
 
     it('should update hiddenWidgets list', () => {
       spyOn(viewModel, 'updateHiddenWidgets');
-      let widget = new can.Map();
+      let widget = new CanMap();
       spyOn(viewModel, 'findWidgetByCountsName').and.returnValue(widget);
 
       viewModel.setWidgetCount('name', 5);
@@ -642,7 +644,7 @@ describe('inner-nav view model', () => {
     });
 
     it('should set forceShow FALSE for widget', () => {
-      let widget = new can.Map({id: '1', forceShow: true});
+      let widget = new CanMap({id: '1', forceShow: true});
 
       viewModel.closeTab({widget});
 
@@ -653,7 +655,7 @@ describe('inner-nav view model', () => {
       () => {
         router.attr('widget', 'selected');
 
-        viewModel.closeTab({widget: new can.Map({id: 'another widget'})});
+        viewModel.closeTab({widget: new CanMap({id: 'another widget'})});
 
         expect(router.attr('widget')).toBe('selected');
       });
@@ -662,15 +664,15 @@ describe('inner-nav view model', () => {
         'if closed tab is currently selected',
     () => {
       router.attr('widget', 'selected');
-      viewModel.attr('widgetList', [new can.Map({id: 'first tab'})]);
+      viewModel.attr('widgetList', [new CanMap({id: 'first tab'})]);
 
-      viewModel.closeTab({widget: new can.Map({id: 'selected'})});
+      viewModel.closeTab({widget: new CanMap({id: 'selected'})});
 
       expect(router.attr('widget')).toBe('first tab');
     });
 
     it('should update hiddenWidgets list', () => {
-      let widget = new can.Map({id: '1', forceShow: true});
+      let widget = new CanMap({id: '1', forceShow: true});
 
       viewModel.closeTab({widget});
 

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 let customAttributesType = {
   Text: 'input',
   'Rich Text': 'text',
@@ -314,7 +315,7 @@ function convertToEditableField(attr) {
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
  * Gets local or global custom attributes from the instance
- * @param  {can.Map} instance object instance
+ * @param  {CanMap} instance object instance
  * @param  {Number}  type     types of custom attributes we want to get
  *                            can be either CUSTOM_ATTRIBUTE_TYPE.LOCAL or
  *                            CUSTOM_ATTRIBUTE_TYPE.GLOBAL
@@ -367,7 +368,7 @@ function setCustomAttributeValue(ca, value) {
  * @param {*} changes
  */
 function applyChangesToCAValue(values, changes) {
-  can.Map.keys(changes).forEach(function (fieldId) {
+  CanMap.keys(changes).forEach(function (fieldId) {
     values.each(function (item, key) {
       if (item.def.id === Number(fieldId)) {
         if (!item) {
@@ -385,7 +386,7 @@ function applyChangesToCAValue(values, changes) {
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
  * Ensures that the Global Custom Attributes are present in the instance
- * @param  {can.Map} instance assessment instance
+ * @param  {CanMap} instance assessment instance
  * @return {Promise} Promise whichi is resolved when GCAs are present in
  *                   the assessment instance
  */

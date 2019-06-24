@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 import {
@@ -47,7 +48,7 @@ export default Mixin.extend(
       }
 
       if (!this.attr('issue_tracker')) {
-        this.attr('issue_tracker', new can.Map({}));
+        this.attr('issue_tracker', new CanMap({}));
       }
 
       let dfd = $.Deferred();
@@ -104,7 +105,7 @@ export default Mixin.extend(
 
       let issueTitle = this.title || '';
 
-      let issueTracker = new can.Map(auditItr).attr({
+      let issueTracker = new CanMap(auditItr).attr({
         title: issueTitle,
         enabled: itrEnabled,
       });

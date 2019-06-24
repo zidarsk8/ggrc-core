@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 const textMap = {
   input: 'This field is required.',
@@ -17,7 +18,7 @@ export default CanComponent.extend({
   tag: 'form-validation-text',
   view: can.stache('<p class="required">{{text}}</p>'),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       text: {
         type: String,

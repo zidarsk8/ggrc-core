@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './read-more.stache';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
@@ -10,7 +11,7 @@ import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
 const readMore = 'Read More';
 const readLess = 'Read Less';
 const classPrefix = 'ellipsis-truncation-';
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     text: {
       type: 'string',

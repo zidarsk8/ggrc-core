@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './create-and-map.stache';
 import {
@@ -30,7 +31,7 @@ export default CanComponent.extend({
   tag: 'create-and-map',
   view: can.stache(template),
   leakScope: false,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       destinationType: {
         get() {

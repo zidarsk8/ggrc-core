@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CustomAttributeObject from './custom-attribute-object';
 import {CUSTOM_ATTRIBUTE_TYPE} from './custom-attribute-config';
 import {
@@ -28,7 +29,7 @@ import {
 export default class CustomAttributeAccess {
   /**
    * Creates CustomAttributeAccess instance.
-   * @param {can.Map} instance - The instance of some object.
+   * @param {CanMap} instance - The instance of some object.
    */
   constructor(instance) {
     this._instance = instance;
@@ -125,7 +126,7 @@ export default class CustomAttributeAccess {
       let caValue = this._findCaValueByCaId(caId, caValues);
 
       if (!caValue) {
-        caValue = new can.Map({});
+        caValue = new CanMap({});
         caValues.push(caValue);
       }
 
@@ -232,8 +233,8 @@ export default class CustomAttributeAccess {
   /**
    * Returns custom attribute value object which equals to сaId.
    * @param {number} caId - The custom attribute id.
-   * @param {Object[]|can.Map[]} caValues - Custom attribute values.
-   * @return {can.Map|undefined} - Custom attribute value if it was found
+   * @param {Object[]|CanMap[]} caValues - Custom attribute values.
+   * @return {CanMap|undefined} - Custom attribute value if it was found
    * else undefined.
    */
   _findCaValueByCaId(caId, caValues) {

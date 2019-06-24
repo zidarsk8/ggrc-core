@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../document-object-list-item';
 
@@ -15,7 +16,7 @@ describe('document-object-list-item component', () => {
 
   describe('expect getter for', () => {
     it('itemData returns "instance"', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         kind: 'listItem',
       });
       viewModel.attr('instance', instance);
@@ -24,7 +25,7 @@ describe('document-object-list-item component', () => {
     });
 
     it('itemTitle returns "instance.title" if defined', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         title: 'Some Title',
         link: 'Some Link',
       });
@@ -34,7 +35,7 @@ describe('document-object-list-item component', () => {
     });
 
     it('itemTitle returns "instance.link" if title not defined', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         title: null,
         link: 'Some Link',
       });
@@ -44,7 +45,7 @@ describe('document-object-list-item component', () => {
     });
 
     it('itemCreationDate returns "instance.created_at"', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         created_at: Date.now(),
       });
       viewModel.attr('instance', instance);
@@ -53,7 +54,7 @@ describe('document-object-list-item component', () => {
     });
 
     it('itemStatus returns "instance.status"', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         status: 'SomeState',
       });
       viewModel.attr('instance', instance);
@@ -62,7 +63,7 @@ describe('document-object-list-item component', () => {
     });
 
     it('isItemValid returns false if "instance.status" is "Deprecated"', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         status: 'DepRecAted',
       });
       viewModel.attr('instance', instance);
@@ -72,7 +73,7 @@ describe('document-object-list-item component', () => {
 
     it('isItemValid returns true if "instance.status" is not "Deprecated"',
       () => {
-        const instance = new can.Map({
+        const instance = new CanMap({
           status: 'Active',
         });
         viewModel.attr('instance', instance);

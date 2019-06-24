@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import Component from '../multiselect-form-field';
 
@@ -16,7 +17,7 @@ describe('multiselect-form-field component', () => {
   });
 
   it('does not fire valueChanged event on first value assignation', () => {
-    const newValue = new can.Map({
+    const newValue = new CanMap({
       selected: [{value: 'option1', checked: true}],
     });
     viewModel.attr('value', newValue);
@@ -24,7 +25,7 @@ describe('multiselect-form-field component', () => {
   });
 
   it('sets the value of the input', () => {
-    const newValue = new can.Map({
+    const newValue = new CanMap({
       selected: [{value: 'option2', checked: true}],
     });
 
@@ -33,7 +34,7 @@ describe('multiselect-form-field component', () => {
   });
 
   it('fires valueChanged event on input value change', () => {
-    const newValue = new can.Map({
+    const newValue = new CanMap({
       selected: [
         {value: 'option1', checked: true},
         {value: 'option2', checked: true},

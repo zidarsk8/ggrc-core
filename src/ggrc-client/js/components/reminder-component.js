@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {confirm} from '../plugins/utils/modals';
 
 export default CanComponent.extend({
   tag: 'reminder-component',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     instance: null,
     type: '',
     modal_title: '',
@@ -18,7 +19,7 @@ export default CanComponent.extend({
     /**
      * Create reminder notifications for all assessors of an Assessment.
      *
-     * @param {can.Map} viewModel - the component's viewModel
+     * @param {CanMap} viewModel - the component's viewModel
      * @param {jQuery.Object} $el - the DOM element that triggered the action
      * @param {jQuery.Event} ev - the event object
      */

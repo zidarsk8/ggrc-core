@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Cacheable from '../../js/models/cacheable';
 import {
   failAll,
@@ -334,8 +335,8 @@ describe('Cacheable model', () => {
       it('returns certain custom attribute object by ca id', () => {
         const caId = 12345;
         const caObject = new CustomAttributeObject(
-          new can.Map(),
-          new can.Map()
+          new CanMap(),
+          new CanMap()
         );
         const getCA = spyOn(instance, '_getCustomAttr')
           .and.returnValue(caObject);

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import './tree-visible-column-checkbox';
@@ -14,7 +15,7 @@ export default CanComponent.extend({
   tag: 'tree-header',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       cssClasses: {
         type: String,

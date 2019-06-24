@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './add-template-field.stache';
 
@@ -13,7 +14,7 @@ export default CanComponent.extend({
   tag: 'add-template-field',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       isDisplayValues: {
         get() {
@@ -31,7 +32,7 @@ export default CanComponent.extend({
      * Field must contain value title, type, values.
      * Opts are populated, once we start changing checkbox values
      *
-     * @param {can.Map} viewModel - the current (add-template-field) viewModel
+     * @param {CanMap} viewModel - the current (add-template-field) viewModel
      * @param {jQuery.Object} el - the clicked DOM element
      * @param {Object} ev - the event object
      */

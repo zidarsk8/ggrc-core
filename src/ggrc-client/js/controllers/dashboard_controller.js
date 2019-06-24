@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import canControl from 'can-control';
 import DashboardWidgets from './dashboard_widgets_controller';
 import InfoPin from './info_pin_controller';
@@ -31,7 +32,7 @@ const DashboardControl = canControl.extend({
   },
 }, {
   init: function (el, options) {
-    this.options = new can.Map(this.options);
+    this.options = new CanMap(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
@@ -51,7 +52,7 @@ const DashboardControl = canControl.extend({
       return;
     }
 
-    validModels = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
+    validModels = CanMap.keys(TreeViewConfig.attr('base_widgets_by_type'));
     // only change the display list
     validModels.forEach( function (mName) {
       savedChildTreeDisplayList = getChildTreeDisplayList(mName);

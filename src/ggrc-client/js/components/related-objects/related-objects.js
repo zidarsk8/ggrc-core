@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import {
@@ -21,7 +22,7 @@ let defaultOrderBy = 'created_at';
 export default CanComponent.extend({
   tag: 'related-objects',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       noRelatedObjectsMessage: {
         type: 'string',

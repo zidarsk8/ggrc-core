@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../related-comments/related-comments';
 import '../custom-attributes/custom-attributes-field-view';
@@ -21,7 +22,7 @@ export default CanComponent.extend({
   tag: 'related-assessment-popover',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     selectedAssessment: {},
     popoverTitleInfo: 'Assessment Title: ',
     define: {

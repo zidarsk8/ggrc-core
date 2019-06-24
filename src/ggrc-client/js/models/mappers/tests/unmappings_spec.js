@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import * as Mappings from '../mappings';
 import Permission from '../../../permission';
 
@@ -144,8 +145,8 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update target', () => {
-      let source = new can.Map({type: 'DataAsset'});
-      let target = new can.Map({type: 'AccessGroup'});
+      let source = new CanMap({type: 'DataAsset'});
+      let target = new CanMap({type: 'AccessGroup'});
       let result = Mappings.allowedToUnmap(source, target);
 
       expect(result).toBeTruthy();

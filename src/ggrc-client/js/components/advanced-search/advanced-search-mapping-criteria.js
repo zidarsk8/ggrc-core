@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
@@ -16,17 +17,17 @@ import * as businessModels from '../../models/business-models';
  * Contains logic used in Mapping Criteria component.
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     /**
      * Contains object represents criteria.
      * Contains the following fields: objectName, filter, mappedTo.
      * Initializes filter with Filter Attribute model.
-     * @type {can.Map}
+     * @type {CanMap}
      */
     criteria: {
       type: '*',
-      Value: can.Map,
+      Value: CanMap,
       set: function (criteria) {
         if (!criteria.filter) {
           criteria.attr('filter',

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
 import '../redirects/role-attr-names-provider/role-attr-names-provider';
@@ -12,7 +13,7 @@ export default CanComponent.extend({
   tag: 'editable-people-group-header',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       peopleCount: {
         get: function () {

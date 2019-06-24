@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {ROLES_CONFLICT} from '../../events/eventTypes';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
@@ -10,7 +11,7 @@ import {getRolesForType} from '../../plugins/utils/acl-utils';
 export default CanComponent.extend({
   tag: 'related-people-access-control',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     instance: {},
     deferredSave: null,
     includeRoles: [],

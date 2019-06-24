@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from './assessment-template-clone';
 
 describe('assessment-template-clone component', () => {
@@ -18,7 +19,7 @@ describe('assessment-template-clone component', () => {
 
     describe('inserted handler', () => {
       beforeEach(() => {
-        vm = new can.Map({
+        vm = new CanMap({
           onSubmit: jasmine.createSpy(),
         });
         handler = events.inserted.bind({viewModel: vm});
@@ -116,7 +117,7 @@ describe('assessment-template-clone component', () => {
       let dfd;
 
       beforeEach(() => {
-        vm = new can.Map();
+        vm = new CanMap();
         spyOn(vm, 'dispatch');
         dfd = new $.Deferred();
         that = {
@@ -194,7 +195,7 @@ describe('assessment-template-clone component', () => {
       let expectedResult;
 
       beforeEach(() => {
-        vm = new can.Map({
+        vm = new CanMap({
           selected: [{id: 1}, {id: 2}, {id: 3}],
           join_object_id: 321,
         });

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-page';
 import Person from '../../../models/business-models/person';
@@ -30,7 +31,7 @@ describe('revision-page component', function () {
     });
 
     it('assigns computed object changes to changeHistory attr', () => {
-      const revisions = new can.Map({
+      const revisions = new CanMap({
         object: [],
         revisionsForCompare: [],
       });
@@ -50,7 +51,7 @@ describe('revision-page component', function () {
     });
 
     it('assigns computed mapping changes to changeHistory attr', () => {
-      const revisions = new can.Map({
+      const revisions = new CanMap({
         mappings: [],
       });
       const mappingChanges = {
@@ -460,7 +461,7 @@ describe('revision-page component', function () {
       ]);
 
       viewModel._mappingChange.and.callFake(function (revision) {
-        return new can.Map({madeBy: revision.madeBy});
+        return new CanMap({madeBy: revision.madeBy});
       });
 
       result = viewModel._computeMappingChanges(revisions);

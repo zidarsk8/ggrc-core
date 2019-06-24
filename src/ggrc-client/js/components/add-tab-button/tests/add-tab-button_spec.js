@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../add-tab-button';
 import Permission from '../../../permission';
@@ -14,7 +15,7 @@ describe('add-tab-button component', function () {
 
   beforeEach(function () {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', new can.Map());
+    viewModel.attr('instance', new CanMap());
   });
 
   describe('isAuditInaccessibleAssessment attribute get() method', function () {

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
@@ -38,7 +39,7 @@ describe('ACL utils peopleWithRoleName() method', () => {
       {person: {id: 9}, ac_role_id: 9},
     ];
 
-    instance = new can.Map({
+    instance = new CanMap({
       id: 42,
       type: 'Audit',
       'class': {model_singular: 'Audit'},

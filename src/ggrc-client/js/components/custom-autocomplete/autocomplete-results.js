@@ -3,12 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 // Base viewModel for 'autocomplete-result' component which is part of 'custom-autocomplete'.
 // It displays available items and handles selected items.
 
 import {KEY_MAP} from './autocomplete-input';
 
-export default can.Map.extend({
+export default CanMap.extend({
   define: {
     items: {
       set(items) {

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './bulk-update-button.stache';
 import updateService from '../../plugins/utils/bulk-update-service';
@@ -13,7 +14,7 @@ export default CanComponent.extend({
   tag: 'bulk-update-button',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     model: null,
     openBulkUpdateModal: function (el, type) {
       import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')

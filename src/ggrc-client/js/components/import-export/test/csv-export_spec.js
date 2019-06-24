@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../csv-export';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import router from '../../../router';
@@ -39,7 +40,7 @@ describe('csv-export component', () => {
   describe('getObjectsForExport() method', () => {
     describe('if object type is not Snapshots', () => {
       it('returns object with empty expression if filters are empty', () => {
-        const panelModel = new can.Map({
+        const panelModel = new CanMap({
           type: 'Program',
           attributes: new can.List(),
           localAttributes: new can.List(),
@@ -56,7 +57,7 @@ describe('csv-export component', () => {
         expect(viewModel.getObjectsForExport()).toEqual(expectedObjects);
       });
       it('returns object with simple expression if there is one filter', () => {
-        const panelModel = new can.Map({
+        const panelModel = new CanMap({
           type: 'Program',
           attributes: new can.List(),
           localAttributes: new can.List(),
@@ -84,7 +85,7 @@ describe('csv-export component', () => {
       });
       it('returns object with OR in expression ' +
         'if the second filter has OR operator', () => {
-        const panelModel = new can.Map({
+        const panelModel = new CanMap({
           type: 'Program',
           attributes: new can.List(),
           localAttributes: new can.List(),
@@ -126,7 +127,7 @@ describe('csv-export component', () => {
 
     describe('if object type is Snapshots', () => {
       it('returns child_type in expression if filters are empty', () => {
-        const panelModel = new can.Map({
+        const panelModel = new CanMap({
           type: 'Snapshot',
           snapshot_type: 'Control',
           attributes: new can.List(),
@@ -150,7 +151,7 @@ describe('csv-export component', () => {
         expect(viewModel.getObjectsForExport()).toEqual(expectedObjects);
       });
       it('returns selected filter in expression and child_type', () => {
-        const panelModel = new can.Map({
+        const panelModel = new CanMap({
           type: 'Snapshot',
           snapshot_type: 'Contract',
           attributes: new can.List(),

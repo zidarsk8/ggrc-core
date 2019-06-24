@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../external-data-autocomplete';
 import * as businessModels from '../../../models/business-models';
@@ -200,7 +201,7 @@ describe('external-data-autocomplete component', () => {
       let model;
 
       beforeEach(() => {
-        item = new can.Map({test: true});
+        item = new CanMap({test: true});
         viewModel.attr('type', 'TestType');
         model = {
           id: 'testId',
@@ -211,7 +212,7 @@ describe('external-data-autocomplete component', () => {
             test: model,
           },
         ]];
-        businessModels.TestType = can.Map.extend({
+        businessModels.TestType = CanMap.extend({
           create: jasmine.createSpy()
             .and.returnValue(Promise.resolve(response)),
           root_object: 'test',

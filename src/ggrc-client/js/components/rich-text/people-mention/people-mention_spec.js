@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import component from './people-mention';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import {KEY_MAP} from '../../custom-autocomplete/autocomplete-input';
@@ -13,7 +14,7 @@ describe('people-mention component', () => {
 
   beforeEach(() => {
     vm = getComponentVM(component);
-    editor = new can.Map({
+    editor = new CanMap({
       keyboard: {
         addBinding: jasmine.createSpy('editor.keyboard.addBinding')
           .and.callFake((options, handler) => handler()),
@@ -125,7 +126,7 @@ describe('people-mention component', () => {
     beforeEach(() => {
       actionKeySpy = jasmine.createSpy('actionKeySpy');
 
-      let originalViewModel = can.Map.extend(
+      let originalViewModel = CanMap.extend(
         component.prototype.viewModel.prototype
       );
       extendedVm = originalViewModel.extend({

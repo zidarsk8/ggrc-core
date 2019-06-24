@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   ddValidationValueToMap,
@@ -19,7 +20,7 @@ export default CanComponent.extend({
   tag: 'template-field',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     types: [],
     field: null,
     /*
@@ -62,7 +63,7 @@ export default CanComponent.extend({
       }
 
       return _.zip(options, vals).map(function (zip) {
-        let attr = new can.Map();
+        let attr = new CanMap();
         let val = parseInt(zip[1], 10);
         attr.attr('type', field.attr('attribute_type'));
         attr.attr('value', zip[0]);

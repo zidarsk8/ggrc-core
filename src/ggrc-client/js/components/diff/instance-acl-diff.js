@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {buildModifiedACL} from '../../plugins/utils/object-history-utils';
 import {getRoleById} from '../../plugins/utils/acl-utils';
@@ -19,7 +20,7 @@ const viewModel = DiffBaseVM.extend({
     const currentAcl = instance.attr('access_control_list');
     const modifiedAcl = buildModifiedACL(instance, modifiedRoles);
 
-    const rolesDiff = can.Map.keys(modifiedRoles).map((roleId) => {
+    const rolesDiff = CanMap.keys(modifiedRoles).map((roleId) => {
       let currentVal;
       let modifiedVal;
 

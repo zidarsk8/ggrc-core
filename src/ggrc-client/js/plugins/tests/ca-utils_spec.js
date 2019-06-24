@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {
   ddValidationMapToValue,
   isCommentRequired,
@@ -16,7 +17,7 @@ describe('ca-utils', function () {
     let dropdownField;
 
     beforeEach(function () {
-      dropdownField = new can.Map({
+      dropdownField = new CanMap({
         id: 2,
         type: 'dropdown',
         validationConfig: {
@@ -146,7 +147,7 @@ describe('ca-utils', function () {
     let ca;
 
     beforeEach(function () {
-      ca = new can.Map();
+      ca = new CanMap();
     });
 
     describe('if attributeType is "person"', function () {

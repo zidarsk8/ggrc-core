@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   confirm,
@@ -17,7 +18,7 @@ export default CanComponent.extend({
   tag: 'delete-button',
   view: can.stache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       instance: {
         set(instance) {

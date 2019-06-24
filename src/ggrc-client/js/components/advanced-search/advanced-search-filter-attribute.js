@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.stache';
@@ -12,7 +13,7 @@ import template from './advanced-search-filter-attribute.stache';
  * Contains logic used in Filter Attribute component
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     isUnary: {
       get() {

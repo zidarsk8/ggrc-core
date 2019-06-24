@@ -3,15 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import template from './mapped-control-related-objects.stache';
 
 /**
  * ViewModel for Assessment Mapped Controls Related Objectives and Regulations.
- * @type {can.Map}
+ * @type {CanMap}
  */
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     items: {
       value: [],

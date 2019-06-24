@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
@@ -24,7 +25,7 @@ export default CanComponent.extend({
   tag: 'revisions-comparer',
   view: can.stache('<content/>'),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     instance: null,
     leftRevisionId: null,
     rightRevision: null,
@@ -158,10 +159,10 @@ export default CanComponent.extend({
         }
 
         if (index === 1) {
-          const instWithProposedValues = new can.Map(content);
+          const instWithProposedValues = new CanMap(content);
           // new model method overrides modified fields
           can.batch.start();
-          can.Map.keys(proposalContent).forEach((key) => {
+          CanMap.keys(proposalContent).forEach((key) => {
             if (Array.isArray(proposalContent[key])) {
               instWithProposedValues.attr(key).replace(proposalContent[key]);
             } else {
@@ -339,9 +340,9 @@ export default CanComponent.extend({
        */
       function isEqual(left, right) {
         const valueOld = Object.assign({},
-          left && left instanceof can.Map && left.attr() || []);
+          left && left instanceof CanMap && left.attr() || []);
         const valueNew = Object.assign({},
-          right && right instanceof can.Map && right.attr() || []);
+          right && right instanceof CanMap && right.attr() || []);
 
         return _.isEqual(valueOld, valueNew);
       }

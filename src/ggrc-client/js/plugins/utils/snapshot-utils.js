@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {
   buildParam,
 } from './query-api-utils';
@@ -106,7 +107,7 @@ function toObject(instance) {
     instance.revision.content.attr() : instance.revision.content;
 
   content.originalLink = getParentUrl(instance);
-  content.snapshot = new can.Map(instance);
+  content.snapshot = new CanMap(instance);
   content.related_sources = [];
   content.related_destinations = [];
   content.viewLink = content.snapshot.viewLink;

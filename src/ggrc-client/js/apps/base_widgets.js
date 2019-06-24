@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import * as businessModels from '../models/business-models';
 import {getRelatedWidgetNames} from '../plugins/utils/mega-object-utils';
 
@@ -139,7 +140,7 @@ _.each(baseWidgetsByType, (val, widget) => {
 
 baseWidgetsByType = _.assign(baseWidgetsByType, objectVersionWidgets);
 
-export default new can.Map({
+export default new CanMap({
   base_widgets_by_type: baseWidgetsByType,
   defaultOrderTypes,
   basic_model_list: [],

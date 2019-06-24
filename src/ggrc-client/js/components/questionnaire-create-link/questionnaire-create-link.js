@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './questionnaire-create-link.stache';
 import {
@@ -12,7 +13,7 @@ import {
 export default CanComponent.extend({
   tag: 'questionnaire-create-link',
   view: can.stache(template),
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       externalUrl: {
         get() {

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
@@ -78,7 +79,7 @@ _.assign(CoreExtension, {
       instance: object,
       widget_view: infoWidgetViews[objectTable],
     });
-    modelNames = can.Map.keys(baseWidgetsByType);
+    modelNames = CanMap.keys(baseWidgetsByType);
     modelNames.sort();
     possibleModelType = modelNames.slice();
     modelNames.forEach(function (name) {

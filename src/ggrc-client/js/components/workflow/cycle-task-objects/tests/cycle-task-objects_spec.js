@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../cycle-task-objects';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import * as QueryApiUtils from '../../../../plugins/utils/query-api-utils';
@@ -85,7 +86,7 @@ describe('cycle-task-objects component', () => {
       WorkflowUtils.getRelevantMappingTypes.and.callFake((instance) =>
         typesCollection[instance.attr('type')]
       );
-      const instance = new can.Map({type: 'FakeType'});
+      const instance = new CanMap({type: 'FakeType'});
       viewModel.attr('instance', instance);
 
       viewModel.initMappedObjects();

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 import '../issue/issue-unmap-item';
@@ -20,7 +21,7 @@ export default CanComponent.extend({
   tag: 'unmap-dropdown-item',
   view: can.stache(template),
   leakScope: false,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       issueUnmap: {
         get() {

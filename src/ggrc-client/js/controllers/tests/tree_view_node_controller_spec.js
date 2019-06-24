@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Ctrl from '../tree/tree-view-node';
 
 describe('TreeViewNode Controller', function () {
@@ -19,7 +20,7 @@ describe('TreeViewNode Controller', function () {
       $element = $('<div></div>');
 
       ctrlInst = {
-        options: new can.Map({
+        options: new CanMap({
           show_view: '/foo/bar.stache',
         }),
         element: $element,
@@ -105,7 +106,7 @@ describe('TreeViewNode Controller', function () {
 
       ctrlInst = {
         element: $tree,
-        options: new can.Map({
+        options: new CanMap({
           show_view: '/foo/bar.stache',
         }),
         _ifNotRemoved: jasmine.createSpy().and.callFake(function (callback) {

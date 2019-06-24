@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../comment/comment-input';
 import '../comment/comment-add-button';
@@ -17,7 +18,7 @@ export default CanComponent.extend({
   tag: 'ca-object-modal-content',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       comment: {
         get() {

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import ObjectOperationsBaseVM from '../object-operations-base-vm';
 import * as Mappings from '../../../models/mappers/mappings';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
@@ -63,7 +64,7 @@ describe('object-operations-base viewModel', function () {
     let vm;
 
     beforeEach(function () {
-      vm = new can.Map({
+      vm = new CanMap({
         config: {
           general: {},
           special: [
@@ -131,7 +132,7 @@ describe('object-operations-base viewModel', function () {
           c: 'c',
         },
       };
-      vm = new can.Map(baseConfig);
+      vm = new CanMap(baseConfig);
       method = baseVM.update.bind(vm);
       spyOn(vm, 'attr').and.callThrough();
     });

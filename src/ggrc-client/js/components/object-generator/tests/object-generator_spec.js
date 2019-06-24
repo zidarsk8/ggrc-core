@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import RefreshQueue from '../../../models/refresh_queue';
 import Component from '../object-generator';
 import Program from '../../../models/business-models/program';
@@ -23,7 +24,7 @@ describe('object-generator component', function () {
     let parentViewModel;
 
     beforeEach(function () {
-      parentViewModel = new can.Map();
+      parentViewModel = new CanMap();
     });
 
     it('returns object with function "isLoadingOrSaving"', function () {

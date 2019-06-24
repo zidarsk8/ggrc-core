@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import Component from '../related-revisions-item';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import * as Utils from '../../../../plugins/utils/user-utils';
@@ -16,7 +17,7 @@ describe('RelatedRevisionsItem component', () => {
 
   describe('isCreated value getter', () => {
     beforeEach(() => {
-      viewModel.attr('revision', new can.Map({action: null}));
+      viewModel.attr('revision', new CanMap({action: null}));
     });
 
     it('returns true when revision.action value is "created"', () => {

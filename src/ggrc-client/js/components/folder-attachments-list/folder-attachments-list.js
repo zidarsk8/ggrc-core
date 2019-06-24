@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-list-item/editable-document-object-list-item';
 import {
@@ -22,7 +23,7 @@ export default CanComponent.extend({
   tag: 'folder-attachments-list',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       showSpinner: {
         type: 'boolean',

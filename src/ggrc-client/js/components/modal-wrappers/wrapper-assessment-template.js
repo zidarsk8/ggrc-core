@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 const peopleTitlesList = [
   'Auditors', 'Principal Assignees', 'Secondary Assignees',
@@ -46,7 +47,7 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
 export default CanComponent.extend({
   tag: 'wrapper-assessment-template',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     instance: {},
     define: {
       showCaptainAlert: {

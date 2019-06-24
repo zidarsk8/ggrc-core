@@ -3,7 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-export default can.Map.extend({
+import CanMap from 'can-map';
+export default CanMap.extend({
   defaults: {
     instance: undefined,
     parent: null,

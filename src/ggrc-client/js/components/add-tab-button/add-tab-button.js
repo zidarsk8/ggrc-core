@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './add-tab-button.stache';
 import {
@@ -13,7 +14,7 @@ import Permission from '../../permission';
 import {shouldBeMappedExternally} from '../../models/mappers/mappings';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     isAuditInaccessibleAssessment: {
       get() {

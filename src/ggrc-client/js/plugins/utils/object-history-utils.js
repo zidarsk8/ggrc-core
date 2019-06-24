@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 // #region ACL
 const buildAclObject = (person, roleId) => {
   return {
@@ -46,7 +47,7 @@ const buildRoleACL = (modifiedRoleId, currentRoleACL, modifiedRole) => {
 };
 
 const buildModifiedACL = (instance, modifiedRoles) => {
-  const modifiedRolesKeys = can.Map.keys(modifiedRoles)
+  const modifiedRolesKeys = CanMap.keys(modifiedRoles)
     .map((key) => Number(key));
   const modifiedAcl = [];
   let aclRoles;
@@ -145,7 +146,7 @@ const getModifiedValue = (modifiedAttr, attr) => {
 const buildModifiedAttValues = (values, definitions, modifiedAttrs) => {
   // convert to string.
   const valueKeys = values.map((val) => `${val.custom_attribute_id}`);
-  const caKeys = can.Map.keys(modifiedAttrs);
+  const caKeys = CanMap.keys(modifiedAttrs);
   const modifiedValues = _.union(valueKeys, caKeys).map((attrId) => {
     let attr;
     let modifiedAttr;

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './people-mention/people-mention';
 
@@ -16,7 +17,7 @@ export default CanComponent.extend('richText', {
   tag: 'rich-text',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       disabled: {
         set(disabled) {

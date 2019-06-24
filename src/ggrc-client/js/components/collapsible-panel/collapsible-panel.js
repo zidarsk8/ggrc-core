@@ -3,12 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './collapsible-panel-header';
 import './collapsible-panel-body';
 import template from './collapsible-panel.stache';
 
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   titleText: '',
   titleIcon: '',
   extraCssClass: '',

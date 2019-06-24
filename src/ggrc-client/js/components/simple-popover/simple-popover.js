@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './simple-popover.stache';
 
@@ -13,7 +14,7 @@ export default CanComponent.extend({
     this.viewModel.attr('element', el);
   },
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     extraCssClass: '',
     placement: '',
     buttonText: '',

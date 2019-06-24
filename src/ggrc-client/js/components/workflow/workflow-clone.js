@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
@@ -38,7 +39,7 @@ let CloneWorkflow = Cacheable.extend({
 
 export default CanComponent.extend({
   tag: 'workflow-clone',
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     workflow: null,
   }),
   events: {

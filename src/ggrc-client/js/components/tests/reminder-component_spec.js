@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../reminder-component';
 
 describe('reminder component', function () {
@@ -19,14 +20,14 @@ describe('reminder component', function () {
       pendingRefresh = new $.Deferred();
       pendingSave = new $.Deferred();
 
-      instance = new can.Map({
+      instance = new CanMap({
         refresh: jasmine.createSpy('refresh')
           .and.returnValue(pendingRefresh.promise()),
         save: jasmine.createSpy('save')
           .and.returnValue(pendingSave.promise()),
       });
 
-      viewModel = new can.Map({
+      viewModel = new CanMap({
         instance: instance,
       });
       eventObj = $.Event();

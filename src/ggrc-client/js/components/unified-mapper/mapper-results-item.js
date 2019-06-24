@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './mapper-results-item-status';
 import './mapper-results-item-details';
@@ -12,7 +13,7 @@ import template from './templates/mapper-results-item.stache';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   itemData: {},
   searchOnly: false,
   drawRelatedAssessments: false,

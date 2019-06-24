@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 // This is primarily useful for passing as the fail case for
 //  promises, since every item passed to it will show up in
 //  the jasmine output.
@@ -23,7 +24,7 @@ function getComponentVM(Component) {
   if (_.isFunction(viewModelConfig)) {
     return new viewModelConfig();
   }
-  return new (can.Map.extend(viewModelConfig));
+  return new (CanMap.extend(viewModelConfig));
 }
 
 function makeFakeModel({model, staticProps = {}, instanceProps = {}} = {}) {

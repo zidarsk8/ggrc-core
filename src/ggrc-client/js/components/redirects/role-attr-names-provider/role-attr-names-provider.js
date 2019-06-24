@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 const roleToLinkMap = {
   Control: {
@@ -20,7 +21,7 @@ const roleToLinkMap = {
   },
 };
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     linkAttrName: {
       get() {

@@ -3,9 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 const MAX_COLUMNS_COUNT = 1000;
 
-export default can.Map.extend({
+export default CanMap.extend({
   define: {
     isValidConfiguration: {
       get() {

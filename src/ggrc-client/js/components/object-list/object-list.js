@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../show-more/show-more';
 import '../spinner-component/spinner-component';
@@ -15,7 +16,7 @@ export default CanComponent.extend({
   tag: 'object-list',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       itemSelector: {
         type: 'string',
@@ -62,7 +63,7 @@ export default CanComponent.extend({
     showMore: false,
     /**
      *
-     * @param {can.Map} ctx - current item context
+     * @param {CanMap} ctx - current item context
      * @param {jQuery} el - selected element
      * @param {jQuery.Event} ev - click event
      */

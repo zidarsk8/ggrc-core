@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
@@ -102,7 +103,7 @@ describe('tree-widget-container component', function () {
 
     beforeEach(function () {
       modelName = 'testModelName';
-      parent = new can.Map({testParent: true});
+      parent = new CanMap({testParent: true});
       page = {
         current: 1,
         pageSize: 10,
@@ -111,7 +112,7 @@ describe('tree-widget-container component', function () {
           direction: null,
         }],
       },
-      filter = new can.Map({testFilter: true});
+      filter = new CanMap({testFilter: true});
       request = new can.List([{testRequest: true}]);
 
       vm.attr('model', {
@@ -793,8 +794,8 @@ describe('tree-widget-container component', function () {
       spyOn(NotifierUtils, 'notifier');
 
       modelName = 'testModelName';
-      parent = new can.Map({testParent: true});
-      filter = new can.Map({testFilter: true});
+      parent = new CanMap({testParent: true});
+      filter = new CanMap({testFilter: true});
       request = new can.List([{testRequest: true}]);
 
       vm.attr('model', {

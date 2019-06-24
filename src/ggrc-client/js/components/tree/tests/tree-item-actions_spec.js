@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../tree-item-actions';
 import {
   getComponentVM,
@@ -18,7 +19,7 @@ describe('tree-item-actions component', function () {
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', new can.Map());
+    viewModel.attr('instance', new CanMap());
   });
 
   describe('isAllowedToMap get() method', () => {

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/task-list.stache';
 import Pagination from '../../base-objects/pagination';
@@ -10,7 +11,7 @@ import Permission from '../../../permission';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
 import TaskGroupTask from '../../../models/business-models/task-group-task';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   TaskGroupTask,
   define: {
     paging: {

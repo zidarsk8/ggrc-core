@@ -3,10 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/text-form-field.stache';
 
-const TEXT_FORM_FIELD_VM = can.Map.extend({
+const TEXT_FORM_FIELD_VM = CanMap.extend({
   define: {
     inputValue: {
       set(newValue) {

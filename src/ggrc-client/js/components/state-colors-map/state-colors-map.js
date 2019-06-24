@@ -3,15 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 /* Default Sate for Assessment should be 'Not Started' */
 const defaultState = 'Not Started';
 
 /**
- * can.Map(ViewModel) presenting behavior of State Colors Map Component
- * @type {can.Map}
+ * CanMap(ViewModel) presenting behavior of State Colors Map Component
+ * @type {CanMap}
  */
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     state: {
       type: 'string',

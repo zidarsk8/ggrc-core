@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './advanced-search-filter-attribute';
 import './advanced-search-filter-group';
@@ -31,7 +32,7 @@ let viewModel = AdvancedSearchContainer.extend({
       get: function (items) {
         if (this.attr('defaultStatusFilter') && items && !items.length &&
           StateUtils.hasFilter(this.attr('modelName'))) {
-          const statusItem = new can.Map(AdvancedSearch.create.state());
+          const statusItem = new CanMap(AdvancedSearch.create.state());
           statusItem.value = AdvancedSearch.setDefaultStatusConfig(
             statusItem.value, this.attr('modelName')
           );
@@ -81,7 +82,7 @@ let viewModel = AdvancedSearchContainer.extend({
   },
   /**
    * Transforms Filter Attribute to Filter Group.
-   * @param {can.Map} attribute - Filter Attribute.
+   * @param {CanMap} attribute - Filter Attribute.
    */
   createGroup: function (attribute) {
     let items = this.attr('items');

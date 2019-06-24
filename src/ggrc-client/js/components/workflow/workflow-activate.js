@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   generateCycle,
@@ -14,7 +15,7 @@ import {
 import Permission from '../../permission';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   instance: {},
   waiting: false,
   async initWorkflow(workflow) {

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../request-review-modal';
 import Review from '../../../models/service-models/review';
@@ -159,7 +160,7 @@ describe('request-review-modal component', () => {
 
   describe('cancel() method', () => {
     beforeEach(() => {
-      const review = new can.Map();
+      const review = new CanMap();
       review.restore = jasmine.createSpy('restore');
       viewModel.attr('review', review);
     });

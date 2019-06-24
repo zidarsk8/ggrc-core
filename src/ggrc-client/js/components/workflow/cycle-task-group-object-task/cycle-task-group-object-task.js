@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/cycle-task-group-object-task.stache';
 import tdmTemplate from './templates/partials/three-dots-menu.stache';
@@ -30,7 +31,7 @@ import {
 } from '../../../plugins/utils/current-page-utils';
 import Permission from '../../../permission';
 
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   partials: {
     restoreButton: can.stache(restoreButtonTemplate),
     threeDotsMenu: can.stache(tdmTemplate),

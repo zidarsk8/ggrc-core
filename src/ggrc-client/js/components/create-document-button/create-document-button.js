@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   uploadFiles,
@@ -20,7 +21,7 @@ import template from './create-document-button.stache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   parentInstance: null,
   openPicker() {
     return uploadFiles()

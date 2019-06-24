@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Spinner from 'spin.js';
 import isFunction from 'can-util/js/is-function/is-function';
 import {
@@ -205,7 +206,7 @@ can.stache.registerHelper('is_allowed', function (...args) {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
-    } else if (typeof arg === 'object' && arg instanceof can.Map) {
+    } else if (typeof arg === 'object' && arg instanceof CanMap) {
       resource = arg;
     }
   });

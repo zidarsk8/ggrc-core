@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../dropdown-wrapper';
 
@@ -22,7 +23,7 @@ describe('dropdown-wrapper component', () => {
     ];
 
     findDfd = $.Deferred();
-    testType = can.Map.extend({
+    testType = CanMap.extend({
       findAll: jasmine.createSpy('findAll').and.returnValue(findDfd),
       findInCacheById: jasmine.createSpy('findInCacheById')
         .and.returnValue({

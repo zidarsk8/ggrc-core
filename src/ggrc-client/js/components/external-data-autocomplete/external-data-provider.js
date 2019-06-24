@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
@@ -12,7 +13,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 export default CanComponent.extend({
   tag: 'external-data-provider',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     /**
      * The search that should be used in request.
      * @type {String}

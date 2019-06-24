@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-log';
 
@@ -596,7 +597,7 @@ describe('revision-log component', function () {
   describe('initObjectReview() method', () => {
     it('assigns reified review in "review" attr ' +
     'if review present in instance', () => {
-      const review = new can.Map();
+      const review = new CanMap();
       spyOn(ReifyUtils, 'reify').and.returnValue('reifiedReview');
       viewModel.attr('review', 'previousReview');
       viewModel.attr('instance', {review});

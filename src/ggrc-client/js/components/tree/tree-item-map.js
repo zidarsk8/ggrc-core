@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/tree-item-map.stache';
 import {trigger} from 'can-event';
 
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     title: {
       type: String,

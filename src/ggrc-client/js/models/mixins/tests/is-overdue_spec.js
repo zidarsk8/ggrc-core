@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import isOverdue from '../is-overdue';
 
 describe('isOverdue mixin', function () {
@@ -19,7 +20,7 @@ describe('isOverdue mixin', function () {
     let method;
 
     beforeEach(function () {
-      instance = new can.Map({
+      instance = new CanMap({
         next_due_date: '2030-01-01',
         status: 'Not Started',
       });

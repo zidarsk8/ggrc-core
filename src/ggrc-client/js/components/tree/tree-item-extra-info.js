@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
@@ -14,7 +15,7 @@ import Cycle from '../../models/business-models/cycle';
 import {formatDate} from '../../plugins/utils/date-utils';
 import template from './templates/tree-item-extra-info.stache';
 
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     isActive: {
       type: 'boolean',

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -14,7 +15,7 @@ import {isScopeModel} from '../../plugins/utils/models-utils';
  * Contains logic used in Filter State component
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = CanMap.extend({
   define: {
     label: {
       get() {
@@ -68,7 +69,7 @@ let viewModel = can.Map.extend({
   /**
    * Contains criterion's fields: operator, modelName, items.
    * Initializes filterStates.
-   * @type {can.Map}
+   * @type {CanMap}
   */
   stateModel: null,
   /**

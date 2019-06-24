@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import canControl from 'can-control';
 import './infinite-scroll-controller';
 import tracker from '../tracker';
@@ -24,7 +25,7 @@ import * as canBatch from 'can-event/batch/batch';
 
 const LhnControl = canControl.extend({}, {
   init: function () {
-    this.obs = new can.Map();
+    this.obs = new CanMap();
 
     this.init_lhn();
 
@@ -367,8 +368,8 @@ const LhnSearchControl = canControl.extend({
     actions_content_selector: 'ul.sub-actions',
     limit: 50,
     observer: null,
-    filter_params: new can.Map(),
-    counts: new can.Map(),
+    filter_params: new CanMap(),
+    counts: new CanMap(),
   },
 }, {
   display: function () {
@@ -383,7 +384,7 @@ const LhnSearchControl = canControl.extend({
     this.element.html(frag);
 
     let initialParams = {};
-    let savedFilters = lhnPrefs.filter_params || new can.Map();
+    let savedFilters = lhnPrefs.filter_params || new CanMap();
 
     this.post_init();
 

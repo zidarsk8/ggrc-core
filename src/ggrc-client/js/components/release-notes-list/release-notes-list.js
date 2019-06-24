@@ -3,11 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './release-notes-list.stache';
 import notesTemplate from './release-notes.md';
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   notesTemplate: notesTemplate,
   onTopButtonCssClass: 'instantly-hidden',
   prevScrollValue: null,

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../tree-pagination/tree-pagination';
 import './revision-page';
@@ -37,7 +38,7 @@ export default CanComponent.extend({
 
     viewModel.fetchItems();
   },
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       showFilter: {
         get() {

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../form/form-validation-icon';
 import '../form/form-validation-text';
@@ -13,7 +14,7 @@ export default CanComponent.extend({
   tag: 'custom-attributes',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     isLocalCa: false,
     fields: [],
     editMode: false,

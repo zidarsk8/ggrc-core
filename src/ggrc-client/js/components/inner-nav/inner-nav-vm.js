@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import {
   isAdmin,
 } from '../../plugins/utils/current-page-utils';
@@ -11,7 +12,7 @@ import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
 import {allowedToCreateOrMap} from '../../models/mappers/mappings';
 
-export default can.Map.extend({
+export default CanMap.extend({
   define: {
     counts: {
       get() {
@@ -101,7 +102,7 @@ export default can.Map.extend({
   },
   /**
      * Configures widgets to display in Add Tab button dropdown
-     * @param {can.Map} widget widget object
+     * @param {CanMap} widget widget object
      */
   updateHiddenWidgets(widget) {
     let instance = this.attr('instance');
@@ -125,7 +126,7 @@ export default can.Map.extend({
   },
   /**
      * Adds widget to hiddenWidgets for Add tab button
-     * @param {can.Map} widget widget
+     * @param {CanMap} widget widget
      */
   addToHiddenWidgets(widget) {
     let hiddenWidgets = this.attr('hiddenWidgets');
@@ -138,7 +139,7 @@ export default can.Map.extend({
   },
   /**
      * Removes widgets from hiddenWidgets for Add tab button
-     * @param {can.Map} widget widget
+     * @param {CanMap} widget widget
      */
   removeFromHiddenWidgets(widget) {
     let hiddenWidgets = this.attr('hiddenWidgets');
@@ -171,7 +172,7 @@ export default can.Map.extend({
   /**
      * Searches widget by Id in widgetList collection
      * @param {string} widgetId widget id
-     * @return {can.Map} widget
+     * @return {CanMap} widget
      */
   findWidgetById(widgetId) {
     return _.find(this.attr('widgetList'),
@@ -180,7 +181,7 @@ export default can.Map.extend({
   /**
      * Searches widget by countName in widgetList collection
      * @param {string} countsName counts name prop in widget
-     * @return {can.Map} widget
+     * @return {CanMap} widget
      */
   findWidgetByCountsName(countsName) {
     return _.find(this.attr('widgetList'),

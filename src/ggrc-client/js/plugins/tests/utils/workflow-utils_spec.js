@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as workflowHelpers from '../../utils/workflow-utils';
 import * as Mappings from '../../../models/mappers/mappings';
 import {
@@ -55,10 +56,10 @@ describe('Workflow helpers', () => {
     let refreshedInstance;
 
     beforeEach(function () {
-      refreshedInstance = new can.Map({
+      refreshedInstance = new CanMap({
         save: jasmine.createSpy('save'),
       });
-      instance = new can.Map({
+      instance = new CanMap({
         refresh: jasmine.createSpy('refresh')
           .and.returnValue(refreshedInstance),
       });
@@ -98,7 +99,7 @@ describe('Workflow helpers', () => {
 
     it('returns filtered list of related sources/destinations items ' +
     'by mapping list of instance', () => {
-      const instance = new can.Map({
+      const instance = new CanMap({
         related_sources: [
           {destination_type: 'FakeType1'},
           {destination_type: 'FakeType2'},

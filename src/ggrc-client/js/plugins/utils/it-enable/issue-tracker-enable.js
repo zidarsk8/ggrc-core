@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import template from './issue-tracker-enable.stache';
 import logger from './issue-tracker-log';
 import {getPageInstance} from '../current-page-utils';
@@ -84,7 +85,7 @@ const updateAssessments = (assessments) => {
   }, result);
 };
 
-const IssueTrackerEnabler = can.Map.extend({
+const IssueTrackerEnabler = CanMap.extend({
   state: {
     open: false,
   },
@@ -116,7 +117,7 @@ const IssueTrackerEnabler = can.Map.extend({
     this.attr('statesList').replace([]);
     this.attr('checked', 0);
     ids.forEach((id) => {
-      let state = new can.Map({
+      let state = new CanMap({
         id,
         state: 'unchecked',
       });

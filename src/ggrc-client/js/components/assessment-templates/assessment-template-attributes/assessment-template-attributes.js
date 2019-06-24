@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 /*
  * Assessment template main component
@@ -13,7 +14,7 @@ import CanComponent from 'can-component';
 export default CanComponent.extend({
   tag: 'assessment-template-attributes',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     fields: [],
     types: [{
       type: 'Text',

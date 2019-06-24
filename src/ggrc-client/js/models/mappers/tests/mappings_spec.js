@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import * as Mappings from '../mappings';
 import Permission from '../../../permission';
 
@@ -168,8 +169,8 @@ describe('Mappings', () => {
     });
 
     it('checks permissions to update target', () => {
-      let source = new can.Map({type: 'Program'});
-      let target = new can.Map({type: 'Document'});
+      let source = new CanMap({type: 'Program'});
+      let target = new CanMap({type: 'Document'});
       let result = Mappings.allowedToMap(source, target);
 
       expect(result).toBeTruthy();
@@ -203,8 +204,8 @@ describe('Mappings', () => {
     });
 
     it('checks permissions to update target', () => {
-      let source = new can.Map({type: 'Program'});
-      let target = new can.Map({type: 'Audit'});
+      let source = new CanMap({type: 'Program'});
+      let target = new CanMap({type: 'Audit'});
       let result = Mappings.allowedToCreate(source, target);
 
       expect(result).toBeTruthy();
@@ -238,8 +239,8 @@ describe('Mappings', () => {
     });
 
     it('checks permissions to update target', () => {
-      let source = new can.Map({type: 'Program'});
-      let target = new can.Map({type: 'Document'});
+      let source = new CanMap({type: 'Program'});
+      let target = new CanMap({type: 'Document'});
       let result = Mappings.allowedToUnmap(source, target);
 
       expect(result).toBeTruthy();

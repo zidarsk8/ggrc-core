@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import Cacheable from '../../../models/cacheable';
 import Component from '../inline-autocomplete-wrapper';
 import {
@@ -113,7 +114,7 @@ describe('inline-autocomplete-wrapper component', () => {
         instance = makeFakeInstance({model: Control})({
           custom_attribute_definitions: caDefs,
         });
-        item = new can.Map({test: true});
+        item = new CanMap({test: true});
         viewModel.attr('instance', instance);
       });
 
@@ -137,7 +138,7 @@ describe('inline-autocomplete-wrapper component', () => {
         viewModel.attr('displayProp', 'test');
         viewModel.attr('textValue', null);
 
-        viewModel.updateTextValue(new can.Map({
+        viewModel.updateTextValue(new CanMap({
           test: 'testTextValue',
         }));
 

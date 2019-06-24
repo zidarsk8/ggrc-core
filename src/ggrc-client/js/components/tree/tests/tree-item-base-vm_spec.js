@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import canEvent from 'can-event';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import BaseTreeItemVM from '../tree-item-base-vm';
@@ -64,7 +65,7 @@ describe('tree-item-base viewModel', function () {
 
     describe('if instance is Cycle', () => {
       beforeEach(() => {
-        vm.attr('instance', new can.Map({
+        vm.attr('instance', new CanMap({
           type: 'Cycle',
         }));
       });
@@ -104,7 +105,7 @@ describe('tree-item-base viewModel', function () {
 
     describe('if instance is CycleTaskGroup', () => {
       beforeEach(() => {
-        vm.attr('instance', new can.Map({
+        vm.attr('instance', new CanMap({
           type: 'CycleTaskGroup',
         }));
       });

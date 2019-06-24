@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 const originalViewModel = $.fn.viewModel;
 
 $.fn.extend({
@@ -13,7 +14,7 @@ $.fn.extend({
   // Get component's viewModel from jQuery element
   viewModel: function () {
     if (!this.length) {
-      return new can.Map();
+      return new CanMap();
     }
 
     return originalViewModel.apply(this, arguments);

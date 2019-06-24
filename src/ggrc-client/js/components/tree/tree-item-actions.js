@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../lazy-render/lazy-render';
 import '../show-related-assessments-button/show-related-assessments-button';
@@ -18,7 +19,7 @@ import {getMappingList} from '../../models/mappers/mappings';
 
 const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
 
-const viewModel = can.Map.extend({
+const viewModel = CanMap.extend({
   define: {
     deepLimit: {
       type: 'number',

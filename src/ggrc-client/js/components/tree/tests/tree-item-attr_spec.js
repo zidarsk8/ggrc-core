@@ -2,6 +2,8 @@
   Copyright (C) 2019 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import CanMap from 'can-map';
 import Component from '../tree-item-attr';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as MarkdownUtils from '../../../plugins/utils/markdown-utils';
@@ -11,7 +13,7 @@ describe('tree-item-attr component', () => {
 
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    viewModel.attr('instance', new can.Map());
+    viewModel.attr('instance', new CanMap());
   });
 
   it('returns an empty string if the attribute is missing', () => {

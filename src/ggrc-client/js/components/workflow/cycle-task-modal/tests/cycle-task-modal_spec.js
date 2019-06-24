@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component from '../cycle-task-modal';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
 import * as QueryApiUtils from '../../../../plugins/utils/query-api-utils';
@@ -32,7 +33,7 @@ describe('cycle-task-modal component', () => {
         typesCollection[instance.attr('type')]
       );
 
-      const instance = new can.Map({
+      const instance = new CanMap({
         type: 'FakeType',
       });
       viewModel.attr('instance', instance);

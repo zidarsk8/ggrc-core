@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/dropdown-component.stache';
 
@@ -16,7 +17,7 @@ export default CanComponent.extend({
   tag: 'dropdown-component',
   view: can.stache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       options: {
         get: function () {
@@ -46,7 +47,7 @@ export default CanComponent.extend({
               }
             );
           } else {
-            list = can.Map.keys(optionsGroups).map(function (key) {
+            list = CanMap.keys(optionsGroups).map(function (key) {
               let group = optionsGroups.attr(key);
               return {
                 group: group.attr('name'),

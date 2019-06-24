@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import {
   ObjectMapper as Ctrl,
   ObjectSearch,
@@ -30,12 +31,12 @@ describe('ObjectMapper', function () {
     });
 
     beforeEach(function () {
-      audit = new can.Map({
+      audit = new CanMap({
         id: 1,
       });
 
       Assessment.cache = [
-        new can.Map({
+        new CanMap({
           audit: audit,
         }),
       ];

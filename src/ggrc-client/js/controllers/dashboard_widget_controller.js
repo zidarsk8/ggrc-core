@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import canControl from 'can-control';
 import {getDashboards} from '../plugins/utils/dashboards-utils';
 import {
@@ -22,7 +23,7 @@ export default canControl.extend({
     let dashboards = getDashboards(options.instance);
     let $element = $(this.element);
 
-    options.context = new can.Map({
+    options.context = new CanMap({
       model: options.model,
       instance: options.instance,
       dashboards: dashboards,

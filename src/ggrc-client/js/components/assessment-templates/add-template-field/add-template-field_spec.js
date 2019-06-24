@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import Component, * as Validations from './add-template-field';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -18,7 +19,7 @@ describe('add-template-field component', () => {
 
     it('does not require the "values" field to add a field of type Map:Person',
       () => {
-        let selectedObj = new can.Map({
+        let selectedObj = new CanMap({
           title: 'External Reviewer',
           type: 'Map:Person',
           values: '',
@@ -29,7 +30,7 @@ describe('add-template-field component', () => {
       }
     );
     it('requires the "values" field to add a field of type Dropdown', () => {
-      let selectedObj = new can.Map({
+      let selectedObj = new CanMap({
         title: 'External Reviewer',
         type: 'Dropdown',
         values: 'value0 value1',
@@ -39,7 +40,7 @@ describe('add-template-field component', () => {
       expect(viewModel.fields.length).toBe(1);
     });
     it('requires the "values" field to add a field of type Dropdown', () => {
-      let selectedObj = new can.Map({
+      let selectedObj = new CanMap({
         title: 'External Reviewer',
         type: 'Dropdown',
         values: '',
@@ -49,7 +50,7 @@ describe('add-template-field component', () => {
       expect(viewModel.fields.length).toBe(0);
     });
     it('requires the "values" field to add a field of type Text', () => {
-      let selectedObj = new can.Map({
+      let selectedObj = new CanMap({
         title: 'External Reviewer',
         type: 'Text',
         values: '',

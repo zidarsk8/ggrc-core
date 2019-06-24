@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 /**
  * State object to present possible icons for validation
@@ -23,7 +24,7 @@ export default CanComponent.extend({
     '<i class="fa form-validation-icon__body {{iconCls}}"></i>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: CanMap.extend({
     define: {
       validation: {},
       iconCls: {

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
@@ -405,7 +406,7 @@ describe('AdvancedSearch', () => {
 
   describe('setDefaultStatusConfig() function', () => {
     let statesSpy;
-    const emptyStatusConfig = new can.Map(AdvancedSearch.create.state());
+    const emptyStatusConfig = new CanMap(AdvancedSearch.create.state());
     const createDummyStatusConfig = () => (
       AdvancedSearch.setDefaultStatusConfig(emptyStatusConfig, 'someModel')
     );

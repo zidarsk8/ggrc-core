@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
@@ -20,7 +21,7 @@ const viewModel = DiffBaseVM.extend({
   },
   buildDiffObject() {
     const modifiedAttributes = this.attr('modifiedAttributes');
-    const caKeys = can.Map.keys(modifiedAttributes);
+    const caKeys = CanMap.keys(modifiedAttributes);
 
     this.prepareAttributes();
     this.attr('diff', []);

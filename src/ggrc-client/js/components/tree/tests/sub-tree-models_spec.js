@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   */
 
+import CanMap from 'can-map';
 import {viewModel, events} from '../sub-tree-models';
 import childModelsMap from '../child-models-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
@@ -250,7 +251,7 @@ describe('sub-tree-models component', function () {
     let viewModel;
 
     beforeEach(function () {
-      viewModel = new can.Map();
+      viewModel = new CanMap();
       handler = events['.sub-tree-models mouseleave'].bind({
         viewModel: viewModel,
       });

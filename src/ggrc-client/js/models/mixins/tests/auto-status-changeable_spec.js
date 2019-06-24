@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import CanMap from 'can-map';
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import autoStatusChangeable from '../auto-status-changeable';
 
@@ -20,7 +21,7 @@ describe('autoStatusChangeable mixin', function () {
     let method;
 
     beforeEach(function () {
-      instance = new can.Map({
+      instance = new CanMap({
         type: 'MyModel',
         status: 'Not Started',
       });

@@ -2,7 +2,8 @@
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-// Disabling some minor eslint rules until major refactoring
+
+import CanMap from 'can-map';// Disabling some minor eslint rules until major refactoring
 /* eslint-disable no-console, id-length */
 
 import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
@@ -256,7 +257,7 @@ export default can.Model.extend({
       return new this.List();
     }
     ms = this._super(params);
-    if (params instanceof can.Map || params instanceof can.List) {
+    if (params instanceof CanMap || params instanceof can.List) {
       params.replace(ms);
       return params;
     }
