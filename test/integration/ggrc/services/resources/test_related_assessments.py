@@ -8,6 +8,7 @@ There are other tests for verifying completeness of the results and that focus
 more on verifying the related SQL query.
 """
 
+import json
 import mock
 import ddt
 
@@ -16,6 +17,7 @@ from ggrc import views
 from ggrc import models
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
+from integration.ggrc_basic_permissions.models.factories import UserRoleFactory
 
 
 @ddt.ddt
@@ -55,6 +57,23 @@ class TestRelatedAssessments(TestCase):
     kwargs["object_type"] = obj.type
     kwargs["object_id"] = obj.id
     return self.client.get(self.URL_BASE, query_string=kwargs)
+
+  def test_creator_read_access(self):
+    """Test related assessments visible for Creator"""
+    creator_role = models.all_models.Role.query.filter(
+        models.all_models.Role.name == "Creator").first()
+    creator = factories.PersonFactory(name="creator",
+                                      email="creator@example.com")
+    UserRoleFactory(person=creator, role=creator_role)
+    headers = {
+        "X-ggrc-user": json.dumps({
+            "name": creator.name, "email": creator.email
+        })
+    }
+    self.client.get("/login", headers=headers)
+    db.session.add(self.control)
+    response = self._get_related_assessments(self.control)
+    self.assert200(response)
 
   @ddt.data("2018-06-06 16:38:17", None)
   def test_verified_status(self, verified_date):
