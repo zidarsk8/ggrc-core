@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import {
   initWidgets,
 } from '../../plugins/utils/widgets-utils';
@@ -44,7 +45,7 @@ gapiClient.loadGapiClient();
 const adminListDescriptors = {
   people: {
     model: Person,
-    roles: new can.List(),
+    roles: new canList(),
     init: function () {
       let self = this;
       Role

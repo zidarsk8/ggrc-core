@@ -3,9 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import canControl from 'can-control';
 const originalControlSetup = canControl.setup;
-const originListReplace = can.List.prototype.replace;
+const originListReplace = canList.prototype.replace;
 const defaultValidator = can.validate.validator();
 const originalOnce = defaultValidator.once;
 
@@ -42,7 +43,7 @@ canControl.setup = function () {
   originalControlSetup.apply(this, arguments);
 };
 
-can.List.prototype.replace = function (items) {
+canList.prototype.replace = function (items) {
   if (!items || !items.then || !_.isFunction(items.then)) {
     originListReplace.call(this, items);
     return;
@@ -62,7 +63,7 @@ defaultValidator.once = function (value, options, name) {
   return originalOnce.apply(this, arguments);
 };
 
-can.List.prototype.sort = function (predicate) {
+canList.prototype.sort = function (predicate) {
   const array = _.map(this, (item) => item);
   this.replace(array.sort(predicate));
   return this;

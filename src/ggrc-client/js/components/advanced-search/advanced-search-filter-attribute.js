@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
@@ -24,11 +25,11 @@ let viewModel = CanMap.extend({
     /**
      * Contains available attributes for specific model.
      * Initializes component with first attribute in the list.
-     * @type {can.List}
+     * @type {canList}
      */
     availableAttributes: {
       type: '*',
-      Value: can.List,
+      Value: canList,
       set: function (attributes) {
         let attribute = this.attr('attribute');
         if (attributes.length &&

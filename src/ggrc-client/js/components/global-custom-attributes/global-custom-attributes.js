@@ -45,7 +45,7 @@ export default CanComponent.extend({
     instance: null,
     /**
      * Contains custom attributes.
-     * @type {can.List}
+     * @type {canList}
      */
     items: [],
     isReadOnlyForInstance(instance) {

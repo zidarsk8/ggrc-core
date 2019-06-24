@@ -3,11 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import allModels from '../../models/all-models';
 
 function reify(obj) {
-  if (obj instanceof can.List) {
+  if (obj instanceof canList) {
     return reifyList(obj);
   }
 
@@ -36,7 +37,7 @@ function reifyMap(obj) {
 }
 
 function reifyList(obj) {
-  return new can.List(_.map(obj, function (item) {
+  return new canList(_.map(obj, function (item) {
     return reifyMap(item);
   }));
 }

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './people-list.stache';
@@ -114,7 +115,7 @@ export default CanComponent.extend({
       const peopleListAttr = this.attr('peopleListAttr');
       const peopleIds = this.attr(`instance.${peopleListAttr}`);
 
-      if (peopleIds instanceof can.List) {
+      if (peopleIds instanceof canList) {
         this.attr('peopleList', peopleIds);
         this.attr('selectedValue', OtherOption);
       } else {

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import canControl from 'can-control';
 import './infinite-scroll-controller';
@@ -686,8 +687,8 @@ const LhnSearchControl = canControl.extend({
       let modelName;
       $list = $($list);
       modelName = self.get_list_model($list);
-      self.options.results_lists[modelName] = new can.List();
-      self.options.visible_lists[modelName] = new can.List();
+      self.options.results_lists[modelName] = new canList();
+      self.options.visible_lists[modelName] = new canList();
       self.options.visible_lists[modelName].attr('is_loading', true);
     });
   },

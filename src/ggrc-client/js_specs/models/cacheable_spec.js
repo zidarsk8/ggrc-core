@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import Cacheable from '../../js/models/cacheable';
 import {
@@ -173,7 +174,7 @@ describe('Cacheable model', () => {
       }));
       DummyModel.findAll().then(function (data) {
         expect($.ajax).toHaveBeenCalled();
-        expect(data).toEqual(jasmine.any(can.List));
+        expect(data).toEqual(jasmine.any(canList));
         expect(data.length).toBe(1);
         expect(data[0]).toEqual(jasmine.any(DummyModel));
         expect(data[0]).toEqual(jasmine.objectContaining({id: 1}));
@@ -186,7 +187,7 @@ describe('Cacheable model', () => {
       ajaxSpy.and.returnValue($.when({id: 1}));
       DummyModel.findAll().then(function (data) {
         expect($.ajax).toHaveBeenCalled();
-        expect(data).toEqual(jasmine.any(can.List));
+        expect(data).toEqual(jasmine.any(canList));
         expect(data.length).toBe(1);
         expect(data[0]).toEqual(jasmine.any(DummyModel));
         expect(data[0]).toEqual(jasmine.objectContaining({id: 1}));
@@ -323,7 +324,7 @@ describe('Cacheable model', () => {
 
     describe('when count of arguments is 0', () => {
       it('returns all custom attriubtes', () => {
-        const customAttrs = new can.List([]);
+        const customAttrs = new canList([]);
         let result;
         spyOn(instance, '_getAllCustomAttr').and.returnValue(customAttrs);
         result = instance.customAttr();

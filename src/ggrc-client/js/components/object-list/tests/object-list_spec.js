@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../object-list';
@@ -37,7 +38,7 @@ describe('object-list component', function () {
       isSelected: false,
     });
 
-    let items = new can.List([
+    let items = new canList([
       scope, {
         instance: {
           type: 'b',
@@ -74,7 +75,7 @@ describe('object-list component', function () {
         },
         isSelected: false,
       });
-      items = new can.List([scope, {
+      items = new canList([scope, {
         instance: {
           type: 'b',
           id: 1,

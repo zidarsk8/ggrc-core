@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 let customAttributesType = {
   Text: 'input',
@@ -247,11 +248,11 @@ function convertToCaValue(type, value) {
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
  * Converts CA values array to form fields.
- * @param {can.List|undefined} customAttributeValues - Custom attributes values
+ * @param {canList|undefined} customAttributeValues - Custom attributes values
  * @return {Array} From fields array
  */
 function convertValuesToFormFields(customAttributeValues) {
-  return (customAttributeValues || new can.List([]))
+  return (customAttributeValues || new canList([]))
     .map(convertToEditableField);
 }
 

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import {tryResolveConflictValues} from '../conflict-resolution';
 import * as conflictResolvers from '../conflict-resolvers';
 
@@ -31,7 +32,7 @@ describe('cacheable conflict resolution', () => {
       };
 
       let hasConflict =
-        tryResolveConflictValues(baseAttrs, [], [], new can.List());
+        tryResolveConflictValues(baseAttrs, [], [], new canList());
 
       expect(hasConflict).toBeFalsy();
       expect(conflictResolvers.simpleFieldResolver).not.toHaveBeenCalled();
@@ -44,7 +45,7 @@ describe('cacheable conflict resolution', () => {
       };
 
       let hasConflict =
-        tryResolveConflictValues(baseAttrs, [], [], new can.List());
+        tryResolveConflictValues(baseAttrs, [], [], new canList());
 
       expect(hasConflict).toBeFalsy();
       expect(conflictResolvers.simpleFieldResolver).toHaveBeenCalled();
@@ -58,7 +59,7 @@ describe('cacheable conflict resolution', () => {
       conflictResolvers.simpleFieldResolver.and.returnValue(true);
 
       let hasConflict =
-        tryResolveConflictValues(baseAttrs, [], [], new can.List());
+        tryResolveConflictValues(baseAttrs, [], [], new canList());
 
       expect(hasConflict).toBe(true);
     });

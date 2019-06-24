@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import * as LocalStorage from './local-storage-utils';
 
@@ -109,7 +110,7 @@ function getObject(...args) {
 function getTreeViewHeaders(modelName) {
   let value = getObject(pageToken, TREE_VIEW_HEADERS);
   if (!value.attr(modelName)) {
-    return new can.List();
+    return new canList();
   }
   return value.attr(modelName).attr('display_list');
 }
@@ -135,7 +136,7 @@ function setTreeViewHeaders(modelName, headers) {
 function getTreeViewStates(modelName) {
   let value = getObject(TREE_VIEW_STATES);
   if (!value.attr(modelName)) {
-    return new can.List();
+    return new canList();
   }
   return value.attr(modelName).attr('status_list');
 }

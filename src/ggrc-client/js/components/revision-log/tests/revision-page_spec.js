@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-page';
@@ -104,7 +105,7 @@ describe('revision-page component', function () {
   describe('_computeObjectChanges() method', function () {
     it('computes an empty list on empty Revision history', function () {
       let result;
-      let revisions = new can.List();
+      let revisions = new canList();
 
       spyOn(viewModel, '_objectChangeDiff');
       result = viewModel._computeObjectChanges(revisions, []);
@@ -455,7 +456,7 @@ describe('revision-page component', function () {
 
     it('creates a list of mapping changes from a Revision list', function () {
       let result;
-      let revisions = new can.List([
+      let revisions = new canList([
         {id: 10, madeBy: 'John'},
         {id: 20, madeBy: 'Doe'},
       ]);

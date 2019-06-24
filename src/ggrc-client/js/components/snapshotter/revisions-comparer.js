@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
@@ -134,7 +135,7 @@ export default CanComponent.extend({
         if (isNeedReverse) {
           revisions = _.reverse(revisions);
         }
-        return new can.List(revisions);
+        return new canList(revisions);
       });
     },
     prepareInstances: function (data) {
@@ -210,7 +211,7 @@ export default CanComponent.extend({
     /**
      * Highlight difference
      * @param {Object} $target - jQuery object
-     * @param {can.List} revisions - revisions for comparing
+     * @param {canList} revisions - revisions for comparing
      */
     highlightDifference: _.debounce(function ($target, revisions) {
       this.highlightAttributes($target);
@@ -310,7 +311,7 @@ export default CanComponent.extend({
      *
      * @param {jQuery} $target - the root DOM element containing the
      *   revision diff comparison
-     * @param {can.List} revisions - revisions for comparing
+     * @param {canList} revisions - revisions for comparing
      */
     highlightAttachments($target, revisions) {
       if (!isEqual(
@@ -333,8 +334,8 @@ export default CanComponent.extend({
 
       /**
        * Checks if two lists are equal.
-       * @param {can.List} left - First list to compare
-       * @param {can.List} right - Second list to compare
+       * @param {canList} left - First list to compare
+       * @param {canList} right - Second list to compare
        *
        * @return {Boolean} - Returns true if lists are equal
        */
@@ -364,7 +365,7 @@ export default CanComponent.extend({
      *
      * @param {jQuery} $target - the root DOM element containing the
      *   revision diff comparison
-     * @param {can.List} revisions - revisions for comparing
+     * @param {canList} revisions - revisions for comparing
      */
     highlightCustomAttributes($target, revisions) {
       let that = this;
@@ -380,7 +381,7 @@ export default CanComponent.extend({
       /**
        * Prepares instance's custom attributes
        * @param {Object} revision - revision
-       * @return {can.List} custom attributes list
+       * @return {canList} custom attributes list
        */
       function getCAs(revision) {
         let instance = revision.instance;
@@ -393,8 +394,8 @@ export default CanComponent.extend({
        * Compares two lists of custom attributes
        * @param {Object} $ca0s - list of jQuery objects for custom attributes
        * @param {Object} $ca1s - list of jQuery objects for custom attributes
-       * @param {can.List} ca0s - list of custom attributes (should be sorted by id)
-       * @param {can.List} ca1s - list of custom attributes (should be sorted by id)
+       * @param {canList} ca0s - list of custom attributes (should be sorted by id)
+       * @param {canList} ca1s - list of custom attributes (should be sorted by id)
        */
       function compareCAs($ca0s, $ca1s, ca0s, ca1s) {
         let i = 0;

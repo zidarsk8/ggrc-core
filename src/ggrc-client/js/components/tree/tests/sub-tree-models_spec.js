@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
   */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import {viewModel, events} from '../sub-tree-models';
 import childModelsMap from '../child-models-map';
@@ -35,7 +36,7 @@ describe('sub-tree-models component', function () {
         {name: 'Objective', display: false},
         {name: 'Market', display: false},
       ];
-      vm.attr('modelsList', new can.List(modelsList));
+      vm.attr('modelsList', new canList(modelsList));
     });
     it('updates values of modelsList', function () {
       selectedModels = ['Audit', 'Market'];
@@ -77,7 +78,7 @@ describe('sub-tree-models component', function () {
   describe('get() of displayModelsList', function () {
     it('splits widgetNames', function () {
       let result;
-      vm.attr('modelsList', new can.List([
+      vm.attr('modelsList', new canList([
         {widgetName: 'Child Programs'},
         {widgetName: 'MockName'},
         {widgetName: 'Singlelinename'},
@@ -92,7 +93,7 @@ describe('sub-tree-models component', function () {
 
     it('sorts model names', function () {
       let result;
-      vm.attr('modelsList', new can.List([
+      vm.attr('modelsList', new canList([
         {widgetName: 'Metrics'},
         {widgetName: 'Control'},
         {widgetName: 'Risk'},
@@ -193,7 +194,7 @@ describe('sub-tree-models component', function () {
 
   describe('getSelectedModels() method', function () {
     beforeEach(function () {
-      const modelsList = new can.List([
+      const modelsList = new canList([
         {name: 'Audit', display: true},
         {name: 'Control', display: true},
         {name: 'Objective', display: false},
@@ -213,7 +214,7 @@ describe('sub-tree-models component', function () {
     let event;
 
     beforeEach(function () {
-      modelsList = new can.List([
+      modelsList = new canList([
         {name: 'Audit', display: true},
         {name: 'Control', display: true},
         {name: 'Objective', display: false},

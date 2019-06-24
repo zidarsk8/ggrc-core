@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 /**
  * A component that unifies pagination API
@@ -53,7 +54,7 @@ export default CanMap.extend({
      * Array with 2 values: first and last element indexes for current page
      */
     limits: {
-      type: can.List,
+      type: canList,
       get: function () {
         let first = 0;
         let last = 0;

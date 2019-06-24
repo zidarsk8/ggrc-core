@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import Component from '../deferred-mapper';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
@@ -46,7 +47,7 @@ describe('deferred-mapper component', function () {
     let objects;
 
     beforeEach(() => {
-      objects = new can.List([1, 2, 3]);
+      objects = new canList([1, 2, 3]);
       spyOn(vm, 'addMappings');
       spyOn(vm, 'updateListWith');
     });
@@ -87,7 +88,7 @@ describe('deferred-mapper component', function () {
     let objects;
 
     beforeEach(() => {
-      objects = new can.List([1, 2, 3]);
+      objects = new canList([1, 2, 3]);
       spyOn(vm, 'updateListWith');
     });
 

@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
@@ -336,8 +337,8 @@ describe('mapper-results component', function () {
       key: 'mock3',
       direction: 'mock4',
     };
-    let mockFilterItems = new can.List(['filterItem']);
-    let mockMappingItems = new can.List(['mappingItem']);
+    let mockFilterItems = new canList(['filterItem']);
+    let mockMappingItems = new canList(['mappingItem']);
     let mockStatusItem = new CanMap({
       value: {
         items: ['statusItem'],

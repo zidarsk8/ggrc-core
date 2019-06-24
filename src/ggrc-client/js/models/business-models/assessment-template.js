@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import Cacheable from '../cacheable';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
@@ -115,7 +116,7 @@ export default Cacheable.extend({
     }
 
     if (!this.custom_attribute_definitions) {
-      this.attr('custom_attribute_definitions', new can.List());
+      this.attr('custom_attribute_definitions', new canList());
     }
   },
 });

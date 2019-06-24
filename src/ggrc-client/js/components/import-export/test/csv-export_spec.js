@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import Component from '../csv-export';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -42,9 +43,9 @@ describe('csv-export component', () => {
       it('returns object with empty expression if filters are empty', () => {
         const panelModel = new CanMap({
           type: 'Program',
-          attributes: new can.List(),
-          localAttributes: new can.List(),
-          mappings: new can.List(),
+          attributes: new canList(),
+          localAttributes: new canList(),
+          mappings: new canList(),
         });
         const expectedObjects = [{
           object_name: 'Program',
@@ -59,9 +60,9 @@ describe('csv-export component', () => {
       it('returns object with simple expression if there is one filter', () => {
         const panelModel = new CanMap({
           type: 'Program',
-          attributes: new can.List(),
-          localAttributes: new can.List(),
-          mappings: new can.List(),
+          attributes: new canList(),
+          localAttributes: new canList(),
+          mappings: new canList(),
           relevant: [{
             filter: {id: 2},
             model_name: 'Program',
@@ -87,9 +88,9 @@ describe('csv-export component', () => {
         'if the second filter has OR operator', () => {
         const panelModel = new CanMap({
           type: 'Program',
-          attributes: new can.List(),
-          localAttributes: new can.List(),
-          mappings: new can.List(),
+          attributes: new canList(),
+          localAttributes: new canList(),
+          mappings: new canList(),
           relevant: [{
             filter: {id: 2},
             model_name: 'Program',
@@ -130,9 +131,9 @@ describe('csv-export component', () => {
         const panelModel = new CanMap({
           type: 'Snapshot',
           snapshot_type: 'Control',
-          attributes: new can.List(),
-          localAttributes: new can.List(),
-          mappings: new can.List(),
+          attributes: new canList(),
+          localAttributes: new canList(),
+          mappings: new canList(),
         });
         const expectedObjects = [{
           object_name: 'Snapshot',
@@ -154,9 +155,9 @@ describe('csv-export component', () => {
         const panelModel = new CanMap({
           type: 'Snapshot',
           snapshot_type: 'Contract',
-          attributes: new can.List(),
-          localAttributes: new can.List(),
-          mappings: new can.List(),
+          attributes: new canList(),
+          localAttributes: new canList(),
+          mappings: new canList(),
           relevant: [{
             filter: {id: 2},
             model_name: 'Program',

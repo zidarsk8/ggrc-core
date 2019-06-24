@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {sortByName} from '../../plugins/utils/label-utils';
@@ -25,7 +26,7 @@ export default CanComponent.extend({
           if (value) {
             this.attr('editMode', true);
             this.attr('labelsBackup',
-              new can.List(this.attr('instance.labels')));
+              new canList(this.attr('instance.labels')));
           }
           return value;
         },
@@ -33,7 +34,7 @@ export default CanComponent.extend({
       labels: {
         value: [],
         set: function (value) {
-          return new can.List(value);
+          return new canList(value);
         },
       },
       _labels: {

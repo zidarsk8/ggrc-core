@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import * as caUtils from '../../../plugins/utils/ca-utils';
 import Component from '../revisions-comparer';
@@ -62,7 +63,7 @@ describe('revisions-comparer component', function () {
       let result;
 
       fakeData.forEach(function (item, i) {
-        let acl = new can.List([
+        let acl = new canList([
           {ac_role_id: i * 10, person_id: i * 10},
           {ac_role_id: i * 10, person_id: i * 10},
         ]);

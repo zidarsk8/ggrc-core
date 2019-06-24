@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import './tree-header-selector';
@@ -488,11 +489,11 @@ let viewModel = CanMap.extend({
   advancedSearch: {
     open: false,
     filter: null,
-    request: can.List(),
-    filterItems: can.List(),
-    appliedFilterItems: can.List(),
-    mappingItems: can.List(),
-    appliedMappingItems: can.List(),
+    request: canList(),
+    filterItems: canList(),
+    appliedFilterItems: canList(),
+    mappingItems: canList(),
+    appliedMappingItems: canList(),
   },
   openAdvancedFilter: function () {
     this.attr('advancedSearch.filterItems',
@@ -506,7 +507,7 @@ let viewModel = CanMap.extend({
   applyAdvancedFilters: function () {
     let filters = this.attr('advancedSearch.filterItems').attr();
     let mappings = this.attr('advancedSearch.mappingItems').attr();
-    let request = can.List();
+    let request = canList();
     let advancedFilters;
 
     this.attr('advancedSearch.appliedFilterItems', filters);
@@ -524,16 +525,16 @@ let viewModel = CanMap.extend({
     this.onFilter();
   },
   removeAdvancedFilters: function () {
-    this.attr('advancedSearch.appliedFilterItems', can.List());
-    this.attr('advancedSearch.appliedMappingItems', can.List());
-    this.attr('advancedSearch.request', can.List());
+    this.attr('advancedSearch.appliedFilterItems', canList());
+    this.attr('advancedSearch.appliedMappingItems', canList());
+    this.attr('advancedSearch.request', canList());
     this.attr('advancedSearch.filter', null);
     this.attr('advancedSearch.open', false);
     this.onFilter();
   },
   resetAdvancedFilters: function () {
-    this.attr('advancedSearch.filterItems', can.List());
-    this.attr('advancedSearch.mappingItems', can.List());
+    this.attr('advancedSearch.filterItems', canList());
+    this.attr('advancedSearch.mappingItems', canList());
   },
   closeInfoPane: function () {
     $('.pin-content')

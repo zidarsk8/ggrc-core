@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import {
   isSnapshot,
@@ -399,7 +400,7 @@ function loadFirstTierItems(modelName,
     operation,
   );
   let requestedType;
-  let requestData = request.slice() || can.List();
+  let requestData = request.slice() || canList();
 
   if (transformToSnapshot ||
     (isSnapshotScope(parent) && isSnapshotModel(modelName))) {
@@ -720,7 +721,7 @@ function startExport(
     params = transformQuery(params);
   }
 
-  let requestData = request.slice() || can.List();
+  let requestData = request.slice() || canList();
   requestData.push(params);
 
   runExport({

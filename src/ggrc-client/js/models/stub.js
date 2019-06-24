@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 let Stub = CanMap.extend({
   setup(model) {
@@ -19,7 +20,7 @@ let Stub = CanMap.extend({
   },
 });
 
-Stub.List = can.List.extend({
+Stub.List = canList.extend({
   Map: Stub,
 }, {
   setup(models=[]) {

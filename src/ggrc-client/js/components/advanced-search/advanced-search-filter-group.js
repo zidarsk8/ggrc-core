@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanComponent from 'can-component';
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
@@ -16,9 +17,9 @@ import template from './advanced-search-filter-group.stache';
 let viewModel = AdvancedSearchContainer.extend({
   /**
    * Contains available attributes for specific model.
-   * @type {can.List}
+   * @type {canList}
    */
-  availableAttributes: can.List(),
+  availableAttributes: canList(),
   /**
    * Adds Filter Operator and Filter Attribute to the collection.
    */

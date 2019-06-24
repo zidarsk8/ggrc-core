@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import Component from '../assessment-info-pane';
 import {getComponentVM, makeFakeInstance} from '../../../../../js_specs/spec_helpers';
@@ -681,7 +682,7 @@ describe('assessment-info-pane component', () => {
   describe('removeItems() method', () => {
     const itemsType = 'comments';
 
-    let items = new can.List([...Array(3).keys()]).map((item, index) => {
+    let items = new canList([...Array(3).keys()]).map((item, index) => {
       return {
         id: index,
         type: itemsType,
@@ -735,7 +736,7 @@ describe('assessment-info-pane component', () => {
       const beforeInvoke = vm.attr(type).serialize();
       const expectedResult = event.items.concat(beforeInvoke);
 
-      event.items = new can.List(event.items);
+      event.items = new canList(event.items);
       vm.addItems(event, type);
 
       expect(vm
@@ -977,7 +978,7 @@ describe('assessment-info-pane component', () => {
       const countOfItems = 3;
       dfd = $.Deferred();
       type = 'type';
-      items = new can.List(
+      items = new canList(
         Array(...Array(countOfItems).keys())
       ).map((item, index) => {
         return {
@@ -1466,7 +1467,7 @@ describe('assessment-info-pane component', () => {
     });
 
     it('sets global custom attributes', function () {
-      const expectedResult = new can.List([]);
+      const expectedResult = new canList([]);
       const customAttr = vm.attr('instance').customAttr;
       customAttr.and.returnValue(expectedResult);
 
@@ -2135,7 +2136,7 @@ describe('assessment-info-pane component', () => {
         {id: 3, value: 'text_val #3'},
       ];
 
-      let updatedFormFields = new can.List([
+      let updatedFormFields = new canList([
         {id: 1, value: 'text_val #1'},
         {id: 2, value: 'text_val #_2'},
         {id: 3, value: 'text_val #3'},
@@ -2161,7 +2162,7 @@ describe('assessment-info-pane component', () => {
         {id: 3, value: 'text_val #3'},
       ];
 
-      let updatedFormFields = new can.List([
+      let updatedFormFields = new canList([
         {id: 11, value: 'text_val #11'},
         {id: 2, value: 'text_val #_2'},
         {id: 33, value: 'text_val #33'},
@@ -2190,7 +2191,7 @@ describe('assessment-info-pane component', () => {
         {id: 3, value: 'text_val #3'},
       ];
 
-      let updatedFormFields = new can.List([
+      let updatedFormFields = new canList([
         {id: 1, value: 'text_val #1'},
         {id: 2, value: 'text_val #22'},
         {id: 3, value: 'text_val #3'},

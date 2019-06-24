@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import {
   getComponentVM,
   makeFakeInstance,
@@ -68,7 +69,7 @@ describe('people-list component', function () {
     it('builds an IDs array from the peopleList', function () {
       const peopleList = [5, 7, 12];
       viewModel.attr('instance.default_people', {
-        [defaultPeopleType]: new can.List(peopleList),
+        [defaultPeopleType]: new canList(peopleList),
       });
 
       viewModel.attr('peopleList', []);
@@ -82,7 +83,7 @@ describe('people-list component', function () {
     it(`sets the selectedValue to "other"
       when there is type of default people`, function () {
       viewModel.attr('instance.default_people', {
-        [defaultPeopleType]: new can.List([5, 7, 12]),
+        [defaultPeopleType]: new canList([5, 7, 12]),
       });
 
       viewModel.unpackPeopleData();
@@ -91,7 +92,7 @@ describe('people-list component', function () {
     });
 
     it(`clears the peopleList IDs array when type of default people
-      not instanceof can.List`, function () {
+      not instanceof canList`, function () {
       viewModel.attr('peopleList', [42, 2, 3]);
       viewModel.attr('instance.default_people', {
         [defaultPeopleType]: 'Some User Group',
@@ -201,7 +202,7 @@ describe('people-list component', function () {
   });
 
   describe('peopleValues() setter', function () {
-    const peopleValues = new can.List([
+    const peopleValues = new canList([
       {value: 'Auditors', title: 'Auditors'},
       {value: 'Secondary Assignees', title: 'Secondary Assignees'},
       {value: 'Control Operators', title: 'Control Operators'},

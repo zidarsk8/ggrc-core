@@ -3,6 +3,7 @@ Copyright (C) 2019 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CustomAttributeAccess from '../custom-attribute-access';
 import CustomAttributeObject from '../custom-attribute-object';
@@ -134,7 +135,7 @@ describe('CustomAttributeAccess module', () => {
           });
         });
 
-        it('returns an empty can.List if there are no custom attribute objects',
+        it('returns an empty canList if there are no custom attribute objects',
           function () {
             const options = {type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL};
             const result = caAccess.read(options);
@@ -301,7 +302,7 @@ describe('CustomAttributeAccess module', () => {
     let caObjects;
 
     beforeEach(function () {
-      caObjects = new can.List();
+      caObjects = new canList();
     });
 
     describe('for each caObject', () => {
@@ -516,7 +517,7 @@ describe('CustomAttributeAccess module', () => {
         expect(caValue.attribute_value).toBe(value);
       });
 
-      it('when a can.List instance was passed', function () {
+      it('when a canList instance was passed', function () {
         const caId = 2;
         const value = 234;
         caValues.push({
@@ -525,7 +526,7 @@ describe('CustomAttributeAccess module', () => {
         });
         const caValue = caAccess._findCaValueByCaId(
           caId,
-          new can.List(caValues)
+          new canList(caValues)
         );
         expect(caValue.attr('attribute_value')).toBe(value);
       });

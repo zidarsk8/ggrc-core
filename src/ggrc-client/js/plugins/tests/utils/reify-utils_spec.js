@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import * as ReifyUtils from '../../utils/reify-utils';
 import Audit from '../../../models/business-models/audit';
@@ -17,10 +18,10 @@ describe('reify-utils', () => {
       expect(model).toBe(obj);
     });
 
-    it(`should return can.List with instances of required model
-      when passed object is can.List`, () => {
-      const objs = new can.List([]);
-      const audits = new can.List([]);
+    it(`should return canList with instances of required model
+      when passed object is canList`, () => {
+      const objs = new canList([]);
+      const audits = new canList([]);
 
       for (let i = 0; i < 3; i++) {
         objs.push(new CanMap({type: 'Audit', id: i}));
@@ -85,9 +86,9 @@ describe('reify-utils', () => {
   });
 
   describe('reifyList() method', () => {
-    it('should return instance can.List with models', () => {
-      const objs = new can.List([]);
-      const audits = new can.List([]);
+    it('should return instance canList with models', () => {
+      const objs = new canList([]);
+      const audits = new canList([]);
 
       for (let i = 0; i < 3; i++) {
         objs.push(new CanMap({type: 'Audit', id: i}));

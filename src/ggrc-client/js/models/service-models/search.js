@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 export default can.Model.extend({
   ajax: $.ajax,
   root_object: 'search',
@@ -63,7 +64,7 @@ export default can.Model.extend({
     let entries;
 
     if (!(this.entries instanceof Array ||
-      this.entries instanceof can.List)) {
+      this.entries instanceof canList)) {
       entries = this.entries[modelName] || [];
     } else {
       entries = _.filteredMap(this.entries, (v) => {

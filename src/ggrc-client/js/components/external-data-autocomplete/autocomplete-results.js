@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import '../spinner-component/spinner-component';
@@ -23,10 +24,10 @@ export default CanComponent.extend({
        * - title {String} - The property containing title of element.
        * - info {String} - The property containing additional info.
        * - value {Object} - The object that should be passed when user picks corresponding element.
-       * @type {can.List}
+       * @type {canList}
        */
       results: {
-        Value: can.List,
+        Value: canList,
         get() {
           let values = this.attr('values');
           let titleFieldPath = this.attr('titleFieldPath');
@@ -62,7 +63,7 @@ export default CanComponent.extend({
 
     /**
      * The list of results which should be displayed.
-     * @type {can.List}
+     * @type {canList}
      */
     values: [],
     /**

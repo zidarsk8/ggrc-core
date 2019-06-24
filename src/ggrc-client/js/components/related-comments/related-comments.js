@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import CanComponent from 'can-component';
 import {
@@ -26,7 +27,7 @@ export default CanComponent.extend({
         value: 'None',
       },
       mappedItems: {
-        Value: can.List,
+        Value: canList,
       },
       requireLimit: {
         get: function () {
@@ -34,7 +35,7 @@ export default CanComponent.extend({
         },
       },
       showItems: {
-        type: can.List,
+        type: canList,
         get: function () {
           return this.attr('showAll') ?
             this.attr('mappedItems') :

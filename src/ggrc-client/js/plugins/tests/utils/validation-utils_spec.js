@@ -4,7 +4,7 @@
  */
 
 import CanMap from 'can-map/can-map';
-import CanList from 'can-list/can-list';
+import canList from 'can-list/can-list';
 import CanModel from 'can-model/src/can-model';
 
 import {isValidAttr, validateAttr} from '../../utils/validation-utils';
@@ -40,7 +40,7 @@ describe('validation utils', () => {
     it('should return error message for simple attrubute',
       () => {
         const errors = new CanMap({
-          title: new CanList([
+          title: new canList([
             'cannot be blank',
             'missed componed id',
           ]),
@@ -55,7 +55,7 @@ describe('validation utils', () => {
     it('should return error message. issue_tracker has title error',
       () => {
         const errors = new CanMap({
-          issue_tracker: new CanList([
+          issue_tracker: new canList([
             'something wrong',
             {title: 'cannot be blank'},
           ]),
@@ -70,7 +70,7 @@ describe('validation utils', () => {
     it('should return error message. issue_tracker has title errors',
       () => {
         const errors = new CanMap({
-          issue_tracker: new CanList([
+          issue_tracker: new canList([
             'something wrong',
             {title: 'cannot be blank'},
             {title: 'max length is 100500'},
@@ -114,7 +114,7 @@ describe('validation utils', () => {
     it('should return FALSE. simple attr is not valid',
       () => {
         const errors = new CanMap({
-          title: new CanList([
+          title: new canList([
             'cannot be blank',
             'missed componed id',
           ]),
@@ -129,7 +129,7 @@ describe('validation utils', () => {
     it('should return FALSE. issue_tracker has title error',
       () => {
         const errors = new CanMap({
-          issue_tracker: new CanList([
+          issue_tracker: new canList([
             'something wrong',
             {title: 'cannot be blank'},
           ]),
@@ -144,7 +144,7 @@ describe('validation utils', () => {
     it('should return FALSE. issue_tracker has title errors',
       () => {
         const errors = new CanMap({
-          issue_tracker: new CanList([
+          issue_tracker: new canList([
             'something wrong',
             {title: 'cannot be blank'},
             {title: 'max length is 100500'},

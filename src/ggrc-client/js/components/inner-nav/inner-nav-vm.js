@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import {
   isAdmin,
@@ -43,7 +44,7 @@ export default CanMap.extend({
     this.handleDescriptors();
 
     // add default sorting for hidden widgets by title
-    let hiddenWidgets = new can.List();
+    let hiddenWidgets = new canList();
     hiddenWidgets.attr('comparator', 'title');
     this.attr('hiddenWidgets', hiddenWidgets);
 

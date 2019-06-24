@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import {
   buildParam,
@@ -178,7 +179,7 @@ function getParentUrl(instance) {
  * @return {Object} The array of objects
  */
 function toObjects(values) {
-  return new can.List(values.map(toObject));
+  return new canList(values.map(toObject));
 }
 
 /**

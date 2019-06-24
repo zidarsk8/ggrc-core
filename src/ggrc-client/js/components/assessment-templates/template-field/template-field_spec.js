@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import CanMap from 'can-map';
 import Component from './template-field';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -74,7 +75,7 @@ describe('template-field component', function () {
 
   describe('normalizeMandatory() method', function () {
     it('returns correct normalized attrs', function () {
-      let attrs = new can.List([
+      let attrs = new canList([
         {attachment: false, comment: false},
         {attachment: true, comment: false},
         {attachment: false, comment: true},
@@ -109,7 +110,7 @@ describe('template-field component', function () {
         ].join('');
 
         templateContext = new CanMap({
-          types: new can.List([
+          types: new canList([
             {
               type: 'Text',
               name: 'Text',
