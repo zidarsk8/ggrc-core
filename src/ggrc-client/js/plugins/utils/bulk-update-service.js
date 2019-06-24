@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../ajax_extensions';
+
 const toBulkModel = (instances, targetProps) => {
   let state = targetProps.state;
   return _.map(instances, (item) => {
@@ -19,7 +21,7 @@ export default {
     const dfd = $.Deferred();
     instances = toBulkModel(instances, targetProps);
 
-    $.ajax({
+    ggrcAjax({
       url: url,
       method: 'PATCH',
       data: JSON.stringify(instances),

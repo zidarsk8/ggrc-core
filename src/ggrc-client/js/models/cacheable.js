@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
 import canBatch from 'can-event/batch/batch';
 import canModel from 'can-model';
 import canList from 'can-list';
@@ -23,7 +24,7 @@ import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
 
 export default canModel.extend({
-  ajax: $.ajax,
+  ajax: ggrcAjax,
   root_object: '',
   attr_list: [
     {
@@ -419,7 +420,7 @@ export default canModel.extend({
         data: data,
       }, params);
 
-      return can.ajax(ajaxOptions).then(function (response) {
+      return ggrcAjax(ajaxOptions).then(function (response) {
         let collection = response[that.root_collection + '_collection'];
         let paginator = makePaginator(collection.paging, params, scope);
         let ret = {
@@ -614,7 +615,7 @@ export default canModel.extend({
           let stopFn = tracker.start(that.type,
             tracker.USER_JOURNEY_KEYS.API,
             tracker.USER_ACTIONS.LOAD_OBJECT);
-          can.ajax({
+          ggrcAjax({
             url: href,
             params: params,
             type: 'get',

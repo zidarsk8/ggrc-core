@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canModel from 'can-model';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -98,7 +99,7 @@ export default canControl.extend({
     }
 
     if (!this.element.find('.modal-body').length) {
-      $.ajax({
+      ggrcAjax({
         url: this.options.preload_view,
         dataType: 'text',
       }).then((view) => {
@@ -287,10 +288,10 @@ export default canControl.extend({
     }) : $.when(this.options);
 
     return $.when(
-      $.ajax({url: this.options.content_view, dataType: 'text'}),
-      $.ajax({url: this.options.header_view, dataType: 'text'}),
-      $.ajax({url: this.options.button_view, dataType: 'text'}),
-      $.ajax({url: this.options.custom_attributes_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.content_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.header_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.button_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.custom_attributes_view, dataType: 'text'}),
       dfd,
     ).then((content, header, footer, customAttributes, context) => {
       this.draw(content, header, footer, customAttributes, context);

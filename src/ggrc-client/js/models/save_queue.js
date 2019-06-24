@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
 import canConstruct from 'can-construct';
 import tracker from '../tracker';
 
@@ -43,7 +44,7 @@ export default canConstruct.extend({
       let stopFn = tracker.start(modelType,
         tracker.USER_JOURNEY_KEYS.API,
         tracker.USER_ACTIONS.CREATE_OBJECT(objs.length));
-      let dfd = $.ajax({
+      let dfd = ggrcAjax({
         type: 'POST',
         url: '/api/' + bucket.plural,
         data: body,

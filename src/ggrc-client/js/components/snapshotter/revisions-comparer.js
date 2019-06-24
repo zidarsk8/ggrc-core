@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
@@ -81,7 +82,7 @@ export default CanComponent.extend({
                 confirmSelf.attr('rightRevisionData', rightRevisionData);
               }
 
-              $.ajax({
+              ggrcAjax({
                 url: view, dataType: 'text',
               }).then((view) => {
                 let render = canStache(view);

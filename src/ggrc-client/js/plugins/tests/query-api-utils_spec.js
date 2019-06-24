@@ -3,21 +3,25 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as AjaxExtensions from '../../plugins/ajax_extensions';
 import CanMap from 'can-map';
 import * as QueryAPI from '../utils/query-api-utils';
 
 describe('QueryAPI utils', function () {
   describe('batchRequests() method', function () {
     let batchRequests = QueryAPI.batchRequests;
+    let ggrcAjax;
 
     beforeEach(function () {
-      spyOn(can, 'ajax')
+      spyOn(AjaxExtensions, 'ggrcAjax')
         .and.returnValues(
           $.Deferred().resolve([1, 2, 3, 4]), $.Deferred().resolve([1]));
+
+      ggrcAjax = AjaxExtensions.ggrcAjax;
     });
 
     afterEach(function () {
-      can.ajax.calls.reset();
+      ggrcAjax.calls.reset();
     });
 
     it('does only one ajax call for a group of consecutive calls',
@@ -26,7 +30,7 @@ describe('QueryAPI utils', function () {
           batchRequests(2),
           batchRequests(3),
           batchRequests(4)).then(function () {
-          expect(can.ajax.calls.count()).toEqual(1);
+          expect(ggrcAjax.calls.count()).toEqual(1);
           done();
         });
       });
@@ -40,7 +44,7 @@ describe('QueryAPI utils', function () {
       // Make a request with a delay
       setTimeout(function () {
         batchRequests(4).then(function () {
-          expect(can.ajax.calls.count()).toEqual(2);
+          expect(ggrcAjax.calls.count()).toEqual(2);
           done();
         });
       }, 150);
@@ -128,9 +132,11 @@ describe('QueryAPI utils', function () {
 
   describe('loadObjectsByStubs() method', () => {
     const BATCH_TIMEOUT = 100;
+    let ggrcAjax;
 
     beforeEach(() => {
-      spyOn(can, 'ajax').and.returnValue($.Deferred());
+      spyOn(AjaxExtensions, 'ggrcAjax').and.returnValue($.Deferred());
+      ggrcAjax = AjaxExtensions.ggrcAjax;
     });
 
     it('makes request with based on passed object stubs and fields ' +
@@ -174,7 +180,7 @@ describe('QueryAPI utils', function () {
 
       jasmine.clock().tick(BATCH_TIMEOUT + 1);
 
-      expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+      expect(ggrcAjax).toHaveBeenCalledWith(jasmine.objectContaining({
         data: JSON.stringify(expectedQuery),
       }));
 
@@ -212,7 +218,7 @@ describe('QueryAPI utils', function () {
         },
       });
 
-      can.ajax.and.callFake(({data}) => Promise.resolve(
+      ggrcAjax.and.callFake(({data}) => Promise.resolve(
         JSON.parse(data).map(generateQueryApiResponse),
       ));
 
@@ -225,9 +231,11 @@ describe('QueryAPI utils', function () {
 
   describe('loadObjectsByTypes() method', () => {
     const BATCH_TIMEOUT = 100;
+    let ggrcAjax;
 
     beforeEach(() => {
-      spyOn(can, 'ajax').and.returnValue($.Deferred());
+      spyOn(AjaxExtensions, 'ggrcAjax').and.returnValue($.Deferred());
+      ggrcAjax = AjaxExtensions.ggrcAjax;
     });
 
     it('makes request with based on passed object types and fields ' +
@@ -253,7 +261,7 @@ describe('QueryAPI utils', function () {
 
       jasmine.clock().tick(BATCH_TIMEOUT + 1);
 
-      expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
+      expect(ggrcAjax).toHaveBeenCalledWith(jasmine.objectContaining({
         data: JSON.stringify(expectedQuery),
       }));
 
@@ -281,7 +289,7 @@ describe('QueryAPI utils', function () {
         },
       });
 
-      can.ajax.and.callFake(({data}) => Promise.resolve(
+      ggrcAjax.and.callFake(({data}) => Promise.resolve(
         JSON.parse(data).map(generateQueryApiResponse),
       ));
 

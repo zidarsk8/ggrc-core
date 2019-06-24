@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import Cacheable from '../cacheable';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
@@ -347,7 +348,7 @@ export default Cacheable.extend({
         dfd: $.Deferred(),
         fn: _.throttle(() => {
           let dfd = this._pending_refresh.dfd;
-          can.ajax({
+          ggrcAjax({
             url: href,
             type: 'get',
             dataType: 'json',

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canCompute from 'can-compute';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -68,7 +69,7 @@ export default TreeLoader.extend({
     this.context.attr(this.options);
 
     if (this.options.header_view) {
-      $.when(this.context, $.ajax({
+      $.when(this.context, ggrcAjax({
         url: this.options.header_view,
         dataType: 'text',
       })).then((ctx, view) => {
@@ -172,7 +173,7 @@ export default TreeLoader.extend({
   },
 
   init_view: function () {
-    $.ajax({
+    ggrcAjax({
       url: this.options.list_view,
       dataType: 'text',
     }).then((view) => {

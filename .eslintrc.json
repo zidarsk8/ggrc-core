@@ -112,6 +112,12 @@
       "allow": ["warn", "error"]
     }],
     "no-restricted-properties": [2, {
+      "object": "jQuery",
+      "property": "ajax"
+    }, {
+        "object": "$",
+        "property": "ajax"
+    }, {
       "object": "can",
       "property": "Deferred"
     }, {

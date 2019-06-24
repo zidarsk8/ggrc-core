@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -48,7 +49,7 @@ const userRolesModalSelector = canControl.extend({
   initView() {
     let deferred = $.Deferred();
 
-    $.ajax({
+    ggrcAjax({
       url: this.options.base_modal_view,
       dataType: 'text',
     }).then((view) => {

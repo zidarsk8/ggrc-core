@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canControl from 'can-control';
 import '../components/info-pin-buttons/info-pin-buttons';
@@ -87,7 +88,7 @@ export default canControl.extend({
           },
         };
 
-        $.ajax({
+        ggrcAjax({
           url: view,
           dataType: 'text',
         }).then((view) => {

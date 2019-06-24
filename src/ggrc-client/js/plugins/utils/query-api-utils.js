@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {
@@ -186,7 +187,7 @@ function buildCountParams(types, relevant, filter) {
  */
 function makeRequest(params) {
   let reqParams = params.data || [];
-  return can.ajax({
+  return ggrcAjax({
     type: 'POST',
     headers: $.extend({
       'Content-Type': 'application/json',

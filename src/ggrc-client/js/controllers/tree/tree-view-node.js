@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import CanMap from 'can-map';
@@ -96,7 +97,7 @@ export default canControl.extend({
     // determine it from the presemce of the corresponding CSS class
     let isActive = this.element.hasClass('active');
 
-    $.ajax({
+    ggrcAjax({
       url: this.options.show_view,
       dataType: 'text',
     }).then((view) => {

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canControl from 'can-control';
 const MOUSEENTER_THROTTLE = 300;
@@ -152,7 +153,7 @@ const LhnTooltipsControl = canControl.extend({
     let tooltipView = this.get_tooltip_view(el);
     if (tooltipView) {
       this.fade_in_timeout = null;
-      $.ajax({
+      ggrcAjax({
         url: tooltipView,
         dataType: 'text',
       }).then((view) => {

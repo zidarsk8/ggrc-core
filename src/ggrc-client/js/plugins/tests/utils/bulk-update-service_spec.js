@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AjaxExtensions from '../../ajax_extensions';
 import service from '../../utils/bulk-update-service';
 
 describe('GGRC BulkUpdateService', function () {
@@ -17,7 +18,7 @@ describe('GGRC BulkUpdateService', function () {
       ajaxRes.done = jasmine.createSpy().and.returnValue(ajaxRes);
       ajaxRes.fail = jasmine.createSpy().and.returnValue(ajaxRes);
 
-      spyOn($, 'ajax')
+      spyOn(AjaxExtensions, 'ggrcAjax')
         .and.returnValue(ajaxRes);
     });
 
@@ -31,7 +32,7 @@ describe('GGRC BulkUpdateService', function () {
 
       method(model, data, {state: 'In Progress'});
 
-      expect($.ajax)
+      expect(AjaxExtensions.ggrcAjax)
         .toHaveBeenCalledWith({
           url: '/api/some_model',
           method: 'PATCH',

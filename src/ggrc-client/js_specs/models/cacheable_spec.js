@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import canModel from 'can-model';
 import canList from 'can-list';
 import CanMap from 'can-map';
@@ -24,7 +25,7 @@ describe('Cacheable model', () => {
     origGcaDefs = GGRC.custom_attr_defs;
     dummyable = Mixin.extend({}, {});
     spyOn(dummyable, 'add_to');
-    ajaxSpy = spyOn($, 'ajax');
+    ajaxSpy = spyOn(AjaxExtensions, 'ggrcAjax');
 
     DummyModel = makeFakeModel({
       model: Cacheable,
@@ -40,7 +41,7 @@ describe('Cacheable model', () => {
         mixins: [dummyable],
         attributes: {},
         is_custom_attributable: true,
-        ajax: $.ajax,
+        ajax: AjaxExtensions.ggrcAjax,
       },
     });
   });
@@ -174,7 +175,7 @@ describe('Cacheable model', () => {
         },
       }));
       DummyModel.findAll().then(function (data) {
-        expect($.ajax).toHaveBeenCalled();
+        expect(AjaxExtensions.ggrcAjax).toHaveBeenCalled();
         expect(data).toEqual(jasmine.any(canList));
         expect(data.length).toBe(1);
         expect(data[0]).toEqual(jasmine.any(DummyModel));
@@ -187,7 +188,7 @@ describe('Cacheable model', () => {
        'from the find', function (done) {
       ajaxSpy.and.returnValue($.when({id: 1}));
       DummyModel.findAll().then(function (data) {
-        expect($.ajax).toHaveBeenCalled();
+        expect(AjaxExtensions.ggrcAjax).toHaveBeenCalled();
         expect(data).toEqual(jasmine.any(canList));
         expect(data.length).toBe(1);
         expect(data[0]).toEqual(jasmine.any(DummyModel));
@@ -263,7 +264,7 @@ describe('Cacheable model', () => {
     let inst;
     beforeEach(() => {
       inst = new DummyModel({href: '/api/dummy_models/1'});
-      spyOn(can, 'ajax').and.returnValue(new $.Deferred(function (dfd) {
+      ajaxSpy.and.returnValue(new $.Deferred(function (dfd) {
         setTimeout(() => {
           dfd.resolve(inst.serialize());
         }, 10);
@@ -273,10 +274,11 @@ describe('Cacheable model', () => {
     it('calls the object endpoint with the supplied href if no ' +
        'selfLink', function (done) {
       inst.refresh().then(() => {
-        expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
-          url: '/api/dummy_models/1',
-          type: 'get',
-        }));
+        expect(AjaxExtensions.ggrcAjax)
+          .toHaveBeenCalledWith(jasmine.objectContaining({
+            url: '/api/dummy_models/1',
+            type: 'get',
+          }));
         done();
       }, fail);
     });
@@ -286,12 +288,12 @@ describe('Cacheable model', () => {
       inst.refresh();
       setTimeout(() => {
         inst.refresh().then(() => {
-          expect(can.ajax.calls.count()).toBe(2);
+          expect(AjaxExtensions.ggrcAjax.calls.count()).toBe(2);
           done();
         }, fail);
       }, 1000); // 1000ms is enough to trigger a new call to the debounced function
       inst.refresh().then(() => {
-        expect(can.ajax.calls.count()).toBe(1);
+        expect(AjaxExtensions.ggrcAjax.calls.count()).toBe(1);
       }, fail);
     });
 

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import canCompute from 'can-compute';
 import makeArray from 'can-util/js/make-array/make-array';
@@ -115,7 +116,7 @@ const TreeViewControl = TreeLoader.extend({
     let dfds = [];
     if (this.options.header_view && this.options.show_header) {
       dfds.push(
-        $.when(this.options, $.ajax({
+        $.when(this.options, ggrcAjax({
           url: this.options.header_view,
           dataType: 'text',
         })).then((ctx, view) => {

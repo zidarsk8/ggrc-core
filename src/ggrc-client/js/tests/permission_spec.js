@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AjaxExtensions from '../plugins/ajax_extensions';
 import Permission from '../permission';
 import {makeFakeInstance} from '../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../plugins/utils/current-page-utils';
@@ -608,7 +609,7 @@ describe('Permission', function () {
       GGRC_PERMISSIONS = GGRC.permissions;
     });
     beforeEach(function () {
-      spyOn($, 'ajax')
+      spyOn(AjaxExtensions, 'ggrcAjax')
         .and.returnValue(new $.Deferred().resolve('permissions'));
     });
     afterEach(function () {

@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import CanMap from 'can-map';
 import canControl from 'can-control';
@@ -74,7 +75,7 @@ export default canControl.extend({
       },
     });
 
-    $.ajax({
+    ggrcAjax({
       url: this.get_widget_view(this.element),
       dataType: 'text',
     }).then((view) => {

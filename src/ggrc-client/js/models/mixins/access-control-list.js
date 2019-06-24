@@ -10,7 +10,7 @@ export default Mixin.extend({
   /**
    * This method clears ACL
    * before it's filled with the data from server or backup.
-   * @param  {Object} resource resource object returned from can.ajax
+   * @param  {Object} resource resource object returned from ggrcAjax
    * @return {Object}        passed resource object
    */
   cleanupAcl(resource) {
