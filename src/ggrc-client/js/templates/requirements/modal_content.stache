@@ -35,7 +35,7 @@
         Description
         <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.title_singular}} and provide context for how and when this {{model.title_singular}} might be used."></i>
       </label>
-      <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+      <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       <div class="rich-text">
           <rich-text
             tabindex="3"

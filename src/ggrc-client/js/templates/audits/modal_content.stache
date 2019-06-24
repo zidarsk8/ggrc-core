@@ -70,7 +70,7 @@
             Description
             <i class="fa fa-question-circle" rel="tooltip" title="Describe reason and purpose of the Audit."></i>
           </label>
-          <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
+          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
           <div class="rich-text">
               <rich-text
                 tabindex="10"
