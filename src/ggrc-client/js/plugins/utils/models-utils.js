@@ -3,6 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIncludes from 'lodash/includes';
+import loForEach from 'lodash/forEach';
+import loFind from 'lodash/find';
+import loSortBy from 'lodash/sortBy';
 import {notifier} from './notifiers-utils';
 import RefreshQueue from '../../models/refresh_queue';
 import * as businessModels from '../../models/business-models';
@@ -84,7 +88,7 @@ const inferObjectType = (data) => {
   if (!data) {
     return null;
   } else {
-    let obj = _.find(Object.keys(data), (key) => objectTypeDecisionTree[key]);
+    let obj = loFind(Object.keys(data), (key) => objectTypeDecisionTree[key]);
     return objectTypeDecisionTree[obj];
   }
 };
@@ -95,7 +99,7 @@ const inferObjectType = (data) => {
  * @return {Boolean}
  */
 const hasRelatedAssessments = (type) => {
-  return _.includes(relatedAssessmentsTypes, type);
+  return loIncludes(relatedAssessmentsTypes, type);
 };
 
 const getInstance = (objectType, objectId) => {
@@ -212,8 +216,8 @@ function groupTypes(types) {
     return _addFormattedType(modelName, groups);
   });
 
-  _.forEach(groups, (group) => {
-    group.items = _.sortBy(group.items, 'name');
+  loForEach(groups, (group) => {
+    group.items = loSortBy(group.items, 'name');
   });
 
   return groups;

@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loIncludes from 'lodash/includes';
+import loIsFunction from 'lodash/isFunction';
+import loForEach from 'lodash/forEach';
+import loFilter from 'lodash/filter';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canModel from 'can-model';
 import canStache from 'can-stache';
@@ -245,7 +249,7 @@ export default canControl.extend({
 
     if (!this.wasDestroyed()) {
       // Do the fields (re-)setting
-      if (_.isFunction(setFieldsCb)) {
+      if (loIsFunction(setFieldsCb)) {
         setFieldsCb();
       }
       // This is to trigger `focus_first_element` in modal_ajax handling
@@ -436,7 +440,7 @@ export default canControl.extend({
       after: 'minDate',
     };
 
-    _.forEach(options, (val, key) => {
+    loForEach(options, (val, key) => {
       let targetEl;
       let isInput;
       let targetDate;
@@ -756,7 +760,7 @@ export default canControl.extend({
     instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
-      _.includes(saveContactModels, this.options.model.model_singular)) {
+      loIncludes(saveContactModels, this.options.model.model_singular)) {
       instance.attr('contact', this.options.attr('instance.contact'));
     }
 
@@ -852,7 +856,7 @@ export default canControl.extend({
       !this.options.skip_refresh && !instance.isNew()) {
       if (instance.type === 'AssessmentTemplate') {
         cad = instance.attr('custom_attribute_definitions');
-        cad = _.filter(cad, function (attr) {
+        cad = loFilter(cad, function (attr) {
           return attr.id;
         });
         instance.attr('custom_attribute_definitions', cad);
