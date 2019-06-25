@@ -98,8 +98,10 @@ class TestAssessmentNotification(TestCase):
     notifs, notif_data = common.get_daily_notifications()
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
-    self.assertEqual(updated[self.assessment.id]["updated_fields"],
-                     ["ASSESSMENT PROCEDURE"])
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["ASSESSMENT PROCEDURE"],
+        ("steps", "")
+    )
 
   def test_custom_attr_change(self):
     """Test notification when custom attribute value is changed"""
@@ -115,7 +117,8 @@ class TestAssessmentNotification(TestCase):
     notifs, notif_data = common.get_daily_notifications()
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
-    self.assertEqual(updated[self.assessment.id]["updated_fields"], ["CA1"])
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"].keys(), ["CA1"])
 
   def test_description_custom_change(self):
     """Test notification updated data when custom attribute value is changed"""
@@ -128,8 +131,6 @@ class TestAssessmentNotification(TestCase):
     notifs, notif_data = common.get_daily_notifications()
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
-    self.assertEqual(updated[self.assessment.id]["updated_fields"],
-                     ["TITLE", "DESCRIPTION"])
     self.assertEqual(
         updated[self.assessment.id]["updated_data"]["TITLE"],
         ("test_title", "Assessment1")
@@ -189,7 +190,7 @@ class TestAssessmentNotification(TestCase):
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
     self.assertEqual(
-        updated[self.assessment.id]["updated_fields"], ["CA3"])
+        updated[self.assessment.id]["updated_data"].keys(), ["CA3"])
 
   def test_access_conrol_list(self):
     """Test notification when access conrol list is changed"""
@@ -208,8 +209,14 @@ class TestAssessmentNotification(TestCase):
     notifs, notif_data = common.get_daily_notifications()
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
-    self.assertEqual(updated[self.assessment.id]["updated_fields"],
-                     ["PRIMARY CONTACTS", "SECONDARY CONTACTS"])
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["PRIMARY CONTACTS"],
+        ([], ["user@example.com"])
+    )
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["SECONDARY CONTACTS"],
+        (["user@example.com"], [])
+    )
 
   def test_multiply_updates(self):
     """Test notification for multiply updates"""
@@ -222,8 +229,14 @@ class TestAssessmentNotification(TestCase):
     notifs, notif_data = common.get_daily_notifications()
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
-    self.assertEqual(sorted(updated[self.assessment.id]["updated_fields"]),
-                     ["ASSESSMENT PROCEDURE", "TITLE"])
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["TITLE"],
+        ("new title", "Assessment1")
+    )
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["ASSESSMENT PROCEDURE"],
+        ("steps", "")
+    )
 
   def test_multiply_mapping(self):
     """Test notification for multiply mapping"""

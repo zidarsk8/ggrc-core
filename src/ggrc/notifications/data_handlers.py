@@ -86,19 +86,34 @@ def _group_acl_persons_by_role_id(acl_list):
   return acl_dict
 
 
+def _get_updated_roles_data(role_id, roles, role_list):
+  """Get person email for the updated roles"""
+  data = []
+  for role in roles:
+    for item in role_list:
+      if item['ac_role_id'] == role_id and item['person_id'] == role:
+        if 'person_email' in item:
+          data.append(item['person_email'])
+  return data
+
+
 def _get_updated_roles(new_list, old_list, roles):
   """Get difference between old and new access control lists"""
   new_dict = _group_acl_persons_by_role_id(new_list)
   old_dict = _group_acl_persons_by_role_id(old_list)
 
-  role_set = set()
+  role_data = []
   role_ids = (set(new_dict) | set(old_dict)) & set(roles)
 
   for role_id in role_ids:
-    if sorted(new_dict.get(role_id, [])) != sorted(old_dict.get(role_id, [])):
-      role_set.add(roles[role_id])
+    new_roles = sorted(new_dict.get(role_id, []))
+    old_roles = sorted(old_dict.get(role_id, []))
+    if new_roles != old_roles:
+      new_data = _get_updated_roles_data(role_id, new_roles, new_list)
+      old_data = _get_updated_roles_data(role_id, old_roles, old_list)
+      role_data.append((roles[role_id], new_data, old_data))
 
-  return role_set
+  return role_data
 
 
 def _get_revisions(obj, created_at):
@@ -125,6 +140,22 @@ def _get_revisions(obj, created_at):
   return new_revision, old_revision
 
 
+def _get_displayed_updated_data(attr_name, new_val, old_val, definitions):
+  """Get predefined names to be visualized it the updated data"""
+  definition = definitions.get(attr_name, None)
+  updated_data = {}
+  if definition:
+    if new_val or old_val:
+      updated_data[definition["display_name"].upper()] = (
+          new_val,
+          old_val
+      )
+  else:
+    if new_val or old_val:
+      updated_data[attr_name.upper()] = (new_val, old_val)
+  return updated_data
+
+
 def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
   """Get dict of updated  attributes of assessment"""
   # pylint: disable=too-many-locals
@@ -137,6 +168,7 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
   new_attrs = new_rev.content
   old_attrs = old_rev.content
 
+  updated_roles = []
   for attr_name, new_val in new_attrs.iteritems():
     if attr_name in notifications.IGNORE_ATTRS:
       continue
@@ -148,27 +180,25 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
          sorted(old_val.split(",")) == sorted(new_val.split(",")):
         continue
       if attr_name == "access_control_list":
-        fields.extend(_get_updated_roles(new_val, old_val, roles))
+        updated_roles = _get_updated_roles(new_val, old_val, roles)
         continue
       fields.append(attr_name)
-  fields.extend(list(notifications.get_updated_cavs(new_attrs, old_attrs)))
-  updated_fields = []
   updated_data = {}
+  for attr_name, new_val, old_val in updated_roles:
+    updated_data.update(
+        _get_displayed_updated_data(attr_name, new_val, old_val, definitions)
+    )
+  updated_cavs = notifications.get_updated_cavs(new_attrs, old_attrs)
+  for attr_name, new_val, old_val in updated_cavs:
+    updated_data.update(
+        _get_displayed_updated_data(attr_name, new_val, old_val, definitions)
+    )
   for field in fields:
-    definition = definitions.get(field, None)
     new_val, old_val = new_attrs.get(field), old_attrs.get(field)
-    if definition:
-      updated_fields.append(definition["display_name"].upper())
-      if new_val or old_val:
-        updated_data[definition["display_name"].upper()] = (
-            new_val,
-            old_val
-        )
-    else:
-      updated_fields.append(field.upper())
-      if new_val or old_val:
-        updated_data[field.upper()] = (new_val, old_val)
-  return updated_fields, updated_data
+    updated_data.update(
+        _get_displayed_updated_data(field, new_val, old_val, definitions)
+    )
+  return updated_data
 
 
 def _get_assignable_roles(obj):
@@ -210,15 +240,6 @@ def _get_assignable_dict(people, notif, ca_cache=None):
   for person in people:
     # We should default to today() if no start date is found on the object.
     start_date = getattr(obj, "start_date", datetime.date.today())
-    if notif.notification_type.name == "assessment_updated":
-      updated_fields, updated_data = _get_updated_fields(
-          obj,
-          notif.created_at,
-          definitions,
-          roles
-      )
-    else:
-      updated_fields, updated_data = None, None
     data[person.email] = {
         "user": get_person_dict(person),
         notif.notification_type.name: {
@@ -231,8 +252,12 @@ def _get_assignable_dict(people, notif, ca_cache=None):
                     notif.id: as_user_time(notif.created_at)},
                 "notif_updated_at": {
                     notif.id: as_user_time(notif.updated_at)},
-                "updated_fields": updated_fields,
-                "updated_data": updated_data,
+                "updated_data": _get_updated_fields(obj,
+                                                    notif.created_at,
+                                                    definitions,
+                                                    roles)
+                if notif.notification_type.name == "assessment_updated"
+                else None,
             }
         }
     }
