@@ -189,8 +189,12 @@ def _get_assignable_dict(people, notif, ca_cache=None):
   obj = get_notification_object(notif)
   data = {}
 
-  definitions = AttributeInfo.get_object_attr_definitions(obj.__class__,
-                                                          ca_cache=ca_cache)
+  # we do not use definitions data if notification name not assessment update
+  if notif.notification_type.name == "assessment_updated":
+    definitions = AttributeInfo.get_object_attr_definitions(obj.__class__,
+                                                            ca_cache=ca_cache)
+  else:
+    definitions = None
   roles = _get_assignable_roles(obj)
 
   for person in people:
@@ -533,13 +537,17 @@ def custom_attributes_cache(notifications):
   Returns:
     Dictionary containing all custom attributes with a definition type as a key
   """
-  objects_ids = [notification.object_id for notification in notifications]
   ca_cache = defaultdict(list)
-  definitions = models.CustomAttributeDefinition.eager_query().filter(
-      models.CustomAttributeDefinition.definition_id.in_(objects_ids)
-  ).group_by(
-      models.CustomAttributeDefinition.title,
-      models.CustomAttributeDefinition.definition_type)
+  definitions = models.CustomAttributeDefinition.query.filter(
+      sa.tuple_(
+          models.CustomAttributeDefinition.definition_type,
+          models.CustomAttributeDefinition.definition_id
+      ).in_([
+          (notification.object_type, notification.object_id)
+          for notification
+          in notifications
+      ])
+  )
   for attr in definitions:
     ca_cache[attr.definition_type].append(attr)
 
