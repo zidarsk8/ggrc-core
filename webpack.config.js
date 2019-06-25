@@ -130,7 +130,6 @@ module.exports = function (env) {
         jQuery: 'jquery',
         'window.jQuery': 'jquery',
         _: 'lodash',
-        moment: 'moment',
       }),
       new webpack.DefinePlugin({
         GOOGLE_ANALYTICS_ID: JSON.stringify(ENV.GOOGLE_ANALYTICS_ID),

@@ -3,8 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import moment from 'moment';
 import canStache from 'can-stache';
-describe('canStache.helper.date', () => {
+
+describe('CanStache.helper.date', () => {
   let helper;
   let testDate;
 
