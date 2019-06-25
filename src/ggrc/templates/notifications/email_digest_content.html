@@ -167,7 +167,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     {{ "cycles" if digest['cycle_start_failed']|length > 1 else "cycle" }}
                     failed to start</h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for workflow_id, workflow in digest['ƒ'].iteritems() %}
+                  {% for workflow_id, workflow in digest['cycle_start_failed'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
                       <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
@@ -201,7 +201,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     {{ "workflows" if digest['cycle_starts_in']|length > 1 else "workflow" }}
                   </h2>
                   <ul {{ style.list_wrap() }} >
-                  {% for workflow_id, workflow in digest['ƒ'].iteritems() %}
+                  {% for workflow_id, workflow in digest['cycle_starts_in'].iteritems() %}
                     <li {{ style.list_item() }} >
                       New cycle of
                       <a href="{{ workflow['workflow_url'] }}" {{ style.link_text() }} >
