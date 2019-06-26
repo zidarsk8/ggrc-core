@@ -83,13 +83,11 @@ export default can.Model.extend({
     };
   },
 
-  setup: function (construct, name, statics, prototypes) {
+  setup: function (construct, name, statics) {
     let staticProps = statics;
-    let protoProps = prototypes; // eslint-disable-line
 
     // if name for model was not set
     if (typeof name !== 'string') {
-      protoProps = statics; // name will be equal to statics
       staticProps = name;
     }
 
