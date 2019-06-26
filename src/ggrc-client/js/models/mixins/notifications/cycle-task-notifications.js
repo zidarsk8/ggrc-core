@@ -5,7 +5,12 @@
 
 import Mixin from '../mixin';
 
-export default Mixin.extend({
-  send_by_default: true,
-  recipients: 'Task Assignees,Task Secondary Assignees',
-});
+export default class CycleTaskNotifications extends Mixin {
+  get send_by_default() {
+    return true;
+  }
+
+  get recipients() {
+    return 'Task Assignees,Task Secondary Assignees';
+  }
+}

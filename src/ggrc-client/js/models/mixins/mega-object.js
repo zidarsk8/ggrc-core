@@ -9,9 +9,9 @@ import Mixin from './mixin';
   Mega object can be mapped to the same object type,
   e.g. map Program to Mega Program
 */
-export default Mixin.extend({
-  isMegaObject: true,
-  'after:init'() {
+
+export default class MegaObject extends Mixin {
+  static 'after:init'() {
     this.tree_view_options.mega_attr_list = [{
       attr_title: 'Map as',
       attr_name: 'map_as',
@@ -20,5 +20,7 @@ export default Mixin.extend({
       disable_sorting: true,
       mandatory: true,
     }];
-  },
-}, {});
+  }
+}
+
+MegaObject.isMegaObject = true;

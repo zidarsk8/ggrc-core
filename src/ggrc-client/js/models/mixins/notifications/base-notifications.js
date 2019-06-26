@@ -5,7 +5,12 @@
 
 import Mixin from '../mixin';
 
-export default Mixin.extend({
-  send_by_default: true,
-  recipients: 'Admin,Primary Contacts,Secondary Contacts',
-});
+export default class BaseNotifications extends Mixin {
+  get send_by_default() {
+    return true;
+  }
+
+  get recipients() {
+    return 'Admin,Primary Contacts,Secondary Contacts';
+  }
+}

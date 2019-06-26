@@ -7,57 +7,66 @@ import canMap from 'can-map';
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 
-export default Mixin.extend(
-  issueTrackerUtils.issueTrackerStaticFields,
-  {
-    'after:init'() {
-      this.initIssueTracker();
-    },
-    'before:refresh'() {
-      issueTrackerUtils.cleanUpWarnings(this);
-    },
-    after_refresh() {
-      this.initIssueTracker();
-    },
-    after_save() {
-      issueTrackerUtils.checkWarnings(this);
-    },
-    initIssueTracker() {
-      if (!GGRC.ISSUE_TRACKER_ENABLED) {
-        return;
-      }
+export default class IssueTracker extends Mixin {
+  'after:init'() {
+    this.initIssueTracker();
+  }
 
-      if (!this.issue_tracker) {
-        this.attr('issue_tracker', new canMap({}));
-      }
+  'before:refresh'() {
+    issueTrackerUtils.cleanUpWarnings(this);
+  }
 
-      let config = this.constructor.buildIssueTrackerConfig
-        ? this.constructor.buildIssueTrackerConfig(this)
-        : {enabled: false};
+  after_refresh() {
+    this.initIssueTracker();
+  }
 
-      issueTrackerUtils.initIssueTrackerObject(
-        this,
-        config,
-        true
-      );
-    },
-    setDefaultHotlistAndComponent() {
-      let config = this.constructor.buildIssueTrackerConfig ?
-        this.constructor.buildIssueTrackerConfig(this) :
-        {};
+  after_save() {
+    issueTrackerUtils.checkWarnings(this);
+  }
 
-      this.attr('issue_tracker').attr({
-        hotlist_id: config.hotlist_id,
-        component_id: config.component_id,
-      });
-    },
-    issueCreated() {
-      return GGRC.ISSUE_TRACKER_ENABLED
-        && issueTrackerUtils.isIssueCreated(this);
-    },
-    issueTrackerEnabled() {
-      return GGRC.ISSUE_TRACKER_ENABLED
-        && issueTrackerUtils.isIssueTrackerEnabled(this);
-    },
-  },
+  initIssueTracker() {
+    if (!GGRC.ISSUE_TRACKER_ENABLED) {
+      return;
+    }
+
+    if (!this.issue_tracker) {
+      this.attr('issue_tracker', new canMap({}));
+    }
+
+    let config = this.constructor.buildIssueTrackerConfig
+      ? this.constructor.buildIssueTrackerConfig(this)
+      : {enabled: false};
+
+    issueTrackerUtils.initIssueTrackerObject(
+      this,
+      config,
+      true
+    );
+  }
+
+  setDefaultHotlistAndComponent() { // eslint-disable-line id-length
+    let config = this.constructor.buildIssueTrackerConfig ?
+      this.constructor.buildIssueTrackerConfig(this) :
+      {};
+
+    this.attr('issue_tracker').attr({
+      hotlist_id: config.hotlist_id,
+      component_id: config.component_id,
+    });
+  }
+
+  issueCreated() {
+    return GGRC.ISSUE_TRACKER_ENABLED
+      && issueTrackerUtils.isIssueCreated(this);
+  }
+
+  issueTrackerEnabled() {
+    return GGRC.ISSUE_TRACKER_ENABLED
+      && issueTrackerUtils.isIssueTrackerEnabled(this);
+  }
+}
+
+Object.assign(
+  IssueTracker,
+  issueTrackerUtils.issueTrackerStaticFields
 );

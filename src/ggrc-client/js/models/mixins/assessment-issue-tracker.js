@@ -9,100 +9,112 @@ import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
-export default Mixin.extend(
-  issueTrackerUtils.issueTrackerStaticFields,
-  {
-    'after:init': function () {
-      this.initIssueTracker();
-      this.trackAuditUpdates();
-    },
-    'before:refresh'() {
-      issueTrackerUtils.cleanUpWarnings(this);
-    },
-    after_refresh() {
-      this.initIssueTracker();
-    },
-    after_save() {
-      issueTrackerUtils.checkWarnings(this);
-    },
-    trackAuditUpdates() {
-      const audit = this.attr('audit') && reify(this.attr('audit'));
+export default class AssessmentIssueTracker extends Mixin {
+  'after:init'() {
+    this.initIssueTracker();
+    this.trackAuditUpdates();
+  }
 
-      if (!audit) {
-        return;
-      }
+  'before:refresh'() {
+    issueTrackerUtils.cleanUpWarnings(this);
+  }
 
-      audit.bind('updated', (event) => {
-        this.attr('audit', event.target);
-        this.initIssueTrackerForAssessment();
-      });
-    },
-    initIssueTracker() {
-      if (!GGRC.ISSUE_TRACKER_ENABLED) {
-        return $.Deferred().reject();
-      }
+  after_refresh() {
+    this.initIssueTracker();
+  }
 
-      if (!this.attr('issue_tracker')) {
-        this.attr('issue_tracker', new canMap({}));
-      }
+  after_save() {
+    issueTrackerUtils.checkWarnings(this);
+  }
 
-      let audit = this.getParentAudit();
-      this.attr('audit', audit);
+  trackAuditUpdates() {
+    const audit = this.attr('audit') && reify(this.attr('audit'));
+
+    if (!audit) {
+      return;
+    }
+
+    audit.bind('updated', (event) => {
+      this.attr('audit', event.target);
       this.initIssueTrackerForAssessment();
-    },
-    getParentAudit() {
-      if (this.audit) {
-        return this.audit;
+    });
+  }
+
+  initIssueTracker() {
+    if (!GGRC.ISSUE_TRACKER_ENABLED) {
+      return $.Deferred().reject();
+    }
+
+    if (!this.attr('issue_tracker')) {
+      this.attr('issue_tracker', new canMap({}));
+    }
+
+    let audit = this.getParentAudit();
+    this.attr('audit', audit);
+    this.initIssueTrackerForAssessment();
+  }
+
+  getParentAudit() {
+    if (this.audit) {
+      return this.audit;
+    }
+
+    if (this.isNew()) {
+      const pageInstance = getPageInstance();
+      if (pageInstance.type !== 'Audit') {
+        throw new Error('Assessment must be created from Audit page only');
       }
 
-      if (this.isNew()) {
-        const pageInstance = getPageInstance();
-        if (pageInstance.type !== 'Audit') {
-          throw new Error('Assessment must be created from Audit page only');
-        }
+      return pageInstance;
+    }
+  }
 
-        return pageInstance;
-      }
-    },
-    /**
-     * Initializes Issue Tracker for Assessment and Assessment Template
-     */
-    initIssueTrackerForAssessment() {
-      let auditItr = this.attr('audit.issue_tracker') || {};
-      let itrEnabled = this.isNew()
-        // turned ON for Assessment & Assessment Template by default
-        // for newly created instances
-        ? (auditItr && auditItr.enabled)
-        // for existing instance, the value from the server will be used
-        : false;
+  /**
+   * Initializes Issue Tracker for Assessment and Assessment Template
+   */
+  initIssueTrackerForAssessment() { // eslint-disable-line id-length
+    let auditItr = this.attr('audit.issue_tracker') || {};
+    let itrEnabled = this.isNew()
+      // turned ON for Assessment & Assessment Template by default
+      // for newly created instances
+      ? (auditItr && auditItr.enabled)
+      // for existing instance, the value from the server will be used
+      : false;
 
-      let issueTitle = this.title || '';
+    let issueTitle = this.title || '';
 
-      let issueTracker = new canMap(auditItr).attr({
-        title: issueTitle,
-        enabled: itrEnabled,
-      });
+    let issueTracker = new canMap(auditItr).attr({
+      title: issueTitle,
+      enabled: itrEnabled,
+    });
 
-      issueTrackerUtils.initIssueTrackerObject(
-        this,
-        issueTracker,
-        auditItr.enabled
-      );
-    },
-    setDefaultHotlistAndComponent() {
-      let config = this.attr('audit.issue_tracker');
-      this.attr('issue_tracker').attr({
-        hotlist_id: config.hotlist_id,
-        component_id: config.component_id,
-      });
-    },
-    issueCreated() {
-      return this.attr('can_use_issue_tracker')
-        && issueTrackerUtils.isIssueCreated(this);
-    },
-    issueTrackerEnabled() {
-      return this.attr('can_use_issue_tracker')
-        && issueTrackerUtils.isIssueTrackerEnabled(this);
-    },
-  },
+    issueTrackerUtils.initIssueTrackerObject(
+      this,
+      issueTracker,
+      auditItr.enabled
+    );
+  }
+
+  setDefaultHotlistAndComponent() { // eslint-disable-line id-length
+    let config = this.attr('audit.issue_tracker');
+    this.attr('issue_tracker').attr({
+      hotlist_id: config.hotlist_id,
+      component_id: config.component_id,
+    });
+  }
+
+  issueCreated() {
+    return this.attr('can_use_issue_tracker')
+      && issueTrackerUtils.isIssueCreated(this);
+  }
+
+  issueTrackerEnabled() {
+    return this.attr('can_use_issue_tracker')
+      && issueTrackerUtils.isIssueTrackerEnabled(this);
+  }
+}
+
+Object.assign(
+  AssessmentIssueTracker,
+  issueTrackerUtils.issueTrackerStaticFields
 );

@@ -5,8 +5,8 @@
 
 import Mixin from './mixin';
 
-export default Mixin.extend({
-  'after:init'() {
+export default class Questionnaire extends Mixin {
+  static 'after:init'() {
     if (GGRC.GGRC_Q_INTEGRATION_URL) {
       const attrTitle = 'Questionnaire';
       const attrList = this.tree_view_options.attr_list;
@@ -25,5 +25,5 @@ export default Mixin.extend({
       });
       this.isQuestionnaireable = true;
     }
-  },
-}, {});
+  }
+}

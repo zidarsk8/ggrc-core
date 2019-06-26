@@ -12,7 +12,7 @@ import {confirm} from '../../plugins/utils/modals';
  *
  * @class Mixins.autoStatusChangeable
  */
-export default Mixin.extend({}, {
+export default class AutoStatusChangeable extends Mixin {
   /**
    * Display a confirmation dialog before starting to edit the instance.
    *
@@ -23,7 +23,7 @@ export default Mixin.extend({}, {
    * @return {Promise} A promise resolved/rejected if the user chooses to
    *   confirm/reject the dialog.
    */
-  confirmBeginEdit: function () {
+  confirmBeginEdit() {
     let STATUS_NOT_STARTED = 'Not Started';
     let STATUS_IN_PROGRESS = 'In Progress';
     let IGNORED_STATES = [STATUS_NOT_STARTED, STATUS_IN_PROGRESS];
@@ -51,5 +51,5 @@ export default Mixin.extend({}, {
     }
 
     return confirmation.promise();
-  },
-});
+  }
+}
