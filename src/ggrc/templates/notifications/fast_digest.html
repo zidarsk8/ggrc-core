@@ -79,7 +79,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     </div>
     {% endfor %}
 
-    {% if review_reviewers %}
+    {% if review_requested_data %}
     <div {{ style.proposal_horizontal_line() }}></div>
 
     <div {{ style.proposal_review_div() }}>
@@ -87,7 +87,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         Your review was requested for the following objects:
       </h1>
       <ul {{style.proposal_review() }}>
-        {% for review in review_reviewers %}
+        {% for review in review_requested_data %}
         <li {{style.proposal_review_item() }}>
           {{review.reviewable.type}} <a {{style.proposal_review_item_link() }} href="{{review.object_url}}">{{review.reviewable.title}}</a>
           {% if review.email_message %}
@@ -100,7 +100,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
     </div>
     {% endif %}
 
-    {% if review_owners %}
+    {% if object_state_reverted_data %}
     <div {{ style.proposal_horizontal_line() }}></div>
 
     <div {{ style.proposal_review_div() }}>
@@ -110,7 +110,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         to be reverted to "Unreviewed" state:
       </h1>
       <ul {{ style.proposal_review() }}>
-        {% for review in review_owners %}
+        {% for review in object_state_reverted_data %}
         <li {{ style.proposal_review_item() }}>
           {{review.reviewable.type}} <a {{ style.proposal_review_item_link() }} href="{{review.object_url}}">{{review.reviewable.title}}</a>
         </li>
