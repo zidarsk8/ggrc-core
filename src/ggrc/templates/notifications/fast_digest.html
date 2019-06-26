@@ -89,7 +89,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
       <ul {{style.proposal_review() }}>
         {% for review in review_requested_data %}
         <li {{style.proposal_review_item() }}>
-          {{review.reviewable.type}} <a {{style.proposal_review_item_link() }} href="{{review.object_url}}">{{review.reviewable.title}}</a>
+          {{review.reviewable.type}} <a {{style.proposal_review_item_link() }} href="{{review.object_url}}">{{review.reviewable.title|e}}</a>
           {% if review.email_message %}
           <div {{style.proposal_review_item_comment() }}>{{review.email_message}} </div>
           {% endif %}
@@ -112,7 +112,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
       <ul {{ style.proposal_review() }}>
         {% for review in object_state_reverted_data %}
         <li {{ style.proposal_review_item() }}>
-          {{review.reviewable.type}} <a {{ style.proposal_review_item_link() }} href="{{review.object_url}}">{{review.reviewable.title}}</a>
+          {{review.reviewable.type}} <a {{ style.proposal_review_item_link() }} href="{{review.object_url}}">{{review.reviewable.title|e}}</a>
         </li>
         {% endfor %}
       </ul>
