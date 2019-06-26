@@ -8,7 +8,6 @@
     showResults:bind="showResults"
     modelName:from="'Person'"
     queryField:from="'email'"
-    modelConstructor:from="loadedModel"
     actionKey:from="actionKey"
     >
 
