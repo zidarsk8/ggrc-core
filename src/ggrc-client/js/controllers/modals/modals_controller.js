@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {exists, filteredMap} from '../../plugins/ggrc_utils';
 import loIncludes from 'lodash/includes';
 import loIsFunction from 'lodash/isFunction';
 import loForEach from 'lodash/forEach';
@@ -227,7 +228,7 @@ export default canControl.extend({
 
     dfd.then(function () {
       if (instance &&
-        _.exists(instance, 'class.is_custom_attributable') &&
+        exists(instance, 'class.is_custom_attributable') &&
         !(instance instanceof Assessment)) {
         return $.when(
           instance.load_custom_attribute_definitions &&
@@ -398,7 +399,7 @@ export default canControl.extend({
 
     if (model) {
       if (item.value instanceof Array) {
-        value = _.filteredMap(item.value, (id) => getInstance(model, id));
+        value = filteredMap(item.value, (id) => getInstance(model, id));
       } else if (item.value instanceof Object) {
         value = getInstance(model, item.value.id);
       } else {
@@ -412,7 +413,7 @@ export default canControl.extend({
 
     if (name.length > 1) {
       if (Array.isArray(value)) {
-        value = new canList(_.filteredMap(value,
+        value = new canList(filteredMap(value,
           (v) => new canMap({}).attr(name.slice(1).join('.'), v)));
       } else {
         value = new canMap({}).attr(name.slice(1).join('.'), value);
