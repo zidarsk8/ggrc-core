@@ -6,11 +6,9 @@
 import Mixin from '../mixin';
 
 export default class BaseNotifications extends Mixin {
-  get send_by_default() { // eslint-disable-line camelcase
-    return true;
-  }
-
-  get recipients() {
-    return 'Admin,Primary Contacts,Secondary Contacts';
-  }
 }
+
+Object.assign(BaseNotifications.prototype, {
+  send_by_default: true,
+  recipients: 'Admin,Primary Contacts,Secondary Contacts',
+});

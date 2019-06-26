@@ -6,11 +6,9 @@
 import Mixin from '../mixin';
 
 export default class CycleTaskNotifications extends Mixin {
-  get send_by_default() { // eslint-disable-line camelcase
-    return true;
-  }
-
-  get recipients() {
-    return 'Task Assignees,Task Secondary Assignees';
-  }
 }
+
+Object.assign(CycleTaskNotifications.prototype, {
+  send_by_default: true,
+  recipients: 'Task Assignees,Task Secondary Assignees',
+});
