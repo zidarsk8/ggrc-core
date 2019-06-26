@@ -24,7 +24,7 @@ describe('Cacheable model', () => {
 
   beforeEach(() => {
     origGcaDefs = GGRC.custom_attr_defs;
-    dummyable = Mixin.extend({}, {});
+    dummyable = Mixin;
     spyOn(dummyable, 'add_to');
     ajaxSpy = spyOn(AjaxExtensions, 'ggrcAjax');
 
