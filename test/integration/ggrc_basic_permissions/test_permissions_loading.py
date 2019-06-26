@@ -43,25 +43,459 @@ class TestPermissionsLoading(TestMemcacheBase):
     self.api = Api()
     self.generator = generator.ObjectGenerator()
 
-    self.control_id = factories.ControlFactory().id
+    _, self.user = self.generator.generate_person(user_role="Creator")
+    _, self.user1 = self.generator.generate_person(user_role="Creator")
+    self.api.set_user(self.user)
+    self.user_id = self.user.id
+    self.user1_id = self.user1.id
 
-    _, user = self.generator.generate_person(user_role="Creator")
-    self.api.set_user(user)
+  def set_dummy_permissions_in_cache(self, *user_ids):
+    """Set dummy permissions for users in memcache.
+    This will reset already existing set."""
+    cached_keys = set()
+    for user_id in user_ids:
+      cached_keys.add("permissions:{}".format(user_id))
+    self.memcache_client.set("permissions:list", cached_keys)
 
   def test_permissions_loading(self):
     """Test if permissions created only once for GET requests."""
+    control_id = factories.ControlFactory().id
     with mock.patch(
         "ggrc_basic_permissions.store_results_into_memcache",
         side_effect=ggrc_basic_permissions.store_results_into_memcache
     ) as store_perm:
-      self.api.get(all_models.Control, self.control_id)
+      self.api.get(all_models.Control, control_id)
       store_perm.assert_called_once()
       store_perm.call_count = 0
 
       # On second GET permissions should be loaded from memcache
       # but not created from scratch.
-      self.api.get(all_models.Control, self.control_id)
+      self.api.get(all_models.Control, control_id)
       store_perm.assert_not_called()
+
+  def test_post_object_with_acl(self):
+    """Permissions are recalculated only for assigned people on POST."""
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_delete_object_with_acl(self):
+    """Permissions are recalculated only for affected people on DELETE."""
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+    program = all_models.Program.query.get(response.json["program"]["id"])
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    self.api.delete(program)
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_add_acl(self):
+    """Permissions are recalculated only for assigned people on PUT."""
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+    program = all_models.Program.query.get(response.json["program"]["id"])
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertNotIn("permissions:{}".format(self.user1_id), cached_keys)
+
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    self.api.put(program, {
+        "access_control_list": [{
+            "ac_role_id": pa_role.id,
+            "person": {
+                "type": "Person",
+                "id": self.user_id,
+            }
+        }, {
+            "ac_role_id": pa_role.id,
+            "person": {
+                "type": "Person",
+                "id": self.user1_id,
+            }
+        }],
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertNotIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_remove_acl(self):
+    """Permissions are recalculated only for unassigned people on PUT."""
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }, {
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user1_id,
+                }
+            }],
+        },
+    })
+    program = all_models.Program.query.get(response.json["program"]["id"])
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertNotIn("permissions:{}".format(self.user1_id), cached_keys)
+
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    self.api.put(program, {
+        "access_control_list": [{
+            "ac_role_id": pa_role.id,
+            "person": {
+                "type": "Person",
+                "id": self.user_id,
+            }
+        }]
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertNotIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_mapping(self):
+    """Perm dict should be recalculated for affected users on map/unmap."""
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+    oa_role = all_models.AccessControlRole.query.filter_by(
+        name="Admin",
+        object_type="Objective",
+    ).one()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+
+    program = all_models.Program.query.get(response.json["program"]["id"])
+    response = self.api.post(all_models.Objective, {
+        "objective": {
+            "access_control_list": [{
+                "ac_role_id": oa_role.id,
+                "person": {
+                    "id": self.user_id,
+                    "type": "Person",
+                }
+            }],
+            "title": "Objective title",
+            "context": None,
+        }
+    })
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    response = self.api.post(all_models.Relationship, {
+        "relationship": {
+            "source": {"id": program.id, "type": "Program"},
+            "destination": {
+                "id": response.json["objective"]["id"],
+                "type": "Objective"
+            },
+            "context": None,
+        },
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertIn("permissions:{}".format(self.user1_id), cached_keys)
+
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    relationship = all_models.Relationship.query.get(
+        response.json["relationship"]["id"])
+    self.api.delete(relationship)
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_add_comment(self):
+    """Permissions dict should be flushed for affected users on add comment."""
+    aa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Assessment",
+        all_models.AccessControlRole.name == "Assignees"
+    ).first()
+    ac_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Audit",
+        all_models.AccessControlRole.name == "Audit Captains"
+    ).first()
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+    response = self.api.post(all_models.Audit, {
+        "audit": {
+            "program": {
+                "id": response.json["program"]["id"],
+                "type": "Program"
+            },
+            "access_control_list": [{
+                "ac_role_id": ac_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user1_id,
+                }
+            }],
+            "context": None,
+            "title": "Some title"
+        }
+    })
+    response = self.api.post(all_models.Assessment, {
+        "assessment": {
+            "audit": {
+                "id": response.json["audit"]["id"],
+                "type": "Audit"
+            },
+            "access_control_list": [{
+                "ac_role_id": aa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user1_id,
+                }
+            }],
+            "context": None,
+            "title": "Some title"
+        }
+    })
+    assessment = all_models.Assessment.query.get(
+        response.json["assessment"]["id"]
+    )
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    request_data = [{
+        "comment": {
+            "description": "<p>{}</p>".format("test"),
+            "context": None,
+            "assignee_type": "Assignees,Verifiers,Creators",
+        },
+    }]
+
+    # logged user will be set as comment admin
+    response = self.api.post(all_models.Comment, request_data)
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertIn("permissions:{}".format(self.user1_id), cached_keys)
+
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    self.api.set_user(self.user1)
+    self.api.put(assessment, {
+        "actions": {"add_related": [{
+            "id": response.json[0][1]["comment"]["id"],
+            "type": "Comment"
+        }]},
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertNotIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_add_evidence(self):
+    """Perm dict should be flushed for affected users on add evidence."""
+    aa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Assessment",
+        all_models.AccessControlRole.name == "Assignees"
+    ).first()
+    ac_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Audit",
+        all_models.AccessControlRole.name == "Audit Captains"
+    ).first()
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+    ea_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Evidence",
+        all_models.AccessControlRole.name == "Admin"
+    ).first()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+    response = self.api.post(all_models.Audit, {
+        "audit": {
+            "program": {
+                "id": response.json["program"]["id"],
+                "type": "Program"
+            },
+            "access_control_list": [{
+                "ac_role_id": ac_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+            "context": None,
+            "title": "Some title"
+        }
+    })
+    response = self.api.post(all_models.Assessment, {
+        "assessment": {
+            "audit": {
+                "id": response.json["audit"]["id"],
+                "type": "Audit"
+            },
+            "access_control_list": [{
+                "ac_role_id": aa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+            "context": None,
+            "title": "Some title"
+        }
+    })
+    assessment = all_models.Assessment.query.get(
+        response.json["assessment"]["id"]
+    )
+    response = self.api.post(all_models.Evidence, {
+        "evidence": {
+            "access_control_list": [{
+                "ac_role_id": ea_role.id,
+                "person": {
+                    "id": self.user_id,
+                    "type": "Person",
+                }
+            }],
+            "link": factories.random_str(),
+            "title": factories.random_str(),
+            "context": None,
+        }
+    })
+    self.set_dummy_permissions_in_cache(self.user_id, self.user1_id)
+    self.api.put(assessment, {
+        "actions": {"add_related": [{
+            "id": response.json["evidence"]["id"],
+            "type": "Evidence"
+        }]},
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+    self.assertIn("permissions:{}".format(self.user1_id), cached_keys)
+
+  def test_edit_object_title(self):
+    """Permissions shouldn't be recalculated on PUT if no acls were changed."""
+    pa_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Program",
+        all_models.AccessControlRole.name == "Program Managers"
+    ).first()
+
+    response = self.api.post(all_models.Program, {
+        "program": {
+            "title": "Program title",
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": pa_role.id,
+                "person": {
+                    "type": "Person",
+                    "id": self.user_id,
+                }
+            }],
+        },
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertNotIn("permissions:{}".format(self.user_id), cached_keys)
+
+    self.api.get(all_models.Program, response.json["program"]["id"])
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertIn("permissions:{}".format(self.user_id), cached_keys)
+
+    program = all_models.Program.query.get(response.json["program"]["id"])
+    self.api.put(program, {
+        "title": "Program title 1"
+    })
+    cached_keys = self.memcache_client.get("permissions:list")
+    self.assertIn("permissions:{}".format(self.user_id), cached_keys)
 
 
 class TestPermissionsCacheFlushing(TestMemcacheBase):
@@ -119,14 +553,14 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
     # ensure that new permissions were returned instead of old ones
     self.assertEquals(result, {"11": "b"})
 
-  def test_permissions_flush_on_post(self):
+  def test_permissions_flush_not_flush_on_simple_post(self):
     """Test that permissions in memcache are cleaned after POST request."""
     user = self.create_user_with_role("Creator")
     self.api.set_user(user)
     self.api.client.get("/permissions")
 
-    perm_ids = self.memcache_client.get('permissions:list')
-    self.assertEqual(perm_ids, {'permissions:{}'.format(user.id)})
+    perm_ids = self.memcache_client.get("permissions:list")
+    self.assertEqual(perm_ids, {"permissions:{}".format(user.id)})
 
     response = self.api.post(
         all_models.Objective,
@@ -134,10 +568,10 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
     )
     self.assert_status(response, 201)
 
-    perm_ids = self.memcache_client.get('permissions:list')
-    self.assertIsNone(perm_ids)
+    perm_ids = self.memcache_client.get("permissions:list")
+    self.assertIn("permissions:{}".format(user.id), perm_ids)
 
-  def test_permissions_flush_on_put(self):
+  def test_permissions_not_flush_on_simple_put(self):
     """Test that permissions in memcache are cleaned after PUT request."""
     with factories.single_commit():
       user = self.create_user_with_role("Creator")
@@ -148,15 +582,15 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
     self.api.set_user(user)
     self.api.client.get("/permissions")
 
-    perm_ids = self.memcache_client.get('permissions:list')
-    self.assertEqual(perm_ids, {'permissions:{}'.format(user.id)})
+    perm_ids = self.memcache_client.get("permissions:list")
+    self.assertEqual(perm_ids, {"permissions:{}".format(user.id)})
 
     objective = all_models.Objective.query.get(objective_id)
     response = self.api.put(objective, {"title": "new title"})
     self.assert200(response)
 
-    perm_ids = self.memcache_client.get('permissions:list')
-    self.assertIsNone(perm_ids)
+    perm_ids = self.memcache_client.get("permissions:list")
+    self.assertIn("permissions:{}".format(user.id), perm_ids)
 
   def test_permissions_flush_on_delete(self):
     """Test that permissions in memcache are cleaned after DELETE request."""
@@ -169,12 +603,12 @@ class TestPermissionsCacheFlushing(TestMemcacheBase):
     self.api.set_user(user)
     self.api.client.get("/permissions")
 
-    perm_ids = self.memcache_client.get('permissions:list')
-    self.assertEqual(perm_ids, {'permissions:{}'.format(user.id)})
+    perm_ids = self.memcache_client.get("permissions:list")
+    self.assertEqual(perm_ids, {"permissions:{}".format(user.id)})
 
     objective = all_models.Objective.query.get(objective_id)
     response = self.api.delete(objective)
     self.assert200(response)
 
-    perm_ids = self.memcache_client.get('permissions:list')
-    self.assertIsNone(perm_ids)
+    perm_ids = self.memcache_client.get("permissions:list")
+    self.assertEqual(perm_ids, set())

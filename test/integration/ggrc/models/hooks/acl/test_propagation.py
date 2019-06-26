@@ -225,11 +225,13 @@ class TestPropagation(BaseTestPropagation):
           ).id,
       ]
 
-    child_ids = propagation._handle_relationship_step(
-        relationship_ids,
-        [],
-        self.user_id,
-    )
+    with app.app.app_context():
+      flask.g.user_ids = set()
+      child_ids = propagation._handle_relationship_step(
+          relationship_ids,
+          [],
+          self.user_id,
+      )
 
     self.assertEqual(
         all_models.AccessControlList.query.filter(
@@ -256,11 +258,17 @@ class TestPropagation(BaseTestPropagation):
           destination=audit.program,
       )
 
-    acl_ids = {acl.id for acl in audit.program._access_control_list}
+    acl_ids = set()
+    user_ids = set()
+    for _acl in audit.program._access_control_list:
+      acl_ids.add(_acl.id)
+      for acp in _acl.access_control_people:
+        user_ids.append(acp.id)
 
     with app.app.app_context():
       flask.g.new_acl_ids = acl_ids
       flask.g.new_relationship_ids = {relationship.id}
+      flask.g.user_ids = user_ids
       flask.g.deleted_objects = set()
 
       propagation.propagate()
@@ -448,8 +456,16 @@ class TestPropagationViaImport(BaseTestPropagation):
                                            child_id=control.id)
       factories.RelationshipFactory(destination=audit, source=snapshot)
 
+    acl_ids = set()
+    user_ids = set()
+    for _acl in program._access_control_list:
+      acl_ids.add(_acl.id)
+      for acp in _acl.access_control_people:
+        user_ids.append(acp.id)
+
     flask.g.new_relationship_ids = [rel.id]
-    flask.g.new_acl_ids = [a.id for a in program._access_control_list]
+    flask.g.new_acl_ids = acl_ids
+    flask.g.user_ids = user_ids
     flask.g.deleted_objects = []
 
     propagation.propagate()

@@ -18,6 +18,8 @@ from ggrc import login
 from ggrc import utils
 from ggrc.utils import helpers
 from ggrc.access_control import utils as acl_utils
+from ggrc.cache.utils import clear_permission_cache
+from ggrc.cache.utils import clear_users_permission_cache
 from ggrc.models import all_models
 from ggrc.models.hooks import access_control_role
 
@@ -294,6 +296,11 @@ def _propagate_relationships(relationship_ids, new_acl_ids, user_id):
     return
   child_ids = _handle_relationship_step(relationship_ids, new_acl_ids, user_id)
   _propagate(child_ids, user_id)
+  # retrieve user ids from propagated ACPs
+  user_ids = acl_utils.get_user_ids(
+      all_models.AccessControlList.id.in_(child_ids)
+  )
+  getattr(flask.g, "user_ids").update(user_ids)
 
 
 def _delete_orphan_acl_entries(deleted_objects):
@@ -347,7 +354,7 @@ def _set_empty_base_ids():
   db.session.plain_commit()
 
 
-def propagate():
+def propagate(full_propagate=False):
   """Propagate all ACLs caused by objects in new_objects list.
 
   Args:
@@ -380,8 +387,15 @@ def propagate():
     with utils.benchmark("Propagate new ACL entries"):
       _propagate(flask.g.new_acl_ids, current_user_id)
 
+  # clear permissions memcache
+  if not full_propagate and flask.g.user_ids:
+    with utils.benchmark("Clear ACL memcache for specific users: %s" %
+                         flask.g.user_ids):
+      clear_users_permission_cache(flask.g.user_ids)
+
   del flask.g.new_acl_ids
   del flask.g.new_relationship_ids
+  del flask.g.user_ids
   del flask.g.deleted_objects
 
 
@@ -404,6 +418,8 @@ def _add_missing_acl_entries():
 @helpers.without_sqlalchemy_cache
 def propagate_all():
   """Re-evaluate propagation for all objects."""
+  with utils.benchmark("Clear ACL memcache"):
+    clear_permission_cache()
   with utils.benchmark("Run propagate_all"):
     with utils.benchmark("Add missing acl entries"):
       _add_missing_acl_entries()
@@ -425,5 +441,6 @@ def propagate_all():
 
         flask.g.new_acl_ids = acl_ids
         flask.g.new_relationship_ids = set()
+        flask.g.user_ids = set()
         flask.g.deleted_objects = set()
-        propagate()
+        propagate(full_propagate=True)
