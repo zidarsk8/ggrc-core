@@ -5,8 +5,8 @@
 
 import canList from 'can-list';
 import Cacheable from '../cacheable';
-import refetchHash from '../mixins/refetch-hash';
-import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
+import RefetchHash from '../mixins/refetch-hash';
+import AssessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import Stub from '../stub';
 
 /**
@@ -26,8 +26,8 @@ export default Cacheable.extend({
   table_singular: 'assessment_template',
   table_plural: 'assessment_templates',
   mixins: [
-    refetchHash,
-    assessmentIssueTracker,
+    RefetchHash,
+    AssessmentIssueTracker,
   ],
   findOne: 'GET /api/assessment_templates/{id}',
   findAll: 'GET /api/assessment_templates',
@@ -108,7 +108,7 @@ export default Cacheable.extend({
    * @param {*} params - additional params
    * @param {*} pageInstance - current page instance
    */
-  form_preload: function (isNew, params, pageInstance) {
+  formPreload: function (isNew, params, pageInstance) {
     if (!this.audit || !this.audit.id || !this.audit.type) {
       if (pageInstance.type === 'Audit') {
         this.attr('audit', pageInstance);

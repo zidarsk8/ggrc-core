@@ -6,7 +6,7 @@
 import Mixin from '../mixin';
 
 export default class ScopeObjectNotifications extends Mixin {
-  get send_by_default() {
+  get send_by_default() { // eslint-disable-line camelcase
     return true;
   }
 

@@ -7,7 +7,7 @@ import Mixin from './mixin';
 import Stub from '../stub';
 
 export default class Contactable extends Mixin {
-  before_create() {
+  beforeCreate() {
     let person = {
       id: GGRC.current_user.id,
       type: 'Person',
@@ -17,7 +17,7 @@ export default class Contactable extends Mixin {
     }
   }
 
-  form_preload(newObjectForm) {
+  formPreload(newObjectForm) {
     let person = {
       id: GGRC.current_user.id,
       type: 'Person',

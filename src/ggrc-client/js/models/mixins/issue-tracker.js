@@ -16,11 +16,11 @@ export default class IssueTracker extends Mixin {
     issueTrackerUtils.cleanUpWarnings(this);
   }
 
-  after_refresh() {
+  afterRefresh() {
     this.initIssueTracker();
   }
 
-  after_save() {
+  afterSave() {
     issueTrackerUtils.checkWarnings(this);
   }
 

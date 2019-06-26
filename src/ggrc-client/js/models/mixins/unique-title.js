@@ -6,13 +6,13 @@
 import Mixin from './mixin';
 
 export default class UniqueTitle extends Mixin {
-  save_error(val) {
+  saveError(val) {
     if (/title values must be unique\.$/.test(val)) {
       this.attr('_transient_title', val);
     }
   }
 
-  after_save() {
+  afterSave() {
     this.removeAttr('_transient_title');
   }
 

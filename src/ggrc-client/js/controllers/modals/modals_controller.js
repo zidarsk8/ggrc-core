@@ -257,8 +257,8 @@ export default canControl.extend({
     if (!instance._transient) {
       instance.attr('_transient', new canMap({}));
     }
-    if (instance.form_preload) {
-      preloadDfd = instance.form_preload(
+    if (instance.formPreload) {
+      preloadDfd = instance.formPreload(
         this.options.new_object_form,
         this.options.object_params,
         getPageInstance());

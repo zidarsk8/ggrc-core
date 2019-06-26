@@ -18,7 +18,7 @@ import * as AjaxUtils from '../../../plugins/ajax_extensions';
 describe('Assessment model', function () {
   'use strict';
 
-  describe('before_create() method', function () {
+  describe('beforeCreate() method', function () {
     let assessment;
     let audit;
     let auditWithoutContext;
@@ -36,33 +36,33 @@ describe('Assessment model', function () {
 
     it('sets the program and context properties', function () {
       assessment.attr('audit', audit);
-      assessment.before_create();
+      assessment.beforeCreate();
       expect(assessment.context.id).toEqual(context.id);
     });
 
     it('throws an error if audit is not defined', function () {
       expect(function () {
-        assessment.before_create();
+        assessment.beforeCreate();
       }).toThrow(new Error('Cannot save assessment, audit not set.'));
     });
 
     it('throws an error if audit program/context are not defined', function () {
       assessment.attr('audit', auditWithoutContext);
       expect(function () {
-        assessment.before_create();
+        assessment.beforeCreate();
       }).toThrow(new Error(
         'Cannot save assessment, audit context not set.'));
     });
     it('sets empty string to design property', function () {
       assessment.attr('audit', audit);
       assessment.attr('design', undefined);
-      assessment.before_create();
+      assessment.beforeCreate();
       expect(assessment.attr('design')).toEqual('');
     });
     it('sets empty string to operationally property', function () {
       assessment.attr('audit', audit);
       assessment.attr('operationally', undefined);
-      assessment.before_create();
+      assessment.beforeCreate();
       expect(assessment.attr('operationally')).toEqual('');
     });
   });
@@ -153,7 +153,7 @@ describe('Assessment model', function () {
     });
   });
 
-  describe('form_preload() method', function () {
+  describe('formPreload() method', function () {
     beforeEach(() => {
       spyOn(modelsUtils, 'getInstance').and.returnValue(GGRC.current_user);
     });
@@ -169,7 +169,7 @@ describe('Assessment model', function () {
 
     it('populates access control roles based on audit roles', function () {
       let model = makeFakeInstance({model: Assessment})();
-      spyOn(model, 'before_create');
+      spyOn(model, 'beforeCreate');
       spyOn(aclUtils, 'getRole').and.returnValues(
         {id: 10, name: 'Creators', object_type: 'Assessment'},
         {id: 11, name: 'Assignees', object_type: 'Assessment'},
@@ -200,7 +200,7 @@ describe('Assessment model', function () {
           return roles[name];
         },
       });
-      model.form_preload(true);
+      model.formPreload(true);
       // Expect 7 new access_control_roles to be created
       expect(model.access_control_list.length).toBe(7);
       checkAcRoles(model, 10, [1]);
@@ -210,7 +210,7 @@ describe('Assessment model', function () {
     it('defaults correctly when auditors/audit captains are undefined',
       function () {
         let model = makeFakeInstance({model: Assessment})();
-        spyOn(model, 'before_create');
+        spyOn(model, 'beforeCreate');
         spyOn(aclUtils, 'getRole').and.returnValues(
           {id: 10, name: 'Creators', object_type: 'Assessment'},
           {id: 11, name: 'Assignees', object_type: 'Assessment'},
@@ -227,7 +227,7 @@ describe('Assessment model', function () {
             return roles[name];
           },
         });
-        model.form_preload(true);
+        model.formPreload(true);
         // Expect 7 new access_control_roles to be created
         expect(model.access_control_list.length).toBe(2);
         checkAcRoles(model, 10, [1]);

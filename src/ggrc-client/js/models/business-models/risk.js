@@ -4,8 +4,8 @@
  */
 
 import Cacheable from '../cacheable';
-import proposable from '../mixins/proposable';
-import changeableExternally from '../mixins/changeable-externally';
+import Proposable from '../mixins/proposable';
+import ChangeableExternally from '../mixins/changeable-externally';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -18,8 +18,8 @@ export default Cacheable.extend({
   update: 'PUT /api/risks/{id}',
   destroy: 'DELETE /api/risks/{id}',
   mixins: [
-    proposable,
-    changeableExternally,
+    Proposable,
+    ChangeableExternally,
   ],
   migrationDate: '06/13/2019',
   is_custom_attributable: true,

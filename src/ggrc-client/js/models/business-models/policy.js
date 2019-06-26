@@ -4,7 +4,7 @@
 */
 
 import Directive from './directive';
-import accessControlList from '../mixins/access-control-list';
+import AccessControlList from '../mixins/access-control-list';
 
 export default Directive.extend({
   root_object: 'policy',
@@ -24,7 +24,7 @@ export default Directive.extend({
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {},
-  mixins: [accessControlList],
+  mixins: [AccessControlList],
   sub_tree_view_options: {
     default_filter: ['DataAsset'],
   },

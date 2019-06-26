@@ -14,12 +14,12 @@ describe('AssessmentTemplate model', () => {
     instance = makeFakeInstance({model: AssessmentTemplate})();
   });
 
-  describe('form_preload method', () => {
+  describe('formPreload method', () => {
     it('adds custom_attribute_definitions field', () => {
       expect(instance.custom_attribute_definitions)
         .toBeUndefined();
 
-      instance.form_preload(true, null, {});
+      instance.formPreload(true, null, {});
 
       expect(instance.custom_attribute_definitions instanceof canList)
         .toBeTruthy();

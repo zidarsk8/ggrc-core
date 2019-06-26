@@ -29,7 +29,7 @@ const viewModel = canMap.extend({
   },
   loadPersonProfile() {
     // Profile is loaded in the moment of modal initialization via person's
-    // form_preload method
+    // formPreload method
     const profile = PersonProfile.findInCacheById(
       this.attr('instance.profile.id')
     );

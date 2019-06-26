@@ -8,7 +8,7 @@ import {
 } from '../../../../js_specs/spec_helpers';
 import * as snapshotUtils from '../../../plugins/utils/snapshot-utils';
 import Cacheable from '../../cacheable';
-import accessControlList from '../../../models/mixins/access-control-list';
+import AccessControlList from '../../../models/mixins/access-control-list';
 
 describe('accessControlList mixin', () => {
   describe('"cleanupAcl" method: ', () => {
@@ -26,7 +26,7 @@ describe('accessControlList mixin', () => {
         model: Cacheable,
         staticProps: {
           mixins: [
-            accessControlList,
+            AccessControlList,
           ],
         },
       });

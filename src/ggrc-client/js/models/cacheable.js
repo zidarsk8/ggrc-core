@@ -157,7 +157,7 @@ export default canModel.extend({
 
     if (staticProps.mixins) {
       loForEach(staticProps.mixins, function (mixin) {
-        mixin.add_to(that);
+        mixin.addTo(that);
       });
       delete this.mixins;
     }
@@ -647,7 +647,7 @@ export default canModel.extend({
               return that.constructor.model(response);
             })
             .then((model) => {
-              that.after_refresh && that.after_refresh();
+              that.afterRefresh && that.afterRefresh();
               return model;
             })
             .done(function (response) {
@@ -736,20 +736,20 @@ export default canModel.extend({
     this.dispatch('modelBeforeSave');
 
     if (isNew) {
-      if (this.before_create) {
-        this.before_create();
+      if (this.beforeCreate) {
+        this.beforeCreate();
       }
     }
 
     let saveXHR = saveCallback.call(this)
       .then((result) => {
         if (!isNew) {
-          this.after_update && this.after_update();
+          this.afterUpdate && this.afterUpdate();
         }
-        this.after_save && this.after_save();
+        this.afterSave && this.afterSave();
         return result;
       }, (xhr, status, message) => {
-        this.save_error && this.save_error(xhr.responseText);
+        this.saveError && this.saveError(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
       })
       .fail((response) => {

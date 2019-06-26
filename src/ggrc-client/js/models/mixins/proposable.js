@@ -7,7 +7,7 @@ import Mixin from './mixin';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 
 export default class Proposable extends Mixin {
-  after_update() {
+  afterUpdate() {
     this.dispatch({
       ...REFRESH_PROPOSAL_DIFF,
     });

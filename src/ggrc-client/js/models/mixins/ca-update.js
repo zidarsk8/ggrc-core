@@ -6,11 +6,11 @@
 import Mixin from './mixin';
 
 export default class CaUpdate extends Mixin {
-  after_save() {
+  afterSave() {
     this.dispatch('readyForRender');
   }
 
-  info_pane_preload() {
+  infoPanePreload() {
     this.refresh();
   }
 }

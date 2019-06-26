@@ -4,10 +4,10 @@
 */
 
 import Cacheable from '../cacheable';
-import caUpdate from '../mixins/ca-update';
-import proposable from '../mixins/proposable';
-import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
-import changeableExternally from '../mixins/changeable-externally';
+import CaUpdate from '../mixins/ca-update';
+import Proposable from '../mixins/proposable';
+import RelatedAssessmentsLoader from '../mixins/related-assessments-loader';
+import ChangeableExternally from '../mixins/changeable-externally';
 
 export default Cacheable.extend({
   root_object: 'control',
@@ -19,10 +19,10 @@ export default Cacheable.extend({
   update: 'PUT /api/controls/{id}',
   destroy: 'DELETE /api/controls/{id}',
   mixins: [
-    caUpdate,
-    proposable,
-    relatedAssessmentsLoader,
-    changeableExternally,
+    CaUpdate,
+    Proposable,
+    RelatedAssessmentsLoader,
+    ChangeableExternally,
   ],
   migrationDate: '03/26/2019',
   is_custom_attributable: true,

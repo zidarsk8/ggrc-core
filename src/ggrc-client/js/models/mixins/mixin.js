@@ -11,7 +11,7 @@ export default class Mixin {
     throw new Error('Mixins cannot be directly instantiated');
   }
 
-  static add_to(cls) {
+  static addTo(cls) {
     if (this === Mixin) {
       throw new Error('Must only add a subclass of Mixin to an object,' +
         ' not Mixin itself');
@@ -70,9 +70,11 @@ export default class Mixin {
     if (!loIncludes(cls._mixins, this)) {
       cls._mixins = cls._mixins || [];
       cls._mixins.push(this);
+      // static properties
       Object.getOwnPropertyNames(this).forEach((key) => {
         setupFns(cls)(this[key], key);
       });
+      // prototype properties
       Object.getOwnPropertyNames(this.prototype).forEach((key) => {
         setupFns(cls.prototype)(this.prototype[key], key);
       });

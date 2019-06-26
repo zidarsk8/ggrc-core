@@ -4,11 +4,11 @@
 */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
-import scopeObjectNotifications from '../mixins/notifications/scope-object-notifications';
-import questionnaire from '../mixins/questionnaire';
+import UniqueTitle from '../mixins/unique-title';
+import CaUpdate from '../mixins/ca-update';
+import AccessControlList from '../mixins/access-control-list';
+import ScopeObjectNotifications from '../mixins/notifications/scope-object-notifications';
+import Questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -21,11 +21,11 @@ export default Cacheable.extend({
   update: 'PUT /api/technology_environments/{id}',
   destroy: 'DELETE /api/technology_environments/{id}',
   mixins: [
-    uniqueTitle,
-    caUpdate,
-    accessControlList,
-    scopeObjectNotifications,
-    questionnaire,
+    UniqueTitle,
+    CaUpdate,
+    AccessControlList,
+    ScopeObjectNotifications,
+    Questionnaire,
   ],
   attributes: {
     context: Stub,

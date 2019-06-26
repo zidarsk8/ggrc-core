@@ -10,7 +10,7 @@ import {
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import Component from '../access-control-list-roles-helper';
 import Cacheable from '../../../models/cacheable';
-import accessControlList from '../../../models/mixins/access-control-list';
+import AccessControlList from '../../../models/mixins/access-control-list';
 
 describe('access-control-list-roles-helper component', function () {
   'use strict';
@@ -24,7 +24,7 @@ describe('access-control-list-roles-helper component', function () {
       model: Cacheable,
       staticProps: {
         mixins: [
-          accessControlList,
+          AccessControlList,
         ],
       },
     });
