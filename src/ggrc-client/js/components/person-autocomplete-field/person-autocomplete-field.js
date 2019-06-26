@@ -50,9 +50,4 @@ export default canComponent.extend({
       }
     },
   }),
-  events: {
-    '{window} click'() {
-      this.viewModel.attr('showResults', false);
-    },
-  },
 });
