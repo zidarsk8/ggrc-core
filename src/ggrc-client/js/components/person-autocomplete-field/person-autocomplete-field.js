@@ -19,12 +19,14 @@ export default canComponent.extend({
   view: canStache(template),
   viewModel: actionKeyable.extend({
     personEmail: '',
+    personName: '',
     showResults: false,
     inputId: '',
     tabindex: -1,
     placeholder: '',
     personSelected({person}) {
       this.attr('personEmail', person.email);
+      this.attr('personName', person.name);
     },
     onKeyDown(event) {
       if (KEYS_TO_LISTEN.includes(event.code)) {

@@ -24,6 +24,7 @@
           <i class="fa fa-asterisk"></i>
         </label>
         <person-autocomplete-field personEmail:bind="email"
+          personName:bind="name"
           inputId:from="'person_email'"
           placeholder:from="'email@company.com'"
           tabindex:from="2">
