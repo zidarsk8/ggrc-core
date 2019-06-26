@@ -4,9 +4,9 @@
 */
 
 import canComponent from 'can-component';
-import canMap from 'can-map';
 import canStache from 'can-stache';
 import template from './person-autocomplete-field.stache';
+import actionKeyable from '../view-models/action-keyable';
 
 const KEYS_TO_LISTEN = ['ArrowUp', 'ArrowDown', 'Enter'];
 
@@ -17,7 +17,7 @@ const KEYS_TO_LISTEN = ['ArrowUp', 'ArrowDown', 'Enter'];
 export default canComponent.extend({
   tag: 'person-autocomplete-field',
   view: canStache(template),
-  viewModel: canMap.extend({
+  viewModel: actionKeyable.extend({
     personEmail: '',
     showResults: false,
     inputId: '',
@@ -25,14 +25,6 @@ export default canComponent.extend({
     placeholder: '',
     personSelected({person}) {
       this.attr('personEmail', person.email);
-    },
-    onActionKey(keyCode) {
-      if (this.attr('showResults')) {
-        // trigger setter of 'actionKey'
-        this.attr('actionKey', keyCode);
-        // reset 'actionKey'
-        this.attr('actionKey', null);
-      }
     },
     onKeyDown(event) {
       if (KEYS_TO_LISTEN.includes(event.code)) {

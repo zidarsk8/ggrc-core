@@ -4,12 +4,12 @@
 */
 
 import canStache from 'can-stache';
-import canMap from 'can-map';
 import canComponent from 'can-component';
 import '../../people-autocomplete/people-autocomplete-wrapper/people-autocomplete-wrapper';
 
 import template from './people-mention.stache';
 import {KEY_MAP} from '../../custom-autocomplete/autocomplete-input';
+import actionKeyable from '../../view-models/action-keyable';
 
 const MENTION_REGEX = {
   BEFORE_SELECTION: /(^.*[\s]|^)[@+]([\S]*)$/s,
@@ -23,7 +23,7 @@ export default canComponent.extend({
   tag: 'people-mention',
   view: canStache(template),
   leakScope: false,
-  viewModel: canMap.extend({
+  viewModel: actionKeyable.extend({
     define: {
       editor: {
         set(editor) {
@@ -49,28 +49,13 @@ export default canComponent.extend({
         },
       },
     },
-    // two way bound attribute to child components
-    // to define if "results" is shown.
-    showResults: false,
     mentionBeforeSelection: null,
     mentionAfterSelection: null,
     mentionIndex: null,
-    actionKey: null,
     clearMention() {
       this.attr('mentionBeforeSelection', null);
       this.attr('mentionAfterSelection', null);
       this.attr('mentionIndex', null);
-    },
-    onActionKey(keyCode) {
-      if (this.attr('showResults')) {
-        // trigger setter of 'actionKey'
-        this.attr('actionKey', keyCode);
-        // reset 'actionKey'
-        this.attr('actionKey', null);
-        // prevent default behavior
-        return false;
-      }
-      return true;
     },
     onEscapeKey() {
       if (this.attr('showResults')) {
