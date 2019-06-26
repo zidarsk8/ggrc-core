@@ -18,17 +18,31 @@ export default canComponent.extend({
   tag: 'people-autocomplete-dropdown',
   view: canStache(template),
   viewModel: actionKeyable.extend({
-    showResults: false,
+    define: {
+      showResults: {
+        set(newValue) {
+          if (newValue === true) {
+            window.addEventListener('click', this.boundOnWindowClick);
+          } else {
+            window.removeEventListener('click', this.boundOnWindowClick);
+          }
+          return newValue;
+        },
+        value: false,
+      },
+    },
     currentValue: null,
+    boundOnWindowClick: null,
     personSelected({item: person}) {
       this.dispatch({type: 'personSelected', person});
       this.attr('showResults', false);
       this.attr('currentValue', null);
     },
-  }),
-  events: {
-    '{window} click'() {
-      this.viewModel.attr('showResults', false);
+    onWindowClick() {
+      this.attr('showResults', false);
     },
-  },
+    init() {
+      this.boundOnWindowClick = this.onWindowClick.bind(this);
+    },
+  }),
 });
