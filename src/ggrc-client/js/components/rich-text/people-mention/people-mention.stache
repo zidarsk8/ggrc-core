@@ -16,7 +16,6 @@
       items:from="result"
       showResults:bind="showResults"
       showNewValue:from="showNewValue"
-      on:addNewItem="createLabel(scope.event)"
       on:selectItem="personSelected(scope.event)"
       actionKey:from="actionKey"
     ></people-autocomplete-results>
