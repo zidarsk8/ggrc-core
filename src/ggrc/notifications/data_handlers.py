@@ -173,13 +173,15 @@ def _get_assignable_roles(obj):
   return {role_id: name for role_id, name in query}
 
 
-def _get_assignable_dict(people, notif):
+def _get_assignable_dict(people, notif, ca_cache=None):
   """Get dict data for assignable object in notification.
 
   Args:
     people (List[Person]): List o people objects who should receive the
       notification.
     notif (Notification): Notification that should be sent.
+    ca_cache (dict): prefetched CustomAttributeDefinition instances accessible
+      by definition_type as a key
   Returns:
     dict: dictionary containing notification data for all people in the given
       list.
@@ -187,7 +189,12 @@ def _get_assignable_dict(people, notif):
   obj = get_notification_object(notif)
   data = {}
 
-  definitions = AttributeInfo.get_object_attr_definitions(obj.__class__)
+  # we do not use definitions data if notification name not assessment update
+  if notif.notification_type.name == "assessment_updated":
+    definitions = AttributeInfo.get_object_attr_definitions(obj.__class__,
+                                                            ca_cache=ca_cache)
+  else:
+    definitions = None
   roles = _get_assignable_roles(obj)
 
   for person in people:
@@ -217,10 +224,12 @@ def _get_assignable_dict(people, notif):
   return data
 
 
-def assignable_open_data(notif):
+def assignable_open_data(notif, ca_cache=None):
   """Get data for open assignable object.
 
   Args:
+    ca_cache (dict): prefetched CustomAttributeDefinition instances accessible
+      by definition_type as a key
     notif (Notification): Notification entry for an open assignable object.
 
   Returns:
@@ -235,13 +244,15 @@ def assignable_open_data(notif):
     return {}
   people = [person for person in obj.assignees]
 
-  return _get_assignable_dict(people, notif)
+  return _get_assignable_dict(people, notif, ca_cache=ca_cache)
 
 
-def assignable_updated_data(notif):
+def assignable_updated_data(notif, ca_cache=None):
   """Get data for updated assignable object.
 
   Args:
+    ca_cache (dict): prefetched CustomAttributeDefinition instances accessible
+      by definition_type as a key
     notif (Notification): Notification entry for an open assignable object.
 
   Returns:
@@ -256,7 +267,7 @@ def assignable_updated_data(notif):
     return {}
   people = [person for person in obj.assignees]
 
-  return _get_assignable_dict(people, notif)
+  return _get_assignable_dict(people, notif, ca_cache=ca_cache)
 
 
 def _get_declined_people(obj):
@@ -274,10 +285,12 @@ def _get_declined_people(obj):
   return []
 
 
-def assignable_declined_data(notif):
+def assignable_declined_data(notif, ca_cache=None):
   """Get data for declined assignable object.
 
   Args:
+    ca_cache (dict): prefetched CustomAttributeDefinition instances accessible
+      by definition_type as a key
     notif (Notification): Notification entry for a declined assignable object.
 
   Returns:
@@ -285,7 +298,7 @@ def assignable_declined_data(notif):
   """
   obj = get_notification_object(notif)
   people = _get_declined_people(obj)
-  return _get_assignable_dict(people, notif)
+  return _get_assignable_dict(people, notif, ca_cache=ca_cache)
 
 
 def get_assessment_url(assessment):
@@ -294,7 +307,7 @@ def get_assessment_url(assessment):
       "assessments/{}".format(assessment.id))
 
 
-def assignable_reminder(notif):
+def assignable_reminder(notif, **_):
   """Get data for assignable object for reminders"""
   obj = get_notification_object(notif)
   reminder = next((attrs for attrs in obj.REMINDERABLE_HANDLERS.values()
@@ -361,7 +374,7 @@ def get_notification_object(notif):
   return None
 
 
-def get_assignable_data(notif):
+def get_assignable_data(notif, **kwargs):
   """Return data for assignable object notifications.
 
   Args:
@@ -392,7 +405,7 @@ def get_assignable_data(notif):
 
   for suffix, data_handler in data_handlers.iteritems():
     if notif_type.endswith(suffix):
-      return data_handler(notif)
+      return data_handler(notif, ca_cache=kwargs.get('ca_cache'))
 
   return {}
 
@@ -470,7 +483,7 @@ def _get_people_with_roles(comment_obj):
   return assignees
 
 
-def get_comment_data(notif):
+def get_comment_data(notif, **_):
   """Return data for comment notifications.
 
   This functions checks who should receive the notification and who not, with
@@ -513,3 +526,29 @@ def get_comment_data(notif):
       data[person.email] = generate_comment_notification(
           comment_obj, comment, person)
   return data
+
+
+def custom_attributes_cache(notifications):
+  """Compile and return Custom Attributes
+
+  Args:
+    notifications: a list of Notification instances for which to fetch the
+      corresponding CAds instances
+  Returns:
+    Dictionary containing all custom attributes with a definition type as a key
+  """
+  ca_cache = defaultdict(list)
+  definitions = models.CustomAttributeDefinition.query.filter(
+      sa.tuple_(
+          models.CustomAttributeDefinition.definition_type,
+          models.CustomAttributeDefinition.definition_id
+      ).in_([
+          (notification.object_type, notification.object_id)
+          for notification
+          in notifications
+      ])
+  )
+  for attr in definitions:
+    ca_cache[attr.definition_type].append(attr)
+
+  return ca_cache

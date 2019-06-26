@@ -31,6 +31,7 @@ from ggrc.gcalendar import calendar_event_sync
 from ggrc.models import Person
 from ggrc.models import Notification, NotificationHistory
 from ggrc.models import background_task
+from ggrc.notifications.data_handlers import custom_attributes_cache
 from ggrc.notifications.unsubscribe import unsubscribe_url
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
@@ -42,8 +43,7 @@ from ggrc_workflows.notification.notification_handler \
     import done_tasks_notify, not_done_tasks_notify
 
 from ggrc_workflows.notification.data_handler import (
-    cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data
-)
+    cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data)
 
 
 # pylint: disable=invalid-name
@@ -102,11 +102,12 @@ class Services(object):
           del_rels_cache=kwargs.get('del_rels_cache')
       )
 
-    return service(notif)
+    return service(notif, ca_cache=kwargs.get('ca_cache'))
 
 
 def get_filter_data(
-    notification, people_cache, tasks_cache=None, del_rels_cache=None
+    notification, people_cache, tasks_cache=None, del_rels_cache=None,
+    ca_cache=None
 ):
   """Get filtered notification data.
 
@@ -116,6 +117,8 @@ def get_filter_data(
   a daily digest and the specific users notification settings.
 
   Args:
+    ca_cache (dict): prefetched CustomAttributeDefinition instances accessible
+      by definition_type as a key
     notification (Notification): Notification object for which we want to get
       data.
     tasks_cache (dict): prefetched CycleTaskGroupObjectTask instances
@@ -129,7 +132,8 @@ def get_filter_data(
   """
   result = {}
   data = Services.call_service(
-      notification, tasks_cache=tasks_cache, del_rels_cache=del_rels_cache)
+      notification, tasks_cache=tasks_cache, del_rels_cache=del_rels_cache,
+      ca_cache=ca_cache)
 
   for user, user_data in data.iteritems():
     if should_receive(notification, user_data, people_cache):
@@ -158,11 +162,12 @@ def get_notification_data(notifications):
 
   tasks_cache = cycle_tasks_cache(notifications)
   deleted_rels_cache = deleted_task_rels_cache(tasks_cache.keys())
+  ca_cache = custom_attributes_cache(notifications)
 
   for notification in notifications:
     filtered_data = get_filter_data(
         notification, people_cache, tasks_cache=tasks_cache,
-        del_rels_cache=deleted_rels_cache)
+        del_rels_cache=deleted_rels_cache, ca_cache=ca_cache)
     aggregate_data = merge_dict(aggregate_data, filtered_data)
 
   # Remove notifications for objects without a contact (such as task groups)

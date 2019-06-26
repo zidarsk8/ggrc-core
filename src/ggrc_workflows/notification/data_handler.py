@@ -286,7 +286,7 @@ def get_cycle_created_data(notification, cycle):
   return result
 
 
-def get_cycle_data(notification):
+def get_cycle_data(notification, **_):
   """Get created and completed cycles data."""
   cycle = get_object(Cycle, notification.object_id)
   if not cycle:
@@ -396,7 +396,8 @@ def deleted_task_rels_cache(task_ids):
   return rels_cache
 
 
-def get_cycle_task_data(notification, tasks_cache=None, del_rels_cache=None):
+def get_cycle_task_data(notification, tasks_cache=None, del_rels_cache=None,
+                        **_):
   """Get all data of cycle task."""
   if tasks_cache is None:
     tasks_cache = {}
@@ -495,7 +496,7 @@ def get_cycle_start_failed_data(notification, workflow):
   return result
 
 
-def get_workflow_data(notification):
+def get_workflow_data(notification, **_):
   """Get workflow data."""
   workflow = get_object(Workflow, notification.object_id)
   if not workflow:
@@ -515,6 +516,7 @@ def get_workflow_data(notification):
 
 
 def get_object(obj_class, obj_id):
+  """Get object of type {obj_class} with id {obj_id}. None if unable to find"""
   result = db.session.query(obj_class).filter(obj_class.id == obj_id)
   if result.count() == 1:
     return result.one()
