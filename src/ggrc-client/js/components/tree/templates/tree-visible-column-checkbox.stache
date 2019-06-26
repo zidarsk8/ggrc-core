@@ -4,21 +4,12 @@
 }}
 
 {{#column}}
-  <label class="checkbox-inline" title="{{title viewType}}">
-    {{#if selected}}
-      <input type="checkbox"
-        checked="checked"
-        {{#mandatory}}disabled{{/mandatory}}
-        on:el:change="onChange"
-        value="{{name}}"
-        class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
-    {{else}}
-      <input type="checkbox"
-        {{#mandatory}}disabled{{/mandatory}}
-        on:el:change="onChange"
-        value="{{name}}"
-        class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
-    {{/if}}
-    {{title viewType}}
+  <label class="checkbox-inline" title="{{getTitle(.)}}">
+    <input type="checkbox"
+      checked:bind="selected"
+      {{#mandatory}}disabled{{/mandatory}}
+      value="{{name}}"
+      class="attr-checkbox {{#mandatory}}mandatory{{/mandatory}}">
+    {{getTitle(.)}}
   </label>
 {{/column}}
