@@ -293,19 +293,20 @@ def update_cad_related_objects(task):
   ).first()
   model = models.get_model(model_name)
   query = db.session.query(model if need_revisions else model.id)
-  objects_count = query.count()
+  objects_count = len(query.all())
   handled_objects = 0
   for chunk in ggrc_utils.generate_query_chunks(query):
-    handled_objects += chunk.count()
+    chunk_objects = chunk.all()
+    handled_objects += len(chunk_objects)
     logger.info(
         "Updating CAD related objects: %s/%s", handled_objects, objects_count
     )
     if need_revisions:
-      for obj in chunk:
+      for obj in chunk_objects:
         obj.updated_at = datetime.datetime.utcnow()
         obj.modified_by_id = modified_by_id
     else:
-      model.bulk_record_update_for([obj_id for obj_id, in chunk])
+      model.bulk_record_update_for([obj_id for obj_id, in chunk_objects])
     log_event.log_event(db.session, cad, event=event)
     db.session.commit()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
