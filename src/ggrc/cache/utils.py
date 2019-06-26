@@ -193,8 +193,6 @@ def update_memcache_after_commit(context):  # noqa: C901
     if delete_result is not True:
       logger.error("CACHE: Failed to remove status entries from cache")
 
-  if getattr(context, "operation", "") != "import":
-    clear_permission_cache()
   cache_manager.clear_cache()
 
 
