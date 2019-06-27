@@ -18,7 +18,6 @@
 
   "globals": {
     "_": false,
-    "can": false,
     "GGRC": false,
     "moment": false,
     "MutationObserver": false,
@@ -117,12 +116,6 @@
     }, {
         "object": "$",
         "property": "ajax"
-    }, {
-      "object": "can",
-      "property": "Deferred"
-    }, {
-      "object": "can",
-      "property": "when"
     }]
   }
 }
