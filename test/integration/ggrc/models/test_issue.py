@@ -449,3 +449,25 @@ class TestIssueUnmap(TestCase):
         0
     )
     self.assertEqual(all_models.Relationship.query.count(), 6)
+
+  def test_unmap_manual_issue(self):
+    """Issue can't be unmapped from Audit if it was mapped manually."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      issue = factories.IssueFactory()
+      factories.RelationshipFactory(source=audit, destination=issue,
+                                    context=audit.context)
+      assmt_issue = factories.RelationshipFactory(source=assessment,
+                                                  destination=issue,
+                                                  context=audit.context)
+
+    audit_id = audit.id
+    issue_id = issue.id
+    response = self.generator.api.delete(assmt_issue,
+                                         args={"cascade": "true"})
+    self.assert200(response)
+    audit_issue = self.get_relationships(
+        audit_id, "Audit", issue_id, "Issue"
+    )
+    self.assertEqual(audit_issue.count(), 1)

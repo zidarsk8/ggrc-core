@@ -418,6 +418,7 @@ def cascade_unmappable(exp, object_class, target_class, query):
           all_models.Relationship.destination_id == issue_id,
           all_models.Relationship.destination_type == "Issue",
           all_models.Relationship.source_type == object_class.__name__,
+          ~all_models.Relationship.automapping_id.is_(None),
       ),
   ), name="mapped_to_issue")
 
