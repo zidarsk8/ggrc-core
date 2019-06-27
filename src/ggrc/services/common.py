@@ -1307,6 +1307,8 @@ class Resource(ModelView):
         result = current_app.make_response(
             (self.as_json(res), status, headers))
 
+      if status >= 500:
+        result.status_code = 200
       if 'X-GGRC-BackgroundTask' in request.headers:
         with benchmark("collection post > finish BackgroundTask"):
           if 200 <= status < 300:
