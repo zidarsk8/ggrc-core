@@ -298,6 +298,18 @@ def generate_query_chunks(query, chunk_size=CHUNK_SIZE, needs_ordering=True):
     yield query.limit(chunk_size).offset(offset)
 
 
+def result_proxy_chunks(result_proxy, chunk_size=CHUNK_SIZE):
+  # type: (sa.engine.ResultProxy, int) -> Iterator[List[tuple]]
+  """Yield successive chunk of chunk_size from sqlalchemy result proxy."""
+  records_remained = True
+  while records_remained:
+    chunk = result_proxy.fetchmany(chunk_size)
+    if not chunk:
+      records_remained = False
+    else:
+      yield chunk
+
+
 def list_chunks(list_, chunk_size=CHUNK_SIZE):
   """Yield successive chunk of chunk_size from list."""
   for index in range(0, len(list_), chunk_size):
