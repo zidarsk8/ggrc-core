@@ -7,6 +7,11 @@ import loFindIndex from 'lodash/findIndex';
 import loMap from 'lodash/map';
 import canMap from 'can-map';
 import canComponent from 'can-component';
+import canStache from 'can-stache';
+import template from './templates/assessment-template-attributes.stache';
+import './template-field/template-field';
+import './add-template-field/add-template-field';
+
 /*
  * Assessment template main component
  *
@@ -15,7 +20,7 @@ import canComponent from 'can-component';
  */
 export default canComponent.extend({
   tag: 'assessment-template-attributes',
-  leakScope: true,
+  view: canStache(template),
   viewModel: canMap.extend({
     fields: [],
     types: [{
