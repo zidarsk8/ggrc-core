@@ -5,21 +5,25 @@
 
 import unittest
 
+import ddt
+
 from ggrc.query import pagination
 
 
+@ddt.ddt
 class TestPaginationHelper(unittest.TestCase):
   """Tests for pagination module"""
 
-  def test_add_additional_sorting(self):
+  @ddt.data(True, False)
+  def test_add_additional_sorting(self, desc):
     """Test additional sorting"""
-    order_by = pagination.add_additional_sorting([{"name": "title",
-                                                   "desc": True}])
-    self.assertEqual([{"name": "title", "desc": True},
-                      {"name": "id", "desc": True}], order_by)
+    order_by = pagination.get_sorting_by_id([{"name": "title",
+                                              "desc": desc},
+                                             {"name": "date"}])
+    self.assertEqual([{"name": "id", "desc": desc}], order_by)
 
   def test_do_not_add_sorting(self):
     """We do not additional sorting if sort by id"""
-    expected = [{"name": "id", "desc": True}]
-    order_by = pagination.add_additional_sorting(expected)
-    self.assertEqual(expected, order_by)
+    init_sorting = [{"name": "id", "desc": True}]
+    order_by = pagination.get_sorting_by_id(init_sorting)
+    self.assertEqual([], order_by)
