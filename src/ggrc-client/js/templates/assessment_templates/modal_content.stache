@@ -149,7 +149,7 @@
 
     <div class="spacing-top row-fluid hidable">
       <label>Custom Attributes</label>
-      <div class="custom-attr-wrap define-attr">
+      <div class="custom-attr-wrap">
         <div>
           <div class="row-fluid">
             <div class="custom-attr-list span12">
