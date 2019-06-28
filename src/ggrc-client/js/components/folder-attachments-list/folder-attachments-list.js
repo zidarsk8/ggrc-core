@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../object-list-item/editable-document-object-list-item';
 import {
   BEFORE_MAPPING,
@@ -20,7 +20,7 @@ import template from './folder-attachments-list.stache';
  * Wrapper Component for rendering and managing of folder and
  * attachments lists
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'folder-attachments-list',
   view: canStache(template),
   leakScope: true,

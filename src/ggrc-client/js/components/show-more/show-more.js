@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './show-more.stache';
 
 /**
@@ -17,7 +17,7 @@ import template from './show-more.stache';
  *        </show-more>
  */
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'show-more',
   view: canStache(template),
   leakScope: true,

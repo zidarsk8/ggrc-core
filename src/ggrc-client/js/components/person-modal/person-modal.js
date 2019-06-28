@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
 import PersonProfile from '../../models/service-models/person-profile';
 
@@ -54,7 +54,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'person-modal',
   leakScope: true,
   viewModel,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './relevant-filter';
 import './export-group';
 import template from './templates/csv-export.stache';
@@ -35,7 +35,7 @@ import {connectionLostNotifier} from './connection-lost-notifier';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'csv-export',
   view: canStache(template),
   leakScope: true,

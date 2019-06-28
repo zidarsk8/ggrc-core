@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {BUTTON_VIEW_SAVE_CANCEL_DELETE} from '../../plugins/utils/modals';
 
 const viewModel = canMap.extend({
@@ -63,7 +63,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-structure',
   viewModel,
   init(el) {

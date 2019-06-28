@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './external-data-provider';
 import './autocomplete-results';
 import '../spinner-component/spinner-component';
@@ -17,7 +17,7 @@ import template from './external-data-autocomplete.stache';
  * The autocomplete component used to load data from external sources.
  * When user picks an external item, system will create corresponding item in database.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'external-data-autocomplete',
   view: canStache(template),
   leakScope: true,

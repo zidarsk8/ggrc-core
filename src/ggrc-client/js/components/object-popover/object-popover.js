@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../show-more/show-more';
 import template from './object-popover.stache';
 
@@ -15,7 +15,7 @@ const defaultRightPosition = 60;
 /**
  * Assessment specific mapped objects popover view component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-popover',
   view: canStache(template),
   leakScope: true,

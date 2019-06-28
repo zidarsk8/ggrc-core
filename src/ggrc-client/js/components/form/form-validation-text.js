@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 const textMap = {
   input: 'This field is required.',
   checkbox: 'This checkbox is required.',
@@ -15,7 +15,7 @@ const textMap = {
 /**
  * Form validation text component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'form-validation-text',
   view: canStache('<p class="required">{{text}}</p>'),
   leakScope: true,

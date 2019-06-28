@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -29,7 +29,7 @@ let DOCUMENT_KIND_MAP = {
   REFERENCE_URL: 'documents_reference_url',
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-documents',
   leakScope: true,
   viewModel: canMap.extend({

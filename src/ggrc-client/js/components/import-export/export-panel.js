@@ -6,10 +6,10 @@
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/export-panel.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'export-panel',
   view: canStache(template),
   leakScope: true,

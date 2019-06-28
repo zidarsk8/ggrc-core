@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/related-proposals.stache';
 import {
   PROPOSAL_CREATED,
@@ -15,7 +15,7 @@ import {
 } from '../../../events/eventTypes';
 
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-proposals',
   view: canStache(template),
   leakScope: true,

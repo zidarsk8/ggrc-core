@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../dropdown/dropdown-component';
 import {
   buildParam,
@@ -14,7 +14,7 @@ import {
 import template from './assessment-templates-dropdown.stache';
 import tracker from '../../../tracker';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-templates-dropdown',
   view: canStache(template),
   leakScope: true,
@@ -56,7 +56,7 @@ export default CanComponent.extend({
      */
     _selectInitialTemplate(templates) {
       const WARN_EMPTY_GROUP = [
-        'CanComponent.assessmentTemplates: ',
+        'canComponent.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
       ].join('');
       let initialTemplate;

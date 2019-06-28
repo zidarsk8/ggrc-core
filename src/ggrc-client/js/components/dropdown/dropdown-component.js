@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/dropdown-component.stache';
 
 /*
@@ -14,7 +14,7 @@ import template from './templates/dropdown-component.stache';
   It receives `name` of the attribute that should be set and `optionsList`
   with titles and values
 */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'dropdown-component',
   view: canStache(template),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../object-list-item/business-object-list-item';
 import template from './issue-unmap-item.stache';
 import Pagination from '../base-objects/pagination';
@@ -21,7 +21,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 import Relationship from '../../models/service-models/relationship';
 import * as businessModels from '../../models/business-models';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'issue-unmap-item',
   view: canStache(template),
   leakScope: true,

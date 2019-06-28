@@ -6,13 +6,13 @@
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './people-list.stache';
 import {validateAttr} from '../../../plugins/utils/validation-utils';
 
 const OtherOption = 'other';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'people-list',
   view: canStache(template),
   leakScope: true,

@@ -4,14 +4,14 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../inline/base-inline-control-title';
 import {confirm} from '../../../plugins/utils/modals';
 
 const EDITABLE_STATES = [
   'In Progress', 'Not Started', 'Rework Needed', 'Deprecated'];
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'confirm-edit-action',
   leakScope: true,
   viewModel: canMap.extend({

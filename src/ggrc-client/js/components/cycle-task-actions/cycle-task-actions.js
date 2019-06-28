@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import tracker from '../../tracker';
 import '../spinner-component/spinner-component';
 import {
@@ -113,7 +113,7 @@ let viewModel = canMap.extend({
 /**
  *
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'cycle-task-actions',
   view: canStache(template),
   leakScope: true,

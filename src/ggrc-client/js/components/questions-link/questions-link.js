@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   hasQuestions,
   getQuestionsUrl,
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questions-link.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'questions-link',
   view: canStache(template),
   leakScope: true,

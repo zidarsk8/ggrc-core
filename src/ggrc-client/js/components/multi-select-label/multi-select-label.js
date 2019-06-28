@@ -6,7 +6,7 @@
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {sortByName} from '../../plugins/utils/label-utils';
 import template from './templates/multi-select-label.stache';
 import './../custom-autocomplete/autocomplete-input';
@@ -14,7 +14,7 @@ import './label-autocomplete-results';
 
 import './label-autocomplete-wrapper';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'multi-select-label',
   view: canStache(template),
   leakScope: true,

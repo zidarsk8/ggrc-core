@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 let viewModel = canMap.extend({
   toState: '',
   changeState: function (newState) {
@@ -23,7 +23,7 @@ let events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-change-state',
   leakScope: true,
   viewModel,

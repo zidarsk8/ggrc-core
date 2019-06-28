@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './collapsible-panel-header';
 import './collapsible-panel-body';
 import template from './collapsible-panel.stache';
@@ -30,7 +30,7 @@ let viewModel = canMap.extend({
 /**
  * Collapsible Panel component to add expand/collapse behavior
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'collapsible-panel',
   view: canStache(template),
   leakScope: false,

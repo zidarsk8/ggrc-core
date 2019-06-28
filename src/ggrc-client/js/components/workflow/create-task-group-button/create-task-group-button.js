@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {refreshTGRelatedItems} from '../../../plugins/utils/workflow-utils';
 import Permission from '../../../permission';
 
@@ -49,7 +49,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'create-task-group-button',
   leakScope: true,
   viewModel,

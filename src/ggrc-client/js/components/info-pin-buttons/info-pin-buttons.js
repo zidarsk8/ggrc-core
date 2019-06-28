@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './info-pin-buttons.stache';
 import isFunction from 'can-util/js/is-function/is-function';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'info-pin-buttons',
   view: canStache(template),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
@@ -181,7 +181,7 @@ let viewModel = canMap.extend({
 /**
  * Mapping Criteria is specific kind of Filter Item.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-mapping-criteria',
   view: canStache(template),
   leakScope: false,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/tree-filter-input.stache';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
@@ -76,7 +76,7 @@ let viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-filter-input',
   view: canStache(template),
   leakScope: true,

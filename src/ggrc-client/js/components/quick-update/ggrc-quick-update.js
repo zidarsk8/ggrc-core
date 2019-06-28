@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import canMap from 'can-map';
 
 /*
@@ -11,7 +11,7 @@ import canMap from 'can-map';
 
   Field updates trigger updates to the model automatically, even on the server.
 */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'ggrc-quick-update',
   leakScope: true,
   viewModel: canMap.extend({

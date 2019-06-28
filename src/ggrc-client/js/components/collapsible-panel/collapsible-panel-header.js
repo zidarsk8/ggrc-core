@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './collapsible-panel-header.stache';
 
 /**
  * Collapsible Panel component to add collapsing behavior
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'collapsible-panel-header',
   view: canStache(template),
   leakScope: true,

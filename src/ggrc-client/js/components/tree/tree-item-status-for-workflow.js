@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/tree-item-status-for-workflow.stache';
 
 const viewModel = canMap.extend({
@@ -30,7 +30,7 @@ const viewModel = canMap.extend({
   instance: {},
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-item-status-for-workflow',
   view: canStache(template),
   leakScope: true,

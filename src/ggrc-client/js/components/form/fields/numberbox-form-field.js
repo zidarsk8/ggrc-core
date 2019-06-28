@@ -4,12 +4,12 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../numberbox/numberbox-component';
 import template from './templates/numberbox-form-field.stache';
 import {TEXT_FORM_FIELD_VM} from './text-form-field';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'numberbox-form-field',
   view: canStache(template),
   leakScope: true,

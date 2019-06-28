@@ -4,11 +4,11 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {ROLES_CONFLICT} from '../../events/eventTypes';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-people-access-control',
   leakScope: true,
   viewModel: canMap.extend({

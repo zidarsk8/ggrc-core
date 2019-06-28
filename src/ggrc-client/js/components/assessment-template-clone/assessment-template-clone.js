@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-wrapper';
@@ -14,7 +14,7 @@ import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './assessment-template-clone.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-template-clone',
   view: canStache(template),
   leakScope: true,

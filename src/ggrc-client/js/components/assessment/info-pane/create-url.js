@@ -4,14 +4,14 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 import {sanitizer} from '../../../plugins/utils/url-utils';
 import Context from '../../../models/service-models/context';
 import Evidence from '../../../models/business-models/evidence';
 import pubSub from '../../../pub-sub';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'create-url',
   leakScope: true,
   viewModel: canMap.extend({

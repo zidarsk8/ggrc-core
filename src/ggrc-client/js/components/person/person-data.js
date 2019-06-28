@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './person-data.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
@@ -14,7 +14,7 @@ import Person from '../../models/business-models/person';
 /**
  * Person List Item Component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'person-data',
   view: canStache(template),
   leakScope: true,

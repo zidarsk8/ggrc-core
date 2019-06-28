@@ -4,12 +4,12 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../object-list-item/business-object-list-item';
 import '../read-more/read-more';
 import RefreshQueue from '../../models/refresh_queue';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-list-item-updater',
   leakScope: true,
   viewModel: canMap.extend({

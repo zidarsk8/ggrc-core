@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './add-tab-button.stache';
 import {
   isMyWork,
@@ -45,7 +45,7 @@ const viewModel = canMap.extend({
   addTabTitle: '',
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'add-tab-button',
   view: canStache(template),
   leakScope: true,

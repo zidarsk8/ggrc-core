@@ -4,11 +4,11 @@
 */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import baseAutocompleteResults from '../../custom-autocomplete/autocomplete-results';
 import template from './people-autocomplete-results.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'people-autocomplete-results',
   view: canStache(template),
   leakScope: false,

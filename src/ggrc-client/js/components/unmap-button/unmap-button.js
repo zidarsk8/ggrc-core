@@ -4,11 +4,11 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
 import Relationship from '../../models/service-models/relationship';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'unmap-button',
   leakScope: true,
   viewModel: canMap.extend({

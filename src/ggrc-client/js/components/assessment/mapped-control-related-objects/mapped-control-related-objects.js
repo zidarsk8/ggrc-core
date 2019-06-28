@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import template from './mapped-control-related-objects.stache';
 
@@ -26,7 +26,7 @@ let viewModel = canMap.extend({
  * Specific Wrapper Component to present Controls only inner popover data.
  * Should Load on expand Related Objectives and Regulations
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapped-control-related-objects',
   view: canStache(template),
   leakScope: true,

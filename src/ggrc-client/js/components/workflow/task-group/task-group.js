@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../info-pin-buttons/info-pin-buttons';
 import '../task-group-clone';
 import '../task-list/task-list';
@@ -38,7 +38,7 @@ const init = function () {
   this.viewModel.loadWorkflow();
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'task-group',
   view: canStache(template),
   leakScope: true,

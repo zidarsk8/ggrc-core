@@ -5,8 +5,8 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
-export default CanComponent.extend({
+import canComponent from 'can-component';
+export default canComponent.extend({
   tag: 'unarchive-link',
   view: canStache('<a href="javascript:void(0)"><content></content></a>'),
   leakScope: true,

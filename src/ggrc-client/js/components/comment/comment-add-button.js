@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'comment-add-button',
   view: canStache(
     '<button type="button" class="btn btn-small btn-gray"' +

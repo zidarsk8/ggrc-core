@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../inline/readonly-inline-content';
 import '../form/field-views/checkbox-form-field-view';
 import '../form/field-views/date-form-field-view';
@@ -13,7 +13,7 @@ import '../form/field-views/person-form-field-view';
 import '../form/field-views/text-form-field-view';
 import template from './custom-attributes-field-view.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'custom-attributes-field-view',
   view: canStache(template),
   leakScope: true,

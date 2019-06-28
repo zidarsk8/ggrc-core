@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../people-autocomplete/people-autocomplete-wrapper/people-autocomplete-wrapper';
 
 import template from './people-mention.stache';
@@ -19,7 +19,7 @@ const MENTION_REGEX = {
 /**
  * Supporting component for rich-text to handle mentions of people
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'people-mention',
   view: canStache(template),
   leakScope: false,

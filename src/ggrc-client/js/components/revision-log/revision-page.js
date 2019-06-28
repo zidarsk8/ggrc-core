@@ -6,7 +6,7 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './revision-log-data';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
@@ -32,7 +32,7 @@ let LIST_FIELDS = {
   recipients: 1,
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'revision-page',
   view: canStache(template),
   leakScope: true,

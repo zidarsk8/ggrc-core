@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './advanced-search-filter-operator.stache';
 
 /**
@@ -27,7 +27,7 @@ let viewModel = canMap.extend({
 /**
  * Filter Operator is a component representing operation connecting Advanced Search items.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-operator',
   view: canStache(template),
   leakScope: true,

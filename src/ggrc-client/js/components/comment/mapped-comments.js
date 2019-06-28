@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../object-list-item/comment-list-item';
 import '../object-list/object-list';
 import template from './mapped-comments.stache';
@@ -13,7 +13,7 @@ import template from './mapped-comments.stache';
 /**
  * Assessment specific mapped controls view component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapped-comments',
   view: canStache(template),
   leakScope: false,

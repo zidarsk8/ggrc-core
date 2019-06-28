@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../sort-component/sort-component';
 import template from './templates/tree-view.stache';
 
@@ -29,7 +29,7 @@ let viewModel = canMap.extend({
   depthFilter: '',
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-view',
   view: canStache(template),
   leakScope: true,

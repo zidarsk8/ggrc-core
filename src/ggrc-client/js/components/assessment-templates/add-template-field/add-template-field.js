@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './add-template-field.stache';
 
 // the field types that require a list of possible values to be defined
 const multiChoiceable = ['Dropdown', 'Multiselect'];
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'add-template-field',
   view: canStache(template),
   leakScope: true,

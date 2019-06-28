@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
 import '../redirects/role-attr-names-provider/role-attr-names-provider';
 import template from './editable-people-group-header.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'editable-people-group-header',
   view: canStache(template),
   leakScope: true,

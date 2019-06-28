@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './gca-controls.stache';
 import '../custom-attributes/custom-attributes-field';
 import isFunction from 'can-util/js/is-function/is-function';
@@ -21,7 +21,7 @@ const errorMessages = {
  * This component renders edit controls for Global Custom Attributes
  */
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'gca-controls',
   view: canStache(template),
   leakScope: true,

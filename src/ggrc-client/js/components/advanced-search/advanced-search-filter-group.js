@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import template from './advanced-search-filter-group.stache';
@@ -34,7 +34,7 @@ let viewModel = AdvancedSearchContainer.extend({
 /**
  * Filter Group is a component allowing to compose Filter Attributes and Operators.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-group',
   view: canStache(template),
   leakScope: true,

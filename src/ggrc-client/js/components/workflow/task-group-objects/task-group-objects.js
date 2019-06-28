@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/task-group-objects.stache';
 import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../events/eventTypes';
 import {unmapObjects} from '../../../plugins/utils/mapper-utils';
@@ -91,7 +91,7 @@ const init = function () {
   this.viewModel.initTaskGroupItems();
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'task-group-objects',
   view: canStache(template),
   leakScope: true,

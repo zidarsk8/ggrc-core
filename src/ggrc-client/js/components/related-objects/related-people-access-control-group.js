@@ -4,13 +4,13 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-people-access-control-group',
   leakScope: true,
   viewModel: canMap.extend({

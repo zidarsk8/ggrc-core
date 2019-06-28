@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Proposal from '../../models/service-models/proposal';
 import template from './templates/create-proposal.stache';
 import {hasPending as hasPendingUtil} from '../../plugins/ggrc_utils';
@@ -15,7 +15,7 @@ import {
 } from '../../events/eventTypes';
 import {getRole} from '../../plugins/utils/acl-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'create-proposal',
   view: canStache(template),
   leakScope: true,

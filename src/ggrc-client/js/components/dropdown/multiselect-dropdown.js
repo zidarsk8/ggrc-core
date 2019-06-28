@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/multiselect-dropdown.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'multiselect-dropdown',
   view: canStache(template),
   leakScope: true,

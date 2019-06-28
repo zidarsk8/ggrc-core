@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './people-mention/people-mention';
 
 import template from './rich-text.stache';
@@ -14,7 +14,7 @@ const URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
 const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
 const EMAIL_REGEX = /^[+|@]\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+/;
 
-export default CanComponent.extend('richText', {
+export default canComponent.extend('richText', {
   tag: 'rich-text',
   view: canStache(template),
   leakScope: true,

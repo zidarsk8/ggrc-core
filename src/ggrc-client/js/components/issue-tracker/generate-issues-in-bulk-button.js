@@ -6,7 +6,7 @@
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/generate-issues-in-bulk-button.stache';
 import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
@@ -17,7 +17,7 @@ import pubSub from '../../pub-sub';
 const DEFAULT_TIMEOUT = 2000;
 const MAX_TIMEOUT = 60000;
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'generate-issues-in-bulk-button',
   view: canStache(template),
   leakScope: true,

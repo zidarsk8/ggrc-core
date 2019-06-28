@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Pagination from '../../base-objects/pagination';
 import template from './templates/related-revisions.stache';
 import './related-revisions-item';
 import Revision from '../../../models/service-models/revision.js';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-revisions',
   view: canStache(template),
   leakScope: true,

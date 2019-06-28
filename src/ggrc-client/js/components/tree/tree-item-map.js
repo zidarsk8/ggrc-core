@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/tree-item-map.stache';
 import {trigger} from 'can-event';
 
@@ -27,7 +27,7 @@ let viewModel = canMap.extend({
   disableLink: false,
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-item-map',
   view: canStache(template),
   leakScope: true,

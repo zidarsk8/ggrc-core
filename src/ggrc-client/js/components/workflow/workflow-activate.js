@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   generateCycle,
   redirectToCycle,
@@ -74,7 +74,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'workflow-activate',
   leakScope: true,
   viewModel,

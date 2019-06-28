@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './object-selection-item.stache';
 import {trigger} from 'can-event';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-selection-item',
   view: canStache(template),
   leakScope: true,

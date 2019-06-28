@@ -6,7 +6,7 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './mapper-results-item';
 import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
@@ -37,7 +37,7 @@ import {isMegaMapping as isMegaMappingUtil} from '../../plugins/utils/mega-objec
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapper-results',
   view: canStache(template),
   leakScope: true,

@@ -6,7 +6,7 @@
 import moment from 'moment';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../tree-pagination/tree-pagination';
 import './revision-page';
 
@@ -25,7 +25,7 @@ import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Pagination from '../base-objects/pagination';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'revision-log',
   view: canStache(template),
   leakScope: true,

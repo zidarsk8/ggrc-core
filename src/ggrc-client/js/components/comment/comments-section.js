@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 import template from './comments-section.stache';
 import './comment-data-provider';
@@ -14,7 +14,7 @@ import './mapped-comments';
 import './comments-paging';
 import Permission from '../../permission';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'comments-section',
   view: canStache(template),
   leakScope: true,

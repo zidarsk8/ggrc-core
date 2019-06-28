@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../tree/tree-item-custom-attribute';
 import '../tree/tree-field-wrapper';
 import '../tree/tree-field';
 import '../tree/tree-item-attr';
 import template from './templates/mapper-results-item-attrs.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapper-results-item-attrs',
   view: canStache(template),
   leakScope: true,

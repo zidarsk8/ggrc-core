@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 import '../change-request-link/change-request-link';
 import {
@@ -22,7 +22,7 @@ import {
 import Permission from '../../permission';
 import template from './templates/tree-actions.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-actions',
   view: canStache(template),
   leakScope: true,

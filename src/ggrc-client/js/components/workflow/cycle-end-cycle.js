@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
@@ -27,7 +27,7 @@ import {trigger} from 'can-event';
  *
  */
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'cycle-end-cycle',
   viewModel: canMap.extend({
     cycle: null,

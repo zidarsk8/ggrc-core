@@ -4,12 +4,12 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-wrapper',
   leakScope: true,
   viewModel: canMap.extend({

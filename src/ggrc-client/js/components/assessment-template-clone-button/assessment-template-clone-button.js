@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './assessment-template-clone-button.stache';
 import router from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-template-clone-button',
   view: canStache(template),
   leakScope: true,

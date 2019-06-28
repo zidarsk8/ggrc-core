@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../custom-roles/custom-roles-modal';
 import {
   getRolesForType,
@@ -13,7 +13,7 @@ import {
 } from '../../plugins/utils/acl-utils';
 import template from './access-control-list-roles-helper.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'access-control-list-roles-helper',
   view: canStache(template),
   leakScope: true,

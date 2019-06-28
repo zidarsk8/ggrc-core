@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/sub-tree-models.stache';
 import childModelsMap from '../tree/child-models-map';
 import {
@@ -113,7 +113,7 @@ let events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'sub-tree-models',
   view: canStache(template),
   leakScope: true,

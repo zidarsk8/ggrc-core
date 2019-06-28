@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-wrapper';
@@ -17,7 +17,7 @@ import template from './object-bulk-update.stache';
 import tracker from '../../tracker';
 import {groupTypes} from '../../plugins/utils/models-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-bulk-update',
   view: canStache(template),
   leakScope: true,

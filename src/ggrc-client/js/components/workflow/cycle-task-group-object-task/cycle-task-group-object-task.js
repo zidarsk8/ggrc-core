@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/cycle-task-group-object-task.stache';
 import tdmTemplate from './templates/partials/three-dots-menu.stache';
 import tdmInHistoryTemplate from './templates/partials/three-dots-menu-in-history.stache';
@@ -118,7 +118,7 @@ let viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'cycle-task-group-object-task',
   view: canStache(template),
   leakScope: true,

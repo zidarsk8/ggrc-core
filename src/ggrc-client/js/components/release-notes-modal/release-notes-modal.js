@@ -6,7 +6,7 @@
 import moment from 'moment';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../release-notes-list/release-notes-list';
 
 import template from './release-notes-modal.stache';
@@ -33,7 +33,7 @@ const viewModel = canMap.extend({
   modalTitle: 'What\'s new',
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'release-notes-modal',
   view: canStache(template),
   leakScope: true,

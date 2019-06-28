@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../assessment/info-pane/confirm-edit-action';
 import template from './templates/info-pane-issue-tracker-fields.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'info-pane-issue-tracker-fields',
   view: canStache(template),
   leakScope: true,

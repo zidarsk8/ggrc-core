@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   ddValidationValueToMap,
   ddValidationMapToValue,
@@ -17,7 +17,7 @@ import template from './template-field.stache';
  *
  * Represents each `field` passed from assessment-template-attributes `fields`
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'template-field',
   view: canStache(template),
   leakScope: true,

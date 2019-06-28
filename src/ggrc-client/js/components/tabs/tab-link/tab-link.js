@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 const viewModel = canMap.extend({
   tabType: 'link',
   instance: null,
@@ -17,7 +17,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tab-link',
   leakScope: true,
   viewModel,

@@ -6,7 +6,7 @@
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -17,7 +17,7 @@ import template from './related-comments.stache';
 /**
  * Mapped objects view component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-comments',
   view: canStache(template),
   leakScope: true,

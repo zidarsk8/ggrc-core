@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 const peopleTitlesList = [
   'Auditors', 'Principal Assignees', 'Secondary Assignees',
   'Primary Contacts', 'Secondary Contacts', 'Control Operators',
@@ -44,7 +44,7 @@ const PEOPLE_VALUES_OPTIONS = Object.freeze({
   ],
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'wrapper-assessment-template',
   leakScope: true,
   viewModel: canMap.extend({

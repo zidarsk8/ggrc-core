@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/dropdown-wrap-text.stache';
 import {isInnerClick} from '../../plugins/ggrc_utils';
 
 const DefaultNoValueLabel = '--';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'dropdown-wrap-text',
   view: canStache(template),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../show-more/show-more';
 import '../spinner-component/spinner-component';
 import template from './object-list.stache';
@@ -13,7 +13,7 @@ import template from './object-list.stache';
 /**
  * Object List component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-list',
   view: canStache(template),
   leakScope: true,

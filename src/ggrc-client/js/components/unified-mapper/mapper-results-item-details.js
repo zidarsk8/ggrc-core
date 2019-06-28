@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
@@ -13,7 +13,7 @@ import '../unarchive-link';
 import template from './templates/mapper-results-item-details.stache';
 import * as businessModels from '../../models/business-models';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapper-results-item-details',
   view: canStache(template),
   leakScope: true,

@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './clipboard-link';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'shortlink-component',
   view: canStache(
     '<clipboard-link text:from="text">' +

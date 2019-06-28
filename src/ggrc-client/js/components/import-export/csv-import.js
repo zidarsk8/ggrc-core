@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../plugins/utils/controllers';
 import {
   jobStatuses,
@@ -69,7 +69,7 @@ const messages = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'csv-import',
   view: canStache(template),
   requestData: null,

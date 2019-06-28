@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
@@ -18,7 +18,7 @@ import {
 import {getPageInstance} from '../plugins/utils/current-page-utils';
 import {reify, isReifiable} from '../plugins/utils/reify-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'deferred-mapper',
   leakScope: true,
   viewModel: canMap.extend({

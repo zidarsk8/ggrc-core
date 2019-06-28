@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './repeat-on-button';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'repeat-on-button-wrapper',
   view: canStache(
     '<repeat-on-button unit:from="instance.unit"' +

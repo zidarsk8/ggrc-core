@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../custom-attributes/custom-attributes-actions';
 import '../../object-state-toolbar/object-state-toolbar';
 import template from './assessment-controls-toolbar.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-controls-toolbar',
   view: canStache(template),
   leakScope: true,

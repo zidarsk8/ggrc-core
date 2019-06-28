@@ -4,10 +4,10 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {trigger} from 'can-event';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'map-button-using-assessment-type',
   leakScope: true,
   viewModel: canMap.extend({

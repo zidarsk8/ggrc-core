@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './questionnaire-create-link.stache';
 import {
   getCreateObjectUrl,
 } from '../../plugins/utils/ggrcq-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'questionnaire-create-link',
   view: canStache(template),
   viewModel: canMap.extend({

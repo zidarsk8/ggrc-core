@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import './tree-visible-column-checkbox';
 import template from './templates/tree-header.stache';
 import {getVisibleColumnsConfig, getSortingForModel}
   from '../../plugins/utils/tree-view-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-header',
   view: canStache(template),
   leakScope: true,

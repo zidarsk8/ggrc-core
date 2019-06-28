@@ -6,7 +6,7 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   uploadFiles,
 } from '../../plugins/utils/gdrive-picker-utils';
@@ -144,7 +144,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'create-document-button',
   view: canStache(template),
   leakScope: true,

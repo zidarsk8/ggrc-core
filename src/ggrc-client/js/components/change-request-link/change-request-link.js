@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/change-request-link.stache';
 
 const viewModel = canMap.extend({
@@ -18,7 +18,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'change-request-link',
   view: canStache(template),
   leakScope: true,

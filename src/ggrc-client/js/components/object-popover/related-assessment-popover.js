@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../related-comments/related-comments';
 import '../custom-attributes/custom-attributes-field-view';
 import '../object-list-item/comment-list-item';
@@ -19,7 +19,7 @@ import template from './related-assessment-popover.stache';
 /**
  * Simple wrapper component to load Related to Parent Object Snapshots of Controls and Objectives
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-assessment-popover',
   view: canStache(template),
   leakScope: true,

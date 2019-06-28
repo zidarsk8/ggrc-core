@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import '../object-list/object-list';
 import '../object-list-item/business-object-list-item';
@@ -31,7 +31,7 @@ const defaultOrderBy = [
   {field: 'created_at', direction: 'desc'},
 ];
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-assessments',
   view: canStache(template),
   leakScope: true,

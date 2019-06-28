@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../simple-modal/simple-modal';
 import '../gca-controls/gca-controls';
 import template from './templates/mandatory-fields-modal.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mandatory-fields-modal',
   view: canStache(template),
   leakScope: true,

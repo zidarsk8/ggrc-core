@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {getModelInstance} from '../../plugins/utils/models-utils';
 import {buildModifiedListField} from '../../plugins/utils/object-history-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
@@ -74,7 +74,7 @@ const viewModel = DiffBaseVM.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'instance-list-fields-diff',
   view: canStache(template),
   leakScope: true,

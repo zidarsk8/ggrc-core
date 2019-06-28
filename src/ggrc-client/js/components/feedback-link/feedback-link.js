@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/feedback-link.stache';
 
 const viewModel = canMap.extend({
@@ -24,7 +24,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'feedback-link',
   view: canStache(template),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Person from '../../models/business-models/person';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
 
@@ -13,7 +13,7 @@ import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-gr
  *  Component to show number of Tasks Owned by Person
  *
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tasks-counter',
   view: canStache(
     '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>'

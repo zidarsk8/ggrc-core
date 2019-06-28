@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   confirm,
   BUTTON_VIEW_CONFIRM_CANCEL,
@@ -17,7 +17,7 @@ import {
 } from '../../plugins/utils/widgets-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'snapshot-scope-update',
   leakScope: true,
   viewModel: canMap.extend({

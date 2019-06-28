@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../proposal/review-proposal';
 import '../../proposal/apply-decline-proposal';
 import '../../diff/instance-fields-diff';
@@ -18,7 +18,7 @@ import {getPersonInfo} from '../../../plugins/utils/user-utils';
 import {getFormattedLocalDate} from '../../../plugins/utils/date-utils';
 import {reify, isReifiable} from '../../../plugins/utils/reify-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-proposals-item',
   view: canStache(template),
   leakScope: true,

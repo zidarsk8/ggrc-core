@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
 import template from './base-inline-control-title.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'base-inline-control-title',
   view: canStache(template),
   leakScope: false,

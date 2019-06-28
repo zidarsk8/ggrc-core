@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './create-and-map.stache';
 import {
   MAP_OBJECTS,
@@ -28,7 +28,7 @@ import {isMegaMapping} from '../../plugins/utils/mega-object-utils';
 import * as businessModels from '../../models/business-models';
 import {externalBusinessObjects} from '../../plugins/models-types-collections';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'create-and-map',
   view: canStache(template),
   leakScope: false,

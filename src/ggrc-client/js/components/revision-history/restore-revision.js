@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './mandatory-fields-modal';
 import {
   buildModifiedACL,
@@ -13,7 +13,7 @@ import {
 } from '../../plugins/utils/object-history-utils';
 import template from './templates/restore-revision.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'restore-revision',
   view: canStache(template),
   leakScope: true,

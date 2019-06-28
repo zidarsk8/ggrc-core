@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 let viewModel = canMap.extend({
   define: {
     trigger: {
@@ -23,7 +23,7 @@ let viewModel = canMap.extend({
 /**
  *
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'lazy-render',
   view: canStache('{{#if activated}}<content/>{{/if}}'),
   leakScope: true,

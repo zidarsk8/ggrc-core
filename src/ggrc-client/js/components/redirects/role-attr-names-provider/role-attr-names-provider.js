@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 const roleToLinkMap = {
   Control: {
     Admin: 'owner',
@@ -33,7 +33,7 @@ const viewModel = canMap.extend({
   roleName: '',
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'role-attr-names-provider',
   viewModel,
 });

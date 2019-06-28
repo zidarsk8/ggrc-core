@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './audit-inner-nav.stache';
 import './inner-nav-item';
 import './inner-nav-collapse';
@@ -12,7 +12,7 @@ import '../add-tab-button/add-tab-button';
 import InnerNavVM from './inner-nav-vm';
 import {isDashboardEnabled} from '../../plugins/utils/dashboards-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'audit-inner-nav',
   leakScope: false,
   view: canStache(template),

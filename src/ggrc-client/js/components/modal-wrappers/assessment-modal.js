@@ -4,12 +4,12 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   toObject,
 } from '../../plugins/utils/snapshot-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-modal',
   leakScope: true,
   viewModel: canMap.extend({

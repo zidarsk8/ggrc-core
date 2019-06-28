@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import './tab-panel';
 import './tab-link/tab-link';
 import '../questionnaire-link/questionnaire-link';
 import template from './tab-container.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tab-container',
   view: canStache(template),
   leakScope: true,

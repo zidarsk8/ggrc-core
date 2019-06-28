@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import '../../object-list-item/business-object-list-item';
 import '../../object-list-item/detailed-business-object-list-item';
@@ -125,7 +125,7 @@ const viewModel = canMap.extend({
 /**
  * Assessment specific mapped controls view component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-mapped-controls',
   view: canStache(template),
   leakScope: true,

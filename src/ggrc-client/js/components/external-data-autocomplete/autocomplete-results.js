@@ -6,14 +6,14 @@
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
 
 /**
  * The component is used to show autocomplete results and handle user's clicks.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'autocomplete-results',
   view: canStache(template),
   leakScope: true,

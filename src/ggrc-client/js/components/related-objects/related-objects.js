@@ -5,7 +5,7 @@
 
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import {
   REFRESH_RELATED,
@@ -20,7 +20,7 @@ import Pagination from '../base-objects/pagination';
 
 let defaultOrderBy = 'created_at';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-objects',
   leakScope: true,
   viewModel: canMap.extend({

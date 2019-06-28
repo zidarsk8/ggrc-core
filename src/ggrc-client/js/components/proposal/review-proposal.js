@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   buildModifiedACL,
   buildModifiedListField,
@@ -15,7 +15,7 @@ import Revision from '../../models/service-models/revision';
 
 import template from './templates/review-proposal.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'review-proposal',
   view: canStache(template),
   leakScope: true,

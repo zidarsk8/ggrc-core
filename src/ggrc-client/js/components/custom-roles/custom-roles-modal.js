@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
@@ -13,7 +13,7 @@ import '../autocomplete/autocomplete-component';
 import '../external-data-autocomplete/external-data-autocomplete';
 import template from './templates/custom-roles-modal.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'custom-roles-modal',
   view: canStache(template),
   leakScope: true,

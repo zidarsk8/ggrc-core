@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {SWITCH_TO_ERROR_PANEL, SHOW_INVALID_FIELD} from '../../events/eventTypes';
 import template from './object-state-toolbar.stache';
 
 /**
  * Object State Toolbar Component allowing Object state modification
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-state-toolbar',
   view: canStache(template),
   leakScope: true,

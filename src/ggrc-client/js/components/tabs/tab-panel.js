@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../lazy-render/lazy-render';
 import template from './tab-panel.stache';
 
 const PRE_RENDER_DELAY = 3000;
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tab-panel',
   view: canStache(template),
   leakScope: true,

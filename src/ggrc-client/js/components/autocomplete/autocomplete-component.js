@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './autocomplete-component.stache';
 
 /**
@@ -72,4 +72,4 @@ let component = {
   },
 };
 
-export default CanComponent.extend(component);
+export default canComponent.extend(component);

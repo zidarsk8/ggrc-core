@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './comments-paging.stache';
 import '../spinner-component/spinner-component';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'comments-paging',
   view: canStache(template),
   leakScope: false,

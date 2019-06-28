@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/numberbox-component.stache';
 
 const FLOAT_NUMBER_PATTERN = '([0-9]+([.][0-9]+){0,1})';
 const INT_NUMBER_PATTERN = '([0-9]+)';
 const NEGATIVE_NUMBER_PATTERN = '([-]{0,1})';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'numberbox-component',
   view: canStache(template),
   leakScope: true,

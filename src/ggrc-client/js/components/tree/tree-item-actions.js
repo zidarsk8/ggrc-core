@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../lazy-render/lazy-render';
 import '../show-related-assessments-button/show-related-assessments-button';
 import template from './templates/tree-item-actions.stache';
@@ -133,7 +133,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-item-actions',
   view: canStache(template),
   leakScope: true,

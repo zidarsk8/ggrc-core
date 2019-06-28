@@ -6,7 +6,7 @@
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   uploadFiles,
   getGDriveItemId,
@@ -15,7 +15,7 @@ import {
 } from '../../plugins/utils/gdrive-picker-utils';
 import template from './templates/ggrc-gdrive-folder-picker.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'ggrc-gdrive-folder-picker',
   view: canStache(template),
   leakScope: true,

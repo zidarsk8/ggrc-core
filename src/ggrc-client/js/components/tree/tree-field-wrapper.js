@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import RefreshQueue from '../../models/refresh_queue';
 
 const viewModel = canMap.extend({
@@ -61,7 +61,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-field-wrapper',
   leakScope: true,
   viewModel,

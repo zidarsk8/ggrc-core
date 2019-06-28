@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.stache';
@@ -52,7 +52,7 @@ const viewModel = DiffBaseVM.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'instance-fields-diff',
   view: canStache(template),
   leakScope: true,

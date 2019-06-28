@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 /* Default Sate for Assessment should be 'Not Started' */
 const defaultState = 'Not Started';
 
@@ -35,7 +35,7 @@ let viewModel = canMap.extend({
 /**
  * Simple Component to add color indication for Assessment State Name
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'state-colors-map',
   view: canStache(
     '<span class="state-value-dot state-{{suffix}} {{verified}}">' +

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
@@ -24,7 +24,7 @@ const VISIBLE_ROLES = {
 /**
  * Assessment specific mapped objects popover view component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'detailed-business-object-list-item',
   view: canStache(template),
   leakScope: true,

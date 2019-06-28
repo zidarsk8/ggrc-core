@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './bulk-update-target-state.stache';
 
 let objectStateToWarningMap = {
@@ -21,7 +21,7 @@ let objectStateToWarningMap = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'bulk-update-target-state',
   view: canStache(template),
   leakScope: true,

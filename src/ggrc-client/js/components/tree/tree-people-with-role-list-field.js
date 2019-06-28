@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
@@ -30,7 +30,7 @@ const viewModel = canMap.extend({
   type: Person,
 });
 
-export default CanComponent.extend('treePeopleWithRoleListField', {
+export default canComponent.extend('treePeopleWithRoleListField', {
   tag: 'tree-people-with-role-list-field',
   view: canStache(template),
   leakScope: true,

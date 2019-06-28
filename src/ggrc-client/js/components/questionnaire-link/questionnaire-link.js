@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   getCommentFormUrl,
   getInfoUrl,
@@ -16,7 +16,7 @@ import {
 } from '../../plugins/utils/ggrcq-utils';
 import template from './questionnaire-link.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'questionnaire-link',
   view: canStache(template),
   leakScope: true,

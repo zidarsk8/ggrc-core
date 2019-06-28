@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-mapping-container';
@@ -90,7 +90,7 @@ let getDefaultType = function (type, object) {
  * A component implementing a modal for mapping objects to other objects,
  * taking the object type mapping constraints into account.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-mapper',
   view: canStache(template),
   leakScope: true,

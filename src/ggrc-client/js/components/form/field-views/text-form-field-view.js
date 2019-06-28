@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './text-form-field-view.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'text-form-field-view',
   view: canStache(template),
   leakScope: true,

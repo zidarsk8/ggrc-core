@@ -6,7 +6,7 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   uploadFiles,
   findGDriveItemById,
@@ -24,7 +24,7 @@ import {
 import Context from '../../models/service-models/context';
 import * as businessModels from '../../models/business-models';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'ggrc-gdrive-picker-launcher',
   view: canStache(template),
   leakScope: true,

@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Clipboard from 'clipboard';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'clipboard-link',
   view: canStache(
     '<a type="button" data-clipboard-text="{{text}}"><content/></a>'

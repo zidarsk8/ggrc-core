@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.stache';
 import {
@@ -14,7 +14,7 @@ import {
 import {initCounts} from '../../plugins/utils/widgets-utils';
 import Issue from '../../models/business-models/issue';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'add-issue-button',
   view: canStache(template),
   leakScope: true,

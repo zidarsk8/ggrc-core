@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../rich-text/rich-text';
 import template from './rich-text-form-field.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'rich-text-form-field',
   view: canStache(template),
   leakScope: true,

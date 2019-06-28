@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import baseAutocompleteWrapper from './../custom-autocomplete/autocomplete-wrapper';
 import Label from '../../models/service-models/label';
 
@@ -19,7 +19,7 @@ let viewModel = baseAutocompleteWrapper.extend({
   showNewValue: false,
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'label-autocomplete-wrapper',
   view: canStache('<content/>'),
   leakScope: true,

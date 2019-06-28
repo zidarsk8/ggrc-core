@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/request-review-modal.stache';
 import {
   createReviewInstance,
@@ -13,7 +13,7 @@ import {
 } from '../../plugins/utils/object-review-utils';
 import {REFRESH_COMMENTS} from '../../events/eventTypes';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'request-review-modal',
   view: canStache(template),
   leakScope: true,

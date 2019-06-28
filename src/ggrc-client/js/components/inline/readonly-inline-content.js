@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../form/fields/dropdown-form-field';
 import '../person/person-data';
 import template from './readonly-inline-content.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'readonly-inline-content',
   view: canStache(template),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './comment-input';
 import './comment-add-button';
 import template from './comment-add-form.stache';
@@ -18,7 +18,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
  * A component that takes care of adding comments
  *
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'comment-add-form',
   view: canStache(template),
   leakScope: true,

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import BaseTreeItemVM from './tree-item-base-vm';
 import './tree-item-extra-info';
 import template from './templates/sub-tree-item.stache';
@@ -74,7 +74,7 @@ let viewModel = BaseTreeItemVM.extend({
   extraCss: '',
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'sub-tree-item',
   view: canStache(template),
   leakScope: true,

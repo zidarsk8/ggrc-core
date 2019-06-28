@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import tracker from '../../tracker';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './templates/assessment-generator-button.stache';
@@ -13,7 +13,7 @@ import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import BackgroundTask from '../../models/service-models/background-task';
 import Assessment from '../../models/business-models/assessment';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-generator-button',
   view: canStache(template),
   leakScope: true,

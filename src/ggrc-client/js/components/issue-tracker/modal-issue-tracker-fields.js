@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../dropdown/dropdown-component';
 import '../numberbox/numberbox-component';
 import template from './templates/modal-issue-tracker-fields.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'modal-issue-tracker-fields',
   view: canStache(template),
   leakScope: true,

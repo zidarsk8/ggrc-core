@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './advanced-search-mapping-group';
 import './advanced-search-mapping-criteria';
 import './advanced-search-filter-operator';
@@ -67,7 +67,7 @@ let viewModel = AdvancedSearchContainer.extend({
 /**
  * Mapping Container is a component allowing to compose Mapping Criteria, Groups and Operators.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-mapping-container',
   view: canStache(template),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../diff/instance-fields-diff';
 import '../../diff/instance-acl-diff';
 import '../../diff/instance-gca-diff';
@@ -15,7 +15,7 @@ import '../../revision-history/restored-revision-comparer-config';
 import {getPersonInfo} from '../../../plugins/utils/user-utils';
 import template from './templates/related-revisions-item.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-revisions-item',
   view: canStache(template),
   leakScope: true,

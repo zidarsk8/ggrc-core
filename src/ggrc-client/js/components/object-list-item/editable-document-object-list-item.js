@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../object-list-item/document-object-list-item';
 import template from './editable-document-object-list-item.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'editable-document-object-list-item',
   view: canStache(template),
   leakScope: true,

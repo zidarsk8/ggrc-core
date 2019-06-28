@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 import '../issue/issue-unmap-item';
 import template from './unmap-dropdown-item.stache';
@@ -18,7 +18,7 @@ import {
   isMyWork,
 } from '../../plugins/utils/current-page-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'unmap-dropdown-item',
   view: canStache(template),
   leakScope: false,

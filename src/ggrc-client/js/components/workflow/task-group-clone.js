@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {refreshTGRelatedItems} from '../../plugins/utils/workflow-utils';
@@ -34,7 +34,7 @@ let CloneTaskGroup = Cacheable.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'task-group-clone',
   viewModel: canMap.extend({
     taskGroup: null,

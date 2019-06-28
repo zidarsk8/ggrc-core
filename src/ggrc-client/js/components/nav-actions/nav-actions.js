@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Permission from '../../permission';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils';
 
@@ -53,7 +53,7 @@ const viewModel = canMap.extend({
   instance: null,
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'nav-actions',
   leakScope: true,
   viewModel,

@@ -4,10 +4,10 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {reify} from '../../plugins/utils/reify-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'review-state',
   leakScope: true,
   viewModel: canMap.extend({

@@ -6,7 +6,7 @@
 import moment from 'moment';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   inViewport,
   isInnerClick,
@@ -14,7 +14,7 @@ import {
 import {DATE_FORMAT} from '../../plugins/utils/date-utils';
 import template from './datepicker-component.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'datepicker-component',
   view: canStache(template),
   leakScope: true,

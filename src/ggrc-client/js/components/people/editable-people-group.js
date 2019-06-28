@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './people-group-modal';
 import './editable-people-group-header';
 import '../autocomplete/autocomplete-component';
@@ -99,7 +99,7 @@ let viewModel = peopleGroupVM.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'editable-people-group',
   view: canStache(template),
   leakScope: true,

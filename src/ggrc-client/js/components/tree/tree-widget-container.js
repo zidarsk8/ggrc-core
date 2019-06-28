@@ -7,7 +7,7 @@ import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './tree-header-selector';
 import './sub-tree-expander';
 import './sub-tree-wrapper';
@@ -664,7 +664,7 @@ let viewModel = canMap.extend({
 /**
  *
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-widget-container',
   view: canStache(template),
   leakScope: true,

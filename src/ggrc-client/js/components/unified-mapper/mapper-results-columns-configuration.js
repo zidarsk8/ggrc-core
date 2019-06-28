@@ -5,14 +5,14 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../tree/tree-header-selector';
 import '../tree/tree-visible-column-checkbox';
 import template from './templates/mapper-results-columns-configuration.stache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import * as businessModels from '../../models/business-models';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapper-results-columns-configuration',
   view: canStache(template),
   leakScope: true,

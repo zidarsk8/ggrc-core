@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../dropdown/multiselect-dropdown';
 import template from './download-template.stache';
 import {downloadTemplate, download} from '../../../plugins/utils/import-export-utils';
@@ -111,7 +111,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'download-template',
   view: canStache(template),
   leakScope: true,

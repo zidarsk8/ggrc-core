@@ -6,7 +6,7 @@
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.stache';
 
@@ -95,7 +95,7 @@ let viewModel = canMap.extend({
  * Criterion has the following form:
  * field - operator - value
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-attribute',
   view: canStache(template),
   leakScope: true,

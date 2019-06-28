@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   CUSTOM_ATTRIBUTE_TYPE,
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
@@ -15,7 +15,7 @@ import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 /**
  * Global Custom Attributes is a component representing custom attributes.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'global-custom-attributes',
   leakScope: true,
   viewModel: canMap.extend({

@@ -4,8 +4,8 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
-export default CanComponent.extend({
+import canComponent from 'can-component';
+export default canComponent.extend({
   tag: 'issue-tracker-switcher',
   leakScope: true,
   viewModel: canMap.extend({

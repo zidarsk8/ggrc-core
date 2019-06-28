@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import '../person/person-data';
 import '../spinner-component/spinner-component';
@@ -15,7 +15,7 @@ import {getCommentAuthorRole} from '../../plugins/utils/comments-utils';
 /**
  * Simple component to show Comment Objects
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'comment-list-item',
   view: canStache(template),
   leakScope: true,

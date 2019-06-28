@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './last-comment.stache';
 import RefreshQueue from '../../models/refresh_queue';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils.js';
@@ -14,7 +14,7 @@ import {formatDate} from '../../plugins/utils/date-utils';
 import Comment from '../../models/service-models/comment';
 import {getOnlyAnchorTags} from '../../plugins/ggrc_utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'last-comment',
   view: canStache(template),
   leakScope: true,

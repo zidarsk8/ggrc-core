@@ -6,7 +6,7 @@
 import moment from 'moment';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
 import Directive from '../../models/business-models/directive';
@@ -182,7 +182,7 @@ let viewModel = canMap.extend({
   instance: null,
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-item-extra-info',
   view: canStache(template),
   leakScope: true,

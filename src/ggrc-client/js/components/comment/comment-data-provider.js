@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {loadComments} from '../../plugins/utils/comments-utils';
 import {
   REFRESH_COMMENTS,
@@ -13,7 +13,7 @@ import {
 import Relationship from '../../models/service-models/relationship';
 import Context from '../../models/service-models/context';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'comment-data-provider',
   leakScope: true,
   viewModel: canMap.extend({

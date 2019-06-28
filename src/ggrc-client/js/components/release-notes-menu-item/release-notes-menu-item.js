@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../release-notes-modal/release-notes-modal';
 import template from './release-notes-menu-item.stache';
 import PersonProfile from '../../models/service-models/person-profile';
@@ -47,7 +47,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'release-notes-menu-item',
   view: canStache(template),
   leakScope: true,

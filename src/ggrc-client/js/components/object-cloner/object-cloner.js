@@ -4,11 +4,11 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
 import {navigate} from '../../plugins/utils/current-page-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-cloner',
   leakScope: true,
   viewModel: canMap.extend({

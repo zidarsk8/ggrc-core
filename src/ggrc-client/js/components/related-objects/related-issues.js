@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './related-objects';
 import '../add-issue-button/add-issue-button';
 import template from './related-issues.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'related-issues',
   view: canStache(template),
   leakScope: true,

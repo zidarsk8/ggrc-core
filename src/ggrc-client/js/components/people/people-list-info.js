@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 
 import template from './people-list-info.stache';
@@ -53,7 +53,7 @@ let viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'people-list-info',
   view: canStache(template),
   leakScope: true,

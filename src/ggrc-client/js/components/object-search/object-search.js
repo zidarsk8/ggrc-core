@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-mapping-container';
@@ -15,7 +15,7 @@ import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-search.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-search',
   view: canStache(template),
   leakScope: true,

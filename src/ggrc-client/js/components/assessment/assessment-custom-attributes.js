@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './info-pane/confirm-edit-action';
 import template from './custom-attributes.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-custom-attributes',
   view: canStache(template),
   leakScope: true,

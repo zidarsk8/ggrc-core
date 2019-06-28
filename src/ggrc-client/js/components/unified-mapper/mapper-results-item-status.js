@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/mapper-results-item-status.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapper-results-item-status',
   view: canStache(template),
   leakScope: true,

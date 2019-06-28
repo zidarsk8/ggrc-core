@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import router from '../../router';
 import {
@@ -99,7 +99,7 @@ let viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-status-filter',
   leakScope: true,
   viewModel: viewModel,

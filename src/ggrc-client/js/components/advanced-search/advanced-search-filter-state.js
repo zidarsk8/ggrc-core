@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import template from './advanced-search-filter-state.stache';
@@ -109,7 +109,7 @@ let viewModel = canMap.extend({
 /**
  * Filter State is a specific kind of Advanced Search Filter items.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-state',
   view: canStache(template),
   leakScope: true,

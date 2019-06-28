@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './cycle-task-objects.stache';
 import {
   loadObjectsByStubs,
@@ -99,7 +99,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'cycle-task-objects',
   view: canStache(template),
   leakScope: true,

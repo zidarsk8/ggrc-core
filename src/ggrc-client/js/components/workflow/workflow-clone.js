@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {navigate} from '../../plugins/utils/current-page-utils';
@@ -37,7 +37,7 @@ let CloneWorkflow = Cacheable.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'workflow-clone',
   viewModel: canMap.extend({
     workflow: null,

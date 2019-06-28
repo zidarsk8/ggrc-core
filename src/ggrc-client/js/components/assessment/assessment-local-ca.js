@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   applyChangesToCAValue,
   isEvidenceRequired,
@@ -18,7 +18,7 @@ import isFunction from 'can-util/js/is-function/is-function';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {getPlainText} from '../../plugins/ggrc_utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-local-ca',
   leakScope: true,
   viewModel: canMap.extend({

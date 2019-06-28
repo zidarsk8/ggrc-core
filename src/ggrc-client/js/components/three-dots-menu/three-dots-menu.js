@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/three-dots-menu.stache';
 
 const viewModel = canMap.extend({
@@ -40,7 +40,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'three-dots-menu',
   view: canStache(template),
   leakScope: true,

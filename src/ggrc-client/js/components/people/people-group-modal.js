@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../person/person-data';
 import template from './templates/people-group-modal.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'people-group-modal',
   view: canStache(template),
   leakScope: true,

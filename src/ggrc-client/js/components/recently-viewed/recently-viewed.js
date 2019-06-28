@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './recently-viewed.stache';
 import {getRecentlyViewedObjects} from '../../plugins/utils/recently-viewed-utils';
 import * as businessModels from '../../models/business-models';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'recently-viewed',
   view: canStache(template),
   leakScope: true,

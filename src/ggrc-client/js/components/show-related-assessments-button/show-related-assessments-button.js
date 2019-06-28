@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../related-objects/related-assessments';
 import template from './show-related-assessments-button.stache';
 import {hasRelatedAssessments} from '../../plugins/utils/models-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'show-related-assessments-button',
   view: canStache(template),
   leakScope: true,

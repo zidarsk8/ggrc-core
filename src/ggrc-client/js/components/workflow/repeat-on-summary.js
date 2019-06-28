@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/repeat-on-summary.stache';
 import {unitOptions as workflowUnitOptions} from '../../apps/workflow-config';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'repeat-on-summary',
   view: canStache(template),
   leakScope: true,

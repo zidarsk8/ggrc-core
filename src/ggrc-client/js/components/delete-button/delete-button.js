@@ -6,7 +6,7 @@
 import canModel from 'can-model';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   confirm,
   BUTTON_VIEW_CLOSE,
@@ -16,7 +16,7 @@ import {handleAjaxError} from '../../plugins/utils/errors-utils';
 import {Snapshot} from '../../models/service-models';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'delete-button',
   view: canStache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
@@ -65,7 +65,7 @@ const viewModel = canMap.extend({
   customAttributeId: null,
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-item-custom-attribute',
   view: canStache('{{{value}}}'),
   leakScope: true,

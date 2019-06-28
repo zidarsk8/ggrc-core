@@ -4,11 +4,11 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 /**
  * Object Selection component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-selection',
   leakScope: true,
   viewModel: canMap.extend({

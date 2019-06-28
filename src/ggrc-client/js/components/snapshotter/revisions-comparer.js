@@ -9,7 +9,7 @@ import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {
@@ -26,7 +26,7 @@ import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 
 const HIGHLIGHT_CLASS = 'diff-highlighted';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'revisions-comparer',
   view: canStache('<content/>'),
   leakScope: true,

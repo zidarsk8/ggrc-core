@@ -5,13 +5,13 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './bulk-update-button.stache';
 import updateService from '../../plugins/utils/bulk-update-service';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {trigger} from 'can-event';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'bulk-update-button',
   view: canStache(template),
   leakScope: true,

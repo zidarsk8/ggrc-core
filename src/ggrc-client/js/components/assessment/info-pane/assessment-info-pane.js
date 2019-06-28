@@ -8,7 +8,7 @@ import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import canList from 'can-list';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../controls-toolbar/assessment-controls-toolbar';
 import '../assessment-local-ca';
 import '../assessment-custom-attributes';
@@ -79,7 +79,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 /**
  * Assessment Specific Info Pane View Component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-info-pane',
   view: canStache(template),
   leakScope: true,

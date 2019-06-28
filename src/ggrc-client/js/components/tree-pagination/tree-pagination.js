@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './tree-pagination.stache';
 
 /**
@@ -13,7 +13,7 @@ import template from './tree-pagination.stache';
  * Usage: <tree-pagination paging:from="paging"></tree-pagination>
  * Optional parameter: placement:from="'top'" - to display content above the control
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-pagination',
   view: canStache(template),
   init: function () {

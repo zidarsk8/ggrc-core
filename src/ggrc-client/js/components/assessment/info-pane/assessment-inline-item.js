@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './confirm-edit-action';
 import template from './assessment-inline-item.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-inline-item',
   view: canStache(template),
   leakScope: true,

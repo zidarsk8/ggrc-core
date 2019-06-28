@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './readonly-inline-content';
 import '../form/fields/checkbox-form-field';
 import '../form/fields/multiselect-form-field';
@@ -18,7 +18,7 @@ import '../form/fields/numberbox-form-field';
 import {isInnerClick, getPlainText} from '../../plugins/ggrc_utils';
 import template from './inline-edit-control.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'inline-edit-control',
   view: canStache(template),
   leakScope: true,

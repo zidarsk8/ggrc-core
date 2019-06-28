@@ -4,12 +4,12 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'sub-tree-expander',
   leakScope: true,
   viewModel: canMap.extend({

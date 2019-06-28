@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './export-panel';
 import template from './templates/export-group.stache';
 import panelModel from './panel';
 
-export default CanComponent.extend('exportGroup', {
+export default canComponent.extend('exportGroup', {
   tag: 'export-group',
   view: canStache(template),
   leakScope: true,

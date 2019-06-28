@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './notifications-menu-item.stache';
 import NotificationConfig
   from '../../models/service-models/notification-config';
@@ -13,7 +13,7 @@ import Context from '../../models/service-models/context';
 
 const emailDigestType = 'Email_Digest';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'notifications-menu-item',
   view: canStache(template),
   leakScope: true,

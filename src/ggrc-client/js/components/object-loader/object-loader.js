@@ -4,11 +4,11 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import RefreshQueue from '../../models/refresh_queue';
 import {reify, isReifiable} from '../../plugins/utils/reify-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-loader',
   leakSkope: true,
   viewModel: canMap.extend({

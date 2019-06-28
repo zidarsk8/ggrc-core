@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
 import template from './templates/tree-item-attr.stache';
@@ -46,7 +46,7 @@ const PERSON_ATTRS = new Set([
   'last_verified_by',
 ]);
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'tree-item-attr',
   view: canStache(template),
   leakScope: true,

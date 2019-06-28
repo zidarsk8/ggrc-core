@@ -4,14 +4,14 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 /*
  * Assessment template main component
  *
  * It collects fields data and it transforms them into appropriate
  * format for saving
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'assessment-template-attributes',
   leakScope: true,
   viewModel: canMap.extend({

@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './templates/proposable-attribute.stache';
 import {isProposableExternally} from '../../../plugins/utils/ggrcq-utils';
 
@@ -23,7 +23,7 @@ const viewModel = canMap.extend({
   mandatory: false,
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'proposable-attribute',
   leakScope: false,
   view: canStache(template),

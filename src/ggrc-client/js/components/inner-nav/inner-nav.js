@@ -4,13 +4,13 @@
  */
 
 import canStache from 'can-stache';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './inner-nav.stache';
 import './inner-nav-item';
 import '../add-tab-button/add-tab-button';
 import InnerNavVM from './inner-nav-vm';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'inner-nav',
   view: canStache(template),
   viewModel: InnerNavVM,

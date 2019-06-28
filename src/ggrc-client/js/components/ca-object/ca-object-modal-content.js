@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../comment/comment-input';
 import '../comment/comment-add-button';
 import '../object-list-item/editable-document-object-list-item';
@@ -15,7 +15,7 @@ import tracker from '../../tracker';
 import {getAssigneeType} from '../../plugins/utils/comments-utils';
 import pubSub from '../../pub-sub';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'ca-object-modal-content',
   view: canStache(template),
   leakScope: true,

@@ -4,7 +4,7 @@
 */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import * as businessModels from '../../../models/business-models';
 import {loadObjectsByTypes} from '../../../plugins/utils/query-api-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
@@ -65,7 +65,7 @@ const viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'cycle-task-modal',
   leakScope: true,
   viewModel,

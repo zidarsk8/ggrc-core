@@ -4,13 +4,13 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 /**
  * The component is used to load data for autocomplete component from external sources.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'external-data-provider',
   leakScope: true,
   viewModel: canMap.extend({

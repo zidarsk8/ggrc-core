@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import Permission from '../../permission';
 import template from './attach-button.stache';
 import {
@@ -14,7 +14,7 @@ import {
 } from '../../plugins/utils/gdrive-picker-utils';
 import pubSub from '../../pub-sub';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'attach-button',
   view: canStache(template),
   confirmationCallback: '',

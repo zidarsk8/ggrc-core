@@ -4,7 +4,7 @@
  */
 
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 /**
  * The component is used to integrate separate autocomplete component
  * with some old pards of code which are working with autocomplete plugin
@@ -12,7 +12,7 @@ import CanComponent from 'can-component';
  *
  * Generally it emulates autocomplete_select handlers from several controllers.
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'inline-autocomplete-wrapper',
   leakScope: true,
   viewModel: canMap.extend({

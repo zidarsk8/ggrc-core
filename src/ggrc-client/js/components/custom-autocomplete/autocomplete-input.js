@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 // The component for 'custom-autocomplete'. Handles user input and propagates it
 // to 'autocomplete-wrapper'.
 
@@ -20,7 +20,7 @@ export const KEY_MAP = {
   ARROW_DOWN: 40,
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'autocomplete-input',
   view: canStache(template),
   leakScope: true,

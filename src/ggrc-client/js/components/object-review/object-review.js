@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './request-review-modal';
 import template from './templates/object-review.stache';
 import notificationTemplate from './templates/complete-review-notification.stache';
@@ -21,7 +21,7 @@ import {
 import {getRole} from '../../plugins/utils/acl-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-review',
   view: canStache(template),
   leakScope: true,

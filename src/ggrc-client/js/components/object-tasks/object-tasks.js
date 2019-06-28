@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -52,7 +52,7 @@ let viewModel = canMap.extend({
   },
 });
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'object-tasks',
   view: canStache(template),
   leakScope: true,

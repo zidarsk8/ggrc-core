@@ -5,12 +5,12 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import '../../dropdown/dropdown-component';
 import '../../dropdown/dropdown-wrap-text';
 import template from './dropdown-form-field.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'dropdown-form-field',
   view: canStache(template),
   leakScope: true,

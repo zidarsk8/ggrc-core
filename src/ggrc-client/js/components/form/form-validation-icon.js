@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 /**
  * State object to present possible icons for validation
  */
@@ -19,7 +19,7 @@ const icons = {
 /**
  * Form validation icon component
  */
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'form-validation-icon',
   view: canStache(
     '<i class="fa form-validation-icon__body {{iconCls}}"></i>'

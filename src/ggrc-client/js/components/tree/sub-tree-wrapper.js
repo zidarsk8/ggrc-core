@@ -6,7 +6,7 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import {
   DESTINATION_UNMAPPED,
   REFRESH_SUB_TREE,
@@ -246,7 +246,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'sub-tree-wrapper',
   view: canStache(template),
   leakScope: true,

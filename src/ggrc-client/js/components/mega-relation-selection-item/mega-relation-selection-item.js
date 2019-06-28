@@ -5,11 +5,11 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './mega-relation-selection-item.stache';
 import pubSub from '../../pub-sub';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mega-relation-selection-item',
   view: canStache(template),
   leakScope: false,

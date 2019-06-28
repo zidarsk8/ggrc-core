@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import './mapper-results-item-status';
 import './mapper-results-item-details';
 import './mapper-results-item-attrs';
@@ -74,7 +74,7 @@ const events = {
   },
 };
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'mapper-results-item',
   view: canStache(template),
   leakScope: true,

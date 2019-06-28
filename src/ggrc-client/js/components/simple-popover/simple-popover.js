@@ -5,10 +5,10 @@
 
 import canStache from 'can-stache';
 import canMap from 'can-map';
-import CanComponent from 'can-component';
+import canComponent from 'can-component';
 import template from './simple-popover.stache';
 
-export default CanComponent.extend({
+export default canComponent.extend({
   tag: 'simple-popover',
   view: canStache(template),
   init: function (el) {
