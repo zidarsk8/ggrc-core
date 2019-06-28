@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/general-page-header.stache';
 import {
@@ -13,7 +13,7 @@ import {
 } from '../../plugins/utils/ggrcq-utils';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     redirectionEnabled: {
       get() {

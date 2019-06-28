@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './clipboard-link';
 
@@ -15,7 +15,7 @@ export default CanComponent.extend({
     '<i class="fa fa-google"/>Get Short Url</clipboard-link>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     define: {
       text: {

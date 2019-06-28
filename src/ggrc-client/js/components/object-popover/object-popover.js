@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../show-more/show-more';
 import template from './object-popover.stache';
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   tag: 'object-popover',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     expanded: false,
     direction: 'left',
     maxInnerHeight: defaultMaxInnerHeight,

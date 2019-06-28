@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../diff/instance-fields-diff';
 import '../../diff/instance-acl-diff';
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   tag: 'related-revisions-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       revision: {
         set(newValue) {

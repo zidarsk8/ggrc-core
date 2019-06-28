@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   peopleWithRoleName,
@@ -15,7 +15,7 @@ const template = '<tree-field-wrapper source:from="peopleList"' +
 ' type:from="type" field:from="\'email\'">' +
 '<tree-field source:from="items"/></tree-field-wrapper>';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     peopleList: {
       get() {

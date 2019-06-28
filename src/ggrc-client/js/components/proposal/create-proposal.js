@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import Proposal from '../../models/service-models/proposal';
 import template from './templates/create-proposal.stache';
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   tag: 'create-proposal',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isDisabled: {
         type: Boolean,

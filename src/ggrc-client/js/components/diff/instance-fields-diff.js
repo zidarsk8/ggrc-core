@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
@@ -15,7 +15,7 @@ const viewModel = DiffBaseVM.extend({
   buildDiffObject() {
     const instance = this.attr('currentInstance');
     const modifiedFields = this.attr('modifiedFields');
-    const fieldsKeys = CanMap.keys(modifiedFields);
+    const fieldsKeys = canMap.keys(modifiedFields);
 
     const diff = fieldsKeys.map((key) => {
       const modifiedVal = modifiedFields[key];

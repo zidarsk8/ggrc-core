@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   isSnapshot,
   isSnapshotModel,
@@ -314,7 +314,7 @@ function getVisibleColumnsConfig(available, selected) {
   availableColumns.forEach(function (attr) {
     const isSelected = selectedColumns
       .some((selectedAttr) => selectedAttr.attr_name === attr.attr_name);
-    columns.push(new CanMap({
+    columns.push(new canMap({
       title: attr.attr_title,
       name: attr.attr_name,
       mandatory: attr.mandatory,

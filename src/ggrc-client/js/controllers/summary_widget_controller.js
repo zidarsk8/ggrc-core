@@ -5,7 +5,7 @@
 
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canControl from 'can-control';
 import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
@@ -63,7 +63,7 @@ export default canControl.extend({
       .on('widget_shown', this.widget_shown.bind(this));
     this.element.closest('.widget')
       .on('widget_hidden', this.widget_hidden.bind(this));
-    this.options.context = new CanMap({
+    this.options.context = new canMap({
       model: this.options.model,
       instance: this.options.instance,
       error_msg: '',

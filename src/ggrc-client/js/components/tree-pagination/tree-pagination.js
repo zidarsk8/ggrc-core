@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './tree-pagination.stache';
 
@@ -34,7 +34,7 @@ export default CanComponent.extend({
     }
   },
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     placement: '',
     setCurrentPage: function (pageNumber) {
       this.paging.attr('current', pageNumber);

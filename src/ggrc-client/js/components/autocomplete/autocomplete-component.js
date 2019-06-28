@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './autocomplete-component.stache';
 
@@ -17,7 +17,7 @@ let component = {
   tag: 'autocomplete-component',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     placeholder: '',
     searchItemsType: '',
     className: '',

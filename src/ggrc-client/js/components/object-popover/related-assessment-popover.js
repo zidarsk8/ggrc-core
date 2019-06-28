@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../related-comments/related-comments';
 import '../custom-attributes/custom-attributes-field-view';
@@ -23,7 +23,7 @@ export default CanComponent.extend({
   tag: 'related-assessment-popover',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     selectedAssessment: {},
     popoverTitleInfo: 'Assessment Title: ',
     define: {

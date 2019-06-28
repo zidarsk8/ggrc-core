@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../assessment/info-pane/confirm-edit-action';
 import template from './templates/info-pane-issue-tracker-fields.stache';
@@ -13,7 +13,7 @@ export default CanComponent.extend({
   tag: 'info-pane-issue-tracker-fields',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isTicketIdMandatory: {
         get() {

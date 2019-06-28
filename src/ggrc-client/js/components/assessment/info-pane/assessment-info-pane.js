@@ -7,7 +7,7 @@ import makeArray from 'can-util/js/make-array/make-array';
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../controls-toolbar/assessment-controls-toolbar';
 import '../assessment-local-ca';
@@ -83,7 +83,7 @@ export default CanComponent.extend({
   tag: 'assessment-info-pane',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       verifiers: {
         get: function () {
@@ -656,7 +656,7 @@ export default CanComponent.extend({
     showRequiredInfoModal: function (e, field) {
       let scope = field || e.field;
       let errors = scope.attr('errorsMap');
-      let errorsList = CanMap.keys(errors)
+      let errorsList = canMap.keys(errors)
         .map(function (error) {
           return errors[error] ? error : null;
         })

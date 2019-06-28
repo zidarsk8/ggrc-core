@@ -5,7 +5,7 @@
 
 import * as CanStacheUtils from 'can-stache';
 import * as AjaxExtensions from '../../plugins/ajax_extensions';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Ctrl from '../tree/tree-view-node';
 
 describe('TreeViewNode Controller', function () {
@@ -22,7 +22,7 @@ describe('TreeViewNode Controller', function () {
       $element = $('<div></div>');
 
       ctrlInst = {
-        options: new CanMap({
+        options: new canMap({
           show_view: '/foo/bar.stache',
         }),
         element: $element,
@@ -109,7 +109,7 @@ describe('TreeViewNode Controller', function () {
 
       ctrlInst = {
         element: $tree,
-        options: new CanMap({
+        options: new canMap({
           show_view: '/foo/bar.stache',
         }),
         _ifNotRemoved: jasmine.createSpy().and.callFake(function (callback) {

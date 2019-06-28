@@ -5,7 +5,7 @@
 
 import moment from 'moment';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
@@ -17,7 +17,7 @@ import Cycle from '../../models/business-models/cycle';
 import {formatDate} from '../../plugins/utils/date-utils';
 import template from './templates/tree-item-extra-info.stache';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     isActive: {
       type: 'boolean',

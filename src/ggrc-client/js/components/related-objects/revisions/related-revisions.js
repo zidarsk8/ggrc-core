@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import Pagination from '../../base-objects/pagination';
 import template from './templates/related-revisions.stache';
@@ -15,7 +15,7 @@ export default CanComponent.extend({
   tag: 'related-revisions',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       paging: {
         value: function () {

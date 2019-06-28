@@ -4,7 +4,7 @@
 */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
@@ -40,7 +40,7 @@ describe('ACL utils peopleWithRoleName() method', () => {
       {person: {id: 9}, ac_role_id: 9},
     ];
 
-    instance = new CanMap({
+    instance = new canMap({
       id: 42,
       type: 'Audit',
       'class': {model_singular: 'Audit'},

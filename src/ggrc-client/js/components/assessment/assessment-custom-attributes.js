@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './info-pane/confirm-edit-action';
 import template from './custom-attributes.stache';
@@ -13,7 +13,7 @@ export default CanComponent.extend({
   tag: 'assessment-custom-attributes',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     items: [],
     editMode: false,
     modifiedFields: {},

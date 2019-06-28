@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/sub-tree-models.stache';
 import childModelsMap from '../tree/child-models-map';
@@ -15,7 +15,7 @@ import {
   getWidgetConfig,
 } from '../../plugins/utils/widgets-utils';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     isActive: {
       type: Boolean,

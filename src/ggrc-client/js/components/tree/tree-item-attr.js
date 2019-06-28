@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
@@ -50,7 +50,7 @@ export default CanComponent.extend({
   tag: 'tree-item-attr',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     name: '',
     define: {

@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-list-item/business-object-list-item';
 import template from './issue-unmap-item.stache';
@@ -25,7 +25,7 @@ export default CanComponent.extend({
   tag: 'issue-unmap-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       paging: {
         value() {

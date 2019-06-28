@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './comment-input';
 import './comment-add-button';
@@ -22,7 +22,7 @@ export default CanComponent.extend({
   tag: 'comment-add-form',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       notificationsInfo: {
         set(newValue) {

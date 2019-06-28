@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   getPageType,
@@ -12,7 +12,7 @@ import {
 export default CanComponent.extend({
   tag: 'sub-tree-expander',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       contextName: {
         type: String,

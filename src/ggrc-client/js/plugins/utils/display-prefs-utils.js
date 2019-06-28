@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as LocalStorage from './local-storage-utils';
 
 const localStorageKey = 'display_prefs';
@@ -26,7 +26,7 @@ let preferences = null;
 /**
  * Creates new preferences object if nothing is saved
  * or reads existing preferences and caches them
- * @return {CanMap} user display preferences
+ * @return {canMap} user display preferences
  */
 function getPreferences() {
   if (preferences) {
@@ -36,9 +36,9 @@ function getPreferences() {
   let prefs = LocalStorage.get(localStorageKey);
 
   if (!prefs.length) {
-    preferences = new CanMap(LocalStorage.create(localStorageKey, {}));
+    preferences = new canMap(LocalStorage.create(localStorageKey, {}));
   } else {
-    preferences = new CanMap(prefs[0]);
+    preferences = new canMap(prefs[0]);
   }
 
   return preferences;
@@ -76,7 +76,7 @@ function saveObject() {
 
 /**
  * Creates nesting objects when there are several key args
- * @param {CanMap} prefs preferences object
+ * @param {canMap} prefs preferences object
  * @param  {Array} keyArgs key parts
  */
 function createNestedProps(prefs, keyArgs) {
@@ -84,7 +84,7 @@ function createNestedProps(prefs, keyArgs) {
   keyArgs.forEach(function (arg) {
     let value = _.get(object, arg);
     if (!value) {
-      value = new CanMap();
+      value = new canMap();
       object.attr(arg, value);
     }
     object = value;
@@ -94,13 +94,13 @@ function createNestedProps(prefs, keyArgs) {
 /**
  * Gets saved preferences.
  * It accepts any string parameters which are parts of path in preferences object
- * @return {CanMap} required preferences
+ * @return {canMap} required preferences
  */
 function getObject(...args) {
   let prefs = getPreferences();
 
   let object = _.get(prefs, args) || {};
-  return new CanMap(object);
+  return new canMap(object);
 }
 
 /**

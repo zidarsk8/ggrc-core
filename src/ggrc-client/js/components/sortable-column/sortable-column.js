@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './sortable-column.stache';
 
@@ -12,7 +12,7 @@ export default CanComponent.extend({
   tag: 'sortable-column',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isSorted: {
         type: Boolean,

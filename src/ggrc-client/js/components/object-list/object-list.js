@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../show-more/show-more';
 import '../spinner-component/spinner-component';
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'object-list',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       itemSelector: {
         type: 'string',
@@ -64,7 +64,7 @@ export default CanComponent.extend({
     showMore: false,
     /**
      *
-     * @param {CanMap} ctx - current item context
+     * @param {canMap} ctx - current item context
      * @param {jQuery} el - selected element
      * @param {jQuery.Event} ev - click event
      */

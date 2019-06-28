@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
 import {navigate} from '../../plugins/utils/current-page-utils';
@@ -11,14 +11,14 @@ import {navigate} from '../../plugins/utils/current-page-utils';
 export default CanComponent.extend({
   tag: 'object-cloner',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     modalTitle: '',
     modalDescription: '',
     includeObjects: {},
     getIncluded: function () {
       let included = this.attr('includeObjects');
-      return _.filter(CanMap.keys(included), function (val) {
+      return _.filter(canMap.keys(included), function (val) {
         return included[val];
       });
     },

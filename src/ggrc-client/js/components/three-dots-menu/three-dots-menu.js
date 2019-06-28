@@ -4,11 +4,11 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/three-dots-menu.stache';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   disabled: true,
   observer: null,
   manageEmptyList(menuNode) {

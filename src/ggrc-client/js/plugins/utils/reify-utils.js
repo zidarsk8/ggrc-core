@@ -5,7 +5,7 @@
 
 import canModel from 'can-model';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import allModels from '../../models/all-models';
 
 function reify(obj) {
@@ -13,13 +13,13 @@ function reify(obj) {
     return reifyList(obj);
   }
 
-  if (obj instanceof CanMap) {
+  if (obj instanceof canMap) {
     return reifyMap(obj);
   }
 }
 
 function isReifiable(obj) {
-  return obj instanceof CanMap;
+  return obj instanceof canMap;
 }
 
 function reifyMap(obj) {

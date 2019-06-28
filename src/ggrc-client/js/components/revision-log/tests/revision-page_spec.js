@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-page';
 import Person from '../../../models/business-models/person';
@@ -32,7 +32,7 @@ describe('revision-page component', function () {
     });
 
     it('assigns computed object changes to changeHistory attr', () => {
-      const revisions = new CanMap({
+      const revisions = new canMap({
         object: [],
         revisionsForCompare: [],
       });
@@ -52,7 +52,7 @@ describe('revision-page component', function () {
     });
 
     it('assigns computed mapping changes to changeHistory attr', () => {
-      const revisions = new CanMap({
+      const revisions = new canMap({
         mappings: [],
       });
       const mappingChanges = {
@@ -462,7 +462,7 @@ describe('revision-page component', function () {
       ]);
 
       viewModel._mappingChange.and.callFake(function (revision) {
-        return new CanMap({madeBy: revision.madeBy});
+        return new canMap({madeBy: revision.madeBy});
       });
 
       result = viewModel._computeMappingChanges(revisions);

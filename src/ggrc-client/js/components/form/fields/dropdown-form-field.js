@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../dropdown/dropdown-component';
 import '../../dropdown/dropdown-wrap-text';
@@ -14,7 +14,7 @@ export default CanComponent.extend({
   tag: 'dropdown-form-field',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isNoneSelected: {
         get: function () {

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {getModelInstance} from '../../plugins/utils/models-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
@@ -16,7 +16,7 @@ const viewModel = DiffBaseVM.extend({
   modifiedFields: {},
 
   buildDiffObject() {
-    const fieldsKeys = CanMap.keys(this.attr('modifiedFields'));
+    const fieldsKeys = canMap.keys(this.attr('modifiedFields'));
     const diffPromises = fieldsKeys.map(async (key) => {
       return await this.buildFieldDiff(key);
     });

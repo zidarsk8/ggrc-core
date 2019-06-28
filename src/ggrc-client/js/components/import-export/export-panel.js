@@ -5,7 +5,7 @@
 
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/export-panel.stache';
 
@@ -13,7 +13,7 @@ export default CanComponent.extend({
   tag: 'export-panel',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       showAttributes: {
         value: true,

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './read-more.stache';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
@@ -12,7 +12,7 @@ import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
 const readMore = 'Read More';
 const readLess = 'Read Less';
 const classPrefix = 'ellipsis-truncation-';
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     text: {
       type: 'string',

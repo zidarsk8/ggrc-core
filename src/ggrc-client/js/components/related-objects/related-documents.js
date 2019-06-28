@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   buildParam,
@@ -32,7 +32,7 @@ let DOCUMENT_KIND_MAP = {
 export default CanComponent.extend({
   tag: 'related-documents',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: {},
     modelType: 'Document',
     kind: '',

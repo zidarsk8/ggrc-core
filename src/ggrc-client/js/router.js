@@ -4,8 +4,8 @@
 */
 
 import canRoute from 'can-route';
-import CanMap from 'can-map';
-const router = new CanMap();
+import canMap from 'can-map';
+const router = new canMap();
 
 class RouterConfig {
   static setupRoutes(routes) {

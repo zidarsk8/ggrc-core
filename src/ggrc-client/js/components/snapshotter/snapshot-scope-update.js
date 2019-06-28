@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   confirm,
@@ -20,7 +20,7 @@ import {notifier} from '../../plugins/utils/notifiers-utils';
 export default CanComponent.extend({
   tag: 'snapshot-scope-update',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     upsertIt: function (scope, el, ev) {
       confirm({

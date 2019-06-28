@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-filter-state';
@@ -44,7 +44,7 @@ describe('advanced-search-filter-state component', function () {
        'if "stateModel.items" is empty', () => {
       viewModel.attr('modelName', 'Requirement');
 
-      viewModel.attr('stateModel', new CanMap({
+      viewModel.attr('stateModel', new canMap({
         items: [],
       }));
 
@@ -59,7 +59,7 @@ describe('advanced-search-filter-state component', function () {
     it('initializes "filterStates" checked with items from "stateModel"',
       function () {
         viewModel.attr('modelName', 'Requirement');
-        viewModel.attr('stateModel', new CanMap({
+        viewModel.attr('stateModel', new canMap({
           items: ['state1'],
         }));
 
@@ -74,7 +74,7 @@ describe('advanced-search-filter-state component', function () {
     it('updates items collection', function () {
       let items;
       let selectedStates = [{value: 'Active'}, {value: 'Draft'}];
-      viewModel.attr('stateModel', new CanMap({
+      viewModel.attr('stateModel', new canMap({
         items: [],
       }));
 

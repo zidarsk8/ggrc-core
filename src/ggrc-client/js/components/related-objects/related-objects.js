@@ -4,7 +4,7 @@
  */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import {
@@ -23,7 +23,7 @@ let defaultOrderBy = 'created_at';
 export default CanComponent.extend({
   tag: 'related-objects',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       noRelatedObjectsMessage: {
         type: 'string',

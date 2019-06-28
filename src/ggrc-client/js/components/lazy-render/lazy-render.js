@@ -4,9 +4,9 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     trigger: {
       type: 'boolean',

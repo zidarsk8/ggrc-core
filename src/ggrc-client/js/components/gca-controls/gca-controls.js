@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './gca-controls.stache';
 import '../custom-attributes/custom-attributes-field';
@@ -25,7 +25,7 @@ export default CanComponent.extend({
   tag: 'gca-controls',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: {},
     items: [],
     allowHide: false,

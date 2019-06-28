@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   uploadFiles,
@@ -23,7 +23,7 @@ import template from './create-document-button.stache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   parentInstance: null,
   openPicker() {
     return uploadFiles()

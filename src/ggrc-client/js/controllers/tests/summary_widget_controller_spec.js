@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Ctrl from '../summary_widget_controller';
 import * as WidgetsUtils from '../../plugins/utils/widgets-utils';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -108,7 +108,7 @@ describe('SummaryWidgetController', function () {
           forceRefresh: false,
           context: {
             charts: {
-              Assessment: new CanMap({
+              Assessment: new canMap({
                 total: {assessments: 3},
                 isInitialized: true,
               }),
@@ -124,7 +124,7 @@ describe('SummaryWidgetController', function () {
       };
       method = Ctrl.prototype.reloadChart.bind(ctrlInst);
       spyOn(WidgetsUtils, 'getCounts')
-        .and.returnValue(new CanMap({Assessment: 3}));
+        .and.returnValue(new canMap({Assessment: 3}));
     });
 
     it('does nothing if chart options is initialized,' +
@@ -160,7 +160,7 @@ describe('SummaryWidgetController', function () {
         widget_shown: jasmine.createSpy('widget_shown'),
         reloadSummary: jasmine.createSpy('reloadSummary'),
         options: {
-          context: new CanMap({}),
+          context: new canMap({}),
         },
       };
       method = Ctrl.prototype.widget_shown.bind(ctrlInst);
@@ -196,7 +196,7 @@ describe('SummaryWidgetController', function () {
       ctrlInst = {
         widget_hidden: jasmine.createSpy('widget_hidden'),
         options: {
-          context: new CanMap({}),
+          context: new canMap({}),
         },
       };
       method = Ctrl.prototype.widget_hidden.bind(ctrlInst);

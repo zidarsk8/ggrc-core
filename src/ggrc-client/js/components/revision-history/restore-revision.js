@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './mandatory-fields-modal';
 import {
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'restore-revision',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: {},
     restoredRevision: {},
     loading: false,
@@ -66,7 +66,7 @@ export default CanComponent.extend({
       });
     },
     applyFields(instance, modifiedFields) {
-      const fieldNames = CanMap.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
 
       fieldNames.forEach((fieldName) => {
         const modifiedField = modifiedFields[fieldName];
@@ -78,7 +78,7 @@ export default CanComponent.extend({
       instance.attr('access_control_list', modifiedACL);
     },
     applyListFields(instance, modifiedFields) {
-      const fieldNames = CanMap.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
       fieldNames.forEach((fieldName) => {
         const items = instance.attr(fieldName);
         const modifiedItems = modifiedFields.attr(fieldName);

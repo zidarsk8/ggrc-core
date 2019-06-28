@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../dropdown/multiselect-dropdown';
 import template from './download-template.stache';
@@ -21,7 +21,7 @@ const importOptions = GGRC.Bootstrap.importable.map((el) => {
     value: el.title_plural,
   };
 });
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {},
   modalTitle: 'Download Template',
   modalState: {

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.stache';
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'add-issue-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       prepareJSON: {
         get: function () {

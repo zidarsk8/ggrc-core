@@ -7,7 +7,7 @@ import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canCompute from 'can-compute';
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import TreeLoader from './tree-loader';
 import {getCounts} from '../../plugins/utils/widgets-utils';
 
@@ -48,9 +48,9 @@ export default TreeLoader.extend({
     if (!this.options.search_params) {
       this.options.search_params = {};
     }
-    this.options.state = new CanMap();
+    this.options.state = new canMap();
 
-    this.context = new CanMap({
+    this.context = new canMap({
       // FIXME: Needed?  Default `pager` to avoid binding issues.
       pager: {
         has_next: function () {

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './info-pane-footer.stache';
 
@@ -15,7 +15,7 @@ export default CanComponent.extend({
   tag: 'info-pane-footer',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     createdAt: '',
     modifiedAt: '',
     modifiedBy: {},

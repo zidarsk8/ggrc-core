@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/dashboard-workflows.stache';
 import isFunction from 'can-util/js/is-function/is-function';
@@ -13,7 +13,7 @@ import {getTruncatedList} from '../../plugins/ggrc_utils';
 
 const SHOWN_WORKFLOWS_COUNT = 5;
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     showAllWorkflows: {
       type: 'boolean',

@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/dropdown-component.stache';
 
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'dropdown-component',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       options: {
         get: function () {
@@ -48,7 +48,7 @@ export default CanComponent.extend({
               }
             );
           } else {
-            list = CanMap.keys(optionsGroups).map(function (key) {
+            list = canMap.keys(optionsGroups).map(function (key) {
               let group = optionsGroups.attr(key);
               return {
                 group: group.attr('name'),

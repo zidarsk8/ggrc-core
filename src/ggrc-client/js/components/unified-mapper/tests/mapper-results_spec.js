@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
@@ -340,7 +340,7 @@ describe('mapper-results component', function () {
     };
     let mockFilterItems = new canList(['filterItem']);
     let mockMappingItems = new canList(['mappingItem']);
-    let mockStatusItem = new CanMap({
+    let mockStatusItem = new canMap({
       value: {
         items: ['statusItem'],
       },

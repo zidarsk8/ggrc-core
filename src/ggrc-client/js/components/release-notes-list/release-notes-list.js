@@ -4,12 +4,12 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './release-notes-list.stache';
 import notesTemplate from './release-notes.md';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   notesTemplate: notesTemplate,
   onTopButtonCssClass: 'instantly-hidden',
   prevScrollValue: null,

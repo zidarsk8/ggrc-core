@@ -5,7 +5,7 @@
 
 import moment from 'moment';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   inViewport,
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'datepicker-component',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     format: '',
     helptext: '',
     label: '',

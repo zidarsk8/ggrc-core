@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
@@ -16,7 +16,7 @@ import {isScopeModel} from '../../plugins/utils/models-utils';
  * Contains logic used in Filter State component
  * @constructor
  */
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     label: {
       get() {
@@ -70,7 +70,7 @@ let viewModel = CanMap.extend({
   /**
    * Contains criterion's fields: operator, modelName, items.
    * Initializes filterStates.
-   * @type {CanMap}
+   * @type {canMap}
   */
   stateModel: null,
   /**

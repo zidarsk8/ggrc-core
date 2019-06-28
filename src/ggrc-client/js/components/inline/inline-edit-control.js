@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './readonly-inline-content';
 import '../form/fields/checkbox-form-field';
@@ -22,7 +22,7 @@ export default CanComponent.extend({
   tag: 'inline-edit-control',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isValid: {
         get() {

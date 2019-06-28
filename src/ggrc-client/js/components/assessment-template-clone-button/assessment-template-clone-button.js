@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './assessment-template-clone-button.stache';
 import router from '../../router';
@@ -14,7 +14,7 @@ export default CanComponent.extend({
   tag: 'assessment-template-clone-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     model: null,
     text: null,
     parentId: null,

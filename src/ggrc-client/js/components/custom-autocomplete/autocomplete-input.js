@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 // The component for 'custom-autocomplete'. Handles user input and propagates it
 // to 'autocomplete-wrapper'.
@@ -24,7 +24,7 @@ export default CanComponent.extend({
   tag: 'autocomplete-input',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       // flag for showing 'autocomplete-result'
       showResults: {

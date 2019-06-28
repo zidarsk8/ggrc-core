@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import tracker from '../../tracker';
 import '../spinner-component/spinner-component';
@@ -17,7 +17,7 @@ import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     cycle: {
       get: function () {

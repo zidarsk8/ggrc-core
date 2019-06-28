@@ -4,7 +4,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CustomAttributeAccess from '../custom-attribute-access';
 import CustomAttributeObject from '../custom-attribute-object';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../custom-attribute-config';
@@ -17,7 +17,7 @@ describe('CustomAttributeAccess module', () => {
 
   beforeEach(function () {
     origCaAttrDefs = GGRC.custom_attr_defs;
-    instance = new CanMap();
+    instance = new canMap();
     caAccess = new CustomAttributeAccess(instance);
   });
 
@@ -29,7 +29,7 @@ describe('CustomAttributeAccess module', () => {
     let instance;
 
     beforeEach(function () {
-      instance = new CanMap({
+      instance = new canMap({
         custom_attribute_values: [],
       });
     });
@@ -74,7 +74,7 @@ describe('CustomAttributeAccess module', () => {
     let caObject;
 
     beforeEach(function () {
-      const caDef = new CanMap();
+      const caDef = new canMap();
       caObject = new CustomAttributeObject(instance, caDef);
       spyOn(caAccess, '_findCaObjectByCaId').and.returnValue(caObject);
     });
@@ -146,8 +146,8 @@ describe('CustomAttributeAccess module', () => {
       it('returns a custom attribute object with certain ca id', function () {
         const caId = 1234;
         const expectedResult = new CustomAttributeObject(
-          new CanMap(),
-          new CanMap()
+          new canMap(),
+          new canMap()
         );
         let result;
         spyOn(caAccess, '_findCaObjectByCaId').and.returnValue(
@@ -220,9 +220,9 @@ describe('CustomAttributeAccess module', () => {
       });
 
       it('validates each CA object', function () {
-        const caDefs = [1, 3, 5].map((id) => new CanMap({id}));
+        const caDefs = [1, 3, 5].map((id) => new canMap({id}));
         const builtCaObjects = new Map(caDefs.map((caDef) =>
-          [caDef.attr('id'), new CustomAttributeObject(new CanMap(), caDef)]
+          [caDef.attr('id'), new CustomAttributeObject(new canMap(), caDef)]
         ));
         caAccess._buildCaObjects.and.returnValue(builtCaObjects);
         const validate = spyOn(CustomAttributeObject.prototype, 'validate');
@@ -309,7 +309,7 @@ describe('CustomAttributeAccess module', () => {
       beforeEach(function () {
         const objects = Array.from(
           {length: 2},
-          () => new CustomAttributeObject(new CanMap(), new CanMap())
+          () => new CustomAttributeObject(new canMap(), new canMap())
         );
         caObjects.push(...objects);
       });
@@ -339,8 +339,8 @@ describe('CustomAttributeAccess module', () => {
 
     beforeEach(function () {
       caObject = new CustomAttributeObject(
-        new CanMap(),
-        new CanMap()
+        new canMap(),
+        new canMap()
       );
     });
 
@@ -472,8 +472,8 @@ describe('CustomAttributeAccess module', () => {
   describe('_applyChangeToCaObject() method', () => {
     it('sets value for passed caObject from passed change object', function () {
       const caObject = new CustomAttributeObject(
-        new CanMap(),
-        new CanMap()
+        new canMap(),
+        new canMap()
       );
       const change = {
         caId: 123,

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/request-review-modal.stache';
 import {
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'request-review-modal',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isValidForm: {
         get() {

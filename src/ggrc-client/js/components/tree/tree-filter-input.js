@@ -4,13 +4,13 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/tree-filter-input.stache';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     filter: {
       type: 'string',

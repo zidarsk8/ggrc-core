@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/relevant-filter.stache';
 import * as businessModels from '../../models/business-models';
@@ -15,7 +15,7 @@ export default CanComponent.extend({
   tag: 'relevant-filter',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     relevant_menu_item: '',
     operators: [{title: 'AND', value: 'AND'}, {title: 'OR', value: 'OR'}],
     addFilter: function () {
@@ -32,7 +32,7 @@ export default CanComponent.extend({
 
       this.attr('relevant').push({
         value: false,
-        filter: new CanMap(),
+        filter: new canMap(),
         textValue: '',
         menu: menu,
         model_name: menu[0].model_singular,
@@ -42,7 +42,7 @@ export default CanComponent.extend({
     menu() {
       const workflowRelatedTypes = ['Cycle', 'CycleTaskGroup',
         'CycleTaskGroupObjectTask', 'TaskGroup', 'Workflow'];
-      const baseWidgetsTypes = CanMap.keys(
+      const baseWidgetsTypes = canMap.keys(
         TreeViewConfig.attr('base_widgets_by_type')
       );
 
@@ -107,7 +107,7 @@ export default CanComponent.extend({
       if (!/model_name/gi.test(which)) {
         return;
       }
-      item.target.attr('filter', new CanMap());
+      item.target.attr('filter', new canMap());
       item.target.attr('value', false);
     },
   },

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {getModelInstance} from '../../plugins/utils/models-utils';
 import {buildModifiedListField} from '../../plugins/utils/object-history-utils';
@@ -18,7 +18,7 @@ const viewModel = DiffBaseVM.extend({
 
   buildDiffObject() {
     const instance = this.attr('currentInstance');
-    const modifiedKeys = CanMap.keys(this.attr('modifiedFields'));
+    const modifiedKeys = canMap.keys(this.attr('modifiedFields'));
     this.attr('diff', []);
     modifiedKeys.forEach((key) => {
       const currentVal = this.loadFieldList(instance.attr(key));

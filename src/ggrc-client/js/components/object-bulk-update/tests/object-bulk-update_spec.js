@@ -4,7 +4,7 @@
  */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 import tracker from '../../../tracker';
@@ -25,7 +25,7 @@ describe('object-bulk-update component', function () {
     let result;
 
     beforeEach(function () {
-      parentViewModel = new CanMap();
+      parentViewModel = new canMap();
       method = Component.prototype.viewModel;
       mappingType = {
         type: 'the same type',
@@ -114,7 +114,7 @@ describe('object-bulk-update component', function () {
 
     beforeEach(function () {
       context = {
-        viewModel: new CanMap(),
+        viewModel: new canMap(),
       };
       event = events['.btn-update click'].bind(context);
 
@@ -142,7 +142,7 @@ describe('object-bulk-update component', function () {
 
     beforeEach(function () {
       context = {
-        viewModel: new CanMap({
+        viewModel: new canMap({
           onSubmit: jasmine.createSpy(),
         }),
       };

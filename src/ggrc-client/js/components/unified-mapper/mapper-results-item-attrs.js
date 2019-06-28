@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../tree/tree-item-custom-attribute';
 import '../tree/tree-field-wrapper';
@@ -16,7 +16,7 @@ export default CanComponent.extend({
   tag: 'mapper-results-item-attrs',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     columns: [],
     serviceColumns: [],

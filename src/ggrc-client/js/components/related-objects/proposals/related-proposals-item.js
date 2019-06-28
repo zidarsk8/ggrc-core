@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../proposal/review-proposal';
 import '../../proposal/apply-decline-proposal';
@@ -22,7 +22,7 @@ export default CanComponent.extend({
   tag: 'related-proposals-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       proposal: {
         value: {},

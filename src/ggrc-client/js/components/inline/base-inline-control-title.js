@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../redirects/proposable-control/proposable-control';
 import template from './base-inline-control-title.stache';
@@ -13,7 +13,7 @@ export default CanComponent.extend({
   tag: 'base-inline-control-title',
   view: canStache(template),
   leakScope: false,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isEditIconAllowed: {
         get: function () {

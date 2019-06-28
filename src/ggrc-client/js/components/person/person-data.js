@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import RefreshQueue from '../../models/refresh_queue';
 import template from './person-data.stache';
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'person-data',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       personId: {
         type: 'number',

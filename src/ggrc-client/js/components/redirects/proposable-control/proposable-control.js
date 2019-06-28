@@ -4,12 +4,12 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/proposable-control.stache';
 import {getProposalAttrUrl} from '../../../plugins/utils/ggrcq-utils';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     link: {
       get() {

@@ -5,7 +5,7 @@
 
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canControl from 'can-control';
 import {getDashboards} from '../plugins/utils/dashboards-utils';
 import {
@@ -25,7 +25,7 @@ export default canControl.extend({
     let dashboards = getDashboards(options.instance);
     let $element = $(this.element);
 
-    options.context = new CanMap({
+    options.context = new canMap({
       model: options.model,
       instance: options.instance,
       dashboards: dashboards,

@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CustomAttributeObject from './custom-attribute-object';
 import {CUSTOM_ATTRIBUTE_TYPE} from './custom-attribute-config';
 import {
@@ -30,7 +30,7 @@ import {
 export default class CustomAttributeAccess {
   /**
    * Creates CustomAttributeAccess instance.
-   * @param {CanMap} instance - The instance of some object.
+   * @param {canMap} instance - The instance of some object.
    */
   constructor(instance) {
     this._instance = instance;
@@ -127,7 +127,7 @@ export default class CustomAttributeAccess {
       let caValue = this._findCaValueByCaId(caId, caValues);
 
       if (!caValue) {
-        caValue = new CanMap({});
+        caValue = new canMap({});
         caValues.push(caValue);
       }
 
@@ -234,8 +234,8 @@ export default class CustomAttributeAccess {
   /**
    * Returns custom attribute value object which equals to сaId.
    * @param {number} caId - The custom attribute id.
-   * @param {Object[]|CanMap[]} caValues - Custom attribute values.
-   * @return {CanMap|undefined} - Custom attribute value if it was found
+   * @param {Object[]|canMap[]} caValues - Custom attribute values.
+   * @return {canMap|undefined} - Custom attribute value if it was found
    * else undefined.
    */
   _findCaValueByCaId(caId, caValues) {

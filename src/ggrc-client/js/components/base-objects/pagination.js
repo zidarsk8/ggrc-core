@@ -4,12 +4,12 @@
  */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 /**
  * A component that unifies pagination API
  * Usage: new Pagination()
  */
-export default CanMap.extend({
+export default canMap.extend({
   define: {
     current: {
       type: 'number',

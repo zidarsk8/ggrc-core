@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './info-pin-buttons.stache';
 import isFunction from 'can-util/js/is-function/is-function';
@@ -13,7 +13,7 @@ export default CanComponent.extend({
   tag: 'info-pin-buttons',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     onChangeMaximizedState: null,
     onClose: null,
     define: {

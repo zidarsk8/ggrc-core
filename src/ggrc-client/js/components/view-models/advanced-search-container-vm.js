@@ -4,13 +4,13 @@
  */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 /**
  * Advanced Search Container view model.
  * Contains logic used in container components.
  * @constructor
  */
-export default CanMap.extend({
+export default canMap.extend({
   /**
    * Contains Advanced Search Items.
    * @type {canList}
@@ -18,7 +18,7 @@ export default CanMap.extend({
   items: canList(),
   /**
    * Removes Filter Operator and Advanced Search mapping item from the collection.
-   * @param {CanMap} item - Advanced Search mapping item.
+   * @param {canMap} item - Advanced Search mapping item.
    * @param {boolean} isGroup - Flag indicates that current component is group.
    */
   removeItem: function (item, isGroup) {

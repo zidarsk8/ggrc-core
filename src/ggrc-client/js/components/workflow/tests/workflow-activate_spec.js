@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../workflow-activate';
 import * as helpers from '../../../plugins/utils/workflow-utils';
@@ -46,7 +46,7 @@ describe('workflow-activate component', function () {
     let workflow;
 
     beforeEach(function () {
-      workflow = new CanMap();
+      workflow = new canMap();
       workflow.refresh_all = jasmine.createSpy('refresh_all');
       spyOn(viewModel, 'initWorkflow');
       spyOn(Permission, 'refresh');
@@ -156,7 +156,7 @@ describe('workflow-activate component', function () {
     let workflow;
 
     beforeEach(function () {
-      workflow = new CanMap({});
+      workflow = new canMap({});
       Object.assign(workflow, {
         refresh: jasmine.createSpy('refresh'),
         save: jasmine.createSpy('save'),
@@ -235,7 +235,7 @@ describe('workflow-activate component', function () {
     let workflow;
 
     beforeEach(function () {
-      workflow = new CanMap();
+      workflow = new canMap();
       workflow.refresh = jasmine.createSpy('refresh');
       workflow.save = jasmine.createSpy('save');
       spyOn(viewModel, 'updateActiveCycleCounts');

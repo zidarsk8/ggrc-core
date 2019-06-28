@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/cycle-task-group-object-task.stache';
 import tdmTemplate from './templates/partials/three-dots-menu.stache';
@@ -32,7 +32,7 @@ import {
 } from '../../../plugins/utils/current-page-utils';
 import Permission from '../../../permission';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   partials: {
     restoreButton: canStache(restoreButtonTemplate),
     threeDotsMenu: canStache(tdmTemplate),

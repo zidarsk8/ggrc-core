@@ -5,8 +5,8 @@
 
 import canModel from 'can-model';
 import canList from 'can-list';
-import CanMap from 'can-map';
-let Stub = CanMap.extend({
+import canMap from 'can-map';
+let Stub = canMap.extend({
   setup(model) {
     let type = (model instanceof canModel)
       ? model.constructor.model_singular

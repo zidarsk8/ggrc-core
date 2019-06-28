@@ -4,14 +4,14 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../release-notes-modal/release-notes-modal';
 import template from './release-notes-menu-item.stache';
 import PersonProfile from '../../models/service-models/person-profile';
 import {getFormattedUtcDate} from '../../plugins/utils/date-utils';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     version: {
       type: 'string',

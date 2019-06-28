@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './inner-nav-item.stache';
 
@@ -12,7 +12,7 @@ export default CanComponent.extend({
   tag: 'inner-nav-item',
   leakScope: false,
   view: canStache(template),
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       displayTab: {
         get() {

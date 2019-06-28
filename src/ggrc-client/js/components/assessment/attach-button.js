@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import Permission from '../../permission';
 import template from './attach-button.stache';
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   view: canStache(template),
   confirmationCallback: '',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       hasPermissions: {
         get: function (prevValue, setValue) {

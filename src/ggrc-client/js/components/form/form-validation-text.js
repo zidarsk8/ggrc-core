@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 const textMap = {
   input: 'This field is required.',
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   tag: 'form-validation-text',
   view: canStache('<p class="required">{{text}}</p>'),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       text: {
         type: String,

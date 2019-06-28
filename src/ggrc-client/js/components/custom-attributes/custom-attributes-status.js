@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 const ALL_SAVED_TEXT = 'All changes saved';
 const UNSAVED_TEXT = 'Unsaved changes';
@@ -12,7 +12,7 @@ const IS_SAVING_TEXT = 'Saving...';
 export default CanComponent.extend({
   tag: 'custom-attributes-status',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isDirty: {
         type: 'boolean',

@@ -5,7 +5,7 @@
 
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canControl from 'can-control';
 import '../components/comment/comments-section';
 import '../components/related-objects/proposals/related-proposals';
@@ -38,7 +38,7 @@ export default canControl.extend({
     if (this.options.instance.info_pane_preload) {
       this.options.instance.info_pane_preload();
     }
-    this.options.context = new CanMap({
+    this.options.context = new canMap({
       model: this.options.model,
       instance: this.options.instance,
       start_menu: this.options.start_menu,

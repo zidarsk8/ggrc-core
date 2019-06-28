@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 
@@ -12,7 +12,7 @@ import template from './people-list-info.stache';
 import '../../models/service-models/role';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   instance: null,
   profile: null,
   isOpen: false,

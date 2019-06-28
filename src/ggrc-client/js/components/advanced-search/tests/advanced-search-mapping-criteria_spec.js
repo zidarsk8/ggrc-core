@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -23,14 +23,14 @@ describe('advanced-search-mapping-criteria component', function () {
   describe('criteria set() method', function () {
     it('initializes "criteria.filter" property with new attribute model',
       function () {
-        viewModel.attr('criteria', CanMap());
+        viewModel.attr('criteria', canMap());
 
         expect(viewModel.attr('criteria.filter').type).toBe('attribute');
       });
 
     it('does not intialize "criteria.filter" when it is already initialized',
       function () {
-        viewModel.attr('criteria', new CanMap({
+        viewModel.attr('criteria', new canMap({
           filter: {
             type: 'test',
           },
@@ -52,7 +52,7 @@ describe('advanced-search-mapping-criteria component', function () {
 
   describe('addRelevant() method', function () {
     it('adds mapping criteria', function () {
-      viewModel.attr('criteria', CanMap());
+      viewModel.attr('criteria', canMap());
 
       viewModel.addRelevant();
 
@@ -62,7 +62,7 @@ describe('advanced-search-mapping-criteria component', function () {
 
   describe('removeRelevant() method', function () {
     it('removes mapping criteria', function () {
-      viewModel.attr('criteria', new CanMap({
+      viewModel.attr('criteria', new canMap({
         mappedTo: {},
       }));
 
@@ -131,7 +131,7 @@ describe('advanced-search-mapping-criteria component', function () {
       it('sets modelName attribute to criteria.objectName', () => {
         modelName = 'Audit';
 
-        viewModel.attr('criteria', new CanMap());
+        viewModel.attr('criteria', new canMap());
         viewModel.attr('modelName', modelName);
         viewModel.mappingTypes();
 

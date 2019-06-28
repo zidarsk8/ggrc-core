@@ -3,9 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   tabType: 'link',
   instance: null,
   titleText: '',

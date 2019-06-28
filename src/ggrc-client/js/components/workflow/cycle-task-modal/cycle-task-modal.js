@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import * as businessModels from '../../../models/business-models';
 import {loadObjectsByTypes} from '../../../plugins/utils/query-api-utils';
@@ -17,7 +17,7 @@ import {getRelevantMappingTypes} from '../../../plugins/utils/workflow-utils';
  * @property {string} type - type of a pre-mapped object
  */
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   instance: null,
   isNewInstance: false,
   /**

@@ -5,10 +5,10 @@
 
 import canCompute from 'can-compute';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 const MAX_COLUMNS_COUNT = 1000;
 
-export default CanMap.extend({
+export default canMap.extend({
   define: {
     isValidConfiguration: {
       get() {

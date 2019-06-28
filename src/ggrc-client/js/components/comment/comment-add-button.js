@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
 
@@ -16,7 +16,7 @@ export default CanComponent.extend({
     '<content/></button>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       disabled: {
         get: function () {

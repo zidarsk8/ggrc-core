@@ -4,7 +4,7 @@
  */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../object-list';
 
@@ -30,7 +30,7 @@ describe('object-list component', function () {
   });
 
   describe('modifySelection() method ', function () {
-    let scope = new CanMap({
+    let scope = new canMap({
       instance: {
         type: 'a',
         id: 1,
@@ -68,7 +68,7 @@ describe('object-list component', function () {
     let items;
 
     beforeEach(function () {
-      scope = new CanMap({
+      scope = new canMap({
         instance: {
           type: 'a',
           id: 1,
@@ -87,7 +87,7 @@ describe('object-list component', function () {
       // Set some not null default value selectedItem for each test execution
       viewModel.attr('selectedItem', {
         el: 'some object',
-        data: new CanMap({
+        data: new canMap({
           field: 'someData',
         }),
       });

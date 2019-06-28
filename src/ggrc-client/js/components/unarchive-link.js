@@ -4,13 +4,13 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 export default CanComponent.extend({
   tag: 'unarchive-link',
   view: canStache('<a href="javascript:void(0)"><content></content></a>'),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     notify: '',
     instance: null,
     notifyText: 'was unarchived successfully',

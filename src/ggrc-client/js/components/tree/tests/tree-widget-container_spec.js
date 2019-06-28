@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
@@ -105,7 +105,7 @@ describe('tree-widget-container component', function () {
 
     beforeEach(function () {
       modelName = 'testModelName';
-      parent = new CanMap({testParent: true});
+      parent = new canMap({testParent: true});
       page = {
         current: 1,
         pageSize: 10,
@@ -114,7 +114,7 @@ describe('tree-widget-container component', function () {
           direction: null,
         }],
       },
-      filter = new CanMap({testFilter: true});
+      filter = new canMap({testFilter: true});
       request = new canList([{testRequest: true}]);
 
       vm.attr('model', {
@@ -796,8 +796,8 @@ describe('tree-widget-container component', function () {
       spyOn(NotifierUtils, 'notifier');
 
       modelName = 'testModelName';
-      parent = new CanMap({testParent: true});
-      filter = new CanMap({testFilter: true});
+      parent = new canMap({testParent: true});
+      filter = new canMap({testFilter: true});
       request = new canList([{testRequest: true}]);
 
       vm.attr('model', {

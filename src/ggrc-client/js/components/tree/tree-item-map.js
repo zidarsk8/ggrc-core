@@ -4,12 +4,12 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/tree-item-map.stache';
 import {trigger} from 'can-event';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     title: {
       type: String,

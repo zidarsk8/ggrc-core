@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
 
@@ -28,7 +28,7 @@ export default Mixin.extend(
       }
 
       if (!this.issue_tracker) {
-        this.attr('issue_tracker', new CanMap({}));
+        this.attr('issue_tracker', new canMap({}));
       }
 
       let config = this.class.buildIssueTrackerConfig

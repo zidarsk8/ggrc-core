@@ -39,7 +39,7 @@ let viewModel = AdvancedSearchContainer.extend({
   },
   /**
    * Transforms Mapping Criteria to Mapping Group.
-   * @param {CanMap} criteria - Mapping Criteria.
+   * @param {canMap} criteria - Mapping Criteria.
    */
   createGroup: function (criteria) {
     let items = this.attr('items');

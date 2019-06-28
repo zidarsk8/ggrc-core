@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/task-list.stache';
 import Pagination from '../../base-objects/pagination';
@@ -12,7 +12,7 @@ import Permission from '../../../permission';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
 import TaskGroupTask from '../../../models/business-models/task-group-task';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   TaskGroupTask,
   define: {
     paging: {

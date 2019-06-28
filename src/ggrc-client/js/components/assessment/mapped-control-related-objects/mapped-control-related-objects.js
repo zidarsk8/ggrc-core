@@ -4,16 +4,16 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import template from './mapped-control-related-objects.stache';
 
 /**
  * ViewModel for Assessment Mapped Controls Related Objectives and Regulations.
- * @type {CanMap}
+ * @type {canMap}
  */
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     items: {
       value: [],

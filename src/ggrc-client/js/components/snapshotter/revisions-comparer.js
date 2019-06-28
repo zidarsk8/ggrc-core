@@ -8,7 +8,7 @@ import makeArray from 'can-util/js/make-array/make-array';
 import canBatch from 'can-event/batch/batch';
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
@@ -30,7 +30,7 @@ export default CanComponent.extend({
   tag: 'revisions-comparer',
   view: canStache('<content/>'),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     leftRevisionId: null,
     rightRevision: null,
@@ -164,10 +164,10 @@ export default CanComponent.extend({
         }
 
         if (index === 1) {
-          const instWithProposedValues = new CanMap(content);
+          const instWithProposedValues = new canMap(content);
           // new model method overrides modified fields
           canBatch.start();
-          CanMap.keys(proposalContent).forEach((key) => {
+          canMap.keys(proposalContent).forEach((key) => {
             if (Array.isArray(proposalContent[key])) {
               instWithProposedValues.attr(key).replace(proposalContent[key]);
             } else {
@@ -345,9 +345,9 @@ export default CanComponent.extend({
        */
       function isEqual(left, right) {
         const valueOld = Object.assign({},
-          left && left instanceof CanMap && left.attr() || []);
+          left && left instanceof canMap && left.attr() || []);
         const valueNew = Object.assign({},
-          right && right instanceof CanMap && right.attr() || []);
+          right && right instanceof canMap && right.attr() || []);
 
         return _.isEqual(valueOld, valueNew);
       }

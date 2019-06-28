@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './mapper-results-item';
 import './mapper-results-items-header';
@@ -41,7 +41,7 @@ export default CanComponent.extend({
   tag: 'mapper-results',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       paging: {
         value: function () {

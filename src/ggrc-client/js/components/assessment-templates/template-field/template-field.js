@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   ddValidationValueToMap,
@@ -21,7 +21,7 @@ export default CanComponent.extend({
   tag: 'template-field',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     types: [],
     field: null,
     /*
@@ -64,7 +64,7 @@ export default CanComponent.extend({
       }
 
       return _.zip(options, vals).map(function (zip) {
-        let attr = new CanMap();
+        let attr = new canMap();
         let val = parseInt(zip[1], 10);
         attr.attr('type', field.attr('attribute_type'));
         attr.attr('value', zip[0]);

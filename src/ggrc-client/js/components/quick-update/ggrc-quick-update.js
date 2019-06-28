@@ -4,7 +4,7 @@
 */
 
 import CanComponent from 'can-component';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 
 /*
   This component is for quickly updating the properties of an object through form fields.
@@ -14,7 +14,7 @@ import CanMap from 'can-map';
 export default CanComponent.extend({
   tag: 'ggrc-quick-update',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isDisabled: {
         get() {

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import * as businessModels from '../../models/business-models';
 import template from './business-object-list-item.stache';
@@ -16,7 +16,7 @@ export default CanComponent.extend({
   tag: 'business-object-list-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: {},
     define: {
       type: {

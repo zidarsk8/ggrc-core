@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import Person from '../../models/business-models/person';
 import CycleTaskGroupObjectTask from '../../models/business-models/cycle-task-group-object-task';
@@ -19,7 +19,7 @@ export default CanComponent.extend({
     '<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     CycleTaskGroupObjectTask,
     define: {
       tasksAmount: {

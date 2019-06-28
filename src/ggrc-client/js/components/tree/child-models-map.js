@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   getChildTreeDisplayList,
   setChildTreeDisplayList,
@@ -11,7 +11,7 @@ import {
 import * as businessModels from '../../models/business-models/index';
 import {isMegaObjectRelated} from '../../plugins/utils/mega-object-utils';
 
-const childModelsMap = CanMap.extend({
+const childModelsMap = canMap.extend({
   container: {},
   getModels: function (parentType) {
     if (!this.attr('container.' + parentType)) {

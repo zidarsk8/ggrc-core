@@ -6,7 +6,7 @@
 import canCompute from 'can-compute';
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canControl from 'can-control';
 import './infinite-scroll-controller';
 import tracker from '../tracker';
@@ -28,7 +28,7 @@ import * as canBatch from 'can-event/batch/batch';
 
 const LhnControl = canControl.extend({}, {
   init: function () {
-    this.obs = new CanMap();
+    this.obs = new canMap();
 
     this.init_lhn();
 
@@ -371,8 +371,8 @@ const LhnSearchControl = canControl.extend({
     actions_content_selector: 'ul.sub-actions',
     limit: 50,
     observer: null,
-    filter_params: new CanMap(),
-    counts: new CanMap(),
+    filter_params: new canMap(),
+    counts: new canMap(),
   },
 }, {
   display: function () {
@@ -387,7 +387,7 @@ const LhnSearchControl = canControl.extend({
     this.element.html(frag);
 
     let initialParams = {};
-    let savedFilters = lhnPrefs.filter_params || new CanMap();
+    let savedFilters = lhnPrefs.filter_params || new canMap();
 
     this.post_init();
 

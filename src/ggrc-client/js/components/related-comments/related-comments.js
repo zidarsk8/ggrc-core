@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   buildParam,
@@ -21,7 +21,7 @@ export default CanComponent.extend({
   tag: 'related-comments',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       emptyMessage: {
         type: 'string',

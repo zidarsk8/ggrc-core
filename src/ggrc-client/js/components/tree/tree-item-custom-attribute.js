@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
 import {formatDate} from '../../plugins/utils/date-utils';
@@ -51,7 +51,7 @@ const getCustomAttrValue = (instance, customAttributeId) => {
   return customAttrValue || '';
 };
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     value: {
       get() {

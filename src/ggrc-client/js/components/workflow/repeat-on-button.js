@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/dropdown-component';
 import template from './templates/repeat-on-button.stache';
@@ -15,7 +15,7 @@ export default CanComponent.extend({
   tag: 'repeat-on-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       buttonText: {
         get: function () {

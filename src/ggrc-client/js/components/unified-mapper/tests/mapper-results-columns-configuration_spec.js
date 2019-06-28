@@ -4,7 +4,7 @@
 */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import Component from '../mapper-results-columns-configuration';
@@ -92,11 +92,11 @@ describe('mapper-results-columns-configuration component', function () {
 
     beforeAll(function () {
       selectedColumns = new makeArray([
-        new CanMap({attr_name: 'title'}),
+        new canMap({attr_name: 'title'}),
       ]);
       availableColumns = new makeArray([
-        new CanMap({attr_name: 'title'}),
-        new CanMap({attr_name: 'date'}),
+        new canMap({attr_name: 'title'}),
+        new canMap({attr_name: 'date'}),
       ]);
     });
 

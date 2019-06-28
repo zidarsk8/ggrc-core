@@ -4,12 +4,12 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/proposable-attribute.stache';
 import {isProposableExternally} from '../../../plugins/utils/ggrcq-utils';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     showToolbarControls: {
       get() {

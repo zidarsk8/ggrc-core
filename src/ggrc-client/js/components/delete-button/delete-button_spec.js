@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from './delete-button';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import {Snapshot} from '../../models/service-models';
@@ -43,7 +43,7 @@ describe('delete-button component', () => {
     });
 
     it('returns setted instance if it has class', () => {
-      const instance = new CanMap({
+      const instance = new canMap({
         id: 2,
         'class': 'mockClass',
       });
@@ -53,7 +53,7 @@ describe('delete-button component', () => {
     });
 
     it('returns setted instance if it is not type of "Snapshot"', () => {
-      const instance = new CanMap({
+      const instance = new canMap({
         id: 3,
         'class': 'mockClass',
         type: 'mockType',
@@ -72,7 +72,7 @@ describe('delete-button component', () => {
     beforeEach(() => {
       refreshDfd = $.Deferred();
       destroyDfd = $.Deferred();
-      instance = new CanMap({
+      instance = new canMap({
         refresh: jasmine.createSpy('refresh').and.returnValue(refreshDfd),
         destroy: jasmine.createSpy('destroy').and.returnValue(destroyDfd),
       });

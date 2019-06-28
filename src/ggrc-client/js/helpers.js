@@ -7,7 +7,7 @@ import moment from 'moment';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Spinner from 'spin.js';
 import isFunction from 'can-util/js/is-function/is-function';
 import {
@@ -202,7 +202,7 @@ canStache.registerHelper('is_allowed', function (...args) {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
-    } else if (typeof arg === 'object' && arg instanceof CanMap) {
+    } else if (typeof arg === 'object' && arg instanceof canMap) {
       resource = arg;
     }
   });

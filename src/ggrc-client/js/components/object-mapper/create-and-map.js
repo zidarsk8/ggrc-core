@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './create-and-map.stache';
 import {
@@ -32,7 +32,7 @@ export default CanComponent.extend({
   tag: 'create-and-map',
   view: canStache(template),
   leakScope: false,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       destinationType: {
         get() {

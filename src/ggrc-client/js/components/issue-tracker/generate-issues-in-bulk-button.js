@@ -5,7 +5,7 @@
 
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/generate-issues-in-bulk-button.stache';
 import Permission from '../../permission';
@@ -21,7 +21,7 @@ export default CanComponent.extend({
   tag: 'generate-issues-in-bulk-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isAllowedToGenerate: {
         get() {

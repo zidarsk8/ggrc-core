@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './mapper-results-item-status';
 import './mapper-results-item-details';
@@ -14,7 +14,7 @@ import template from './templates/mapper-results-item.stache';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   itemData: {},
   searchOnly: false,
   drawRelatedAssessments: false,

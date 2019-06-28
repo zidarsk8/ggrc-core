@@ -5,7 +5,7 @@
 
 import moment from 'moment';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../tree-pagination/tree-pagination';
 import './revision-page';
@@ -40,7 +40,7 @@ export default CanComponent.extend({
 
     viewModel.fetchItems();
   },
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       showFilter: {
         get() {

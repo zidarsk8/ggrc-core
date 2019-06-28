@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../lazy-render/lazy-render';
 import '../show-related-assessments-button/show-related-assessments-button';
@@ -20,7 +20,7 @@ import {getMappingList} from '../../models/mappers/mappings';
 
 const forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     deepLimit: {
       type: 'number',

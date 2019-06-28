@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './people-list.stache';
 import {validateAttr} from '../../../plugins/utils/validation-utils';
@@ -16,7 +16,7 @@ export default CanComponent.extend({
   tag: 'people-list',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     peopleList: [],
     instance: null,
     hasEmptyValue: false,
@@ -86,7 +86,7 @@ export default CanComponent.extend({
     /**
      * Remove user from people list
      *
-     * @param {CanMap} user - user which should be removed
+     * @param {canMap} user - user which should be removed
      */
     removePerson({id}) {
       const peopleList = this.attr('peopleList');

@@ -5,7 +5,7 @@
 
 import canModel from 'can-model';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as ReifyUtils from '../../utils/reify-utils';
 import Audit from '../../../models/business-models/audit';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
@@ -25,7 +25,7 @@ describe('reify-utils', () => {
       const audits = new canList([]);
 
       for (let i = 0; i < 3; i++) {
-        objs.push(new CanMap({type: 'Audit', id: i}));
+        objs.push(new canMap({type: 'Audit', id: i}));
         audits.push(makeFakeInstance({model: Audit})(
           {id: i, data: `Test data ${i}`})
         );
@@ -39,8 +39,8 @@ describe('reify-utils', () => {
     });
 
     it(`should return canModel's instance
-      when passed object is CanMap`, () => {
-      const obj = new CanMap({type: 'Audit', id: 1});
+      when passed object is canMap`, () => {
+      const obj = new canMap({type: 'Audit', id: 1});
       const audit = makeFakeInstance({model: Audit})(
         {id: 1, data: 'Test data'}
       );
@@ -54,7 +54,7 @@ describe('reify-utils', () => {
   });
 
   describe('isReifiable() method', () => {
-    it('should return true when obj is the instance of CanMap', () => {
+    it('should return true when obj is the instance of canMap', () => {
       const obj = new canModel({});
       const result = ReifyUtils.isReifiable(obj);
 
@@ -64,7 +64,7 @@ describe('reify-utils', () => {
 
   describe('reifyMap() method', () => {
     it('should call console.warn when model is unrecognized type', () => {
-      const obj = new CanMap({type: 'Object'});
+      const obj = new canMap({type: 'Object'});
       spyOn(console, 'warn');
 
       ReifyUtils.reifyMap(obj);
@@ -73,7 +73,7 @@ describe('reify-utils', () => {
     });
 
     it('should return instance canModel when model is recognized type', () => {
-      const obj = new CanMap({type: 'Audit', id: 1});
+      const obj = new canMap({type: 'Audit', id: 1});
       const audit = makeFakeInstance({model: Audit})(
         {id: 1, data: 'Test data'}
       );
@@ -92,7 +92,7 @@ describe('reify-utils', () => {
       const audits = new canList([]);
 
       for (let i = 0; i < 3; i++) {
-        objs.push(new CanMap({type: 'Audit', id: i}));
+        objs.push(new canMap({type: 'Audit', id: i}));
         audits.push(makeFakeInstance({model: Audit})(
           {id: i, data: `Test data ${i}`}
         ));

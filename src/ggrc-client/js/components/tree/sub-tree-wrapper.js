@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   DESTINATION_UNMAPPED,
@@ -21,7 +21,7 @@ import childModelsMap from './child-models-map';
 import tracker from '../../tracker';
 import Pagination from '../base-objects/pagination';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     parentModel: {
       type: String,

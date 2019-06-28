@@ -4,7 +4,7 @@
   */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {viewModel, events} from '../sub-tree-models';
 import childModelsMap from '../child-models-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
@@ -252,7 +252,7 @@ describe('sub-tree-models component', function () {
     let viewModel;
 
     beforeEach(function () {
-      viewModel = new CanMap();
+      viewModel = new canMap();
       handler = events['.sub-tree-models mouseleave'].bind({
         viewModel: viewModel,
       });

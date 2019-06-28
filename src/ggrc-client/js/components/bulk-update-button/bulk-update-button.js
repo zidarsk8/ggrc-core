@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './bulk-update-button.stache';
 import updateService from '../../plugins/utils/bulk-update-service';
@@ -15,7 +15,7 @@ export default CanComponent.extend({
   tag: 'bulk-update-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     model: null,
     openBulkUpdateModal: function (el, type) {
       import(/* webpackChunkName: "mapper" */ '../../controllers/mapper/mapper')

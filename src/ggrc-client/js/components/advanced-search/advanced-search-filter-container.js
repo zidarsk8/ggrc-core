@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './advanced-search-filter-attribute';
 import './advanced-search-filter-group';
@@ -34,7 +34,7 @@ let viewModel = AdvancedSearchContainer.extend({
       get: function (items) {
         if (this.attr('defaultStatusFilter') && items && !items.length &&
           StateUtils.hasFilter(this.attr('modelName'))) {
-          const statusItem = new CanMap(AdvancedSearch.create.state());
+          const statusItem = new canMap(AdvancedSearch.create.state());
           statusItem.value = AdvancedSearch.setDefaultStatusConfig(
             statusItem.value, this.attr('modelName')
           );
@@ -84,7 +84,7 @@ let viewModel = AdvancedSearchContainer.extend({
   },
   /**
    * Transforms Filter Attribute to Filter Group.
-   * @param {CanMap} attribute - Filter Attribute.
+   * @param {canMap} attribute - Filter Attribute.
    */
   createGroup: function (attribute) {
     let items = this.attr('items');

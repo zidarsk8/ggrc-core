@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../related-objects/related-assessments';
 import template from './show-related-assessments-button.stache';
@@ -14,7 +14,7 @@ export default CanComponent.extend({
   tag: 'show-related-assessments-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       cssClasses: {
         type: String,

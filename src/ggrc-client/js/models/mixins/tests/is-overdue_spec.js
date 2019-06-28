@@ -4,7 +4,7 @@
 */
 
 import moment from 'moment';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import isOverdue from '../is-overdue';
 
 describe('isOverdue mixin', function () {
@@ -21,7 +21,7 @@ describe('isOverdue mixin', function () {
     let method;
 
     beforeEach(function () {
-      instance = new CanMap({
+      instance = new canMap({
         next_due_date: '2030-01-01',
         status: 'Not Started',
       });

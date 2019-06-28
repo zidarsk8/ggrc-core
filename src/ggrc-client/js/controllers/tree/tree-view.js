@@ -9,7 +9,7 @@ import canCompute from 'can-compute';
 import makeArray from 'can-util/js/make-array/make-array';
 import canModel from 'can-model';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getCounts} from '../../plugins/utils/widgets-utils';
 import TreeLoader from './tree-loader';
@@ -55,8 +55,8 @@ const TreeViewControl = TreeLoader.extend({
     optionsProperty = opts.options_property || defaults.options_property;
     defaultOptions = opts.model[optionsProperty] || {};
 
-    this.options = new CanMap(defaults).attr(defaultOptions).attr(opts);
-    if (opts instanceof CanMap) {
+    this.options = new canMap(defaults).attr(defaultOptions).attr(opts);
+    if (opts instanceof canMap) {
       this.options = Object.assign(this.options, opts);
     }
   },
@@ -96,7 +96,7 @@ const TreeViewControl = TreeLoader.extend({
     this.options.attr('child_options', this.options.child_options.slice(0));
     _.forEach(this.options.child_options, function (options, i) {
       this.options.child_options.attr(i,
-        new CanMap(Object.assign(options.attr(), allowed)));
+        new canMap(Object.assign(options.attr(), allowed)));
     }.bind(this));
 
     this._attached_deferred = $.Deferred();

@@ -4,11 +4,11 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/tree-item-status-for-workflow.stache';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     statusCSSClass: {
       type: 'string',

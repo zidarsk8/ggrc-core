@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../related-urls';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
@@ -222,8 +222,8 @@ describe('related-urls component', () => {
 
       it('prevents adding duplicate URLs', () => {
         viewModel.attr('urls', [
-          new CanMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
-          new CanMap({link: 'www.test.url', title: 'www.test.url'}),
+          new canMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
+          new canMap({link: 'www.test.url', title: 'www.test.url'}),
         ]);
 
         method(url);
@@ -232,8 +232,8 @@ describe('related-urls component', () => {
 
       it('issues error notification when adding duplicate URLs', () => {
         viewModel.attr('urls', [
-          new CanMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
-          new CanMap({link: 'www.test.url', title: 'www.test.url'}),
+          new canMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
+          new canMap({link: 'www.test.url', title: 'www.test.url'}),
         ]);
 
         method(url);
@@ -265,8 +265,8 @@ describe('related-urls component', () => {
       it('in case of duplicate url', () => {
         let url = 'www.test.url';
         viewModel.attr('urls', [
-          new CanMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
-          new CanMap({link: 'www.test.url', title: 'www.test.url'}),
+          new canMap({link: 'www.xyz.com', title: 'www.xyz.com'}),
+          new canMap({link: 'www.test.url', title: 'www.test.url'}),
         ]);
 
         spyOn(UrlUtils, 'sanitizer').and.returnValue({

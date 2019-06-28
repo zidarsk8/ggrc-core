@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from './release-notes-menu-item';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import PersonProfile from '../../models/service-models/person-profile';
@@ -68,7 +68,7 @@ describe('"release-notes-menu-item" component', () => {
         beforeEach(() => {
           dayBefore = new Date(releaseDateObj)
             .setDate(releaseDateObj.getDate() - 1);
-          profile = new CanMap({
+          profile = new canMap({
             last_seen_whats_new: new Date(dayBefore).toISOString(),
           });
           saveDfd = $.Deferred();
@@ -109,7 +109,7 @@ describe('"release-notes-menu-item" component', () => {
         let profile;
 
         beforeEach(() => {
-          profile = new CanMap({
+          profile = new canMap({
             last_seen_whats_new: new Date(releaseDateObj).toISOString(),
           });
           profileDfd.resolve(profile);

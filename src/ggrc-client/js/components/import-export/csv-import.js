@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../plugins/utils/controllers';
 import {
@@ -74,7 +74,7 @@ export default CanComponent.extend({
   view: canStache(template),
   requestData: null,
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isImportStopped: {
         get() {

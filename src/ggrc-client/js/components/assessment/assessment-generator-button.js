@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import tracker from '../../tracker';
 import RefreshQueue from '../../models/refresh_queue';
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'assessment-generator-button',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     audit: null,
     button: '',
   }),

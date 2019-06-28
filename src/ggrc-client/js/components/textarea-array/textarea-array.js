@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 export default CanComponent.extend({
   tag: 'textarea-array',
@@ -14,7 +14,7 @@ export default CanComponent.extend({
     '</textarea>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     array: null,
     className: '',
     delimeter: ', ',

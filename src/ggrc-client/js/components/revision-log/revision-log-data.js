@@ -4,11 +4,11 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './revision-log-data.stache';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   data: null,
   isLoading: false,
   define: {

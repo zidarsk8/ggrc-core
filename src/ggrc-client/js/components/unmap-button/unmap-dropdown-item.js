@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 import '../issue/issue-unmap-item';
@@ -22,7 +22,7 @@ export default CanComponent.extend({
   tag: 'unmap-dropdown-item',
   view: canStache(template),
   leakScope: false,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       issueUnmap: {
         get() {

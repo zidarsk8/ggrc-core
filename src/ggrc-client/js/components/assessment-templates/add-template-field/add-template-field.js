@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './add-template-field.stache';
 
@@ -15,7 +15,7 @@ export default CanComponent.extend({
   tag: 'add-template-field',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isDisplayValues: {
         get() {
@@ -33,7 +33,7 @@ export default CanComponent.extend({
      * Field must contain value title, type, values.
      * Opts are populated, once we start changing checkbox values
      *
-     * @param {CanMap} viewModel - the current (add-template-field) viewModel
+     * @param {canMap} viewModel - the current (add-template-field) viewModel
      * @param {jQuery.Object} el - the clicked DOM element
      * @param {Object} ev - the event object
      */

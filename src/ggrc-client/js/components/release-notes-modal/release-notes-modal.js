@@ -5,13 +5,13 @@
 
 import moment from 'moment';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../release-notes-list/release-notes-list';
 
 import template from './release-notes-modal.stache';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     shortVersion: {
       type: 'string',

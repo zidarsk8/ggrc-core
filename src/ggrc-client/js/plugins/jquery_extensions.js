@@ -4,7 +4,7 @@
 */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 const originalViewModel = $.fn.viewModel;
 
 $.fn.extend({
@@ -15,7 +15,7 @@ $.fn.extend({
   // Get component's viewModel from jQuery element
   viewModel: function () {
     if (!this.length) {
-      return new CanMap();
+      return new canMap();
     }
 
     return originalViewModel.apply(this, arguments);

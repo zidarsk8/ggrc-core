@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
@@ -18,17 +18,17 @@ import * as businessModels from '../../models/business-models';
  * Contains logic used in Mapping Criteria component.
  * @constructor
  */
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     /**
      * Contains object represents criteria.
      * Contains the following fields: objectName, filter, mappedTo.
      * Initializes filter with Filter Attribute model.
-     * @type {CanMap}
+     * @type {canMap}
      */
     criteria: {
       type: '*',
-      Value: CanMap,
+      Value: canMap,
       set: function (criteria) {
         if (!criteria.filter) {
           criteria.attr('filter',

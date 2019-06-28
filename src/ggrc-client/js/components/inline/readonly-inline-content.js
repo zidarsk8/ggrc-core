@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../form/fields/dropdown-form-field';
 import '../person/person-data';
@@ -14,7 +14,7 @@ export default CanComponent.extend({
   tag: 'readonly-inline-content',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     withReadMore: false,
     options: [],
     value: '',

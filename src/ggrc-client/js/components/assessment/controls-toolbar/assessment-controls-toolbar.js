@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../custom-attributes/custom-attributes-actions';
 import '../../object-state-toolbar/object-state-toolbar';
@@ -14,7 +14,7 @@ export default CanComponent.extend({
   tag: 'assessment-controls-toolbar',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     verifiers: [],
     isInfoPaneSaving: false,

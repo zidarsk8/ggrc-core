@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-list-item/editable-document-object-list-item';
 import {
@@ -24,7 +24,7 @@ export default CanComponent.extend({
   tag: 'folder-attachments-list',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       showSpinner: {
         type: 'boolean',

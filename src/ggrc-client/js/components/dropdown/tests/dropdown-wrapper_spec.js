@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../dropdown-wrapper';
 
@@ -24,7 +24,7 @@ describe('dropdown-wrapper component', () => {
     ];
 
     findDfd = $.Deferred();
-    testType = CanMap.extend({
+    testType = canMap.extend({
       findAll: jasmine.createSpy('findAll').and.returnValue(findDfd),
       findInCacheById: jasmine.createSpy('findInCacheById')
         .and.returnValue({

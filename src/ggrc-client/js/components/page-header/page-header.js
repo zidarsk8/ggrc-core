@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
@@ -58,7 +58,7 @@ let colorsMap = {
   Vendor: 'header-style-1',
 };
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     showTitles: {
       type: Boolean,

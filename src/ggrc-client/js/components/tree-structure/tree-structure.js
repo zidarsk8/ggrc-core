@@ -3,11 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {BUTTON_VIEW_SAVE_CANCEL_DELETE} from '../../plugins/utils/modals';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   element: null,
   parentModel: null,
   contentViewPath: '',

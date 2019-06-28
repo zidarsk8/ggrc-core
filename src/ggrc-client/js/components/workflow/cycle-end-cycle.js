@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   getPageInstance,
@@ -29,7 +29,7 @@ import {trigger} from 'can-event';
 
 export default CanComponent.extend({
   tag: 'cycle-end-cycle',
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     cycle: null,
   }),
   events: {

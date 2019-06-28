@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   applyChangesToCAValue,
@@ -21,7 +21,7 @@ import {getPlainText} from '../../plugins/ggrc_utils';
 export default CanComponent.extend({
   tag: 'assessment-local-ca',
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: null,
     fields: [],
     isDirty: false,
@@ -182,7 +182,7 @@ export default CanComponent.extend({
         let caValues = self.attr('instance.custom_attribute_values');
         applyChangesToCAValue(
           caValues,
-          new CanMap(changes));
+          new canMap(changes));
 
         self.attr('saving', true);
       })

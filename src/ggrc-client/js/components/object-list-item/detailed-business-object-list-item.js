@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
@@ -28,7 +28,7 @@ export default CanComponent.extend({
   tag: 'detailed-business-object-list-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: {},
     customAttributes: null,
     deletableAdmin: false,

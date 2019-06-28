@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './add-tab-button.stache';
 import {
@@ -15,7 +15,7 @@ import Permission from '../../permission';
 import {shouldBeMappedExternally} from '../../models/mappers/mappings';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     isAuditInaccessibleAssessment: {
       get() {

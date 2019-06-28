@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/tree-visible-column-checkbox.stache';
 
@@ -12,7 +12,7 @@ export default CanComponent.extend({
   tag: 'tree-visible-column-checkbox',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     column: {},
     viewType: null,
     getTitle(item) {

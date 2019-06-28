@@ -4,7 +4,7 @@
  */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   buildRelevantIdsQuery,
   batchRequests,
@@ -22,7 +22,7 @@ import {changeUrl, reloadPage} from '../../router';
  * Util methods for work with Current Page.
  */
 
-let relatedToCurrentInstance = new CanMap({
+let relatedToCurrentInstance = new canMap({
   initialized: false,
 });
 

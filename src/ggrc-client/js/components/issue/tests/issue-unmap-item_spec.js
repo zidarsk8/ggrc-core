@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
@@ -404,7 +404,7 @@ describe('issue-unmap-item component', () => {
 
     describe('when there is relationship', () => {
       beforeEach(function () {
-        const rel = new CanMap();
+        const rel = new canMap();
         viewModel.attr({
           target: {related_sources: [{id: 1}]},
           issueInstance: {related_sources: [{id: 1}]},

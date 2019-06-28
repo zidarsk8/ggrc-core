@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {sortByName} from '../../plugins/utils/label-utils';
 import template from './templates/multi-select-label.stache';
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'multi-select-label',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       onlyEditMode: {
         type: 'boolean',

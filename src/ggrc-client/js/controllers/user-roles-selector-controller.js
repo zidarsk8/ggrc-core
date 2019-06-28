@@ -7,7 +7,7 @@ import {ggrcAjax} from '../plugins/ajax_extensions';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canControl from 'can-control';
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
@@ -73,7 +73,7 @@ const userRolesModalSelector = canControl.extend({
   },
 
   initContext() {
-    this.context = new CanMap($.extend({
+    this.context = new canMap($.extend({
       rolesList: this.rolesList,
       selectedPerson: null,
       selectedOption: null,

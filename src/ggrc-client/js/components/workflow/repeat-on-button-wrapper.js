@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './repeat-on-button';
 
@@ -17,7 +17,7 @@ export default CanComponent.extend({
     '</repeat-on-button>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       autoSave: {
         type: 'boolean',

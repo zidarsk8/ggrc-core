@@ -4,7 +4,7 @@
 */
 
 import canModel from 'can-model/src/can-model';
-import CanMap from 'can-map/can-map';
+import canMap from 'can-map/can-map';
 
 describe('validateIssueTrackerIssueId extension', () => {
   let TestModel;
@@ -29,7 +29,7 @@ describe('validateIssueTrackerIssueId extension', () => {
 
   it('should return TRUE. issue tracker is disabled', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: false,
     }));
     expect(instance.validate()).toBeTruthy();
@@ -45,7 +45,7 @@ describe('validateIssueTrackerIssueId extension', () => {
 
   it('should return TRUE. issue tracker has issue id', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: true,
       issue_id: 12345,
     }));
@@ -56,7 +56,7 @@ describe('validateIssueTrackerIssueId extension', () => {
 
   it('should return TRUE. issue tracker has wrong status', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: true,
     }));
     instance.attr('status', 'Draft');
@@ -66,7 +66,7 @@ describe('validateIssueTrackerIssueId extension', () => {
 
   it('should return FALSE. issue tracker does not have issue id', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: true,
     }));
     instance.attr('status', 'Fixed');

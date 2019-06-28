@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
@@ -22,7 +22,7 @@ const viewModel = DiffBaseVM.extend({
   },
   buildDiffObject() {
     const modifiedAttributes = this.attr('modifiedAttributes');
-    const caKeys = CanMap.keys(modifiedAttributes);
+    const caKeys = canMap.keys(modifiedAttributes);
 
     this.prepareAttributes();
     this.attr('diff', []);

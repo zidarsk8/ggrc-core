@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './cycle-task-objects.stache';
 import {
@@ -21,7 +21,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const fields = ['id', 'type', 'title', 'viewLink'];
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   instance: null,
   mappedObjects: [],
   isLoading: false,

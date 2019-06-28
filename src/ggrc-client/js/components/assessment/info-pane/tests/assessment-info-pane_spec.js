@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../assessment-info-pane';
 import {getComponentVM, makeFakeInstance} from '../../../../../js_specs/spec_helpers';
 import tracker from '../../../../tracker';
@@ -801,7 +801,7 @@ describe('assessment-info-pane component', () => {
       dfd = $.Deferred();
       type = 'type';
       event = {
-        item: new CanMap({
+        item: new canMap({
           id: 1,
           type: 'Type',
         }),
@@ -810,7 +810,7 @@ describe('assessment-info-pane component', () => {
         id: event.item.attr('id'),
         type: event.item.attr('type'),
       };
-      assessment = new CanMap({
+      assessment = new canMap({
         actions: [],
       });
 
@@ -991,7 +991,7 @@ describe('assessment-info-pane component', () => {
         id: item.attr('id'),
         type: item.attr('type'),
       };
-      assessment = new CanMap({
+      assessment = new canMap({
         actions: [],
       });
       vm.attr(type, items);
@@ -1705,7 +1705,7 @@ describe('assessment-info-pane component', () => {
       });
 
       it('sets global custom attributes from passed event object', function () {
-        event.globalAttributes = new CanMap({
+        event.globalAttributes = new canMap({
           '123': 'Value',
           '2': 'Value2',
         });
@@ -1720,7 +1720,7 @@ describe('assessment-info-pane component', () => {
     let event;
 
     beforeEach(function () {
-      const field = new CanMap({
+      const field = new canMap({
         title: 'Perfect Title',
         type: 'Perfect Type',
         options: [],
@@ -1756,7 +1756,7 @@ describe('assessment-info-pane component', () => {
 
       it('"fields" field', function () {
         const errors = field.errorsMap;
-        const expectedResult = CanMap.keys(errors)
+        const expectedResult = canMap.keys(errors)
           .map((error) => errors[error] ? error : null)
           .filter((errorCode) => !!errorCode);
         vm.showRequiredInfoModal(event);
@@ -2063,7 +2063,7 @@ describe('assessment-info-pane component', () => {
     it('pushes callback into deferredSave which calls customAttr method',
       () => {
         event = {
-          globalAttributes: new CanMap({'1': true}),
+          globalAttributes: new canMap({'1': true}),
         };
 
         method(event);

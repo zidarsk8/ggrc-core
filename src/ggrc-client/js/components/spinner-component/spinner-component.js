@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './spinner-component.stache';
 
@@ -12,7 +12,7 @@ export default CanComponent.extend({
   tag: 'spinner-component',
   view: canStache(template),
   leakScope: true,
-  scope: CanMap.extend({
+  scope: canMap.extend({
     extraCssClass: '',
     size: '',
     toggle: null,

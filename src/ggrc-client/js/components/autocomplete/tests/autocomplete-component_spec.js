@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../autocomplete-component';
 
@@ -30,7 +30,7 @@ describe('autocomplete-component', function () {
     let $element;
 
     beforeEach(function () {
-      fakeViewModel = new CanMap({});
+      fakeViewModel = new canMap({});
       handler = Component.prototype.events['autocomplete:select'].bind({
         viewModel: fakeViewModel,
       });

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import '../../object-list-item/business-object-list-item';
@@ -27,9 +27,9 @@ import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 /**
  * ViewModel for Assessment Mapped Controls Popover.
- * @type {CanMap}
+ * @type {canMap}
  */
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     /**
      * Private Attribute defining array of requested Objects, Types and Fields of Objects

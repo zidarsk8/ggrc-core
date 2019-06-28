@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../../info-pin-buttons/info-pin-buttons';
 import '../task-group-clone';
@@ -13,7 +13,7 @@ import '../task-group-objects/task-group-objects';
 import template from './templates/task-group.stache';
 import Permission from '../../../permission';
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   define: {
     canEdit: {
       get() {

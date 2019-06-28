@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/dropdown-component';
 import '../numberbox/numberbox-component';
@@ -14,7 +14,7 @@ export default CanComponent.extend({
   tag: 'modal-issue-tracker-fields',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     instance: {},
     note: '',
     linkingNote: '',

@@ -4,7 +4,7 @@
 */
 
 import canModel from 'can-model';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 // TODO: this import is used to correctly build assets. It should be removed and cyclic dependencies should be resolved.
 import '../../plugins/utils/models-utils';
 
@@ -48,7 +48,7 @@ function userHasPermissions(source, target) {
   let hasPermissions = Permission.is_allowed_for('update', source)
     || source.isNew();
 
-  if (target instanceof CanMap) {
+  if (target instanceof canMap) {
     hasPermissions = hasPermissions
       && Permission.is_allowed_for('update', target);
   }

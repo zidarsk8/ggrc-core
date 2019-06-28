@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import Clipboard from 'clipboard';
 import {notifier} from '../../plugins/utils/notifiers-utils';
@@ -15,7 +15,7 @@ export default CanComponent.extend({
     '<a type="button" data-clipboard-text="{{text}}"><content/></a>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     text: '',
   }),
   events: {

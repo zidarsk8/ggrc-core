@@ -4,7 +4,7 @@
 */
 
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   buildChangeDescriptor,
   simpleFieldResolver,
@@ -104,7 +104,7 @@ describe('conflict resolvers', () => {
       baseAttrs = {};
       attrs = {};
       remoteAttrs = {};
-      container = new CanMap();
+      container = new canMap();
     });
 
     it('resolves server change', () => {

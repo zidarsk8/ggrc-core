@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {buildModifiedACL} from '../../plugins/utils/object-history-utils';
 import {getRoleById} from '../../plugins/utils/acl-utils';
@@ -21,7 +21,7 @@ const viewModel = DiffBaseVM.extend({
     const currentAcl = instance.attr('access_control_list');
     const modifiedAcl = buildModifiedACL(instance, modifiedRoles);
 
-    const rolesDiff = CanMap.keys(modifiedRoles).map((roleId) => {
+    const rolesDiff = canMap.keys(modifiedRoles).map((roleId) => {
       let currentVal;
       let modifiedVal;
 

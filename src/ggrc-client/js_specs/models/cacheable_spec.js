@@ -6,7 +6,7 @@
 import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import canModel from 'can-model';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Cacheable from '../../js/models/cacheable';
 import {
   failAll,
@@ -339,8 +339,8 @@ describe('Cacheable model', () => {
       it('returns certain custom attribute object by ca id', () => {
         const caId = 12345;
         const caObject = new CustomAttributeObject(
-          new CanMap(),
-          new CanMap()
+          new canMap(),
+          new canMap()
         );
         const getCA = spyOn(instance, '_getCustomAttr')
           .and.returnValue(caObject);

@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canEvent from 'can-event';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../multiselect-dropdown';
@@ -134,7 +134,7 @@ describe('multiselect-dropdown component', function () {
     let openItem;
 
     beforeEach(function () {
-      options = new CanMap([
+      options = new canMap([
         {
           value: 'Draft',
         },

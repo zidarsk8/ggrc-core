@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tab-container';
 
@@ -20,17 +20,17 @@ describe('tab-container component', function () {
 
     beforeEach(function () {
       viewModel = getComponentVM(Component);
-      selectedScope = new CanMap({
+      selectedScope = new canMap({
         tabIndex: selectionIndex,
         titleText: 'Some test value ',
         active: false,
       });
-      secondScope = new CanMap({
+      secondScope = new canMap({
         tabIndex: 9999,
         titleText: 'Some test value ',
         active: false,
       });
-      thirdScope = new CanMap({
+      thirdScope = new canMap({
         tabIndex: 8888,
         titleText: 'Some test value ',
         active: false,
@@ -54,12 +54,12 @@ describe('tab-container component', function () {
 
     beforeEach(function () {
       viewModel = getComponentVM(Component);
-      scope = new CanMap({
+      scope = new canMap({
         tabIndex: 1111,
         titleText: 'Some test value ',
         active: false,
       });
-      secondScope = new CanMap({
+      secondScope = new canMap({
         tabIndex: 9999,
         titleText: 'Some test value ',
         active: false,

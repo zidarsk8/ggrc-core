@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../tree-actions';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AclUtils from '../../../plugins/utils/acl-utils';
@@ -35,14 +35,14 @@ describe('tree-actions component', () => {
       });
 
       it('returns options.add_item_view if it exists', () => {
-        let expectedData = new CanMap({});
+        let expectedData = new canMap({});
         vm.attr('options', {add_item_view: expectedData});
         expect(vm.attr('addItem')).toBe(expectedData);
       });
 
       it('returns model.tree_view_options.add_item_view by default',
         () => {
-          let expectedData = new CanMap({});
+          let expectedData = new canMap({});
           vm.attr('options', {add_item_view: null});
           vm.attr('model', {
             tree_view_options: {

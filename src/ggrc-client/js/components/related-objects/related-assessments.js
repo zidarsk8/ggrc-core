@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import '../object-list/object-list';
@@ -35,7 +35,7 @@ export default CanComponent.extend({
   tag: 'related-assessments',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       unableToReuse: {
         get: function () {

@@ -5,7 +5,7 @@
 
 import canList from 'can-list/can-list';
 import canModel from 'can-model/src/can-model';
-import CanMap from 'can-map/can-map';
+import canMap from 'can-map/can-map';
 
 describe('validateDefaultPeople extensions.', () => {
   describe('validateDefaultAssignees extension', () => {
@@ -15,7 +15,7 @@ describe('validateDefaultPeople extensions.', () => {
       TestModel = canModel.extend({}, {
         define: {
           default_people: {
-            value: new CanMap([]),
+            value: new canMap([]),
             validate: {
               validateDefaultAssignees: true,
             },
@@ -26,7 +26,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return TRUE, assignees is NOT empty list', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         assignees: new canList([1, 2]),
       }));
       expect(instance.validate()).toBeTruthy();
@@ -35,7 +35,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return TRUE, assignees is NOT empty string', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         assignees: 'Auditor',
       }));
       expect(instance.validate()).toBeTruthy();
@@ -44,7 +44,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return FALSE, assignees is EMPTY string', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         assignees: '',
       }));
       expect(instance.validate()).toBeFalsy();
@@ -54,7 +54,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return FALSE, assignees is undefined', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         assignees: undefined,
       }));
       expect(instance.validate()).toBeFalsy();
@@ -64,7 +64,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return FALSE, assignees is EMPTY list', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         assignees: new canList([]),
       }));
       expect(instance.validate()).toBeFalsy();
@@ -80,7 +80,7 @@ describe('validateDefaultPeople extensions.', () => {
       TestModel = canModel.extend({}, {
         define: {
           default_people: {
-            value: new CanMap([]),
+            value: new canMap([]),
             validate: {
               validateDefaultVerifiers: true,
             },
@@ -91,7 +91,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return TRUE, verifiers is NOT empty list', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         verifiers: new canList([1, 2]),
       }));
       expect(instance.validate()).toBeTruthy();
@@ -100,7 +100,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return TRUE, verifiers is NOT empty string', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         verifiers: 'Auditor',
       }));
       expect(instance.validate()).toBeTruthy();
@@ -109,7 +109,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return TRUE, verifiers is EMPTY string', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         verifiers: '',
       }));
       expect(instance.validate()).toBeTruthy();
@@ -118,7 +118,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return TRUE, verifiers is undefined', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         verifiers: undefined,
       }));
       expect(instance.validate()).toBeTruthy();
@@ -127,7 +127,7 @@ describe('validateDefaultPeople extensions.', () => {
 
     it('shoud return FALSE, verifiers is EMPTY list', () => {
       const instance = new TestModel();
-      instance.attr('default_people', new CanMap({
+      instance.attr('default_people', new canMap({
         verifiers: new canList([]),
       }));
       expect(instance.validate()).toBeFalsy();

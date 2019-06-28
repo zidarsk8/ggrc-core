@@ -5,7 +5,7 @@
 
 import canModel from 'can-model';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   confirm,
@@ -20,7 +20,7 @@ export default CanComponent.extend({
   tag: 'delete-button',
   view: canStache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       instance: {
         set(instance) {

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   buildModifiedACL,
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   tag: 'review-proposal',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       buttonView: {
         get() {
@@ -72,7 +72,7 @@ export default CanComponent.extend({
     buildModifiedRevision(originalRevision) {
       const diff = this.attr('proposal.content');
       const diffAttributes = diff.custom_attribute_values;
-      const rightRevision = new CanMap({
+      const rightRevision = new canMap({
         id: originalRevision.id,
         content: Object.assign({}, originalRevision.content.attr()),
       });
@@ -90,7 +90,7 @@ export default CanComponent.extend({
       this.openRevisionComparer();
     },
     applyFields(instance, modifiedFields) {
-      const fieldNames = CanMap.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
 
       fieldNames.forEach((fieldName) => {
         const modifiedField = modifiedFields[fieldName];
@@ -102,7 +102,7 @@ export default CanComponent.extend({
       instance.access_control_list = modifiedACL;
     },
     applyListFields(instance, modifiedFields) {
-      const fieldNames = CanMap.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
       fieldNames.forEach((fieldName) => {
         const items = instance[fieldName];
         const modifiedItems = modifiedFields[fieldName];

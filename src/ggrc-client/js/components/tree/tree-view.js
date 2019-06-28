@@ -4,12 +4,12 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../sort-component/sort-component';
 import template from './templates/tree-view.stache';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     notResult: {
       type: Boolean,

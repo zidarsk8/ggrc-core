@@ -4,7 +4,7 @@
 */
 
 import canModel from 'can-model/src/can-model';
-import CanMap from 'can-map/can-map';
+import canMap from 'can-map/can-map';
 
 describe('validateIssueTrackerTitle extension', () => {
   let TestModel;
@@ -27,7 +27,7 @@ describe('validateIssueTrackerTitle extension', () => {
 
   it('should return FALSE. issue tracker does not have title', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: true,
     }));
     instance.attr('can_use_issue_tracker', true);
@@ -38,7 +38,7 @@ describe('validateIssueTrackerTitle extension', () => {
 
   it('should return FALSE. issue tracker has empty title', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: true,
       title: '     ',
     }));
@@ -50,7 +50,7 @@ describe('validateIssueTrackerTitle extension', () => {
 
   it('should return TRUE. issue tracker has title', () => {
     const instance = new TestModel();
-    instance.attr('issue_tracker', new CanMap({
+    instance.attr('issue_tracker', new canMap({
       enabled: true,
       title: 'my title',
     }));
@@ -62,7 +62,7 @@ describe('validateIssueTrackerTitle extension', () => {
   it('should return TRUE. can_use_issue_tracker - true, enabled - false',
     () => {
       const instance = new TestModel();
-      instance.attr('issue_tracker', new CanMap({
+      instance.attr('issue_tracker', new canMap({
         enabled: false,
       }));
       instance.attr('can_use_issue_tracker', true);
@@ -74,7 +74,7 @@ describe('validateIssueTrackerTitle extension', () => {
   it('should return TRUE. can_use_issue_tracker - false, enabled - false',
     () => {
       const instance = new TestModel();
-      instance.attr('issue_tracker', new CanMap({
+      instance.attr('issue_tracker', new canMap({
         enabled: false,
       }));
       instance.attr('can_use_issue_tracker', false);

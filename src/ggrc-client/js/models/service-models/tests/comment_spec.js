@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Comment from '../comment';
 
 describe('Comment model', function () {
@@ -12,7 +12,7 @@ describe('Comment model', function () {
     let method;
 
     beforeEach(function () {
-      fakeComment = new CanMap({});
+      fakeComment = new canMap({});
       method = Comment.prototype.display_name.bind(fakeComment);
     });
 

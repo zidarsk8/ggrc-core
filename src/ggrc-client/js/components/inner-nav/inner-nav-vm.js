@@ -5,7 +5,7 @@
 
 import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   isAdmin,
 } from '../../plugins/utils/current-page-utils';
@@ -14,7 +14,7 @@ import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
 import {allowedToCreateOrMap} from '../../models/mappers/mappings';
 
-export default CanMap.extend({
+export default canMap.extend({
   define: {
     counts: {
       get() {
@@ -104,7 +104,7 @@ export default CanMap.extend({
   },
   /**
      * Configures widgets to display in Add Tab button dropdown
-     * @param {CanMap} widget widget object
+     * @param {canMap} widget widget object
      */
   updateHiddenWidgets(widget) {
     let instance = this.attr('instance');
@@ -128,7 +128,7 @@ export default CanMap.extend({
   },
   /**
      * Adds widget to hiddenWidgets for Add tab button
-     * @param {CanMap} widget widget
+     * @param {canMap} widget widget
      */
   addToHiddenWidgets(widget) {
     let hiddenWidgets = this.attr('hiddenWidgets');
@@ -141,7 +141,7 @@ export default CanMap.extend({
   },
   /**
      * Removes widgets from hiddenWidgets for Add tab button
-     * @param {CanMap} widget widget
+     * @param {canMap} widget widget
      */
   removeFromHiddenWidgets(widget) {
     let hiddenWidgets = this.attr('hiddenWidgets');
@@ -174,7 +174,7 @@ export default CanMap.extend({
   /**
      * Searches widget by Id in widgetList collection
      * @param {string} widgetId widget id
-     * @return {CanMap} widget
+     * @return {canMap} widget
      */
   findWidgetById(widgetId) {
     return _.find(this.attr('widgetList'),
@@ -183,7 +183,7 @@ export default CanMap.extend({
   /**
      * Searches widget by countName in widgetList collection
      * @param {string} countsName counts name prop in widget
-     * @return {CanMap} widget
+     * @return {canMap} widget
      */
   findWidgetByCountsName(countsName) {
     return _.find(this.attr('widgetList'),

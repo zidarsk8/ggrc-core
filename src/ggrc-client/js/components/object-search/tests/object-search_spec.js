@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../object-search';
 
 describe('object-search component', function () {
@@ -13,7 +13,7 @@ describe('object-search component', function () {
   let parentViewModel;
 
   beforeEach(function () {
-    parentViewModel = new CanMap();
+    parentViewModel = new canMap();
     viewModel = new Component.prototype.viewModel({}, parentViewModel)();
   });
 

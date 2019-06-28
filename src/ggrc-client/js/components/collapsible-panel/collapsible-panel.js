@@ -4,13 +4,13 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './collapsible-panel-header';
 import './collapsible-panel-body';
 import template from './collapsible-panel.stache';
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   titleText: '',
   titleIcon: '',
   extraCssClass: '',

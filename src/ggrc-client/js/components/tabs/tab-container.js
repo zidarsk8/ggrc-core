@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import './tab-panel';
@@ -16,7 +16,7 @@ export default CanComponent.extend({
   tag: 'tab-container',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     lastErrorTab: null,
     define: {
       showTabs: {

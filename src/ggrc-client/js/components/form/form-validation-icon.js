@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 /**
  * State object to present possible icons for validation
@@ -25,7 +25,7 @@ export default CanComponent.extend({
     '<i class="fa form-validation-icon__body {{iconCls}}"></i>'
   ),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       validation: {},
       iconCls: {

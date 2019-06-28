@@ -4,16 +4,16 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 /* Default Sate for Assessment should be 'Not Started' */
 const defaultState = 'Not Started';
 
 /**
- * CanMap(ViewModel) presenting behavior of State Colors Map Component
- * @type {CanMap}
+ * canMap(ViewModel) presenting behavior of State Colors Map Component
+ * @type {canMap}
  */
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     state: {
       type: 'string',

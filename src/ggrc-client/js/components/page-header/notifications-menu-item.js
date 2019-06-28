@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './notifications-menu-item.stache';
 import NotificationConfig
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'notifications-menu-item',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       emailDigest: {
         set(newValue) {

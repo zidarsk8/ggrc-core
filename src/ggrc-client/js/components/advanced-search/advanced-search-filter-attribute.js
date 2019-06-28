@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.stache';
@@ -15,7 +15,7 @@ import template from './advanced-search-filter-attribute.stache';
  * Contains logic used in Filter Attribute component
  * @constructor
  */
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   define: {
     isUnary: {
       get() {

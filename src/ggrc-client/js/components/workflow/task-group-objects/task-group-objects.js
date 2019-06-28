@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './templates/task-group-objects.stache';
 import {OBJECTS_MAPPED_VIA_MAPPER} from '../../../events/eventTypes';
@@ -21,7 +21,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const requiredObjectsFields = ['id', 'type', 'title'];
 
-const viewModel = CanMap.extend({
+const viewModel = canMap.extend({
   canEdit: false,
   taskGroup: null,
   items: [],

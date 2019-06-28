@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from './template-field';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -18,7 +18,7 @@ describe('template-field component', function () {
 
   describe('denormalizeMandatory() method', function () {
     it('returns correct denormalized field', function () {
-      let field = new CanMap({
+      let field = new canMap({
         multi_choice_options: 'foo,bar,baz,bam',
         multi_choice_mandatory: '0,1,2,3',
       });
@@ -37,7 +37,7 @@ describe('template-field component', function () {
 
     it('returns false for attachment and comment for missing mandatory',
       function () {
-        let field = new CanMap({
+        let field = new canMap({
           multi_choice_options: 'one,two,three,four,five',
           multi_choice_mandatory: '0,1,2',
         });
@@ -58,7 +58,7 @@ describe('template-field component', function () {
       });
 
     it('returns values only for defined options', function () {
-      let field = new CanMap({
+      let field = new canMap({
         multi_choice_options: 'one,two,three',
         multi_choice_mandatory: '0,1,2,2,0',
       });
@@ -110,7 +110,7 @@ describe('template-field component', function () {
           '</template-field>',
         ].join('');
 
-        templateContext = new CanMap({
+        templateContext = new canMap({
           types: new canList([
             {
               type: 'Text',

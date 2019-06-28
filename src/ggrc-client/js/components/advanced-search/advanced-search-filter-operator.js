@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './advanced-search-filter-operator.stache';
 
@@ -13,7 +13,7 @@ import template from './advanced-search-filter-operator.stache';
  * Contains logic used in Filter Operator component
  * @constructor
  */
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   /**
    * Contains operation name.
    * @type {string}

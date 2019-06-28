@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../related-people-access-control';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
@@ -176,7 +176,7 @@ describe('related-people-access-control component', function () {
     let instance;
 
     beforeAll(function () {
-      instance = new CanMap({
+      instance = new canMap({
         'class': {
           model_singular: 'Control',
         },
@@ -406,7 +406,7 @@ describe('related-people-access-control component', function () {
     ];
 
     beforeAll(function () {
-      instance = new CanMap({
+      instance = new canMap({
         'class': {
           model_singular: 'Control',
         },
@@ -542,7 +542,7 @@ describe('related-people-access-control component', function () {
     ];
 
     beforeAll(function () {
-      instance = new CanMap({
+      instance = new canMap({
         'class': {
           model_singular: 'Control',
         },

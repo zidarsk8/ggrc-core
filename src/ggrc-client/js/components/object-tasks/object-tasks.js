@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   buildParam,
@@ -22,7 +22,7 @@ const REQUIRED_FIELDS = Object.freeze([
   'is_verification_needed',
 ]);
 
-let viewModel = CanMap.extend({
+let viewModel = canMap.extend({
   instanceId: null,
   instanceType: null,
   tasks: [],

@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'mapper-results-item-details',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     init() {
       let instance = this.attr('instance');
       if (instance.snapshotObject) {

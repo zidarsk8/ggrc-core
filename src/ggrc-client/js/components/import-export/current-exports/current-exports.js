@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './current-exports.stache';
 import {jobStatuses} from '../../../plugins/utils/import-export-utils';
@@ -13,7 +13,7 @@ export default CanComponent.extend({
   tag: 'current-exports',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     exports: [],
     disabled: {},
     inProgress: false,

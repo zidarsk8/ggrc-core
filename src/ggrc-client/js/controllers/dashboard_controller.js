@@ -5,7 +5,7 @@
 
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import canControl from 'can-control';
 import DashboardWidgets from './dashboard_widgets_controller';
 import InfoPin from './info_pin_controller';
@@ -34,7 +34,7 @@ const DashboardControl = canControl.extend({
   },
 }, {
   init: function (el, options) {
-    this.options = new CanMap(this.options);
+    this.options = new canMap(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
@@ -54,7 +54,7 @@ const DashboardControl = canControl.extend({
       return;
     }
 
-    validModels = CanMap.keys(TreeViewConfig.attr('base_widgets_by_type'));
+    validModels = canMap.keys(TreeViewConfig.attr('base_widgets_by_type'));
     // only change the display list
     validModels.forEach( function (mName) {
       savedChildTreeDisplayList = getChildTreeDisplayList(mName);

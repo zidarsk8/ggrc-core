@@ -10,7 +10,7 @@ import {ggrcAjax} from '../plugins/ajax_extensions';
 import canBatch from 'can-event/batch/batch';
 import canModel from 'can-model';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
 import {
   isSnapshot,
@@ -262,7 +262,7 @@ export default canModel.extend({
       return new this.List();
     }
     ms = this._super(params);
-    if (params instanceof CanMap || params instanceof canList) {
+    if (params instanceof canMap || params instanceof canList) {
       params.replace(ms);
       return params;
     }

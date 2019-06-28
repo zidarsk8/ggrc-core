@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {hasEmptyValue} from '../custom-attribute-help-utils';
 import CustomAttributeObject from '../custom-attribute-object';
 
@@ -12,9 +12,9 @@ describe('hasEmptyValue() function', () => {
 
   beforeEach(function () {
     caObject = new CustomAttributeObject(
-      new CanMap(),
-      new CanMap(),
-      new CanMap()
+      new canMap(),
+      new canMap(),
+      new canMap()
     );
   });
 

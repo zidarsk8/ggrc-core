@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../comment/comment-input';
 import '../comment/comment-add-button';
@@ -19,7 +19,7 @@ export default CanComponent.extend({
   tag: 'ca-object-modal-content',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       comment: {
         get() {

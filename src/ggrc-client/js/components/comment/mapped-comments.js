@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../object-list-item/comment-list-item';
 import '../object-list/object-list';
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'mapped-comments',
   view: canStache(template),
   leakScope: false,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       noItemsText: {
         type: 'string',

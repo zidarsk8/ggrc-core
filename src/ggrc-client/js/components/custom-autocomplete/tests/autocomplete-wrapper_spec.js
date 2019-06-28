@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import baseAutocompleteWrapper from '../autocomplete-wrapper';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
@@ -66,7 +66,7 @@ describe('autocomplete-wrapper viewModel', () => {
     'to "showNewValue" attribute', (done) => {
       deferred.resolve(data);
       viewModel.attr('showNewValue', false);
-      const expected = new CanMap({});
+      const expected = new canMap({});
       viewModel.isCurrentValueUnique.and.returnValue(expected);
 
       viewModel.getResult(event).then(() => {

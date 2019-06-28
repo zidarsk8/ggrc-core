@@ -4,7 +4,7 @@
  */
 
 import canBatch from 'can-event/batch/batch';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   getMappingList,
 } from '../../models/mappers/mappings';
@@ -30,7 +30,7 @@ import * as businessModels from '../../models/business-models';
  *  @property {Object} config - Has fields with special values for viewModel.
  */
 
-const ObjectOperationsBaseVM = CanMap.extend({
+const ObjectOperationsBaseVM = canMap.extend({
   /**
    * Extract certain config for passed type from config.
    * If there is special config for type then return it else return

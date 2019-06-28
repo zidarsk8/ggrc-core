@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   hasQuestions,
@@ -16,7 +16,7 @@ export default CanComponent.extend({
   tag: 'questions-link',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       hasQuestions: {
         type: Boolean,

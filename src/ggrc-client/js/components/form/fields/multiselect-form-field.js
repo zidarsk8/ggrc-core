@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './multiselect-form-field.stache';
 
@@ -12,7 +12,7 @@ export default CanComponent.extend({
   tag: 'multiselect-form-field',
   view: canStache(template),
   leakScope: false,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       inputValue: {
         set(newValue) {

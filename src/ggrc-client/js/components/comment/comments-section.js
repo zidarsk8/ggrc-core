@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 import template from './comments-section.stache';
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'comments-section',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       notification: {
         value: 'Send Notifications',

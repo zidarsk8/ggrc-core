@@ -5,7 +5,7 @@
 
 import canStache from 'can-stache';
 import canList from 'can-list';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
@@ -17,7 +17,7 @@ export default CanComponent.extend({
   tag: 'autocomplete-results',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       /**
        * Collection containing a list of results.

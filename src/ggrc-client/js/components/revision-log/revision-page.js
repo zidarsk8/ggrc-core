@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './revision-log-data';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
@@ -36,7 +36,7 @@ export default CanComponent.extend({
   tag: 'revision-page',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       revisions: {
         set(newValue, setter) {
@@ -276,7 +276,7 @@ export default CanComponent.extend({
           _.map(rev2people, (person) => person.id)
         );
         if (idsDiff.length) {
-          roleDiff = new CanMap({
+          roleDiff = new canMap({
             fieldName: role.name,
             origVal: [],
             newVal: [],

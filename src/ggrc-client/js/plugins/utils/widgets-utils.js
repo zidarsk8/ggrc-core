@@ -4,7 +4,7 @@
  */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import * as TreeViewUtils from './tree-view-utils';
 import {
   batchRequests,
@@ -31,7 +31,7 @@ import {
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Person from '../../models/business-models/person';
 
-let widgetsCounts = new CanMap({});
+let widgetsCounts = new canMap({});
 let cachedObjects = {};
 
 let CUSTOM_COUNTERS = {
@@ -106,7 +106,7 @@ function getDefaultWidgets(widgetList, path) {
 /**
  * Counts for related objects.
  *
- * @return {CanMap} Promise which return total count of objects.
+ * @return {canMap} Promise which return total count of objects.
  */
 function getCounts() {
   return widgetsCounts;

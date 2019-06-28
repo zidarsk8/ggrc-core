@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   ddValidationMapToValue,
 } from '../../../plugins/utils/ca-utils';
@@ -59,7 +59,7 @@ describe('assessment-local-ca component', () => {
       viewModel.attr('evidenceAmount', 0);
       performValidation = viewModel.performValidation.bind(viewModel);
 
-      inputField = new CanMap({
+      inputField = new canMap({
         type: 'input',
         validationConfig: null,
         preconditions_failed: null,
@@ -68,7 +68,7 @@ describe('assessment-local-ca component', () => {
         },
       });
 
-      checkboxField = new CanMap({
+      checkboxField = new canMap({
         type: 'checkbox',
         validationConfig: null,
         preconditions_failed: null,
@@ -207,7 +207,7 @@ describe('assessment-local-ca component', () => {
       performDropdownValidation = viewModel.performDropdownValidation
         .bind(viewModel);
 
-      dropdownField = new CanMap({
+      dropdownField = new canMap({
         type: 'dropdown',
         validationConfig: {
           'nothing required': ddValidationMapToValue(),
@@ -806,7 +806,7 @@ describe('assessment-local-ca component', () => {
       saveDfd = $.Deferred();
       saveSpy = spyOn(viewModel, 'save').and.returnValue(saveDfd);
 
-      inputField = new CanMap({
+      inputField = new canMap({
         id: 1,
         type: 'input',
         validationConfig: null,
@@ -816,7 +816,7 @@ describe('assessment-local-ca component', () => {
         },
       });
 
-      dropdownField = new CanMap({
+      dropdownField = new canMap({
         id: 2,
         type: 'dropdown',
         validationConfig: {
@@ -846,7 +846,7 @@ describe('assessment-local-ca component', () => {
 
     it('should validate form and save instance on field change event',
       function () {
-        let fieldChangeEvent = new CanMap({
+        let fieldChangeEvent = new canMap({
           fieldId: inputField.id,
           field: inputField,
           value: 'new value',
@@ -865,7 +865,7 @@ describe('assessment-local-ca component', () => {
 
     it('should force requirement of a new comment on dropdown field change',
       function () {
-        let fieldChangeEvent = new CanMap({
+        let fieldChangeEvent = new canMap({
           fieldId: dropdownField.id,
           field: dropdownField,
           value: 'comment required',

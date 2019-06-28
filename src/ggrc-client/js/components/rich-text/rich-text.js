@@ -4,7 +4,7 @@
  */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import './people-mention/people-mention';
 
@@ -18,7 +18,7 @@ export default CanComponent.extend('richText', {
   tag: 'rich-text',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       disabled: {
         set(disabled) {

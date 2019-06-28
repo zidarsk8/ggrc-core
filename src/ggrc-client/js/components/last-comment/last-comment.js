@@ -4,7 +4,7 @@
 */
 
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import template from './last-comment.stache';
 import RefreshQueue from '../../models/refresh_queue';
@@ -18,7 +18,7 @@ export default CanComponent.extend({
   tag: 'last-comment',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       instance: {
         set(instance) {

@@ -3,14 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 import tracker from '../../tracker';
 import {trigger} from 'can-event';
 
-export default CanMap.extend({
+export default canMap.extend({
   define: {
     expanded: {
       type: Boolean,

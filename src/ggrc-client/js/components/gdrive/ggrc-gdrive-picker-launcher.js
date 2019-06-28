@@ -5,7 +5,7 @@
 
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import CanComponent from 'can-component';
 import {
   uploadFiles,
@@ -28,7 +28,7 @@ export default CanComponent.extend({
   tag: 'ggrc-gdrive-picker-launcher',
   view: canStache(template),
   leakScope: true,
-  viewModel: CanMap.extend({
+  viewModel: canMap.extend({
     define: {
       isInactive: {
         get: function () {

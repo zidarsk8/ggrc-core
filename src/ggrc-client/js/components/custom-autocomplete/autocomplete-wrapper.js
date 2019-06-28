@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 // Base viewModel for custom autocomplete. Must be extended into component.
 // Provides component-wrapper for custom autocomplete.
 // Must contain 'autocomplete-results' and 'autocomplete-input' components.
@@ -13,7 +13,7 @@ import {
   batchRequests,
 } from '../../plugins/utils/query-api-utils';
 
-export default CanMap.extend({
+export default canMap.extend({
   currentValue: '',
   modelName: null,
   modelConstructor: null,

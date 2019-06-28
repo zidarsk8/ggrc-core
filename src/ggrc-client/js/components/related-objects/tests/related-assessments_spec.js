@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import Component from '../related-assessments';
 import {
   getComponentVM,
@@ -169,7 +169,7 @@ describe('related-assessments component', () => {
       });
 
       it('builds FILE model correctly', () => {
-        let evidence = new CanMap({
+        let evidence = new canMap({
           kind: 'FILE',
           title: 'title',
           gdrive_id: 'gdrive_id',
@@ -195,7 +195,7 @@ describe('related-assessments component', () => {
       });
 
       it('builds URL model correctly', () => {
-        let evidence = new CanMap({
+        let evidence = new canMap({
           kind: 'URL',
           title: 'title',
           link: 'link',
@@ -304,7 +304,7 @@ describe('related-assessments component', () => {
 
     describe('checkReuseAbility() method', () => {
       it('returns true if evidence is not a file', () => {
-        let evidence = new CanMap({
+        let evidence = new canMap({
           kind: 'URL',
         });
 
@@ -314,7 +314,7 @@ describe('related-assessments component', () => {
       });
 
       it('returns true if evidence is a file with gdrive_id', () => {
-        let evidence = new CanMap({
+        let evidence = new canMap({
           kind: 'FILE',
           gdrive_id: 'gdrive_id',
         });
@@ -325,7 +325,7 @@ describe('related-assessments component', () => {
       });
 
       it('returns false if evidence is a file without gdrive_id', () => {
-        let evidence = new CanMap({
+        let evidence = new canMap({
           kind: 'FILE',
           gdrive_id: '',
         });

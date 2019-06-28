@@ -5,7 +5,7 @@
 
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
-import CanMap from 'can-map';
+import canMap from 'can-map';
 import {
   buildRelevantIdsQuery,
   batchRequests,
@@ -218,7 +218,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
 
   _renderMenu: function (ul, items) {
     let template = this.element.data('template');
-    let context = new CanMap(this._setup_menu_context(items));
+    let context = new canMap(this._setup_menu_context(items));
     let model = context.model;
     let $ul = $(ul);
 
