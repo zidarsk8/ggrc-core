@@ -165,7 +165,6 @@ export default TreeLoader.extend({
     }
 
     this.context.attr(this.options);
-    this.update_count();
   },
 
   init_view: function () {
@@ -199,8 +198,6 @@ export default TreeLoader.extend({
     this.options.list.push(...items);
     return $.Deferred().resolve();
   },
-
-  '{list} change': 'update_count',
 
   '.view-more-paging click': function (el, ev) {
     let that = this;
@@ -245,5 +242,13 @@ export default TreeLoader.extend({
   },
 
   '.search-filters button[type=reset] click': 'reset_search',
-  '.btn-add modal:success': 'reset_search',
+  '[data-toggle="modal-ajax-form"] modal:success'(el, ev, options) {
+    if (this.options.model.constructor.model_singular === options.type) {
+      this.fetch_list()
+        .then((list) => {
+          this.draw_list(list);
+          this.update_count();
+        });
+    }
+  },
 });

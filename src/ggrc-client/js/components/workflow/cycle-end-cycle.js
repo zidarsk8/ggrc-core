@@ -47,9 +47,8 @@ export default can.Component.extend({
           trigger.call(el[0], 'refreshTree');
 
           return initCounts(
-            [workflowCountsMap.history],
-            pageInstance.type,
-            pageInstance.id);
+            [workflowCountsMap.activeCycles, workflowCountsMap.history],
+            pageInstance.type, pageInstance.id);
         });
     },
   },

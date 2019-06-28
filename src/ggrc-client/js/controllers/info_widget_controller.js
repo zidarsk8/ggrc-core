@@ -14,6 +14,8 @@ import {
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models';
 import {getCreateObjectUrl} from '../plugins/utils/ggrcq-utils';
+import Cacheable from '../models/cacheable';
+import {refreshCounts} from '../plugins/utils/widgets-utils';
 
 export default can.Control.extend({
   defaults: {
@@ -120,6 +122,14 @@ export default can.Control.extend({
         'Vendor',
       ];
       this.options.object_menu = this.generate_menu_items(names);
+      Cacheable.bind('created', this.updateCounts);
     }
   },
+
+  // timeout required to let server correctly calculate changed counts
+  updateCounts: _.debounce((ev, instance) => {
+    if (/dashboard/.test(window.location)) {
+      refreshCounts();
+    }
+  }, 250),
 });

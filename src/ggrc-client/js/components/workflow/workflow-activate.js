@@ -51,6 +51,7 @@ const viewModel = can.Map.extend({
       await generateCycle(workflow);
       await workflow.refresh();
       await workflow.attr('status', 'Active').save();
+      await this.updateActiveCycleCounts(workflow);
     } catch (err) {
       return Promise.reject(err);
     } finally {
