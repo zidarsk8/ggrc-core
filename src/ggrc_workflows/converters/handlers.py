@@ -207,7 +207,5 @@ COLUMN_HANDLERS = {
         "task_group": TaskGroupColumnHandler,
         "task_type": TaskTypeColumnHandler,
         "workflow": WorkflowColumnHandler,
-        "finished_date": handlers.NullableDateColumnHandler,
-        "verified_date": handlers.NullableDateColumnHandler,
     },
 }
