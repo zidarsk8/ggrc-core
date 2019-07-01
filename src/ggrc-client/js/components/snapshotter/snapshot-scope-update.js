@@ -11,16 +11,14 @@ import {
   BUTTON_VIEW_CONFIRM_CANCEL,
 } from '../../plugins/utils/modals';
 import {
-  isSnapshotModel,
-} from '../../plugins/utils/snapshot-utils';
-import {
   refreshCounts,
 } from '../../plugins/utils/widgets-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import pubSub from '../../pub-sub';
 
 export default canComponent.extend({
   tag: 'snapshot-scope-update',
-  leakScope: true,
+  leakScope: false,
   viewModel: canMap.extend({
     instance: null,
     upsertIt: function (scope, el, ev) {
@@ -39,20 +37,11 @@ export default canComponent.extend({
       );
     },
     _refreshContainers: function () {
-      return refreshCounts()
-        .then(function () {
-        // tell each container with snapshots that it should refresh own data
-          $('tree-widget-container')
-            .each(function () {
-              let vm = $(this).viewModel();
-              let modelName = vm.model.model_singular;
-
-              if (!isSnapshotModel(modelName)) {
-                return true;
-              }
-              vm.setRefreshFlag(true);
-            });
-        });
+      pubSub.dispatch({
+        type: 'refetchOnce',
+        modelNames: GGRC.config.snapshotable_objects,
+      });
+      return refreshCounts();
     },
     _success: function () {
       let instance = this.instance;

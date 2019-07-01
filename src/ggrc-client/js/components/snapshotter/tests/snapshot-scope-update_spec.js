@@ -8,6 +8,8 @@ import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../snapshot-scope-update';
+import pubSub from '../../../pub-sub';
+import { ggrcAjax } from '../../../plugins/ajax_extensions';
 
 describe('snapshot-scope-update component', function () {
   'use strict';
@@ -30,7 +32,6 @@ describe('snapshot-scope-update component', function () {
       '<tree-widget-container></tree-widget-container>' +
       '<tree-widget-container></tree-widget-container>';
     containerVM = {
-      setRefreshFlag: jasmine.createSpy('setRefreshFlag'),
       display: jasmine.createSpy('display'),
       model: {
         model_singular: 'Control',
@@ -99,23 +100,14 @@ describe('snapshot-scope-update component', function () {
     });
 
     it('sets refresh flag for each tree-widget-container that contains' +
-    ' snapshots', function (done) {
-      method().then(() => {
-        $('tree-widget-container').each(function () {
-          let viewModel = $(this).viewModel();
-          expect(viewModel.setRefreshFlag).toHaveBeenCalledWith(true);
-          done();
-        });
-      });
-    });
+    ' snapshots', () => {
+      spyOn(pubSub, 'dispatch');
 
-    it('does not set refresh flag for each tree-widget-container that does ' +
-    'not contain snapshots', async function () {
-      Object.assign(containerVM.model, {model_singular: 'Something'});
-      await method();
-      $('tree-widget-container').each(function () {
-        let viewModel = $(this).viewModel();
-        expect(viewModel.setRefreshFlag).not.toHaveBeenCalled();
+      method();
+
+      expect(pubSub.dispatch).toHaveBeenCalledWith({
+        type: 'refetchOnce',
+        modelNames: GGRC.config.snapshotable_objects,
       });
     });
   });
