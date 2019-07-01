@@ -278,16 +278,18 @@ let viewModel = canMap.extend({
       return;
     }
 
-    let loadedItems;
-
     if (!this.attr('loaded') || needToRefresh || router.attr('refetch')) {
-      loadedItems = this.loadItems()
+      let loadedItems = this.loadItems()
         .then(() => this.setRefreshFlag(false)); // refreshed
 
       this.attr('loaded', loadedItems);
     }
 
     return this.attr('loaded');
+  },
+  reloadTree() {
+    this.closeInfoPane();
+    this.loadItems();
   },
   setColumnsConfiguration: function () {
     let columns = TreeViewUtils.getColumnsForModel(
@@ -832,7 +834,7 @@ export default canComponent.extend({
     },
     ' refreshTree'(el, ev) {
       ev.stopPropagation();
-      this.reloadTree();
+      this.viewModel.reloadTree();
     },
     [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`]([scope], ev) {
       const vm = this.viewModel;
@@ -845,7 +847,7 @@ export default canComponent.extend({
       currentModelName = vm.attr('model').model_singular;
 
       if (currentModelName === ev.destinationType) {
-        this.reloadTree();
+        this.viewModel.reloadTree();
       }
     },
     inserted() {
@@ -858,10 +860,6 @@ export default canComponent.extend({
       this.element.closest('.widget')
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
       viewModel._widgetShown();
-    },
-    reloadTree() {
-      this.viewModel.closeInfoPane();
-      this.viewModel.loadItems();
     },
     '{viewModel.parent_instance} displayTree'([scope], event) {
       const {viewModel} = this;
