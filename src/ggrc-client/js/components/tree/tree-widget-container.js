@@ -285,9 +285,13 @@ let viewModel = canMap.extend({
 
     return this.attr('loaded');
   },
-  reloadTree() {
-    this.closeInfoPane();
-    this.loadItems();
+  refresh(destinationType) {
+    if (!destinationType || this.attr('modelName') === destinationType) {
+      this.closeInfoPane();
+      return this.loadItems();
+    }
+
+    return Promise.resolve();
   },
   setColumnsConfiguration: function () {
     let columns = TreeViewUtils.getColumnsForModel(
@@ -322,16 +326,14 @@ let viewModel = canMap.extend({
     this.attr('sortingInfo.sortDirection', event.sortDirection);
 
     this.attr('pageInfo.current', 1);
-    this.loadItems();
-    this.closeInfoPane();
+    this.refresh();
   },
   onFilter: function () {
     const stopFn = tracker.start(this.attr('modelName'),
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.FILTER);
     this.attr('pageInfo.current', 1);
-    this.loadItems().then(stopFn);
-    this.closeInfoPane();
+    this.refresh().then(stopFn);
   },
   getDepthFilter: function (deepLevel) {
     let filters = makeArray(this.attr('filters'));
@@ -784,8 +786,7 @@ export default canComponent.extend({
     },
     '{viewModel.pageInfo} current': function () {
       if (!this.viewModel.attr('loading')) {
-        this.viewModel.loadItems();
-        this.viewModel.closeInfoPane();
+        this.viewModel.refresh();
       }
     },
     '{viewModel.pageInfo} pageSize': function () {
@@ -826,21 +827,12 @@ export default canComponent.extend({
     },
     ' refreshTree'(el, ev) {
       ev.stopPropagation();
-      this.viewModel.reloadTree();
+      this.viewModel.refresh();
     },
-    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`]([scope], ev) {
-      const vm = this.viewModel;
-      let currentModelName;
-
-      if (!vm.attr('model')) {
-        return;
-      }
-
-      currentModelName = vm.attr('model').model_singular;
-
-      if (currentModelName === ev.destinationType) {
-        this.viewModel.reloadTree();
-      }
+    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`](
+      [scope], {destinationType}
+    ) {
+      this.viewModel.refresh(destinationType);
     },
     inserted() {
       let viewModel = this.viewModel;
@@ -853,14 +845,8 @@ export default canComponent.extend({
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
       viewModel._widgetShown();
     },
-    '{viewModel.parent_instance} displayTree'([scope], event) {
-      const {viewModel} = this;
-      const currentModelName = viewModel.attr('model').model_singular;
-
-      if (currentModelName === event.destinationType) {
-        const forceRefresh = true;
-        viewModel.display(forceRefresh);
-      }
+    '{viewModel.parent_instance} displayTree'([scope], {destinationType}) {
+      this.viewModel.refresh(destinationType);
     },
     '{viewModel.router} saved_search'() {
       if (isLoadSavedSearch(this.viewModel)) {
