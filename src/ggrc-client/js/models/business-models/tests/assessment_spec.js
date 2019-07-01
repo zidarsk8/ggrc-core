@@ -12,6 +12,7 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Context from '../../service-models/context';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {REFRESH_MAPPING} from '../../../events/eventTypes';
+import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 describe('Assessment model', function () {
   'use strict';
@@ -236,7 +237,7 @@ describe('Assessment model', function () {
 
   describe('getRelatedObjects() method', () => {
     beforeEach(() => {
-      spyOn($, 'get').and.returnValue($.Deferred().resolve({
+      spyOn(AjaxUtils, 'ggrcGet').and.returnValue($.Deferred().resolve({
         Audit: {
           title: 'FooBar',
         },

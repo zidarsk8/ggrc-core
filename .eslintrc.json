@@ -116,6 +116,9 @@
     }, {
         "object": "$",
         "property": "ajax"
+    }, {
+      "object": "$",
+      "property": "get"
     }]
   }
 }

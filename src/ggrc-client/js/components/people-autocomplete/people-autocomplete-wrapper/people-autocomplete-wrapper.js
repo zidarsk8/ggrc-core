@@ -8,6 +8,7 @@ import '../people-autocomplete-results/people-autocomplete-results';
 
 import baseAutocompleteWrapper from '../../custom-autocomplete/autocomplete-wrapper';
 import PersonModel from '../../../models/business-models/person';
+import {ggrcGet} from '../../../plugins/ajax_extensions';
 
 export default canComponent.extend({
   tag: 'people-autocomplete-wrapper',
@@ -40,7 +41,7 @@ export default canComponent.extend({
       const externalServiceUrl = GGRC.config.external_services[type];
 
       if (externalServiceUrl) {
-        $.get({
+        ggrcGet({
           url: externalServiceUrl,
           data: {
             prefix: value,

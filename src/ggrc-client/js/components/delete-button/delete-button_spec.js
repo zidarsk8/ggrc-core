@@ -9,6 +9,7 @@ import {getComponentVM} from '../../../js_specs/spec_helpers';
 import {Snapshot} from '../../models/service-models';
 import * as ErrorsUtils from '../../plugins/utils/errors-utils';
 import * as ModalsUtils from '../../plugins/utils/modals';
+import * as AjaxUtils from '../../plugins/ajax_extensions';
 
 describe('delete-button component', () => {
   let vm;
@@ -141,7 +142,7 @@ describe('delete-button component', () => {
 
     beforeEach(() => {
       getDfd = $.Deferred();
-      spyOn($, 'get').and.returnValue(getDfd);
+      spyOn(AjaxUtils, 'ggrcGet').and.returnValue(getDfd);
     });
 
     it('fetches related objects for instance', () => {
@@ -150,7 +151,7 @@ describe('delete-button component', () => {
       const url = `/api/snapshots/${instance.id}/related_objects`;
       vm.fetchRelatedObjects();
 
-      expect($.get).toHaveBeenCalledWith(url);
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(url);
     });
 
     describe('after data fetch', () => {

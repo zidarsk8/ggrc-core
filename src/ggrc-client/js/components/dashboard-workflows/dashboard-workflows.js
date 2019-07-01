@@ -10,6 +10,7 @@ import template from './templates/dashboard-workflows.stache';
 import isFunction from 'can-util/js/is-function/is-function';
 import {DATE_FORMAT, getFormattedLocalDate} from '../../plugins/utils/date-utils';
 import {getTruncatedList} from '../../plugins/ggrc_utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
 const SHOWN_WORKFLOWS_COUNT = 5;
 
@@ -67,7 +68,7 @@ const viewModel = canMap.extend({
   },
   async initMyWorkflows() {
     this.attr('isLoading', true);
-    const {workflows: rawWorkflows} = await $.get(
+    const {workflows: rawWorkflows} = await ggrcGet(
       `/api/people/${GGRC.current_user.id}/my_workflows`
     );
     this.attr('isLoading', false);

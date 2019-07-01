@@ -130,6 +130,16 @@ const ggrcAjax = function () {
   return _ajax;
 };
 
+const jqueryRequest = (type, url, data) => {
+  return ggrcAjax({
+    type,
+    url,
+    data,
+  });
+};
+
+const ggrcGet = jqueryRequest.bind(null, 'get');
+
 $(document).ajaxError(function (event, jqxhr, settings, exception) {
   if (!isExpectedError(jqxhr)) {
     tracker.trackError(getAjaxErrorInfo(jqxhr, exception));
@@ -146,4 +156,5 @@ $(document).ajaxError(function (event, jqxhr, settings, exception) {
 
 export {
   ggrcAjax,
+  ggrcGet,
 };

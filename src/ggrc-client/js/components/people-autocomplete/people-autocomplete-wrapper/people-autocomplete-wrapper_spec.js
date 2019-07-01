@@ -6,6 +6,7 @@
 import canList from 'can-list';
 import component from './people-autocomplete-wrapper';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 describe('people-autocomplete-wrapper component', () => {
   let vm;
@@ -68,16 +69,16 @@ describe('people-autocomplete-wrapper component', () => {
         GGRC.config.external_services[modelName] = 'externalServiceUrlMock';
 
         getDfd = $.Deferred();
-        spyOn($, 'get').and.returnValue(getDfd);
+        spyOn(AjaxUtils, 'ggrcGet').and.returnValue(getDfd);
         spyOn(vm, 'processItems');
       });
 
-      it('calls $.get with specified settings', () => {
+      it('calls AjaxUtils.ggrcGet with specified settings', () => {
         const value = 'ara';
 
         vm.getResult(value);
 
-        expect($.get).toHaveBeenCalledWith({
+        expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith({
           url: GGRC.config.external_services[modelName],
           data: {
             prefix: value,

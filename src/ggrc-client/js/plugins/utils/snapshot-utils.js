@@ -17,6 +17,7 @@ import Audit from '../../models/business-models/audit';
 import Stub from '../../models/stub';
 import tracker from '../../tracker';
 import * as businessModels from '../../models/business-models';
+import {ggrcGet} from '../ajax_extensions';
 
 /**
  * Util methods for work with Snapshots.
@@ -269,7 +270,7 @@ function getSnapshotsCounts(widgets, instance) {
     tracker.USER_JOURNEY_KEYS.API,
     tracker.USER_ACTIONS[instance.type.toUpperCase()].SNAPSHOTS_COUNT);
 
-  return $.get(url)
+  return ggrcGet(url)
     .then((counts) => {
       stopFn();
       let countsMap = {};

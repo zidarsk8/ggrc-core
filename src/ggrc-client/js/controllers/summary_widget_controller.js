@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {ggrcAjax} from '../plugins/ajax_extensions';
+import {ggrcAjax, ggrcGet} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canControl from 'can-control';
@@ -318,7 +318,7 @@ export default canControl.extend({
    * N, L - total count of assessments, evidence accordingly in this audit.
    */
   getStatuses: function (auditId) {
-    return $.get('/api/audits/'+ auditId + '/summary');
+    return ggrcGet('/api/audits/'+ auditId + '/summary');
   },
   loadChartLibrary: function (callback) {
     if (typeof google !== 'undefined' &&

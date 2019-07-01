@@ -15,6 +15,7 @@ import {
 import {handleAjaxError} from '../../plugins/utils/errors-utils';
 import {Snapshot} from '../../models/service-models';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
 export default canComponent.extend({
   tag: 'delete-button',
@@ -80,25 +81,26 @@ export default canComponent.extend({
       });
     },
     fetchRelatedObjects() {
-      return $.get(`/api/snapshots/${this.attr('instance.id')}/related_objects`)
-        .then((rawData) => {
-          const {
-            relatedToOriginal,
-            relatedToSnapshot,
-          } = this.composeData(rawData);
+      return ggrcGet(
+        `/api/snapshots/${this.attr('instance.id')}/related_objects`
+      ).then((rawData) => {
+        const {
+          relatedToOriginal,
+          relatedToSnapshot,
+        } = this.composeData(rawData);
 
-          const originalObject = this.attr('instance.revision.content');
+        const originalObject = this.attr('instance.revision.content');
 
-          confirm({
-            modal_title: 'Warning',
-            originalObject,
-            relatedToOriginal,
-            relatedToSnapshot,
-            content_view:
-              `${GGRC.templates_path}/modals/snapshot-related-objects.stache`,
-            button_view: BUTTON_VIEW_CLOSE,
-          });
+        confirm({
+          modal_title: 'Warning',
+          originalObject,
+          relatedToOriginal,
+          relatedToSnapshot,
+          content_view:
+            `${GGRC.templates_path}/modals/snapshot-related-objects.stache`,
+          button_view: BUTTON_VIEW_CLOSE,
         });
+      });
     },
     composeData(rawData) {
       let issues = rawData.Issue ? rawData.Issue : [];
