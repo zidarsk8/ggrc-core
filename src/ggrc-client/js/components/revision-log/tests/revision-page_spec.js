@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../revision-page';
 import Person from '../../../models/business-models/person';
@@ -30,7 +32,7 @@ describe('revision-page component', function () {
     });
 
     it('assigns computed object changes to changeHistory attr', () => {
-      const revisions = new can.Map({
+      const revisions = new canMap({
         object: [],
         revisionsForCompare: [],
       });
@@ -50,7 +52,7 @@ describe('revision-page component', function () {
     });
 
     it('assigns computed mapping changes to changeHistory attr', () => {
-      const revisions = new can.Map({
+      const revisions = new canMap({
         mappings: [],
       });
       const mappingChanges = {
@@ -103,7 +105,7 @@ describe('revision-page component', function () {
   describe('_computeObjectChanges() method', function () {
     it('computes an empty list on empty Revision history', function () {
       let result;
-      let revisions = new can.List();
+      let revisions = new canList();
 
       spyOn(viewModel, '_objectChangeDiff');
       result = viewModel._computeObjectChanges(revisions, []);
@@ -454,13 +456,13 @@ describe('revision-page component', function () {
 
     it('creates a list of mapping changes from a Revision list', function () {
       let result;
-      let revisions = new can.List([
+      let revisions = new canList([
         {id: 10, madeBy: 'John'},
         {id: 20, madeBy: 'Doe'},
       ]);
 
       viewModel._mappingChange.and.callFake(function (revision) {
-        return new can.Map({madeBy: revision.madeBy});
+        return new canMap({madeBy: revision.madeBy});
       });
 
       result = viewModel._computeMappingChanges(revisions);

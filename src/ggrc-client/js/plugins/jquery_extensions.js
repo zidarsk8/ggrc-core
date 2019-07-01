@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
 const originalViewModel = $.fn.viewModel;
 
 $.fn.extend({
@@ -13,7 +15,7 @@ $.fn.extend({
   // Get component's viewModel from jQuery element
   viewModel: function () {
     if (!this.length) {
-      return new can.Map();
+      return new canMap();
     }
 
     return originalViewModel.apply(this, arguments);
@@ -21,22 +23,22 @@ $.fn.extend({
 
   /*
   * @function jQuery.fn.controls jQuery.fn.controls
-  * @parent can.Control.plugin
+  * @parent can-control.plugin
   * @description Get the Controls associated with elements.
   * @signature `jQuery.fn.controls([type])`
-  * @param {String|can.Control} [control] The type of Controls to find.
-  * @return {can.Control} The controls associated with the given elements.
+  * @param {String|can-control} [control] The type of Controls to find.
+  * @return {can-control} The controls associated with the given elements.
   *
   * @body
   * When the widget is initialized, the plugin control creates an array
   * of control instance(s) with the DOM element it was initialized on using
-  * [can.data] method.
+  * [canData] helper.
   *
   * The `controls` method allows you to get the control instance(s) for any element
   * either by their type or pluginName.
   */
   controls: function () {
-    let controllerNames = can.makeArray(arguments);
+    let controllerNames = makeArray(arguments);
     let instances = [];
     let controls;
     // check if arguments
@@ -57,11 +59,11 @@ $.fn.extend({
 
   /*
    * @function jQuery.fn.control jQuery.fn.control
-   * @parent can.Control.plugin
+   * @parent can-control.plugin
    * @description Get the Control associated with elements.
    * @signature `jQuery.fn.control([type])`
-   * @param {String|can.Control} [control] The type of Control to find.
-   * @return {can.Control} The first control found.
+   * @param {String|can-control} [control] The type of Control to find.
+   * @return {can-control} The first control found.
    *
    * @body
    * This is the same as [jQuery.fn.controls $().controls] except that

@@ -3,6 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import makeArray from 'can-util/js/make-array/make-array';
+import canBatch from 'can-event/batch/batch';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {
@@ -19,11 +26,11 @@ import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 
 const HIGHLIGHT_CLASS = 'diff-highlighted';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'revisions-comparer',
-  view: can.stache('<content/>'),
+  view: canStache('<content/>'),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: null,
     leftRevisionId: null,
     rightRevision: null,
@@ -75,10 +82,10 @@ export default can.Component.extend({
                 confirmSelf.attr('rightRevisionData', rightRevisionData);
               }
 
-              $.ajax({
+              ggrcAjax({
                 url: view, dataType: 'text',
               }).then((view) => {
-                let render = can.stache(view);
+                let render = canStache(view);
                 let fragLeft = render(revisions[0]);
                 let fragRight = render(revisions[1]);
 
@@ -118,7 +125,7 @@ export default can.Component.extend({
       } else if (cached.length === 1) {
         result = $.when(cached[0], Revision.findOne({id: notCached[0]}))
           .then(function () {
-            return can.makeArray(arguments);
+            return makeArray(arguments);
           });
       } else {
         result = Revision.findAll({
@@ -132,7 +139,7 @@ export default can.Component.extend({
         if (isNeedReverse) {
           revisions = _.reverse(revisions);
         }
-        return new can.List(revisions);
+        return new canList(revisions);
       });
     },
     prepareInstances: function (data) {
@@ -157,17 +164,17 @@ export default can.Component.extend({
         }
 
         if (index === 1) {
-          const instWithProposedValues = new can.Map(content);
+          const instWithProposedValues = new canMap(content);
           // new model method overrides modified fields
-          can.batch.start();
-          can.Map.keys(proposalContent).forEach((key) => {
+          canBatch.start();
+          canMap.keys(proposalContent).forEach((key) => {
             if (Array.isArray(proposalContent[key])) {
               instWithProposedValues.attr(key).replace(proposalContent[key]);
             } else {
               instWithProposedValues.attr(key, proposalContent[key]);
             }
           });
-          can.batch.stop();
+          canBatch.stop();
           content = instWithProposedValues.attr();
         }
 
@@ -208,7 +215,7 @@ export default can.Component.extend({
     /**
      * Highlight difference
      * @param {Object} $target - jQuery object
-     * @param {can.List} revisions - revisions for comparing
+     * @param {canList} revisions - revisions for comparing
      */
     highlightDifference: _.debounce(function ($target, revisions) {
       this.highlightAttributes($target);
@@ -308,7 +315,7 @@ export default can.Component.extend({
      *
      * @param {jQuery} $target - the root DOM element containing the
      *   revision diff comparison
-     * @param {can.List} revisions - revisions for comparing
+     * @param {canList} revisions - revisions for comparing
      */
     highlightAttachments($target, revisions) {
       if (!isEqual(
@@ -331,16 +338,16 @@ export default can.Component.extend({
 
       /**
        * Checks if two lists are equal.
-       * @param {can.List} left - First list to compare
-       * @param {can.List} right - Second list to compare
+       * @param {canList} left - First list to compare
+       * @param {canList} right - Second list to compare
        *
        * @return {Boolean} - Returns true if lists are equal
        */
       function isEqual(left, right) {
         const valueOld = Object.assign({},
-          left && left instanceof can.Map && left.attr() || []);
+          left && left instanceof canMap && left.attr() || []);
         const valueNew = Object.assign({},
-          right && right instanceof can.Map && right.attr() || []);
+          right && right instanceof canMap && right.attr() || []);
 
         return _.isEqual(valueOld, valueNew);
       }
@@ -362,7 +369,7 @@ export default can.Component.extend({
      *
      * @param {jQuery} $target - the root DOM element containing the
      *   revision diff comparison
-     * @param {can.List} revisions - revisions for comparing
+     * @param {canList} revisions - revisions for comparing
      */
     highlightCustomAttributes($target, revisions) {
       let that = this;
@@ -378,7 +385,7 @@ export default can.Component.extend({
       /**
        * Prepares instance's custom attributes
        * @param {Object} revision - revision
-       * @return {can.List} custom attributes list
+       * @return {canList} custom attributes list
        */
       function getCAs(revision) {
         let instance = revision.instance;
@@ -391,8 +398,8 @@ export default can.Component.extend({
        * Compares two lists of custom attributes
        * @param {Object} $ca0s - list of jQuery objects for custom attributes
        * @param {Object} $ca1s - list of jQuery objects for custom attributes
-       * @param {can.List} ca0s - list of custom attributes (should be sorted by id)
-       * @param {can.List} ca1s - list of custom attributes (should be sorted by id)
+       * @param {canList} ca0s - list of custom attributes (should be sorted by id)
+       * @param {canList} ca1s - list of custom attributes (should be sorted by id)
        */
       function compareCAs($ca0s, $ca1s, ca0s, ca1s) {
         let i = 0;

@@ -3,16 +3,20 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './people-list.stache';
 import {validateAttr} from '../../../plugins/utils/validation-utils';
 
 const OtherOption = 'other';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'people-list',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     peopleList: [],
     instance: null,
     hasEmptyValue: false,
@@ -82,7 +86,7 @@ export default can.Component.extend({
     /**
      * Remove user from people list
      *
-     * @param {can.Map} user - user which should be removed
+     * @param {canMap} user - user which should be removed
      */
     removePerson({id}) {
       const peopleList = this.attr('peopleList');
@@ -112,7 +116,7 @@ export default can.Component.extend({
       const peopleListAttr = this.attr('peopleListAttr');
       const peopleIds = this.attr(`instance.${peopleListAttr}`);
 
-      if (peopleIds instanceof can.List) {
+      if (peopleIds instanceof canList) {
         this.attr('peopleList', peopleIds);
         this.attr('selectedValue', OtherOption);
       } else {

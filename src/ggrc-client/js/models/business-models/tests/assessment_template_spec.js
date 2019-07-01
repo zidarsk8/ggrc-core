@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import AssessmentTemplate from '../assessment-template';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
@@ -20,7 +21,7 @@ describe('AssessmentTemplate model', () => {
 
       instance.form_preload(true, null, {});
 
-      expect(instance.custom_attribute_definitions instanceof can.List)
+      expect(instance.custom_attribute_definitions instanceof canList)
         .toBeTruthy();
     });
   });

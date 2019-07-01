@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import moment from 'moment';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
 import Directive from '../../models/business-models/directive';
@@ -13,7 +17,7 @@ import Cycle from '../../models/business-models/cycle';
 import {formatDate} from '../../plugins/utils/date-utils';
 import template from './templates/tree-item-extra-info.stache';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     isActive: {
       type: 'boolean',
@@ -178,9 +182,9 @@ let viewModel = can.Map.extend({
   instance: null,
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-item-extra-info',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
 });

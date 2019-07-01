@@ -3,17 +3,20 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import './tab-panel';
 import './tab-link/tab-link';
 import '../questionnaire-link/questionnaire-link';
 import template from './tab-container.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tab-container',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     lastErrorTab: null,
     define: {
       showTabs: {

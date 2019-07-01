@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
+import canMap from 'can-map';
 // TODO: this import is used to correctly build assets. It should be removed and cyclic dependencies should be resolved.
 import '../../plugins/utils/models-utils';
 
@@ -46,7 +48,7 @@ function userHasPermissions(source, target) {
   let hasPermissions = Permission.is_allowed_for('update', source)
     || source.isNew();
 
-  if (target instanceof can.Map) {
+  if (target instanceof canMap) {
     hasPermissions = hasPermissions
       && Permission.is_allowed_for('update', target);
   }
@@ -138,7 +140,7 @@ function allowedToUnmap(source, target) {
 function _getType(object) {
   let type;
 
-  if (object instanceof can.Model) {
+  if (object instanceof canModel) {
     type = object.constructor.model_singular;
   } else {
     type = object.type || object;

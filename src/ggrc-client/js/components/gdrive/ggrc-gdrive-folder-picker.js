@@ -3,6 +3,10 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   uploadFiles,
   getGDriveItemId,
@@ -11,11 +15,11 @@ import {
 } from '../../plugins/utils/gdrive-picker-utils';
 import template from './templates/ggrc-gdrive-folder-picker.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'ggrc-gdrive-folder-picker',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       readonly: {
         type: 'boolean',
@@ -55,7 +59,7 @@ export default can.Component.extend({
     unlinkFolder: function () {
       let instance = this.attr('instance');
 
-      return $.ajax({
+      return ggrcAjax({
         url: '/api/remove_folder',
         type: 'POST',
         data: {
@@ -77,7 +81,7 @@ export default can.Component.extend({
     linkFolder: function (folderId) {
       let instance = this.attr('instance');
 
-      return $.ajax({
+      return ggrcAjax({
         url: '/api/add_folder',
         type: 'POST',
         data: {

@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../collapsible-panel/collapsible-panel';
 import '../../object-list-item/business-object-list-item';
 import '../../object-list-item/detailed-business-object-list-item';
@@ -24,9 +27,9 @@ import {notifier} from '../../../plugins/utils/notifiers-utils';
 
 /**
  * ViewModel for Assessment Mapped Controls Popover.
- * @type {can.Map}
+ * @type {canMap}
  */
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     /**
      * Private Attribute defining array of requested Objects, Types and Fields of Objects
@@ -122,9 +125,9 @@ const viewModel = can.Map.extend({
 /**
  * Assessment specific mapped controls view component
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'assessment-mapped-controls',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
   events: {

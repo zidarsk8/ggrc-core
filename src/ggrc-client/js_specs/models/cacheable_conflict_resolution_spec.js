@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import Cacheable from '../../js/models/cacheable';
 import {
   failAll,
@@ -14,11 +15,11 @@ describe('Cacheable conflict resolution', function () {
   let ajaxSpy;
 
   beforeAll(function () {
-    ajaxSpy = spyOn($, 'ajax');
+    ajaxSpy = spyOn(AjaxExtensions, 'ggrcAjax');
     DummyModel = makeFakeModel({
       model: Cacheable,
       staticProps: {
-        ajax: $.ajax,
+        ajax: AjaxExtensions.ggrcAjax,
         update: 'PUT /api/dummy_models/{id}',
         table_singular: 'dummy_model',
       },

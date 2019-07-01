@@ -3,12 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AjaxExtensions from '../ajax_extensions';
 import * as importExportUtils from '../utils/import-export-utils';
 
 const baseUrlPrefix = '/api/people/1';
 
 const ajaxSpy = () => {
-  return spyOn($, 'ajax');
+  return spyOn(AjaxExtensions, 'ggrcAjax');
 };
 
 const calledWithOptions = (url, type = 'POST', data) => {
@@ -22,7 +23,7 @@ const calledWithOptions = (url, type = 'POST', data) => {
   if (data) {
     options.data = data;
   }
-  expect($.ajax).toHaveBeenCalledWith(options);
+  expect(AjaxExtensions.ggrcAjax).toHaveBeenCalledWith(options);
 };
 
 describe('Import/Export utils', () => {

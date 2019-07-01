@@ -3,7 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-let viewModel = can.Map.extend({
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
+let viewModel = canMap.extend({
   define: {
     trigger: {
       type: 'boolean',
@@ -20,9 +23,9 @@ let viewModel = can.Map.extend({
 /**
  *
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'lazy-render',
-  view: can.stache('{{#if activated}}<content/>{{/if}}'),
+  view: canStache('{{#if activated}}<content/>{{/if}}'),
   leakScope: true,
   viewModel,
 });

@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as CanStacheUtils from 'can-stache';
+import * as AjaxExtensions from '../../plugins/ajax_extensions';
+import canMap from 'can-map';
 import Ctrl from '../tree/tree-view-node';
 
 describe('TreeViewNode Controller', function () {
@@ -19,7 +22,7 @@ describe('TreeViewNode Controller', function () {
       $element = $('<div></div>');
 
       ctrlInst = {
-        options: new can.Map({
+        options: new canMap({
           show_view: '/foo/bar.stache',
         }),
         element: $element,
@@ -32,8 +35,9 @@ describe('TreeViewNode Controller', function () {
       };
 
       method = Ctrl.prototype.draw_node.bind(ctrlInst);
-      spyOn($, 'ajax').and.returnValue(Promise.resolve('<div></div>'));
-      spyOn(can, 'view');
+      spyOn(AjaxExtensions, 'ggrcAjax')
+        .and.returnValue(Promise.resolve('<div></div>'));
+      spyOn(CanStacheUtils, 'default');
     });
 
     it('doesn\'t render if DOM element is null', function () {
@@ -105,7 +109,7 @@ describe('TreeViewNode Controller', function () {
 
       ctrlInst = {
         element: $tree,
-        options: new can.Map({
+        options: new canMap({
           show_view: '/foo/bar.stache',
         }),
         _ifNotRemoved: jasmine.createSpy().and.callFake(function (callback) {

@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canControl from 'can-control';
 import '../components/info-pin-buttons/info-pin-buttons';
 import '../components/questions-link/questions-link';
 import '../components/info-pane/info-pane-footer';
@@ -36,7 +39,7 @@ export const pinContentHiddenClass = 'pin-content--hidden';
 export const pinContentMaximizedClass = 'pin-content--maximized';
 export const pinContentMinimizedClass = 'pin-content--minimized';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     view: GGRC.templates_path + '/base_objects/info.stache',
   },
@@ -85,11 +88,11 @@ export default can.Control.extend({
           },
         };
 
-        $.ajax({
+        ggrcAjax({
           url: view,
           dataType: 'text',
         }).then((view) => {
-          let frag = can.stache(view)(context);
+          let frag = canStache(view)(context);
           this.element.html(frag);
         });
       });
@@ -158,7 +161,7 @@ export default can.Control.extend({
   },
   confirmEdit: function (instance, modalDetails) {
     let confirmDfd = $.Deferred();
-    let renderer = can.stache(modalDetails.description);
+    let renderer = canStache(modalDetails.description);
     confirm({
       modal_description: renderer(instance).textContent,
       modal_confirm: modalDetails.button,

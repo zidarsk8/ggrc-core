@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -19,7 +22,7 @@ const REQUIRED_FIELDS = Object.freeze([
   'is_verification_needed',
 ]);
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   instanceId: null,
   instanceType: null,
   tasks: [],
@@ -49,9 +52,9 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'object-tasks',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

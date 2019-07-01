@@ -3,12 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-export default can.Component.extend({
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
+export default canComponent.extend({
   tag: 'action-toolbar-control',
-  view: can.stache(
+  view: canStache(
     '<div class="action-toolbar__controls-item"><content/></div>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({}),
+  viewModel: canMap.extend({}),
 });
 

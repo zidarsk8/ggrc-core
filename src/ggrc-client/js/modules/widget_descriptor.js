@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canConstruct from 'can-construct';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
@@ -18,7 +19,7 @@ const widgetDescriptors = {};
 // content_controller_options: options passed directly to the content controller; the
 //   precise options depend on the controller itself.  They usually require instance
 //   and/or model and some view.
-export default can.Construct.extend({
+export default canConstruct.extend({
   /*
     make an info widget descriptor for a GGRC object
     You must provide:

@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './tree-header-selector';
 import './sub-tree-expander';
 import './sub-tree-wrapper';
@@ -63,7 +68,7 @@ import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     /**
      * Condition that adds into all request to server-side Query API
@@ -81,7 +86,7 @@ let viewModel = can.Map.extend({
     currentFilter: {
       type: String,
       get: function () {
-        let filters = can.makeArray(this.attr('filters'));
+        let filters = makeArray(this.attr('filters'));
         let additionalFilter = this.attr('additionalFilter');
 
         if (this.attr('advancedSearch.filter')) {
@@ -286,7 +291,7 @@ let viewModel = can.Map.extend({
     this.closeInfoPane();
   },
   getDepthFilter: function (deepLevel) {
-    let filters = can.makeArray(this.attr('filters'));
+    let filters = makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
       return options.query &&
@@ -486,11 +491,11 @@ let viewModel = can.Map.extend({
   advancedSearch: {
     open: false,
     filter: null,
-    request: can.List(),
-    filterItems: can.List(),
-    appliedFilterItems: can.List(),
-    mappingItems: can.List(),
-    appliedMappingItems: can.List(),
+    request: canList(),
+    filterItems: canList(),
+    appliedFilterItems: canList(),
+    mappingItems: canList(),
+    appliedMappingItems: canList(),
   },
   openAdvancedFilter: function () {
     this.attr('advancedSearch.filterItems',
@@ -504,7 +509,7 @@ let viewModel = can.Map.extend({
   applyAdvancedFilters: function () {
     let filters = this.attr('advancedSearch.filterItems').attr();
     let mappings = this.attr('advancedSearch.mappingItems').attr();
-    let request = can.List();
+    let request = canList();
     let advancedFilters;
 
     this.attr('advancedSearch.appliedFilterItems', filters);
@@ -522,16 +527,16 @@ let viewModel = can.Map.extend({
     this.onFilter();
   },
   removeAdvancedFilters: function () {
-    this.attr('advancedSearch.appliedFilterItems', can.List());
-    this.attr('advancedSearch.appliedMappingItems', can.List());
-    this.attr('advancedSearch.request', can.List());
+    this.attr('advancedSearch.appliedFilterItems', canList());
+    this.attr('advancedSearch.appliedMappingItems', canList());
+    this.attr('advancedSearch.request', canList());
     this.attr('advancedSearch.filter', null);
     this.attr('advancedSearch.open', false);
     this.onFilter();
   },
   resetAdvancedFilters: function () {
-    this.attr('advancedSearch.filterItems', can.List());
-    this.attr('advancedSearch.mappingItems', can.List());
+    this.attr('advancedSearch.filterItems', canList());
+    this.attr('advancedSearch.mappingItems', canList());
   },
   closeInfoPane: function () {
     $('.pin-content')
@@ -659,9 +664,9 @@ let viewModel = can.Map.extend({
 /**
  *
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-widget-container',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   init: function () {
@@ -681,7 +686,7 @@ export default can.Component.extend({
     ' selectTreeItem': function (el, ev, selectedEl, instance) {
       let parent = this.viewModel.attr('parent_instance');
       let setInstanceDfd;
-      let infoPaneOptions = new can.Map({
+      let infoPaneOptions = new canMap({
         instance: instance,
         parent_instance: parent,
         options: this.viewModel,

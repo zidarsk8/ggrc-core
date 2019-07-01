@@ -2,6 +2,11 @@
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './mapper-results-item';
 import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
@@ -32,11 +37,11 @@ import {isMegaMapping as isMegaMappingUtil} from '../../plugins/utils/mega-objec
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'mapper-results',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       paging: {
         value: function () {
@@ -324,7 +329,7 @@ export default can.Component.extend({
       }
     },
     setSelectedItems: function (allItems) {
-      let selectedItems = can.makeArray(this.attr('selected'));
+      let selectedItems = makeArray(this.attr('selected'));
 
       allItems.forEach(function (item) {
         item.isSelected =

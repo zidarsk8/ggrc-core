@@ -3,11 +3,15 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import moment from 'moment';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../release-notes-list/release-notes-list';
 
 import template from './release-notes-modal.stache';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     shortVersion: {
       type: 'string',
@@ -29,9 +33,9 @@ const viewModel = can.Map.extend({
   modalTitle: 'What\'s new',
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'release-notes-modal',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
 });

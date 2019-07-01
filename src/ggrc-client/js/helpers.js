@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import moment from 'moment';
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
 import Spinner from 'spin.js';
 import isFunction from 'can-util/js/is-function/is-function';
 import {
@@ -83,7 +88,7 @@ $.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
  * @param  {Object} [options.computeSeparator=''] separator which replaces whitespaces in computed value
  * @return {String} computed class string
  */
-can.stache.registerHelper('addclass', function (prefix, compute, options = {}) {
+canStache.registerHelper('addclass', function (prefix, compute, options = {}) {
   prefix = resolveComputed(prefix);
   let computeVal = resolveComputed(compute);
   let opts = options.hash || {};
@@ -98,8 +103,8 @@ can.stache.registerHelper('addclass', function (prefix, compute, options = {}) {
 });
 
 // Resolve and return the first computed value from a list
-can.stache.registerHelper('firstexist', function () {
-  let args = can.makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
+canStache.registerHelper('firstexist', function () {
+  let args = makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
   for (let i = 0; i < args.length; i++) {
     let v = resolveComputed(args[i]);
     if (v && v.length) {
@@ -110,8 +115,8 @@ can.stache.registerHelper('firstexist', function () {
 });
 
 // Return the first value from a list that computes to a non-empty string
-can.stache.registerHelper('firstnonempty', function () {
-  let args = can.makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
+canStache.registerHelper('firstnonempty', function () {
+  let args = makeArray(arguments).slice(0, arguments.length - 1); // ignore the last argument (some Can object)
   for (let i = 0; i < args.length; i++) {
     let v = resolveComputed(args[i]);
     if (v !== null && v !== undefined && !!v.toString()
@@ -120,17 +125,9 @@ can.stache.registerHelper('firstnonempty', function () {
   return '';
 });
 
-can.stache.registerHelper('is_empty', (data, options) => {
-  data = resolveComputed(data);
-  const result = can.isEmptyObject(
-    can.isPlainObject(data) ? data : data.attr()
-  );
-  return options[result ? 'fn' : 'inverse'](options.contexts);
-});
-
 // Like 'render', but doesn't serialize the 'context' object, and doesn't
 // apply options.hash
-can.stache.registerHelper('renderLive', function (template, context, options) {
+canStache.registerHelper('renderLive', function (template, context, options) {
   if (!options) {
     options = context;
     context = this;
@@ -151,7 +148,7 @@ can.stache.registerHelper('renderLive', function (template, context, options) {
   }
 
   let view = GGRC.Templates[template];
-  return can.stache(view)(options.contexts);
+  return canStache(view)(options.contexts);
 });
 
 /**
@@ -162,7 +159,7 @@ can.stache.registerHelper('renderLive', function (template, context, options) {
  *    * date: MM/DD/YYYY),
  *    * datetime (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
-can.stache.registerHelper('date', function (date, hideTime) {
+canStache.registerHelper('date', function (date, hideTime) {
   date = isFunction(date) ? date() : date;
   return formatDate(date, hideTime);
 });
@@ -173,7 +170,7 @@ can.stache.registerHelper('date', function (date, hideTime) {
  *  @return {String} - datetime string in the following format:
  *  (MM/DD/YYYY hh:mm:ss [PM|AM] [local timezone])
  */
-can.stache.registerHelper('dateTime', function (date) {
+canStache.registerHelper('dateTime', function (date) {
   date = isFunction(date) ? date() : date;
   return getFormattedLocalDate(date);
 });
@@ -185,7 +182,7 @@ can.stache.registerHelper('dateTime', function (date) {
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
 let allowedActions = ['create', 'read', 'update', 'delete', '__GGRC_ADMIN__'];
-can.stache.registerHelper('is_allowed', function (...args) {
+canStache.registerHelper('is_allowed', function (...args) {
   let actions = [];
   let resource;
   let resourceType;
@@ -205,7 +202,7 @@ can.stache.registerHelper('is_allowed', function (...args) {
       actions.push(arg);
     } else if (typeof arg === 'string') {
       resourceType = arg;
-    } else if (typeof arg === 'object' && arg instanceof can.Map) {
+    } else if (typeof arg === 'object' && arg instanceof canMap) {
       resource = arg;
     }
   });
@@ -262,7 +259,7 @@ can.stache.registerHelper('is_allowed', function (...args) {
     options.inverse(options.contexts || this);
 });
 
-can.stache.registerHelper('any_allowed', function (action, data, options) {
+canStache.registerHelper('any_allowed', function (action, data, options) {
   let passed = [];
   let hasPassed;
   data = resolveComputed(data);
@@ -276,7 +273,7 @@ can.stache.registerHelper('any_allowed', function (action, data, options) {
   return options[hasPassed ? 'fn' : 'inverse'](options.contexts || this);
 });
 
-can.stache.registerHelper('is_allowed_to_map',
+canStache.registerHelper('is_allowed_to_map',
   function (source, target, options) {
     //  For creating mappings, we only care if the user has update permission on
     //  source and/or target.
@@ -294,7 +291,7 @@ can.stache.registerHelper('is_allowed_to_map',
     return options.inverse(options.contexts || this);
   });
 
-can.stache.registerHelper('is_allowed_to_create', (source, target, options) => {
+canStache.registerHelper('is_allowed_to_create', (source, target, options) => {
   let canCreate;
 
   source = resolveComputed(source);
@@ -313,7 +310,7 @@ function resolveComputed(maybeComputed, alwaysResolve) {
     resolveComputed(maybeComputed(), alwaysResolve) : maybeComputed;
 }
 
-can.stache.registerHelper('attach_spinner', function (spinOpts, styles) {
+canStache.registerHelper('attach_spinner', function (spinOpts, styles) {
   spinOpts = isFunction(spinOpts) ? spinOpts() : spinOpts;
   styles = isFunction(styles) ? styles() : styles;
   spinOpts = typeof spinOpts === 'string' ? JSON.parse(spinOpts) : {};
@@ -349,7 +346,7 @@ function localizeDate(date, options, tmpl, allowNonISO) {
   return '';
 }
 
-can.stache.registerHelper('localize_date',
+canStache.registerHelper('localize_date',
   function (date, allowNonISO, options) {
     // allowNonIso was not passed
     if (!options) {
@@ -359,7 +356,7 @@ can.stache.registerHelper('localize_date',
     return localizeDate(date, options, 'MM/DD/YYYY', allowNonISO);
   });
 
-can.stache.registerHelper('normalizeLink', (value) => {
+canStache.registerHelper('normalizeLink', (value) => {
   let link = resolveComputed(value);
   if (link) {
     link = link.replace(/^(?!(?:\w+:)?\/)/, 'http://');
@@ -368,32 +365,32 @@ can.stache.registerHelper('normalizeLink', (value) => {
   return link;
 });
 
-can.stache.registerHelper('lowercase', function (value, options) {
+canStache.registerHelper('lowercase', function (value, options) {
   value = resolveComputed(value) || '';
   return value.toLowerCase();
 });
 
-can.stache.registerHelper('is_dashboard', function (options) {
+canStache.registerHelper('is_dashboard', function (options) {
   return /dashboard/.test(window.location) ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
 });
 
-can.stache.registerHelper('is_dashboard_or_all', function (options) {
+canStache.registerHelper('is_dashboard_or_all', function (options) {
   return (/dashboard/.test(window.location) ||
     /objectBrowser/.test(window.location)) ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
 });
 
-can.stache.registerHelper('current_user_is_admin', function (options) {
+canStache.registerHelper('current_user_is_admin', function (options) {
   if (Permission.is_allowed('__GGRC_ADMIN__')) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
 });
 
-can.stache.registerHelper('urlPath', function () {
+canStache.registerHelper('urlPath', function () {
   return window.location.pathname;
 });
 
@@ -434,7 +431,7 @@ can.stache.registerHelper('urlPath', function () {
     conjunctions and disjunctions to one using a _.reduce(Array, function (Deferred, item) {}, $.when())
     pattern instead of _.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
-can.stache.registerHelper('if_helpers', function (...args) {
+canStache.registerHelper('if_helpers', function (...args) {
   let options = args[args.length - 1];
   let helperResult;
   let helperOptions = Object.assign({}, options, {
@@ -467,7 +464,7 @@ can.stache.registerHelper('if_helpers', function (...args) {
         if (match = arg.match(/^\\n\s*((and|or) )?([#^])?(\S+?)$/)) {
           statement = {
             fn_name: match[3] === '^' ? 'inverse' : 'fn',
-            helper: can.stache.getHelper(match[4], options.contexts),
+            helper: canStache.getHelper(match[4], options.contexts),
             args: [],
             logic: match[2] === 'or' ? 'or' : 'and',
           };
@@ -538,7 +535,7 @@ can.stache.registerHelper('if_helpers', function (...args) {
   }
 });
 
-can.stache.registerHelper('if_in', function (needle, haystack, options) {
+canStache.registerHelper('if_in', function (needle, haystack, options) {
   needle = resolveComputed(needle);
   haystack = resolveComputed(haystack).split(',');
 
@@ -548,7 +545,7 @@ can.stache.registerHelper('if_in', function (needle, haystack, options) {
   return options[found ? 'fn' : 'inverse'](options.contexts);
 });
 
-can.stache.registerHelper('if_instance_of', function (inst, cls, options) {
+canStache.registerHelper('if_instance_of', function (inst, cls, options) {
   let result;
   cls = resolveComputed(cls);
   inst = resolveComputed(inst);
@@ -567,7 +564,7 @@ can.stache.registerHelper('if_instance_of', function (inst, cls, options) {
   return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
-can.stache.registerHelper('ggrc_config_value',
+canStache.registerHelper('ggrc_config_value',
   function (key, default_, options) {
     key = resolveComputed(key);
     if (!options) {
@@ -579,7 +576,7 @@ can.stache.registerHelper('ggrc_config_value',
     return _.get(GGRC.config, key) || default_;
   });
 
-can.stache.registerHelper('if_config_exist', function (key, options) {
+canStache.registerHelper('if_config_exist', function (key, options) {
   key = resolveComputed(key);
   let configValue = _.get(GGRC.config, key);
 
@@ -588,7 +585,7 @@ can.stache.registerHelper('if_config_exist', function (key, options) {
     options.inverse(options.contexts);
 });
 
-can.stache.registerHelper('autocomplete_select', function (disableCreate, opt) {
+canStache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   let options = arguments[arguments.length - 1];
   let _disableCreate = isFunction(disableCreate) ?
     disableCreate() : disableCreate;
@@ -607,7 +604,7 @@ can.stache.registerHelper('autocomplete_select', function (disableCreate, opt) {
   };
 });
 
-can.stache.registerHelper('debugger', function () {
+canStache.registerHelper('debugger', function () {
   // This just gives you a helper that you can wrap around some code in a
   // template to see what's in the context. Dev tools need to be open for this
   // to work (in Chrome at least).
@@ -626,7 +623,7 @@ Example:
     {{log .}} // {example1: "a", example2: "b"}
   {{/add_to_current_scope}}
 */
-can.stache.registerHelper('add_to_current_scope', function (options) {
+canStache.registerHelper('add_to_current_scope', function (options) {
   return options.fn(options.contexts
     .add(_.assign({}, options.context, options.hash)));
 });
@@ -637,7 +634,7 @@ Add spaces to a CamelCase string.
 Example:
 {{un_camel_case "InProgress"}} becomes "In Progress"
 */
-can.stache.registerHelper('un_camel_case', function (str, toLowerCase) {
+canStache.registerHelper('un_camel_case', function (str, toLowerCase) {
   let value = isFunction(str) ? str() : str;
   toLowerCase = typeof toLowerCase !== 'object';
   if (!value) {
@@ -647,7 +644,7 @@ can.stache.registerHelper('un_camel_case', function (str, toLowerCase) {
   return toLowerCase ? value.toLowerCase() : value;
 });
 
-can.stache.registerHelper('modifyFieldTitle', function (type, field, options) {
+canStache.registerHelper('modifyFieldTitle', function (type, field, options) {
   let titlesMap = {
     Cycle: 'Cycle ',
     CycleTaskGroup: 'Group ',
@@ -658,7 +655,7 @@ can.stache.registerHelper('modifyFieldTitle', function (type, field, options) {
   return titlesMap[type] ? titlesMap[type] + field : field;
 });
 
-can.stache.registerHelper('is_auditor', function (options) {
+canStache.registerHelper('is_auditor', function (options) {
   const audit = getPageInstance();
   if (audit.type !== 'Audit') {
     console.warn('is_auditor called on non audit page');
@@ -671,7 +668,7 @@ can.stache.registerHelper('is_auditor', function (options) {
   return options.inverse(options.contexts);
 });
 
-can.stache.registerHelper('has_role', function (role, instance, options) {
+canStache.registerHelper('has_role', function (role, instance, options) {
   instance = isFunction(instance) ? instance() : instance;
   const acr = instance ? getRole(instance.type, role) : null;
 
@@ -691,7 +688,7 @@ can.stache.registerHelper('has_role', function (role, instance, options) {
   }
 });
 
-can.stache.registerHelper('isScopeModel', function (instance, options) {
+canStache.registerHelper('isScopeModel', function (instance, options) {
   const modelName = isFunction(instance) ? instance().type : instance.type;
 
   return isScopeModel(modelName) ? options.fn(this) : options.inverse(this);
@@ -703,7 +700,7 @@ can.stache.registerHelper('isScopeModel', function (instance, options) {
 
   @param object - the object we want to check
   */
-can.stache.registerHelper('if_recurring_workflow', function (object, options) {
+canStache.registerHelper('if_recurring_workflow', function (object, options) {
   object = isFunction(object) ? object() : object;
   if (object.type === 'Workflow' &&
       _.includes(['day', 'week', 'month'], object.unit)) {
@@ -713,7 +710,7 @@ can.stache.registerHelper('if_recurring_workflow', function (object, options) {
 });
 
 // Sets current "can" context into element data
-can.stache.registerHelper('canData',
+canStache.registerHelper('canData',
   (key, options) => {
     key = isFunction(key) ? key() : key;
 
@@ -723,7 +720,7 @@ can.stache.registerHelper('canData',
   }
 );
 
-can.stache.registerHelper('validateAttr',
+canStache.registerHelper('validateAttr',
   (instance, attrName, options) => {
     instance = isFunction(instance) ? instance() : instance;
     attrName = isFunction(attrName) ? attrName() : attrName;
@@ -735,7 +732,7 @@ can.stache.registerHelper('validateAttr',
   }
 );
 
-can.stache.registerHelper('isValidAttr',
+canStache.registerHelper('isValidAttr',
   (instance, attrName, options) => {
     instance = isFunction(instance) ? instance() : instance;
     attrName = isFunction(attrName) ? attrName() : attrName;
@@ -746,10 +743,10 @@ can.stache.registerHelper('isValidAttr',
   }
 );
 
-can.stache.registerHelper('isArray', (items, options) => {
+canStache.registerHelper('isArray', (items, options) => {
   items = isFunction(items) ? items() : items;
 
-  return _.isArray(items) || items instanceof can.List ?
+  return _.isArray(items) || items instanceof canList ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
 });

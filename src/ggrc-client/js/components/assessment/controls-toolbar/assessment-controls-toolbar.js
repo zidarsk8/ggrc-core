@@ -3,15 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../custom-attributes/custom-attributes-actions';
 import '../../object-state-toolbar/object-state-toolbar';
 import template from './assessment-controls-toolbar.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'assessment-controls-toolbar',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: null,
     verifiers: [],
     isInfoPaneSaving: false,

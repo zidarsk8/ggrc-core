@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canComponent from 'can-component';
 import './people-group-modal';
 import './editable-people-group-header';
 import '../autocomplete/autocomplete-component';
@@ -49,7 +51,7 @@ let viewModel = peopleGroupVM.extend({
     },
     /**
      * Contains people list which is displayed when editableMode is off
-     * @type {can.List}
+     * @type {canList}
      */
     showPeople: {
       get: function () {
@@ -97,9 +99,9 @@ let viewModel = peopleGroupVM.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'editable-people-group',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

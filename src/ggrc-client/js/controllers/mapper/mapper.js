@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canControl from 'can-control';
 import '../../components/assessment-template-clone/assessment-template-clone';
 import '../../components/object-bulk-update/object-bulk-update';
 import '../../components/object-mapper/object-mapper';
@@ -26,7 +28,7 @@ const DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
 const OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
   ' - Original Object is mandatory';
 
-const ObjectMapper = can.Control.extend({
+const ObjectMapper = canControl.extend({
   defaults: {
     component: objectMapperTemplate,
   },
@@ -195,7 +197,7 @@ const ObjectMapper = can.Control.extend({
   },
 }, {
   init: function () {
-    let frag = can.stache(this.options.component)(this.options);
+    let frag = canStache(this.options.component)(this.options);
     this.element.html(frag);
   },
 });

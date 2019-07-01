@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import moment from 'moment';
+import {ggrcAjax} from '../ajax_extensions';
+
 const currentUserId = GGRC.current_user.id;
 
 export const jobStatuses = {
@@ -63,7 +66,7 @@ export const deleteExportJob = (jobId) => {
 };
 
 export const downloadTemplate = (request) => {
-  return $.ajax({
+  return ggrcAjax({
     type: 'POST',
     headers: $.extend({
       'Content-Type': 'application/json',
@@ -193,5 +196,5 @@ const request = (url, type = 'POST', data) => {
     params.data = data;
   }
 
-  return $.ajax(params);
+  return ggrcAjax(params);
 };

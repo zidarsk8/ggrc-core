@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import Component from '../export-panel';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -10,7 +11,7 @@ describe('export-panel component', function () {
   let viewModel;
 
   let panel = {
-    attributes: new can.List([
+    attributes: new canList([
       {id: 1, isSelected: false},
     ]),
     mappings: [

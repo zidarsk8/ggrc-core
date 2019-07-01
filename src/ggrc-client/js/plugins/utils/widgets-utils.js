@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
 import * as TreeViewUtils from './tree-view-utils';
 import {
   batchRequests,
@@ -29,7 +31,7 @@ import {
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Person from '../../models/business-models/person';
 
-let widgetsCounts = new can.Map({});
+let widgetsCounts = new canMap({});
 let cachedObjects = {};
 
 let CUSTOM_COUNTERS = {
@@ -104,7 +106,7 @@ function getDefaultWidgets(widgetList, path) {
 /**
  * Counts for related objects.
  *
- * @return {can.Map} Promise which return total count of objects.
+ * @return {canMap} Promise which return total count of objects.
  */
 function getCounts() {
   return widgetsCounts;
@@ -113,7 +115,7 @@ function getCounts() {
 function initWidgetCounts(widgets, type, id) {
   let resultsArray = [];
 
-  let widgetConfigs = getWidgetConfigs(can.makeArray(widgets));
+  let widgetConfigs = getWidgetConfigs(makeArray(widgets));
 
   // custom endpoint we use only in order to initialize counts for all tabs.
   // In order to update counter for individual tab need to use Query API

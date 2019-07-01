@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './mapper-results-item-status';
 import './mapper-results-item-details';
 import './mapper-results-item-attrs';
@@ -11,7 +14,7 @@ import template from './templates/mapper-results-item.stache';
 import Snapshot from '../../models/service-models/snapshot';
 import * as businessModels from '../../models/business-models';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   itemData: {},
   searchOnly: false,
   drawRelatedAssessments: false,
@@ -71,9 +74,9 @@ const events = {
   },
 };
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'mapper-results-item',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events,

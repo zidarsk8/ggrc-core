@@ -3,15 +3,18 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../form/fields/dropdown-form-field';
 import '../person/person-data';
 import template from './readonly-inline-content.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'readonly-inline-content',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     withReadMore: false,
     options: [],
     value: '',

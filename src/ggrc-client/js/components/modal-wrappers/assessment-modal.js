@@ -3,14 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   toObject,
 } from '../../plugins/utils/snapshot-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'assessment-modal',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: null,
     isNewInstance: false,
     mappedObjects: [],

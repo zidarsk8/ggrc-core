@@ -2,9 +2,15 @@
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
 // Disabling some minor eslint rules until major refactoring
 /* eslint-disable no-console, id-length */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canBatch from 'can-event/batch/batch';
+import canModel from 'can-model';
+import canList from 'can-list';
+import canMap from 'can-map';
 import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
 import {
   isSnapshot,
@@ -18,8 +24,8 @@ import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
 
-export default can.Model.extend({
-  ajax: $.ajax,
+export default canModel.extend({
+  ajax: ggrcAjax,
   root_object: '',
   attr_list: [
     {
@@ -256,7 +262,7 @@ export default can.Model.extend({
       return new this.List();
     }
     ms = this._super(params);
-    if (params instanceof can.Map || params instanceof can.List) {
+    if (params instanceof canMap || params instanceof canList) {
       params.replace(ms);
       return params;
     }
@@ -275,16 +281,16 @@ export default can.Model.extend({
 
       start = Date.now();
       while (sourceData.length > index && (Date.now() - start) < ms) {
-        can.batch.start();
+        canBatch.start();
         item = sourceData[index];
         index += 1;
         models = self.models([item]);
         instances.push(...models);
-        can.batch.stop();
+        canBatch.stop();
       }
-      can.batch.start();
+      canBatch.start();
       obsList.push(...instances);
-      can.batch.stop();
+      canBatch.stop();
     }
 
     // Trigger a setTimeout loop to modelize remaining objects
@@ -415,7 +421,7 @@ export default can.Model.extend({
         data: data,
       }, params);
 
-      return can.ajax(ajaxOptions).then(function (response) {
+      return ggrcAjax(ajaxOptions).then(function (response) {
         let collection = response[that.root_collection + '_collection'];
         let paginator = makePaginator(collection.paging, params, scope);
         let ret = {
@@ -610,7 +616,7 @@ export default can.Model.extend({
           let stopFn = tracker.start(that.type,
             tracker.USER_JOURNEY_KEYS.API,
             tracker.USER_ACTIONS.LOAD_OBJECT);
-          can.ajax({
+          ggrcAjax({
             url: href,
             params: params,
             type: 'get',

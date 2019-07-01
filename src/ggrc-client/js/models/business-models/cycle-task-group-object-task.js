@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import moment from 'moment';
 import Cacheable from '../cacheable';
 import CycleTaskGroup from './cycle-task-group';
 import Workflow from './workflow';

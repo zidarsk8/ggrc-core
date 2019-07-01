@@ -3,10 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 describe('CanJS extensions', () => {
   describe('sort extension', () => {
     it('should sort strings. Do not use predicate', () => {
-      let list = new can.List(['b', 'd', 'a', 'c']);
+      let list = new canList(['b', 'd', 'a', 'c']);
       let cid = list._cid;
 
       let sortedList = list.sort();
@@ -19,7 +20,7 @@ describe('CanJS extensions', () => {
     });
 
     it('should sort DESC strings. Use predicate', () => {
-      let list = new can.List(['b', 'd', 'a', 'c']);
+      let list = new canList(['b', 'd', 'a', 'c']);
       let cid = list._cid;
       let predicate = (a, b) => a < b ? 1 : -1;
 
@@ -33,7 +34,7 @@ describe('CanJS extensions', () => {
     });
 
     it('should sort ASC objects', () => {
-      let list = new can.List([
+      let list = new canList([
         {
           id: 3,
         }, {
@@ -55,7 +56,7 @@ describe('CanJS extensions', () => {
     });
 
     it('should sort DESC objects', () => {
-      let list = new can.List([
+      let list = new canList([
         {
           id: 3,
         }, {

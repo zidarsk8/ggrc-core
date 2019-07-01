@@ -3,11 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './collapsible-panel-header';
 import './collapsible-panel-body';
 import template from './collapsible-panel.stache';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   titleText: '',
   titleIcon: '',
   extraCssClass: '',
@@ -27,9 +30,9 @@ let viewModel = can.Map.extend({
 /**
  * Collapsible Panel component to add expand/collapse behavior
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'collapsible-panel',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: false,
   viewModel,
 });

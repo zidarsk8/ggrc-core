@@ -3,17 +3,20 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import Comment from '../../models/service-models/comment';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'comment-add-button',
-  view: can.stache(
+  view: canStache(
     '<button type="button" class="btn btn-small btn-gray"' +
     ' on:el:click="createComment()">' +
     '<content/></button>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       disabled: {
         get: function () {

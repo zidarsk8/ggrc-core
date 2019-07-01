@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   buildModifiedACL,
   buildModifiedListField,
@@ -12,11 +15,11 @@ import Revision from '../../models/service-models/revision';
 
 import template from './templates/review-proposal.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'review-proposal',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       buttonView: {
         get() {
@@ -69,7 +72,7 @@ export default can.Component.extend({
     buildModifiedRevision(originalRevision) {
       const diff = this.attr('proposal.content');
       const diffAttributes = diff.custom_attribute_values;
-      const rightRevision = new can.Map({
+      const rightRevision = new canMap({
         id: originalRevision.id,
         content: Object.assign({}, originalRevision.content.attr()),
       });
@@ -87,7 +90,7 @@ export default can.Component.extend({
       this.openRevisionComparer();
     },
     applyFields(instance, modifiedFields) {
-      const fieldNames = can.Map.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
 
       fieldNames.forEach((fieldName) => {
         const modifiedField = modifiedFields[fieldName];
@@ -99,7 +102,7 @@ export default can.Component.extend({
       instance.access_control_list = modifiedACL;
     },
     applyListFields(instance, modifiedFields) {
-      const fieldNames = can.Map.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
       fieldNames.forEach((fieldName) => {
         const items = instance[fieldName];
         const modifiedItems = modifiedFields[fieldName];

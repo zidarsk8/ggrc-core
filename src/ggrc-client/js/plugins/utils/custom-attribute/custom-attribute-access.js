@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 import CustomAttributeObject from './custom-attribute-object';
 import {CUSTOM_ATTRIBUTE_TYPE} from './custom-attribute-config';
 import {
@@ -28,7 +30,7 @@ import {
 export default class CustomAttributeAccess {
   /**
    * Creates CustomAttributeAccess instance.
-   * @param {can.Map} instance - The instance of some object.
+   * @param {canMap} instance - The instance of some object.
    */
   constructor(instance) {
     this._instance = instance;
@@ -60,15 +62,15 @@ export default class CustomAttributeAccess {
    *  Options: {@link Options} gives ability to filter custom attributes by
    *  certain rules.
    *  number: Gives ability to find the custom attriubte by passed custom attribute id.
-   * @return {CustomAttributeObject|can.List<CustomAttributeObject>|undefined} - Custom
+   * @return {CustomAttributeObject|canList<CustomAttributeObject>|undefined} - Custom
    *  attriubtes or ceratain custom attriubte.
    */
   read(arg) {
     if (!arg) {
-      return new can.List(this._caObjects);
+      return new canList(this._caObjects);
     } else if (arg instanceof Object) {
       const options = arg;
-      return new can.List(this._getFilteredCaObjects(options));
+      return new canList(this._getFilteredCaObjects(options));
     } else {
       const caId = arg;
       return this._findCaObjectByCaId(caId);
@@ -125,7 +127,7 @@ export default class CustomAttributeAccess {
       let caValue = this._findCaValueByCaId(caId, caValues);
 
       if (!caValue) {
-        caValue = new can.Map({});
+        caValue = new canMap({});
         caValues.push(caValue);
       }
 
@@ -169,9 +171,9 @@ export default class CustomAttributeAccess {
   /**
    * Returns filtered custom attribute objects by certain type.
    * @param {Options} options - {@link Options}.
-   * @param {can.List<CUSTOM_ATTRIBUTE_TYPE>} [options.type=CUSTOM_ATTRIBUTE_TYPE.GLOBAL] -
+   * @param {canList<CUSTOM_ATTRIBUTE_TYPE>} [options.type=CUSTOM_ATTRIBUTE_TYPE.GLOBAL] -
    *  {@link CUSTOM_ATTRIBUTE_TYPE}.
-   * @return {can.List<CustomAttributeObject>} - Filtered custom attribute objects.
+   * @return {canList<CustomAttributeObject>} - Filtered custom attribute objects.
    */
   _getFilteredCaObjects({type = CUSTOM_ATTRIBUTE_TYPE.GLOBAL}) {
     const caObjects = this._caObjects;
@@ -232,8 +234,8 @@ export default class CustomAttributeAccess {
   /**
    * Returns custom attribute value object which equals to сaId.
    * @param {number} caId - The custom attribute id.
-   * @param {Object[]|can.Map[]} caValues - Custom attribute values.
-   * @return {can.Map|undefined} - Custom attribute value if it was found
+   * @param {Object[]|canMap[]} caValues - Custom attribute values.
+   * @return {canMap|undefined} - Custom attribute value if it was found
    * else undefined.
    */
   _findCaValueByCaId(caId, caValues) {

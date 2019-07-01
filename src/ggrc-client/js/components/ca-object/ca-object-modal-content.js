@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../comment/comment-input';
 import '../comment/comment-add-button';
 import '../object-list-item/editable-document-object-list-item';
@@ -12,11 +15,11 @@ import tracker from '../../tracker';
 import {getAssigneeType} from '../../plugins/utils/comments-utils';
 import pubSub from '../../pub-sub';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'ca-object-modal-content',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       comment: {
         get() {

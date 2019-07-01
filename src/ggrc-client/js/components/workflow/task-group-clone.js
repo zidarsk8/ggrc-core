@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import Cacheable from '../../models/cacheable';
 import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 import {refreshTGRelatedItems} from '../../plugins/utils/workflow-utils';
@@ -32,9 +34,9 @@ let CloneTaskGroup = Cacheable.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'task-group-clone',
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     taskGroup: null,
   }),
   events: {

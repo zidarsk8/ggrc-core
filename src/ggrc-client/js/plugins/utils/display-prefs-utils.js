@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canList from 'can-list';
+import canMap from 'can-map';
 import * as LocalStorage from './local-storage-utils';
 
 const localStorageKey = 'display_prefs';
@@ -23,7 +26,7 @@ let preferences = null;
 /**
  * Creates new preferences object if nothing is saved
  * or reads existing preferences and caches them
- * @return {can.Map} user display preferences
+ * @return {canMap} user display preferences
  */
 function getPreferences() {
   if (preferences) {
@@ -33,9 +36,9 @@ function getPreferences() {
   let prefs = LocalStorage.get(localStorageKey);
 
   if (!prefs.length) {
-    preferences = new can.Map(LocalStorage.create(localStorageKey, {}));
+    preferences = new canMap(LocalStorage.create(localStorageKey, {}));
   } else {
-    preferences = new can.Map(prefs[0]);
+    preferences = new canMap(prefs[0]);
   }
 
   return preferences;
@@ -55,7 +58,7 @@ function clearPreferences() {
  * The other should be parts of path in preferences object
  */
 function saveObject() {
-  let args = can.makeArray(arguments);
+  let args = makeArray(arguments);
 
   let keyArgs = args.slice(0, args.length - 1);
   let value = args[args.length - 1];
@@ -73,7 +76,7 @@ function saveObject() {
 
 /**
  * Creates nesting objects when there are several key args
- * @param {can.Map} prefs preferences object
+ * @param {canMap} prefs preferences object
  * @param  {Array} keyArgs key parts
  */
 function createNestedProps(prefs, keyArgs) {
@@ -81,7 +84,7 @@ function createNestedProps(prefs, keyArgs) {
   keyArgs.forEach(function (arg) {
     let value = _.get(object, arg);
     if (!value) {
-      value = new can.Map();
+      value = new canMap();
       object.attr(arg, value);
     }
     object = value;
@@ -91,13 +94,13 @@ function createNestedProps(prefs, keyArgs) {
 /**
  * Gets saved preferences.
  * It accepts any string parameters which are parts of path in preferences object
- * @return {can.Map} required preferences
+ * @return {canMap} required preferences
  */
 function getObject(...args) {
   let prefs = getPreferences();
 
   let object = _.get(prefs, args) || {};
-  return new can.Map(object);
+  return new canMap(object);
 }
 
 /**
@@ -108,7 +111,7 @@ function getObject(...args) {
 function getTreeViewHeaders(modelName) {
   let value = getObject(pageToken, TREE_VIEW_HEADERS);
   if (!value.attr(modelName)) {
-    return new can.List();
+    return new canList();
   }
   return value.attr(modelName).attr('display_list');
 }
@@ -134,7 +137,7 @@ function setTreeViewHeaders(modelName, headers) {
 function getTreeViewStates(modelName) {
   let value = getObject(TREE_VIEW_STATES);
   if (!value.attr(modelName)) {
-    return new can.List();
+    return new canList();
   }
   return value.attr(modelName).attr('status_list');
 }

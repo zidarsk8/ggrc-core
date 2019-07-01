@@ -3,15 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../related-objects/related-assessments';
 import template from './show-related-assessments-button.stache';
 import {hasRelatedAssessments} from '../../plugins/utils/models-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'show-related-assessments-button',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       cssClasses: {
         type: String,

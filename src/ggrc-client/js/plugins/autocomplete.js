@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
 import {
   buildRelevantIdsQuery,
   batchRequests,
@@ -215,7 +218,7 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
 
   _renderMenu: function (ul, items) {
     let template = this.element.data('template');
-    let context = new can.Map(this._setup_menu_context(items));
+    let context = new canMap(this._setup_menu_context(items));
     let model = context.model;
     let $ul = $(ul);
 
@@ -268,11 +271,11 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
       /* webpackChunkName: "infiniteScroll" */
       '../controllers/infinite-scroll-controller'
     ).then(() => {
-      $.ajax({
+      ggrcAjax({
         url: GGRC.templates_path + template,
         dataType: 'text',
       }).then((view) => {
-        let frag = can.stache(view)(context);
+        let frag = canStache(view)(context);
         $ul.html(frag);
         new LhnTooltipsControl($ul);
         new InfiniteScrollControl($ul);

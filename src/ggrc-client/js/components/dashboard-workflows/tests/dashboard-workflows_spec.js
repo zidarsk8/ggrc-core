@@ -5,6 +5,7 @@
 
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../dashboard-workflows';
+import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 describe('dashboard-workflows component', () => {
   let viewModel;
@@ -155,7 +156,7 @@ describe('dashboard-workflows component', () => {
     });
 
     beforeEach(() => {
-      spyOn($, 'get').and.returnValue(new Promise(() => {}));
+      spyOn(AjaxUtils, 'ggrcGet').and.returnValue(new Promise(() => {}));
     });
 
     it('sets "isLoading" flag to true before loading of workflow statistic ' +
@@ -172,7 +173,7 @@ describe('dashboard-workflows component', () => {
 
       viewModel.initMyWorkflows();
 
-      expect($.get).toHaveBeenCalledWith(expectedPath);
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(expectedPath);
     });
 
     describe('after loading of workflow statistic', () => {
@@ -184,7 +185,8 @@ describe('dashboard-workflows component', () => {
           {data: 'Info about active workflow 1'},
           {data: 'Info about active workflow 2'},
         ],
-        $.get.and.returnValue(Promise.resolve({workflows: fakeWorkflows}));
+        AjaxUtils.ggrcGet
+          .and.returnValue(Promise.resolve({workflows: fakeWorkflows}));
 
         fakeConvertedWorkflows = [
           {data: 'Converted workflow item 1'},

@@ -3,13 +3,15 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canComponent from 'can-component';
 import '../../numberbox/numberbox-component';
 import template from './templates/numberbox-form-field.stache';
 import {TEXT_FORM_FIELD_VM} from './text-form-field';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'numberbox-form-field',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: TEXT_FORM_FIELD_VM,
   events: {

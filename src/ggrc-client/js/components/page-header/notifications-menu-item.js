@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './notifications-menu-item.stache';
 import NotificationConfig
   from '../../models/service-models/notification-config';
@@ -10,11 +13,11 @@ import Context from '../../models/service-models/context';
 
 const emailDigestType = 'Email_Digest';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'notifications-menu-item',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       emailDigest: {
         set(newValue) {

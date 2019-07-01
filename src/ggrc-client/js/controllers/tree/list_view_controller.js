@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import canCompute from 'can-compute';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
 import TreeLoader from './tree-loader';
 import {getCounts} from '../../plugins/utils/widgets-utils';
 
@@ -14,7 +19,7 @@ function modelListLoader(controller, params) {
     let collectionName = model.root_collection + '_collection';
     let collection = results[collectionName] || [];
 
-    page.resolve(new can.List(collection), results.paging);
+    page.resolve(new canList(collection), results.paging);
   });
   return page;
 }
@@ -43,9 +48,9 @@ export default TreeLoader.extend({
     if (!this.options.search_params) {
       this.options.search_params = {};
     }
-    this.options.state = new can.Map();
+    this.options.state = new canMap();
 
-    this.context = new can.Map({
+    this.context = new canMap({
       // FIXME: Needed?  Default `pager` to avoid binding issues.
       pager: {
         has_next: function () {
@@ -53,22 +58,22 @@ export default TreeLoader.extend({
         },
       },
     });
-    this.context.attr('has_next_page', can.compute(() => {
+    this.context.attr('has_next_page', canCompute(() => {
       let pager = this.context.attr('pager');
       return pager && pager.has_next && pager.has_next();
     }));
-    this.context.attr('has_prev_page', can.compute(() => {
+    this.context.attr('has_prev_page', canCompute(() => {
       let pager = this.context.attr('pager');
       return pager && pager.has_prev && pager.has_prev();
     }));
     this.context.attr(this.options);
 
     if (this.options.header_view) {
-      $.when(this.context, $.ajax({
+      $.when(this.context, ggrcAjax({
         url: this.options.header_view,
         dataType: 'text',
       })).then((ctx, view) => {
-        let frag = can.stache(view[0])(ctx);
+        let frag = canStache(view[0])(ctx);
         if (this.element) {
           this.element.prepend(frag);
         }
@@ -150,7 +155,7 @@ export default TreeLoader.extend({
 
     if (list) {
       if (!this.options.list) {
-        this.options.list = new can.List();
+        this.options.list = new canList();
         list.on('add', function (list, item, index) {
           that.enqueue_items(item);
         }).on('remove', function (list, item, index) {
@@ -168,11 +173,11 @@ export default TreeLoader.extend({
   },
 
   init_view: function () {
-    $.ajax({
+    ggrcAjax({
       url: this.options.list_view,
       dataType: 'text',
     }).then((view) => {
-      let frag = can.stache(view)(this.context);
+      let frag = canStache(view)(this.context);
       this.element.find('.spinner, .tree-structure').hide();
       this.element.append(frag).trigger('loaded');
       this.options.state.attr('loading', false);

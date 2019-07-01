@@ -3,11 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/tree-filter-input.stache';
 import router from '../../router';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     filter: {
       type: 'string',
@@ -73,9 +76,9 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-filter-input',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

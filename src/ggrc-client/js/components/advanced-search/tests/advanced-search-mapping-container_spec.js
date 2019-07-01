@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../advanced-search-mapping-container';
@@ -19,7 +20,7 @@ describe('advanced-search-mapping-container component', function () {
   describe('addMappingCriteria() method', function () {
     it('adds only criteria if list is empty', function () {
       let items;
-      viewModel.attr('items', can.List());
+      viewModel.attr('items', canList());
 
       viewModel.addMappingCriteria();
 
@@ -46,7 +47,7 @@ describe('advanced-search-mapping-container component', function () {
     it('transforms criteria to group with 2 criteria and operator inside',
       function () {
         let viewItems;
-        viewModel.attr('items', new can.List([
+        viewModel.attr('items', new canList([
           AdvancedSearch.create.mappingCriteria({field: 'first'}),
           AdvancedSearch.create.operator(),
           AdvancedSearch.create.mappingCriteria({field: 'second'}),

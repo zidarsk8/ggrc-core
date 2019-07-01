@@ -3,10 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import Permission from '../../permission';
 import {peopleWithRoleName} from '../../plugins/utils/acl-utils';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     canEdit: {
       get() {
@@ -51,7 +53,7 @@ const viewModel = can.Map.extend({
   instance: null,
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'nav-actions',
   leakScope: true,
   viewModel,

@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canList from 'can-list';
 import {
   initWidgets,
 } from '../../plugins/utils/widgets-utils';
@@ -23,7 +25,7 @@ import TreeViewControl from '../../controllers/tree/tree-view';
 import {DashboardControl} from '../../controllers/dashboard_controller';
 
 const sortByNameEmail = (list) => {
-  return new list.constructor(can.makeArray(list).sort(function (a, b) {
+  return new list.constructor(makeArray(list).sort(function (a, b) {
     a = a.person || a;
     b = b.person || b;
     a = (_.trim(a.name) || _.trim(a.email)).toLowerCase();
@@ -44,7 +46,7 @@ gapiClient.loadGapiClient();
 const adminListDescriptors = {
   people: {
     model: Person,
-    roles: new can.List(),
+    roles: new canList(),
     init: function () {
       let self = this;
       Role

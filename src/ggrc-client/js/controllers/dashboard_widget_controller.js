@@ -3,13 +3,17 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import {getDashboards} from '../plugins/utils/dashboards-utils';
 import {
   getPageModel,
   getPageInstance,
 } from '../plugins/utils/current-page-utils';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),
@@ -21,7 +25,7 @@ export default can.Control.extend({
     let dashboards = getDashboards(options.instance);
     let $element = $(this.element);
 
-    options.context = new can.Map({
+    options.context = new canMap({
       model: options.model,
       instance: options.instance,
       dashboards: dashboards,
@@ -31,11 +35,11 @@ export default can.Control.extend({
         this.attr('activeDashboard', dashboard);
       },
     });
-    $.ajax({
+    ggrcAjax({
       url: options.widget_view,
       dataType: 'text',
     }).then((view) => {
-      let frag = can.stache(view)(options.context);
+      let frag = canStache(view)(options.context);
       $element.html(frag);
     });
     return 0;

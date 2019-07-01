@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {REFRESH_PROPOSAL_DIFF} from '../../events/eventTypes';
 import DiffBaseVM from './diff-base-vm';
 import template from './templates/instance-diff-items.stache';
@@ -12,7 +15,7 @@ const viewModel = DiffBaseVM.extend({
   buildDiffObject() {
     const instance = this.attr('currentInstance');
     const modifiedFields = this.attr('modifiedFields');
-    const fieldsKeys = can.Map.keys(modifiedFields);
+    const fieldsKeys = canMap.keys(modifiedFields);
 
     const diff = fieldsKeys.map((key) => {
       const modifiedVal = modifiedFields[key];
@@ -49,9 +52,9 @@ const viewModel = DiffBaseVM.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'instance-fields-diff',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
   events: {

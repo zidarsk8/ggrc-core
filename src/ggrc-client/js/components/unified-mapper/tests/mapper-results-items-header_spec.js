@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../mapper-results-items-header';
 
@@ -20,12 +22,12 @@ describe('mapper-results-items-header component', function () {
       viewModel.attr('columns', [0, 1]);
       viewModel.attr('serviceColumns', [2]);
       const result = viewModel.aggregatedColumns();
-      expect(can.makeArray(result)).toEqual([0, 1, 2]);
+      expect(makeArray(result)).toEqual([0, 1, 2]);
     });
   });
 
   describe('isSorted() method', function () {
-    let attr = new can.Map({
+    let attr = new canMap({
       attr_sort_field: 'Title',
     });
 
@@ -68,7 +70,7 @@ describe('mapper-results-items-header component', function () {
 
     it('toggles sort direction if sorted by current attribute',
       function () {
-        let attr = new can.Map({
+        let attr = new canMap({
           attr_sort_field: 'Title',
         });
         viewModel.applySort(attr);
@@ -77,7 +79,7 @@ describe('mapper-results-items-header component', function () {
 
     it('changes sortKey if sorted by another attribute',
       function () {
-        let attr = new can.Map({
+        let attr = new canMap({
           attr_sort_field: 'State',
         });
         viewModel.applySort(attr);
@@ -86,7 +88,7 @@ describe('mapper-results-items-header component', function () {
 
     it('sets sortDirection to "asc" if sorted by another attribute',
       function () {
-        let attr = new can.Map({
+        let attr = new canMap({
           attr_sort_field: 'State',
         });
         viewModel.applySort(attr);

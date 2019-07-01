@@ -3,10 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../sort-component/sort-component';
 import template from './templates/tree-view.stache';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     notResult: {
       type: Boolean,
@@ -26,9 +29,9 @@ let viewModel = can.Map.extend({
   depthFilter: '',
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-view',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
 });

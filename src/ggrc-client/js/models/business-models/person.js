@@ -8,6 +8,7 @@ import tracker from '../../tracker';
 import caUpdate from '../mixins/ca-update';
 import Stub from '../stub';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
 export default Cacheable.extend({
   root_object: 'person',
@@ -95,7 +96,7 @@ export default Cacheable.extend({
       tracker.USER_JOURNEY_KEYS.API,
       tracker.USER_ACTIONS.API.COUNTS_MY_WORK);
 
-    return $.get(url)
+    return ggrcGet(url)
       .then((counts) => {
         stopFn();
         return counts;
@@ -108,7 +109,7 @@ export default Cacheable.extend({
       tracker.USER_JOURNEY_KEYS.API,
       tracker.USER_ACTIONS.API.COUNTS_ALL_OBJECTS);
 
-    return $.get(url)
+    return ggrcGet(url)
       .then((counts) => {
         stopFn();
         return counts;
@@ -121,7 +122,7 @@ export default Cacheable.extend({
       tracker.USER_JOURNEY_KEYS.API,
       tracker.USER_ACTIONS.API.TASKS_COUNT);
 
-    return $.get(url)
+    return ggrcGet(url)
       .then((counts) => {
         stopFn();
         return counts;

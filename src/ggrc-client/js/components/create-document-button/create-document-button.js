@@ -3,6 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   uploadFiles,
 } from '../../plugins/utils/gdrive-picker-utils';
@@ -18,8 +22,9 @@ import Permission from '../../permission';
 import template from './create-document-button.stache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
+import {ggrcPost} from '../../plugins/ajax_extensions';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   parentInstance: null,
   openPicker() {
     return uploadFiles()
@@ -48,13 +53,13 @@ const viewModel = can.Map.extend({
           this.useExistingDocuments(existingDocuments),
           this.createDocuments(newFiles)
         ).then((existingDocs, newDocs) => {
-          return [...can.makeArray(existingDocs), ...can.makeArray(newDocs)];
+          return [...makeArray(existingDocs), ...makeArray(newDocs)];
         });
       })
       .then((documents) => this.refreshPermissionsAndMap(documents));
   },
   checkDocumentsExist(files) {
-    return $.post('/api/document/documents_exist', {
+    return ggrcPost('/api/document/documents_exist', {
       gdrive_ids: files.map((file) => file.id),
     });
   },
@@ -62,7 +67,7 @@ const viewModel = can.Map.extend({
    * Adds current user to admins for existing document
    */
   makeAdmin(documents) {
-    return $.post('/api/document/make_admin', {
+    return ggrcPost('/api/document/make_admin', {
       gdrive_ids: documents.map((document) => document.gdrive_id),
     });
   },
@@ -140,9 +145,9 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'create-document-button',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
 });

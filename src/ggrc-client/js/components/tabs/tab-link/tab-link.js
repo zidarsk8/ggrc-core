@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-const viewModel = can.Map.extend({
+import canMap from 'can-map';
+import canComponent from 'can-component';
+const viewModel = canMap.extend({
   tabType: 'link',
   instance: null,
   titleText: '',
@@ -15,7 +17,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tab-link',
   leakScope: true,
   viewModel,

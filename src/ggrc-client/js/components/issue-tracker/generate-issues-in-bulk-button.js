@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/generate-issues-in-bulk-button.stache';
 import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
@@ -13,11 +17,11 @@ import pubSub from '../../pub-sub';
 const DEFAULT_TIMEOUT = 2000;
 const MAX_TIMEOUT = 60000;
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'generate-issues-in-bulk-button',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isAllowedToGenerate: {
         get() {
@@ -39,14 +43,14 @@ export default can.Component.extend({
       let url = '/background_task_status/' +
         `${this.attr('instance.type')}/${this.attr('instance.id')}`;
 
-      return can.ajax({
+      return ggrcAjax({
         method: 'GET',
         url,
         cache: false,
       });
     },
     generateChildrenIssues() {
-      return can.ajax({
+      return ggrcAjax({
         method: 'POST',
         url: '/generate_children_issues',
         data: JSON.stringify({

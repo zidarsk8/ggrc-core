@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './request-review-modal';
 import template from './templates/object-review.stache';
 import notificationTemplate from './templates/complete-review-notification.stache';
@@ -18,11 +21,11 @@ import {
 import {getRole} from '../../plugins/utils/acl-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'object-review',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       reviewStatus: {
         get() {

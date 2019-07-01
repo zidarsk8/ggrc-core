@@ -3,9 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import RefreshQueue from '../../models/refresh_queue';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   field: 'title',
   source: null,
   type: null,
@@ -22,7 +25,7 @@ const viewModel = can.Map.extend({
   },
   getItems: function () {
     let source = this.attr('source');
-    let sourceList = can.isArray(source) ? source : can.makeArray(source);
+    let sourceList = Array.isArray(source) ? source : makeArray(source);
     let deferred = $.Deferred();
     let readyItemsList;
 
@@ -58,7 +61,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-field-wrapper',
   leakScope: true,
   viewModel,

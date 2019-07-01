@@ -13,12 +13,13 @@ import Regulation from '../../business-models/regulation';
 import System from '../../business-models/system';
 import Issue from '../../business-models/issue';
 import Requirement from '../../business-models/requirement';
+import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 const ENDPOINT = '/api/related_assessments';
 
 describe('relatedAssessmentsLoader mixin', () => {
   beforeEach(() => {
-    spyOn($, 'get');
+    spyOn(AjaxUtils, 'ggrcGet');
   });
 
   describe('for Assessment model', () => {
@@ -59,7 +60,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
       model.getRelatedAssessments();
 
-      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(ENDPOINT, {
         object_id: 13,
         object_type: 'Control',
         limit: '0,5',
@@ -98,7 +99,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
       model.getRelatedAssessments();
 
-      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(ENDPOINT, {
         object_id: 1,
         object_type: 'Assessment',
         limit: '0,5',
@@ -110,7 +111,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
       model.getRelatedAssessments([0, 10]);
 
-      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(ENDPOINT, {
         object_id: 1,
         object_type: 'Assessment',
         limit: '0,10',
@@ -122,7 +123,7 @@ describe('relatedAssessmentsLoader mixin', () => {
 
       model.getRelatedAssessments([0, 10], [{field: 'foo', direction: 'asc'}]);
 
-      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(ENDPOINT, {
         object_id: 1,
         object_type: 'Assessment',
         limit: '0,10',
@@ -138,7 +139,7 @@ describe('relatedAssessmentsLoader mixin', () => {
         {field: 'bar', direction: 'desc'},
       ]);
 
-      expect($.get).toHaveBeenCalledWith(ENDPOINT, {
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(ENDPOINT, {
         object_id: 1,
         object_type: 'Assessment',
         limit: '0,10',

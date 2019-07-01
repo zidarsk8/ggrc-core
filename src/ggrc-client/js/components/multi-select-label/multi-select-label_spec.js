@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import * as LabelUtils from '../../plugins/utils/label-utils';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import Component from './multi-select-label';
@@ -24,7 +25,7 @@ describe('multi-select-label component', () => {
     });
 
     it('sets labelsBackup with new list of labels if value is true', () => {
-      let labels = new can.List([1, 2, 3]);
+      let labels = new canList([1, 2, 3]);
       vm.attr('instance', {
         labels: labels,
       });
@@ -47,8 +48,8 @@ describe('multi-select-label component', () => {
   });
 
   describe('labels setter', () => {
-    it('sets new can.List with setted values', () => {
-      let value = new can.List([{name: '1'}, {name: '2'}, {name: '3'}]);
+    it('sets new canList with setted values', () => {
+      let value = new canList([{name: '1'}, {name: '2'}, {name: '3'}]);
       let labels;
 
       vm.attr('labels', []);

@@ -3,13 +3,15 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
 import Relationship from '../../models/service-models/relationship';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'unmap-button',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     destination: {},
     source: {},
     isUnmapping: false,

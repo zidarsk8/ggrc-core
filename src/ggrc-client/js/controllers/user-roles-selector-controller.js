@@ -3,12 +3,18 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import Role from '../models/service-models/role';
 import Person from '../models/business-models/person';
 import UserRole from '../models/service-models/user-role';
 
 // Role Assignment Modal Selector
-const userRolesModalSelector = can.Control.extend({
+const userRolesModalSelector = canControl.extend({
   defaults: {
     base_modal_view:
       GGRC.templates_path + '/people_roles/base_modal.stache',
@@ -29,8 +35,8 @@ const userRolesModalSelector = can.Control.extend({
   },
 }, {
   init() {
-    this.rolesList = new can.List();
-    this.userRolesList = new can.List();
+    this.rolesList = new canList();
+    this.userRolesList = new canList();
 
     this.initContext();
     this.initView();
@@ -43,11 +49,11 @@ const userRolesModalSelector = can.Control.extend({
   initView() {
     let deferred = $.Deferred();
 
-    $.ajax({
+    ggrcAjax({
       url: this.options.base_modal_view,
       dataType: 'text',
     }).then((view) => {
-      let frag = can.stache(view)(this.context);
+      let frag = canStache(view)(this.context);
       $(this.element).html(frag);
       $(this.element).trigger('loaded');
       deferred.resolve();
@@ -67,7 +73,7 @@ const userRolesModalSelector = can.Control.extend({
   },
 
   initContext() {
-    this.context = new can.Map($.extend({
+    this.context = new canMap($.extend({
       rolesList: this.rolesList,
       selectedPerson: null,
       selectedOption: null,
@@ -89,7 +95,7 @@ const userRolesModalSelector = can.Control.extend({
     return Role.findAll(
       params,
       (options) => {
-        options = can.makeArray(_.sortBy(options, 'role_order'));
+        options = makeArray(_.sortBy(options, 'role_order'));
         const description =
           'This role allows a user access to the MyWork dashboard and ' +
           'applications Help files.';

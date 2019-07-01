@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canConstruct from 'can-construct';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
 import InfoWidget from '../controllers/info_widget_controller';
@@ -22,7 +23,7 @@ import {getPageInstance} from '../plugins/utils/current-page-utils';
   See the comments for WidgetDescriptor for details in what is necessary to define
   a widget descriptor.
 */
-export default can.Construct.extend({
+export default canConstruct.extend({
   modules: {},
   /*
     get_widget_list_for: return a keyed object of widget descriptors for the specified page type.

@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canList from 'can-list';
+import canMap from 'can-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
@@ -159,7 +162,7 @@ describe('mapper-results component', function () {
       viewModel.attr('object', 'Program');
       viewModel.attr('type', 'Control');
       viewModel.setColumnsConfiguration();
-      expect(can.makeArray(viewModel.attr('columns.service'))).toEqual([]);
+      expect(makeArray(viewModel.attr('columns.service'))).toEqual([]);
     });
   });
 
@@ -335,9 +338,9 @@ describe('mapper-results component', function () {
       key: 'mock3',
       direction: 'mock4',
     };
-    let mockFilterItems = new can.List(['filterItem']);
-    let mockMappingItems = new can.List(['mappingItem']);
-    let mockStatusItem = new can.Map({
+    let mockFilterItems = new canList(['filterItem']);
+    let mockMappingItems = new canList(['mappingItem']);
+    let mockStatusItem = new canMap({
       value: {
         items: ['statusItem'],
       },
@@ -702,7 +705,7 @@ describe('mapper-results component', function () {
         id: 123,
       });
       viewModel.disableItself(isMegaMapping, allItems);
-      expect(can.makeArray(viewModel.attr('disabledIds'))).toEqual([123]);
+      expect(makeArray(viewModel.attr('disabledIds'))).toEqual([123]);
     });
 
     it('assigns true to "isDisabled" for allItems ' +

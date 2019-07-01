@@ -3,6 +3,10 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   uploadFiles,
   findGDriveItemById,
@@ -20,11 +24,11 @@ import {
 import Context from '../../models/service-models/context';
 import * as businessModels from '../../models/business-models';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'ggrc-gdrive-picker-launcher',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isInactive: {
         get: function () {
@@ -197,7 +201,7 @@ export default can.Component.extend({
       });
       // waiting for all docs promises
       return $.when(...dfdDocs).then(() => {
-        return can.makeArray(arguments);
+        return makeArray(arguments);
       }, (xhr) => {
         notifierXHR('error', xhr);
       });

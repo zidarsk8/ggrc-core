@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './cycle-task-objects.stache';
 import {
   loadObjectsByStubs,
@@ -18,7 +21,7 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 
 const fields = ['id', 'type', 'title', 'viewLink'];
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   instance: null,
   mappedObjects: [],
   isLoading: false,
@@ -96,9 +99,9 @@ const events = {
   },
 };
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'cycle-task-objects',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   init,

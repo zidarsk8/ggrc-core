@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import component from '../workflow-start-cycle';
 import * as helpers from '../../../plugins/utils/workflow-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
@@ -23,7 +24,7 @@ describe('workflow-start-cycle component', () => {
 
     beforeEach(() => {
       handler = events.click;
-      workflow = new can.Map({
+      workflow = new canMap({
         refresh_all: jasmine.createSpy('refresh_all'),
         type: 'Type',
         id: 'ID',

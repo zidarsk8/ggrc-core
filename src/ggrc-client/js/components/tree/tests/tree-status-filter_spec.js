@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import Component from '../tree-status-filter';
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import router from '../../../router';
@@ -120,13 +121,13 @@ describe('tree-status-filter component', () => {
   describe('getDefaultStates() method', () => {
     let savedFilters;
     beforeEach(() => {
-      savedFilters = new can.List(['c', 'd']);
+      savedFilters = new canList(['c', 'd']);
       spyOn(savedFilters, 'filter').and.returnValue(['c']);
       spyOn(DisplayPrefs, 'getTreeViewStates').and.returnValue(savedFilters);
     });
 
     it('use filter set from query if it is presented', () => {
-      let queryFilters = new can.List(['a', 'b']);
+      let queryFilters = new canList(['a', 'b']);
       spyOn(queryFilters, 'filter').and.returnValue(['a']);
       router.attr('state', queryFilters);
 

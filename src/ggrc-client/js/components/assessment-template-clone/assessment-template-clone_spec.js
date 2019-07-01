@@ -3,7 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import Component from './assessment-template-clone';
+import * as AjaxUtils from '../../plugins/ajax_extensions';
 
 describe('assessment-template-clone component', () => {
   let events;
@@ -18,7 +20,7 @@ describe('assessment-template-clone component', () => {
 
     describe('inserted handler', () => {
       beforeEach(() => {
-        vm = new can.Map({
+        vm = new canMap({
           onSubmit: jasmine.createSpy(),
         });
         handler = events.inserted.bind({viewModel: vm});
@@ -116,7 +118,7 @@ describe('assessment-template-clone component', () => {
       let dfd;
 
       beforeEach(() => {
-        vm = new can.Map();
+        vm = new canMap();
         spyOn(vm, 'dispatch');
         dfd = new $.Deferred();
         that = {
@@ -194,12 +196,12 @@ describe('assessment-template-clone component', () => {
       let expectedResult;
 
       beforeEach(() => {
-        vm = new can.Map({
+        vm = new canMap({
           selected: [{id: 1}, {id: 2}, {id: 3}],
           join_object_id: 321,
         });
         expectedResult = 'mockDfd';
-        spyOn($, 'post').and.returnValue(expectedResult);
+        spyOn(AjaxUtils, 'ggrcPost').and.returnValue(expectedResult);
         handler = events.cloneObjects.bind({viewModel: vm});
       });
 
@@ -212,8 +214,10 @@ describe('assessment-template-clone component', () => {
           },
         }];
         expect(handler()).toBe(expectedResult);
-        expect($.post).toHaveBeenCalledWith('/api/assessment_template/clone',
-          expectedArguments);
+        expect(AjaxUtils.ggrcPost).toHaveBeenCalledWith(
+          '/api/assessment_template/clone',
+          expectedArguments
+        );
       });
     });
   });

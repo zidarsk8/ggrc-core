@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './external-data-provider';
 import './autocomplete-results';
 import '../spinner-component/spinner-component';
@@ -14,11 +17,11 @@ import template from './external-data-autocomplete.stache';
  * The autocomplete component used to load data from external sources.
  * When user picks an external item, system will create corresponding item in database.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'external-data-autocomplete',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       /**
        * The flag indicating that results will be rendered.
@@ -123,7 +126,7 @@ export default can.Component.extend({
     /**
      * Creates new model or returns existing from cache.
      * @param {Object} item - model data.
-     * @return {can.promise} - promise indicates state of operation.
+     * @return {Promise} - promise indicates state of operation.
      */
     createOrGet(item) {
       const type = this.attr('type');

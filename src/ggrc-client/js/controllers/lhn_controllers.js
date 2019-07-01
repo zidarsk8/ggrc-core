@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canCompute from 'can-compute';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import './infinite-scroll-controller';
 import tracker from '../tracker';
 import RefreshQueue from '../models/refresh_queue';
@@ -21,9 +26,9 @@ import '../components/questionnaire-create-link/questionnaire-create-link';
 import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
 import * as canBatch from 'can-event/batch/batch';
 
-const LhnControl = can.Control.extend({}, {
+const LhnControl = canControl.extend({}, {
   init: function () {
-    this.obs = new can.Map();
+    this.obs = new canMap();
 
     this.init_lhn();
 
@@ -351,7 +356,7 @@ const LhnControl = can.Control.extend({}, {
   },
 });
 
-const LhnSearchControl = can.Control.extend({
+const LhnSearchControl = canControl.extend({
   defaults: {
     list_view: 'base_objects/search_result',
     actions_view: 'base_objects/search_actions',
@@ -366,8 +371,8 @@ const LhnSearchControl = can.Control.extend({
     actions_content_selector: 'ul.sub-actions',
     limit: 50,
     observer: null,
-    filter_params: new can.Map(),
-    counts: new can.Map(),
+    filter_params: new canMap(),
+    counts: new canMap(),
   },
 }, {
   display: function () {
@@ -378,11 +383,11 @@ const LhnSearchControl = can.Control.extend({
     //  We also listen for this value in the controller
     //  to trigger the search.
     let view = GGRC.Templates[this.element.data('template')];
-    let frag = can.stache(view)(lhnPrefs);
+    let frag = canStache(view)(lhnPrefs);
     this.element.html(frag);
 
     let initialParams = {};
-    let savedFilters = lhnPrefs.filter_params || new can.Map();
+    let savedFilters = lhnPrefs.filter_params || new canMap();
 
     this.post_init();
 
@@ -684,8 +689,8 @@ const LhnSearchControl = can.Control.extend({
       let modelName;
       $list = $($list);
       modelName = self.get_list_model($list);
-      self.options.results_lists[modelName] = new can.List();
-      self.options.visible_lists[modelName] = new can.List();
+      self.options.results_lists[modelName] = new canList();
+      self.options.visible_lists[modelName] = new canList();
       self.options.visible_lists[modelName].attr('is_loading', true);
     });
   },
@@ -702,14 +707,14 @@ const LhnSearchControl = can.Control.extend({
         filter_params: self.options.filter_params,
         list: self.options.visible_lists[modelName],
         counts: self.options.counts,
-        count: can.compute(function () {
+        count: canCompute(function () {
           return self.options.results_lists[modelName].attr('length');
         }),
       };
 
       let listView = GGRC.Templates[
         $list.data('template') || self.options.list_view];
-      let listItem = can.stache(listView)(context);
+      let listItem = canStache(listView)(context);
       $list.find(self.options.list_content_selector).html(listItem);
 
       // If this category we're rendering is the one that is open, wait for the
@@ -725,7 +730,7 @@ const LhnSearchControl = can.Control.extend({
 
       let actionView = GGRC.Templates[
         $list.data('actions') || self.options.actions_view];
-      let actions = can.stache(actionView)(context);
+      let actions = canStache(actionView)(context);
       $list.find(self.options.actions_content_selector).html(actions);
     });
   },
