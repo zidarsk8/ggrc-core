@@ -139,6 +139,7 @@ const jqueryRequest = (type, url, data) => {
 };
 
 const ggrcGet = jqueryRequest.bind(null, 'get');
+const ggrcPost = jqueryRequest.bind(null, 'post');
 
 $(document).ajaxError(function (event, jqxhr, settings, exception) {
   if (!isExpectedError(jqxhr)) {
@@ -157,4 +158,5 @@ $(document).ajaxError(function (event, jqxhr, settings, exception) {
 export {
   ggrcAjax,
   ggrcGet,
+  ggrcPost,
 };

@@ -119,6 +119,9 @@
     }, {
       "object": "$",
       "property": "get"
+    }, {
+      "object": "$",
+      "property": "post"
     }]
   }
 }

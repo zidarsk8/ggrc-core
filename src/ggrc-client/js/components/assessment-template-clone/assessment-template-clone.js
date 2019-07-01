@@ -13,6 +13,7 @@ import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './assessment-template-clone.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
+import {ggrcPost} from '../../plugins/ajax_extensions';
 
 export default canComponent.extend({
   tag: 'assessment-template-clone',
@@ -70,7 +71,7 @@ export default canComponent.extend({
       let sourceIds = _.map(this.viewModel.attr('selected'), (item) => item.id);
       let destinationId = this.viewModel.attr('join_object_id');
 
-      return $.post('/api/assessment_template/clone', [{
+      return ggrcPost('/api/assessment_template/clone', [{
         sourceObjectIds: sourceIds,
         destination: {
           type: 'Audit',

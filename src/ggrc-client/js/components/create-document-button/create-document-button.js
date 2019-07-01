@@ -22,6 +22,7 @@ import Permission from '../../permission';
 import template from './create-document-button.stache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
+import {ggrcPost} from '../../plugins/ajax_extensions';
 
 const viewModel = canMap.extend({
   parentInstance: null,
@@ -58,7 +59,7 @@ const viewModel = canMap.extend({
       .then((documents) => this.refreshPermissionsAndMap(documents));
   },
   checkDocumentsExist(files) {
-    return $.post('/api/document/documents_exist', {
+    return ggrcPost('/api/document/documents_exist', {
       gdrive_ids: files.map((file) => file.id),
     });
   },
@@ -66,7 +67,7 @@ const viewModel = canMap.extend({
    * Adds current user to admins for existing document
    */
   makeAdmin(documents) {
-    return $.post('/api/document/make_admin', {
+    return ggrcPost('/api/document/make_admin', {
       gdrive_ids: documents.map((document) => document.gdrive_id),
     });
   },
