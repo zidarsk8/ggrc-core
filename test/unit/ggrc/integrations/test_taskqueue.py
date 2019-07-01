@@ -7,12 +7,7 @@ import unittest
 
 import mock
 
-from ggrc import db
-from ggrc.app import app
 from ggrc.cloud_api.task_queue import get_app_engine_tasks
-from ggrc.models import all_models
-
-from integration.ggrc.models import factories
 
 
 class TestTaskQueueAPI(unittest.TestCase):
@@ -62,41 +57,3 @@ class TestTaskQueueAPI(unittest.TestCase):
     ):
       tasks = get_app_engine_tasks("ggrc")
     self.assertEqual(tasks, ["reindex1542710631_29764"])
-
-
-class TestBackgroundTaskQueue(unittest.TestCase):
-  """Test class for background tasks in queue."""
-
-  def setUp(self):
-    super(TestBackgroundTaskQueue, self).setUp()
-
-    all_models.BackgroundTask.query.delete()
-    db.session.commit()
-
-  def test_bg_error_task(self):
-    """Test error BackgroundTask for success response."""
-    from ggrc.views import create_missing_revisions
-
-    with mock.patch(
-        "ggrc.views.app.make_response",
-        return_value=app.make_response(
-            ("error", 500, [("Content-Type", "text/html")])
-        )
-    ):
-      with mock.patch("ggrc.utils.revisions.do_missing_revisions"):
-        bg_task = factories.BackgroundTaskFactory(name="test_error_task_queue")
-        response = create_missing_revisions(bg_task)
-        self.assertEqual(response.status_code, 200)
-        db.session.delete(bg_task)
-        db.session.commit()
-
-  def test_bg_success_task(self):
-    """Test success BackgroundTask for success response."""
-    from ggrc.views import create_missing_revisions
-
-    with mock.patch("ggrc.utils.revisions.do_missing_revisions"):
-      bg_task = factories.BackgroundTaskFactory(name="test_success_task_queue")
-      response = create_missing_revisions(bg_task)
-      self.assertEqual(response.status_code, 200)
-      db.session.delete(bg_task)
-      db.session.commit()
