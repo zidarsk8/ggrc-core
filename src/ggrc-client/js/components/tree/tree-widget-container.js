@@ -221,7 +221,6 @@ let viewModel = canMap.extend({
   },
   filters: [],
   loaded: null,
-  refreshLoaded: true,
   canOpenInfoPin: true,
   savedSearchPermalink: '',
   pubSub,
@@ -279,8 +278,7 @@ let viewModel = canMap.extend({
     }
 
     if (!this.attr('loaded') || needToRefresh || router.attr('refetch')) {
-      let loadedItems = this.loadItems()
-        .then(() => this.setRefreshFlag(false)); // refreshed
+      let loadedItems = this.loadItems();
 
       this.attr('loaded', loadedItems);
     }
@@ -343,12 +341,6 @@ let viewModel = canMap.extend({
         options.depth &&
         options.filterDeepLimit > deepLevel;
     }).reduce(this._concatFilters, null);
-  },
-  setRefreshFlag: function (refresh) {
-    this.attr('refreshLoaded', refresh);
-  },
-  needToRefresh: function (refresh) {
-    return this.attr('refreshLoaded');
   },
   registerFilter: function (option) {
     this.attr('filters').push(option);

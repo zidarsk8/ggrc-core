@@ -53,15 +53,6 @@ describe('tree-widget-container component', function () {
       expect(vm.attr('loaded')).not.toBeNull();
     });
 
-    it('sets refreshLoaded flag in false after resolve loaded field',
-      function (done) {
-        display(true);
-        dfd.resolve().then(() => {
-          expect(vm.attr('refreshLoaded')).toBe(false);
-          done();
-        });
-      });
-
     it('returns value of loaded field', function () {
       let result;
       vm.attr('loaded', dfd);
@@ -168,56 +159,6 @@ describe('tree-widget-container component', function () {
         done();
       });
     });
-  });
-
-  describe('setRefreshFlag() method', function () {
-    let setRefreshFlag;
-
-    beforeEach(function () {
-      setRefreshFlag = vm.setRefreshFlag.bind(vm);
-      vm.attr('refreshLoaded', null);
-    });
-
-    it('sets refreshLoaded state in true if refresh param is true',
-      function () {
-        setRefreshFlag(true);
-        expect(vm.attr('refreshLoaded')).toBe(true);
-      });
-
-    it('sets refreshLoaded state in false if refresh param is false',
-      function () {
-        setRefreshFlag(false);
-        expect(vm.attr('refreshLoaded')).toBe(false);
-      });
-  });
-
-  describe('needToRefresh() method', function () {
-    let needToRefresh;
-    let setRefreshFlag;
-
-    beforeEach(function () {
-      needToRefresh = vm.needToRefresh.bind(vm);
-      setRefreshFlag = vm.setRefreshFlag.bind(vm);
-      vm.attr('refreshLoaded', null);
-    });
-
-    it('returns true if refreshLoaded field is true',
-      function () {
-        let result;
-        setRefreshFlag(true);
-        result = needToRefresh();
-
-        expect(result).toBe(true);
-      });
-
-    it('returns false if refreshLoaded field is false',
-      function () {
-        let result;
-        setRefreshFlag(false);
-        result = needToRefresh();
-
-        expect(result).toBe(false);
-      });
   });
 
   describe('on widget appearing', function () {

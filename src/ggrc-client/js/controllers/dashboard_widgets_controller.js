@@ -92,11 +92,8 @@ export default canControl.extend({
       let $containerVM = that.element
         .find('tree-widget-container')
         .viewModel();
-      let FORCE_REFRESH = true;
 
-      if (!that.content_controller && $containerVM.needToRefresh()) {
-        dfd = $containerVM.display(FORCE_REFRESH);
-      } else if (that.options.widgetType === 'treeview') {
+      if (that.options.widgetType === 'treeview') {
         dfd = $containerVM.display(refetch);
       } else if (that.content_controller && that.content_controller.display) {
         dfd = that.content_controller.display();
