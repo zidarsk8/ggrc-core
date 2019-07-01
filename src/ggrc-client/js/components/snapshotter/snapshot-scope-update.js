@@ -15,6 +15,7 @@ import {
 } from '../../plugins/utils/widgets-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import pubSub from '../../pub-sub';
+import {trigger} from 'can-event';
 
 export default canComponent.extend({
   tag: 'snapshot-scope-update',
@@ -57,11 +58,11 @@ export default canComponent.extend({
           return instance.save();
         })
         .then(this._refreshContainers.bind(this))
-        .then(function () {
-          this._updateVisibleContainer.bind(this)();
+        .then(() => {
+          this._updateVisibleContainer();
           this._showSuccessMsg();
           instance.dispatch('snapshotScopeUpdated');
-        }.bind(this));
+        });
     },
     _dismiss: loIdentity,
     _showProgressWindow: function () {
@@ -72,13 +73,12 @@ export default canComponent.extend({
     },
     _updateVisibleContainer: function () {
       let visibleContainer = $('tree-widget-container:visible');
-      let forceRefresh = true;
       if (visibleContainer.length === 0) {
         return;
       }
       // if a user switches to the snapshot tab during the audit refresh
       // then update the tab
-      visibleContainer.viewModel().display(forceRefresh);
+      trigger.call(visibleContainer[0], 'refreshTree');
     },
     _showSuccessMsg: function () {
       let message = 'Audit was refreshed successfully.';
