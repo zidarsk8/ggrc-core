@@ -4,6 +4,6 @@
 }}
 
 <dropdown-component className:from="'assessment-templates'"
-                    optionsList:from="templates"
+                    optionsList:from="optionsList"
                     name:bind="assessmentTemplate">
 </dropdown-component>

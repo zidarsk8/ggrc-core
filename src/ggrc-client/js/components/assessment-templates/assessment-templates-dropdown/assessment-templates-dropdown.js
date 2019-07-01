@@ -21,19 +21,20 @@ export default canComponent.extend({
   view: canStache(template),
   leakScope: true,
   viewModel: canMap.extend({
-    responses: [],
+    /**
+     * List of dropdown items, which represent assessment templates
+     */
+    optionsList: [],
     instance: null,
     assessmentTemplate: null,
-    templates() {
+    initDropdownOptions(templates) {
       const result = {};
-      const responses = this.attr('responses');
       const noValue = {
         title: 'No template',
         value: '',
       };
-      loForEach(responses, function (instance) {
-        let type;
-        type = instance.template_object_type;
+      loForEach(templates, (instance) => {
+        const type = instance.template_object_type;
         if (!result[type]) {
           result[type] = {
             group: type,
@@ -45,7 +46,8 @@ export default canComponent.extend({
           value: instance.id + '-' + type,
         });
       });
-      return [noValue].concat(loToArray(result));
+
+      this.attr('optionsList', [noValue].concat(loToArray(result)));
     },
     /**
      * Set the initial Assessment Template to be selected in the relevant
@@ -56,19 +58,23 @@ export default canComponent.extend({
      *
      * @param {Array} templates - a list of possible options for the dropdown
      */
-    _selectInitialTemplate(templates) {
+    selectInitialTemplate() {
+      const optionsList = this.attr('optionsList');
+
+
+      // The first element is a dummy option, thus if there are no other
+      // elements, simply don't pick anything.
+      if (optionsList.length < 2) {
+        return;
+      }
+
+      let initialTemplate;
       const WARN_EMPTY_GROUP = [
         'canComponent.assessmentTemplates: ',
         'An empty template group encountered, possible API error',
       ].join('');
-      let initialTemplate;
-      let nonDummyItem;
-      // The first element is a dummy option, thus if there are no other
-      // elements, simply don't pick anything.
-      if (templates.length < 2) {
-        return;
-      }
-      nonDummyItem = templates[1]; // a single item or an object group
+      const nonDummyItem = optionsList[1]; // a single item or an object group
+
       if (!nonDummyItem.group) {
         // a single item
         initialTemplate = nonDummyItem.value;
@@ -86,20 +92,21 @@ export default canComponent.extend({
           tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
       }
     },
+    initDropdown() {
+      const instance = this.attr('instance');
+      const param = buildParam('AssessmentTemplate', {}, {
+        type: instance.type,
+        id: instance.id,
+      }, ['id', 'type', 'title', 'template_object_type']);
+
+      batchRequests(param).then(({AssessmentTemplate: {values}}) => {
+        this.initDropdownOptions(values);
+        this.selectInitialTemplate();
+        this.dispatch('assessmentTemplateLoaded');
+      });
+    },
   }),
   init() {
-    const viewModel = this.viewModel;
-    const instance = viewModel.attr('instance');
-    const param = buildParam('AssessmentTemplate', {}, {
-      type: instance.type,
-      id: instance.id,
-    }, ['id', 'type', 'title', 'template_object_type']);
-
-    batchRequests(param).then((response) => {
-      const values = response.AssessmentTemplate.values;
-      viewModel.attr('responses', values);
-      viewModel._selectInitialTemplate(viewModel.templates());
-      viewModel.dispatch('assessmentTemplateLoaded');
-    });
+    this.viewModel.initDropdown();
   },
 });
