@@ -26,7 +26,7 @@
           <div class="object-controls__template">
             <h6>Assessment template</h6>
             <assessment-templates-dropdown instance:from="parentInstance"
-                                           assessmentTemplate:bind="assessmentTemplate"
+                                           on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)"
                                            on:assessmentTemplateLoaded="onSubmit()">
             </assessment-templates-dropdown>
           </div>

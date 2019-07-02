@@ -26,7 +26,20 @@ export default canComponent.extend({
      */
     optionsList: [],
     instance: null,
-    assessmentTemplate: null,
+    assessmentTemplate: '',
+    onTemplateChanged(value) {
+      let template = null;
+
+      if (value.length) {
+        const [id, objectType] = value.split('-');
+        template = {id: Number(id), objectType};
+      }
+
+      this.dispatch({
+        type: 'onTemplateChanged',
+        template,
+      });
+    },
     initDropdownOptions(templates) {
       const result = {};
       const noValue = {
@@ -108,5 +121,10 @@ export default canComponent.extend({
   }),
   init() {
     this.viewModel.initDropdown();
+  },
+  events: {
+    '{viewModel} assessmentTemplate'(viewModel, event, template) {
+      this.viewModel.onTemplateChanged(template);
+    },
   },
 });
