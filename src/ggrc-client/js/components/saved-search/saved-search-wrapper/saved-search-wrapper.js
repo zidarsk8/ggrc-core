@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canComponent from 'can-component';
+import canMap from 'can-map';
 import SavedSearch from '../../../models/service-models/saved-search';
 import Pagination from '../../base-objects/pagination';
 import {isMyWork} from '../../../plugins/utils/current-page-utils';
@@ -12,10 +14,10 @@ import {
 } from '../../../plugins/utils/advanced-search-utils';
 import * as BusinessModels from '../../../models/business-models';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'saved-search-wrapper',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isGlobalSearch: {
         get() {

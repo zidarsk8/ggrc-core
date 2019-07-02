@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canComponent from 'can-component';
+import canStache from 'can-stache';
+import canMap from 'can-map';
 import template from './saved-search-list.stache';
 import {
   buildSearchPermalink,
@@ -10,11 +13,11 @@ import {
 import isFunction from 'can-util/js/is-function/is-function';
 import '../../clipboard-link/clipboard-link';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'saved-search-list',
-  template: can.stache(template),
+  template: canStache(template),
   leakScope: false,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     objectName: '',
     modelName: '',
     searchType: '',

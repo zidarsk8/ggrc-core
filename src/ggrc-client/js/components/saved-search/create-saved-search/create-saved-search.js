@@ -3,16 +3,19 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canComponent from 'can-component';
+import canStache from 'can-stache';
+import canMap from 'can-map';
 import template from './create-saved-search.stache';
 import SavedSearch from '../../../models/service-models/saved-search';
 import {handleAjaxError} from '../../../plugins/utils/errors-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'create-saved-search',
-  template: can.stache(template),
+  template: canStache(template),
   leakScope: false,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     filterItems: null,
     mappingItems: null,
     statusItem: null,
