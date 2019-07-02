@@ -8,22 +8,19 @@
   Filter sub tree
 </a>
 
-<div class="sub-tree-models flex-box flex-col {{#if isActive}}active{{/if}}" on:el:click="innerClick(scope.event)">
+<div class="sub-tree-models flex-box flex-col {{#if isActive}}active{{/if}}">
   <h5>Select child tree object type for {{title}}</h5>
   <div class="flex-box sub-tree-models_select" style="justify-content: flex-end">
     <span on:el:click="selectNone(scope.event)">Select none</span>
     <span on:el:click="selectAll(scope.event)">Select all</span>
   </div>
-  <div class="flex-box flex-box-multi sub-tree-models__options">
+  <div class="sub-tree-models__options">
     {{#displayModelsList}}
-      <div class="flex-box sub-models_item">
-          <label for="{{firstnonempty inputId ''}}" class="single-line" title="{{displayName}}">
-            <input type="checkbox"
-              id="{{firstnonempty inputId ''}}"
-              el:checked:bind="display"
-              value="{{name}}">
-            {{displayName}}
-          </label>
+      <div class="sub-models_item">
+        <label class="single-line" title="{{displayName}}">
+          <input type="checkbox" el:checked:bind="display" value="{{name}}">
+          {{displayName}}
+        </label>
       </div>
     {{/displayModelsList}}
   </div>

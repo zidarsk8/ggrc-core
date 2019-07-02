@@ -4,28 +4,52 @@
 */
 
 import template from './templates/cycle-task-group-object-task.stache';
+import tdmTemplate from './templates/partials/three-dots-menu.stache';
+import tdmInHistoryTemplate from './templates/partials/three-dots-menu-in-history.stache';
+import restoreButtonTemplate from './templates/partials/restore-button.stache';
+
 import '../../object-change-state/object-change-state';
 import '../../dropdown/dropdown-component';
 import '../../comment/comment-data-provider';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
-import {updateStatus} from '../../../plugins/utils/workflow-utils';
-import {getPageType} from '../../../plugins/utils/current-page-utils';
+import '../../comment/comments-paging';
+import {countsMap} from '../../../apps/workflows';
+import {
+  initCounts,
+  getCounts,
+} from '../../../plugins/utils/widgets-utils';
+import {
+  updateStatus,
+  redirectToCycle,
+  redirectToHistory,
+} from '../../../plugins/utils/workflow-utils';
+import {
+  getPageType,
+} from '../../../plugins/utils/current-page-utils';
 import Permission from '../../../permission';
 
 let viewModel = can.Map.extend({
+  partials: {
+    restoreButton: can.stache(restoreButtonTemplate),
+    threeDotsMenu: can.stache(tdmTemplate),
+    threeDotsMenuInHistory: can.stache(tdmInHistoryTemplate),
+  },
   define: {
+    isAllowedToUpdate: {
+      get() {
+        return Permission.is_allowed_for('update', this.attr('instance'));
+      },
+    },
     isEditDenied: {
       get() {
-        const instance = this.attr('instance');
-        return !Permission
-          .is_allowed_for('update', instance) ||
-          instance.attr('is_in_history');
+        return !this.attr('isAllowedToUpdate') ||
+          this.attr('instance.is_in_history');
       },
     },
     showWorkflowLink: {
       get() {
-        return getPageType() !== 'Workflow';
+        return !this.isWorkflowPage();
       },
     },
     showMapObjectsButton: {
@@ -38,7 +62,7 @@ let viewModel = can.Map.extend({
         );
 
         return (
-          Permission.is_allowed_for('update', instance) &&
+          !this.attr('isEditDenied') &&
           hasAllowedStatus
         );
       },
@@ -51,10 +75,43 @@ let viewModel = can.Map.extend({
   },
   instance: {},
   initialState: 'Assigned',
+  isWorkflowPage() {
+    return getPageType() === 'Workflow';
+  },
   onStateChange(event) {
     const instance = this.attr('instance');
     const status = event.state;
-    updateStatus(instance, status);
+    const isWorkflow = this.isWorkflowPage();
+
+    updateStatus(instance, status)
+      .then(async () => {
+        if (!isWorkflow) {
+          return;
+        }
+
+        await initCounts(
+          [countsMap.activeCycles, countsMap.history],
+          instance.workflow.type, instance.workflow.id,
+        );
+
+        this.redirectFromEmptyTab();
+      });
+  },
+  redirectFromEmptyTab() {
+    const counts = getCounts();
+
+    switch (window.location.hash) {
+      case '#!current':
+        if (counts['cycles:active'] === 0) {
+          redirectToHistory();
+        }
+        break;
+      case '#!history':
+        if (counts['cycles:history'] === 0) {
+          redirectToCycle();
+        }
+        break;
+    }
   },
 });
 

@@ -17,7 +17,6 @@ describe('comment-list-item component', () => {
     it('and they should be correct', () => {
       expect(viewModel.attr('showIcon')).toBeFalsy();
       expect(viewModel.attr('commentAuthor')).toBeFalsy();
-      expect(viewModel.attr('commentAuthorType')).toEqual('');
       expect(viewModel.attr('hasRevision')).toBeFalsy();
     });
   });
@@ -63,14 +62,6 @@ describe('comment-list-item component', () => {
     it('if input empty string', () => {
       viewModel.attr('instance', {
         assignee_type: '',
-      });
-
-      expect(viewModel.attr('commentAuthorType')).toEqual('');
-    });
-
-    it('if input undefined', () => {
-      viewModel.attr('instance', {
-        assignee_type: undefined,
       });
 
       expect(viewModel.attr('commentAuthorType')).toEqual('');

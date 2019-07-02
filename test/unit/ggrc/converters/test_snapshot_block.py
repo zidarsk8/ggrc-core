@@ -238,6 +238,9 @@ class TestSnapshotBlockConverter(unittest.TestCase):
       ({"custom_attribute_id": 1, "attribute_value": True}, "yes"),
       ({"custom_attribute_id": 1, "attribute_value": "1"}, "yes"),
       ({"custom_attribute_id": 1, "attribute_value": "0"}, "no"),
+      ({"custom_attribute_id": 6, "attribute_value": True}, True),
+      ({"custom_attribute_id": 6, "attribute_value": "yes"}, "yes"),
+      ({"custom_attribute_id": 6, "attribute_value": "no"}, "no"),
       ({"custom_attribute_id": 3, "attribute_value": "Person",
         "attribute_object": {
             "context_id": None, "href": "/api/people/4",
@@ -265,6 +268,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             (1, {"id": 1, "title": "CCC", "attribute_type": "Checkbox"}),
             (4, {"id": 4, "title": "DDD", "attribute_type": "Map:Person"}),
             (5, {"id": 5, "title": "DDD", "attribute_type": "Text"}),
+            (6, {"id": 6, "title": "EEE", "attribute_type": "Multiselect"}),
         ]
     )
     self.block._stub_cache = {

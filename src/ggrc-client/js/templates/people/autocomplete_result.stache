@@ -3,19 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#each items}}
-<li {{canData 'ui-autocomplete-item'}} class="ui-menu-item">
-  <a href="javascript://">
-    {{name}} <span class="small">{{email}}</span>
-  {{#is(system_wide_role, "No Access")}}
-    <span class="user-disabled">
-      (Inactive user)
-    </span>
-  {{/is}}
-  </a>
-</li>
-{{/each}}
-{{^items}}
+{{#items}}
+  <li {{canData 'ui-autocomplete-item'}} class="ui-menu-item">
+    <a href="javascript://">
+      {{name}}
+      <span class="small">{{email}}</span>
+      {{#is(system_wide_role, "No Access")}}
+        <span class="user-disabled">
+          (Inactive user)
+        </span>
+      {{/is}}
+    </a>
+  </li>
+{{else}}
   <li class="ui-menu-item" data-ui-autocomplete-item="">
     No results
   </li>

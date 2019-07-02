@@ -16,6 +16,7 @@ from sqlalchemy.orm.session import Session
 from ggrc.models import all_models
 from ggrc.models.hooks.acl import propagation
 from ggrc.utils import benchmark
+from ggrc.access_control import utils as acl_utils
 
 
 def _add_or_update(name, value):
@@ -38,6 +39,7 @@ def add_relationships(relationship_ids):
   """
   _add_or_update("new_acl_ids", set())
   _add_or_update("new_relationship_ids", relationship_ids)
+  _add_or_update("user_ids", set())
   _add_or_update("deleted_objects", set())
 
 
@@ -50,7 +52,8 @@ def _get_propagation_entries(session):
   Returns:
     lists of ids of new ACL, relationship, and delete objects
   """
-  propagated_models = (all_models.AccessControlList, all_models.Relationship)
+  propagated_models = (all_models.AccessControlList, all_models.Relationship,
+                       all_models.AccessControlPerson)
   objs = collections.defaultdict(set)
   for obj in session.new:
     if not isinstance(obj, propagated_models):
@@ -60,12 +63,36 @@ def _get_propagation_entries(session):
       # get flushed and the rest remain as None. All the none objects are still
       # inserted at the last full flush before the session gets committed.
       continue
-    objs[obj.__class__].add(obj.id)
+    if isinstance(obj, all_models.AccessControlPerson):
+      # New user ids are collected for cases when new acl was added or
+      # new object with acls was created. Permissions should be cleared out
+      # from memcache for such users.
+      objs[obj.__class__].add(obj.person_id)
+    else:
+      objs[obj.__class__].add(obj.id)
 
-  deleted = {(obj.type, obj.id) for obj in session.deleted}
+  for obj in session.dirty:
+    # When person was unassigned his acp is marked as
+    # dirty because it's acl is marked as deleted. Permissions
+    # should be cleared out from memcache for such users.
+    if isinstance(obj, all_models.AccessControlPerson):
+      objs[obj.__class__].add(obj.person_id)
+
+  deleted = set()
+  for obj in session.deleted:
+    if isinstance(obj, all_models.AccessControlPerson):
+      # If object is deleted related ACPs are marked as deleted too.
+      # Permissions should be cleared out from memcache for such users.
+      objs[obj.__class__].add(obj.person_id)
+    deleted.add((obj.type, obj.id))
+  # We should collect user ids from ACPs of deleted relationships here manually
+  # because they are not marked in session if relationship was removed.
+  user_ids_from_deleted = acl_utils.get_user_ids_from_deleted_objects(deleted)
+  objs[all_models.AccessControlPerson].update(user_ids_from_deleted)
 
   return (objs[all_models.AccessControlList],
           objs[all_models.Relationship],
+          objs[all_models.AccessControlPerson],
           deleted)
 
 
@@ -75,10 +102,11 @@ def after_flush(session, _):
     if not flask.has_app_context():
       return
 
-    acl_ids, relationship_ids, deleted = _get_propagation_entries(session)
+    acl_ids, related_ids, user_ids, deleted = _get_propagation_entries(session)
 
     _add_or_update("new_acl_ids", acl_ids)
-    _add_or_update("new_relationship_ids", relationship_ids)
+    _add_or_update("new_relationship_ids", related_ids)
+    _add_or_update("user_ids", user_ids)
     _add_or_update("deleted_objects", deleted)
 
 

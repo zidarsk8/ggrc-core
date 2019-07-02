@@ -79,6 +79,7 @@ describe('request-review-modal component', () => {
 
       viewModel.attr('review', review);
       viewModel.attr('modalState.open', true);
+      viewModel.attr('parentInstance', {dispatch: () => {}});
     });
 
     it('should not save review in case of empty ACL', () => {
@@ -103,24 +104,15 @@ describe('request-review-modal component', () => {
       saveDfd.resolve(review);
     });
 
-    it('should update "Email" notification text', (done) => {
+    it('should update "Email" notification text', () => {
+      const fakeMsg = 'Some message';
+
       viewModel.attr('review.access_control_list', newACL);
+      viewModel.attr('reviewEmailMessage', fakeMsg);
 
-      const newEmailMessage = 'NEW EMAIL MESSAGE!';
-
-      expect(viewModel.attr('review.email_message'))
-        .toEqual(originalEmailComment);
-
-      review.attr('email_message', newEmailMessage);
       viewModel.save();
 
-      saveDfd.then(() => {
-        expect(review.save).toHaveBeenCalled();
-        expect(viewModel.attr('review.email_message'))
-          .toEqual(newEmailMessage);
-        done();
-      });
-      saveDfd.resolve(review);
+      expect(viewModel.attr('review.email_message')).toEqual(fakeMsg);
     });
 
     it('should set Unreviewed status', (done) => {
@@ -166,40 +158,32 @@ describe('request-review-modal component', () => {
   });
 
   describe('cancel() method', () => {
-    const originalEmailComment = 'email comment...';
-    const originalACL = [{person_id: 1}];
-    let review;
-
     beforeEach(() => {
-      review = new Review({
-        access_control_list: originalACL,
-        email_message: originalEmailComment,
-      });
-
-      review.backup();
+      const review = new can.Map();
+      review.restore = jasmine.createSpy('restore');
       viewModel.attr('review', review);
     });
 
     it('should change modal open state to false', () => {
+      viewModel.attr('modalState.open', true);
+
       viewModel.cancel();
 
-      expect(viewModel.attr('modalState.open')).toBeFalsy();
+      expect(viewModel.attr('modalState.open')).toBe(false);
     });
 
     it('should restore Review model', () => {
-      spyOn(review, 'restore').and.callThrough();
-
-      review.attr({
-        email_message: 'NEW EMAIL MESSAGE!',
-        access_control_list: [{person_id: 2}],
-      });
       viewModel.cancel();
 
-      expect(review.restore).toHaveBeenCalledWith(true);
-      expect(viewModel.attr('review.email_message'))
-        .toEqual(originalEmailComment);
-      expect(viewModel.attr('review.access_control_list').serialize())
-        .toEqual(originalACL);
+      expect(viewModel.attr('review').restore).toHaveBeenCalledWith(true);
+    });
+
+    it('should set reviewEmailMessage to null', () => {
+      viewModel.attr('reviewEmailMessage', 'some value');
+
+      viewModel.cancel();
+
+      expect(viewModel.attr('reviewEmailMessage')).toBeNull();
     });
   });
 });

@@ -597,3 +597,25 @@ class TestMegaProgramAutomappings(TestCase):
     program_b = all_models.Program.query.get(program_b_id)
     program_b_related = program_b.related_objects()
     self.assertIn("Standard", {obj.type for obj in program_b_related})
+
+  def test_snapshot_automapping(self):
+    """Test automapping after Snapshot to Audit mapping"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      program_id = program.id
+      parent_program = factories.ProgramFactory()
+      parent_program_id = parent_program.id
+      factories.RelationshipFactory(source=parent_program, destination=program)
+      audit = factories.AuditFactory(program=program)
+      standard = factories.StandardFactory()
+      requirement = factories.RequirementFactory()
+      factories.RelationshipFactory(source=standard, destination=requirement)
+    self.gen.generate_relationship(audit, standard)
+    program = all_models.Program.query.get(program_id)
+    program_related = program.related_objects()
+    parent_program = all_models.Program.query.get(parent_program_id)
+    parent_program_related = parent_program.related_objects()
+    self.assertEqual(len(program_related), 3)
+    self.assertEqual(len(parent_program_related), 3)
+    self.assertEqual({o.type for o in parent_program_related},
+                     {"Program", "Standard", "Requirement"})

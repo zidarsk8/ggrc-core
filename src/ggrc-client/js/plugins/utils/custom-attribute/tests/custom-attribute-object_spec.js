@@ -102,6 +102,22 @@ describe('CustomAttributeObject module', () => {
         });
     });
 
+    describe('when caObject has Person type', function () {
+      it('returns person id if custom attribute object has "id"', function () {
+        caDef.attr('attribute_type', caDefTypeName.MapPerson);
+        const id = 345;
+        caValue.attr('attribute_object', {id});
+        expect(caObject.value).toBe(id);
+      });
+
+      it('returns "null" if custom attribute object doesn\'t have "id"',
+        function () {
+          caDef.attr('attribute_type', caDefTypeName.MapPerson);
+          caValue.attr('attribute_object', {email: 345});
+          expect(caObject.value).toBeNull();
+        });
+    });
+
     it('returns custom attribute value', function () {
       const value = 'Some ca value';
       caValue.attr('attribute_value', value);
@@ -389,6 +405,7 @@ describe('CustomAttributeObject module', () => {
         {type: caDefTypeName.RichText, value: 'rich text'},
         {type: caDefTypeName.Input, value: 'input'},
         {type: caDefTypeName.Dropdown, value: 'dropdown'},
+        {type: caDefTypeName.Multiselect, value: 'multiselect'},
         {type: caDefTypeName.Date, value: 'date'},
       ];
       attrDefs.forEach((attrDef) => {
@@ -432,6 +449,7 @@ describe('CustomAttributeObject module', () => {
       const attrTypes = [
         caDefTypeName.Text, caDefTypeName.RichText, caDefTypeName.Input,
         caDefTypeName.Dropdown, caDefTypeName.Date, caDefTypeName.Checkbox,
+        caDefTypeName.Multiselect,
       ];
       attrTypes.forEach((attrType) => {
         caDef.attr('attribute_type', attrType);

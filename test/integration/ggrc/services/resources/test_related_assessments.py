@@ -195,6 +195,7 @@ class TestRelatedAssessments(TestCase):
 
       cad = factories.CustomAttributeDefinitionFactory(
           definition_type="assessment",
+          definition_id=self.assessment1.id,
           attribute_type="Map:Person"
       )
       cav = factories.CustomAttributeValueFactory(

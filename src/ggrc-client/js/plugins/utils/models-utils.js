@@ -158,6 +158,62 @@ function getCustomAttributableModels() { // eslint-disable-line
     .map((modelName) => businessModels[modelName]);
 }
 
+/**
+ * Return grouped types.
+ * @param {Array} types - array of base model types
+ * @return {Array} - object with one allowed for mapping Model
+ */
+function groupTypes(types) {
+  let groups = {
+    entities: {
+      name: 'People/Groups',
+      items: [],
+    },
+    scope: {
+      name: 'Scope',
+      items: [],
+    },
+    governance: {
+      name: 'Governance',
+      items: [],
+    },
+  };
+
+  types.forEach((modelName) => {
+    return _addFormattedType(modelName, groups);
+  });
+
+  _.forEach(groups, (group) => {
+    group.items = _.sortBy(group.items, 'name');
+  });
+
+  return groups;
+}
+
+/**
+ * Adds model to correct group.
+ * @param {string} modelName - model name
+ * @param {object} groups - type groups
+ */
+function _addFormattedType(modelName, groups) {
+  let cmsModel = getModelByType(modelName);
+  if (!cmsModel || !cmsModel.title_singular) {
+    return;
+  }
+
+  let type = {
+    category: cmsModel.category,
+    name: cmsModel.title_plural,
+    value: cmsModel.model_singular,
+  };
+
+  let group = !groups[type.category] ?
+    groups.governance :
+    groups[type.category];
+
+  group.items.push(type);
+}
+
 export {
   getModelInstance,
   hasRelatedAssessments,
@@ -168,4 +224,5 @@ export {
   getModelByType,
   getRoleableModels,
   getCustomAttributableModels,
+  groupTypes,
 };

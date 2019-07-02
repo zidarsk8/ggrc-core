@@ -564,7 +564,7 @@ class TestAssessmentsWorkflow(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("attr_type",
-                           AdminWidgetCustomAttributes.ALL_CA_TYPES)
+                           AdminWidgetCustomAttributes.ALL_GCA_TYPES)
   def test_fill_asmt_gcas_inline(
       self, program, audit, assessment, attr_type, selenium
   ):

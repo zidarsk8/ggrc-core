@@ -7,6 +7,7 @@ import {NAVIGATE_TO_TAB} from '../../events/eventTypes';
 import '../person/person-data';
 import '../spinner-component/spinner-component';
 import template from './comment-list-item.stache';
+import {getCommentAuthorRole} from '../../plugins/utils/comments-utils';
 
 /**
  * Simple component to show Comment Objects
@@ -52,16 +53,9 @@ export default can.Component.extend({
       },
       commentAuthorType: {
         get() {
-          function capitalizeFirst(type) {
-            return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
-          }
-
-          const assignee = _.chain(this.attr('itemData.assignee_type'))
-            .split(',')
-            .head()
-            .trim()
-            .value();
-          return assignee ? `(${capitalizeFirst(assignee)})` : '';
+          let userRolesStr = this.attr('itemData.assignee_type');
+          return getCommentAuthorRole(this.attr('baseInstance'),
+            userRolesStr);
         },
       },
       hasRevision: {

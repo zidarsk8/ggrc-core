@@ -35,7 +35,7 @@ describe('Cacheable model', () => {
         findAll: 'GET /api/dummy_models/',
         update: 'PUT /api/dummy_models/{id}',
         mixins: [dummyable],
-        attributes: {dummy_attribute: 'dummy_convert'},
+        attributes: {},
         is_custom_attributable: true,
         ajax: $.ajax,
       },
@@ -132,15 +132,6 @@ describe('Cacheable model', () => {
     it('applies mixins based on the mixins property', () => {
       expect(dummyable.add_to)
         .toHaveBeenCalledWith(DummyModel);
-    });
-
-    it('merges in default attributes for created_at and ' +
-       'updated_at', () => {
-      expect(DummyModel.attributes).toEqual({
-        created_at: 'datetime',
-        updated_at: 'datetime',
-        dummy_attribute: 'dummy_convert',
-      });
     });
   });
 

@@ -11,6 +11,15 @@ export default can.Component.extend({
   view: can.stache(template),
   leakScope: true,
   viewModel: can.Map.extend({
+    define: {
+      isTicketIdMandatory: {
+        get() {
+          let instance = this.attr('instance');
+          return instance.class.unchangeableIssueTrackerIdStatuses
+            .includes(instance.attr('status'));
+        },
+      },
+    },
     instance: {},
   }),
 });

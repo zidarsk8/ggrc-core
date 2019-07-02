@@ -8,6 +8,7 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as notifierUtils from '../../../plugins/utils/notifiers-utils';
 import * as errorsUtils from '../../../plugins/utils/errors-utils';
 import Permission from '../../../permission';
+import pubSub from '../../../pub-sub';
 
 describe('generate-issues-in-bulk-button component', () => {
   let viewModel;
@@ -118,6 +119,66 @@ describe('generate-issues-in-bulk-button component', () => {
       });
     });
 
+    describe('onSuccessHandler() method', () => {
+      beforeEach(() => {
+        spyOn(notifierUtils, 'notifier');
+        spyOn(pubSub, 'dispatch');
+      });
+
+      it('should notify the user regarding successful generation and ' +
+      'provide appropriate redirection link', () => {
+        const id = 123;
+        viewModel.attr('instance', {id});
+
+        const expectedLink = window.location.origin +
+          `/audits/${id}#!assessment`;
+
+        viewModel.onSuccessHandler();
+
+        expect(notifierUtils.notifier)
+          .toHaveBeenCalledWith(
+            'success',
+            'Tickets were generated successfully. {reload_link}',
+            {reloadLink: expectedLink}
+          );
+      });
+
+      it('should prepare Assessments tab to be refreshed when it\'s opened',
+        () => {
+          viewModel.onSuccessHandler();
+
+          expect(pubSub.dispatch).toHaveBeenCalledWith({
+            type: 'refetchOnce',
+            modelNames: ['Assessment'],
+          });
+        });
+
+      describe('when there are errors', () => {
+        let errors;
+
+        beforeEach(() => {
+          errors = ['Fake error'];
+        });
+
+        it('should notify regarding that', () => {
+          viewModel.onSuccessHandler(errors);
+
+          expect(notifierUtils.notifier)
+            .toHaveBeenCalledWith('error', (
+              'There were some errors in generating ' +
+              'tickets. More details will be sent by email.'
+            ));
+        });
+
+        it('should not prepare Assessments tab to be refreshed when it\'s ' +
+        'opened', () => {
+          viewModel.onSuccessHandler(errors);
+
+          expect(pubSub.dispatch).not.toHaveBeenCalled();
+        });
+      });
+    });
+
     describe('checkStatus() method', () => {
       const timeout = 1;
       let dfd;
@@ -149,15 +210,32 @@ describe('generate-issues-in-bulk-button component', () => {
         expect(viewModel.trackStatus).toHaveBeenCalledWith(timeout * 2);
       });
 
-      it('should notify if status is SUCCESS', () => {
-        spyOn(notifierUtils, 'notifier');
+      describe('if status is SUCCESS', () => {
+        let fakeTask;
 
-        viewModel.checkStatus(timeout);
-        dfd.resolve({status: 'Success'});
+        beforeEach(() => {
+          fakeTask = {status: 'Success'};
+          dfd.resolve(fakeTask);
+          spyOn(viewModel, 'onSuccessHandler');
+        });
 
-        expect(notifierUtils.notifier)
-          .toHaveBeenCalledWith('success', jasmine.any(String));
-        expect(viewModel.attr('isGeneratingInProgress')).toBeFalsy();
+        it('should call onSuccessHandler with error list', () => {
+          fakeTask.errors = ['Fake error'];
+
+          viewModel.checkStatus(timeout);
+
+          expect(viewModel.onSuccessHandler).toHaveBeenCalledWith(
+            ['Fake error']
+          );
+        });
+
+        it('should set isGeneratingInProgress to false', () => {
+          viewModel.attr('isGeneratingInProgress', true);
+
+          viewModel.checkStatus(timeout);
+
+          viewModel.attr('isGeneratingInProgress', false);
+        });
       });
 
       it('should notify if status is FAILURE', () => {

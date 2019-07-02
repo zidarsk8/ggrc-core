@@ -2,7 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Helper methods."""
-
+import functools
+from functools import wraps
 from flask import _app_ctx_stack
 
 from ggrc.utils import structures
@@ -16,6 +17,7 @@ def without_sqlalchemy_cache(func):
   SQLALCHEMY_RECORD_QUERIES config variable is set to True.
   This decorator make the cache empty everywhere in wrapped function.
   """
+  @wraps(func)
   def wrapper(*args, **kwargs):
     """Wrapper function."""
     # Running migration can trigger this decorator, but in such case
@@ -51,3 +53,21 @@ def assert_type(obj, expected_type):
         "Object of incorrect type '{}' provided. "
         "Should be '{}'".format(type(obj), expected_type)
     )
+
+
+def cached(func):
+  """Memorize the return value of a function."""
+  memo = {}
+
+  @functools.wraps(func)
+  def wrapper(*args):
+    """Wrapper function."""
+    keys = str(args)
+    if keys in memo:
+      return memo[keys]
+
+    result = func(*args)
+    memo[keys] = result
+    return result
+
+  return wrapper

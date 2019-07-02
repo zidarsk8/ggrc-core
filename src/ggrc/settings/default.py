@@ -3,7 +3,9 @@
 
 """Module defines application settings."""
 
+import datetime
 import os
+
 import jinja2
 
 DEBUG = False
@@ -57,7 +59,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "2.6.0-Pumpkin" + BUILD_NUMBER
+VERSION = "2.7.0-Pumpkin" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -89,6 +91,8 @@ else:
 # Initialize from environment if present
 SQLALCHEMY_DATABASE_URI = os.environ.get('GGRC_DATABASE_URI', '')
 SECRET_KEY = os.environ.get('GGRC_SECRET_KEY', 'Replace-with-something-secret')
+PERMANENT_SESSION_LIFETIME = os.environ.get('GGRC_PERMANENT_SESSION_LIFETIME',
+                                            datetime.timedelta(days=365))
 
 MEMCACHE_MECHANISM = True
 
@@ -175,6 +179,9 @@ INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
 
 # GGRC user account to be used by external application auth
 EXTERNAL_APP_USER = os.environ.get('EXTERNAL_APP_USER', '')
+
+# Sync Service account to validate requests from sync service
+SYNC_SERVICE_USER = os.environ.get('SYNC_SERVICE_USER', '')
 
 # Integration service mandatory header value
 URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')

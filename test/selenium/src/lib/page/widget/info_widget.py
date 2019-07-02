@@ -283,6 +283,17 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     if not is_inline:
       self.edit_popup.save_and_close()
 
+  def has_ca_inline_edit(self, attr_title):
+    """Tries to open edit form for CA by its title
+    and returns bool if edit exists."""
+    ca_manager = page_elements.CustomAttributeManager(
+        self._browser,
+        obj_type=self.child_cls_name.lower(),
+        is_global=True,
+        is_inline=True)
+    return ca_manager.find_ca_elem_by_title(
+        attr_title).open_edit().is_inline_edit_opened
+
   def obj_scope(self):
     """Returns dict of object."""
     scope = {
@@ -711,22 +722,15 @@ class Assessments(InfoWidget):
     base.Button(self.info_widget_elem,
                 WidgetInfoAssessment.BUTTON_NEEDS_REWORK).click()
 
-  def choose_and_fill_dropdown_lca(self, dropdown_id, option_title, **kwargs):
+  def choose_and_fill_dropdown_lca(self, dropdown, **kwargs):
     """Choose and fill comment or url for Assessment dropdown."""
-    self.select_ca_dropdown_option(dropdown_id, option_title)
+    self.fill_ca_values({dropdown.title: dropdown.multi_choice_options},
+                        is_global=False,
+                        is_inline=True)
     set_value_for_asmt_ca.SetValueForAsmtDropdown(
         self._driver).fill_dropdown_lca(**kwargs)
     selenium_utils.get_when_clickable(
         self._driver, WidgetInfoAssessment.BUTTON_COMPLETE)
-
-  def select_ca_dropdown_option(self, dropdown_id, option_value):
-    """Select custom attribute dropdown option."""
-    dropdown_locator = (
-        By.CSS_SELECTOR, "#form-field-{}".format(dropdown_id))
-    selenium_utils.get_when_clickable(
-        self.info_widget_elem, dropdown_locator)
-    base.DropdownStatic(self.info_widget_elem,
-                        dropdown_locator).select(option_value)
 
   def edit_answers(self):
     """Click to Edit Answers and Confirm"""
@@ -811,17 +815,13 @@ class Controls(WithAssignFolder, InfoWidget):
     self.control_operator_text = roles.CONTROL_OPERATORS.upper()
     self.control_operator_entered_text = (
         self.control_operators.get_people_emails())
-    self._assertions = self._root.element(
-        class_name="custom-attr-wrap").element(
-        text="Assertions").parent().text.splitlines()
-    self.assertions_text = self._assertions[0]
-    self.assertions_entered_text = self._assertions[1:]
+    self.assertions = self._assertions_dropdown()
     self.reference_urls = self._related_urls(
         self._reference_url_label, self._root)
     self._extend_list_all_scopes(
-        [self.admin_text, self.control_operator_text, self.assertions_text],
+        [self.admin_text, self.control_operator_text, self.assertions.text],
         [self.admin_entered_text, self.control_operator_entered_text,
-         self.assertions_entered_text])
+         self.assertions.assertions_values])
 
   @property
   def control_review_status(self):

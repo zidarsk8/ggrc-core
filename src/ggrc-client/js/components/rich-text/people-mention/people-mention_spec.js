@@ -101,12 +101,12 @@ describe('people-mention component', () => {
   });
 
   describe('clearMention() method', () => {
-    it('assigns null to mentionValue attribute', () => {
-      vm.attr('mentionValue', 'ara');
+    it('assigns null to mentionBeforeSelection attribute', () => {
+      vm.attr('mentionBeforeSelection', 'ara');
 
       vm.clearMention();
 
-      expect(vm.attr('mentionValue')).toBeNull();
+      expect(vm.attr('mentionBeforeSelection')).toBeNull();
     });
 
     it('assigns null to mentionIndex attribute', () => {
@@ -214,19 +214,35 @@ describe('people-mention component', () => {
     });
 
     describe('if editorText is parsed according to mention regex', () => {
-      const validValues = ['+a', ' \n\n \n @a@a.com', '+a@a.com \n @b', ' +'];
+      const validValues = ['+a@example.com', ' \n\n \n @a@a.com',
+        '+a@a.com \n @b@user.dom ', ' +@google.com',
+      ];
       const expectedMentions = ['a', 'a@a.com', 'b', ''];
+      const expectedDomains = ['@example.com', '', '@user.dom ', '@google.com'];
       const expectedMentionIndexes = [0, 6, 11, 1];
-      const selectionIndexes = validValues.map((value) => value.length);
+      const selectionIndexes = [
+        {index: 2}, {index: 14}, {index: 13}, {index: 2},
+      ];
 
-      it('assigns parsed value to "mentionValue" attribute', () => {
+      it('assigns parsed value to "mentionBeforeSelection" attribute', () => {
         editor.getSelection.and.returnValues(...selectionIndexes);
         editor.getText.and.returnValues(...validValues);
 
         expectedMentions.forEach((expected) => {
           vm.onChange();
 
-          expect(vm.attr('mentionValue')).toBe(expected);
+          expect(vm.attr('mentionBeforeSelection')).toBe(expected);
+        });
+      });
+
+      it('assigns parsed value to "mentionAfterSelection" attribute', () => {
+        editor.getSelection.and.returnValues(...selectionIndexes);
+        editor.getText.and.returnValues(...validValues);
+
+        expectedDomains.forEach((expected) => {
+          vm.onChange();
+
+          expect(vm.attr('mentionAfterSelection')).toBe(expected);
         });
       });
 
@@ -266,7 +282,8 @@ describe('people-mention component', () => {
         setSelection: jasmine.createSpy('editor.setSelection'),
       });
       vm.attr('editor', editor);
-      vm.attr('mentionValue', 'a');
+      vm.attr('mentionBeforeSelection', 'a');
+      vm.attr('mentionAfterSelection', '');
       spyOn(vm, 'clearMention');
     });
 
@@ -296,7 +313,7 @@ describe('people-mention component', () => {
 
         const ops = editor.updateContents.calls.first().args[0].ops;
         expect(ops).toEqual(jasmine.arrayContaining(
-          [{'delete': vm.attr('mentionValue').length + 1}]));
+          [{'delete': vm.attr('mentionBeforeSelection').length + 1}]));
       });
 
       it('with "insert" operation for link', () => {

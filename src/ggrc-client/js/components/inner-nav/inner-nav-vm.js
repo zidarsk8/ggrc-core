@@ -9,7 +9,7 @@ import {
 import {getCounts} from '../../plugins/utils/widgets-utils';
 import router, {buildUrl} from '../../router';
 import {isObjectVersion} from '../../plugins/utils/object-versions-utils';
-import Mappings from '../../models/mappers/mappings';
+import {allowedToCreateOrMap} from '../../models/mappers/mappings';
 
 export default can.Map.extend({
   define: {
@@ -111,7 +111,7 @@ export default can.Map.extend({
         || widget.attr('inForceShowList')
         || widget.attr('type') === 'version'
         || widget.attr('uncountable')
-        || !Mappings.allowedToCreateOrMap(instance, targetType)) {
+        || !allowedToCreateOrMap(instance, targetType)) {
       // widget will never be in hiddenWidgets
       return;
     }

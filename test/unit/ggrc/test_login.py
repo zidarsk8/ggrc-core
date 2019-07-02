@@ -29,7 +29,7 @@ class TestIsExternalAppUser(unittest.TestCase):
     current_user_mock.assert_called_once_with()
     user_mock.is_anonymous.assert_called_once_with()
 
-  @mock.patch('ggrc.utils.user_generator.is_external_app_user_email')
+  @mock.patch('ggrc.utils.user_generator.is_app_2_app_user_email')
   @mock.patch('ggrc.login._get_current_logged_user')
   def test_not_external_user(self, current_user_mock, is_external_email_mock):
     """Currently logged in user is not external app."""
@@ -43,7 +43,7 @@ class TestIsExternalAppUser(unittest.TestCase):
     user_mock.is_anonymous.assert_called_once_with()
     is_external_email_mock.assert_called_once_with('user@example.com')
 
-  @mock.patch('ggrc.utils.user_generator.is_external_app_user_email')
+  @mock.patch('ggrc.utils.user_generator.is_app_2_app_user_email')
   @mock.patch('ggrc.login._get_current_logged_user')
   def test_external_user(self, current_user_mock, is_external_email_mock):
     """Currently logged in user is external app."""

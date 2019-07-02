@@ -23,11 +23,11 @@
     <li {{canData 'option' }} data-id="{{ id }}">
       <label>
         {{#is(selectedOption, id)}}
-          <input type="radio" checked="checked" name="map" rel="tooltip" title="map">
+          <input type="radio" checked="checked" name="map">
         {{else}}
-          <input type="radio" name="map" rel="tooltip" title="map">
+          <input type="radio" name="map">
         {{/is}}
-        {{pretty_role_name name}}
+        {{name}}
       </label>
       <div class="role-description">
         <p>{{{description}}}</p>
@@ -37,7 +37,7 @@
             Please ensure that all Administrator users are also members of <span style="white-space: nowrap">{{ggrc_config_value "GAPI_ADMIN_GROUP"}}</span>
           </p>
         {{/is}}
-        {{#scope}}<p><strong>Role Scope:</strong> {{role_scope this.scope}}</p>{{/scope}}
+        <p><strong>Role Scope:</strong> {{this.scope}}</p>
       </div>
     </li>
     {{/rolesList}}

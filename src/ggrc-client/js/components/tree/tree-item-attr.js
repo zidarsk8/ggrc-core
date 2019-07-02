@@ -6,30 +6,41 @@ import {formatDate} from '../../plugins/utils/date-utils';
 import {getUserRoles} from '../../plugins/utils/user-utils';
 import template from './templates/tree-item-attr.stache';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
+import {getOnlyAnchorTags} from '../../plugins/ggrc_utils';
 
 // attribute names considered "default" and representing a date
-const DATE_ATTRS = Object.freeze({
-  end_date: 1,
-  due_date: 1,
-  finished_date: 1,
-  start_date: 1,
-  created_at: 1,
-  updated_at: 1,
-  verified_date: 1,
-  last_deprecated_date: 1,
-  last_assessment_date: 1,
-});
+const DATE_ATTRS = new Set([
+  'end_date',
+  'due_date',
+  'finished_date',
+  'start_date',
+  'created_at',
+  'updated_at',
+  'verified_date',
+  'last_deprecated_date',
+  'last_assessment_date',
+  'last_submitted_at',
+  'last_verified_at',
+]);
 
 // attribute names considered "default" and representing rich text fields
-const RICH_TEXT_ATTRS = Object.freeze({
-  notes: 1,
-  description: 1,
-  test_plan: 1,
-  risk_type: 1,
-  threat_source: 1,
-  threat_event: 1,
-  vulnerability: 1,
-});
+const RICH_TEXT_ATTRS = new Set([
+  'notes',
+  'description',
+  'test_plan',
+  'risk_type',
+  'threat_source',
+  'threat_event',
+  'vulnerability',
+]);
+
+// attribute names considered "default" and representing fields which contain
+// at least "email" field
+const PERSON_ATTRS = new Set([
+  'created_by',
+  'last_submitted_by',
+  'last_verified_by',
+]);
 
 export default can.Component.extend({
   tag: 'tree-item-attr',
@@ -60,6 +71,20 @@ export default can.Component.extend({
       },
     },
     /**
+     * Transforms Rich text attribute value.
+     *
+     * @param {String} value - Rich text attribute value from DB.
+     * @return {String} - the transformed rich text attribute value.
+     */
+    getConvertedRichTextAttr(value) {
+      let result = value;
+
+      if (this.isMarkdown()) {
+        result = convertMarkdownToHtml(result);
+      }
+      return getOnlyAnchorTags(result);
+    },
+    /**
      * Retrieve the string value of an attribute.
      *
      * The method only supports instance attributes categorized as "default",
@@ -79,19 +104,17 @@ export default can.Component.extend({
 
       let result = instance.attr(attrName);
 
-      const regexTags = /<[^>]*>?/g;
-      const regexNewLines = /<\/p>?/g;
-
       if (result !== undefined && result !== null) {
-        if (attrName in DATE_ATTRS) {
+        if (PERSON_ATTRS.has(attrName)) {
+          return result.attr('email');
+        }
+
+        if (DATE_ATTRS.has(attrName)) {
           return formatDate(result, true);
         }
-        if (attrName in RICH_TEXT_ATTRS) {
-          if (this.isMarkdown()) {
-            result = convertMarkdownToHtml(result);
-          }
-          return result
-            .replace(regexNewLines, '\n').replace(regexTags, ' ').trim();
+
+        if (RICH_TEXT_ATTRS.has(attrName)) {
+          return this.getConvertedRichTextAttr(result);
         }
         return String(result);
       }

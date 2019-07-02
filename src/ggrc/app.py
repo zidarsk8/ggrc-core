@@ -13,7 +13,6 @@ import sqlalchemy
 
 import flask
 from flask import Flask
-from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
@@ -26,11 +25,15 @@ from ggrc import extensions
 from ggrc import notifications
 from ggrc import settings
 from ggrc.gdrive import init_gdrive_routes
-from ggrc.utils import benchmark
-from ggrc.utils.issue_tracker_mock import init_issue_tracker_mock
+from ggrc.utils import benchmark, format_api_error_response
+from ggrc.utils import issue_tracker_mock
+
 
 if settings.ISSUE_TRACKER_MOCK and not settings.PRODUCTION:
-  init_issue_tracker_mock()
+  if getattr(settings, "APP_ENGINE", False):
+    issue_tracker_mock.init_gae_issue_tracker_mock()
+  else:
+    issue_tracker_mock.init_issue_tracker_mock()
 
 setup_logging(settings.LOGGING)
 
@@ -76,30 +79,37 @@ def setup_user_timezone_offset():
   g.user_timezone_offset = request.headers.get("X-UserTimezoneOffset")
 
 
-@app.before_request
-def check_if_under_maintenance():
-  """Check if the site is in maintenance mode."""
-  with benchmark('Check for maintenance'):
-    from ggrc.models.maintenance import Maintenance
-    try:
-      db_row = db.session.query(Maintenance).get(1)
-    except sqlalchemy.exc.ProgrammingError as error:
-      if re.search(r"\(1146, \"Table '.+' doesn't exist\"\)$", error.message):
-        db_row = None
-      else:
-        raise
-    condition = (db_row and
-                 db_row.under_maintenance and
-                 request.path != url_for('maintenance_') and
-                 request.path != '/_ah/start')
-    if condition:
-      return redirect(url_for('maintenance_'))
+def _setup_maintenance_check():
+  """Initialize hook to check maintenance mode"""
 
+  @app.before_request
+  def check_if_under_maintenance():
+    """Check if the site is in maintenance mode."""
 
-@app.route('/maintenance_')
-def maintenance_():
-  """Render a maintenance page while on maintenance mode."""
-  return render_template("maintenance/maintenance.html")
+    # allow process some routes even under maintenance
+    if request.path == '/_ah/start':
+      return None
+
+    with benchmark('Check for maintenance'):
+      from ggrc.models.maintenance import Maintenance
+      try:
+        db_row = db.session.query(Maintenance).get(1)
+      except sqlalchemy.exc.ProgrammingError as error:
+        if re.search(r"\(1146, \"Table '.+' doesn't exist\"\)$",
+                     error.message):
+          db_row = None
+        else:
+          raise
+
+      if not db_row or not db_row.under_maintenance:
+        return None
+
+    # for API requests return error in JSON format
+    if request.path.startswith('/api/'):
+      return format_api_error_response(503, "GGRC is under maintenance")
+
+    # in all other cases redirect user to maintenance page
+    return render_template("maintenance/maintenance.html"), 503
 
 
 def setup_error_handlers(app_):
@@ -311,3 +321,4 @@ register_indexing()
 _enable_debug_toolbar()
 _display_sql_queries()
 _display_request_time()
+_setup_maintenance_check()

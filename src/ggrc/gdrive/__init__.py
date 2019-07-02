@@ -50,6 +50,7 @@ def get_http_auth():
     logger.exception(ex.message)
     del flask.session['credentials']
     raise GdriveUnauthorized(errors.GDRIVE_UNAUTHORIZED)
+  flask.session.permanent = True
   flask.session['credentials'] = credentials.to_json()
   return http_auth
 
@@ -80,6 +81,7 @@ def auth_gdrive():
   # to prevent Cross Site Request Forgery we need to send state to google auth
   state = str(uuid.uuid4())
   auth_uri = flow.step1_get_authorize_url(state=state)
+  flask.session.permanent = True
   flask.session['state'] = state
   return flask.redirect(auth_uri)
 
@@ -99,7 +101,7 @@ def authorize_app():
   except FlowExchangeError as ex:
     logger.exception(ex.message)
     raise Unauthorized(errors.UNABLE_GET_TOKEN.format(ex.message))
-
+  flask.session.permanent = True
   flask.session['credentials'] = credentials.to_json()
   return render_template('gdrive/auth_gdrive.haml')
 
@@ -112,6 +114,8 @@ def init_flow():
       redirect_uri=flask.url_for('authorize_app', _external=True),
       auth_uri=_GOOGLE_AUTH_URI,
       token_uri=_GOOGLE_TOKEN_URI,
+      access_type='offline',
+      prompt='consent',
   )
 
 

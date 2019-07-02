@@ -616,6 +616,14 @@ class RevisionFactory(ModelFactory):
     return rev
 
 
+class MaintenanceFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.Maintenance
+
+  id = 1  # pylint: disable=invalid-name
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -644,6 +652,7 @@ def get_model_factory(model_name):
       "IssueTrackerIssue": IssueTrackerIssueFactory,
       "KeyReport": KeyReportFactory,
       "Label": LabelFactory,
+      "Maintenance": MaintenanceFactory,
       "Market": MarketFactory,
       "Metric": MetricFactory,
       "Objective": ObjectiveFactory,

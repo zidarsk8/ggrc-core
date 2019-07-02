@@ -479,30 +479,4 @@ persistence (database). They're essentially just an abstraction over our
 database, so that you don't have to care about which tables the
 relationships are stored in.
 
-Mappings essentially turn the entire system into a
-`property graph <https://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph>`_.
-
 Mappings are defined in :src:`ggrc-client/js/models/mappers/mappings-ggrc.js`.
-
-Types of Mappings
-^^^^^^^^^^^^^^^^^
-
-There are 2 types of mappings. The types of mappings are defined with
-Mappers. Mappers are defined in :src:`ggrc-client/js/models/mappers/models/index.js`
-
-Each type of mapping is defined below:
-
--  **Direct** :src:`ggrc-client/js/models/mappers/direct-list-loader.js`:
-   A direct mapping is a relationship where one model
-   directly references another model.  E.g., Sections contain a
-   ``directive`` attribute, so Section has a Direct mapping to
-   Directive.
-
--  **Search** :src:`ggrc-client/js/models/mappers/search-list-loader.js`:
-   A search mapping is a relationship where results are
-   produced by a function returning a deferred. This mapping is f
-   foremost used by the Advanced Search feature and for getting owned
-   objects for a Person, but other uses are also possible. Note that the
-   search function is run at attach time and also when a new object of
-   any type is created, so it is recommended to use this mapper
-   sparingly in the system if it makes a number of large AJAX calls.

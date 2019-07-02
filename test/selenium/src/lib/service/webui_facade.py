@@ -197,14 +197,22 @@ def check_user_menu_has_icons(user_menu):
 def submit_obj_for_review(selenium, obj, reviewer):
   """Submit object for review scenario.
   Returns obj with assigned review."""
+  review_comment = string_utils.StringMethods.random_string()
   _get_ui_service(selenium, obj).submit_for_review(
-      obj, reviewer.email, string_utils.StringMethods.random_string())
-  exp_review = entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
-      reviewers=reviewer,
-      status=element.ReviewStates.UNREVIEWED)
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
+      obj, reviewer.email, review_comment)
+  obj.update_attrs(
+      review=entities_factory.ReviewsFactory().create(
+          reviewers=reviewer,
+          status=element.ReviewStates.UNREVIEWED))
+  exp_comment = entities_factory.CommentsFactory().create(
+      description=element.Common.REVIEW_COMMENT_PATTERN.format(
+          # reviewers emails in review comment message need to be sorted
+          # as they are displayed in UI in random order
+          emails=', '.join(sorted(obj.review["reviewers"])),
+          comment=review_comment))
+  exp_comment.created_at = rest_service.ObjectsInfoService().get_comment_obj(
+      paren_obj=obj, comment_description=review_comment).created_at
+  obj.comments = [exp_comment.repr_ui()]
   return obj
 
 
@@ -212,30 +220,36 @@ def approve_obj_review(selenium, obj):
   """Approve obj review.
   Returns obj with approved review."""
   _get_ui_service(selenium, obj).approve_review(obj)
-  exp_review = entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
-      status=element.ReviewStates.REVIEWED,
-      last_reviewed_by=users.current_user().email,
-      last_reviewed_at=rest_facade.get_last_review_date(obj),
-      reviewers=users.current_user())
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
-  return obj
+  return obj.update_attrs(
+      review=entities_factory.ReviewsFactory().create(
+          status=element.ReviewStates.REVIEWED,
+          last_reviewed_by=users.current_user().email,
+          last_reviewed_at=rest_facade.get_last_review_date(obj),
+          reviewers=users.current_user()))
 
 
 def undo_obj_review_approval(selenium, obj):
   """Cancel approved obj review.
   Returns obj with reverted to unreviewed status review."""
   _get_ui_service(selenium, obj).undo_review_approval(obj)
-  exp_review = entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
+  return obj.update_attrs(review=entities_factory.ReviewsFactory().create(
       status=element.ReviewStates.UNREVIEWED,
       last_reviewed_by=users.current_user().email,
       last_reviewed_at=rest_facade.get_last_review_date(obj),
-      reviewers=users.current_user())
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
-  return obj
+      reviewers=users.current_user()))
+
+
+def cancel_review_by_editing_obj(selenium, obj):
+  """Edit obj title and revert obj review to unreviewed state.
+  Returns updated obj with reverted to unreviewed status review."""
+  new_title = element.Common.TITLE_EDITED_PART + obj.title
+  _get_ui_service(selenium, obj).edit_obj(obj, title=new_title)
+  return obj.update_attrs(
+      title=new_title,
+      updated_at=rest_facade.get_obj(obj).updated_at,
+      modified_by=users.current_user().email,
+      review=entities_factory.ReviewsFactory().create(
+          status=element.ReviewStates.UNREVIEWED))
 
 
 def get_object(selenium, obj):
@@ -243,15 +257,26 @@ def get_object(selenium, obj):
   return _get_ui_service(selenium, obj).get_obj_from_info_page(obj)
 
 
-def map_object_via_unified_mapper(selenium, obj_name, dest_objs_type,
-                                  return_tree_items=True,
-                                  open_in_new_frontend=False):
+def map_object_via_unified_mapper(
+    selenium, obj_name, dest_objs_type=None, obj_to_map=None,
+    return_tree_items=False, open_in_new_frontend=False,
+    proceed_in_new_tab=False
+):
   """Maps selected obj to dest_obj_type via Unified Mapper."""
-  modal = unified_mapper.MapObjectsModal(driver=selenium, obj_name=obj_name)
-  modal.search_dest_objs(dest_objs_type=dest_objs_type,
-                         return_tree_items=return_tree_items)
+  assert dest_objs_type or obj_to_map, ("At least one of params "
+                                        "should be provided.")
+  if not dest_objs_type:
+    dest_objs_type = obj_to_map._obj_name()
+  map_modal = unified_mapper.MapObjectsModal(driver=selenium,
+                                             obj_name=obj_name)
+  map_modal.search_dest_objs(dest_objs_type=dest_objs_type,
+                             return_tree_items=return_tree_items)
   if open_in_new_frontend:
-    modal.open_in_new_frontend_btn.click()
+    map_modal.open_in_new_frontend_btn.click()
+    return map_modal
   else:
-    raise NotImplementedError
-  return modal
+    if obj_to_map:
+      dest_obj_modal = map_modal.click_create_and_map_obj()
+      dest_obj_modal.submit_obj(obj_to_map)
+    if proceed_in_new_tab:
+      object_modal.WarningModal().proceed_in_new_tab()

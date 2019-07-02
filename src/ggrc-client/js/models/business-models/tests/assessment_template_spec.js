@@ -18,7 +18,7 @@ describe('AssessmentTemplate model', () => {
       expect(instance.custom_attribute_definitions)
         .toBeUndefined();
 
-      instance.form_preload();
+      instance.form_preload(true, null, {});
 
       expect(instance.custom_attribute_definitions instanceof can.List)
         .toBeTruthy();

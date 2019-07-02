@@ -3,8 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {getRolesForType} from '../plugins/utils/acl-utils';
-
 /**
  * A module containing various utility functions.
  */
@@ -126,36 +124,6 @@ function getPlainText(originalText) {
   return originalText.replace(/<[^>]*>?/g, '').trim();
 }
 
-/**
- * Build string of assignees types separated by commas.
- * @param {Object} instance - Object instance
- * @return {String} assignees types separated by commas
- */
-function getAssigneeType(instance) {
-  let currentUser = GGRC.current_user;
-  let roles = getRolesForType(instance.type);
-  let userType = null;
-
-  if (!instance || !currentUser) {
-    return;
-  }
-
-  _.forEach(roles, function (role) {
-    let aclPerson = instance
-      .access_control_list
-      .filter((item) => item.ac_role_id === role.id &&
-        item.person.id == currentUser.id); // eslint-disable-line
-
-    if (!aclPerson.length) {
-      return;
-    }
-
-    userType = userType ? userType + ',' + role.name : role.name;
-  });
-
-  return userType;
-}
-
 function getTruncatedList(items) {
   const itemsLimit = 5;
   const mainContent = items
@@ -168,6 +136,27 @@ function getTruncatedList(items) {
   return mainContent + lastLine;
 }
 
+/**
+ * Remove all html tags except anchor tags from html text.
+ * @param {String} htmltext - html content
+ * @return {String} - transformed html content
+ */
+function getOnlyAnchorTags(htmltext) {
+  const regexStartTags = /<(?!a\s|\/)[^>]*>/g;
+  const regexEndTags1 = /<\/[^>]*[^a]>/g;
+  const regexEndTags2 = /<\/[^>]+a>/g;
+  const regexNewLines = /<\/p>?/g;
+
+  let anchoronlyhtml = htmltext
+    .replace(regexNewLines, '\n')
+    .replace(regexStartTags, ' ')
+    .replace(regexEndTags1, ' ')
+    .replace(regexEndTags2, ' ')
+    .trim();
+
+  return anchoronlyhtml;
+}
+
 export {
   applyTypeFilter,
   isInnerClick,
@@ -176,6 +165,6 @@ export {
   loadScript,
   hasPending,
   getPlainText,
-  getAssigneeType,
   getTruncatedList,
+  getOnlyAnchorTags,
 };

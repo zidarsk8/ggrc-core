@@ -5,7 +5,6 @@
 
 import Cacheable from '../cacheable';
 import caUpdate from '../mixins/ca-update';
-import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import baseNotifications from '../mixins/notifications/base-notifications';
 import issueTracker from '../mixins/issue-tracker';
@@ -22,7 +21,6 @@ export default Cacheable.extend({
   create: 'POST /api/issues',
   mixins: [
     caUpdate,
-    timeboxed,
     accessControlList,
     baseNotifications,
     issueTracker,
@@ -69,6 +67,8 @@ export default Cacheable.extend({
     status: 'Draft',
   },
   statuses: ['Draft', 'Deprecated', 'Active', 'Fixed', 'Fixed and Verified'],
+  unchangeableIssueTrackerIdStatuses:
+    ['Fixed', 'Fixed and Verified', 'Deprecated'],
   buildIssueTrackerConfig(instance) {
     return {
       hotlist_id: '1498476',
@@ -99,7 +99,9 @@ export default Cacheable.extend({
       validate: {
         validateIssueTracker: true,
         validateIssueTrackerTitle: true,
-        validateIssueTrackerIssueId: true,
+        validateIssueTrackerIssueId() {
+          return this.constructor.unchangeableIssueTrackerIdStatuses;
+        },
       },
     },
   },

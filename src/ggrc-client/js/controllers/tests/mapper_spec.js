@@ -157,5 +157,46 @@ describe('ObjectMapper', function () {
         );
       });
     });
+
+    describe('shows mapper for mega objects', function () {
+      let fakeDataForMega;
+
+      beforeEach(function () {
+        fakeDataForMega = _.assign({}, fakeData, {
+          mega_object: 'Program',
+          mega_object_widget: 'Program_parent',
+          toggle: 'unified unified-search',
+        });
+      });
+
+      it('extends generalConfig with "isMegaObject" and "megaRelation"',
+        function () {
+          let args;
+          let btn = {};
+          method(fakeDataForMega, false, btn);
+
+          args = fakeCtrlInst.launch.calls.argsFor(0);
+
+          expect(args[1]).toEqual(
+            jasmine.objectContaining({
+              general: jasmine.objectContaining({
+                isMegaObject: 'Program',
+                megaRelation: 'parent',
+              }),
+            })
+          );
+        });
+
+      it('calls launch for ObjectMapper with passed btn and config',
+        function () {
+          let btn = {};
+          method(fakeDataForMega, false, btn);
+
+          expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
+            btn,
+            jasmine.any(Object)
+          );
+        });
+    });
   });
 });

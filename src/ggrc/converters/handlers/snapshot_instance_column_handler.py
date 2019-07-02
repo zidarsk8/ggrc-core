@@ -10,7 +10,9 @@ from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import MappingColumnHandler
+from ggrc.services import signals
 from ggrc.snapshotter.rules import Types
+from ggrc.utils import objects_cache
 
 
 class SnapshotInstanceColumnHandler(MappingColumnHandler):
@@ -132,8 +134,10 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
         mapping = models.Relationship(source=row_obj, destination=snapshot)
         relationships.append(mapping)
         db.session.add(mapping)
+        signals.Restful.model_posted.send(models.Relationship, obj=mapping)
       elif self.unmap and mapping:
         db.session.delete(mapping)
+        signals.Restful.model_deleted.send(models.Relationship, obj=mapping)
     db.session.flush(relationships)
     self.dry_run = True
 
@@ -141,19 +145,22 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     "return column value"
     if self.unmap or not self.mapping_object:
       return ""
-    if self.row_converter.obj.type == models.Audit.__name__ and \
-       self.mapping_object.__name__ in Types.all:
-      # Audit should have the same mappings as Assessment. Mapped objects
-      # will be loaded from snapshots.
-      mapped_snapshots = self.row_converter.block_converter.mapped_snapshots
-      snapshot_slugs = mapped_snapshots[self.row_converter.obj.id][
-          self.mapping_object.__name__
-      ]
-      human_readable_ids = sorted(list(snapshot_slugs))
+
+    obj_class = self.row_converter.block_converter.object_class
+    obj_ids = self.row_converter.block_converter.object_ids
+    if obj_class == models.Audit and self.mapping_object.__name__ in Types.all:
+      mapped_snapshots = objects_cache.audit_snapshot_slugs_cache(obj_ids)
     else:
-      objects = self.snapshoted_instances_query.all()
-      human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
-                            for i in objects]
+      mapped_snapshots = objects_cache.related_snapshot_slugs_cache(
+          obj_class,
+          obj_ids
+      )
+
+    snapshot_slugs = mapped_snapshots[self.row_converter.obj.id].get(
+        self.mapping_object.__name__,
+        set(),
+    )
+    human_readable_ids = sorted(snapshot_slugs)
     return "\n".join(human_readable_ids)
 
   def is_valid_creation(self, to_append_ids):

@@ -235,6 +235,8 @@ def make_import(csv_data, dry_run, ie_job=None):
                                      csv_data=csv_data)
     converter.import_csv_data()
     return converter.get_info()
+  except models_exceptions.ImportStoppedException:
+    raise
   except Exception as e:  # pylint: disable=broad-except
     logger.exception("Import failed: %s", e.message)
     if settings.TESTING:
@@ -288,6 +290,8 @@ def run_export(task):
 @background_task.queued_task
 def run_import_phases(task):
   """Execute import phases"""
+  # pylint: disable=too-many-return-statements
+  # pylint: disable=too-many-branches
   ie_id = task.parameters.get("ie_id")
   user = login.get_current_user()
   try:
@@ -324,6 +328,8 @@ def run_import_phases(task):
 
     if ie_job.status == "In Progress":
       info = make_import(csv_data, False, ie_job)
+      if ie_job.status == "Stopped":
+        return utils.make_simple_response()
       ie_job.results = json.dumps(info)
       for block_info in info:
         if block_info["block_errors"] or block_info["row_errors"]:
@@ -338,6 +344,11 @@ def run_import_phases(task):
       db.session.commit()
       job_emails.send_email(job_emails.IMPORT_COMPLETED, user.email,
                             ie_job.title)
+  except models_exceptions.ImportStoppedException:
+    ie_job = import_export.get(ie_id)
+    job_emails.send_email(job_emails.IMPORT_STOPPED, user.email,
+                          ie_job.title)
+    logger.info("Import was stopped by user.")
   except Exception as e:  # pylint: disable=broad-except
     logger.exception(e.message)
     ie_job = import_export.get(ie_id)
@@ -640,12 +651,21 @@ def handle_import_stop(**kwargs):
   """Handle import stop"""
   try:
     ie_job = import_export.get(kwargs["id2"])
-    if ie_job.status in ("Analysis", "Blocked"):
+    if ie_job.status in ("Analysis", "In Progress", "Blocked"):
       ie_job.status = "Stopped"
+      ie_job.end_at = datetime.utcnow()
+      # Stop tasks only on non local instance
+      if getattr(settings, "APPENGINE_INSTANCE", "local") != "local":
+        stop_ie_bg_tasks(ie_job)
       db.session.commit()
+      expire_ie_cache(ie_job)
       return make_import_export_response(ie_job.log_json())
+    if ie_job.status == "Stopped":
+      raise models_exceptions.ImportStoppedException()
   except wzg_exceptions.Forbidden:
     raise
+  except models_exceptions.ImportStoppedException:
+    raise wzg_exceptions.BadRequest(app_errors.IMPORT_STOPPED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
@@ -672,7 +692,7 @@ def handle_export_stop(**kwargs):
   except wzg_exceptions.Forbidden:
     raise
   except models_exceptions.ExportStoppedException:
-    raise wzg_exceptions.BadRequest(app_errors.STOPPED_WARNING)
+    raise wzg_exceptions.BadRequest(app_errors.EXPORT_STOPPED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(

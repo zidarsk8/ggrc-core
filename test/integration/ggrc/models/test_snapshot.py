@@ -122,7 +122,8 @@ class TestSnapshotQueryApi(TestCase):
         {"title": "CA rich text", "attribute_type": "Rich Text"},
         {"title": "CA date", "attribute_type": "Date"},
         {"title": "CA checkbox", "attribute_type": "Checkbox"},
-        {"title": "CA person", "attribute_type": "Map:Person"},
+        {"title": "CA multiselect", "attribute_type": "Multiselect",
+         "multi_choice_options": "yes,no"},
         {"title": "CA dropdown", "attribute_type": "Dropdown",
          "multi_choice_options": "one,two,three,four,five"},
     ]
@@ -138,7 +139,6 @@ class TestSnapshotQueryApi(TestCase):
   def _create_external_object():
     """Populate external model object that could not be imported."""
     with factories.single_commit():
-      ca_person = factories.PersonFactory(email="user4@example.com")
       objects = [
           factories.ControlFactory(directive=None),
           factories.RiskFactory()
@@ -152,7 +152,7 @@ class TestSnapshotQueryApi(TestCase):
               "CA rich text",
               "CA date",
               "CA checkbox",
-              "CA person",
+              "CA multiselect",
               "CA dropdown"
           ])
       }
@@ -161,7 +161,7 @@ class TestSnapshotQueryApi(TestCase):
           "CA rich text": "control<br><br>\nrich text",
           "CA date": "22/02/2022",
           "CA checkbox": "yes",
-          "CA person": ca_person,
+          "CA multiselect": "yes",
           "CA dropdown": "one"
       }
 

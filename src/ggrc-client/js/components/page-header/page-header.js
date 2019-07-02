@@ -21,6 +21,8 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import template from './page-header.stache';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
+import {getAjaxErrorInfo} from '../../plugins/utils/errors-utils';
+import {notifier} from '../../plugins/utils/notifiers-utils';
 
 let colorsMap = {
   AccountBalance: 'header-style-1',
@@ -126,7 +128,7 @@ let viewModel = can.Map.extend({
     },
   },
   menuInitialized: false,
-  lhnInitialized: false,
+  isOpenLhnTriggered: false,
   showHideTitles: function (element) {
     let elWidth = element.width();
     let $menu = element.find('.menu');
@@ -144,11 +146,18 @@ let viewModel = can.Map.extend({
     this.attr('menuInitialized', true);
   },
   handleLHNOpening() {
-    if (!this.attr('lhnInitialized')) {
+    if (!this.attr('isOpenLhnTriggered')) {
+      this.attr('isOpenLhnTriggered', true);
       import(/* webpackChunkName: "lhn" */'../../controllers/lhn_controllers')
         .then((module) => {
           new module.LhnControl('#lhn');
-          this.attr('lhnInitialized', true);
+        }).catch((err) => {
+          this.attr('isOpenLhnTriggered', false);
+          const errorDetails = getAjaxErrorInfo(err).details;
+          notifier('error', errorDetails);
+          if (!errorDetails) {
+            console.error(err);
+          }
         });
     }
   },

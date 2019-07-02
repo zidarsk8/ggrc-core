@@ -5,7 +5,7 @@
 
 import Component from '../ca-object-modal-content';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import * as Utils from '../../../plugins/ggrc_utils';
+import * as Utils from '../../../plugins/utils/comments-utils';
 
 describe('ca-object-modal-content component', () => {
   let viewModel;

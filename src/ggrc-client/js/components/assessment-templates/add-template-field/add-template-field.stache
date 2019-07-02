@@ -21,7 +21,7 @@
 <div class="span2{{#selected.invalidValues}}
             field-failure{{/selected.invalidValues}}
             ca-values">
-  {{#in_array selected.type valueAttrs}}
+  {{#if isDisplayValues}}
     <input type="text" class="input-block-level"
            el:value:bind="selected.values"
            placeholder="{{placeholder}}"/>
@@ -31,7 +31,7 @@
       {{/selected.invalidValues}}
   {{else}}
     N/A
-  {{/in_array}}
+  {{/if}}
 </div>
 <div class="span2 centered checkbox-wrap">
 </div>

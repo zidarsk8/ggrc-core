@@ -820,13 +820,13 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
       notifications = self._get_notifications().all()
-      self.assertEqual(len(notifications), 6)
+      self.assertEqual(len(notifications), 7)
 
       revisions = Revision.query.filter(
           Revision.resource_type == 'Notification',
           Revision.resource_id.in_([notif.id for notif in notifications])
       ).count()
-      self.assertEqual(revisions, 6)
+      self.assertEqual(revisions, 7)
 
       self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)

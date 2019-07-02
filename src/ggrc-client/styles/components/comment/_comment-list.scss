@@ -7,3 +7,9 @@ mapped-comments {
   overflow-x: hidden;
   display: flex;
 }
+
+comments-paging {
+  .btn:first-child {
+    margin-right: 10px;
+  }
+}

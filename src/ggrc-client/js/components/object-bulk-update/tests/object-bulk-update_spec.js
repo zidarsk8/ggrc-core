@@ -6,7 +6,7 @@
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 import tracker from '../../../tracker';
-import Mappings from '../../../models/mappers/mappings';
+import * as modelsUtils from '../../../plugins/utils/models-utils';
 
 describe('object-bulk-update component', function () {
   let events;
@@ -32,7 +32,7 @@ describe('object-bulk-update component', function () {
 
       spyOn(stateUtils, 'getBulkStatesForModel')
         .and.returnValue(targetStates);
-      spyOn(Mappings, 'getMappingType')
+      spyOn(modelsUtils, 'groupTypes')
         .and.returnValue(mappingType);
 
       result = method({type: 'some type'}, parentViewModel)();
@@ -141,18 +141,16 @@ describe('object-bulk-update component', function () {
     beforeEach(function () {
       context = {
         viewModel: new can.Map({
-          submitCbs: {
-            fire: jasmine.createSpy(),
-          },
+          onSubmit: jasmine.createSpy(),
         }),
       };
       event = events.inserted.bind(context);
     });
 
-    it('calls fire() of submitCbs attribute', function () {
+    it('calls onSubmit()', function () {
       event();
 
-      expect(context.viewModel.submitCbs.fire).toHaveBeenCalled();
+      expect(context.viewModel.onSubmit).toHaveBeenCalled();
     });
   });
 });

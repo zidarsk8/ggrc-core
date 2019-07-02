@@ -54,7 +54,6 @@ const adminListDescriptors = {
         });
     },
     object_display: 'People',
-    tooltip_view: '/static/templates/people/object_tooltip.stache',
     header_view:
     // includes only the filter, not the column headers
       '/static/templates/people/filters.stache',

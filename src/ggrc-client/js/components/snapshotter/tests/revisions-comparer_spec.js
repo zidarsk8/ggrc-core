@@ -260,7 +260,7 @@ describe('revisions-comparer component', function () {
 
   describe('"highlightCustomAttributes" method', () => {
     const titleSelector = '.info-pane__section-title';
-    const valueSelector = '.inline__content';
+    const valueSelector = 'readonly-inline-content';
     const highlightSelector = '.diff-highlighted';
     const attributeSelector = '.ggrc-form-item';
 
@@ -304,9 +304,6 @@ describe('revisions-comparer component', function () {
             title: 'person attr',
           },
           attribute_value: 'Person',
-          attribute_object: {
-            id: 3,
-          },
         }];
 
         let ca1s = [{
@@ -320,10 +317,7 @@ describe('revisions-comparer component', function () {
           def: {
             title: 'person attr',
           },
-          attribute_value: 'Person',
-          attribute_object: {
-            id: 4,
-          },
+          attribute_value: 'changed Person',
         }];
 
         let index = 0;
@@ -341,11 +335,11 @@ describe('revisions-comparer component', function () {
                       <global-custom-attributes>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title"></div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title"></div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                       </global-custom-attributes>
                     </section>
@@ -353,11 +347,11 @@ describe('revisions-comparer component', function () {
                       <global-custom-attributes>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title"></div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title"></div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                       </global-custom-attributes>
                     </section>
@@ -420,29 +414,31 @@ describe('revisions-comparer component', function () {
             return ca1s;
           });
 
-        $target = $(`<div>
-                    <section class="info">
-                      <global-custom-attributes>
-                        <div class="ggrc-form-item">
-                          <div class="info-pane__section-title">title</div>
-                          <div class="inline__content">value</div>
-                        </div>
-                        <div class="ggrc-form-item">
-                          <div class="info-pane__section-title">ca2 title</div>
-                          <div class="inline__content">ca2 value</div>
-                        </div>
-                      </global-custom-attributes>
-                    </section>
+        $target = $(
+          `<div>
+            <section class="info">
+              <global-custom-attributes>
+                <div class="ggrc-form-item">
+                  <div class="info-pane__section-title">title</div>
+                  <readonly-inline-content>value</readonly-inline-content>
+                </div>
+                <div class="ggrc-form-item">
+                  <div class="info-pane__section-title">ca2 title</div>
+                  <readonly-inline-content>ca2 value</readonly-inline-content>
+                </div>
+              </global-custom-attributes>
+            </section>
 
-                    <section class="info">
-                      <global-custom-attributes>
-                        <div class="ggrc-form-item">
-                          <div class="info-pane__section-title">ca2 title</div>
-                          <div class="inline__content">ca2 value</div>
-                        </div>
-                      </global-custom-attributes>
-                    </section>
-                  </div>`);
+            <section class="info">
+              <global-custom-attributes>
+                <div class="ggrc-form-item">
+                  <div class="info-pane__section-title">ca2 title</div>
+                  <readonly-inline-content>ca2 value</readonly-inline-content>
+                </div>
+              </global-custom-attributes>
+            </section>
+          </div>`
+        );
       });
 
       it('adds empty html block to the right panel', () => {
@@ -500,25 +496,27 @@ describe('revisions-comparer component', function () {
             return ca1s;
           });
 
-        $target = $(`<div>
-                    <section class="info">
-                      <global-custom-attributes>
-                        <div class="ggrc-form-item">
-                          <div class="info-pane__section-title">title</div>
-                          <div class="inline__content">value</div>
-                        </div>
-                        <div class="ggrc-form-item">
-                          <div class="info-pane__section-title">ca2 title</div>
-                          <div class="inline__content">ca2 value</div>
-                        </div>
-                      </global-custom-attributes>
-                    </section>
+        $target = $(
+          `<div>
+            <section class="info">
+              <global-custom-attributes>
+                <div class="ggrc-form-item">
+                  <div class="info-pane__section-title">title</div>
+                  <readonly-inline-content>value</readonly-inline-content>
+                </div>
+                <div class="ggrc-form-item">
+                  <div class="info-pane__section-title">ca2 title</div>
+                  <readonly-inline-content>ca2 value</readonly-inline-content>
+                </div>
+              </global-custom-attributes>
+            </section>
 
-                    <section class="info">
-                      <global-custom-attributes>
-                      </global-custom-attributes>
-                    </section>
-                  </div>`);
+            <section class="info">
+              <global-custom-attributes>
+              </global-custom-attributes>
+            </section>
+          </div>`
+        );
       });
 
       it('adds empty html blocks to the right panel', () => {
@@ -587,7 +585,7 @@ describe('revisions-comparer component', function () {
                       <global-custom-attributes>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title">title</div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                       </global-custom-attributes>
                     </section>
@@ -595,11 +593,11 @@ describe('revisions-comparer component', function () {
                       <global-custom-attributes>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title">new title</div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title">title</div>
-                          <div class="inline__content"></div>
+                          <readonly-inline-content></readonly-inline-content>
                         </div>
                       </global-custom-attributes>
                     </section>
@@ -653,17 +651,20 @@ describe('revisions-comparer component', function () {
                           </related-people-access-control-group>
                         </div>`);
         $blockNotEmpty = $(`<div>
-                            <related-people-access-control-group>
-                              <object-list>
-                                  <person-data>
-                                  </person-data>
-                              </object-list>
-                            </related-people-access-control-group>
-                          </div>`);
+                              <related-people-access-control-group>
+                                <object-list>
+                                  <div class="object-list__items">
+                                    <person-data>
+                                      person1@example.com
+                                    </person-data>
+                                  </div>
+                                </object-list>
+                              </related-people-access-control-group>
+                            </div>`);
         $target = {find: () => {}};
       });
 
-      it(`highlights blocks of grants if list of people was empty
+      it(`do not highlights blocks of grants if list of people was empty
         in the old revision`, () => {
         $rolesPanes = $blockEmpty.add($blockNotEmpty);
         spyOn($target, 'find').and.returnValue($rolesPanes);
@@ -671,10 +672,10 @@ describe('revisions-comparer component', function () {
         viewModel.highlightCustomRoles($target);
 
         expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
-          .length).toEqual(2);
+          .length).toEqual(1);
       });
 
-      it(`highlights blocks of grants if list of people is empty
+      it(`do not highlights blocks of grants if list of people is empty
         in the new revision`, () => {
         $rolesPanes = $blockNotEmpty.add($blockEmpty);
         spyOn($target, 'find').and.returnValue($rolesPanes);
@@ -682,7 +683,7 @@ describe('revisions-comparer component', function () {
         viewModel.highlightCustomRoles($target);
 
         expect($rolesPanes.find(`${blockSelector}${highlightSelector}`)
-          .length).toEqual(2);
+          .length).toEqual(1);
       });
     });
   });

@@ -29,6 +29,8 @@ from ggrc.models import Revision, all_models
 from integration.ggrc import api_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 # Hide errors during testing. Errors are still displayed after all tests are
 # done. This is for the bad request error messages while testing the api calls.
@@ -557,6 +559,17 @@ class TestCase(BaseTestCase, object):
     return assignees
 
   @staticmethod
+  def create_user_with_role(role, **person_params):
+    """Create new user and assign global role to him."""
+    with factories.single_commit():
+      user = factories.PersonFactory(**person_params)
+      system_role = all_models.Role.query.filter(
+          all_models.Role.name == role
+      ).one()
+      rbac_factories.UserRoleFactory(role=system_role, person=user)
+    return user
+
+  @staticmethod
   def get_model_ca(model_name, ids):
     """Get CAs for model."""
     return db.session.query(all_models.Attributes).filter(
@@ -576,3 +589,13 @@ class TestCase(BaseTestCase, object):
         sorted(expected_notification_list),
         sorted([n.notification_type.name for n in active_notifications])
     )
+
+  def assert201(self, response, message=None):
+    """
+    Checks if response status code is 201
+
+    :param response: Flask response
+    :param message: Message to display on test failure
+    """
+
+    self.assertStatus(response, 201, message)

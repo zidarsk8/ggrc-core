@@ -1,10 +1,10 @@
 {{!
-    Copyright (C) 2019 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
 {{#instance}}
-  <section class="info{{#if is_info_pin}} sticky-info-panel{{/if}}">
+  <section class="info {{#if is_info_pin}}sticky-info-panel{{/if}}">
     <div class="tier-content">
       <general-page-header instance:from="instance"></general-page-header>
 
@@ -78,21 +78,39 @@
                     </div>
                   </div>
                 </div>
-                {{> /static/templates/custom_attributes/info.stache}}
               </div><!-- custom-attr-wrap end -->
+              {{> /static/templates/custom_attributes/info.stache}}
             </div>
-            <div class="info-pane__sidebar">
-              <div class="info-pane__section-title">Responses/Comments</div>
-              <comments-section class="flex-box flex-col"
-                instance:from="instance"
-                notification:from="'Notify Contacts'">
-              </comments-section>
-            </div>
+            {{^if isSnapshot}}
+              <div class="info-pane__sidebar">
+                <div class="info-pane__section-title">Responses/Comments</div>
+                <comments-section class="flex-box flex-col"
+                  instance:from="instance"
+                  notification:from="'Notify Contacts'">
+                </comments-section>
+              </div>
+            {{/if}}
           </div>
         </tab-panel>
-        <tab-panel tabId:from="'change-log'" panels:bind="panels" titleText:from="'Change Log'">
-          <revision-log instance:from="instance" options:from="tabOptions"></revision-log>
-        </tab-panel>
+        {{^if isSnapshot}}
+          <tab-panel panels:bind="panels" titleText:from="'Change Proposals'"
+                     parentInstance:from="instance"
+                     warningText:from="'Some proposals are pending approval'"
+                     extraClasses:from="'proposal proposal__tab-warning'"
+                     tabId:from="'tab-related-proposals'"
+                     canDisplayWarning:from="true"
+                     preRenderContent:from="true">
+            <related-proposals baseInstance:from="instance"
+                               on:updateProposalsWarning="updateWarningState(scope.event)">
+            </related-proposals>
+          </tab-panel>
+          <tab-panel panels:bind="panels" titleText:from="'Version History'">
+            <related-revisions instance:from="instance"></related-revisions>
+          </tab-panel>
+          <tab-panel tabId:from="'change-log'" panels:bind="panels" titleText:from="'Change Log'">
+            <revision-log instance:from="instance" options:from="tabOptions"></revision-log>
+          </tab-panel>
+        {{/if}}
       </tab-container>
     </div><!-- tier-content end -->
 

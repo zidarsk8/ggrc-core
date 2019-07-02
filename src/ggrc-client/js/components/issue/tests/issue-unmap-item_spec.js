@@ -150,12 +150,15 @@ describe('issue-unmap-item component', () => {
     });
 
     it('should handle server errors correctly', () => {
-      viewModel.loadRelatedObjects();
+      spyOn(NotifiersUtils, 'notifier');
       reqDeferred.reject();
 
-      expect($.prototype.trigger).toHaveBeenCalledWith('ajax:flash', {
-        error: 'There was a problem with retrieving related objects.',
-      });
+      viewModel.loadRelatedObjects();
+
+      expect(NotifiersUtils.notifier).toHaveBeenCalledWith(
+        'error',
+        'There was a problem with retrieving related objects.'
+      );
     });
   });
 
@@ -271,34 +274,32 @@ describe('issue-unmap-item component', () => {
 
   describe('unmap() method', () => {
     beforeEach(function () {
-      spyOn($.prototype, 'trigger');
+      spyOn(NotifiersUtils, 'notifier');
       spyOn(CurrentPageUtils, 'getPageInstance');
       spyOn(CurrentPageUtils, 'navigate');
     });
 
     it('should change "isLoading" flag in case of success',
-      async function (done) {
+      async function () {
         spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.resolve());
         viewModel.attr('isLoading', true);
         await viewModel.unmap();
         expect(viewModel.attr('isLoading')).toBe(false);
-        done();
       });
 
     it('should change "isLoading" flag in case of error',
-      async function (done) {
+      async function () {
         spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.reject());
         viewModel.attr('isLoading', true);
 
         await viewModel.unmap();
         expect(viewModel.attr('isLoading')).toBe(false);
-        done();
       });
 
     it('should refresh issue page if page instance is issue',
-      async function (done) {
+      async function () {
         spyOn(Relationship, 'findRelationship')
           .and.returnValue(Promise.resolve({
             unmap: () => Promise.resolve(),
@@ -310,38 +311,33 @@ describe('issue-unmap-item component', () => {
         expect(CurrentPageUtils.navigate).toHaveBeenCalledWith(
           viewModel.attr('issueInstance.viewLink')
         );
-        done();
       });
 
     it('should change open modal state to false if page instance is not issue',
-      async function (done) {
+      async function () {
         spyOn(Relationship, 'findRelationship')
           .and.returnValue({});
 
         await viewModel.unmap();
         expect(viewModel.attr('modalState.open')).toBe(false);
-        done();
       });
 
-    it('should unmap issue correctly', async function (done) {
+    it('should unmap issue correctly', async function () {
       const relationship = jasmine.createSpyObj(['unmap']);
       spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve(relationship));
       await viewModel.unmap();
       expect(relationship.unmap).toHaveBeenCalledWith(true);
-      done();
     });
 
-    it('should handle server errors correctly', async function (done) {
+    it('should handle server errors correctly', async function () {
       spyOn(Relationship, 'findRelationship')
         .and.returnValue(Promise.resolve({
           unmap: () => Promise.reject(),
         }));
       await viewModel.unmap();
-      expect($.prototype.trigger).toHaveBeenCalledWith('ajax:flash', {
-        error: 'There was a problem with unmapping.',
-      });
-      done();
+      expect(NotifiersUtils.notifier).toHaveBeenCalledWith('error',
+        'There was a problem with unmapping.');
     });
   });
 

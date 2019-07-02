@@ -3,11 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.popover-data-title,
-.popover-data-content {
-  display: none;
-}
-
 .popover {
   padding: 0;
   @include border-radius($default-border-radius);
@@ -268,22 +263,6 @@
   }
   .updated {
     text-align:right;
-  }
-  .popoverfooter {
-    margin-bottom:0;
-    border-top:1px solid $lightGray;
-    background:#f3f3f3;
-    padding:4px 14px;
-    min-height: auto;
-    a {
-      color:$gray;
-      &:hover {
-       color:$error;
-      }
-    }
-    i {
-      @include opacity(0.4);
-    }
   }
   h3,
   h4 {

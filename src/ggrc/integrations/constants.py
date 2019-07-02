@@ -79,8 +79,8 @@ NO_VERIFIER_STATUSES = {
     ('Not Started', 'Completed'): 'VERIFIED',
     ('In Progress', 'Completed'): 'VERIFIED',
 
-    ('Completed', 'In Progress'): 'ASSIGNED',
-    ('Deprecated', 'In Progress'): 'ASSIGNED',
+    ('Completed', 'In Progress'): 'ACCEPTED',
+    ('Deprecated', 'In Progress'): 'ACCEPTED',
 
     ('Completed', 'Not Started'): 'ASSIGNED',
     ('Deprecated', 'Not Started'): 'ASSIGNED',
@@ -92,9 +92,9 @@ NO_VERIFIER_STATUSES = {
 
 STATUSES_MAPPING = {
     "Not Started": "ASSIGNED",
-    "In Progress": "ASSIGNED",
+    "In Progress": "ACCEPTED",
     "In Review": "FIXED",
-    "Rework Needed": "ASSIGNED",
+    "Rework Needed": "ACCEPTED",
     "Completed": "VERIFIED",
     "Deprecated": "OBSOLETE"
 }
@@ -111,16 +111,16 @@ VERIFIER_STATUSES = {
     ('Completed', 'In Review', True): 'FIXED',
     ('Deprecated', 'In Review', False): 'FIXED',
 
-    # State: ASSIGNED
-    ('In Review', 'In Progress', False): 'ASSIGNED',
+    # State: ACCEPTED
+    ('In Review', 'In Progress', False): 'ACCEPTED',
     # if gets from Completed and Verified to In Progress, can not be verified
-    ('Completed', 'In Progress', False): 'ASSIGNED',
-    ('Deprecated', 'In Progress', False): 'ASSIGNED',
+    ('Completed', 'In Progress', False): 'ACCEPTED',
+    ('Deprecated', 'In Progress', False): 'ACCEPTED',
 
-    # State: ASSIGNED
-    ('In Review', 'Rework Needed', False): 'ASSIGNED',
-    ('Completed', 'Rework Needed', True): 'ASSIGNED',
-    ('Deprecated', 'Rework Needed', False): 'ASSIGNED',
+    # State: ACCEPTED
+    ('In Review', 'Rework Needed', False): 'ACCEPTED',
+    ('Completed', 'Rework Needed', True): 'ACCEPTED',
+    ('Deprecated', 'Rework Needed', False): 'ACCEPTED',
 
     # State: FIXED (Verified)
     ('Not Started', 'Completed', True): 'VERIFIED',

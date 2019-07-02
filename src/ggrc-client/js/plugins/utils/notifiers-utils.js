@@ -18,11 +18,14 @@ const messages = {
 
 /**
  * Shows flash notification
- * @param  {String} type    type of notification. error|warning
- * @param  {String} message Plain text message or template if data is passed
- * @param  {Object} [data] data to populate template
+ * @param  {String} type - Type of notification. error|warning
+ * @param  {String} message - Plain text message or template if data is passed
+ * @param  {Object} [options={}] - Set of options
+ * @param  {Object} [options.data=null] - Data to populate template
+ * @param  {String} [options.reloadLink=null] - Redirection link which will be
+ * inserted instead of "{reload_link}" locator placed in the message
  */
-function notifier(type, message, data) {
+function notifier(type, message, {data = null, reloadLink = null} = {}) {
   let props = {};
 
   if ( message && data ) {
@@ -32,7 +35,7 @@ function notifier(type, message, data) {
 
   type = type || 'warning';
   props[type] = message || messages.default;
-  $('body').trigger('ajax:flash', props);
+  $('body').trigger('ajax:flash', [props, reloadLink]);
 }
 
 function notifierXHR(type, xhr) {

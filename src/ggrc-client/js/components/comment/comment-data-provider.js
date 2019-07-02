@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import * as QueryAPI from '../../plugins/utils/query-api-utils';
+import {loadComments} from '../../plugins/utils/comments-utils';
 import {
   REFRESH_COMMENTS,
   REFRESH_MAPPED_COUNTER,
@@ -15,46 +15,67 @@ export default can.Component.extend({
   tag: 'comment-data-provider',
   leakScope: true,
   viewModel: can.Map.extend({
+    define: {
+      commentObjectName: {
+        get() {
+          return this.attr('instance').constructor.isChangeableExternally
+            ? 'ExternalComment'
+            : 'Comment';
+        },
+      },
+    },
     instance: null,
     comments: [],
+    pageSize: 10,
+    totalCount: 0,
+    newCommentsCount: 0,
     isLoading: false,
-
-    loadComments() {
-      let query = this.buildQuery();
-      let comments = this.getComments(query);
-      this.attr('comments').replace(comments);
+    hideComments() {
+      // remain only first comments
+      this.attr('comments').splice(this.attr('pageSize'));
     },
-    buildQuery() {
-      let objectName = this.attr('instance').class.isChangeableExternally
-        ? 'ExternalComment'
-        : 'Comment';
+    async loadFirstComments(count) {
+      let instance = this.attr('instance');
+      let modelName = this.attr('commentObjectName');
+      let newCommentsCount = this.attr('newCommentsCount');
 
-      let query = QueryAPI.buildParam(objectName, {sort: [{
-        key: 'created_at',
-        direction: 'desc',
-      }]}, {
-        type: this.attr('instance.type'),
-        id: this.attr('instance.id'),
-        operation: 'relevant',
-      });
-      return query;
+      // load more comments as they can be added by other users before or after current user's new comments
+      let pageSize = (count || this.attr('pageSize')) + newCommentsCount;
+
+      let response = await loadComments(instance, modelName, 0, pageSize);
+      let {values: comments, total} = response[modelName];
+
+      this.attr('comments').splice(0, newCommentsCount);
+      this.attr('comments').unshift(...comments);
+
+      this.attr('totalCount', total);
+      this.attr('newCommentsCount', 0);
     },
-    getComments(query) {
-      let dfd = $.Deferred();
+    async loadMoreComments(startIndex) {
       this.attr('isLoading', true);
-      QueryAPI.batchRequests(query)
-        .done((response) => {
-          let type = Object.keys(response)[0];
-          let values = response[type].values;
-          dfd.resolve(values);
-        })
-        .fail(() => {
-          dfd.resolve([]);
-        })
-        .always(() => {
-          this.attr('isLoading', false);
-        });
-      return dfd.promise();
+
+      let instance = this.attr('instance');
+      let modelName = this.attr('commentObjectName');
+      let index = startIndex || this.attr('comments').length;
+      let pageSize = this.attr('pageSize');
+
+      try {
+        let response = await loadComments(instance, modelName, index, pageSize);
+        let {values: comments, total} = response[modelName];
+
+        let totalCount = this.attr('totalCount');
+        if (totalCount !== total) {
+          // new comments were added by other users
+          let newCommentsCount = total - totalCount;
+          await Promise.all([
+            this.loadFirstComments(newCommentsCount),
+            this.loadMoreComments(index + newCommentsCount)]);
+        } else {
+          this.attr('comments').push(...comments);
+        }
+      } finally {
+        this.attr('isLoading', false);
+      }
     },
     addComment(event) {
       let newComment = event.items[0];
@@ -68,6 +89,9 @@ export default can.Component.extend({
     },
     processComment(event) {
       if (event.success) {
+        this.attr('totalCount', this.attr('totalCount') + 1);
+        this.attr('newCommentsCount', this.attr('newCommentsCount') + 1);
+
         this.mapToInstance(event.item).then(() => {
           const instance = this.attr('instance');
           instance.dispatch({
@@ -92,12 +116,18 @@ export default can.Component.extend({
         });
     },
   }),
-  init() {
-    this.viewModel.loadComments();
+  async init() {
+    this.viewModel.attr('isLoading', true);
+    try {
+      await this.viewModel.loadFirstComments();
+    } finally {
+      this.viewModel.attr('isLoading', false);
+    }
   },
   events: {
     [`{viewModel.instance} ${REFRESH_COMMENTS.type}`]() {
-      this.viewModel.loadComments();
+      this.viewModel.attr('comments').replace([]);
+      this.viewModel.loadFirstComments();
     },
   },
 });

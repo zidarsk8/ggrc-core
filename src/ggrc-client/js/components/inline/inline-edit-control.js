@@ -5,6 +5,7 @@
 
 import './readonly-inline-content';
 import '../form/fields/checkbox-form-field';
+import '../form/fields/multiselect-form-field';
 import '../form/fields/date-form-field';
 import '../form/fields/dropdown-form-field';
 import '../form/fields/person-form-field';

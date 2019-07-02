@@ -115,7 +115,7 @@ export default can.Component.extend({
     },
     showNotification() {
       notifier('info', notificationTemplate, {
-        revertState: this.markUnreviewed.bind(this),
+        data: {revertState: this.markUnreviewed.bind(this)},
       });
     },
     updateReview(review) {
@@ -161,7 +161,7 @@ export default can.Component.extend({
     '{viewModel.instance} modelAfterSave'() {
       this.viewModel.loadReview();
     },
-    [`{viewModel.instance} ${REFRESH_MAPPING.type}`](instance, event) {
+    [`{viewModel.instance} ${REFRESH_MAPPING.type}`]([instance], event) {
       // check destinationType because REFRESH_MAPPING is also dispatched on modal 'hide'
       if (event.destinationType) {
         this.viewModel.loadReview();

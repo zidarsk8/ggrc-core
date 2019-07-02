@@ -1,17 +1,22 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tests for basic csv imports."""
-
+import collections
 from collections import OrderedDict
 
 import ddt
 import mock
 
+from appengine import base
 from ggrc import models
 from ggrc.converters import errors
-from integration.ggrc import TestCase
+from ggrc.models import all_models
+import ggrc_basic_permissions
+from integration.ggrc import TestCase, api_helper
 from integration.ggrc import generator
 from integration.ggrc.models import factories
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @ddt.ddt
@@ -21,6 +26,7 @@ class TestBasicCsvImport(TestCase):
   def setUp(self):
     super(TestBasicCsvImport, self).setUp()
     self.generator = generator.ObjectGenerator()
+    self.api = api_helper.Api()
     self.client.get("/login")
 
   def generate_people(self, people):
@@ -283,7 +289,7 @@ class TestBasicCsvImport(TestCase):
                 errors.UNSUPPORTED_MAPPING.format(
                     line=18,
                     obj_a=obj_type,
-                    obj_b=warn_column.split(":", 1)[1],
+                    obj_b=warn_column.split(":", 1)[1].title(),
                     column_name=warn_column
                 )
             } for warn_column in warn_columns
@@ -492,3 +498,91 @@ class TestBasicCsvImport(TestCase):
       self._import_file("assessment_with_templates.csv")
     self.assertEqual(models.all_models.Assessment.query.count(), 0)
     self.assertEqual(models.all_models.Revision.query.count(), 0)
+
+
+@base.with_memcache
+class TestImportPermissions(TestCase):
+  """Test permissions loading during import."""
+
+  def setUp(self):
+    super(TestImportPermissions, self).setUp()
+    self.api = api_helper.Api()
+
+  def test_import_permissions(self):
+    """Test that permissions aren't recalculated during import new objects."""
+    with factories.single_commit():
+      audit = factories.AuditFactory(slug="audit-1")
+      market = factories.MarketFactory()
+      user = factories.PersonFactory()
+      system_role = all_models.Role.query.filter(
+          all_models.Role.name == "Creator"
+      ).one()
+      rbac_factories.UserRoleFactory(role=system_role, person=user)
+      audit.add_person_with_role_name(user, "Audit Captains")
+      market.add_person_with_role_name(user, "Admin")
+    self._create_snapshots(audit, [market])
+
+    data = [
+        collections.OrderedDict([
+            ("Code*", ""),
+            ("Audit*", "audit-1"),
+            ("Title*", "assessment{}".format(i)),
+            ("State", "Not Started"),
+            ("Assignees*", "user@example.com"),
+            ("Creators*", "user@example.com"),
+            ("map:market versions", market.slug),
+        ]) for i in range(10)
+    ]
+
+    self.api.set_user(user)
+
+    with mock.patch(
+        "ggrc_basic_permissions.load_access_control_list",
+        side_effect=ggrc_basic_permissions.load_access_control_list
+    ) as acl_loader:
+      response = self.api.run_import_job(user, "Assessment", data)
+      self.assert200(response)
+      # 10 Assessments should be created in import
+      self.assertEqual(all_models.Assessment.query.count(), 10)
+      # Permissions were loaded once on dry run and once on real run
+      self.assertEqual(acl_loader.call_count, 2)
+
+  def test_permissions_cleared(self):
+    """Test that permissions where cleared after import."""
+    with factories.single_commit():
+      user = factories.PersonFactory()
+      user_id = user.id
+      market = factories.MarketFactory(slug="test market")
+      system_role = all_models.Role.query.filter(
+          all_models.Role.name == "Creator"
+      ).one()
+      rbac_factories.UserRoleFactory(role=system_role, person=user)
+      market.add_person_with_role_name(user, "Admin")
+
+    user_perm_key = 'permissions:{}'.format(user_id)
+
+    # Recalculate permissions under new user
+    self.api.set_user(user)
+    self.api.client.get("/permissions")
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertEqual(perm_ids, {user_perm_key})
+    user_perm = self.memcache_client.get(user_perm_key)
+    self.assertIsNotNone(user_perm)
+
+    data = [
+        collections.OrderedDict([
+            ("Code*", ""),
+            ("Title*", "Test Objective"),
+            ("Admin", "user@example.com"),
+            ("map:market", "test market"),
+        ])
+    ]
+    response = self.api.run_import_job(user, "Objective", data)
+    self.assert200(response)
+    self.assertEqual(all_models.Objective.query.count(), 1)
+
+    perm_ids = self.memcache_client.get('permissions:list')
+    self.assertEqual(perm_ids, set())
+    user_perm = self.memcache_client.get(user_perm_key)
+    self.assertIsNone(user_perm)

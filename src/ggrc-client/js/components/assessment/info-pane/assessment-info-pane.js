@@ -12,6 +12,7 @@ import '../attach-button';
 import '../info-pane-save-status';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
+import '../../comment/comments-paging';
 import '../mapped-controls/assessment-mapped-controls';
 import '../../assessment/map-button-using-assessment-type';
 import '../../ca-object/ca-object-modal-content';
@@ -39,6 +40,7 @@ import {
   buildParam,
   batchRequests,
 } from '../../../plugins/utils/query-api-utils';
+import {loadComments} from '../../../plugins/utils/comments-utils';
 import {
   getCustomAttributes,
   getLCAPopupTitle,
@@ -202,7 +204,8 @@ export default can.Component.extend({
       instance: {},
       isInfoPaneSaving: {
         get: function () {
-          if (this.attr('isUpdatingRelatedItems')) {
+          if (this.attr('isUpdatingRelatedItems') ||
+            this.attr('isLoadingComments')) {
             return false;
           }
 
@@ -233,6 +236,9 @@ export default can.Component.extend({
     initialState: 'Not Started',
     deprecatedState: 'Deprecated',
     assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
+    commentsTotalCount: 0,
+    commentsPerPage: 10,
+    newCommentsCount: 0,
     refreshCounts: function (types) {
       let pageInstance = getPageInstance();
       initCounts(
@@ -364,7 +370,7 @@ export default can.Component.extend({
       this.attr('deferredSave').execute(function () {
         self.addAction('add_related', related);
       })
-        .done(function () {
+        .done(() => {
           if (type === 'comments') {
             tracker.stop(assessment.type,
               tracker.USER_JOURNEY_KEYS.INFO_PANE,
@@ -372,6 +378,11 @@ export default can.Component.extend({
             tracker.stop(assessment.type,
               tracker.USER_JOURNEY_KEYS.INFO_PANE,
               tracker.USER_ACTIONS.INFO_PANE.ADD_COMMENT);
+
+            let commentsTotalCount = this.attr('commentsTotalCount');
+            this.attr('commentsTotalCount', ++commentsTotalCount);
+            let newCommentsCount = this.attr('newCommentsCount');
+            this.attr('newCommentsCount', ++newCommentsCount);
           }
         })
         .fail(function (instance, xhr) {
@@ -435,7 +446,6 @@ export default can.Component.extend({
       return this.attr('instance').getRelatedObjects()
         .then((data) => {
           this.attr('mappedSnapshots').replace(data.Snapshot);
-          this.attr('comments').replace(data.Comment);
           this.attr('files')
             .replace(data['Evidence:FILE'].map((file) => new Evidence(file)));
           this.attr('urls')
@@ -448,6 +458,51 @@ export default can.Component.extend({
             tracker.USER_JOURNEY_KEYS.INFO_PANE,
             tracker.USER_ACTIONS.INFO_PANE.OPEN_INFO_PANE);
         });
+    },
+    async loadFirstComments(count) {
+      let instance = this.attr('instance');
+      let newCommentsCount = this.attr('newCommentsCount');
+
+      // load more comments as they can be added by other users before or after current user's new comments
+      let pageSize = (count || this.attr('commentsPerPage')) + newCommentsCount;
+
+      let response = await loadComments(instance, 'Comment', 0, pageSize);
+      let {values: comments, total} = response.Comment;
+
+      this.attr('comments').splice(0, newCommentsCount);
+      this.attr('comments').unshift(...comments);
+
+      this.attr('commentsTotalCount', total);
+      this.attr('newCommentsCount', 0);
+    },
+    async loadMoreComments(startIndex) {
+      this.attr('isLoadingComments', true);
+
+      let instance = this.attr('instance');
+      let index = startIndex || this.attr('comments').length;
+      let pageSize = this.attr('commentsPerPage');
+
+      try {
+        let response = await loadComments(instance, 'Comment', index, pageSize);
+        let {values: comments, total} = response.Comment;
+
+        let totalCount = this.attr('commentsTotalCount');
+        if (totalCount !== total) {
+          // new comments were added by other users
+          let newCommentsCount = total - totalCount;
+          await Promise.all([
+            this.loadFirstComments(newCommentsCount),
+            this.loadMoreComments(index + newCommentsCount)]);
+        } else {
+          this.attr('comments').push(...comments);
+        }
+      } finally {
+        this.attr('isLoadingComments', false);
+      }
+    },
+    hideComments() {
+      // remain only first comments
+      this.attr('comments').splice(this.attr('commentsPerPage'));
     },
     addReusableEvidence(event) {
       this.attr('deferredSave').push(() => {
@@ -632,18 +687,25 @@ export default can.Component.extend({
       this.attr('isUndoButtonVisible', false);
     },
   }),
-  init: function () {
+  async init() {
     this.viewModel.initializeFormFields();
     this.viewModel.initGlobalAttributes();
     this.viewModel.updateRelatedItems();
     this.viewModel.initializeDeferredSave();
     this.viewModel.setVerifierRoleId();
+
+    try {
+      this.viewModel.attr('isLoadingComments', true);
+      await this.viewModel.loadFirstComments();
+    } finally {
+      this.viewModel.attr('isLoadingComments', false);
+    }
   },
   events: {
     inserted() {
       this.viewModel.resetCurrentState();
     },
-    [`{viewModel.instance} ${REFRESH_MAPPING.type}`](scope, event) {
+    [`{viewModel.instance} ${REFRESH_MAPPING.type}`]([scope], event) {
       const viewModel = this.viewModel;
       viewModel.attr('mappedSnapshots')
         .replace(this.viewModel.loadSnapshots());
@@ -683,12 +745,20 @@ export default can.Component.extend({
       };
       this.viewModel.instance.bind('updated', onSave);
     },
-    '{viewModel} instance': function () {
+    async '{viewModel} instance'() {
       this.viewModel.initializeFormFields();
       this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
-
       this.viewModel.resetCurrentState();
+
+      try {
+        this.viewModel.attr('comments', []);
+        this.viewModel.attr('commentsTotalCount', 0);
+        this.viewModel.attr('isLoadingComments', true);
+        await this.viewModel.loadFirstComments();
+      } finally {
+        this.viewModel.attr('isLoadingComments', false);
+      }
     },
     '{pubSub} objectDeleted'(pubSub, event) {
       let instance = event.instance;

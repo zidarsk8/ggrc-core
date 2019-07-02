@@ -102,7 +102,8 @@ validatejs.validators.validateMultiChoiceOptions = (value,
     return; // nothing  to validate here
   }
 
-  if (attributes.attribute_type !== 'Dropdown') {
+  if (attributes.attribute_type !== 'Dropdown' &&
+    attributes.attribute_type !== 'Multiselect') {
     return; // all ok, the value of multi_choice_options not needed
   }
 
@@ -145,9 +146,8 @@ validatejs.validators.validateDefaultVerifiers = (value) => {
 };
 
 validatejs.validators.validateIssueTrackerIssueId = (value,
-  options, key, attributes) => {
-  if (!['Fixed', 'Fixed and Verified', 'Deprecated']
-    .includes(attributes.status)) {
+  statuses, key, attributes) => {
+  if (!statuses.includes(attributes.status)) {
     return;
   }
 

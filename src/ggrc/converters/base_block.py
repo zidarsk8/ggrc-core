@@ -7,20 +7,20 @@ Each import block should contain data for one Object type. The blocks are
 separated in the csv file with empty lines.
 """
 
-from logging import getLogger
-from collections import defaultdict
-from collections import OrderedDict
-from collections import Counter
+import collections
+import logging
 
-from cached_property import cached_property
-import sqlalchemy as sa
 from sqlalchemy import or_
 from sqlalchemy import and_
 from flask import _app_ctx_stack
 
 from ggrc import db
 from ggrc import models
+from ggrc import utils
+from ggrc.models import exceptions
+from ggrc.models import all_models
 from ggrc.models import reflection
+from ggrc.models import mixins
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.utils import structures
@@ -28,15 +28,14 @@ from ggrc.utils import list_chunks
 from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import base_row
-from ggrc.converters.import_helper import get_column_order
-from ggrc.converters.import_helper import get_object_column_definitions
+from ggrc.converters import import_helper
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask
 
 
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BlockConverter(object):
@@ -107,34 +106,61 @@ class BlockConverter(object):
     else:
       self.name = ""
 
-  def _create_ca_definitions_cache(self):
-    """Create dict cache for custom attribute definitions.
+  @property
+  def ca_definitions_cache(self):
+    # type: () -> Dict[Tuple(int, str), models.CustomAttributeDefinition]
+    """Return custom attribute definitions used for objects in the block.
+
+    Returns custom attribute definitions mapped to objects in the block grouped
+    by ID of object definition is created for and definition title.
 
     Returns:
-        dict containing custom attribute definitions for the current object
-        type.
+      A dict where keys are tuples containing object ID definition is created
+      for and definition title, and values are custom attribute definitions
+      objects.
     """
-    cad = models.CustomAttributeDefinition
+    if self._ca_definitions_cache is None:
+      with benchmark("Create cache of CADs"):
+        self._create_ca_definitions_cache()
+    return self._ca_definitions_cache
+
+  def _create_ca_definitions_cache(self, field_names=None):
+    """Create cache for custom attribute definitions used in this block."""
+    if not issubclass(self.object_class, mixins.CustomAttributable):
+      self._ca_definitions_cache = {}
+      return
+
     gca_prefix = reflection.AttributeInfo.CUSTOM_ATTR_PREFIX
     lca_prefix = reflection.AttributeInfo.OBJECT_CUSTOM_ATTR_PREFIX
-    defs = cad.eager_query().filter(
-        cad.definition_type == self.table_singular,
-        sa.or_(
-            cad.mandatory,
-            cad.title.in_(
-                v["attr_name"]
-                for k, v in self.headers.items()
-                if k.startswith(gca_prefix) or k.startswith(lca_prefix)
-            ),
-        ),
-    )
-    return {(d.definition_id, d.title): d for d in defs}
 
-  def get_ca_definitions_cache(self):
-    """Return cached property value _ca_definitions_cache."""
-    if self._ca_definitions_cache is None:
-      self._ca_definitions_cache = self._create_ca_definitions_cache()
-    return self._ca_definitions_cache
+    def _is_ca(field):
+      """Helper function to check if field is custom attribute."""
+      return field.startswith(lca_prefix) or field.startswith(gca_prefix)
+
+    def _strip_ca_prefix(field):
+      """Helper function to strip custom attribute prefix from field."""
+      if field.startswith(gca_prefix):
+        return field[len(gca_prefix):]
+      elif field.startswith(lca_prefix):
+        return field[len(lca_prefix):]
+      return field
+
+    def _get_ca_name(field):
+      """Helper function to get custom attribute name from header."""
+      return self.headers[field]["attr_name"]
+
+    if not field_names and self.headers:
+      field_names = map(_get_ca_name, filter(_is_ca, self.headers.keys()))
+    elif field_names:
+      field_names = map(_strip_ca_prefix, filter(_is_ca, field_names))
+
+    ca_definitions = self.object_class.get_custom_attribute_definitions(
+        attributable_ids=self.object_ids or None,
+        field_names=field_names or None,
+    )
+
+    self._ca_definitions_cache = {(cad.definition_id, cad.title): cad
+                                  for cad in ca_definitions}
 
   def _get_relationships(self):
     """Get all relationships for any of the object in the current block."""
@@ -161,7 +187,7 @@ class BlockConverter(object):
 
   def _get_identifier_mappings(self, relationships):
     """Get object and id mapping to user visible identifier."""
-    object_ids = defaultdict(set)
+    object_ids = collections.defaultdict(set)
     for rel in relationships:
       if rel.source_type == self.object_class.__name__:
         object_ids[rel.destination_type].add(rel.destination_id)
@@ -188,7 +214,7 @@ class BlockConverter(object):
       relationships = self._get_relationships()
       id_map = self._get_identifier_mappings(relationships)
       with benchmark("building cache"):
-        cache = defaultdict(lambda: defaultdict(list))
+        cache = collections.defaultdict(lambda: collections.defaultdict(list))
         for rel in relationships:
           if rel.source_type == self.object_class.__name__:
             identifier = id_map.get(rel.destination_type, {}).get(
@@ -229,23 +255,6 @@ class BlockConverter(object):
       self._ticket_tracker_cache = self._create_ticket_tracker_cache()
     return self._ticket_tracker_cache
 
-  @cached_property
-  def mapped_snapshots(self):
-    """Cached property of mapped to audit snapshots"""
-    # pylint: disable=protected-access
-    snapshots = defaultdict(lambda: defaultdict(set))
-    query = db.session.query(
-        models.Revision.resource_slug,
-        models.Snapshot.parent_id,
-        models.Snapshot.child_type,
-    ).join(models.Snapshot).filter(
-        models.Snapshot.parent_type == self.object_class.__name__,
-        models.Snapshot.parent_id.in_(self.object_ids),
-    )
-    for slug, parent_id, child_type in query:
-      snapshots[parent_id][child_type].add(slug)
-    return snapshots
-
   def check_for_duplicate_columns(self, raw_headers):
     """Check for duplicate column names in the current block.
 
@@ -253,8 +262,8 @@ class BlockConverter(object):
     that case it is impossible to determine the correct handler for all
     columns. Blocks with duplicate names are ignored.
     """
-    counter = Counter(header.strip().rstrip("*").lower()
-                      for header in raw_headers)
+    counter = collections.Counter(header.strip().rstrip("*").lower()
+                                  for header in raw_headers)
     duplicates = [header for header, count in counter.items() if count > 1]
     if duplicates:
       self.add_errors(errors.DUPLICATE_COLUMN,
@@ -285,7 +294,7 @@ class BlockConverter(object):
     Returns:
       Ordered Dictionary containing all valid headers
     """
-    clean_headers = OrderedDict()
+    clean_headers = collections.OrderedDict()
     header_names = self._get_header_names()
     removed_count = 0
     for index, raw_header in enumerate(raw_headers):
@@ -303,7 +312,7 @@ class BlockConverter(object):
       else:
         if header.startswith(("map:", "unmap:")):
           obj_a = self.name
-          obj_b = header.split(":", 1)[1]
+          obj_b = header.split(":", 1)[1].title()
           self.add_warning(errors.UNSUPPORTED_MAPPING,
                            line=self.offset + 2,
                            obj_a=obj_a,
@@ -365,9 +374,9 @@ class ImportBlockConverter(BlockConverter):
         operation="import"
     )
     names = {n.strip().strip("*").lower() for n in raw_headers or []} or None
-    self.object_headers = get_object_column_definitions(
+    self.object_headers = import_helper.get_object_column_definitions(
         self.object_class,
-        names,
+        fields=names,
         include_hidden=True,
     )
     self.check_for_duplicate_columns(raw_headers)
@@ -434,12 +443,18 @@ class ImportBlockConverter(BlockConverter):
         k for k in self.headers if k not in self.converter.priority_columns
     ]
 
-  def import_csv_data(self):
+  def import_csv_data(self):  # noqa
     """Perform import sequence for the block."""
     try:
       for row in self.row_converters_from_csv():
         try:
+          ie_status = self.converter.get_job_status()
+          if ie_status and ie_status == \
+             all_models.ImportExport.STOPPED_STATUS:
+            raise exceptions.ImportStoppedException()
           row.process_row()
+        except exceptions.ImportStoppedException:
+          raise
         except ValueError as err:
           db.session.rollback()
           msg = err.message or errors.UNEXPECTED_ERROR
@@ -451,6 +466,8 @@ class ImportBlockConverter(BlockConverter):
           logger.exception(errors.UNEXPECTED_ERROR)
         self._update_info(row)
         _app_ctx_stack.top.sqlalchemy_queries = []
+    except exceptions.ImportStoppedException:
+      raise
     except Exception:  # pylint: disable=broad-except
       logger.exception(errors.UNEXPECTED_ERROR)
     finally:
@@ -469,7 +486,8 @@ class ImportBlockConverter(BlockConverter):
     classes = sharing_rules.get(object_class, object_class)
     shared_state = self.converter.shared_state
     if classes not in shared_state:
-      shared_state[classes] = defaultdict(structures.CaseInsensitiveDict)
+      shared_state[classes] = collections.defaultdict(
+          structures.CaseInsensitiveDict)
     return shared_state[classes]
 
   def store_revision_ids(self, event):
@@ -482,10 +500,10 @@ class ImportBlockConverter(BlockConverter):
     """Send bulk create pre-commit signals."""
     if not new_objects:
       return
-    collections = {}
+    _collections = {}
     for obj in new_objects:
-      collections.setdefault(obj.__class__, []).append(obj)
-    for object_class, objects in collections.iteritems():
+      _collections.setdefault(obj.__class__, []).append(obj)
+    for object_class, objects in _collections.iteritems():
       signals.Restful.collection_posted.send(
           object_class,
           objects=objects,
@@ -549,10 +567,20 @@ class ExportBlockConverter(BlockConverter):
         class_name=class_name,
         operation="export"
     )
-    self.object_headers = get_object_column_definitions(self.object_class)
+
+    self._create_ca_definitions_cache(field_names=fields)
+    self.object_headers = import_helper.get_object_column_definitions(
+        self.object_class, ca_cache=self._ca_cache)
+
     raw_headers = [unicode(key) for key in self._get_header_names().keys()]
     self.headers = self.clean_headers(raw_headers)
     self.organize_fields(fields)
+
+  @property
+  def _ca_cache(self):
+    """Get custom attributes definitions in ca_cache-compatible format."""
+    object_name = utils.underscore_from_camelcase(self.object_class.__name__)
+    return {object_name: self.ca_definitions_cache.values()}
 
   @property
   def block_width(self):
@@ -563,7 +591,7 @@ class ExportBlockConverter(BlockConverter):
     """Setup fields property."""
     if fields == "all":
       fields = self.object_headers.keys()
-    self.fields = get_column_order(fields)
+    self.fields = import_helper.get_column_order(fields)
 
   def generate_csv_header(self):
     """Generate 2D array with csv header description."""

@@ -11,6 +11,7 @@ and deletion.
 import logging
 
 import sqlalchemy as sa
+from sqlalchemy import and_
 
 from ggrc import db
 from ggrc.models import all_models
@@ -89,3 +90,34 @@ def insert_select_acls(select_statement):
         logger.exception(error)
       else:
         inserted_successfully = True
+
+
+def get_user_ids(acl_filter):
+  """Helper method to retrieve user ids from
+  joined acl and acp tables using acl filter"""
+  acps = db.session.query(
+      all_models.AccessControlPerson.person_id
+  ).join(
+      all_models.AccessControlList,
+      all_models.AccessControlList.base_id ==
+      all_models.AccessControlPerson.ac_list_id
+  ).filter(acl_filter).all()
+  user_ids = [acp.person_id for acp in acps]
+  return user_ids
+
+
+def get_user_ids_from_deleted_objects(deleted_objs):
+  """Helper method to retrieve user ids from
+  ACPs of deleted relationships."""
+  rel_ids = [obj[1] for obj in deleted_objs if
+             obj[0] == 'Relationship']
+
+  user_ids = []
+  if rel_ids:
+    user_ids = get_user_ids(
+        and_(
+            all_models.AccessControlList.object_type == 'Relationship',
+            all_models.AccessControlList.object_id.in_(rel_ids)
+        )
+    )
+  return user_ids

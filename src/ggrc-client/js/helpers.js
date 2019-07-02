@@ -16,7 +16,10 @@ import Permission from './permission';
 import _ from 'lodash';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
-import Mappings from './models/mappers/mappings';
+import {
+  allowedToMap,
+  allowedToCreate,
+} from './models/mappers/mappings';
 import {
   getFormattedLocalDate,
   formatDate,
@@ -291,7 +294,7 @@ can.stache.registerHelper('is_allowed_to_map',
 
     source = resolveComputed(source);
     target = resolveComputed(target);
-    canMap = Mappings.allowedToMap(source, target, options);
+    canMap = allowedToMap(source, target, options);
 
     if (canMap) {
       return options.fn(options.contexts || this);
@@ -304,7 +307,7 @@ can.stache.registerHelper('is_allowed_to_create', (source, target, options) => {
 
   source = resolveComputed(source);
   target = resolveComputed(target);
-  canCreate = Mappings.allowedToCreate(source, target);
+  canCreate = allowedToCreate(source, target);
 
   if (canCreate) {
     return options.fn(options.contexts);
@@ -620,32 +623,6 @@ can.stache.registerHelper('debugger', function () {
 
   let options = arguments[arguments.length - 1];
   return options.fn(options.contexts);
-});
-
-can.stache.registerHelper('pretty_role_name', function (name) {
-  name = isFunction(name) ? name() : name;
-  let ROLE_LIST = {
-    ProgramOwner: 'Program Manager',
-    ProgramEditor: 'Program Editor',
-    ProgramReader: 'Program Reader',
-    WorkflowOwner: 'Workflow Manager',
-    WorkflowMember: 'Workflow Member',
-    Mapped: 'No Role',
-    Owner: 'Manager',
-  };
-  if (ROLE_LIST[name]) {
-    return ROLE_LIST[name];
-  }
-  return name;
-});
-
-can.stache.registerHelper('role_scope', function (scope) {
-  scope = isFunction(scope) ? scope() : scope;
-
-  if (scope === 'Private Program') {
-    return 'Program';
-  }
-  return scope;
 });
 
 /*

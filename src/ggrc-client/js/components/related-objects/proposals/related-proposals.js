@@ -63,7 +63,7 @@ export default can.Component.extend({
     '{viewModel.proposals} change'() {
       this.viewModel.checkTabWarning();
     },
-    [`{viewModel.baseInstance} ${PROPOSAL_CREATED.type}`](scope, event) {
+    [`{viewModel.baseInstance} ${PROPOSAL_CREATED.type}`]([scope], event) {
       let vm = this.viewModel;
       let newProposal = event.proposal;
       let proposals = vm.attr('proposals');

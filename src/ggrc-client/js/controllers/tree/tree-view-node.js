@@ -3,14 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {
-  isSnapshot,
-} from '../../plugins/utils/snapshot-utils';
-import {
-  related,
-  isObjectContextPage,
-  getPageType,
-} from '../../plugins/utils/current-page-utils';
 import TreeViewControl from './tree-view';
 import TreeViewOptions from './tree-view-options';
 import {reify} from '../../plugins/utils/reify-utils';
@@ -81,20 +73,6 @@ export default can.Control.extend({
       }
     },
 
-  markNotRelatedItem: function () {
-    let instance = this.options.instance;
-    let relatedInstances = related.attr(instance.type);
-    let instanceId = isSnapshot(instance) ?
-      instance.snapshot.child_id :
-      instance.id;
-    if (!relatedInstances || relatedInstances &&
-      !relatedInstances[instanceId]) {
-      this.element.addClass('not-directly-related');
-    } else {
-      this.element.addClass('directly-related');
-    }
-  },
-
   /**
    * Trigger rendering the tree node in the DOM.
    * @param {Boolean} force - indicates redraw is/is not mandatory
@@ -152,7 +130,6 @@ export default can.Control.extend({
       this.add_child_list(this.options, options);
       options.attr({
         options_property: this.options.options_property,
-        single_object: false,
         parent: this,
         parent_instance: this.options.instance,
       });
@@ -173,7 +150,7 @@ export default can.Control.extend({
   // data is an entry from child options.  if child options is an array, run once for each.
   add_child_list: function (item, data) {
     let findParams;
-    data.attr({start_expanded: false});
+
     if (_.isFunction(item.instance[data.property])) {
       // Special case for handling mappings which are functions until
       // first requested, then set their name via .attr('...')
@@ -190,7 +167,6 @@ export default can.Control.extend({
         data.attr('original_list', findParams);
         findParams = findParams.slice(0);
       }
-      data.attr('list', findParams);
     } else {
       findParams = data.attr('find_params');
       if (findParams) {
@@ -227,11 +203,6 @@ export default can.Control.extend({
     this.element = firstchild.addClass('tree-view-node')
       .data(oldData);
 
-    if (this.options.is_subtree &&
-      isObjectContextPage() &&
-      getPageType() !== 'Workflow') {
-      this.markNotRelatedItem();
-    }
     this.on();
   },
 

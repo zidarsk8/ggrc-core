@@ -89,7 +89,7 @@ export default can.Component.extend({
       panel.attr('value', true);
       panel.attr('textValue', textValue);
     },
-    '.ui-autocomplete-input input': function (el, ev, data) {
+    '.ui-autocomplete-input input': function (el) {
       let index = el.data('index');
       let panel = this.viewModel.attr('relevant')[index];
 

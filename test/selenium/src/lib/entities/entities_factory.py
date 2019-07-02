@@ -234,7 +234,8 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
         attr_value = datetime.datetime.today().strftime("%Y-%m-%d")
       if cad_type == AdminWidgetCustomAttributes.CHECKBOX:
         attr_value = random.choice((True, False))
-      if cad_type == AdminWidgetCustomAttributes.DROPDOWN:
+      if cad_type in (AdminWidgetCustomAttributes.MULTISELECT,
+                      AdminWidgetCustomAttributes.DROPDOWN):
         attr_value = unicode(
             random.choice(cad.multi_choice_options.split(",")))
     if cad_type == AdminWidgetCustomAttributes.PERSON:
@@ -324,7 +325,8 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
                      objects.get_singular(random.choice(objects.ALL_CA_OBJS)))
     attrs.setdefault("title",
                      self.generate_ca_title(attrs["attribute_type"]))
-    if attrs["attribute_type"] == AdminWidgetCustomAttributes.DROPDOWN:
+    if attrs["attribute_type"] in (AdminWidgetCustomAttributes.MULTISELECT,
+                                   AdminWidgetCustomAttributes.DROPDOWN):
       attrs.setdefault("multi_choice_options",
                        StringMethods.random_list_strings())
     else:
@@ -377,6 +379,24 @@ class ProgramsFactory(EntitiesFactory):
               unicode(roles.PRIMARY_CONTACTS),
               unicode(roles.SECONDARY_CONTACTS))))
     return program_obj
+
+
+class ProductsFactory(EntitiesFactory):
+  """Factory class for Products entities."""
+  def __init__(self):
+    super(ProductsFactory, self).__init__(objects.PRODUCTS)
+    self._acl_roles = [
+        ("managers",
+         roles.ACLRolesIDs.PRODUCT_MANAGERS,
+         [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create Product entity."""
+    product_object = self.obj_inst().update_attrs(
+        title=self.obj_title
+    )
+    return product_object
 
 
 class ControlsFactory(EntitiesFactory):

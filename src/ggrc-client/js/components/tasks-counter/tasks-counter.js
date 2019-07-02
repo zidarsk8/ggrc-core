@@ -64,7 +64,7 @@ export default can.Component.extend({
     },
   }),
   events: {
-    onModelChange: function (model, event, instance) {
+    onModelChange: function ([model], event, instance) {
       if (instance instanceof CycleTaskGroupObjectTask) {
         this.viewModel.loadTasks();
       }

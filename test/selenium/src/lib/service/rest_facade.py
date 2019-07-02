@@ -28,6 +28,11 @@ def create_control(**attrs):
   return _create_obj_in_program_scope("Controls", None, **attrs)
 
 
+def create_product(**attrs):
+  """Create a product."""
+  return _create_obj_in_program_scope("Products", None, **attrs)
+
+
 def create_control_mapped_to_program(program, **attrs):
   """Create a control (optionally map to a `program`)"""
   # pylint: disable=invalid-name
@@ -93,11 +98,11 @@ def create_gcad(**attrs):
       factory_params=attrs)
 
 
-def create_gcad_for_control():
+def create_gcads_for_control():
   """Creates global CADs for all types."""
   return [create_gcad(definition_type="control",
                       attribute_type=ca_type)
-          for ca_type in element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
+          for ca_type in element.AdminWidgetCustomAttributes.ALL_GCA_TYPES]
 
 
 def create_issue(obj=None):
@@ -137,8 +142,22 @@ def create_access_control_role(**attrs):
 
 def map_objs(src_obj, dest_obj):
   """Map two objects to each other"""
+
+  def _is_external(src_obj, dest_obj):
+    """Check if one of objects to map is external."""
+    singular_title_external_objs = [
+        objects.get_singular(x, title=True) for x in objects.EXTERNAL_OBJECTS]
+    objects_list = [src_obj, ]
+    dest_ojbect_list = dest_obj if isinstance(dest_obj,
+                                              (tuple, list)) else [dest_obj, ]
+    objects_list.extend(dest_ojbect_list)
+    if [x for x in objects_list if x.type in singular_title_external_objs]:
+      return True
+    return False
+
   return rest_service.RelationshipsService().map_objs(
-      src_obj=src_obj, dest_objs=dest_obj)
+      src_obj=src_obj, dest_objs=dest_obj,
+      is_external=_is_external(src_obj, dest_obj))
 
 
 def get_obj(obj):
@@ -226,13 +245,10 @@ def request_obj_review(obj, reviewer):
   rest_service.ReviewService().create_obj(
       {"reviewers": reviewer,
        "reviewable": obj.repr_min_dict()})
-  exp_review = entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
-      status=element.ReviewStates.UNREVIEWED,
-      reviewers=reviewer)
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
-  return obj
+  return obj.update_attrs(
+      review=entities_factory.ReviewsFactory().create(
+          status=element.ReviewStates.UNREVIEWED,
+          reviewers=reviewer))
 
 
 def approve_obj_review(obj):
@@ -240,12 +256,10 @@ def approve_obj_review(obj):
   rest_review = get_obj_review(obj)
   rest_service.ReviewService().update_obj(
       obj=rest_review, status=element.ReviewStates.REVIEWED)
-  exp_review = entities_factory.ReviewsFactory().create(
-      is_add_rest_attrs=True,
-      status=element.ReviewStates.REVIEWED,
-      reviewers=users.current_user(),
-      last_reviewed_by=users.current_user().email,
-      last_reviewed_at=rest_review.last_reviewed_at)
-  obj.review = exp_review.convert_review_to_dict()
-  obj.review_status = exp_review.status
-  return obj
+  return obj.update_attrs(
+      review=entities_factory.ReviewsFactory().create(
+          status=element.ReviewStates.REVIEWED,
+          reviewers=users.current_user(),
+          last_reviewed_by=users.current_user().email,
+          last_reviewed_at=date_utils.iso8601_to_ui_str_with_zone(
+              rest_review.last_reviewed_at)))

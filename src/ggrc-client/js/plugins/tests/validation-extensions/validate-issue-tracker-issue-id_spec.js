@@ -10,12 +10,16 @@ describe('validateIssueTrackerIssueId extension', () => {
   let TestModel;
 
   beforeAll(() => {
-    TestModel = CanModel.extend({}, {
+    TestModel = CanModel.extend({
+      unchangeableIssueTrackerIdStatuses: ['Fixed'],
+    }, {
       define: {
         issue_tracker: {
           value: {},
           validate: {
-            validateIssueTrackerIssueId: true,
+            validateIssueTrackerIssueId() {
+              return this.constructor.unchangeableIssueTrackerIdStatuses;
+            },
           },
         },
       },

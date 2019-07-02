@@ -11,6 +11,9 @@ import '../../components/import-export/csv-export';
 import '../../components/object-list/object-list';
 import '../../components/tree-pagination/tree-pagination';
 import '../../components/page-header/page-header';
+import '../../components/questionnaire-link/questionnaire-link';
+import '../../components/custom-roles/custom-roles';
+import '../../components/mapped-counter/mapped-counter';
 
 import '../../common-handlers';
 

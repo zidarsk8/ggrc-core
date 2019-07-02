@@ -844,6 +844,12 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Threat Event",
         "Risk Type",
         "Review Status",
+        "Due Date",
+        "Created By",
+        "Last Owner Reviewed Date",
+        "Last Owner Reviewed By",
+        "Last Compliance Reviewed Date",
+        "Last Compliance Reviewed By",
     }
     expected_fields = {
         "mandatory": {

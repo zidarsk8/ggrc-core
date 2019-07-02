@@ -34,6 +34,7 @@ from ggrc_basic_permissions.contributed_roles import RoleContributions
 # pylint: disable=invalid-name
 logger = logging.getLogger(__name__)
 
+COPY_TITLE_TEMPLATE = '%(parent_title)s (copy %(copy_count)s)'
 
 # Initialize Flask Blueprint for extension
 blueprint = Blueprint(
@@ -96,6 +97,28 @@ def contributed_object_views():
   return [
       object_view(models.Workflow),
   ]
+
+
+def get_copy_title(current_title, used_titles):
+  """Get's first available copy title from the list of titles.
+  In general, the convention is:
+    title = old_title + (copy N)
+
+  Args:
+      current_title (str): Title of the parent object
+      used_titles (List[str]): List of object titles copied from the same
+          parent
+  """
+  copy_title = ''
+  for copy_count in range(1, len(used_titles) + 2):
+    title = COPY_TITLE_TEMPLATE % {
+        'parent_title': current_title,
+        'copy_count': copy_count
+    }
+    if title not in used_titles:
+      copy_title = title
+      break
+  return copy_title
 
 
 def _get_min_next_due_date(due_dated_objects):
@@ -547,7 +570,12 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
         clone_tasks=src.get('clone_tasks', False),
         clone_objects=src.get('clone_objects', False)
     )
-    obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
+
+    copied_task_groups = models.TaskGroup.query.filter_by(
+        workflow_id=source_task_group.workflow_id,
+        parent_id=source_task_group.id).values('title')
+    used_titles = [t.title for t in copied_task_groups]
+    obj.title = get_copy_title(source_task_group.title, used_titles)
 
   obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
@@ -748,7 +776,11 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
         id=source_workflow_id
     ).first()
     source_workflow.copy(obj, clone_people=src.get('clone_people', False))
-    obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
+
+    copied_workflows = models.Workflow.query.filter_by(
+        parent_id=source_workflow.id).values('title')
+    used_titles = [w.title for w in copied_workflows]
+    obj.title = get_copy_title(source_workflow.title, used_titles)
 
   # get the personal context for this logged in user
   user = get_current_user(use_external_user=False)

@@ -367,16 +367,18 @@ class DateColumnHandler(ColumnHandler):
     # to 'Date' type. Remove if statement after it.
     try:
       value = value or self.get_value()
-      if not value and self.mandatory:
-        self.add_error(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
+      if not value:
+        if self.mandatory:
+          self.add_error(errors.MISSING_VALUE_ERROR,
+                         column_name=self.display_name)
         return None
 
       parsed_value = parse(value)
-      if self.key == "last_assessment_date":
-        self.check_last_asmnt_date(parsed_value)
-      if type(getattr(self.row_converter.obj, self.key, None)) is date:
-        return parsed_value.date()
+      if isinstance(getattr(self.row_converter.obj, self.key, None), date):
+        parsed_value = parsed_value.date()
+      if self.key in ("last_assessment_date", "verified_date") and \
+         self.check_readonly_changes(parsed_value, self.key):
+        return None
       return parsed_value
     except:  # pylint: disable=bare-except
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
@@ -410,18 +412,15 @@ class DateColumnHandler(ColumnHandler):
       return value.strftime("%m/%d/%Y")
     return ""
 
-  def check_last_asmnt_date(self, new_last_asmnt_date):
-    """Check if the new object don't contain changed Last Assessment Date."""
-    old_last_asmnt_date = getattr(
-        self.row_converter.obj, "last_assessment_date", None
-    )
-    date_modified = old_last_asmnt_date and new_last_asmnt_date and \
-        old_last_asmnt_date.date() != new_last_asmnt_date.date()
-    if date_modified:
-      self.add_warning(
-          errors.UNMODIFIABLE_COLUMN,
-          column_name=self.display_name,
-      )
+  def check_readonly_changes(self, new_date, attr_name):
+    """Check if the new object don't contain changed date."""
+    old_date = getattr(self.row_converter.obj, attr_name, None)
+    is_modified = old_date and new_date and old_date != new_date
+    if is_modified:
+      self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                       column_name=self.display_name,)
+      return True
+    return False
 
 
 class NullableDateColumnHandler(DateColumnHandler):

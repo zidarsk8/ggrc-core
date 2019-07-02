@@ -3,12 +3,14 @@
 """Create, description, representation and equal of entities."""
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
+# pylint: disable=inconsistent-return-statements
 
 import copy
 from datetime import date, datetime
 
 from dateutil import parser, tz
 
+from lib.entities import mixin
 from lib.utils import help_utils
 from lib.utils.string_utils import StringMethods
 
@@ -353,6 +355,8 @@ class Representation(object):
     def update_obj_attrs_values(obj, is_replace_attrs_values,
                                 is_allow_none_values, **attrs):
       """Update object's attributes values."""
+      if "review" in attrs and isinstance(attrs["review"], ReviewEntity):
+        obj.update_review(attrs.pop("review"))
       for obj_attr_name in attrs:
         obj_attr_value = None
         if obj_attr_name in Representation.all_attrs_names():
@@ -643,7 +647,9 @@ class Entity(Representation):
         PersonEntity, CustomAttributeDefinitionEntity, ProgramEntity,
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
-        RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity)
+        RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
+        ProductEntity
+    )
 
   def __lt__(self, other):
     return self.slug < other.slug
@@ -660,6 +666,13 @@ class CommentEntity(Representation):
 
   def __lt__(self, other):
     return self.description < other.description
+
+  def repr_ui(self):
+    """Represents UI view of comment."""
+    ui_attrs = copy.deepcopy(self.attrs_names_to_repr)
+    ui_attrs.remove("type")
+    return dict(
+        zip(ui_attrs, [getattr(self, ui_attr) for ui_attr in ui_attrs]))
 
 
 class PersonEntity(Entity):
@@ -725,7 +738,7 @@ class CustomAttributeValueEntity(Representation):
         "custom_attribute_id", **attrs)
 
 
-class ProgramEntity(Entity):
+class ProgramEntity(Entity, mixin.Reviewable):
   """Class that represent model for Program entity."""
 
   def __init__(self, **attrs):
@@ -734,6 +747,12 @@ class ProgramEntity(Entity):
     self.set_attrs(
         "managers", "editors", "readers", "primary_contacts",
         "secondary_contacts", "review", **attrs)
+
+
+class ProductEntity(Entity):
+  """Class that represent model for Product entity."""
+  def __init__(self, **attrs):
+    super(ProductEntity, self).__init__()
 
 
 class ControlEntity(Entity):

@@ -1,100 +1,124 @@
-[//]: <> (updated 06/18/2019)
+[//]: <> (updated 07/02/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Introducing new Risk Library frontend (v.2.6.0, 06/18/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.idegtxkw7mkx)
+[Introducing ‘Propose changes’ on Programs (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.xl1ok43woard)
 
-[Integration with Drogon enabled for SOX systems (v.2.5.0, 05/22/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.sai06mckrfn4)
+[Possibility to revert to any version of a Program (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.22hdzqmnzr7x)
 
-[Mapping Scope Object to Standard or Regulation moved to new frontend (v.2.5.0, 05/22/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.b64613515b6c)
+[Past Evidence can be marked as ‘Deprecated’ (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.28wvv9s2492r)
 
-[Introducing Program to Program mapping (Mega Program) (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9zvt2bl5lw41)
+[Introducing the ‘Multiselect’ attribute on Assessment templates (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.v0y4mcs3hx1k)
 
-[A functionality to turn off sync of people fields between Assessment and Ticket tracker (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.bee9ft50hu3p)
+[Introducing new Risk Library frontend (v.2.6.0, 06/18/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.tp5h3hev91id)
 
-[Mentioning person enabled at comments (v.2.2.0, 04/24/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l5ud67lwwc62)
+[Integration with Drogon enabled for SOX systems (v.2.5.0, 05/22/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.sai06mckrfn4)
 
-[New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ny5sa23suyjm)
+[Mapping Scope Object to Standard or Regulation moved to new frontend (v.2.5.0, 05/22/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.b64613515b6c)
 
-[Introducing new Control Library frontend (v.2.0.0, 03/26/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.oo6v96vy5j1x)
+[Introducing Program to Program mapping (Mega Program) (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.9zvt2bl5lw41)
 
-[‘Related Requirements’ added to snapshot (v.2.0.0, 03/26/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.dwnfktph11qf)
+[A functionality to turn off sync of people fields between Assessment and Ticket tracker (v.2.3.0, 05/03/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.bee9ft50hu3p)
 
-[Introduced new object ‘Key report’ (v.1.41.0, 02/19/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.acts40q04kus)
+[Mentioning person enabled at comments (v.2.2.0, 04/24/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.l5ud67lwwc62)
 
-[Changes at synchronization logic with Ticket Tracker (v.1.39.0, 02/05/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fe36fb28bds4)
+[New object Account Balance (v.2.1.0, 04/10/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.ny5sa23suyjm)
 
-[Calendar events added for tasks (v.1.38.0, 01/16/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.v06wxnchauyl)
+[Introducing new Control Library frontend (v.2.0.0, 03/26/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.oo6v96vy5j1x)
 
-[Added a checkbox in Audit ‘Create screen’ to map snapshots manually (v.1.38.0, 01/16/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.1k1frii91vko)
+[‘Related Requirements’ added to snapshot (v.2.0.0, 03/26/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.dwnfktph11qf)
 
-[Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.fyunlkl3iivr)
+[Introduced new object ‘Key report’ (v.1.41.0, 02/19/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.acts40q04kus)
 
-[You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ypafmrujihtr)
+[Changes at synchronization logic with Ticket Tracker (v.1.39.0, 02/05/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.fe36fb28bds4)
 
-[New roles for scoping objects (v1.29.0, 10/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.c6k8uylt9ww9)
+[Calendar events added for tasks (v.1.38.0, 01/16/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.v06wxnchauyl)
 
-[Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7101oq4j5iuv)
+[Added a checkbox in Audit ‘Create screen’ to map snapshots manually (v.1.38.0, 01/16/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.1k1frii91vko)
 
-[Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.eg0wu7janrz)
+[Primary and Secondary Contacts in Control object are renamed (v.1.35.0, 12/20/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.fyunlkl3iivr)
 
-[Enhanced object review flow (v1.24.0, 09/26/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.l4dezngquz60)
+[You can now import ticket tracker integration settings for assessments and issues (v1.32.0, 11/28/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.ypafmrujihtr)
 
-[Linking assessments with other issue tracking systems in bulk (v1.23.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.12djjl6l1y2a)
+[New roles for scoping objects (v1.29.0, 10/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.c6k8uylt9ww9)
 
-[Roles reorganization for scoping objects (v1.22.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.4dqw7c51mjir)
+[Link existing tickets to track assessments and issues (v1.28.0, 10/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.7101oq4j5iuv)
 
-[New roles for scoping objects (v1.19.0, 08/23/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.mfp0k3svtkws)
+[Changes to the mapping flow from scope to directives (v1.25.0, 10/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.eg0wu7janrz)
 
-[Due Date for Issue object (v1.18.0, 08/14/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.is6tlxqjgft)
+[Enhanced object review flow (v1.24.0, 09/26/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.l4dezngquz60)
 
-[Requirement object type (v1.17.0, 08/07/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.uzxzuedlpa22)
+[Linking assessments with other issue tracking systems in bulk (v1.23.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.12djjl6l1y2a)
 
-[Linking issue object with other issue tracking systems (v1.16.0, 07/31/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.cb8a70sw2yog)
+[Roles reorganization for scoping objects (v1.22.0, 09/18/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.4dqw7c51mjir)
 
-[New scoping objects (v1.15.0, 07/12/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.mg7bm4q7szqj)
+[New roles for scoping objects (v1.19.0, 08/23/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.mfp0k3svtkws)
 
-[Document object (v1.13.0, 06/19/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.s6ko14lo9tq5)
+[Due Date for Issue object (v1.18.0, 08/14/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.is6tlxqjgft)
 
-[Disable some automatic mapping rules (v1.12.0, 06/13/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.rxmls9jn511d)
+[Requirement object type (v1.17.0, 08/07/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.uzxzuedlpa22)
 
-[Evidences for Assessments and Audits (v1.11.0, 05/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.wqhz0ruaj3fw)
+[Linking issue object with other issue tracking systems (v1.16.0, 07/31/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.cb8a70sw2yog)
 
-[Offline mode for Import and export (v1.9.0, 04/25/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.y2zdcxwsxd1n)
+[New scoping objects (v1.15.0, 07/12/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.mg7bm4q7szqj)
 
-[Re-use assessment templates across different Audits (v1.6.0, 03/15/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.4ko2c9ewc1mp)
+[Document object (v1.13.0, 06/19/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.s6ko14lo9tq5)
 
-[No more automatic mappings from Objective-Objective and Control-Control relationships (v1.6.0, 03/15/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.6hcj2nia2p16)
+[Disable some automatic mapping rules (v1.12.0, 06/13/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.rxmls9jn511d)
 
-[Auto-copying of assessment procedure (v1.4.0, 02/22/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.c0z9r6fhxoab)
+[Evidences for Assessments and Audits (v1.11.0, 05/30/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.wqhz0ruaj3fw)
 
-[Task secondary assignees (v1.3.0, 02/12/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.6umfpzijah2)
+[Offline mode for Import and export (v1.9.0, 04/25/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.y2zdcxwsxd1n)
 
-[Improvements to RBAC model (v1.3.0, 02/12/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.61naj7lj55l1)
+[Re-use assessment templates across different Audits (v1.6.0, 03/15/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.4ko2c9ewc1mp)
 
-[Piper / Git style lite weight versioning on objects like Controls & Risks (v1.2.0, 01/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.d5q7knc6uqfq)
+[No more automatic mappings from Objective-Objective and Control-Control relationships (v1.6.0, 03/15/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.6hcj2nia2p16)
 
-[Versioning functionality for Controls & Risks with ability to roll back to any previous version (v1.2.0, 01/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9hplnbrdbo4p)
+[Auto-copying of assessment procedure (v1.4.0, 02/22/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.c0z9r6fhxoab)
 
-[Reverting assessments to ‘In Progress’ state (v1.0.0, 01/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.85226ud4mjgw)
+[Task secondary assignees (v1.3.0, 02/12/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.6umfpzijah2)
 
-[Labeling assessments (v1.0.0, 01/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.5txczslhtpoh)
+[Improvements to RBAC model (v1.3.0, 02/12/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.61naj7lj55l1)
 
-[Improvements to surfacing ‘related assessments’ (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.7k6w49k7otk6)
+[Piper / Git style lite weight versioning on objects like Controls & Risks (v1.2.0, 01/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.d5q7knc6uqfq)
 
-[Extend assessment assignees rights (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.4oo5iegll1ze)
+[Versioning functionality for Controls & Risks with ability to roll back to any previous version (v1.2.0, 01/24/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.9hplnbrdbo4p)
 
-[Commenting functionality (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.nl3wm8ds3np)
+[Reverting assessments to ‘In Progress’ state (v1.0.0, 01/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.85226ud4mjgw)
 
-[Default sorting by ‘Last Updated Date’ (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9rj0x5tg6woe)
+[Labeling assessments (v1.0.0, 01/04/2018)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.5txczslhtpoh)
 
-[Change Workflow tasks state in bulk (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.4yenrfg4h7h6)
+[Improvements to surfacing ‘related assessments’ (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.7k6w49k7otk6)
 
-[Import from Google Sheets (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.ciaeix2ny197)
+[Extend assessment assignees rights (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.4oo5iegll1ze)
 
-[Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.9ry21bbez6aa)
+[Commenting functionality (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.nl3wm8ds3np)
 
-[Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit#heading=h.m9vl04nitn8)
+[Default sorting by ‘Last Updated Date’ (v0.10.37, 12/20/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.9rj0x5tg6woe)
+
+[Change Workflow tasks state in bulk (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.4yenrfg4h7h6)
+
+[Import from Google Sheets (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.ciaeix2ny197)
+
+[Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.9ry21bbez6aa)
+
+[Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.m9vl04nitn8)
+
+### Introducing ‘Propose changes’ on Programs (v2.7.0, 07/01/2019)
+
+You can propose changes to any Program to which you have at least read access. Just click ‘Propose Changes’ button on the Program info pane, make changes and save proposal. The system sends a notification via email to Program Managers, Program Editors and Primary Contacts. Anyone who has edit access to the Program, can apply or decline the proposal.
+
+### Possibility to revert to any version of a Program (v2.7.0, 07/01/2019)
+
+You can find a list of all versions of a Program in the ‘Version History’ tab. You can revert to any Program version by clicking the ‘Review & Restore’ button, if you have edit access to the Program.
+
+### Past Evidence can be marked as ‘Deprecated’ (v2.7.0, 07/01/2019)
+
+You can mark an Evidence from past Audits and Assessments as ‘Deprecated’ and an appropriate icon will appear on the Audit info page, Assessment info page and while reusing an Evidence file/URL from ‘Related Assessments’.
+
+### Introducing the ‘Multiselect’ attribute on Assessment templates (v2.7.0, 07/01/2019)
+
+Now you can add the ‘Multiselect’ attribute to an Assessment template. This attribute allows selecting several options from a list.
 
 ### Introducing new Risk Library frontend (v.2.6.0, 06/18/2019)
 
@@ -112,7 +136,7 @@ Mapping and unmapping of Scope Object to Standard or Regulation was moved to a n
 
 Program to Program mapping was enabled. Through Unified mapper Programs can be selected to become a Parent or a Child. Objects listed below will be automapped from a Child Program to a Parent Program.
 
-Object types available for automapping: Regulation, Objective, Control, Contract, Policy, Risk, Standard, Thread, Requirement, System, Product, Process, Market, DataAsset, Facility, OrgGroup, Metric, Technology Environment, Product Group, Projects, Vendors, Access Groups, Key report, Account balance.
+Object types available for automapping: Regulation, Objective, Control, Contract, Policy, Risk, Standard, Thread, Requirement, System, Product, Process, Market, Data Asset, Facility, Org Group, Metric, Technology Environment, Product Group, Projects, Vendors, Access Groups, Key Report, Account Balance.
 
 ### A functionality to turn off sync of people fields between Assessment and Ticket tracker (v.2.3.0, 05/03/2019)
 
@@ -149,7 +173,7 @@ When the ticket for Assessment is created the fields are synced with the followi
 
 ### Calendar events added for tasks (v.1.38.0, 01/16/2019)
 
-GGRC Workflow Tasks are now integrated with Google Calendar. In order to improve the notification capability of the tool we introduce a Google Calendar integration feature. It provides an ability to track upcoming tasks based on their due dates as google calendar events. Google calendar events are created for all tasks that are due in future and not finished. User will have ability to have an associated calendar event for every workcycle cycle task. The calendar event associated with the task contains the description of task due on that day as well as the “My Task” link.   
+GGRC Workflow Tasks are now integrated with Google Calendar. In order to improve the notification capability of the tool we introduce a Google Calendar integration feature. It provides an ability to track upcoming tasks based on their due dates as google calendar events. Google calendar events are created for all tasks that are due in future and not finished. User will have ability to have an associated calendar event for every workcycle cycle task. The calendar event associated with the task contains the description of task due on that day as well as the “My Task” link.   
 
 ### Added a checkbox in Audit ‘Create screen’ to map snapshots manually (v.1.38.0, 01/16/2019)
 
@@ -165,7 +189,7 @@ New columns in import files are now supported for bulk import of ticket tracker 
 
 ### New roles for scoping objects (v1.29.0, 10/30/2018)
 
-All scoping objects (like product, systems, entities etc.) will have the following people roles associated with them. Multiple people can be added within each role.  
+All scoping objects (like product, systems, entities etc.) will have the following people roles associated with them. Multiple people can be added within each role.
 
 - Vice Presidents;
 - Line of Defense One Contacts.
@@ -184,7 +208,7 @@ Once reviewer can be assigned for any object like control. The system will infor
 
 ### Linking assessments with other issue tracking systems in bulk (v1.23.0, 09/18/2018)
 
-You can link all existing assessments in scope of a particular audit with other issue tracking/ticketing systems in bulk, to receive notifications about their updates. You need to click ‘Generate’ button on audit info pane, and the system will auto-generate tickets using a background job for all audit’s assessments, which are not linked to tickets yet. The system will send an email once this process is complete or if there are errors.  
+You can link all existing assessments in scope of a particular audit with other issue tracking/ticketing systems in bulk, to receive notifications about their updates. You need to click ‘Generate’ button on audit info pane, and the system will auto-generate tickets using a background job for all audit’s assessments, which are not linked to tickets yet. The system will send an email once this process is complete or if there are errors.
 
 ### Roles reorganization for scoping objects (v1.22.0, 09/18/2018)
 

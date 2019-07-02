@@ -38,6 +38,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
       _types.DATE: lambda self: self.get_date_value(),
       _types.DROPDOWN: lambda self: self.get_dropdown_value(),
       _types.CHECKBOX: lambda self: self.get_checkbox_value(),
+      _types.MULTISELECT: lambda self: self.get_multiselect_values(),
       _types.RICH_TEXT: lambda self: self.get_rich_text_value(),
       _types.MAP: lambda self: self.get_person_value(),
   }
@@ -158,6 +159,23 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return value
 
+  def get_multiselect_values(self):
+    """Get valid value for multiselect fields."""
+    if not self.raw_value:  # empty value
+      return ""
+
+    definition = self.get_ca_definition()
+    choices_set = set(definition.multi_choice_options.lower().split(","))
+    raw_values = set(self.raw_value.lower().split(","))
+
+    is_valid_values = raw_values.issubset(choices_set)
+    valid_values = choices_set.intersection(raw_values)
+
+    if not is_valid_values:
+      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+
+    return ",".join(valid_values)
+
   def get_dropdown_value(self):
     """Get valid value of the dropdown field."""
     definition = self.get_ca_definition()
@@ -207,7 +225,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
 
   def get_ca_definition(self):
     """Get custom attribute definition."""
-    cache = self.row_converter.block_converter.get_ca_definitions_cache()
+    cache = self.row_converter.block_converter.ca_definitions_cache
     return cache.get((None, self.display_name))
 
 
@@ -231,5 +249,5 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
     """Get custom attribute definition for a specific object."""
     if self.row_converter.obj.id is None:
       return None
-    cache = self.row_converter.block_converter.get_ca_definitions_cache()
+    cache = self.row_converter.block_converter.ca_definitions_cache
     return cache.get((self.row_converter.obj.id, self.display_name))

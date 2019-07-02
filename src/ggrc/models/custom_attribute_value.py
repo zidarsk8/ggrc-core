@@ -65,6 +65,7 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       "Rich Text": lambda self: self._validate_rich_text(),
       "Date": lambda self: self._validate_date(),
       "Dropdown": lambda self: self._validate_dropdown(),
+      "Multiselect": lambda self: self._validate_multiselect(),
       "Map:Person": lambda self: self._validate_map_object(),
       "Checkbox": lambda self: self._validate_checkbox(),
   }
@@ -253,7 +254,6 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
     this custom attribute.
     """
     self._extract_object_id_from_value()
-    self._validate_mandatory_mapping()
     self._validate_map_type()
     self._validate_object_existence()
 
@@ -263,16 +263,6 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       value, id_ = self.attribute_value.split(":")
       self.attribute_value = value
       self.attribute_object_id = id_
-
-  def _validate_mandatory_mapping(self):
-    """Validate mandatory mapping attribute"""
-    if (
-        self.custom_attribute.is_gca and
-        self.custom_attribute.mandatory and
-        not self.attribute_object_id
-    ):
-      raise ValueError('Missing mandatory attribute: %s' %
-                       self.custom_attribute.title)
 
   def _validate_map_type(self):
     """Validate related CAD attribute_type and provided attribute_value
@@ -367,6 +357,17 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
     """Set falsy value to zero."""
     if not self.attribute_value:
       self.attribute_value = "0"
+
+  def _validate_multiselect(self):
+    """Validate multiselect checkbox values."""
+    if self.attribute_value:
+      valid_options = set(
+          self.custom_attribute.multi_choice_options.split(","))
+      attr_values = set(self.attribute_value.split(","))
+      if not attr_values.issubset(valid_options):
+        raise ValueError("Invalid custom attribute multiselect options {act}. "
+                         "Expected some of {exp}".format(act=attr_values,
+                                                         exp=valid_options))
 
   def validate(self):
     """Validate custom attribute value."""

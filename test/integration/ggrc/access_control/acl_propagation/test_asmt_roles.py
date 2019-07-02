@@ -94,7 +94,8 @@ class TestAsmtRolesPropagation(base.TestACLPropagation):
               },
           },
           "Evidence Assessment": {
-              ("Assignees", "Creators", "Verifiers"): {
+              ("Assignees", "Creators", "Verifiers", "Primary Contacts",
+               "Secondary Contacts"): {
                   "create_and_map": True,
                   "read": True,
                   "update": True,

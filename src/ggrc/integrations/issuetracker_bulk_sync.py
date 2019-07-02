@@ -643,7 +643,11 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     parent_model = models.get_model(parent_type)
     parent = parent_model.query.get(parent_id)
 
-    data = {"title": parent.title}
+    data = {
+        "title": parent.title,
+        "url": get_object_url(parent),
+    }
+
     if failed:
       body = settings.EMAIL_BULK_CHILD_SYNC_EXCEPTION.render()
     elif errors:

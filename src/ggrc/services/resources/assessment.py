@@ -143,20 +143,6 @@ class AssessmentResource(mixins.SnapshotCounts, common.ExtendedResource):
              if evd.kind == evd.FILE]
     return urls, files
 
-  def _get_comment_data(self, relationships):
-    """Get assessment comment data."""
-    relationship_ids = self._filter_rels(relationships, "Comment")
-    if not relationship_ids:
-      return []
-    with benchmark("Get assessment comment data"):
-      comments = models.Comment.eager_query().filter(
-          models.Comment.id.in_(relationship_ids)
-      ).order_by(
-          models.Comment.created_at.desc(),
-          models.Comment.id.desc(),
-      ).all()
-    return [comment.log_json() for comment in comments]
-
   def _get_related_data(self, assessment):
     """Get assessment related data.
 
@@ -170,7 +156,6 @@ class AssessmentResource(mixins.SnapshotCounts, common.ExtendedResource):
     data = {
         "Audit": self._get_audit_data(assessment),
         "Snapshot": self._get_snapshot_data(assessment, relationships),
-        "Comment": self._get_comment_data(relationships),
         urls_key: urls,
         attachments_key: files,
     }

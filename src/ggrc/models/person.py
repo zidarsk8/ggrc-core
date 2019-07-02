@@ -211,8 +211,8 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
       return SystemWideRoles.SUPERUSER
 
-    from ggrc.utils.user_generator import is_external_app_user_email
-    if is_external_app_user_email(self.email):
+    from ggrc.utils.user_generator import is_app_2_app_user_email
+    if is_app_2_app_user_email(self.email):
       return SystemWideRoles.SUPERUSER
 
     role_hierarchy = {

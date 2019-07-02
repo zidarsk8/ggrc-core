@@ -2,7 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests of assessment notifications."""
-from collections import OrderedDict
+import collections
+import ddt
+import mock
 
 from ggrc import db
 from ggrc.notifications import common
@@ -11,9 +13,11 @@ from ggrc.models import all_models
 from integration.ggrc import api_helper
 from integration.ggrc import TestCase
 from integration.ggrc.access_control import acl_helper
+from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestAssessmentNotification(TestCase):
   """Tests of assessment notifications"""
 
@@ -67,17 +71,6 @@ class TestAssessmentNotification(TestCase):
     factories.CustomAttributeValueFactory(
         custom_attribute=self.cad1,
         attributable=self.assessment
-    )
-
-    self.cad2 = factories.CustomAttributeDefinitionFactory(
-        definition_type="assessment",
-        attribute_type="Map:Person",
-        title="ca2",
-    )
-    factories.CustomAttributeValueFactory(
-        custom_attribute=self.cad2,
-        attributable=self.assessment,
-        attribute_value='Person'
     )
 
     self.cad3 = factories.CustomAttributeDefinitionFactory(
@@ -142,7 +135,7 @@ class TestAssessmentNotification(TestCase):
     from flask import g
     setattr(g, '_current_user', user)
 
-    import_data = OrderedDict([
+    import_data = collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment_slug),
         ("Test GCAD", "test value"),
@@ -158,23 +151,6 @@ class TestAssessmentNotification(TestCase):
         title="Test GCAD").first()
     self.assertEqual(
         [i.attribute_value for i in cad.attribute_values], ["test value"])
-
-  def test_person_attr_change(self):
-    """Test notification when person attribute value is changed"""
-    custom_attribute_values = [{
-        "custom_attribute_id": self.cad2.id,
-        "attribute_value": "Person:" + str(self.auditor.id),
-    }]
-    response = self.api.put(self.assessment, {
-        "custom_attribute_values": custom_attribute_values
-    })
-    self.assert200(response)
-
-    notifs, notif_data = common.get_daily_notifications()
-    updated = notif_data["user@example.com"]["assessment_updated"]
-    self.assertEqual(len(notifs), 1)
-    self.assertEqual(
-        updated[self.assessment.id]["updated_fields"], ["CA2"])
 
   def test_checkbox_attr_change(self):
     """Test notification when person attribute value is changed"""
@@ -253,3 +229,88 @@ class TestAssessmentNotification(TestCase):
     self.assert200(resp)
     notifs, _ = common.get_daily_notifications()
     self.assertEqual(len(notifs), 1)
+
+  def assert_asmnt_notifications(self):
+    """Check if Assessment reopen notifications are sent."""
+    notifs, _ = common.get_daily_notifications()
+    self.assertGreaterEqual(len(notifs), 2)
+
+    with mock.patch("ggrc.notifications.common.send_email") as send_email_mock:
+      self.client.get("/_notifications/send_daily_digest")
+      _, _, content = send_email_mock.call_args[0]
+      self.assertIn("Assessments have been updated", content)
+      self.assertIn("Reopened assessments", content)
+
+  @ddt.data(
+      all_models.Assessment.DONE_STATE,
+      all_models.Assessment.FINAL_STATE,
+  )
+  def test_import_evidence_mapped(self, status):
+    """Test notifications for '{}' Assessment if Evidence mapped in import."""
+    object_generator = ObjectGenerator()
+    _, user = object_generator.generate_person(user_role="Creator")
+    assessment = factories.AssessmentFactory()
+    assessment.add_person_with_role_name(user, "Verifiers")
+    assessment.status = status
+    db.session.commit()
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Evidence URL", "some url"),
+    ]))
+    self._check_csv_response(response, {})
+    self.assert_asmnt_notifications()
+
+  @ddt.data(
+      all_models.Assessment.DONE_STATE,
+      all_models.Assessment.FINAL_STATE,
+  )
+  def test_import_lcad_changed(self, status):
+    """Test notifications for '{}' Assessment if LCAD changed in import."""
+    object_generator = ObjectGenerator()
+    _, user = object_generator.generate_person(user_role="Creator")
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      factories.CustomAttributeDefinitionFactory(
+          title="Test LCAD",
+          definition_type="assessment",
+          definition_id=assessment.id,
+          attribute_type="Text",
+      )
+    assessment.add_person_with_role_name(user, "Verifiers")
+    assessment.status = status
+    db.session.commit()
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Test LCAD", "some value"),
+    ]))
+    self._check_csv_response(response, {})
+    self.assert_asmnt_notifications()
+
+  @ddt.data(
+      all_models.Assessment.DONE_STATE,
+      all_models.Assessment.FINAL_STATE,
+  )
+  def test_import_snapshot_mapped(self, status):
+    """Test notifications for '{}' Assessment if snapshot mapped in import."""
+    object_generator = ObjectGenerator()
+    _, user = object_generator.generate_person(user_role="Creator")
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      control = factories.ControlFactory()
+    # pylint: disable=expression-not-assigned
+    self._create_snapshots(assessment.audit, [control])[0]
+    assessment.add_person_with_role_name(user, "Verifiers")
+    assessment.status = status
+    db.session.commit()
+
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Map:control versions", control.slug),
+    ]))
+    self._check_csv_response(response, {})
+    self.assert_asmnt_notifications()

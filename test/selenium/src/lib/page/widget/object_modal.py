@@ -24,7 +24,8 @@ def get_modal_obj(obj_type, _selenium=None):
       "threat": ThreatModal,
       "workflow": WorkflowModal,
       "task_group_task": TaskGroupTaskModal,
-      "task_group": TaskGroupModal
+      "task_group": TaskGroupModal,
+      "regulation": RegulationModal
   }
   return mapping.get(obj_type.lower(), BaseObjectModal)()
 
@@ -253,6 +254,12 @@ class WorkflowModal(BaseObjectModal):
       repeat_modal.click_save_and_close_btn()
 
 
+class RegulationModal(BaseObjectModal):
+  def __init__(self):
+    super(RegulationModal, self).__init__()
+    self._fields = ["title"]
+
+
 class TaskGroupTaskModal(BaseObjectModal):
   """Represents task group task object modal."""
 
@@ -296,9 +303,27 @@ class TaskGroupModal(BaseObjectModal):
     self._fields = ["title"]
 
 
-class UnifiedMapperModal(BaseObjectModal):
-  """Represents unified mapper object modal."""
-
+class CommonConfirmModal(BaseObjectModal):
+  """Represents confirmation object modal."""
   def __init__(self):
-    super(UnifiedMapperModal, self).__init__()
-    self._root = self._browser.element(css=locator.Common.MODAL_MAPPER)
+    super(CommonConfirmModal, self).__init__()
+    self._root = self._browser.element(
+        css="{}[style*='display: block']".format(locator.Common.MODAL_CONFIRM))
+    self.confirm_btn = self._browser.element(
+        css="{} .modal-footer .btn-small".format(locator.Common.MODAL_CONFIRM))
+
+  def confirm(self):
+    """Clicks confirmation button on modal object."""
+    self.confirm_btn.click()
+
+
+class WarningModal(CommonConfirmModal):
+  """Represents warning object modal."""
+  def __init__(self):
+    super(WarningModal, self).__init__()
+    self.proceed_in_new_tab_btn = self.confirm_btn
+
+  def proceed_in_new_tab(self):
+    """Clicks 'Proceed in new tab' button on modal object."""
+    self.proceed_in_new_tab_btn.wait_until_present()
+    self.proceed_in_new_tab_btn.click()

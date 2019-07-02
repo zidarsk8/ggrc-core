@@ -28,29 +28,36 @@
   <div class="tier-2-info item-content">
     <div class="tier-2-info-content">
       <div class="table-wrap {{#if instance.isChangeableExternally}}table-wrap_type_readonly{{/if}}">
-        <table class="table custom-attribute-definitions">
-          <colgroup>
-            <col style="width: 50%"/>
-            <col style="width: 25%"/>
-            <col style="width: 15%"/>
-            <col style="width: 10%"/>
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Attribute name</th>
-              <th>Attribute type</th>
-              <th>Mandatory</th>
-              {{^if instance.isChangeableExternally}}
-                <th>Edit</th>
-              {{/if}}
-            </tr>
-          </thead>
-          {{#child_options.0}}
-          <tbody class="tree-structure new-tree tree-view-control" {{canData 'options'}}>
-          </tbody>
-          {{/child_options.0}}
-          <!-- Custom attribute definitions here -->
-          {{^if instance.isChangeableExternally}}
+        <model-loader path:from="'custom-attributes/custom-attribute-definition'">
+        <tree-structure
+          parentModel:from="instance"
+          model:from="loadedModel"
+          modalTitle:from="'Add Attribute to type {{instance.title_singular}}'"
+          contentViewPath:from="'/custom_attribute_definitions/modal_content.stache'"
+        >
+          <table class="table custom-attribute-definitions">
+            <colgroup>
+              <col style="width: 50%"/>
+              <col style="width: 25%"/>
+              <col style="width: 15%"/>
+              <col style="width: 10%"/>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Attribute name</th>
+                <th>Attribute type</th>
+                <th>Mandatory</th>
+                {{^if instance.isChangeableExternally}}
+                  <th>Edit</th>
+                {{/if}}
+              </tr>
+            </thead>
+            {{#child_options.0}}
+            <tbody class="tree-structure new-tree tree-view-control" {{canData 'options'}}>
+            </tbody>
+            {{/child_options.0}}
+            <!-- Custom attribute definitions here -->
+            {{^if instance.isChangeableExternally}}
             <tfoot class="add-item">
               <tr>
                 <td colspan="4" class="tree-item tree-item-add">
@@ -58,18 +65,11 @@
                     <div class="span12">
                       <a
                         href="javascript://"
-                        data-toggle="modal-ajax-form"
                         class="btn btn-small btn-white"
                         rel="tooltip"
                         data-placement="right"
-                        data-object-title="{{instance.title_singular}}"
-                        data-object-singular="CustomAttributeDefinition"
-                        data-object-plural="custom_attribute_definitions"
-                        data-object-params='{
-                          "definition_type": "{{instance.table_singular}}",
-                          "modal_title": "Add Attribute to type {{instance.title_singular}}"
-                        }'
-                        data-original-title="Add Attribute">
+                        data-original-title="Add Attribute"
+                        on:el:click="showAddNewItemModal(scope.element)">
                         <i class="fa fa-plus-circle"
                           data-test-id="button_add-86eaf948">
                         </i>
@@ -79,8 +79,10 @@
                 </td>
               </tr>
             </tfoot>
-          {{/if}}
-        </table>
+            {{/if}}
+          </table>
+        </tree-structure>
+        </model-loader>
       </div>
     </div>
   </div>

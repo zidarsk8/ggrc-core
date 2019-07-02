@@ -457,22 +457,18 @@ sub-tree-models {
     }
 
     .sub-tree-models__options {
-      flex-direction: column;
-      max-height: 320px;
+      column-width: 150px;
     }
 
     .sub-models_item {
       margin-bottom: 15px;
-      margin-right: 5px;
-      flex: 0 1 20px;
-      min-width: 120px;
-      max-width: 150px;
 
       input {
         margin-right: 5px;
       }
       label {
         cursor: pointer;
+        line-height: 24px;
       }
     }
 

@@ -8,7 +8,7 @@ import './comment-add-button';
 import template from './comment-add-form.stache';
 import {COMMENT_CREATED} from '../../events/eventTypes';
 import tracker from '../../tracker';
-import {getAssigneeType} from '../../plugins/ggrc_utils';
+import {getAssigneeType} from '../../plugins/utils/comments-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
 /**

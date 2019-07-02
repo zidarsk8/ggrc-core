@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Mappings from '../mappings';
+import * as Mappings from '../mappings';
 import Permission from '../../../permission';
 
 describe('Mappings', function () {
@@ -93,7 +93,7 @@ describe('Mappings', function () {
       ['Audit', 'Assessment', 'Document', 'Person', 'Workflow']),
     Facility: _.difference(filtered, modules.core.scope.notMappable),
     Issue: _.difference(allTypes,
-      ['RiskAssessment', 'Person', 'AssessmentTemplate', 'Evidence']
+      ['Person', 'AssessmentTemplate', 'Evidence']
         .concat(modules.workflows.notMappable)),
     KeyReport: _.difference(filtered, modules.core.scope.notMappable),
     Market: _.difference(filtered, modules.core.scope.notMappable),
@@ -106,12 +106,11 @@ describe('Mappings', function () {
     Product: _.difference(filtered, modules.core.scope.notMappable),
     ProductGroup: _.difference(filtered, modules.core.scope.notMappable),
     Program: _.difference(allTypes,
-      ['Audit', 'RiskAssessment', 'Assessment', 'Person']
+      ['Audit', 'Assessment', 'Person']
         .concat(modules.core.notMappable, modules.workflows.notMappable)),
     Project: _.difference(filtered, modules.core.scope.notMappable),
     Regulation: _.difference(filtered, ['Audit', 'Regulation']),
     Risk: _.difference(filtered, ['Audit']),
-    RiskAssessment: [],
     Requirement: _.difference(filtered, ['Audit']),
     Standard: _.difference(filtered, ['Audit', 'Standard']),
     System: _.difference(filtered, modules.core.scope.notMappable),
@@ -129,10 +128,6 @@ describe('Mappings', function () {
     });
 
     it('checks that types are mappable', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        Control: {},
-      });
-
       let result = Mappings.allowedToUnmap('SourceType', 'TargetType');
 
       expect(result).toBeFalsy();
@@ -140,10 +135,6 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update source', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        AccessGroup: {},
-      });
-
       let result = Mappings.allowedToUnmap('DataAsset', 'AccessGroup');
 
       expect(result).toBeTruthy();
@@ -153,10 +144,6 @@ describe('Mappings', function () {
     });
 
     it('checks permissions to update target', () => {
-      spyOn(Mappings, 'getAllowedToUnmapModels').and.returnValue({
-        AccessGroup: {},
-      });
-
       let source = new can.Map({type: 'DataAsset'});
       let target = new can.Map({type: 'AccessGroup'});
       let result = Mappings.allowedToUnmap(source, target);

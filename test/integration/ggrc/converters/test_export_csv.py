@@ -7,6 +7,7 @@ import collections
 import ddt
 from flask.json import dumps
 
+from ggrc import utils
 from ggrc.converters import get_importables
 from ggrc.models import inflector, all_models
 from ggrc.models.reflection import AttributeInfo
@@ -698,3 +699,76 @@ class TestExportMultipleObjects(TestCase):
     }]
     exported_data = self.export_parsed_csv(search_request)[model]
     self.assertEqual(exported_data, obj_dicts)
+
+
+@ddt.ddt
+class TestExportPerformance(TestCase):
+  """Test performance of export."""
+
+  def setUp(self):
+    super(TestExportPerformance, self).setUp()
+    self.headers = {
+        'Content-Type': 'application/json',
+        "X-Requested-By": "GGRC",
+        "X-export-view": "blocks",
+    }
+    self.client.get("/login")
+
+  @ddt.data(
+      ("Assessment", 21),
+      ("Issue", 25),
+  )
+  @ddt.unpack
+  def test_export_query_count(self, model_name, query_limit):
+    """Test query count during export of {0}."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      model_factory = factories.get_model_factory(model_name)
+      for _ in range(3):
+        model_factory(audit=audit)
+    data = [{
+        "object_name": model_name,
+        "filters": {
+            "expression": {},
+        },
+        "fields": "all",
+    }]
+    with utils.QueryCounter() as counter:
+      response = self.export_parsed_csv(data)
+      self.assertNotEqual(counter.get, 0)
+      self.assertLessEqual(counter.get, query_limit)
+    self.assertEqual(len(response[model_name]), 3)
+
+  @ddt.data(
+      ("Assessment", ["Objective", "Market"], 21),
+      ("Issue", ["Objective", "Risk", "System"], 25),
+  )
+  @ddt.unpack
+  def test_with_snapshots_query_count(self, model_name, snapshot_models,
+                                      query_limit):
+    """Test query count during export of {0} with mapped {1} snapshots."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      snap_objects = []
+      for snap_model in snapshot_models:
+        snap_objects.append(factories.get_model_factory(snap_model)())
+      snapshots = self._create_snapshots(audit, snap_objects)
+
+      model_factory = factories.get_model_factory(model_name)
+      for _ in range(3):
+        obj = model_factory(audit=audit)
+        for snapshot in snapshots:
+          factories.RelationshipFactory(source=obj, destination=snapshot)
+
+    data = [{
+        "object_name": model_name,
+        "filters": {
+            "expression": {},
+        },
+        "fields": "all",
+    }]
+    with utils.QueryCounter() as counter:
+      response = self.export_parsed_csv(data)
+      self.assertNotEqual(counter.get, 0)
+      self.assertLessEqual(counter.get, query_limit)
+    self.assertEqual(len(response[model_name]), 3)

@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './multiselect-dropdown.stache';
+import template from './templates/multiselect-dropdown.stache';
 
 export default can.Component.extend({
   tag: 'multiselect-dropdown',
@@ -11,6 +11,9 @@ export default can.Component.extend({
   leakScope: true,
   viewModel: can.Map.extend({
     disabled: false,
+    isHighlightable: true,
+    isInlineMode: false,
+    isOpen: false,
     _stateWasUpdated: false,
     selected: [],
     options: [],
@@ -40,9 +43,15 @@ export default can.Component.extend({
           });
         },
       },
-      isOpen: {
-        type: 'boolean',
-        value: false,
+      isOpenOrInline: {
+        get() {
+          return this.attr('isOpen') || this.attr('isInlineMode');
+        },
+      },
+      isHighlighted: {
+        get() {
+          return this.attr('isHighlightable') && this.attr('isOpen');
+        },
       },
       options: {
         value: [],

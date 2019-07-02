@@ -10,7 +10,7 @@ import {
 } from '../../../../js_specs/spec_helpers';
 import Permission from '../../../permission';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
-import Mapper from '../../../models/mappers/mappings';
+import * as Mapper from '../../../models/mappers/mappings';
 import Cacheable from '../../../models/cacheable';
 
 describe('tree-item-actions component', function () {

@@ -108,6 +108,16 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                     columns=", ".join(self.IMPORTABLE_COLUMN_NAMES)
                 )
             },
+            'row_warnings': {
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=12,
+                    column_name="Actual Verified Date"
+                ),
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=17,
+                    column_name="Actual Verified Date"
+                )
+            }
         }
     }
 
@@ -443,8 +453,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_active[4]["description"] + " five",
             "start_date": "2016-06-25",
             "end_date": "2016-06-30",
-            "finished_date": "2016-07-25",
-            "verified_date": "2016-08-30",
+            "finished_date": "2016-07-01",
+            "verified_date": "2016-07-01",
             "status": "Verified"
         },
         "CYCLETASK-6": {
@@ -493,8 +503,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[4]["description"] + " five",
             "start_date": "2014-04-25",
             "end_date": "2014-04-30",
-            "finished_date": "2014-05-25",
-            "verified_date": "2014-06-30",
+            "finished_date": "2014-05-01",
+            "verified_date": "2014-05-01",
             "status": "Verified"
         }
     }
@@ -665,8 +675,6 @@ class TestCycleTaskImportComments(TestCase):
     self.import_data(OrderedDict([
         ("object_type", self.task.type),
         ("Code*", self.task.slug),
-        ("Task Assignees*", 'test@exmple.com'),
-        ("Task Type", "some data"),
         ("Comments", comment)]))
 
     new_comments_count = all_models.Relationship.query.filter_by(

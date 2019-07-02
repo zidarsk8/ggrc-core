@@ -8,15 +8,12 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
-import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import caUpdate from '../mixins/ca-update';
 import autoStatusChangeable from '../mixins/auto-status-changeable';
-import timeboxed from '../mixins/timeboxed';
 import accessControlList from '../mixins/access-control-list';
 import refetchHash from '../mixins/refetch-hash';
 import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
 import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
-import {getInstance} from '../../plugins/utils/models-utils';
 import {REFRESH_MAPPING, REFRESHED} from '../../events/eventTypes';
 
 export default Cacheable.extend({
@@ -30,7 +27,7 @@ export default Cacheable.extend({
   create: 'POST /api/assessments',
   mixins: [
     caUpdate,
-    autoStatusChangeable, timeboxed,
+    autoStatusChangeable,
     accessControlList, refetchHash,
     assessmentIssueTracker, relatedAssessmentsLoader,
   ],
@@ -45,6 +42,15 @@ export default Cacheable.extend({
   },
   statuses: ['Not Started', 'In Progress', 'In Review',
     'Verified', 'Completed', 'Deprecated', 'Rework Needed'],
+  unchangeableIssueTrackerIdStatuses: ['In Review', 'Verified', 'Completed',
+    'Deprecated'],
+  assigneeHierarchy: {
+    Verifiers: 1,
+    Assignees: 2,
+    Creators: 3,
+    'Primary Contacts': 4,
+    'Secondary Contacts': 5,
+  },
   tree_view_options: {
     add_item_view: 'assessments/tree_add_item',
     attr_list: [{
@@ -228,6 +234,9 @@ export default Cacheable.extend({
       validate: {
         validateAssessmentIssueTracker: true,
         validateIssueTrackerTitle: true,
+        validateIssueTrackerIssueId() {
+          return this.constructor.unchangeableIssueTrackerIdStatuses;
+        },
       },
     },
   },
@@ -276,11 +285,10 @@ export default Cacheable.extend({
     this._transformBackupProperty(['design', 'operationally']);
     return this._super(checkAssociations);
   },
-  form_preload: function (newObjectForm) {
-    let pageInstance = getPageInstance();
-    let currentUser = getInstance('Person', GGRC.current_user.id);
+  form_preload: function (newObjectForm, params, pageInstance) {
+    let currentUser = GGRC.current_user;
 
-    if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
+    if (!this.audit || !this.audit.id || !this.audit.type) {
       if (pageInstance.type === 'Audit') {
         this.attr('audit', pageInstance);
       }

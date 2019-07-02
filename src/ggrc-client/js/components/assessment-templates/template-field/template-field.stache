@@ -8,20 +8,22 @@
   <div class="span-custom1-and-half">{{field.attribute_name}}</div>
   <div class="span5">
     {{#attrs}}
-        <div class="row">
-            <div class="span4">
-                <span class="block single-line" title="{{value}}">{{value}}</span>
-            </div>
-            <div class="span4 centered checkbox-wrap">
-                <input type="checkbox" el:checked:bind="attachment"/>
-            </div>
-            <div class="span2 centered checkbox-wrap">
-                <input type="checkbox" el:checked:bind="url"/>
-            </div>
-            <div class="span2 centered checkbox-wrap">
-                <input type="checkbox" el:checked:bind="comment"/>
-            </div>
+      <div class="row">
+        <div class="span4">
+          <span class="block single-line" title="{{value}}">{{value}}</span>
         </div>
+        {{#is(type, "Dropdown")}}
+          <div class="span4 centered checkbox-wrap">
+            <input type="checkbox" el:checked:bind="attachment"/>
+          </div>
+          <div class="span2 centered checkbox-wrap">
+            <input type="checkbox" el:checked:bind="url"/>
+          </div>
+          <div class="span2 centered checkbox-wrap">
+            <input type="checkbox" el:checked:bind="comment"/>
+          </div>
+        {{/is}}
+      </div>
     {{/attrs}}
   </div>
 

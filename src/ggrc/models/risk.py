@@ -8,6 +8,7 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc import utils as ggrc_utils
+from ggrc.fulltext import attributes
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models import comment
 from ggrc.models import exceptions
@@ -112,7 +113,27 @@ class Risk(synchronizable.Synchronizable,
       'threat_source',
       'threat_event',
       'vulnerability',
-      'review_status_display_name'
+      'review_status_display_name',
+      attributes.DateFullTextAttr('due_date', 'due_date'),
+      attributes.DatetimeFullTextAttr('last_submitted_at',
+                                      'last_submitted_at'),
+      attributes.DatetimeFullTextAttr('last_verified_at',
+                                      'last_verified_at'),
+      attributes.FullTextAttr(
+          "created_by",
+          "created_by",
+          ["email", "name"]
+      ),
+      attributes.FullTextAttr(
+          "last_submitted_by",
+          "last_submitted_by",
+          ["email", "name"]
+      ),
+      attributes.FullTextAttr(
+          "last_verified_by",
+          "last_verified_by",
+          ["email", "name"]
+      )
   ]
 
   _custom_publish = {
@@ -176,6 +197,30 @@ class Risk(synchronizable.Synchronizable,
       },
       "review_status_display_name": {
           "display_name": "Review Status",
+          "mandatory": False,
+      },
+      "due_date": {
+          "display_name": "Due Date",
+          "mandatory": False,
+      },
+      "created_by": {
+          "display_name": "Created By",
+          "mandatory": False,
+      },
+      "last_submitted_at": {
+          "display_name": "Last Owner Reviewed Date",
+          "mandatory": False,
+      },
+      "last_submitted_by": {
+          "display_name": "Last Owner Reviewed By",
+          "mandatory": False,
+      },
+      "last_verified_at": {
+          "display_name": "Last Compliance Reviewed Date",
+          "mandatory": False,
+      },
+      "last_verified_by": {
+          "display_name": "Last Compliance Reviewed By",
           "mandatory": False,
       },
   }

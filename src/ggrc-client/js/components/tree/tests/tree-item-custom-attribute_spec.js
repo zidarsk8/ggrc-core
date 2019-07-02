@@ -4,20 +4,20 @@
 */
 
 import Cacheable from '../../../models/cacheable';
-import {helpers} from './../tree-item-custom-attribute';
-import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import Component from '../tree-item-custom-attribute';
+import {
+  makeFakeInstance,
+  getComponentVM,
+} from '../../../../js_specs/spec_helpers';
 import * as DateUtils from '../../../plugins/utils/date-utils';
 import * as MarkdownUtils from '../../../plugins/utils/markdown-utils';
 
-describe('helpers.getCustomAttrValue', () => {
-  let helper;
+describe('tree-item-custom-attribute component', () => {
   let fakeInstance;
-  let fakeOptions;
   let origValue;
-  let actual;
+  let viewModel;
 
   beforeAll(() => {
-    helper = helpers.getCustomAttrValue;
     origValue = GGRC.custom_attr_defs;
   });
 
@@ -26,13 +26,11 @@ describe('helpers.getCustomAttrValue', () => {
   });
 
   beforeEach(() => {
-    fakeOptions = {};
-
     const fakeCustomAttrDefs = [{
       definition_type: 'control',
-      id: 3,
-      attribute_type: '',
       title: 'Type',
+      attribute_type: '',
+      id: 3,
     },
     {
       definition_type: 'control',
@@ -60,12 +58,6 @@ describe('helpers.getCustomAttrValue', () => {
     },
     {
       definition_type: 'control',
-      title: 'Persons',
-      attribute_type: 'Map:Person',
-      id: 8,
-    },
-    {
-      definition_type: 'control',
       title: 'Date',
       attribute_type: 'Date',
       id: 9,
@@ -75,7 +67,14 @@ describe('helpers.getCustomAttrValue', () => {
       title: 'Dropdown',
       attribute_type: 'Dropdown',
       id: 10,
+    },
+    {
+      definition_type: 'control',
+      title: 'Multiselect',
+      attribute_type: 'Multiselect',
+      id: 11,
     }];
+
     fakeInstance = makeFakeInstance({
       model: Cacheable,
       staticProps: {
@@ -85,95 +84,119 @@ describe('helpers.getCustomAttrValue', () => {
     })({
       custom_attribute_definitions: fakeCustomAttrDefs,
     });
+
     GGRC.custom_attr_defs = fakeCustomAttrDefs;
+
+    viewModel = getComponentVM(Component);
+    viewModel.attr('instance', fakeInstance);
   });
 
-  it('return correct value if there is ca value with certain caId',
-    function () {
-      const caId = 3;
-      const value = 'correctValue';
-      fakeInstance.customAttr(caId, value);
-      actual = helper(fakeInstance, caId, fakeOptions);
-      expect(actual).toBe(value);
-    });
-
-  describe('return an empty string', () => {
-    it('if ca value is empty', function () {
-      const caId = 3;
-      fakeInstance.customAttr(caId, null);
-      actual = helper(fakeInstance, caId, fakeOptions);
-      expect(actual).toBe('');
-    });
-
-    it('if caObject was not found', function () {
-      const caId = 10000;
-      actual = helper(fakeInstance, caId, fakeOptions);
-      expect(actual).toBe('');
-    });
-  });
-
-  describe('for caObject of Checkbox type', () => {
-    it('returns "Yes" if ca value is true',
+  describe('value getter', () => {
+    it('return correct value if there is ca value with certain caId',
       function () {
-        const caId = 4;
-        fakeInstance.customAttr(caId, true);
-        actual = helper(fakeInstance, caId, fakeOptions);
-        expect(actual).toEqual('Yes');
+        const caId = 3;
+        const value = 'correctValue';
+        fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
+
+        expect(viewModel.attr('value')).toBe(value);
       });
 
-    it('returns "No" if ca value is false',
-      function () {
-        const caId = 4;
-        fakeInstance.customAttr(caId, false);
-        actual = helper(fakeInstance, caId, fakeOptions);
-        expect(actual).toEqual('No');
+    describe('return an empty string', () => {
+      it('if ca value is empty', function () {
+        const caId = 3;
+        fakeInstance.customAttr(caId, null);
+        viewModel.attr('customAttributeId', caId);
+
+        expect(viewModel.attr('value')).toBe('');
       });
-  });
 
-  describe('for caObject of Date type', () => {
-    it('returns formatted date when CAD was found', function () {
-      const caId = 9;
-      const expected = 'expected date';
-      const attrValue = '2017-09-30';
-      spyOn(DateUtils, 'formatDate')
-        .and.returnValue(expected);
+      it('if caObject was not found', function () {
+        const caId = 10000;
+        viewModel.attr('customAttributeId', caId);
 
-      fakeInstance.customAttr(caId, attrValue);
-      actual = helper(fakeInstance, caId, fakeOptions);
-
-      expect(actual).toBe(expected);
-      expect(DateUtils.formatDate)
-        .toHaveBeenCalledWith(attrValue, true);
+        expect(viewModel.attr('value')).toBe('');
+      });
     });
-  });
 
-  describe('for caObject of Dropdown type', () => {
-    it('returns caObject value', function () {
-      const caId = 10;
-      const value = 'Choice 1';
-      fakeInstance.customAttr(caId, value);
-      actual = helper(fakeInstance, caId, fakeOptions);
-      expect(actual).toBe(value);
+    describe('for caObject of Checkbox type', () => {
+      it('returns "Yes" if ca value is true',
+        function () {
+          const caId = 4;
+          fakeInstance.customAttr(caId, true);
+          viewModel.attr('customAttributeId', caId);
+
+          expect(viewModel.attr('value')).toEqual('Yes');
+        });
+
+      it('returns "No" if ca value is false',
+        function () {
+          const caId = 4;
+          fakeInstance.customAttr(caId, false);
+          viewModel.attr('customAttributeId', caId);
+
+          expect(viewModel.attr('value')).toEqual('No');
+        });
     });
-  });
 
-  describe('for caObject of Text type', () => {
-    it('returns caObject value', function () {
-      const caId = 6;
-      const value = 'Some text';
-      fakeInstance.customAttr(caId, value);
-      actual = helper(fakeInstance, caId, fakeOptions);
-      expect(actual).toBe(value);
+    describe('for caObject of Multiselect type', () => {
+      it('returns caObject value', function () {
+        const caId = 11;
+        const value = 'Option 1, Option 2';
+        fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
+        expect(viewModel.attr('value')).toBe(value);
+      });
     });
-  });
 
-  describe('for caObject of Rich Text type', () => {
-    it('returns caObject value', function () {
-      const caId = 7;
-      const value = '<strong>some text</strong>';
-      fakeInstance.customAttr(caId, value);
-      actual = helper(fakeInstance, caId, fakeOptions);
-      expect(actual).toBe(value);
+    describe('for caObject of Date type', () => {
+      it('returns formatted date when CAD was found', function () {
+        const caId = 9;
+        const expected = 'expected date';
+        const attrValue = '2017-09-30';
+        spyOn(DateUtils, 'formatDate')
+          .and.returnValue(expected);
+
+        fakeInstance.customAttr(caId, attrValue);
+        viewModel.attr('customAttributeId', caId);
+
+        expect(viewModel.attr('value')).toBe(expected);
+        expect(DateUtils.formatDate)
+          .toHaveBeenCalledWith(attrValue, true);
+      });
+    });
+
+    describe('for caObject of Dropdown type', () => {
+      it('returns caObject value', function () {
+        const caId = 10;
+        const value = 'Choice 1';
+        fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
+
+        expect(viewModel.attr('value')).toBe(value);
+      });
+    });
+
+    describe('for caObject of Text type', () => {
+      it('returns caObject value', function () {
+        const caId = 6;
+        const value = 'Some text';
+        fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
+
+        expect(viewModel.attr('value')).toBe(value);
+      });
+    });
+
+    describe('for caObject of Rich Text type', () => {
+      it('returns caObject value', function () {
+        const caId = 7;
+        const value = '<strong>some text</strong>';
+        fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
+
+        expect(viewModel.attr('value')).toBe(value);
+      });
     });
 
     describe('if isMarkdown is true', () => {
@@ -184,12 +207,11 @@ describe('helpers.getCustomAttrValue', () => {
         const value = '<strong>some text</strong>';
         fakeInstance.constructor.isChangeableExternally = true;
         fakeInstance.customAttr(caId, value);
+        viewModel.attr('customAttributeId', caId);
 
-        actual = helper(fakeInstance, caId, fakeOptions);
-
+        expect(viewModel.attr('value')).toBe('some markdown');
         expect(MarkdownUtils.convertMarkdownToHtml)
           .toHaveBeenCalledWith(value);
-        expect(actual).toBe('some markdown');
       });
     });
   });

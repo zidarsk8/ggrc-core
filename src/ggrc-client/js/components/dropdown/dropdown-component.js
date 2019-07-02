@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import template from './dropdown-component.stache';
+import template from './templates/dropdown-component.stache';
 
 /*
   Component abstracts <select> dropdown in HTML.

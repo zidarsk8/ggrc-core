@@ -175,11 +175,12 @@ def _add_state_change_notif(obj, state_change, remove_existing=False):
     _add_notification(obj, notif_type)
 
 
-def handle_assignable_modified(obj):  # noqa: ignore=C901
+def handle_assignable_modified(obj, event=None):  # noqa: ignore=C901
   """A handler for the Assignable object modified event.
 
   Args:
     obj (models.mixins.Assignable): an object that has been modified
+    event (models.Event): event which lead to object modification
   """
   attrs = inspect(obj).attrs
   status_history = attrs["status"].history
@@ -230,7 +231,8 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
       is_changed = True
       break
 
-  is_changed = is_changed or _ca_values_changed(obj)  # CA check only if needed
+  is_changed = is_changed or \
+      _ca_values_changed(obj, event)  # CA check only if needed
 
   if not is_changed:
     return  # no changes detected, nothing left to do
@@ -245,7 +247,7 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   _add_assessment_updated_notif(obj)
 
 
-def _ca_values_changed(obj):
+def _ca_values_changed(obj, event):
   """Check if object's custom attribute values have been changed.
 
   The changes are determined by comparing the current object custom attributes
@@ -255,15 +257,24 @@ def _ca_values_changed(obj):
 
   Args:
     obj (models.mixins.Assignable): the object to check
+    event (models.Event): event which lead to object modification
 
   Returns:
     (bool) True if there is a change to any of the CA values, False otherwise.
   """
+  filters = [models.Revision.resource_id == obj.id,
+             models.Revision.resource_type == obj.type]
+  if event and event.revisions:
+    filters.append(
+        ~models.Revision.id.in_(
+            [rev.id for rev in event.revisions
+             if rev.resource_type == obj.type and rev.resource_id == obj.id]
+        )
+    )
   revision = db.session.query(
       models.Revision
-  ).filter_by(
-      resource_id=obj.id,
-      resource_type=obj.type
+  ).filter(
+      *filters
   ).order_by(models.Revision.id.desc()).first()
   if not revision:
     raise InternalServerError(errors.MISSING_REVISION)
@@ -429,6 +440,11 @@ def register_handlers():  # noqa: C901
   @signals.Restful.model_put.connect_via(models.Assessment)
   def assignable_modified_listener(sender, obj=None, src=None, service=None):
     handle_assignable_modified(obj)
+
+  @signals.Restful.model_put_before_commit.connect_via(models.Assessment)
+  def assignable_put_listener(sender, obj=None, event=None, **kwargs):
+    """Assessment put before commit listener."""
+    handle_assignable_modified(obj, event)
 
   @signals.Restful.collection_posted.connect_via(models.Assessment)
   def assignable_created_listener(sender, objects=None, **kwargs):

@@ -4,6 +4,13 @@
  */
 
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import {
+  notifier,
+} from './notifiers-utils';
+import {
+  isConnectionLost,
+  handleAjaxError,
+} from './errors-utils';
 /**
  * Util methods for work with QueryAPI.
  */
@@ -80,6 +87,8 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @param {Number} page.pageSize - Page size
  * @param {Array} page.sort - Array of sorting criteria
  * @param {Number} page.buffer - Size of additional items
+ * @param {Number} page.first - first item number in the list
+ * @param {Number} page.last - last item number in the list
  * @param {Object|Object[]} relevant - Information about relevant object
  * @param {Object} relevant.type - Type of relevant object
  * @param {Object} relevant.id - Id of relevant object
@@ -89,8 +98,6 @@ function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
  * @return {Object} Object of QueryAPIRequest
  */
 function buildParam(objName, page, relevant, fields, filters) {
-  let first;
-  let last;
   let params = {};
 
   if (!objName) {
@@ -101,12 +108,14 @@ function buildParam(objName, page, relevant, fields, filters) {
   params.filters = _makeFilter(filters, relevant);
 
   if (page.current && page.pageSize) {
-    first = (page.current - 1) * page.pageSize;
-    last = page.current * page.pageSize;
+    let first = (page.current - 1) * page.pageSize;
+    let last = page.current * page.pageSize;
     if (page.buffer) {
       last += page.buffer;
     }
     params.limit = [first, last];
+  } else if (_.isNumber(page.first) && _.isNumber(page.last)) {
+    params.limit = [page.first, page.last];
   }
 
   if (page.sort) {
@@ -241,6 +250,13 @@ function _resolveBatch(queue) {
 
       req.dfd.resolve(info);
     });
+  }).catch((jqxhr, textStatus, exception) => {
+    if (isConnectionLost()) {
+      notifier('error', 'Internet connection was lost.');
+    } else {
+      handleAjaxError(jqxhr, exception);
+    }
+    queue.forEach((req) => req.dfd.reject());
   });
 }
 

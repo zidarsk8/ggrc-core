@@ -15,6 +15,7 @@ export default can.Component.extend({
     item: null,
     isDisabled: false,
     isSelected: false,
+    isBlocked: false,
     toggleSelection: function (el, isSelected) {
       let event = isSelected ? 'selectItem' : 'deselectItem';
       trigger.call(el[0], event, [this.attr('item')]);

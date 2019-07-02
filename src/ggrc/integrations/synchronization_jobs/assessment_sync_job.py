@@ -19,9 +19,9 @@ FIELDS_TO_CHECK = ('status', 'type', 'priority', 'severity')
 # Status values maps from GGRC to IssueTracker.
 ASSESSMENT_STATUSES_MAPPING = {
     'Not Started': 'ASSIGNED',
-    'In Progress': 'ASSIGNED',
+    'In Progress': 'ACCEPTED',
     'In Review': 'FIXED',
-    'Rework Needed': 'ASSIGNED',
+    'Rework Needed': 'ACCEPTED',
     'Completed': 'VERIFIED',
     'Deprecated': 'OBSOLETE',
 }

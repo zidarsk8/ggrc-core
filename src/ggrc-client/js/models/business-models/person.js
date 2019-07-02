@@ -24,8 +24,6 @@ export default Cacheable.extend({
     modified_by: Stub,
     language: Stub,
     user_roles: Stub.List,
-    name: 'trimmed',
-    email: 'trimmedLower',
   },
   mixins: [caUpdate],
   defaults: {
@@ -33,22 +31,6 @@ export default Cacheable.extend({
     email: '',
     contact: null,
     owners: null,
-  },
-  convert: {
-    trimmed: function (val) {
-      return (val && val.trim) ? val.trim() : val;
-    },
-    trimmedLower: function (val) {
-      return ((val && val.trim) ? val.trim() : val).toLowerCase();
-    },
-  },
-  serialize: {
-    trimmed: function (val) {
-      return (val && val.trim) ? val.trim() : val;
-    },
-    trimmedLower: function (val) {
-      return ((val && val.trim) ? val.trim() : val).toLowerCase();
-    },
   },
   tree_view_options: {
     attr_list: [{
@@ -58,7 +40,14 @@ export default Cacheable.extend({
       attr_title: 'Email',
       attr_name: 'email',
     }, {
-      attr_title: 'Authorizations',
+      attr_title(viewType) {
+        viewType = _.isFunction(viewType) ? viewType() : viewType;
+        if (viewType === 'unified-mapper') {
+          return 'System Authorizations';
+        }
+
+        return 'Object Authorizations';
+      },
       attr_name: 'authorizations',
     }, {
       attr_title: 'Last Updated Date',

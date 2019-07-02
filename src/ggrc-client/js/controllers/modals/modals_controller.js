@@ -59,6 +59,7 @@ import Assessment from '../../models/business-models/assessment';
 import Stub from '../../models/stub';
 import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
+import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
 export default can.Control.extend({
   defaults: {
@@ -375,7 +376,8 @@ export default can.Control.extend({
     if (instance.form_preload) {
       preloadDfd = instance.form_preload(
         this.options.new_object_form,
-        this.options.object_params);
+        this.options.object_params,
+        getPageInstance());
       if (preloadDfd) {
         preloadDfd.then(function () {
           instance.backup();
@@ -492,7 +494,8 @@ export default can.Control.extend({
   'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
     let instance = this.options.instance;
 
-    if (instance.attribute_type !== 'Dropdown') {
+    if (instance.attribute_type !== 'Dropdown' &&
+      instance.attribute_type !== 'Multiselect') {
       instance.attr('multi_choice_options', undefined);
     }
   },
@@ -933,7 +936,8 @@ export default can.Control.extend({
       $.when(this.options.attr('instance', newInstance))
         .then(() => this.apply_object_params())
         .then(() => this.serialize_form())
-        .then((el) => this.autocomplete(el));
+        .then((el) => this.autocomplete(el))
+        .then(() => this.options.attr('instance').backup());
     });
 
     this.restore_ui_status();
