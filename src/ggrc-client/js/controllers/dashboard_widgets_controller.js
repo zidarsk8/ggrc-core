@@ -84,21 +84,14 @@ export default canControl.extend({
       }
     }
   },
-  display: function (refetch) {
+  display: function () {
     const that = this;
 
     this._display_deferred = this.prepare().then(function () {
-      let dfd;
-      let $containerVM = that.element
-        .find('tree-widget-container')
-        .viewModel();
+      let dfd = new $.Deferred().resolve();
 
-      if (that.options.widgetType === 'treeview') {
-        dfd = $containerVM.display(refetch);
-      } else if (that.content_controller && that.content_controller.display) {
+      if (that.content_controller && that.content_controller.display) {
         dfd = that.content_controller.display();
-      } else {
-        dfd = new $.Deferred().resolve();
       }
 
       return dfd;

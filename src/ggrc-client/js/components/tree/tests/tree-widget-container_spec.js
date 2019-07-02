@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loSet from 'lodash/set';
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -19,46 +18,13 @@ import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
 import exportMessage from '../templates/export-message.stache';
 import QueryParser from '../../../generated/ggrc_filter_query_parser';
+import router from '../../../router';
 
 describe('tree-widget-container component', function () {
-  'use strict';
-
   let vm;
 
   beforeEach(function () {
     vm = getComponentVM(Component);
-  });
-
-  describe('display() method', function () {
-    let display;
-    let dfd;
-
-    beforeEach(function () {
-      dfd = new $.Deferred();
-
-      display = vm.display.bind(vm);
-      spyOn(vm, 'loadItems').and.returnValue(dfd);
-      vm.attr('loaded', null);
-      vm.attr('refreshLoaded', true);
-    });
-
-    it('sets loaded field if it does not exist', function () {
-      display();
-      expect(vm.attr('loaded')).not.toBeNull();
-    });
-
-    it('sets loaded field if needToRefresh param is true', function () {
-      vm.attr('loaded', dfd);
-      display(true);
-      expect(vm.attr('loaded')).not.toBeNull();
-    });
-
-    it('returns value of loaded field', function () {
-      let result;
-      vm.attr('loaded', dfd);
-      result = display();
-      expect(result.serialize()).toEqual(dfd);
-    });
   });
 
   describe('onSort() method', function () {
@@ -170,113 +136,62 @@ describe('tree-widget-container component', function () {
       spyOn(vm, 'loadItems');
     });
 
-    describe('for any viewModel except Issue', function () {
-      beforeEach(function () {
-        let modelName = 'Model';
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          loSet({}, modelName, 123)
-        );
-        vm.attr({
-          options: {
-            countsName: modelName,
-          },
-          loaded: {},
-          pageInfo: {
-            total: 123,
-          },
-        });
-      });
-
-      it('should only add listeners', function () {
-        _widgetShown();
-        expect(vm._triggerListeners).toHaveBeenCalled();
-        expect(vm.loadItems).not.toHaveBeenCalled();
+    beforeEach(function () {
+      let modelName = 'Model';
+      spyOn(WidgetsUtils, 'getCounts').and.returnValue({[modelName]: 123});
+      vm.attr({
+        options: {
+          countsName: modelName,
+        },
+        pageInfo: {
+          total: 123,
+        },
       });
     });
 
-    describe('for Issue viewModel that wasn\'t loaded before', function () {
-      let modelName = 'Issue';
-
-      beforeEach(function () {
-        vm.attr({
-          options: {
-            countsName: modelName,
-          },
-        });
-        vm.attr('loaded', null);
-        vm.attr('pageInfo', {
-          total: 123,
-        });
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          loSet({}, modelName, 123)
-        );
-      });
-
-      it('should only add listeners', function () {
-        _widgetShown();
-        expect(vm._triggerListeners).toHaveBeenCalled();
-        expect(vm.loadItems).not.toHaveBeenCalled();
-      });
+    it('should add listeners', function () {
+      _widgetShown();
+      expect(vm._triggerListeners).toHaveBeenCalled();
+      expect(vm.loadItems).not.toHaveBeenCalled();
     });
 
-    describe('for Issue viewModel that was loaded before' +
-      'in case of equality between counts on tab ' +
-      'and total counts in viewModel',
-    function () {
-      let modelName = 'Issue';
+    it('should load items if refetch flag is true', () => {
+      vm.attr('refetch', true);
+      router.attr('refetch', false);
+      vm.attr('options.forceRefetch', false);
 
-      beforeEach(function () {
-        vm.attr({
-          options: {
-            countsName: modelName,
-          },
-        });
-        vm.attr('loaded', {});
-        vm.attr('pageInfo', {
-          total: 123,
-        });
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          loSet({}, modelName, 123)
-        );
-      });
+      _widgetShown();
+      expect(vm.loadItems).toHaveBeenCalled();
+    });
 
-      it('should only add listeners', function () {
-        _widgetShown();
-        expect(vm._triggerListeners).toHaveBeenCalled();
-        expect(vm.loadItems).not.toHaveBeenCalled();
-      });
-    }
-    );
+    it('should load items if url has refetch param', () => {
+      vm.attr('refetch', false);
+      router.attr('refetch', true);
+      vm.attr('options.forceRefetch', false);
 
-    describe('for Issue viewModel that was loaded before' +
-      'in case of inequality between counts on tab ' +
-      'and total counts in viewModel',
-    function () {
-      let modelName = 'Issue';
+      _widgetShown();
+      expect(vm.loadItems).toHaveBeenCalled();
+      expect(vm.attr('refetch')).toBeFalsy();
+    });
 
-      beforeEach(function () {
-        vm.attr({
-          model: {
-            model_singular: modelName,
-          },
-          modelName: modelName,
-        });
-        vm.attr('loaded', {});
-        vm.attr('pageInfo', {
-          total: 123,
-        });
-        spyOn(WidgetsUtils, 'getCounts').and.returnValue(
-          loSet({}, modelName, 124)
-        );
-      });
+    it('should load items if widget has forceRefetch option', () => {
+      vm.attr('refetch', false);
+      router.attr('refetch', false);
+      vm.attr('options.forceRefetch', true);
 
-      it('should add listeners and update viewModel', function () {
-        _widgetShown();
-        expect(vm._triggerListeners).toHaveBeenCalled();
-        expect(vm.loadItems).toHaveBeenCalled();
-      });
-    }
-    );
+      _widgetShown();
+      expect(vm.loadItems).toHaveBeenCalled();
+    });
+
+    it('should load items if count has changed', () => {
+      vm.attr('refetch', false);
+      router.attr('refetch', false);
+      vm.attr('options.forceRefetch', false);
+      vm.attr('pageInfo.total', 100); // less than current count
+
+      _widgetShown();
+      expect(vm.loadItems).toHaveBeenCalled();
+    });
   });
 
   describe('openAdvancedFilter() method', function () {

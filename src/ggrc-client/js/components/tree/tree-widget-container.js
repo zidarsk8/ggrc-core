@@ -215,12 +215,12 @@ let viewModel = canMap.extend({
   router: null,
   $el: null,
   loading: false,
+  refetch: false,
   columns: {
     selected: [],
     available: [],
   },
   filters: [],
-  loaded: null,
   canOpenInfoPin: true,
   savedSearchPermalink: '',
   pubSub,
@@ -269,21 +269,6 @@ let viewModel = canMap.extend({
         this.attr('loading', false);
       })
       .then(stopFn, stopFn.bind(null, true));
-  },
-  display: function (needToRefresh) {
-    // load saved search if router has saved_search id
-    if (isLoadSavedSearch(this)) {
-      loadSavedSearch(this);
-      return;
-    }
-
-    if (!this.attr('loaded') || needToRefresh || router.attr('refetch')) {
-      let loadedItems = this.loadItems();
-
-      this.attr('loaded', loadedItems);
-    }
-
-    return this.attr('loaded');
   },
   refresh(destinationType) {
     if (!destinationType || this.attr('modelName') === destinationType) {
@@ -370,17 +355,27 @@ let viewModel = canMap.extend({
   _widgetHidden: function () {
     this._triggerListeners(true);
   },
-  _widgetShown: function () {
+  _widgetShown() {
     let countsName = this.attr('options.countsName');
-    let loaded = this.attr('loaded');
     let total = this.attr('pageInfo.total');
     let counts = loGet(getCounts(), countsName);
 
-    if (loaded !== null && (total !== counts)) {
-      this.loadItems();
+    this._triggerListeners();
+
+    // load saved search if router has saved_search id
+    if (isLoadSavedSearch(this)) {
+      loadSavedSearch(this);
+      return;
     }
 
-    this._triggerListeners();
+    if (this.attr('refetch') ||
+      router.attr('refetch') ||
+      this.attr('options.forceRefetch') ||
+      // this condition is mostly for Issues, Documents and Evidence as they can be created from other object info pane
+      (total !== counts)) {
+      this.loadItems();
+      this.attr('refetch', false);
+    }
   },
   _needToRefreshAfterRelRemove(relationship) {
     const parentInstance = this.attr('parent_instance');
@@ -843,7 +838,8 @@ export default canComponent.extend({
         .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
       this.element.closest('.widget')
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
-      viewModel._widgetShown();
+      viewModel._triggerListeners();
+      viewModel.loadItems();
     },
     '{viewModel.parent_instance} displayTree'([scope], {destinationType}) {
       this.viewModel.refresh(destinationType);
@@ -864,6 +860,12 @@ export default canComponent.extend({
         this.viewModel.attr('advancedSearch'),
         ev.savedSearch
       );
+    },
+    '{pubSub} refetchOnce'(scope, event) {
+      if (event.modelNames.includes(this.viewModel.attr('modelName'))) {
+        // refresh widget content when tab is opened
+        this.viewModel.attr('refetch', true);
+      }
     },
   },
 });
