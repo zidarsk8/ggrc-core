@@ -6,7 +6,7 @@ import datetime
 
 from ggrc import db
 from ggrc.models import all_models
-from integration.ggrc import generator
+from integration.ggrc import generator, query_helper
 from integration.ggrc import TestCase, Api
 from integration.ggrc.models import factories
 
@@ -291,7 +291,7 @@ class TestIssueAuditMapping(TestCase):
     self.assertIsNone(self.issue_mapped.audit_id)
 
 
-class TestIssueUnmap(TestCase):
+class TestIssueUnmap(query_helper.WithQueryApi, TestCase):
   """Test suite to check the rules for Issue-Audit mappings."""
   def setUp(self):
     """Setup tests data"""
@@ -454,8 +454,10 @@ class TestIssueUnmap(TestCase):
     """Issue can't be unmapped from Audit if it was mapped manually."""
     with factories.single_commit():
       audit = factories.AuditFactory()
-      assessment = factories.AssessmentFactory(audit=audit)
       issue = factories.IssueFactory()
+      assessment = factories.AssessmentFactory()
+      factories.RelationshipFactory(source=assessment, destination=audit,
+                                    context=audit.context)
       factories.RelationshipFactory(source=audit, destination=issue,
                                     context=audit.context)
       assmt_issue = factories.RelationshipFactory(source=assessment,
@@ -464,6 +466,19 @@ class TestIssueUnmap(TestCase):
 
     audit_id = audit.id
     issue_id = issue.id
+    assmt_id = assessment.id
+    assmt_issue_id = assmt_issue.id
+
+    request_body = {
+        "object_name": "Audit", "filters":
+            {"expression": {"op": {"name": "cascade_unmappable"},
+                            "issue": {"id": issue_id},
+                            "assessment": {"id": assmt_id}}},
+        "limit": [0, 5]}
+    self.client.get("/login")
+    unmap_popup = self.raw_query(request_body)[0]
+    self.assertEqual(unmap_popup["Audit"]["count"], 0)
+    assmt_issue = all_models.Relationship.query.get(assmt_issue_id)
     response = self.generator.api.delete(assmt_issue,
                                          args={"cascade": "true"})
     self.assert200(response)

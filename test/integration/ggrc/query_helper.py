@@ -147,6 +147,13 @@ class WithQueryApi(object):
         model_name, field
     )
 
+  def raw_query(self, data):
+    """Do request with raw body"""
+    response = self._post(data)
+    self.assert200(response)
+    result = json.loads(response.data)
+    return result
+
 
 class TestQueryHelper(TestCase, WithQueryApi):
   """Test utils from ggrc.query_helper"""
