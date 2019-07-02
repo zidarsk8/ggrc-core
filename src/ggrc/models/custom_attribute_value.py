@@ -254,7 +254,6 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
     this custom attribute.
     """
     self._extract_object_id_from_value()
-    self._validate_mandatory_mapping()
     self._validate_map_type()
     self._validate_object_existence()
 
@@ -264,16 +263,6 @@ class CustomAttributeValue(base.ContextRBAC, Base, Indexed, db.Model):
       value, id_ = self.attribute_value.split(":")
       self.attribute_value = value
       self.attribute_object_id = id_
-
-  def _validate_mandatory_mapping(self):
-    """Validate mandatory mapping attribute"""
-    if (
-        self.custom_attribute.is_gca and
-        self.custom_attribute.mandatory and
-        not self.attribute_object_id
-    ):
-      raise ValueError('Missing mandatory attribute: %s' %
-                       self.custom_attribute.title)
 
   def _validate_map_type(self):
     """Validate related CAD attribute_type and provided attribute_value
