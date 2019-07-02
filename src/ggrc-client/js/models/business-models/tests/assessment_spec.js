@@ -265,14 +265,14 @@ describe('Assessment model', function () {
 
     it('calls refresh of instance if it is in read mode status', () => {
       spyOn(instance, 'refresh');
-      Assessment.readModeStatuses.forEach((status) => {
+      Assessment.doneStatuses.forEach((status) => {
         instance.attr('status', status);
 
         instance.dispatch(REFRESH_MAPPING);
       });
 
       expect(instance.refresh)
-        .toHaveBeenCalledTimes(Assessment.readModeStatuses.length);
+        .toHaveBeenCalledTimes(Assessment.doneStatuses.length);
     });
 
     it('does not call refresh of instance if it is in edit mode status', () => {

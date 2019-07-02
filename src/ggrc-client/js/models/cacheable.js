@@ -12,6 +12,7 @@ import canModel from 'can-model';
 import canList from 'can-list';
 import canMap from 'can-map';
 import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
+import {CUSTOM_ATTRIBUTE_TYPE} from '../plugins/utils/custom-attribute/custom-attribute-config';
 import {
   isSnapshot,
   setAttrs,
@@ -579,6 +580,17 @@ export default canModel.extend({
   },
   isCustomAttributable() {
     return this.constructor.is_custom_attributable;
+  },
+  validateGCAs() {
+    let gcas = this.customAttr({type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL});
+    gcas.each((caObject) => caObject.validate());
+
+    let valid = _.find(gcas, (caObject) =>
+      caObject.validationState.hasGCAErrors
+    ) === undefined;
+
+    this.attr('_gca_valid', valid);
+    return valid;
   },
   getInstanceErrors: function () {
     const errors = this.attr('errors');

@@ -1599,15 +1599,20 @@ describe('assessment-info-pane component', () => {
       instanceSave = $.Deferred();
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
-      vm.attr('instance', {
-        save() {
-          return instanceSave;
+      vm.attr('instance', makeFakeInstance({
+        model: businessModels.Assessment,
+        instanceProps: {
+          save() {
+            return instanceSave;
+          },
+          validateGCAs: jasmine.createSpy('validateGCAs'),
         },
-      });
+      })());
       vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
         vm.attr('instance').save().done(resolve).fail(reject);
       }, 0, true));
       spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
+      spyOn(NotifiersUtils, 'notifier');
     });
 
     it('prevents state change to deprecated for archived instance', (done) => {
@@ -1633,6 +1638,17 @@ describe('assessment-info-pane component', () => {
         done();
       });
     });
+
+    it('prevents completing assessment when mandatory GCAs are not filled in',
+      () => {
+        let instance = vm.attr('instance');
+        instance.attr('status', 'In Progress');
+
+        method({state: 'In Review'});
+
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('error', jasmine.any(String));
+      });
 
     it('should set status from response', (done) => {
       const newStatus = 'new status';

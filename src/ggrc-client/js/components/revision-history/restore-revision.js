@@ -42,20 +42,12 @@ export default canComponent.extend({
       // use legacy approach to save custom attribute
       this.applyCustomAttributes(instance, attrValues);
 
-      if (this.isInstanceValid(instance)) {
+      if (instance.validateGCAs()) {
         this.saveInstance(element);
       } else {
         // fill in mandatory fields
         this.attr('modalState.open', true);
       }
-    },
-    isInstanceValid(instance) {
-      let gcas = instance.customAttr().each((caObject) => caObject.validate());
-      let gcaValid = _.find(gcas, (caObject) =>
-        caObject.validationState.hasGCAErrors
-      ) === undefined;
-
-      return gcaValid;
     },
     saveInstance(element) {
       this.attr('instance').save().then(() => {

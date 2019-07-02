@@ -30,14 +30,7 @@ export default canComponent.extend({
     items: [],
     allowHide: false,
     validateControls: function () {
-      const items = this.attr('items');
-      let valid;
-      items.each((caObject) => caObject.validate());
-
-      valid = _.find(items, (caObject) =>
-        caObject.validationState.hasGCAErrors
-      ) === undefined;
-      this.instance.attr('_gca_valid', valid);
+      this.attr('instance').validateGCAs();
     },
     initGlobalAttributes: function () {
       const instance = this.attr('instance');

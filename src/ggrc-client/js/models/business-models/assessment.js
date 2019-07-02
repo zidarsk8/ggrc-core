@@ -153,7 +153,7 @@ export default Cacheable.extend({
   conclusions: ['Effective', 'Ineffective', 'Needs improvement',
     'Not Applicable'],
   editModeStatuses: ['In Progress', 'Rework Needed', 'Not Started'],
-  readModeStatuses: ['Completed', 'Verified', 'In Review'],
+  doneStatuses: ['Completed', 'Verified', 'In Review'],
   prepareAttributes: function (attrs) {
     return attrs[this.root_object] ? attrs[this.root_object] : attrs;
   },
@@ -247,7 +247,7 @@ export default Cacheable.extend({
     }
     this.bind('refreshInstance', this.refresh.bind(this));
     this.bind(REFRESH_MAPPING.type, () => {
-      if (this.constructor.readModeStatuses.includes(this.status)) {
+      if (this.constructor.doneStatuses.includes(this.status)) {
         this.refresh();
       }
     });
