@@ -62,9 +62,7 @@ class Titled(object):
 
     return value.strip()
 
-  @declared_attr
-  def title(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.String, nullable=False), cls.__name__)
+  title = db.Column(db.String, nullable=False)
 
   @classmethod
   def indexed_query(cls):
