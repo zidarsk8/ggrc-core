@@ -98,29 +98,16 @@ Copyright (C) 2019 Google Inc.
             {{#is_allowed 'update' instance context='for'}}
               <li>
                 {{#unless instance.archived}}
-                  {{#if verifiers.length}}
-                    <reminder-component
-                      instance:from="instance"
-                      type:from="statusToPerson"
-                      modal_title:from="'Reminder for Assignees set'"
-                      modal_description:from="'Tomorrow all Assignees will receive a notification to look at this Assessment if they didn&#39;t move it to &#39;Finished&#39; in between.'">
-                        <a href="javascript://" on:el:click="reminder">
-                          <i class="fa fa-bell-o"></i>
-                          Send reminder to assignees
-                        </a>
-                    </reminder-component>
-                  {{else}}
-                    <reminder-component 
-                      instance:from="instance"
-                      type:from="statusToPerson"
-                      modal_title:from="'Reminder for Assignees set'"
-                      modal_description:from="'Tomorrow all Assignees will receive a notification to look at this Assessment if they didn&#39;t move it to &#39;Final&#39; in between.'">
-                        <a href="javascript://" on:el:click="reminder">
-                          <i class="fa fa-bell-o"></i>
-                          Send reminder to assignees
-                        </a>
-                    </reminder-component>
-                  {{/if}}
+                  <reminder-component
+                    instance:from="instance"
+                    type:from="statusToPerson"
+                    modal_title:from="'Reminder for Assignees set'"
+                    modal_description:from="'A reminder to complete the Assessment for Assignees will be sent in the next daily email digest.'">
+                      <a href="javascript://" on:el:click="reminder">
+                        <i class="fa fa-bell-o"></i>
+                        Send reminder to assignees
+                      </a>
+                  </reminder-component>
                 {{/unless}}
               </li>
             {{/is_allowed}}
