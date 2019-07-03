@@ -324,3 +324,9 @@ class TestPeopleAdministration(base.Test):
     act_person = ppl_admin_service.expand_found_person(creator).get_person()
     self.general_equal_assert(creator.people_tree_item_representation(),
                               act_person)
+
+  def test_second_tier_opening(self, creator, person_tree_item_data):
+    """Check that the second tier of the tree view is opening after clicking.
+    """
+    self.general_equal_assert(creator.people_tree_item_representation(),
+                              person_tree_item_data)
