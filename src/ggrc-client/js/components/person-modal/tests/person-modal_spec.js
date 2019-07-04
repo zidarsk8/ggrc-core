@@ -51,7 +51,7 @@ describe('person-modal component', () => {
       expect(UserUtils.loadPersonProfile).toHaveBeenCalledWith(
         viewModel.attr('instance')
       );
-      expect(UserUtils.loadPersonProfile).toHaveBeenCalledBefore(profile.save),
+      expect(UserUtils.loadPersonProfile).toHaveBeenCalledBefore(profile.save);
       done();
     });
 
