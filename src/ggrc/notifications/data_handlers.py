@@ -86,14 +86,14 @@ def _group_acl_persons_by_role_id(acl_list):
   return acl_dict
 
 
-def _get_updated_roles_data(role_id, roles, role_list):
+def _get_updated_roles_data(role_id, person_ids, role_list):
   """Get person email for the updated roles"""
   data = []
-  for role in roles:
-    for item in role_list:
-      if item['ac_role_id'] == role_id and item['person_id'] == role:
-        if 'person_email' in item:
-          data.append(item['person_email'])
+  for person_id in person_ids:
+    for role in role_list:
+      if role['ac_role_id'] == role_id and role['person_id'] == person_id:
+        if 'person_email' in role:
+          data.append(role['person_email'])
   return data
 
 
@@ -106,11 +106,11 @@ def _get_updated_roles(new_list, old_list, roles):
   role_ids = (set(new_dict) | set(old_dict)) & set(roles)
 
   for role_id in role_ids:
-    new_roles = sorted(new_dict.get(role_id, []))
-    old_roles = sorted(old_dict.get(role_id, []))
-    if new_roles != old_roles:
-      new_data = _get_updated_roles_data(role_id, new_roles, new_list)
-      old_data = _get_updated_roles_data(role_id, old_roles, old_list)
+    new_persons = sorted(new_dict.get(role_id, []))
+    old_persons = sorted(old_dict.get(role_id, []))
+    if new_persons != old_persons:
+      new_data = _get_updated_roles_data(role_id, new_persons, new_list)
+      old_data = _get_updated_roles_data(role_id, old_persons, old_list)
       role_data.append((roles[role_id], new_data, old_data))
 
   return role_data
@@ -144,14 +144,13 @@ def _get_displayed_updated_data(attr_name, new_val, old_val, definitions):
   """Get predefined names to be visualized it the updated data"""
   definition = definitions.get(attr_name, None)
   updated_data = {}
-  if definition:
-    if new_val or old_val:
+  if new_val or old_val:
+    if definition:
       updated_data[definition["display_name"].upper()] = (
           new_val,
           old_val
       )
-  else:
-    if new_val or old_val:
+    else:
       updated_data[attr_name.upper()] = (new_val, old_val)
   return updated_data
 
