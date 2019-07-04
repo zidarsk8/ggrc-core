@@ -714,6 +714,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     expected_fields = {
         "mandatory": {
             "Email",
+            "Name",
         },
         "unique": {
             "Email",

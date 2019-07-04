@@ -42,7 +42,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   __tablename__ = 'people'
 
   email = deferred(db.Column(db.String, nullable=False), 'Person')
-  name = deferred(db.Column(db.String), 'Person')
+  name = deferred(db.Column(db.String, nullable=False), 'Person')
   language_id = deferred(db.Column(db.Integer), 'Person')
   company = deferred(db.Column(db.String), 'Person')
 
@@ -162,6 +162,13 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       message = "Email address '{}' is invalid. Valid email must be provided"
       raise ValidationError(message.format(email))
     return email
+
+  @validates('name')
+  def validate_name(self, _, name):
+    """Name property validator."""
+    if not name:
+      raise ValidationError("Name is empty")
+    return name
 
   @staticmethod
   def is_valid_email(val):
