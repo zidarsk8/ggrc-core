@@ -33,18 +33,6 @@ export default canModel.extend({
     });
   },
 }, {
-  define: {
-    name: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
-    object_type: {
-      value: '',
-      validate: {
-        required: true,
-      },
-    },
-  },
+  object_type: '',
+  name: '',
 });
