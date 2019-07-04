@@ -883,13 +883,17 @@ const isLoadSavedSearch = (viewModel) => {
   return !!viewModel.attr('router.saved_search');
 };
 
+const processNotExistedSearch = (viewModel) => {
+  notifier('warning', 'Saved search doesn\'t exist');
+  viewModel.removeAdvancedFilters();
+};
+
 const loadSavedSearch = (viewModel) => {
   const searchId = viewModel.attr('router.saved_search');
   viewModel.attr('loading', true);
 
   SavedSearch.findOne({id: searchId}).then((response) => {
     viewModel.attr('loading', false);
-
     const savedSearch = response.SavedSearch;
 
     if (savedSearch &&
@@ -901,11 +905,11 @@ const loadSavedSearch = (viewModel) => {
       applySavedSearch(savedSearchFilters, viewModel);
     } else {
       // clear filter and apply default
-      viewModel.removeAdvancedFilters();
+      processNotExistedSearch(viewModel);
     }
   }).fail(() => {
-    viewModel.removeAdvancedFilters();
     viewModel.attr('loading', false);
+    processNotExistedSearch(viewModel);
   });
 };
 
