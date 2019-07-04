@@ -299,6 +299,23 @@ describe('TreeViewUtils module', function () {
       spyOn(MegaObjectUtils, 'isMegaObjectRelated');
     });
 
+    function emptyBatchResponse(params) {
+      if (params.type === 'count') {
+        return $.Deferred().resolve({
+          [params.object_name]: {
+            total: 0,
+          },
+        });
+      }
+
+      return $.Deferred().resolve({
+        [params.object_name]: {
+          total: 0,
+          values: [],
+        },
+      });
+    }
+
     function notEmptyBatchResponse(params) {
       if (params.type === 'count') {
         return $.Deferred().resolve({
@@ -327,24 +344,120 @@ describe('TreeViewUtils module', function () {
           values: [{
             id: 1,
             type: params.object_name,
-            revision: {content: {}},
           }],
         }});
     }
+
+    it('should make requests in the correct order: first - count requests, ' +
+      'then object requests', (done) => {
+      QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+
+      let widgetIds = ['Metric', 'Contract'];
+      module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
+        .then(() => {
+          let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+          expect(queries.length).toBe(4);
+
+          // first two requests to get counts
+          expect(queries[0][0]).toEqual(jasmine.objectContaining({
+            type: 'count',
+          }));
+          expect(queries[1][0]).toEqual(jasmine.objectContaining({
+            type: 'count',
+          }));
+
+          // next two requests to get objects
+          expect(queries[2][0]).toEqual(jasmine.objectContaining({
+            fields: jasmine.any(Array),
+          }));
+          expect(queries[3][0]).toEqual(jasmine.objectContaining({
+            fields: jasmine.any(Array),
+          }));
+
+          done();
+        });
+    });
+
+    it('should make correct counts request', (done) => {
+      QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
+
+      let widgetIds = ['Metric', 'Contract'];
+      module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
+        .then(() => {
+          let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+          expect(queries[0][0]).toEqual({
+            object_name: 'Metric',
+            type: 'count',
+            filters: {
+              expression: {
+                object_name: 'Issue',
+                op: {name: 'relevant'},
+                ids: ['1'],
+              },
+            },
+          });
+
+          // makes Snapshot request for *_version model
+          expect(queries[1][0]).toEqual({
+            object_name: 'Contract',
+            type: 'count',
+            filters: {
+              expression: {
+                object_name: 'Issue',
+                op: {name: 'relevant'},
+                ids: ['1']},
+            },
+          });
+
+          done();
+        });
+    });
+
+    it('should make correct objects requests', (done) => {
+      QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
+
+      let widgetIds = ['Metric', 'Contract'];
+      module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
+        .then(() => {
+          let queries = QueryApiUtils.batchRequests.calls.allArgs();
+
+          expect(queries.length).toBe(4);
+
+          expect(queries[2][0]).toEqual({
+            object_name: 'Metric',
+            filters: {
+              expression: {
+                object_name: 'Issue',
+                op: {name: 'relevant'},
+                ids: ['1'],
+              },
+            },
+            fields: jasmine.any(Array),
+          });
+
+          // makes Snapshot request for *_version model
+          expect(queries[3][0]).toEqual({
+            object_name: 'Contract',
+            filters: {
+              expression: {
+                object_name: 'Issue',
+                op: {name: 'relevant'},
+                ids: ['1']},
+            },
+            fields: jasmine.any(Array),
+          });
+
+          done();
+        });
+    });
 
     describe('for Cycle, CycleTaskGroup, CycleTaskGroupObjectTask', () => {
       ['Cycle', 'CycleTaskGroup', 'CycleTaskGroupObjectTask']
         .forEach((model) => {
           it(`should not make counts requests (${model})`, (done) => {
-            QueryApiUtils.batchRequests
-              .and.callFake((params) => {
-                return $.Deferred().resolve({
-                  [params.object_name]: {
-                    total: 0,
-                    values: [],
-                  },
-                });
-              });
+            QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
 
             module.loadItemsForSubTier(['Metric', 'Policy'], model, 1, null, {})
               .then(() => {
@@ -359,23 +472,7 @@ describe('TreeViewUtils module', function () {
           });
 
           it(`should make correct objects requests (${model})`, (done) => {
-            QueryApiUtils.batchRequests
-              .and.callFake((params) => {
-                if (params.type === 'count') {
-                  return $.Deferred().resolve({
-                    [params.object_name]: {
-                      total: 1,
-                    },
-                  });
-                }
-
-                return $.Deferred().resolve({
-                  [params.object_name]: {
-                    total: 1,
-                    values: [{id: 1, type: params.object_name}],
-                  },
-                });
-              });
+            QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
 
             module.loadItemsForSubTier(['Metric'], model, 1, null, {})
               .then(() => {
@@ -401,16 +498,7 @@ describe('TreeViewUtils module', function () {
 
     describe('for object versions objects (Issue)', () => {
       it('should make correct counts request', (done) => {
-        QueryApiUtils.batchRequests
-          .and.callFake((params) => {
-            if (params.type === 'count') {
-              return $.Deferred().resolve({
-                [params.object_name]: {
-                  total: 0,
-                },
-              });
-            }
-          });
+        QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
 
         let widgetIds = ['Metric', 'Metric_version'];
         module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
@@ -450,8 +538,7 @@ describe('TreeViewUtils module', function () {
       });
 
       it('should make correct objects requests', (done) => {
-        QueryApiUtils.batchRequests
-          .and.callFake(notEmptyBatchResponse);
+        QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
 
         let widgetIds = ['Metric', 'Metric_version'];
         module.loadItemsForSubTier(widgetIds, 'Issue', 1, null, {})
@@ -496,16 +583,7 @@ describe('TreeViewUtils module', function () {
 
     describe('for snapshot related objects', () => {
       it('should make correct counts request', (done) => {
-        QueryApiUtils.batchRequests
-          .and.callFake((params) => {
-            if (params.type === 'count') {
-              return $.Deferred().resolve({
-                [params.object_name]: {
-                  total: 0,
-                },
-              });
-            }
-          });
+        QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
 
         SnapshotUtils.isSnapshotRelated.and.returnValue(true);
 
@@ -536,8 +614,7 @@ describe('TreeViewUtils module', function () {
       });
 
       it('should make correct objects requests', (done) => {
-        QueryApiUtils.batchRequests
-          .and.callFake(notEmptyBatchResponse);
+        QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
 
         SnapshotUtils.isSnapshotRelated.and.returnValue(true);
 
@@ -571,16 +648,7 @@ describe('TreeViewUtils module', function () {
 
     describe('for mega objects', () => {
       it('should make correct counts request', (done) => {
-        QueryApiUtils.batchRequests
-          .and.callFake((params) => {
-            if (params.type === 'count') {
-              return $.Deferred().resolve({
-                [params.object_name]: {
-                  total: 0,
-                },
-              });
-            }
-          });
+        QueryApiUtils.batchRequests.and.callFake(emptyBatchResponse);
 
         MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
 
@@ -621,8 +689,7 @@ describe('TreeViewUtils module', function () {
       });
 
       it('should make correct objects requests', (done) => {
-        QueryApiUtils.batchRequests
-          .and.callFake(notEmptyBatchResponse);
+        QueryApiUtils.batchRequests.and.callFake(notEmptyBatchResponse);
 
         MegaObjectUtils.isMegaObjectRelated.and.returnValue(true);
 
