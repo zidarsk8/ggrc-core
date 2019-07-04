@@ -154,7 +154,8 @@ class AssessmentTrackerHandler(object):
 
     integration_utils.populate_issue_tracker_fields(
         assessment,
-        issue_tracker_info
+        issue_tracker_info,
+        create_mode=True,
     )
     issue_info = cls._update_with_assmt_data_for_ticket_create(
         assessment,
@@ -1493,9 +1494,7 @@ class AssessmentTrackerHandler(object):
         "reporter": issue_info["reporter"],
         "assignee": issue_info["assignee"],
         "verifier": issue_info["assignee"],
-        "status": constants.STATUSES_MAPPING.get(
-            assessment.status
-        ),
+        "status": constants.CREATE_STATUSES_MAPPING.get(assessment.status),
         "ccs": issue_info["cc_list"],
         "comment": cls._get_create_comment(assessment)
     }
