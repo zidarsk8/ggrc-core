@@ -41,7 +41,7 @@ export const onAutocompleteKeyup = (instance, el, ev) => {
 
 export const onAutocompleteSelect = (
   instance, isNewInstance, useInstanceInputHandler = false
-) => (el, ui) => {
+) => (el, item) => {
   let path;
   let index;
   $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
@@ -52,9 +52,9 @@ export const onAutocompleteSelect = (
 
 
   if (useInstanceInputHandler) {
-    instance.setValueFromInput(ui.item);
+    instance.setValueFromInput(item);
     setTimeout(function () {
-      el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      el.val(item.name || item.email || item.title, item);
     }, 0);
     return;
   }
@@ -65,18 +65,18 @@ export const onAutocompleteSelect = (
     if (!instance.attr(path)) {
       instance.attr(path, []);
     }
-    instance.attr(path).splice(index, 1, new Stub(ui.item));
+    instance.attr(path).splice(index, 1, new Stub(item));
   } else {
     path = path.join('.');
     setTimeout(function () {
-      el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
+      el.val(item.name || item.email || item.title, item);
     }, 0);
 
-    instance.attr(path, null).attr(path, ui.item);
+    instance.attr(path, null).attr(path, item);
     initAuditTitle(instance, isNewInstance);
     if (!instance._transient) {
       instance.attr('_transient', canMap());
     }
-    instance.attr('_transient.' + path, ui.item);
+    instance.attr('_transient.' + path, item);
   }
 };

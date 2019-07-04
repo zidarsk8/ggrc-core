@@ -129,14 +129,14 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
         $this.trigger('autocomplete:select', [ui]);
 
         if (onSelectCallback) {
-          onSelectCallback($this, ui);
+          onSelectCallback($this, ui.item);
         }
       } else {
         $(document.body)
           .off('.autocomplete')
           .one('modal:success.autocomplete', function (_ev, newObj) {
             if (onSelectCallback) {
-              onSelectCallback($this, {item: newObj});
+              onSelectCallback($this, newObj);
               return;
             }
 
