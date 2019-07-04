@@ -12,25 +12,13 @@
   </h2>
 </div>
 
-<saved-search-wrapper
-  searchType:from="'GlobalSearch'"
-  objectType:from="model.model_singular">
 <div class="modal-body-wrapper">
   <aside>
     <saved-search-list
-      searches:from="searches"
-      searchType:from="searchType"
-      isLoading:from="isLoading"
+      objectType:from="model.model_singular"
       selectedSearchId:from="selectedSavedSearchId"
-      on:applySearch="applySearch(scope.event)"
-      on:removed="loadSavedSearches()"
+      searchType:from="'GlobalSearch'"
     ></saved-search-list>
-
-    {{#if isPagingShown}}
-      <tree-pagination
-        paging:from="searchesPaging"
-      ></tree-pagination>
-    {{/if}}
   </aside>
 
   <main>
@@ -38,7 +26,6 @@
       <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
         <advanced-search-wrapper modelName:bind="type"
                                 modelDisplayName:from="model.title_plural"
-                                savedFiltersToApply:from="savedFiltersToApply"
                                 mappingItems:to="scope.vars.mappingItems"
                                 filterItems:to="scope.vars.filterItems"
                                 statusItem:to="scope.vars.statusItem"
@@ -98,8 +85,7 @@
                   filterItems:from="filterItems"
                   mappingItems:from="mappingItems"
                   statusItem:from="statusItem"
-                  objectType:from="modelName"
-                  on:savedSearchCreated="savedSearchCreated(scope.event)"
+                  objectType:from="model.model_singular"
                 ></create-saved-search>
 
                 <div class="object-controls__actions--right">
@@ -122,7 +108,7 @@
                             baseInstance:from="parentInstance"
                             isLoading:bind="is_loading"
                             type:from="type"
-                            @onSearch:to="../onSearchCallback"
+                            @onSearch:to="onSearchCallback"
                             paging.total:to="scope.vars.totalObjects"
                             searchOnly:from="true"
                             useSnapshots:from="useSnapshots"
@@ -142,4 +128,3 @@
     </div>
   </main>
 </div>
-</saved-search-wrapper>

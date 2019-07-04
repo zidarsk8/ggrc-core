@@ -8,6 +8,7 @@ import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+import pubSub from '../../pub-sub';
 
 export default canComponent.extend({
   tag: 'advanced-search-wrapper',
@@ -19,23 +20,6 @@ export default canComponent.extend({
           return StateUtils.hasFilter(this.attr('modelName'));
         },
       },
-      savedFiltersToApply: {
-        set(filters) {
-          if (filters) {
-            this.attr('filterItems', filters.filterItems || []);
-            this.attr('mappingItems', filters.mappingItems || []);
-            this.attr('statusItem', filters.statusItem);
-
-            if (filters.modelName && filters.modelDisplayName) {
-              this.attr('modelName', filters.modelName);
-              this.attr('modelDisplayName', filters.modelDisplayName);
-            }
-
-            this.attr('selectedSavedSearchId', filters.savedSearchId);
-            this.savedSearchSelected(filters.savedSearchId);
-          }
-        },
-      },
     },
     modelName: null,
     modelDisplayName: null,
@@ -43,11 +27,29 @@ export default canComponent.extend({
     mappingItems: [],
     statusItem: AdvancedSearch.create.state(),
     relevantTo: [],
-    selectedSavedSearchId: null,
-    savedSearchSelected(savedSearchId) {
+    pubSub,
+    savedSearchSelected(savedSearch) {
+      if (!savedSearch) {
+        // reset selected search ID
+        this.dispatch({
+          type: 'savedSearchSelected',
+          savedSearchId: null,
+        });
+        return;
+      }
+
+      this.attr('filterItems', savedSearch.filterItems || []);
+      this.attr('mappingItems', savedSearch.mappingItems || []);
+      this.attr('statusItem', savedSearch.statusItem);
+
+      if (savedSearch.modelName && savedSearch.modelDisplayName) {
+        this.attr('modelName', savedSearch.modelName);
+        this.attr('modelDisplayName', savedSearch.modelDisplayName);
+      }
+
       this.dispatch({
         type: 'savedSearchSelected',
-        savedSearchId: savedSearchId,
+        savedSearchId: savedSearch.id,
       });
     },
     availableAttributes: function () {
@@ -99,6 +101,13 @@ export default canComponent.extend({
     },
     '{viewModel.statusItem} change'() {
       this.viewModel.savedSearchSelected(null);
+    },
+    '{pubSub} savedSearchSelected'(pubSub, ev) {
+      if (ev.searchType !== 'GlobalSearch') {
+        return;
+      }
+
+      this.viewModel.savedSearchSelected(ev.savedSearch);
     },
   },
 });

@@ -51,29 +51,18 @@
                   on:hide="searchModalClosed"
                   modalTitle:from="'{{model.title_singular}} Advanced Search'"
                   extraCssClass:from="'advanced-search'">
-      <saved-search-wrapper
-        searchType:from="'AdvancedSearch'"
-        objectType:from="modelName"
-        advancedSearch:from="advancedSearch">
-      <div class="advanced-search__wrapper">
-      {{#if isShowSavedSearch}}
-      <aside>
-        <saved-search-list
-          modelName:from="model.table_singular"
-          searches:from="searches"
-          searchType:from="searchType"
-          isLoading:from="isLoading"
-          selectedSearchId:from="selectedSavedSearchId"
-          on:applySearch="applySearch(scope.event)"
-          on:removed="loadSavedSearches()"
-        ></saved-search-list>
 
-        {{#if isPagingShown}}
-          <tree-pagination
-            paging:from="searchesPaging"
-          ></tree-pagination>
-        {{/if}}
-      </aside>
+      <div class="advanced-search__wrapper">
+      {{#if isSavedSearchShown}}
+        <aside>
+          <saved-search-list
+            modelName:from="model.table_singular"
+            objectType:from="model.model_singular"
+            selectedSearchId:from="selectedSavedSearchId"
+            searchType:from="'AdvancedSearch'"
+            advancedSearch:from="advancedSearch"
+          ></saved-search-list>
+        </aside>
       {{/if}}
       <main>
       <div class="advanced-search__content">
@@ -106,16 +95,15 @@
         </div>
       </div>
       <div class="simple-modal__footer">
-        {{#if isShowSavedSearch}}
-        <create-saved-search
-          type:from="'AdvancedSearch'"
-          filterItems:from="advancedSearch.filterItems"
-          mappingItems:from="advancedSearch.mappingItems"
-          parentItems:from="advancedSearch.parentItems"
-          parent:from="advancedSearch.parent"
-          objectType:from="modelName"
-          on:savedSearchCreated="savedSearchCreated(scope.event)"
-        ></create-saved-search>
+        {{#if isSavedSearchShown}}
+          <create-saved-search
+            type:from="'AdvancedSearch'"
+            filterItems:from="advancedSearch.filterItems"
+            mappingItems:from="advancedSearch.mappingItems"
+            parentItems:from="advancedSearch.parentItems"
+            parent:from="advancedSearch.parent"
+            objectType:from="model.model_singular"
+          ></create-saved-search>
         {{/if}}
         <div class="advanced-search__controls">
           <button type="reset" class="btn btn-white" on:el:click="resetAdvancedFilters()">Reset to Defaults</button>
@@ -124,7 +112,6 @@
       </div>
       </main>
       </div>
-      </saved-search-wrapper>
     </simple-modal>
 
     <tree-header selectedColumns:from="columns.selected"

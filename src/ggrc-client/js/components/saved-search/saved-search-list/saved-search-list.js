@@ -9,51 +9,130 @@ import canMap from 'can-map';
 import template from './saved-search-list.stache';
 import {
   buildSearchPermalink,
+  parseFilterJson,
 } from '../../../plugins/utils/advanced-search-utils';
 import isFunction from 'can-util/js/is-function/is-function';
 import '../../clipboard-link/clipboard-link';
+import Pagination from '../../base-objects/pagination';
+import SavedSearch from '../../../models/service-models/saved-search';
+import * as BusinessModels from '../../../models/business-models';
+import pubSub from '../../../pub-sub';
 
 export default canComponent.extend({
   tag: 'saved-search-list',
   template: canStache(template),
   leakScope: false,
   viewModel: canMap.extend({
-    objectName: '',
+    pubSub,
     modelName: '',
+    objectType: '',
     searchType: '',
     searches: [],
     disabled: false,
     selectedSearchId: null,
+    advancedSearch: null,
+    isLoading: false,
     define: {
-      isLoading: {
-        set(value) {
-          // disable list while loading
-          this.attr('disabled', value);
-          return value;
+      isGlobalSearch: {
+        get() {
+          return this.attr('searchType') === 'GlobalSearch';
+        },
+      },
+      isPagingShown: {
+        get() {
+          const total = this.attr('searchesPaging.total');
+          const pageSize = this.attr('searchesPaging.pageSize');
+
+          return total > pageSize;
+        },
+      },
+      searchesPaging: {
+        value() {
+          return new Pagination({
+            pageSize: 10, pageSizeSelect: [10],
+          });
         },
       },
     },
-    applySearch(search) {
-      if (this.attr('disabled')) {
-        return;
+    selectSearch(search) {
+      const filter = parseFilterJson(search.filters);
+      const model = BusinessModels[search.object_type];
+      const selectedSavedSearch = {
+        filterItems: filter.filterItems,
+        mappingItems: filter.mappingItems,
+        statusItem: filter.statusItem,
+        parentItems: filter.parentItems,
+        id: search.id,
+      };
+
+      if (this.attr('isGlobalSearch') && model) {
+        selectedSavedSearch.modelName = model.model_singular;
+        selectedSavedSearch.modelDisplayName = model.title_plural;
       }
-      this.dispatch({
-        type: 'applySearch',
-        search,
+
+      pubSub.dispatch({
+        type: 'savedSearchSelected',
+        savedSearch: selectedSavedSearch,
+        searchType: this.attr('searchType'),
       });
+    },
+    loadSavedSearches() {
+      // do NOT set type for global search
+      const type = this.attr('isGlobalSearch') ?
+        null :
+        this.attr('objectType');
+
+      const paging = this.attr('searchesPaging');
+      const searchType = this.attr('searchType');
+
+      const needToGoToPrevPage = (
+        paging.attr('current') > 1 &&
+        this.attr('searches.length') === 1
+      );
+
+      if (needToGoToPrevPage) {
+        paging.attr('current', paging.attr('current') - 1);
+      }
+
+      this.attr('isLoading', true);
+      return SavedSearch.findBy(searchType, paging, type)
+        .then(({total, values}) => {
+          this.attr('searchesPaging.total', total);
+
+          const searches = values.map((value) => new SavedSearch(value));
+          this.attr('searches', searches);
+        }).always(() => {
+          this.attr('isLoading', false);
+        });
     },
     removeSearch(search, event) {
       event.stopPropagation();
-      search.attr('disabled', true);
 
       search.destroy().then(() => {
-        this.dispatch('removed');
+        this.loadSavedSearches();
       });
     },
-    isAppliedSearch(search) {
+    isSelectedSearch(search) {
       return search.id === this.attr('selectedSearchId');
     },
+    copyLink(permalink, el, event) {
+      // prevent select
+      event.stopPropagation();
+    },
   }),
+  events: {
+    '{viewModel.searchesPaging} current'() {
+      this.viewModel.loadSavedSearches();
+    },
+    inserted() {
+      this.viewModel.loadSavedSearches();
+    },
+    '{pubSub} savedSearchCreated'(pubsub, ev) {
+      this.viewModel.loadSavedSearches().then(() => {
+        this.viewModel.selectSearch(ev.search);
+      });
+    },
+  },
   helpers: {
     permalinkBuilder(savedSearch, options) {
       if (isFunction(savedSearch)) {

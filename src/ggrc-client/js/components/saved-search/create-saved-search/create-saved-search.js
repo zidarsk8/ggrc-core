@@ -10,6 +10,7 @@ import template from './create-saved-search.stache';
 import SavedSearch from '../../../models/service-models/saved-search';
 import {handleAjaxError} from '../../../plugins/utils/errors-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
+import pubSub from '../../../pub-sub';
 
 export default canComponent.extend({
   tag: 'create-saved-search',
@@ -72,7 +73,7 @@ export default canComponent.extend({
 
       this.attr('isDisabled', true);
       return savedSearch.save().then((savedSearch) => {
-        this.dispatch({
+        pubSub.dispatch({
           type: 'savedSearchCreated',
           search: savedSearch,
         });

@@ -37,7 +37,6 @@ import '../dropdown/dropdown-wrapper';
 import '../assessment/assessment-generator-button';
 import '../last-comment/last-comment';
 import '../saved-search/saved-search-list/saved-search-list';
-import '../saved-search/saved-search-wrapper/saved-search-wrapper';
 import '../saved-search/create-saved-search/create-saved-search';
 
 import template from './templates/tree-widget-container.stache';
@@ -72,7 +71,7 @@ import exportMessage from './templates/export-message.stache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 import SavedSearch from '../../models/service-models/saved-search';
-
+import pubSub from '../../pub-sub';
 
 let viewModel = canMap.extend({
   define: {
@@ -106,6 +105,12 @@ let viewModel = canMap.extend({
         return filters.filter(function (options) {
           return options.query;
         }).reduce(this._concatFilters, additionalFilter);
+      },
+    },
+    isSavedSearchShown: {
+      get() {
+        // do NOT show Advanced saved searche list on Dashboard tab
+        return !isMyWork();
       },
     },
     modelName: {
@@ -206,6 +211,7 @@ let viewModel = canMap.extend({
   refreshLoaded: true,
   canOpenInfoPin: true,
   savedSearchPermalink: '',
+  pubSub,
   loadItems: function () {
     let modelName = this.attr('modelName');
     let pageInfo = this.attr('pageInfo');
@@ -863,6 +869,13 @@ export default canComponent.extend({
         loadSavedSearch(this.viewModel);
       }
     },
+    '{pubSub} savedSearchSelected'(pubSub, ev) {
+      if (ev.searchType !== 'AdvancedSearch') {
+        return;
+      }
+
+      selectSavedSearch(ev.savedSearch, this.viewModel.attr('advancedSearch'));
+    },
   },
 });
 
@@ -882,7 +895,10 @@ const loadSavedSearch = (viewModel) => {
     if (savedSearch &&
       savedSearch.object_type === viewModel.attr('modelName') &&
       savedSearch.search_type === 'AdvancedSearch') {
-      applySavedSearch(savedSearch, viewModel);
+      const savedSearchFilters = AdvancedSearch
+        .parseFilterJson(savedSearch.filters);
+      savedSearchFilters.id = savedSearch.id;
+      applySavedSearch(savedSearchFilters, viewModel);
     } else {
       // clear filter and apply default
       viewModel.removeAdvancedFilters();
@@ -893,10 +909,11 @@ const loadSavedSearch = (viewModel) => {
   });
 };
 
+const selectSavedSearch = (savedSearch, advancedSearch) => {
+  AdvancedSearch.selectSavedSearchFilter(advancedSearch, savedSearch);
+};
+
 const applySavedSearch = (savedSearch, viewModel) => {
-  AdvancedSearch.selectSavedSearchFilter(
-    viewModel.attr('advancedSearch'),
-    savedSearch
-  );
+  selectSavedSearch(savedSearch, viewModel.attr('advancedSearch'));
   viewModel.applyAdvancedFilters();
 };

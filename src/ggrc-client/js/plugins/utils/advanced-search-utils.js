@@ -226,27 +226,6 @@ export const setDefaultStatusConfig = (state, modelName) => {
 };
 
 /**
- * Convert JSON filter to Object
- * @param {string} json - JSON string
- * @return {Object} - parsed advanced search filter
- */
-export const parseFilterJson = (json) => {
-  let {
-    filterItems,
-    mappingItems,
-    statusItem,
-    parentItems,
-  } = JSON.parse(json);
-
-  return {
-    filterItems,
-    mappingItems,
-    statusItem,
-    parentItems,
-  };
-};
-
-/**
  * Filter parent items to remove duplicates
  * @param {Object} parent - parent attribute of Advanced search
  * @param {Array} parentItems - parentItems attribute of Advanced search
@@ -264,22 +243,20 @@ export const filterParentItems = (parent, parentItems) => {
  * @param {Object} savedSearch - saved search
  */
 export const selectSavedSearchFilter = (advancedSearch, savedSearch) => {
-  const savedSearchFilter = parseFilterJson(savedSearch.filters);
-
   const parent = advancedSearch.attr('parent');
-  if (parent && savedSearchFilter.parentItems) {
-    savedSearchFilter.parentItems =
-      filterParentItems(parent, savedSearchFilter.parentItems);
+  if (parent && savedSearch.parentItems) {
+    savedSearch.parentItems =
+      filterParentItems(parent, savedSearch.parentItems);
   }
 
-  advancedSearch.attr('filterItems', savedSearchFilter.filterItems);
-  advancedSearch.attr('mappingItems', savedSearchFilter.mappingItems);
-  advancedSearch.attr('parentItems', savedSearchFilter.parentItems);
+  advancedSearch.attr('filterItems', savedSearch.filterItems);
+  advancedSearch.attr('mappingItems', savedSearch.mappingItems);
+  advancedSearch.attr('parentItems', savedSearch.parentItems);
 
   const selectedSavedSearch = {
-    filterItems: savedSearchFilter.filterItems,
-    mappingItems: savedSearchFilter.mappingItems,
-    parentItems: savedSearchFilter.parentItems,
+    filterItems: savedSearch.filterItems,
+    mappingItems: savedSearch.mappingItems,
+    parentItems: savedSearch.parentItems,
     id: savedSearch.id,
   };
 
@@ -330,4 +307,25 @@ export const buildSearchPermalink = (searchId, modelName) => {
   const permalink = `${url}${hash}`;
 
   return permalink;
+};
+
+/**
+ * Convert JSON filter to Object
+ * @param {string} json - JSON string
+ * @return {Object} - parsed advanced search filter
+ */
+export const parseFilterJson = (json) => {
+  let {
+    filterItems,
+    mappingItems,
+    statusItem,
+    parentItems,
+  } = JSON.parse(json);
+
+  return {
+    filterItems,
+    mappingItems,
+    statusItem,
+    parentItems,
+  };
 };

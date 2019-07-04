@@ -10,16 +10,16 @@
 
 <ul>
   {{#each searches}}
-    <li class="{{#if disabled}}disabled{{/if}}"}>
-      <div on:el:click="applySearch(.)"
-        class="saved-search-item {{#if isAppliedSearch(.)}}applied{{/if}}">
+    <li class="{{#if isLoading}}disabled{{/if}}"}>
+      <div on:el:click="selectSearch(.)"
+        class="saved-search-item {{#if isSelectedSearch(.)}}applied{{/if}}">
           <span class="saved-search-item__title" title="{{name}}">
             {{name}}
           </span>
 
           {{#is(searchType, 'AdvancedSearch')}}
             {{#permalinkBuilder .}}
-              <clipboard-link text:from="permalink">
+              <clipboard-link text:from="permalink" on:el:click="copyLink">
                 <i class="fa fa-link"></i>
               </clipboard-link>
             {{/permalinkBuilder}}
@@ -30,3 +30,9 @@
     </li>
   {{/each}}
 </ul>
+
+{{#if isPagingShown}}
+  <tree-pagination
+    paging:from="searchesPaging"
+  ></tree-pagination>
+{{/if}}
