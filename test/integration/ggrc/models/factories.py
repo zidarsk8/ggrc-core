@@ -272,6 +272,10 @@ class PersonFactory(ModelFactory):
       lambda _: random_str(prefix="Person")
   )
 
+  name = factory.LazyAttribute(
+      lambda _: random_str(chars=string.ascii_letters)
+  )
+
 
 class CommentFactory(ModelFactory):
 

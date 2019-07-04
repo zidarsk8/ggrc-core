@@ -989,6 +989,13 @@ class ExportOnlyDateColumnHandler(ExportOnlyColumnHandler):
     return ""
 
 
+class ExportOnlyPersonColumnHandler(ExportOnlyColumnHandler):
+  """Only on export handler for Person type columns"""
+  def get_value(self):
+    person = getattr(self.row_converter.obj, self.key, self.value)
+    return getattr(person, "email", "")
+
+
 class ExportOnlyIssueTrackerColumnHandler(ExportOnlyColumnHandler):
 
   def get_value(self):
