@@ -13,7 +13,7 @@ from datetime import timedelta
 import pytest
 
 from lib import base, constants, url, users
-from lib.constants import messages, objects, roles
+from lib.constants import element, messages, objects, roles
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
 from lib.page import dashboard
@@ -296,6 +296,13 @@ class TestPeopleAdministration(base.Test):
       }
     return self.__class__.data
 
+  @pytest.fixture()
+  def person_tree_item_data(self, creator, selenium):
+    """Create new person and return actual person data from people
+    tree view item."""
+    return admin_webui_service.PeopleAdminWebUiService(
+        selenium).expand_found_person(creator).get_person()
+
   def test_destructive_create_new_person_w_no_role(self, ppl_data):
     """Check newly created person is on Admin People widget and ppl count
     increased by one.
@@ -306,3 +313,14 @@ class TestPeopleAdministration(base.Test):
   def test_destructive_tab_count_increased(self, ppl_data):
     """Check that tab count will be increased correctly."""
     assert ppl_data["exp_ppl_count"] == ppl_data["act_ppl_count"]
+
+  def test_edit_person(self, person_tree_item_data, creator, selenium):
+    """Check that person can be edited."""
+    creator.name = element.Common.EDITED_PART + creator.name
+    creator.email = element.Common.EDITED_PART + creator.email
+    creator.company = element.Common.EDITED_PART
+    ppl_admin_service = admin_webui_service.PeopleAdminWebUiService(selenium)
+    ppl_admin_service.edit_person(person_tree_item_data, creator)
+    act_person = ppl_admin_service.expand_found_person(creator).get_person()
+    self.general_equal_assert(creator.people_tree_item_representation(),
+                              act_person)

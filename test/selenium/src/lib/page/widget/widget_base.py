@@ -7,9 +7,11 @@
 
 from lib import base, decorator
 from lib.constants import locator
-from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
+from lib.element import info_widget_three_bbs
+from lib.entities import entities_factory
 from lib.utils import selenium_utils
 from lib.utils.string_utils import StringMethods
+from lib.page.modal import person_modal
 
 
 class _Modal(base.Modal):
@@ -77,7 +79,7 @@ class CustomAttributesItemContent(base.Component):
           *self._locators.CELL_IN_ROW_CSS)]
       # todo: add PO and getting 'multi_choice_options' via 'Edit' btn
       self.custom_attributes_list.append(
-          CustomAttributeDefinitionsFactory().create(
+          entities_factory.CustomAttributeDefinitionsFactory().create(
               title=attrs[0], attribute_type=attrs[1],
               mandatory=StringMethods.get_bool_value_from_arg(attrs[2]),
               definition_type=self._item_name, multi_choice_options=None))
@@ -177,3 +179,26 @@ class WidgetAdminCustomAttributes(base.Widget):
 class WidgetAdminPeople(base.Widget):
   """Base model for people on Admin Dashboard page."""
   _locators = locator.WidgetAdminPeople
+
+
+class PeopleItemContent(base.Component):
+  """Model for 2-tier of People Tree View item."""
+
+  def __init__(self, driver=None):
+    super(PeopleItemContent, self).__init__(driver)
+    self._root = self._browser.element(class_name="info")
+    self._3bbs_menu = info_widget_three_bbs.InfoWidgetThreeBbbs(self._root)
+
+  def get_person(self):
+    """Get person from people tree item."""
+    fields = self._root.elements(class_name="span12")
+    filled_fields = [i.text.splitlines() for i in fields
+                     if not i.span(class_name="empty-message").exists]
+    person_data = {k.lower(): v for (k, v) in filled_fields}
+    return entities_factory.PeopleFactory().create(
+        system_wide_role=person_data["system authorizations"], **person_data)
+
+  def open_edit_modal(self):
+    """Click "Edit Person" in dropdown menu."""
+    self._3bbs_menu.select_edit()
+    return person_modal.BasePersonModal(self._driver)

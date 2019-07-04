@@ -73,7 +73,10 @@ class People(dashboard.AdminDashboard):
 
   def __init__(self, driver):
     super(People, self).__init__(driver)
-    self.people_tree_view = base.AdminTreeView(self._driver)
+
+  @property
+  def people_tree_view(self):
+    return base.AdminTreeView(self._driver)
 
   def get_people(self):
     """Get list of people that displayed in Tree View on People widget.
@@ -95,8 +98,15 @@ class People(dashboard.AdminDashboard):
     filter_tf = base.TextInputField(
         self._driver, self._locators.FILTER_BY_NAME_EMAIL_COM_FIELD_SELECTOR)
     filter_tf.enter_text(str_to_filter_by)
-    filter_tf.send_enter_key()
     selenium_utils.wait_for_js_to_load(self._driver)
+    filter_tf.send_enter_key()
+
+  def expand_top_person(self):
+    """Expand information panel for top person in the tree view if it is not
+    expanded already.
+    - Return: lib.page.widget.widget_base.PeopleItemContent"""
+    self.people_tree_view.tree_view_items()[0].expand()
+    return widget_base.PeopleItemContent()
 
 
 class Roles(dashboard.AdminDashboard):
@@ -140,7 +150,8 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     for i in items:
       if i.text == item_title:
         if expand:
-          return i.expand()
+          i.expand()
+          return widget_base.CustomAttributesItemContent(self._driver, i.text)
         return i.collapse()
     raise exception.ElementNotFound('{} in list {}'.format(item_title, items))
 
