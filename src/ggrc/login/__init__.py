@@ -19,6 +19,7 @@ from flask import request
 from flask import redirect
 from ggrc.extensions import get_extension_module_for
 from ggrc.rbac import SystemWideRoles
+from ggrc import settings
 
 
 logger = logging.getLogger(__name__)
@@ -29,8 +30,18 @@ def get_login_module():
 
 
 def user_loader(user_id):
+  """Returns the auth user by user_id"""
   from ggrc.utils.user_generator import find_user_by_id
-  return find_user_by_id(user_id)
+  user = find_user_by_id(user_id)
+  if user and settings.DEBUG:
+    from google.appengine.api import users
+    try:
+      ae_user = users.get_current_user()
+    except AssertionError:
+      ae_user = None
+    if ae_user and ae_user.email() != user.email:
+      return None
+  return user
 
 
 def init_app(app):
