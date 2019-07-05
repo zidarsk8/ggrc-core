@@ -72,7 +72,8 @@ export const onAutocompleteSelect = (
       el.val(item.name || item.email || item.title, item);
     }, 0);
 
-    instance.attr(path, null).attr(path, item);
+    instance.attr(path, item);
+
     initAuditTitle(instance, isNewInstance);
     if (!instance._transient) {
       instance.attr('_transient', canMap());
