@@ -124,6 +124,12 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "threat_event": handlers.TextColumnHandler,
     "vulnerability": handlers.TextColumnHandler,
 
+    # External app attributes
+    "last_submitted_at": handlers.ExportOnlyDateColumnHandler,
+    "last_submitted_by": handlers.ExportOnlyPersonColumnHandler,
+    "last_verified_at": handlers.ExportOnlyDateColumnHandler,
+    "last_verified_by": handlers.ExportOnlyPersonColumnHandler,
+
     # IssueTracker fields
     "component_id": issue_tracker.IssueTrackerAddsColumnHandler,
     "hotlist_id": issue_tracker.IssueTrackerAddsColumnHandler,
