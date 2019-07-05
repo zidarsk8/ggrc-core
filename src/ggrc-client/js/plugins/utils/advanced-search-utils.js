@@ -265,35 +265,6 @@ export const selectSavedSearchFilter = (advancedSearch, savedSearch) => {
 };
 
 /**
- * Compare applied saved search with current advanced search filter
- * @param {Object} appliedSavedSearch - applied saved search
- * @param {Object} searchFilter - cuurent search filter
- * @return {Boolean} - is current advanced search filter equals to
- * applied save search
- */
-export const isSavedSearch = (appliedSavedSearch, searchFilter) => {
-  if (!appliedSavedSearch) {
-    return false;
-  }
-
-  function getParents(parentItems) {
-    return parentItems.map((item) => {
-      return {
-        id: item.value.id,
-        type: item.value.type,
-      };
-    });
-  }
-
-  const savedSearchParents = getParents(appliedSavedSearch.parentItems);
-  const currentSearchParents = getParents(searchFilter.parentItems);
-
-  return _.isEqual(appliedSavedSearch.filterItems, searchFilter.filterItems) &&
-    _.isEqual(appliedSavedSearch.mappingItems, searchFilter.mappingItems) &&
-    _.isEqual(savedSearchParents, currentSearchParents);
-};
-
-/**
  * Build permalink for saved search
  * @param {Number} searchId - saved search ID
  * @param {String} modelName - model name
