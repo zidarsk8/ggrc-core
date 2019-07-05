@@ -27,6 +27,7 @@ export default canComponent.extend({
   leakScope: true,
   viewModel: canMap.extend({
     types: [],
+    editMode: true,
     field: null,
     /*
      * Removes `field` from `fields`

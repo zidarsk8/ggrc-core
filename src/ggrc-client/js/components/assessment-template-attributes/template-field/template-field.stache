@@ -14,13 +14,13 @@
         </div>
         {{#is(type, "Dropdown")}}
           <div class="span4 centered checkbox-wrap">
-            <input type="checkbox" el:checked:bind="attachment"/>
+            <input type="checkbox" el:checked:bind="attachment" {{^if editMode}}disabled{{/if}}>
           </div>
           <div class="span2 centered checkbox-wrap">
-            <input type="checkbox" el:checked:bind="url"/>
+            <input type="checkbox" el:checked:bind="url" {{^if editMode}}disabled{{/if}}>
           </div>
           <div class="span2 centered checkbox-wrap">
-            <input type="checkbox" el:checked:bind="comment"/>
+            <input type="checkbox" el:checked:bind="comment" {{^if editMode}}disabled{{/if}}>
           </div>
         {{/is}}
       </div>
@@ -28,13 +28,13 @@
   </div>
 
   <div class="span1 centered checkbox-wrap">
-    <input type="checkbox" el:checked:bind="field.mandatory"/>
+    <input type="checkbox" el:checked:bind="field.mandatory" {{^if editMode}}disabled{{/if}}>
   </div>
-  <div class="span2">
-    <div class="pull-right">
-      {{#field}}
+  {{#if editMode}}
+    <div class="span2">
+      <div class="pull-right">
         <a on:el:click="removeField()"><i class="fa fa-trash"></i></a>
-      {{/field}}
+      </div>
     </div>
-  </div>
+  {{/if}}
 {{/field._pending_delete}}

@@ -23,6 +23,7 @@ export default canComponent.extend({
   view: canStache(template),
   viewModel: canMap.extend({
     fields: [],
+    editMode: true,
     types: [{
       type: 'Text',
       name: 'Text',

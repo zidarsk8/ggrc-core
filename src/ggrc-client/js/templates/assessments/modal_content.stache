@@ -143,7 +143,9 @@
               <label class="ggrc-form-item__label">
                 Custom Attributes
               </label>
-              <assessment-template-attributes fields:from="assessmentTemplate.custom_attribute_definitions" />
+              <assessment-template-attributes
+                fields:from="assessmentTemplate.custom_attribute_definitions"
+                editMode:from="false" />
           </div>
         </div>
       {{/if}}
