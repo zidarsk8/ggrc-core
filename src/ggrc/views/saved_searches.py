@@ -16,13 +16,19 @@ from ggrc.models.exceptions import ValidationError
 
 @app.route("/api/saved_searches/<int:saved_search_id>", methods=["GET"])
 def get_saved_searches_by_id(saved_search_id):
-  """
+  """Get a saved search by ID.
+
+  Endpoint returning saved search JSON representation by it's ID. Request
+  should contain saved search ID. If there isn't any saved search with provided
+  ID, 404 status code and "No saved search with id <id> found" message will be
+  returned.
 
   Args:
-    saved_search_id:
+    saved_search_id (int): ID of saved search to look for.
 
   Returns:
-
+    Flask Response object containing JSON representation of saved search or
+    error message if saved search was not found.
   """
   saved_search = SavedSearch.query.filter(
       SavedSearch.id == saved_search_id
@@ -45,17 +51,18 @@ def get_saved_searches_by_id(saved_search_id):
 
 @app.route("/api/saved_searches/<string:search_type>", methods=["GET"])
 def get_saved_searches_by_type(search_type):
-  """Get SavedSearch by object type
+  """Get saved searches by type.
 
-  Get SavedSearch model by object type.
-  Request object should includes search_type parameter and can includes
-   offset and limit parameters.
+  Endpoint returning saved searches JSON representation by their type. Request
+  should contain saved search type and can include offset and limit parameters.
+  If there isn't any saved searches with provided type, empty response will be
+  returned.
 
   Args:
-    search_type: Type of search
+    search_type (str): Type of saved search.
 
   Returns:
-    Flask Response object with object_name, count, total and values as payload
+    Flask Response object with object_name, count, total and values as payload.
   """
   user = login.get_current_user(use_external_user=False)
   all_objects = user.saved_searches.filter(
@@ -87,14 +94,20 @@ def get_saved_searches_by_type(search_type):
 
 @app.route("/api/saved_searches/<int:saved_search_id>", methods=["DELETE"])
 def delete_saved_search(saved_search_id):
-  """Delete saved search
+  """Delete saved search by ID.
 
-    Args
-      saved_search_id: id of saved_search object that should be deleted
+  Endpoint deleting saved search by it's ID. Request should contain saved
+  search ID. If saved search is successfully deleted, it's ID will be returned.
+  If there isn't any saved search with provided ID, 404 status code and
+  "No saved search with id <id> found for current user" message will be
+  returned.
 
-    Returns
-      Response object with id of a deleted object or error message if object
-      did not found
+  Args:
+    saved_search_id (int): ID of saved search to delete
+
+  Returns:
+    Flask Response object containing ID of deleted saved search or error
+    message if saved search is not found.
   """
   user = login.get_current_user(use_external_user=False)
 
@@ -120,7 +133,17 @@ def delete_saved_search(saved_search_id):
 @app.route("/api/saved_searches", methods=["POST"])
 @validate_post_data_keys(["name", "object_type", "search_type"])
 def create_saved_search():
-  """Create new saved search"""
+  """Create a saved search.
+
+  Endpoint creating saved search with provided parameters. Request payload
+  should contain saved search `name`, `search_type` and `object_type`. Also it
+  could contain saved search `filters`. If there will any error during saved
+  search creation, 400 status code and corresponding error will be returned.
+
+  Returns:
+    Flask Response object containing JSON representation of created saved
+    search or error message if error occurred.
+  """
   user = login.get_current_user(use_external_user=False)
 
   data = request.get_json()
