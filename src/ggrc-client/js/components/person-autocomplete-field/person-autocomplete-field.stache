@@ -4,7 +4,7 @@
 }}
 
 <div class="input-wrapper">
-  <input class="person-autocomplete-field__input span12"
+  <input class="person-autocomplete-field__input"
     tabindex="{{tabindex}}"
     id="{{inputId}}"
     placeholder="{{placeholder}}"

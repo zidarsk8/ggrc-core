@@ -4,5 +4,8 @@
  */
 
 input.person-autocomplete-field__input {
+  box-sizing: border-box;
   margin-bottom: 0;
+  width: 100%;
+  min-height: 28px;
 }
