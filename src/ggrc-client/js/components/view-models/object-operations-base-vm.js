@@ -114,7 +114,6 @@ const ObjectOperationsBaseVM = canMap.extend({
   object: '',
   is_loading: false,
   is_saving: false,
-  assessmentTemplate: '',
   join_object_id: '',
   selected: [],
   entries: [],

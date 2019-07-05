@@ -28,6 +28,7 @@ export default canComponent.extend({
   leakScope: true,
   viewModel: function (attrs, parentViewModel) {
     return ObjectOperationsBaseVM.extend({
+      assessmentTemplate: '',
       object: attrs.object,
       join_object_id: attrs.joinObjectId,
       type: attrs.type,
