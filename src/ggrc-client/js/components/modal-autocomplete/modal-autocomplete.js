@@ -50,7 +50,13 @@ const events = {
   'input[data-lookup] keyup'(el, ev) {
     onAutocompleteKeyup(this.viewModel.attr('instance'), el, ev);
   },
-  'input[data-lookup] change'([el]) {
+  /**
+   * Need to track change of input's value via "input" event instead of
+   * "change" event in order to setting of null will be performed before the
+   * setting of selected value from autocomplete's list ("input" event
+   * is called earlier then "change" event).
+   */
+  'input[data-lookup] input'([el]) {
     const viewModel = this.viewModel;
     const instance = viewModel.attr('instance');
 
