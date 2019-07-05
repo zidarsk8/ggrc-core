@@ -226,45 +226,6 @@ export const setDefaultStatusConfig = (state, modelName) => {
 };
 
 /**
- * Filter parent items to remove duplicates
- * @param {Object} parent - parent attribute of Advanced search
- * @param {Array} parentItems - parentItems attribute of Advanced search
- * @return {Array} - filtered parentItems
- */
-export const filterParentItems = (parent, parentItems) => {
-  return parentItems = parentItems.filter((item) =>
-    item.value.id !== parent.value.id ||
-    item.value.type !== parent.value.type);
-};
-
-/**
- * Select saved search filter to current advanced search
- * @param {can.Map} advancedSearch - current advanced search
- * @param {Object} savedSearch - saved search
- */
-export const selectSavedSearchFilter = (advancedSearch, savedSearch) => {
-  const parent = advancedSearch.attr('parent');
-  if (parent && savedSearch.parentItems) {
-    savedSearch.parentItems =
-      filterParentItems(parent, savedSearch.parentItems);
-  }
-
-  advancedSearch.attr('filterItems', savedSearch.filterItems);
-  advancedSearch.attr('mappingItems', savedSearch.mappingItems);
-  advancedSearch.attr('parentItems', savedSearch.parentItems);
-
-  const selectedSavedSearch = {
-    filterItems: savedSearch.filterItems,
-    mappingItems: savedSearch.mappingItems,
-    parentItems: savedSearch.parentItems,
-    id: savedSearch.id,
-  };
-
-  // save selected saved search
-  advancedSearch.attr('selectedSavedSearch', selectedSavedSearch);
-};
-
-/**
  * Build permalink for saved search
  * @param {Number} searchId - saved search ID
  * @param {String} modelName - model name

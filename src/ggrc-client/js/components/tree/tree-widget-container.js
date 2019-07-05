@@ -545,7 +545,7 @@ let viewModel = canMap.extend({
         AdvancedSearch.create.parent(this.attr('parent_instance')));
 
       // remove duplicates
-      const parentItems = AdvancedSearch.filterParentItems(
+      const parentItems = filterParentItems(
         this.attr('advancedSearch.parent'),
         this.attr('advancedSearch.parentItems'));
 
@@ -864,7 +864,10 @@ export default canComponent.extend({
         return;
       }
 
-      selectSavedSearch(ev.savedSearch, this.viewModel.attr('advancedSearch'));
+      selectSavedSearchFilter(
+        this.viewModel.attr('advancedSearch'),
+        ev.savedSearch
+      );
     },
   },
 });
@@ -889,10 +892,16 @@ const loadSavedSearch = (viewModel) => {
     if (savedSearch &&
       savedSearch.object_type === viewModel.attr('modelName') &&
       savedSearch.search_type === 'AdvancedSearch') {
-      const savedSearchFilters = AdvancedSearch
-        .parseFilterJson(savedSearch.filters);
-      savedSearchFilters.id = savedSearch.id;
-      applySavedSearch(savedSearchFilters, viewModel);
+      const parsedSavedSearch = {
+        ...AdvancedSearch.parseFilterJson(savedSearch.filters),
+        id: savedSearch.id,
+      };
+
+      selectSavedSearchFilter(
+        viewModel.attr('advancedSearch'),
+        parsedSavedSearch
+      );
+      viewModel.applyAdvancedFilters();
     } else {
       // clear filter and apply default
       processNotExistedSearch(viewModel);
@@ -903,11 +912,41 @@ const loadSavedSearch = (viewModel) => {
   });
 };
 
-const selectSavedSearch = (savedSearch, advancedSearch) => {
-  AdvancedSearch.selectSavedSearchFilter(advancedSearch, savedSearch);
+/**
+ * Filter parent items to remove duplicates
+ * @param {Object} parent - parent attribute of Advanced search
+ * @param {Array} parentItems - parentItems attribute of Advanced search
+ * @return {Array} - filtered parentItems
+ */
+const filterParentItems = (parent, parentItems) => {
+  return parentItems = parentItems.filter((item) =>
+    item.value.id !== parent.value.id ||
+    item.value.type !== parent.value.type);
 };
 
-const applySavedSearch = (savedSearch, viewModel) => {
-  selectSavedSearch(savedSearch, viewModel.attr('advancedSearch'));
-  viewModel.applyAdvancedFilters();
+/**
+ * Select saved search filter to current advanced search
+ * @param {can.Map} advancedSearch - current advanced search
+ * @param {Object} savedSearch - saved search
+ */
+const selectSavedSearchFilter = (advancedSearch, savedSearch) => {
+  const parent = advancedSearch.attr('parent');
+  if (parent && savedSearch.parentItems) {
+    savedSearch.parentItems =
+      filterParentItems(parent, savedSearch.parentItems);
+  }
+
+  advancedSearch.attr('filterItems', savedSearch.filterItems);
+  advancedSearch.attr('mappingItems', savedSearch.mappingItems);
+  advancedSearch.attr('parentItems', savedSearch.parentItems);
+
+  const selectedSavedSearch = {
+    filterItems: savedSearch.filterItems,
+    mappingItems: savedSearch.mappingItems,
+    parentItems: savedSearch.parentItems,
+    id: savedSearch.id,
+  };
+
+  // save selected saved search
+  advancedSearch.attr('selectedSavedSearch', selectedSavedSearch);
 };
