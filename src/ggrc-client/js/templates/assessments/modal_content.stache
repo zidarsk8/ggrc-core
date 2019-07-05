@@ -126,6 +126,29 @@
       </div>
     </div>
 
+    {{#if new_object_form}}
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__row">
+          <label class="ggrc-form-item__label">
+            Select Assessment Template
+          </label>
+          <assessment-templates-dropdown
+            instance:from="instance.audit"
+            on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
+        </div>
+      </div>
+      {{#if assessmentTemplate}}
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row">
+              <label class="ggrc-form-item__label">
+                Custom Attributes
+              </label>
+              <assessment-template-attributes fields:from="assessmentTemplate.custom_attribute_definitions" />
+          </div>
+        </div>
+      {{/if}}
+    {{/if}}
+
     <div class="ggrc-form-item">
       <div class="ggrc-form-item__row">
         <deferred-mapper class="width-100"

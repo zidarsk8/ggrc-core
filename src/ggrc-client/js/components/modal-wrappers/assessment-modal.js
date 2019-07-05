@@ -3,12 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../assessment-template-attributes/assessment-template-attributes';
+import '../assessment-templates/assessment-templates-dropdown/assessment-templates-dropdown';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
   toObject,
   extendSnapshot,
 } from '../../plugins/utils/snapshot-utils';
+import {loadObjectsByStubs} from '../../plugins/utils/query-api-utils';
 
 export default canComponent.extend({
   tag: 'assessment-modal',
@@ -17,6 +20,7 @@ export default canComponent.extend({
     instance: null,
     isNewInstance: false,
     mappedObjects: [],
+    assessmentTemplate: null,
     loadData() {
       return this.attr('instance').getRelatedObjects()
         .then((data) => {
@@ -27,6 +31,33 @@ export default canComponent.extend({
 
           this.attr('mappedObjects', snapshots);
         });
+    },
+    async setAssessmentTemplate(templateId) {
+      const instance = this.attr('instance');
+      const audit = instance.attr('audit');
+      const templateStub = {
+        id: templateId,
+        type: 'AssessmentTemplate',
+      };
+      const [loadedTemplate] = await loadObjectsByStubs(
+        [templateStub],
+        ['custom_attribute_definitions'],
+        {
+          type: audit.attr('type'),
+          id: audit.attr('id'),
+        },
+      );
+
+      instance.attr('template', templateStub);
+      this.attr('assessmentTemplate', loadedTemplate);
+    },
+    onAssessmentTemplateChanged({template}) {
+      if (!template) {
+        this.attr('assessmentTemplate', null);
+        this.attr('instance.template', null);
+      } else {
+        this.setAssessmentTemplate(template.id);
+      }
     },
   }),
   events: {
