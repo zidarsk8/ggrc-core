@@ -597,6 +597,11 @@ class ExportBlockConverter(BlockConverter):
     """Generate 2D array with csv header description."""
     headers = []
     for field in self.fields:
+      if field not in self.object_headers:
+        # There may be cases when self.fields contains local custom attribute
+        # fields passed from FE, but self.object_headers does not have them
+        # since there are no such LCAs for objects being exported.
+        continue
       description = self.object_headers[field]["description"]
       display_name = self.object_headers[field]["display_name"]
       if self.object_headers[field]["mandatory"]:
