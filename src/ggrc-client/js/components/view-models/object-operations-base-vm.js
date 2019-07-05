@@ -74,10 +74,8 @@ const ObjectOperationsBaseVM = canMap.extend({
      * For example, if not set a special config for type [TYPE] then is used
      * general config, otherwise special config.
      */
-      set: function (mapType) {
+      set(mapType) {
         let config = this.attr('config') || {};
-        let type = this.attr('type');
-        let configHandler;
         let resultConfig = ObjectOperationsBaseVM.extractConfig(
           mapType,
           config.serialize()
@@ -87,14 +85,7 @@ const ObjectOperationsBaseVM = canMap.extend({
         // type)
         delete resultConfig.type;
 
-        // if we set type first time then update config immediately
-        if (!type) {
-          configHandler = this.update.bind(this);
-        } else {
-          configHandler = this.prepareConfig.bind(this);
-        }
-
-        configHandler(resultConfig);
+        this.update(resultConfig);
         if (_.isNull(this.attr('freezedConfigTillSubmit'))) {
           this.attr('freezedConfigTillSubmit', resultConfig);
         }
@@ -156,9 +147,6 @@ const ObjectOperationsBaseVM = canMap.extend({
     $('.modal:visible')
       .last()
       .focus();
-  },
-  prepareConfig: function (config) {
-    this.update(config);
   },
   /**
    * Updates view model fields to values from config.
