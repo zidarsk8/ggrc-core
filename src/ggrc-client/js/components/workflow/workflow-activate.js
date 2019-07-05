@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   generateCycle,
   redirectToCycle,
@@ -13,7 +15,7 @@ import {
 import Permission from '../../permission';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   instance: {},
   waiting: false,
   async initWorkflow(workflow) {
@@ -51,6 +53,7 @@ const viewModel = can.Map.extend({
       await generateCycle(workflow);
       await workflow.refresh();
       await workflow.attr('status', 'Active').save();
+      await this.updateActiveCycleCounts(workflow);
     } catch (err) {
       return Promise.reject(err);
     } finally {
@@ -71,7 +74,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'workflow-activate',
   leakScope: true,
   viewModel,

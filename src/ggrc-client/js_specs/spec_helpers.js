@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 // This is primarily useful for passing as the fail case for
 //  promises, since every item passed to it will show up in
 //  the jasmine output.
@@ -23,7 +24,7 @@ function getComponentVM(Component) {
   if (_.isFunction(viewModelConfig)) {
     return new viewModelConfig();
   }
-  return new (can.Map.extend(viewModelConfig));
+  return new (canMap.extend(viewModelConfig));
 }
 
 function makeFakeModel({model, staticProps = {}, instanceProps = {}} = {}) {
@@ -54,7 +55,7 @@ function makeFakeInstance({
  * viewModel.attr(property), viewModel.attr(property, someValue).
  * get/set of this 'property' should be defined in viewModel through define plugin.
 
- * @param {can.Component.viewModel} viewModel
+ * @param {canComponent.viewModel} viewModel
  * @param {string} property
  *
  * @returns {jasmine.Spy}

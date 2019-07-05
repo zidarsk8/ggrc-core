@@ -3,15 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './related-objects';
 import '../add-issue-button/add-issue-button';
 import template from './related-issues.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-issues',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       orderBy: {
         type: 'string',

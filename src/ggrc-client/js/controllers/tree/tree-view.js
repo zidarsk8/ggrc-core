@@ -3,6 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import isEmptyObject from 'can-util/js/is-empty-object/is-empty-object';
+import canCompute from 'can-compute';
+import makeArray from 'can-util/js/make-array/make-array';
+import canModel from 'can-model';
+import canStache from 'can-stache';
+import canMap from 'can-map';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getCounts} from '../../plugins/utils/widgets-utils';
 import TreeLoader from './tree-loader';
@@ -48,8 +55,8 @@ const TreeViewControl = TreeLoader.extend({
     optionsProperty = opts.options_property || defaults.options_property;
     defaultOptions = opts.model[optionsProperty] || {};
 
-    this.options = new can.Map(defaults).attr(defaultOptions).attr(opts);
-    if (opts instanceof can.Map) {
+    this.options = new canMap(defaults).attr(defaultOptions).attr(opts);
+    if (opts instanceof canMap) {
       this.options = Object.assign(this.options, opts);
     }
   },
@@ -89,7 +96,7 @@ const TreeViewControl = TreeLoader.extend({
     this.options.attr('child_options', this.options.child_options.slice(0));
     _.forEach(this.options.child_options, function (options, i) {
       this.options.child_options.attr(i,
-        new can.Map(Object.assign(options.attr(), allowed)));
+        new canMap(Object.assign(options.attr(), allowed)));
     }.bind(this));
 
     this._attached_deferred = $.Deferred();
@@ -109,11 +116,11 @@ const TreeViewControl = TreeLoader.extend({
     let dfds = [];
     if (this.options.header_view && this.options.show_header) {
       dfds.push(
-        $.when(this.options, $.ajax({
+        $.when(this.options, ggrcAjax({
           url: this.options.header_view,
           dataType: 'text',
         })).then((ctx, view) => {
-          return can.stache(view[0])(ctx);
+          return canStache(view[0])(ctx);
         }).then(
           this._ifNotRemoved((frag) => {
             this.element.before(frag);
@@ -135,7 +142,7 @@ const TreeViewControl = TreeLoader.extend({
     if (this.options.list_loader) {
       this.options.list_loader(this.options.parent_instance)
         .then(function (list) {
-          return can.compute(function () {
+          return canCompute(function () {
             return list.attr('length');
           });
         })
@@ -155,7 +162,7 @@ const TreeViewControl = TreeLoader.extend({
       //  Skip, because already done, e.g., display() already called
       return this.find_all_deferred;
     }
-    if (can.isEmptyObject(this.options.find_params.serialize())) {
+    if (isEmptyObject(this.options.find_params.serialize())) {
       this.options.find_params.attr(
         'id', this.options.parent_instance ?
           this.options.parent_instance.id : undefined);
@@ -219,8 +226,8 @@ const TreeViewControl = TreeLoader.extend({
         }
       });
     }
-    if (!(v.instance instanceof can.Model)) {
-      if (v.instance.instance instanceof can.Model) {
+    if (!(v.instance instanceof canModel)) {
+      if (v.instance.instance instanceof canModel) {
         v.attr('result', v.instance);
         v.attr('mappings', v.instance.mappings_compute());
         v.attr('instance', v.instance.instance);
@@ -240,7 +247,7 @@ const TreeViewControl = TreeLoader.extend({
   // add child options to every item (TreeViewOptions instance) in the drawing list at this level of the tree.
   add_child_lists: function (list) {
     let that = this;
-    let currentList = can.makeArray(list);
+    let currentList = makeArray(list);
     let listWindow = [];
     let finalDfd;
     let queue = [];
@@ -291,7 +298,7 @@ const TreeViewControl = TreeLoader.extend({
     let drawItemsDfds = [];
     let res;
 
-    items = can.makeArray(optionsList);
+    items = makeArray(optionsList);
 
     items = _.map(items, function (options) {
       let elem = document.createElement('li');

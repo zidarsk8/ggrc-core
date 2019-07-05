@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import moment from 'moment';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../tree-pagination/tree-pagination';
 import './revision-page';
 
@@ -21,9 +25,9 @@ import QueryParser from '../../generated/ggrc_filter_query_parser';
 import Pagination from '../base-objects/pagination';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'revision-log',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   /**
    * The component's entry point. Invoked when a new component instance has
@@ -36,7 +40,7 @@ export default can.Component.extend({
 
     viewModel.fetchItems();
   },
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       showFilter: {
         get() {

@@ -3,16 +3,19 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './simple-popover.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'simple-popover',
-  view: can.stache(template),
+  view: canStache(template),
   init: function (el) {
     this.viewModel.attr('element', el);
   },
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     extraCssClass: '',
     placement: '',
     buttonText: '',

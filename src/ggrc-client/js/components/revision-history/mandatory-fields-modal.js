@@ -3,15 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../simple-modal/simple-modal';
 import '../gca-controls/gca-controls';
 import template from './templates/mandatory-fields-modal.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'mandatory-fields-modal',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       showCAs: {
         type: 'boolean',

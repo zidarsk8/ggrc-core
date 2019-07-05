@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../simple-popover/simple-popover';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
@@ -15,17 +18,17 @@ import * as businessModels from '../../models/business-models';
  * Contains logic used in Mapping Criteria component.
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     /**
      * Contains object represents criteria.
      * Contains the following fields: objectName, filter, mappedTo.
      * Initializes filter with Filter Attribute model.
-     * @type {can.Map}
+     * @type {canMap}
      */
     criteria: {
       type: '*',
-      Value: can.Map,
+      Value: canMap,
       set: function (criteria) {
         if (!criteria.filter) {
           criteria.attr('filter',
@@ -99,7 +102,7 @@ let viewModel = can.Map.extend({
   isClone: false,
   /**
    * Returns a list of available attributes for specific model.
-   * @return {can.List} - List of available attributes.
+   * @return {canList} - List of available attributes.
    */
   availableAttributes: function () {
     return getAvailableAttributes(this.attr('criteria.objectName'));
@@ -178,9 +181,9 @@ let viewModel = can.Map.extend({
 /**
  * Mapping Criteria is specific kind of Filter Item.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'advanced-search-mapping-criteria',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: false,
   viewModel: viewModel,
 });

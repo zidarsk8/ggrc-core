@@ -3,17 +3,20 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {SWITCH_TO_ERROR_PANEL, SHOW_INVALID_FIELD} from '../../events/eventTypes';
 import template from './object-state-toolbar.stache';
 
 /**
  * Object State Toolbar Component allowing Object state modification
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'object-state-toolbar',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       updateState: {
         get: function () {

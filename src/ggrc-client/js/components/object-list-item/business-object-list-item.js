@@ -3,17 +3,20 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import * as businessModels from '../../models/business-models';
 import template from './business-object-list-item.stache';
 
 /**
  * Mapped objects item view component
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'business-object-list-item',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: {},
     define: {
       type: {

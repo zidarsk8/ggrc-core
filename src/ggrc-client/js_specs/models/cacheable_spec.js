@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
+import canModel from 'can-model';
+import canList from 'can-list';
+import canMap from 'can-map';
 import Cacheable from '../../js/models/cacheable';
 import {
   failAll,
@@ -21,7 +25,7 @@ describe('Cacheable model', () => {
     origGcaDefs = GGRC.custom_attr_defs;
     dummyable = Mixin.extend({}, {});
     spyOn(dummyable, 'add_to');
-    ajaxSpy = spyOn($, 'ajax');
+    ajaxSpy = spyOn(AjaxExtensions, 'ggrcAjax');
 
     DummyModel = makeFakeModel({
       model: Cacheable,
@@ -37,7 +41,7 @@ describe('Cacheable model', () => {
         mixins: [dummyable],
         attributes: {},
         is_custom_attributable: true,
-        ajax: $.ajax,
+        ajax: AjaxExtensions.ggrcAjax,
       },
     });
   });
@@ -124,7 +128,7 @@ describe('Cacheable model', () => {
     });
 
     it('sets findAll to default based on root_collection if not set', () => {
-      spyOn(can.Model, 'setup');
+      spyOn(canModel, 'setup');
       let DummyFind = Cacheable.extend({root_collection: 'foos'}, {});
       expect(DummyFind.findAll).toBe('GET /api/foos');
     });
@@ -171,8 +175,8 @@ describe('Cacheable model', () => {
         },
       }));
       DummyModel.findAll().then(function (data) {
-        expect($.ajax).toHaveBeenCalled();
-        expect(data).toEqual(jasmine.any(can.List));
+        expect(AjaxExtensions.ggrcAjax).toHaveBeenCalled();
+        expect(data).toEqual(jasmine.any(canList));
         expect(data.length).toBe(1);
         expect(data[0]).toEqual(jasmine.any(DummyModel));
         expect(data[0]).toEqual(jasmine.objectContaining({id: 1}));
@@ -184,8 +188,8 @@ describe('Cacheable model', () => {
        'from the find', function (done) {
       ajaxSpy.and.returnValue($.when({id: 1}));
       DummyModel.findAll().then(function (data) {
-        expect($.ajax).toHaveBeenCalled();
-        expect(data).toEqual(jasmine.any(can.List));
+        expect(AjaxExtensions.ggrcAjax).toHaveBeenCalled();
+        expect(data).toEqual(jasmine.any(canList));
         expect(data.length).toBe(1);
         expect(data[0]).toEqual(jasmine.any(DummyModel));
         expect(data[0]).toEqual(jasmine.objectContaining({id: 1}));
@@ -260,7 +264,7 @@ describe('Cacheable model', () => {
     let inst;
     beforeEach(() => {
       inst = new DummyModel({href: '/api/dummy_models/1'});
-      spyOn(can, 'ajax').and.returnValue(new $.Deferred(function (dfd) {
+      ajaxSpy.and.returnValue(new $.Deferred(function (dfd) {
         setTimeout(() => {
           dfd.resolve(inst.serialize());
         }, 10);
@@ -270,10 +274,11 @@ describe('Cacheable model', () => {
     it('calls the object endpoint with the supplied href if no ' +
        'selfLink', function (done) {
       inst.refresh().then(() => {
-        expect(can.ajax).toHaveBeenCalledWith(jasmine.objectContaining({
-          url: '/api/dummy_models/1',
-          type: 'get',
-        }));
+        expect(AjaxExtensions.ggrcAjax)
+          .toHaveBeenCalledWith(jasmine.objectContaining({
+            url: '/api/dummy_models/1',
+            type: 'get',
+          }));
         done();
       }, fail);
     });
@@ -283,12 +288,12 @@ describe('Cacheable model', () => {
       inst.refresh();
       setTimeout(() => {
         inst.refresh().then(() => {
-          expect(can.ajax.calls.count()).toBe(2);
+          expect(AjaxExtensions.ggrcAjax.calls.count()).toBe(2);
           done();
         }, fail);
       }, 1000); // 1000ms is enough to trigger a new call to the debounced function
       inst.refresh().then(() => {
-        expect(can.ajax.calls.count()).toBe(1);
+        expect(AjaxExtensions.ggrcAjax.calls.count()).toBe(1);
       }, fail);
     });
 
@@ -322,7 +327,7 @@ describe('Cacheable model', () => {
 
     describe('when count of arguments is 0', () => {
       it('returns all custom attriubtes', () => {
-        const customAttrs = new can.List([]);
+        const customAttrs = new canList([]);
         let result;
         spyOn(instance, '_getAllCustomAttr').and.returnValue(customAttrs);
         result = instance.customAttr();
@@ -334,8 +339,8 @@ describe('Cacheable model', () => {
       it('returns certain custom attribute object by ca id', () => {
         const caId = 12345;
         const caObject = new CustomAttributeObject(
-          new can.Map(),
-          new can.Map()
+          new canMap(),
+          new canMap()
         );
         const getCA = spyOn(instance, '_getCustomAttr')
           .and.returnValue(caObject);

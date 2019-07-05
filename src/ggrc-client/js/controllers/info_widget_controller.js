@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import '../components/comment/comments-section';
 import '../components/related-objects/proposals/related-proposals';
 import '../components/related-objects/proposals/related-proposals-item';
@@ -14,8 +18,10 @@ import {
 } from '../plugins/utils/current-page-utils';
 import * as businessModels from '../models/business-models';
 import {getCreateObjectUrl} from '../plugins/utils/ggrcq-utils';
+import Cacheable from '../models/cacheable';
+import {refreshCounts} from '../plugins/utils/widgets-utils';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     model: getPageModel(),
     instance: getPageInstance(),
@@ -32,7 +38,7 @@ export default can.Control.extend({
     if (this.options.instance.info_pane_preload) {
       this.options.instance.info_pane_preload();
     }
-    this.options.context = new can.Map({
+    this.options.context = new canMap({
       model: this.options.model,
       instance: this.options.instance,
       start_menu: this.options.start_menu,
@@ -43,11 +49,11 @@ export default can.Control.extend({
     });
     import(/* webpackChunkName: "modalsCtrls" */'./modals')
       .then(() => {
-        $.ajax({
+        ggrcAjax({
           url: this.get_widget_view(this.element),
           dataType: 'text',
         }).then((view) => {
-          let frag = can.stache(view)(this.options.context);
+          let frag = canStache(view)(this.options.context);
           this.element.html(frag);
         });
       });
@@ -120,6 +126,14 @@ export default can.Control.extend({
         'Vendor',
       ];
       this.options.object_menu = this.generate_menu_items(names);
+      Cacheable.bind('created', this.updateCounts);
     }
   },
+
+  // timeout required to let server correctly calculate changed counts
+  updateCounts: _.debounce((ev, instance) => {
+    if (/dashboard/.test(window.location)) {
+      refreshCounts();
+    }
+  }, 250),
 });

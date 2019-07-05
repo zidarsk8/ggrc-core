@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../dropdown/multiselect-dropdown';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import template from './advanced-search-filter-state.stache';
@@ -13,7 +16,7 @@ import {isScopeModel} from '../../plugins/utils/models-utils';
  * Contains logic used in Filter State component
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     label: {
       get() {
@@ -67,7 +70,7 @@ let viewModel = can.Map.extend({
   /**
    * Contains criterion's fields: operator, modelName, items.
    * Initializes filterStates.
-   * @type {can.Map}
+   * @type {canMap}
   */
   stateModel: null,
   /**
@@ -106,9 +109,9 @@ let viewModel = can.Map.extend({
 /**
  * Filter State is a specific kind of Advanced Search Filter items.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-state',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
 });

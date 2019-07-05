@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import Assessment from '../assessment';
 import Program from '../program';
 import Audit from '../audit';
@@ -11,6 +12,7 @@ import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Context from '../../service-models/context';
 import * as modelsUtils from '../../../plugins/utils/models-utils';
 import {REFRESH_MAPPING} from '../../../events/eventTypes';
+import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 describe('Assessment model', function () {
   'use strict';
@@ -156,7 +158,7 @@ describe('Assessment model', function () {
     });
 
     function checkAcRoles(model, roleId, peopleIds) {
-      const res = can.makeArray(model.access_control_list).filter((acl) => {
+      const res = makeArray(model.access_control_list).filter((acl) => {
         return acl.ac_role_id === roleId;
       }).map((acl) => {
         return acl.person.id;
@@ -235,7 +237,7 @@ describe('Assessment model', function () {
 
   describe('getRelatedObjects() method', () => {
     beforeEach(() => {
-      spyOn($, 'get').and.returnValue($.Deferred().resolve({
+      spyOn(AjaxUtils, 'ggrcGet').and.returnValue($.Deferred().resolve({
         Audit: {
           title: 'FooBar',
         },
@@ -263,14 +265,14 @@ describe('Assessment model', function () {
 
     it('calls refresh of instance if it is in read mode status', () => {
       spyOn(instance, 'refresh');
-      Assessment.readModeStatuses.forEach((status) => {
+      Assessment.doneStatuses.forEach((status) => {
         instance.attr('status', status);
 
         instance.dispatch(REFRESH_MAPPING);
       });
 
       expect(instance.refresh)
-        .toHaveBeenCalledTimes(Assessment.readModeStatuses.length);
+        .toHaveBeenCalledTimes(Assessment.doneStatuses.length);
     });
 
     it('does not call refresh of instance if it is in edit mode status', () => {

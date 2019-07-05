@@ -209,13 +209,14 @@ class TestReviewNotification(TestCase):
       fast_digest.send_notification()
       template_args = bodybuilder_mock.call_args[1]
       self.assertListEqual([], template_args["proposals"])
-      self.assertListEqual([], template_args["review_owners"])
-      self.assertEqual(1, len(template_args["review_reviewers"]))
+      self.assertListEqual([], template_args["object_state_reverted_data"])
+      self.assertEqual(1, len(template_args["review_requested_data"]))
       self.assertEqual(
-          program.id, template_args["review_reviewers"][0].reviewable.id
+          program.id, template_args["review_requested_data"][0].reviewable.id
       )
       self.assertEqual(
-          email_message, template_args["review_reviewers"][0].email_message
+          email_message,
+          template_args["review_requested_data"][0].email_message
       )
 
   @patch("google.appengine.api.mail.send_mail")
@@ -268,7 +269,7 @@ class TestReviewNotification(TestCase):
     """Object owners should receive notifications
 
     System should send notification(s) to object's managers,
-    primary contacts, secondary contacts,
+    primary contacts, secondary contacts, reviewers
     if object is reverted to 'Unreviewed'.
     """
     reviewer = factories.PersonFactory(name='reviewers')
@@ -322,10 +323,10 @@ class TestReviewNotification(TestCase):
       self.assertEqual(3, bodybuilder_mock.call_count)
       call_count = _call_counter(bodybuilder_mock)
       # 1 email to reviewer -> need to review
-      self.assertEqual(1, call_count["review_reviewers"])
+      self.assertEqual(1, call_count["review_requested_data"])
 
-      # 1 emails to owners -> object state updated
-      self.assertEqual(2, call_count["review_owners"])
+      # 1 emails to owners and reviewers -> object state updated
+      self.assertEqual(3, call_count["object_state_reverted_data"])
 
   @patch("google.appengine.api.mail.send_mail")
   @freezegun.freeze_time("2019-01-15 12:00:00")

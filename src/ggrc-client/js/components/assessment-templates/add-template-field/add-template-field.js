@@ -3,16 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './add-template-field.stache';
 
 // the field types that require a list of possible values to be defined
 const multiChoiceable = ['Dropdown', 'Multiselect'];
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'add-template-field',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isDisplayValues: {
         get() {
@@ -30,7 +33,7 @@ export default can.Component.extend({
      * Field must contain value title, type, values.
      * Opts are populated, once we start changing checkbox values
      *
-     * @param {can.Map} viewModel - the current (add-template-field) viewModel
+     * @param {canMap} viewModel - the current (add-template-field) viewModel
      * @param {jQuery.Object} el - the clicked DOM element
      * @param {Object} ev - the event object
      */

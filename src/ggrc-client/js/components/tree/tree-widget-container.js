@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './tree-header-selector';
 import './sub-tree-expander';
 import './sub-tree-wrapper';
@@ -40,9 +45,14 @@ import {
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   initMappedInstances,
+  isAllObjects,
+  isMyWork,
 } from '../../plugins/utils/current-page-utils';
 import {
+  initCounts,
   getCounts,
+  refreshCounts,
+  getWidgetModels,
 } from '../../plugins/utils/widgets-utils';
 import {getMegaObjectRelation} from '../../plugins/utils/mega-object-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
@@ -57,9 +67,8 @@ import exportMessage from './templates/export-message.stache';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
 
-let viewModel;
 
-viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     /**
      * Condition that adds into all request to server-side Query API
@@ -77,7 +86,7 @@ viewModel = can.Map.extend({
     currentFilter: {
       type: String,
       get: function () {
-        let filters = can.makeArray(this.attr('filters'));
+        let filters = makeArray(this.attr('filters'));
         let additionalFilter = this.attr('additionalFilter');
 
         if (this.attr('advancedSearch.filter')) {
@@ -197,7 +206,6 @@ viewModel = can.Map.extend({
     const stopFn = tracker.start(modelName,
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.TREE_VIEW_PAGE_LOADING(page.pageSize));
-    const countsName = this.attr('options.countsName');
 
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
@@ -223,12 +231,6 @@ viewModel = can.Map.extend({
         this.attr('pageInfo.total', total);
         this.attr('pageInfo.disabled', false);
         this.attr('loading', false);
-
-        if (!this._getFilterByName('custom') &&
-          !this._getFilterByName('status') &&
-          total !== getCounts().attr(countsName)) {
-          getCounts().attr(countsName, total);
-        }
       })
       .then(stopFn, stopFn.bind(null, true));
   },
@@ -289,7 +291,7 @@ viewModel = can.Map.extend({
     this.closeInfoPane();
   },
   getDepthFilter: function (deepLevel) {
-    let filters = can.makeArray(this.attr('filters'));
+    let filters = makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
       return options.query &&
@@ -325,11 +327,6 @@ viewModel = can.Map.extend({
     }
 
     return filter;
-  },
-  _getFilterByName: function (name) {
-    let filter = _.find(this.attr('filters'), {name: name});
-
-    return filter && filter.query ? filter.query : null;
   },
   _widgetHidden: function () {
     this._triggerListeners(true);
@@ -381,6 +378,8 @@ viewModel = can.Map.extend({
     function onCreated(ev, instance) {
       if (activeTabModel === instance.type) {
         _refresh(true);
+      } else if (!(instance instanceof Relationship)) {
+        _refreshCounts();
       }
     }
 
@@ -399,16 +398,16 @@ viewModel = can.Map.extend({
             current > 1 ? current - 1 : 1);
         }
 
-        if (!self._isRefreshNeeded(instance)) {
-          return;
-        }
+        if (self._isRefreshNeeded(instance)) {
+          _refresh();
 
-        _refresh();
-
-        // TODO: This is a workaround.We need to update communication between
-        //       info-pin and tree views through Observer
-        if (!self.attr('$el').closest('.pin-content').length) {
-          $('.pin-content').control().unsetInstance();
+          // TODO: This is a workaround.We need to update communication between
+          //       info-pin and tree views through Observer
+          if (!self.attr('$el').closest('.pin-content').length) {
+            $('.pin-content').control().unsetInstance();
+          }
+        } else {
+          _refreshCounts();
         }
       } else {
         // reinit mapped instances (subTree uses mapped instances)
@@ -416,7 +415,7 @@ viewModel = can.Map.extend({
       }
     }
 
-    function _refresh(sortByUpdatedAt) {
+    const _refresh = async (sortByUpdatedAt) => {
       if (self.attr('loading')) {
         return;
       }
@@ -425,9 +424,27 @@ viewModel = can.Map.extend({
         self.attr('sortingInfo.sortBy', 'updated_at');
         self.attr('pageInfo.current', 1);
       }
-      self.loadItems();
+      await self.loadItems();
+      if (self.attr('currentFilter')) {
+        _refreshCounts();
+      } else {
+        const countsName = self.attr('options.countsName');
+        const total = self.attr('pageInfo.total');
+        getCounts().attr(countsName, total);
+      }
       self.closeInfoPane();
-    }
+    };
+
+    // timeout required to let server correctly calculate changed counts
+    const _refreshCounts = _.debounce(() => {
+      if (isMyWork() || isAllObjects()) {
+        const location = window.location.pathname;
+        const widgetModels = getWidgetModels('Person', location);
+        initCounts(widgetModels, 'Person', GGRC.current_user.id);
+      } else {
+        refreshCounts();
+      }
+    }, 250);
 
     function _verifyRelationship(instance, shortName, parentInstance) {
       if (!(instance instanceof Relationship)) {
@@ -474,11 +491,11 @@ viewModel = can.Map.extend({
   advancedSearch: {
     open: false,
     filter: null,
-    request: can.List(),
-    filterItems: can.List(),
-    appliedFilterItems: can.List(),
-    mappingItems: can.List(),
-    appliedMappingItems: can.List(),
+    request: canList(),
+    filterItems: canList(),
+    appliedFilterItems: canList(),
+    mappingItems: canList(),
+    appliedMappingItems: canList(),
   },
   openAdvancedFilter: function () {
     this.attr('advancedSearch.filterItems',
@@ -492,7 +509,7 @@ viewModel = can.Map.extend({
   applyAdvancedFilters: function () {
     let filters = this.attr('advancedSearch.filterItems').attr();
     let mappings = this.attr('advancedSearch.mappingItems').attr();
-    let request = can.List();
+    let request = canList();
     let advancedFilters;
 
     this.attr('advancedSearch.appliedFilterItems', filters);
@@ -510,16 +527,16 @@ viewModel = can.Map.extend({
     this.onFilter();
   },
   removeAdvancedFilters: function () {
-    this.attr('advancedSearch.appliedFilterItems', can.List());
-    this.attr('advancedSearch.appliedMappingItems', can.List());
-    this.attr('advancedSearch.request', can.List());
+    this.attr('advancedSearch.appliedFilterItems', canList());
+    this.attr('advancedSearch.appliedMappingItems', canList());
+    this.attr('advancedSearch.request', canList());
     this.attr('advancedSearch.filter', null);
     this.attr('advancedSearch.open', false);
     this.onFilter();
   },
   resetAdvancedFilters: function () {
-    this.attr('advancedSearch.filterItems', can.List());
-    this.attr('advancedSearch.mappingItems', can.List());
+    this.attr('advancedSearch.filterItems', canList());
+    this.attr('advancedSearch.mappingItems', canList());
   },
   closeInfoPane: function () {
     $('.pin-content')
@@ -647,9 +664,9 @@ viewModel = can.Map.extend({
 /**
  *
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-widget-container',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   init: function () {
@@ -669,7 +686,7 @@ export default can.Component.extend({
     ' selectTreeItem': function (el, ev, selectedEl, instance) {
       let parent = this.viewModel.attr('parent_instance');
       let setInstanceDfd;
-      let infoPaneOptions = new can.Map({
+      let infoPaneOptions = new canMap({
         instance: instance,
         parent_instance: parent,
         options: this.viewModel,

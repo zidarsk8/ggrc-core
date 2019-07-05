@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
 import {formatDate} from '../../plugins/utils/date-utils';
 import {convertMarkdownToHtml} from '../../plugins/utils/markdown-utils';
@@ -48,7 +51,7 @@ const getCustomAttrValue = (instance, customAttributeId) => {
   return customAttrValue || '';
 };
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     value: {
       get() {
@@ -62,9 +65,9 @@ const viewModel = can.Map.extend({
   customAttributeId: null,
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-item-custom-attribute',
-  view: can.stache('{{{value}}}'),
+  view: canStache('{{{value}}}'),
   leakScope: true,
   viewModel,
 });

@@ -3,18 +3,21 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './repeat-on-button';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'repeat-on-button-wrapper',
-  view: can.stache(
+  view: canStache(
     '<repeat-on-button unit:from="instance.unit"' +
     ' repeatEvery:from="instance.repeat_every"' +
     ' onSaveRepeat:from="@onSetRepeat">' +
     '</repeat-on-button>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       autoSave: {
         type: 'boolean',

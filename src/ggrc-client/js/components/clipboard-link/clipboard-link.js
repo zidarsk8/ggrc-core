@@ -3,16 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import Clipboard from 'clipboard';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'clipboard-link',
-  view: can.stache(
+  view: canStache(
     '<a type="button" data-clipboard-text="{{text}}"><content/></a>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     text: '',
   }),
   events: {

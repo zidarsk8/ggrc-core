@@ -3,10 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './release-notes-list.stache';
 import notesTemplate from './release-notes.md';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   notesTemplate: notesTemplate,
   onTopButtonCssClass: 'instantly-hidden',
   prevScrollValue: null,
@@ -47,9 +50,9 @@ const events = {
   },
 };
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'release-notes-list',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events,

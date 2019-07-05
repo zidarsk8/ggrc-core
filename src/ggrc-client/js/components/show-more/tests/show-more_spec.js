@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../show-more';
 
@@ -24,7 +25,7 @@ describe('show-more component', function () {
   });
 
   describe('isOverLimit property', function () {
-    let items = new can.List([{id: 1}, {id: 2}]);
+    let items = new canList([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
       viewModel = getComponentVM(Component);
@@ -51,7 +52,7 @@ describe('show-more component', function () {
   });
 
   describe('showAllButtonText property', function () {
-    let items = new can.List([{id: 1}, {id: 2}]);
+    let items = new canList([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
       viewModel = getComponentVM(Component);
@@ -80,7 +81,7 @@ describe('show-more component', function () {
   });
 
   describe('visibleItems property', function () {
-    let items = new can.List([{id: 1}, {id: 2}]);
+    let items = new canList([{id: 1}, {id: 2}]);
 
     beforeEach(function () {
       viewModel = getComponentVM(Component);

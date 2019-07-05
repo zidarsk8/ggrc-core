@@ -3,9 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/text-form-field.stache';
 
-const TEXT_FORM_FIELD_VM = can.Map.extend({
+const TEXT_FORM_FIELD_VM = canMap.extend({
   define: {
     inputValue: {
       set(newValue) {
@@ -60,8 +63,8 @@ const TEXT_FORM_FIELD_VM = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
-  view: can.stache(template),
+export default canComponent.extend({
+  view: canStache(template),
   tag: 'text-form-field',
   leakScope: true,
   viewModel: TEXT_FORM_FIELD_VM,

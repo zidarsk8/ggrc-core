@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './revision-log-data';
 import {getRolesForType} from '../../plugins/utils/acl-utils';
 import RefreshQueue from '../../models/refresh_queue';
@@ -28,11 +32,11 @@ let LIST_FIELDS = {
   recipients: 1,
 };
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'revision-page',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       revisions: {
         set(newValue, setter) {
@@ -57,9 +61,9 @@ export default can.Component.extend({
 
       // combine all the changes and sort them by date descending
       let changeHistory = _([]).concat(
-        can.makeArray(this._computeObjectChanges(revisions.object,
+        makeArray(this._computeObjectChanges(revisions.object,
           revisions.revisionsForCompare)),
-        can.makeArray(this._computeMappingChanges(revisions.mappings)))
+        makeArray(this._computeMappingChanges(revisions.mappings)))
         .sortBy('updatedAt')
         .reverse()
         .value();
@@ -272,7 +276,7 @@ export default can.Component.extend({
           _.map(rev2people, (person) => person.id)
         );
         if (idsDiff.length) {
-          roleDiff = new can.Map({
+          roleDiff = new canMap({
             fieldName: role.name,
             origVal: [],
             newVal: [],

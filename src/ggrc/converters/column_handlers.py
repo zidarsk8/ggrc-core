@@ -92,6 +92,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "link": handlers.TextColumnHandler,
     "means": handlers.OptionColumnHandler,
     "modified_by": handlers.DirecPersonMappingColumnHandler,
+    "created_by": handlers.ExportOnlyPersonColumnHandler,
     "name": handlers.TextColumnHandler,
     "network_zone": handlers.OptionColumnHandler,
     "notes": handlers.TextColumnHandler,

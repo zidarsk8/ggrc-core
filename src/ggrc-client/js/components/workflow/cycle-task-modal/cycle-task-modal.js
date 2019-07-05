@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import * as businessModels from '../../../models/business-models';
 import {loadObjectsByTypes} from '../../../plugins/utils/query-api-utils';
 import {notifier} from '../../../plugins/utils/notifiers-utils';
@@ -15,7 +17,7 @@ import {getRelevantMappingTypes} from '../../../plugins/utils/workflow-utils';
  * @property {string} type - type of a pre-mapped object
  */
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   instance: null,
   isNewInstance: false,
   /**
@@ -63,7 +65,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'cycle-task-modal',
   leakScope: true,
   viewModel,

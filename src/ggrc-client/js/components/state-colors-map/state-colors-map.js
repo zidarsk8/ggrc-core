@@ -3,14 +3,17 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 /* Default Sate for Assessment should be 'Not Started' */
 const defaultState = 'Not Started';
 
 /**
- * can.Map(ViewModel) presenting behavior of State Colors Map Component
- * @type {can.Map}
+ * canMap(ViewModel) presenting behavior of State Colors Map Component
+ * @type {canMap}
  */
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     state: {
       type: 'string',
@@ -32,9 +35,9 @@ let viewModel = can.Map.extend({
 /**
  * Simple Component to add color indication for Assessment State Name
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'state-colors-map',
-  view: can.stache(
+  view: canStache(
     '<span class="state-value-dot state-{{suffix}} {{verified}}">' +
     '{{state}}</span>'
   ),

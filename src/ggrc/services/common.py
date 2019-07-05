@@ -1214,6 +1214,11 @@ class Resource(ModelView):
 
       # auto generation of user with Creator role if external flag is set
       if body and 'person' in body[0]:
+
+        if not body[0]["person"].get("name") and \
+           body[0]["person"].get("email"):
+          body[0]["person"]["name"] = body[0]["person"]["email"].split("@")[0]
+
         ext_flags_passed = {p.get("person", {}).get("external", False)
                             for p in body}
         if ext_flags_passed == {True, False}:

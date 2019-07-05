@@ -40,34 +40,40 @@ def normalize_issue_tracker_info(info):
       raise exceptions.ValidationError('Hotlist ID must be a number.')
 
 
-def set_values_for_missed_fields(assmt, issue_tracker_info):
-  """Set values for empty issue tracked fields.
+def populate_issue_tracker_fields(assmt, issue_tracker_info,
+                                  with_update=False, create_mode=False):
+  """Populate issue tracker fields values.
 
   Current list of fields with default values: component_id, hotlist_id,
     issue_type, priority, severity. They would be taken from default values if
     they are empty in appropriate audit.
   Current list of values that would be taken from assessment: title, status,
     due date.
+
+  Args
+    assmt (Assessment): Assessment instance
+    issue_tracker_info (dict): dictionary with issue information
+    with_update (bool): overwrite existing value
   """
   audit_info = assmt.audit.issue_tracker or {}
   default_values = constants.DEFAULT_ISSUETRACKER_VALUES
-  if not issue_tracker_info.get("component_id"):
+  if not issue_tracker_info.get("component_id") or with_update:
     issue_tracker_info["component_id"] = audit_info.get("component_id") or\
         default_values["component_id"]
 
-  if not issue_tracker_info.get("hotlist_id"):
+  if not issue_tracker_info.get("hotlist_id") or with_update:
     issue_tracker_info["hotlist_id"] = audit_info.get("hotlist_id") or\
         default_values["hotlist_id"]
 
-  if not issue_tracker_info.get("issue_type"):
+  if not issue_tracker_info.get("issue_type") or with_update:
     issue_tracker_info["issue_type"] = audit_info.get("issue_type") or\
         default_values["issue_type"]
 
-  if not issue_tracker_info.get("issue_priority"):
+  if not issue_tracker_info.get("issue_priority") or with_update:
     issue_tracker_info["issue_priority"] = audit_info.get("issue_priority") or\
         default_values["issue_priority"]
 
-  if not issue_tracker_info.get("issue_severity"):
+  if not issue_tracker_info.get("issue_severity") or with_update:
     issue_tracker_info["issue_severity"] = audit_info.get("issue_severity") or\
         default_values["issue_severity"]
 
@@ -75,9 +81,9 @@ def set_values_for_missed_fields(assmt, issue_tracker_info):
     issue_tracker_info["title"] = assmt.title
 
   if not issue_tracker_info.get("status"):
-    issue_tracker_info["status"] = constants.STATUSES_MAPPING.get(
-        assmt.status
-    )
+    status_mapping = constants.CREATE_STATUSES_MAPPING if create_mode else \
+        constants.STATUSES_MAPPING
+    issue_tracker_info["status"] = status_mapping.get(assmt.status)
 
   if not issue_tracker_info.get('due_date'):
     issue_tracker_info['due_date'] = assmt.start_date

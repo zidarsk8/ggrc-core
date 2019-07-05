@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import moment from 'moment';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   inViewport,
   isInnerClick,
@@ -10,11 +14,11 @@ import {
 import {DATE_FORMAT} from '../../plugins/utils/date-utils';
 import template from './datepicker-component.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'datepicker-component',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     format: '',
     helptext: '',
     label: '',

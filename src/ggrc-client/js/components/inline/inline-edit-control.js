@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './readonly-inline-content';
 import '../form/fields/checkbox-form-field';
 import '../form/fields/multiselect-form-field';
@@ -15,11 +18,11 @@ import '../form/fields/numberbox-form-field';
 import {isInnerClick, getPlainText} from '../../plugins/ggrc_utils';
 import template from './inline-edit-control.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'inline-edit-control',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isValid: {
         get() {

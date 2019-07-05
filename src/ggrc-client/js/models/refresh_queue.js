@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canModel from 'can-model';
+import canConstruct from 'can-construct';
 import {reify} from '../plugins/utils/reify-utils';
 import allModels from './all-models';
 
@@ -12,7 +14,7 @@ import allModels from './all-models';
  *  trigger() -> Deferred
  */
 
-const ModelRefreshQueue = can.Construct.extend({}, {
+const ModelRefreshQueue = canConstruct.extend({}, {
   init: function (model) {
     this.model = model;
     this.ids = [];
@@ -66,7 +68,7 @@ const ModelRefreshQueue = can.Construct.extend({}, {
   },
 });
 
-const RefreshQueueManager = can.Construct.extend({}, {
+const RefreshQueueManager = canConstruct.extend({}, {
   init: function () {
     this.null_queue = new ModelRefreshQueue(null);
     this.queues = [];
@@ -86,7 +88,7 @@ const RefreshQueueManager = can.Construct.extend({}, {
     let id = obj.id;
 
     if (!obj.selfLink) {
-      if (obj instanceof can.Model) {
+      if (obj instanceof canModel) {
         modelName = obj.constructor.model_singular;
       } else if (obj.type) {
         // FIXME: obj.kind is to catch invalid stubs coming from Directives
@@ -131,7 +133,7 @@ const RefreshQueueManager = can.Construct.extend({}, {
   },
 });
 
-const RefreshQueue = can.Construct.extend({
+const RefreshQueue = canConstruct.extend({
   refresh_queue_manager: new RefreshQueueManager(),
   refresh_all: function (instance, props, force) {
     let dfd = new $.Deferred();

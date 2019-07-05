@@ -26,6 +26,7 @@ CONTACTS = "contacts"
 QUERY = "query"
 ACCESS_CONTROL_ROLES = "access_control_roles"
 REVIEWS = "reviews"
+NOTIFICATIONS = "_notifications"
 
 
 class Widget(object):

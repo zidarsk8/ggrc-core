@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
 import Component from '../object-bulk-update';
 import * as stateUtils from '../../../plugins/utils/state-utils';
 import tracker from '../../../tracker';
@@ -23,7 +25,7 @@ describe('object-bulk-update component', function () {
     let result;
 
     beforeEach(function () {
-      parentViewModel = new can.Map();
+      parentViewModel = new canMap();
       method = Component.prototype.viewModel;
       mappingType = {
         type: 'the same type',
@@ -43,7 +45,7 @@ describe('object-bulk-update component', function () {
     });
 
     it('returns correct target states', function () {
-      let actual = can.makeArray(result.targetStates);
+      let actual = makeArray(result.targetStates);
       expect(actual).toEqual(targetStates);
     });
 
@@ -112,7 +114,7 @@ describe('object-bulk-update component', function () {
 
     beforeEach(function () {
       context = {
-        viewModel: new can.Map(),
+        viewModel: new canMap(),
       };
       event = events['.btn-update click'].bind(context);
 
@@ -140,7 +142,7 @@ describe('object-bulk-update component', function () {
 
     beforeEach(function () {
       context = {
-        viewModel: new can.Map({
+        viewModel: new canMap({
           onSubmit: jasmine.createSpy(),
         }),
       };

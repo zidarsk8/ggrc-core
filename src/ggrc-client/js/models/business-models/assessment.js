@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax, ggrcGet} from '../../plugins/ajax_extensions';
 import Cacheable from '../cacheable';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
@@ -152,7 +153,7 @@ export default Cacheable.extend({
   conclusions: ['Effective', 'Ineffective', 'Needs improvement',
     'Not Applicable'],
   editModeStatuses: ['In Progress', 'Rework Needed', 'Not Started'],
-  readModeStatuses: ['Completed', 'Verified', 'In Review'],
+  doneStatuses: ['Completed', 'Verified', 'In Review'],
   prepareAttributes: function (attrs) {
     return attrs[this.root_object] ? attrs[this.root_object] : attrs;
   },
@@ -246,7 +247,7 @@ export default Cacheable.extend({
     }
     this.bind('refreshInstance', this.refresh.bind(this));
     this.bind(REFRESH_MAPPING.type, () => {
-      if (this.constructor.readModeStatuses.includes(this.status)) {
+      if (this.constructor.doneStatuses.includes(this.status)) {
         this.refresh();
       }
     });
@@ -347,7 +348,7 @@ export default Cacheable.extend({
         dfd: $.Deferred(),
         fn: _.throttle(() => {
           let dfd = this._pending_refresh.dfd;
-          can.ajax({
+          ggrcAjax({
             url: href,
             type: 'get',
             dataType: 'json',
@@ -382,7 +383,7 @@ export default Cacheable.extend({
       tracker.USER_JOURNEY_KEYS.API,
       tracker.USER_ACTIONS.ASSESSMENT.RELATED_OBJECTS);
 
-    return $.get(`/api/assessments/${this.attr('id')}/related_objects`)
+    return ggrcGet(`/api/assessments/${this.attr('id')}/related_objects`)
       .then((response) => {
         let auditTitle = response.Audit.title;
 

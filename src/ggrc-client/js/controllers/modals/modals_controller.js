@@ -3,6 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import canModel from 'can-model';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access-control-list/access-control-list-roles-helper';
@@ -61,7 +67,7 @@ import {getInstance} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     preload_view: GGRC.templates_path + '/dashboard/modal_preload.stache',
     header_view: GGRC.templates_path + '/modals/modal_header.stache',
@@ -88,16 +94,16 @@ export default can.Control.extend({
   init: function () {
     let userFetch;
 
-    if (!(this.options instanceof can.Map)) {
-      this.options = new can.Map(this.options);
+    if (!(this.options instanceof canMap)) {
+      this.options = new canMap(this.options);
     }
 
     if (!this.element.find('.modal-body').length) {
-      $.ajax({
+      ggrcAjax({
         url: this.options.preload_view,
         dataType: 'text',
       }).then((view) => {
-        let frag = can.stache(view)();
+        let frag = canStache(view)();
         this.after_preload(frag);
       });
       return;
@@ -210,13 +216,13 @@ export default can.Control.extend({
     name.pop(); // set the owner to null, not the email
 
     if (!instance._transient) {
-      instance.attr('_transient', new can.Map({}));
+      instance.attr('_transient', new canMap({}));
     }
 
     _.reduce(name.slice(0, -1), function (current, next) {
       current = current + '.' + next;
       if (!instance.attr(current)) {
-        instance.attr(current, new can.Map({}));
+        instance.attr(current, new canMap({}));
       }
       return current;
     }, '_transient');
@@ -270,7 +276,7 @@ export default can.Control.extend({
         this.init_audit_title();
       }
       if (!instance._transient) {
-        instance.attr('_transient', can.Map());
+        instance.attr('_transient', canMap());
       }
       instance.attr('_transient.' + path, ui.item);
     }
@@ -282,10 +288,10 @@ export default can.Control.extend({
     }) : $.when(this.options);
 
     return $.when(
-      $.ajax({url: this.options.content_view, dataType: 'text'}),
-      $.ajax({url: this.options.header_view, dataType: 'text'}),
-      $.ajax({url: this.options.button_view, dataType: 'text'}),
-      $.ajax({url: this.options.custom_attributes_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.content_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.header_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.button_view, dataType: 'text'}),
+      ggrcAjax({url: this.options.custom_attributes_view, dataType: 'text'}),
       dfd,
     ).then((content, header, footer, customAttributes, context) => {
       this.draw(content, header, footer, customAttributes, context);
@@ -319,23 +325,9 @@ export default can.Control.extend({
         )).then(function () {
           instance = this.options.attr('instance');
         }.bind(this));
-      } else {
-        dfd = this.options.model.findAll(params).then(function (data) {
-          if (data.length) {
-            that.options.attr('instance', data[0]);
-            return data[0].refresh(); // have to refresh (get ETag) to be editable.
-          }
-          that.options.attr('new_object_form', true);
-          that.options.attr('instance', new that.options.model(params));
-          return instance;
-        }).done(function () {
-          if (!that.wasDestroyed()) {
-            that.on(); // listen to instance.
-          }
-        });
       }
     } else {
-      this.options.attr('instance', new can.Map(params));
+      this.options.attr('instance', new canMap(params));
       that.on();
       dfd = new $.Deferred().resolve(instance);
     }
@@ -371,7 +363,7 @@ export default can.Control.extend({
       this.element.trigger('loaded');
     }
     if (!instance._transient) {
-      instance.attr('_transient', new can.Map({}));
+      instance.attr('_transient', new canMap({}));
     }
     if (instance.form_preload) {
       preloadDfd = instance.form_preload(
@@ -406,32 +398,32 @@ export default can.Control.extend({
     let isObjectModal = modalTitle && (modalTitle.indexOf('Edit') === 0 ||
       modalTitle.indexOf('New') === 0);
 
-    if (can.isArray(content)) {
+    if (Array.isArray(content)) {
       content = content[0];
     }
-    if (can.isArray(header)) {
+    if (Array.isArray(header)) {
       header = header[0];
     }
-    if (can.isArray(footer)) {
+    if (Array.isArray(footer)) {
       footer = footer[0];
     }
-    if (can.isArray(customAttributes)) {
+    if (Array.isArray(customAttributes)) {
       customAttributes = customAttributes[0];
     }
     if (header !== null) {
-      header = can.stache(header)(context);
+      header = canStache(header)(context);
       $(this.options.headerEl).find('h2').html(header);
     }
     if (content !== null) {
-      content = can.stache(content)(context);
+      content = canStache(content)(context);
       $(this.options.contentEl).html(content).removeAttr('style');
     }
     if (footer !== null) {
-      footer = can.stache(footer)(context);
+      footer = canStache(footer)(context);
       $(this.options.footerEl).html(footer);
     }
     if (customAttributes !== null && (isObjectModal || isProposal)) {
-      customAttributes = can.stache(customAttributes)(context);
+      customAttributes = canStache(customAttributes)(context);
       $(this.options.contentEl).append(customAttributes);
     }
 
@@ -577,9 +569,9 @@ export default can.Control.extend({
     }
 
     if (name.length > 1) {
-      if (can.isArray(value)) {
-        value = new can.List(_.filteredMap(value,
-          (v) => new can.Map({}).attr(name.slice(1).join('.'), v)));
+      if (Array.isArray(value)) {
+        value = new canList(_.filteredMap(value,
+          (v) => new canMap({}).attr(name.slice(1).join('.'), v)));
       } else if ($elem.is('[data-lookup]')) {
         if (!value) {
           value = null;
@@ -588,7 +580,7 @@ export default can.Control.extend({
           return;
         }
       } else {
-        value = new can.Map({}).attr(name.slice(1).join('.'), value);
+        value = new canMap({}).attr(name.slice(1).join('.'), value);
       }
     }
 
@@ -1045,7 +1037,7 @@ export default can.Control.extend({
       ev.preventDefault();
       return false;
     }
-    if (instance instanceof can.Model &&
+    if (instance instanceof canModel &&
       // Ensure that this modal was hidden and not a child modal
       this.element && ev.target === this.element[0] &&
       !this.options.skip_refresh && !instance.isNew()) {

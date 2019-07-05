@@ -3,15 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './questionnaire-create-link.stache';
 import {
   getCreateObjectUrl,
 } from '../../plugins/utils/ggrcq-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'questionnaire-create-link',
-  view: can.stache(template),
-  viewModel: can.Map.extend({
+  view: canStache(template),
+  viewModel: canMap.extend({
     define: {
       externalUrl: {
         get() {

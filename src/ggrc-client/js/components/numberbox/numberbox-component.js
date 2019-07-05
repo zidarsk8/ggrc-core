@@ -3,17 +3,20 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/numberbox-component.stache';
 
 const FLOAT_NUMBER_PATTERN = '([0-9]+([.][0-9]+){0,1})';
 const INT_NUMBER_PATTERN = '([0-9]+)';
 const NEGATIVE_NUMBER_PATTERN = '([-]{0,1})';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'numberbox-component',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     value: '',
     enableFloat: false,
     enableNegative: false,

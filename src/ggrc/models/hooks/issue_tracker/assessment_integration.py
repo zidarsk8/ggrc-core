@@ -152,9 +152,10 @@ class AssessmentTrackerHandler(object):
     """
     del create_issuetracker  # Unused
 
-    integration_utils.set_values_for_missed_fields(
+    integration_utils.populate_issue_tracker_fields(
         assessment,
-        issue_tracker_info
+        issue_tracker_info,
+        create_mode=True,
     )
     issue_info = cls._update_with_assmt_data_for_ticket_create(
         assessment,
@@ -180,7 +181,7 @@ class AssessmentTrackerHandler(object):
     if not issue_tracker_info:
       issue_tracker_info = assessment.issue_tracker
 
-    integration_utils.set_values_for_missed_fields(
+    integration_utils.populate_issue_tracker_fields(
         assessment,
         issue_tracker_info
     )
@@ -286,10 +287,11 @@ class AssessmentTrackerHandler(object):
         assessment_src: dictionary with issue information
     """
 
-    if assessment.is_import:
+    if assessment.is_import or not self._is_tracker_enabled(assessment.audit):
       return
 
-    if not self._is_issue_on_create_enabled(assessment, assessment_src):
+    if not self._is_issue_on_create_enabled(assessment_src):
+      self._create_disabled_record(assessment, assessment_src)
       return
 
     issue_id = assessment_src.get("issue_tracker", {}).get("issue_id")
@@ -314,6 +316,24 @@ class AssessmentTrackerHandler(object):
           assessment,
           issue_info
       )
+
+  @staticmethod
+  def _create_disabled_record(assessment, assessment_src):
+    """Create IssueTrackerIssue model for assessment with values from Audit.
+
+    Args:
+      assessment (Assessment): Assessment instance
+      assessment_src (dict): dictionary with issue information
+    """
+    integration_utils.populate_issue_tracker_fields(
+        assessment,
+        assessment_src,
+        with_update=True,
+    )
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        assessment,
+        assessment_src,
+    )
 
   def handle_assessment_delete(self, assessment):
     """Handle assessment issue delete.
@@ -1474,9 +1494,7 @@ class AssessmentTrackerHandler(object):
         "reporter": issue_info["reporter"],
         "assignee": issue_info["assignee"],
         "verifier": issue_info["assignee"],
-        "status": constants.STATUSES_MAPPING.get(
-            assessment.status
-        ),
+        "status": constants.CREATE_STATUSES_MAPPING.get(assessment.status),
         "ccs": issue_info["cc_list"],
         "comment": cls._get_create_comment(assessment)
     }
@@ -2303,20 +2321,15 @@ class AssessmentTrackerHandler(object):
         "enabled", False
     )
 
-  def _is_issue_on_create_enabled(self, assessment, assessment_src):
+  def _is_issue_on_create_enabled(self, assessment_src):
     """Check that issue tracker on create enabled.
 
     Args:
-      assessment: assessment instance
       assessment_src: dictionary with issue information
 
     Returns:
       Boolean indicator that issue enabled
     """
-
-    # Ensure that Issue Tracker in Audit is enabled
-    if not self._is_tracker_enabled(assessment.audit):
-      return False
 
     # Get enable flag from API request if available
     issue_tracker_info = assessment_src.get(

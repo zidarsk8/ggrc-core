@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../proposal/review-proposal';
 import '../../proposal/apply-decline-proposal';
 import '../../diff/instance-fields-diff';
@@ -15,11 +18,11 @@ import {getPersonInfo} from '../../../plugins/utils/user-utils';
 import {getFormattedLocalDate} from '../../../plugins/utils/date-utils';
 import {reify, isReifiable} from '../../../plugins/utils/reify-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-proposals-item',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       proposal: {
         value: {},

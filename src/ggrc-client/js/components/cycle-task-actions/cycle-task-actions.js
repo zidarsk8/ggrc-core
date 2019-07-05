@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import tracker from '../../tracker';
 import '../spinner-component/spinner-component';
 import {
@@ -14,7 +17,7 @@ import Permission from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     cycle: {
       get: function () {
@@ -110,9 +113,9 @@ let viewModel = can.Map.extend({
 /**
  *
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'cycle-task-actions',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

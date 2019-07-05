@@ -9,12 +9,12 @@ class Reviewable(object):
 
   def update_review(self, new_review):
     """Update obj review dict and status with new values."""
-    upd_review = new_review.convert_review_to_dict()
-    self.review["status"] = upd_review["status"]
-    if upd_review["last_reviewed_by"]:
-      self.review["last_reviewed_by"] = upd_review["last_reviewed_by"]
-    self._upd_reviewers(upd_review["reviewers"])
-    self.update_attrs(review_status=upd_review["status"])
+    new_review = new_review.convert_review_to_dict()
+    self.review["status"] = new_review["status"]
+    if new_review["last_reviewed_by"]:
+      self.review["last_reviewed_by"] = new_review["last_reviewed_by"]
+    self._upd_reviewers(new_review["reviewers"])
+    self.update_attrs(review_status=new_review["status"])
 
   def _upd_reviewers(self, new_reviewers):
     """Update object review `reviewers` with new values if needed."""

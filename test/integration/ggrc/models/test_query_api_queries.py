@@ -34,7 +34,7 @@ class TestAllModels(WithQueryApi, TestCase):
       'Control': 14,
       'Cycle': 7,
       'CycleTaskGroup': 8,
-      'CycleTaskGroupObjectTask': 13,
+      'CycleTaskGroupObjectTask': 14,
       'Document': 7,
       'Issue': 14,
       'KeyReport': 12,
@@ -123,3 +123,24 @@ class TestAllModels(WithQueryApi, TestCase):
               obj_count=obj_count,
           )
       )
+
+  def test_soring_objects(self):
+    """Test sorting in pagination module"""
+    with ggrc_factories.single_commit():
+      audit = ggrc_factories.AuditFactory()
+      for _ in xrange(10):
+        ggrc_factories.AssessmentFactory(audit=audit)
+    response = self._post([{
+        "object_name": "Assessment",
+        "filters": {"expression": {}},
+        "limit": [0, 10],
+        "order_by": [{"name": "created_at", "desc": True}]
+    }])
+    values = response.json[0]["Assessment"]["values"]
+    for index in xrange(0, len(values) - 1):
+      self.assertGreaterEqual(values[index]["created_at"],
+                              values[index + 1]["created_at"])
+      # sorted by id if equal created_at values
+      if values[index]["created_at"] == values[index + 1]["created_at"]:
+        self.assertGreater(values[index]["id"],
+                           values[index + 1]["id"])

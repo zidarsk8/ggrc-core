@@ -3,15 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/relevant-filter.stache';
 import * as businessModels from '../../models/business-models';
 import TreeViewConfig from '../../apps/base_widgets';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'relevant-filter',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     relevant_menu_item: '',
     operators: [{title: 'AND', value: 'AND'}, {title: 'OR', value: 'OR'}],
     addFilter: function () {
@@ -28,7 +32,7 @@ export default can.Component.extend({
 
       this.attr('relevant').push({
         value: false,
-        filter: new can.Map(),
+        filter: new canMap(),
         textValue: '',
         menu: menu,
         model_name: menu[0].model_singular,
@@ -38,7 +42,7 @@ export default can.Component.extend({
     menu() {
       const workflowRelatedTypes = ['Cycle', 'CycleTaskGroup',
         'CycleTaskGroupObjectTask', 'TaskGroup', 'Workflow'];
-      const baseWidgetsTypes = can.Map.keys(
+      const baseWidgetsTypes = canMap.keys(
         TreeViewConfig.attr('base_widgets_by_type')
       );
 
@@ -51,7 +55,7 @@ export default can.Component.extend({
     },
     optionHidden: function (option) {
       let type = option.model_singular;
-      return can.makeArray(this.attr('relevantTo'))
+      return makeArray(this.attr('relevantTo'))
         .some(function (item) {
           return item.readOnly && item.type === type;
         });
@@ -103,7 +107,7 @@ export default can.Component.extend({
       if (!/model_name/gi.test(which)) {
         return;
       }
-      item.target.attr('filter', new can.Map());
+      item.target.attr('filter', new canMap());
       item.target.attr('value', false);
     },
   },

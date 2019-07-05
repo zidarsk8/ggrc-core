@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax, ggrcGet} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import '../components/add-object-button/add-object-button';
 import '../components/assessment/assessment-generator-button';
 import {
@@ -18,7 +22,7 @@ import {loadScript} from '../plugins/ggrc_utils';
 import Relationship from '../models/service-models/relationship';
 import Assessment from '../models/business-models/assessment';
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     Assessment,
     Relationship,
@@ -59,7 +63,7 @@ export default can.Control.extend({
       .on('widget_shown', this.widget_shown.bind(this));
     this.element.closest('.widget')
       .on('widget_hidden', this.widget_hidden.bind(this));
-    this.options.context = new can.Map({
+    this.options.context = new canMap({
       model: this.options.model,
       instance: this.options.instance,
       error_msg: '',
@@ -71,11 +75,11 @@ export default can.Control.extend({
       },
     });
 
-    $.ajax({
+    ggrcAjax({
       url: this.get_widget_view(this.element),
       dataType: 'text',
     }).then((view) => {
-      let frag = can.stache(view)(this.options.context);
+      let frag = canStache(view)(this.options.context);
       this.element.html(frag);
       this.widget_shown();
     });
@@ -314,7 +318,7 @@ export default can.Control.extend({
    * N, L - total count of assessments, evidence accordingly in this audit.
    */
   getStatuses: function (auditId) {
-    return $.get('/api/audits/'+ auditId + '/summary');
+    return ggrcGet('/api/audits/'+ auditId + '/summary');
   },
   loadChartLibrary: function (callback) {
     if (typeof google !== 'undefined' &&

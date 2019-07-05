@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../related-comments/related-comments';
 import '../custom-attributes/custom-attributes-field-view';
 import '../object-list-item/comment-list-item';
@@ -16,11 +19,11 @@ import template from './related-assessment-popover.stache';
 /**
  * Simple wrapper component to load Related to Parent Object Snapshots of Controls and Objectives
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-assessment-popover',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     selectedAssessment: {},
     popoverTitleInfo: 'Assessment Title: ',
     define: {

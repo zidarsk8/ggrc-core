@@ -3,14 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 const ALL_SAVED_TEXT = 'All changes saved';
 const UNSAVED_TEXT = 'Unsaved changes';
 const IS_SAVING_TEXT = 'Saving...';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'custom-attributes-status',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isDirty: {
         type: 'boolean',

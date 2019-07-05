@@ -458,7 +458,8 @@ class TestSyncServiceControl(TestCase):
     expected_comments = db.session.query(
         all_models.ExternalComment.description
     ).order_by(
-        getattr(all_models.ExternalComment, order_by_attr).desc()
+        getattr(all_models.ExternalComment, order_by_attr).desc(),
+        all_models.ExternalComment.id.desc()
     )
     self.assertEqual(comments, [i[0] for i in expected_comments])
 

@@ -3,9 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canCompute from 'can-compute';
+import canList from 'can-list';
+import canMap from 'can-map';
 const MAX_COLUMNS_COUNT = 1000;
 
-export default can.Map.extend({
+export default canMap.extend({
   define: {
     isValidConfiguration: {
       get() {
@@ -28,12 +31,12 @@ export default can.Map.extend({
   type: 'Program',
   filter: '',
   maxAttributesCount: MAX_COLUMNS_COUNT,
-  relevant: can.compute(() => {
-    return new can.List();
+  relevant: canCompute(() => {
+    return new canList();
   }),
-  attributes: new can.List(),
-  localAttributes: new can.List(),
-  mappings: new can.List(),
+  attributes: new canList(),
+  localAttributes: new canList(),
+  mappings: new canList(),
   init() {
     this.setAttributes();
   },

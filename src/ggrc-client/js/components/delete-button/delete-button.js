@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   confirm,
   BUTTON_VIEW_CLOSE,
@@ -11,16 +15,17 @@ import {
 import {handleAjaxError} from '../../plugins/utils/errors-utils';
 import {Snapshot} from '../../models/service-models';
 import {isSnapshotType} from '../../plugins/utils/snapshot-utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'delete-button',
-  view: can.stache('<span><i class="fa fa-trash"/>Delete</span>'),
+  view: canStache('<span><i class="fa fa-trash"/>Delete</span>'),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       instance: {
         set(instance) {
-          if (!(instance instanceof can.Model) && isSnapshotType(instance)) {
+          if (!(instance instanceof canModel) && isSnapshotType(instance)) {
             instance = new Snapshot(instance);
           }
           return instance;
@@ -76,25 +81,26 @@ export default can.Component.extend({
       });
     },
     fetchRelatedObjects() {
-      return $.get(`/api/snapshots/${this.attr('instance.id')}/related_objects`)
-        .then((rawData) => {
-          const {
-            relatedToOriginal,
-            relatedToSnapshot,
-          } = this.composeData(rawData);
+      return ggrcGet(
+        `/api/snapshots/${this.attr('instance.id')}/related_objects`
+      ).then((rawData) => {
+        const {
+          relatedToOriginal,
+          relatedToSnapshot,
+        } = this.composeData(rawData);
 
-          const originalObject = this.attr('instance.revision.content');
+        const originalObject = this.attr('instance.revision.content');
 
-          confirm({
-            modal_title: 'Warning',
-            originalObject,
-            relatedToOriginal,
-            relatedToSnapshot,
-            content_view:
-              `${GGRC.templates_path}/modals/snapshot-related-objects.stache`,
-            button_view: BUTTON_VIEW_CLOSE,
-          });
+        confirm({
+          modal_title: 'Warning',
+          originalObject,
+          relatedToOriginal,
+          relatedToSnapshot,
+          content_view:
+            `${GGRC.templates_path}/modals/snapshot-related-objects.stache`,
+          button_view: BUTTON_VIEW_CLOSE,
         });
+      });
     },
     composeData(rawData) {
       let issues = rawData.Issue ? rawData.Issue : [];

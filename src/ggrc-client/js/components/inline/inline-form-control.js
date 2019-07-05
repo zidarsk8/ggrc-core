@@ -3,12 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'inline-form-control',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     deferredSave: null,
     instance: null,
 

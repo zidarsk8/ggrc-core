@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 import '../change-request-link/change-request-link';
 import {
@@ -19,11 +22,11 @@ import {
 import Permission from '../../permission';
 import template from './templates/tree-actions.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-actions',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       addItem: {
         type: String,

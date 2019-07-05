@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 const textMap = {
   input: 'This field is required.',
   checkbox: 'This checkbox is required.',
@@ -12,11 +15,11 @@ const textMap = {
 /**
  * Form validation text component
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'form-validation-text',
-  view: can.stache('<p class="required">{{text}}</p>'),
+  view: canStache('<p class="required">{{text}}</p>'),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       text: {
         type: String,

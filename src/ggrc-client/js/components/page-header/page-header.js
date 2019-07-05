@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
 import '../tooltip-content/tooltip-content';
@@ -55,7 +58,7 @@ let colorsMap = {
   Vendor: 'header-style-1',
 };
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     showTitles: {
       type: Boolean,
@@ -163,9 +166,9 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'page-header',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

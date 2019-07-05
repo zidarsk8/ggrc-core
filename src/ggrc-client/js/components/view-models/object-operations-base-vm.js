@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canBatch from 'can-event/batch/batch';
+import canMap from 'can-map';
 import {
   getMappingList,
 } from '../../models/mappers/mappings';
@@ -28,7 +30,7 @@ import * as businessModels from '../../models/business-models';
  *  @property {Object} config - Has fields with special values for viewModel.
  */
 
-const ObjectOperationsBaseVM = can.Map.extend({
+const ObjectOperationsBaseVM = canMap.extend({
   /**
    * Extract certain config for passed type from config.
    * If there is special config for type then return it else return
@@ -164,7 +166,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
    * @param {Object} config - Plain object with values for updating
    */
   update: function (config) {
-    can.batch.start();
+    canBatch.start();
 
     // do not update fields with the same values in VM and config
     _.forEach(config, (value, key) => {
@@ -180,7 +182,7 @@ const ObjectOperationsBaseVM = can.Map.extend({
       }
     });
 
-    can.batch.stop();
+    canBatch.stop();
   },
 });
 

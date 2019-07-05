@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../info-pin-buttons/info-pin-buttons';
 import '../task-group-clone';
 import '../task-list/task-list';
@@ -10,7 +13,7 @@ import '../task-group-objects/task-group-objects';
 import template from './templates/task-group.stache';
 import Permission from '../../../permission';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     canEdit: {
       get() {
@@ -35,9 +38,9 @@ const init = function () {
   this.viewModel.loadWorkflow();
 };
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'task-group',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   init,

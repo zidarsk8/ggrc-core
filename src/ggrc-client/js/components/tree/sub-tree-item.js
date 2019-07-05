@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canComponent from 'can-component';
 import BaseTreeItemVM from './tree-item-base-vm';
 import './tree-item-extra-info';
 import template from './templates/sub-tree-item.stache';
@@ -72,9 +74,9 @@ let viewModel = BaseTreeItemVM.extend({
   extraCss: '',
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'sub-tree-item',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

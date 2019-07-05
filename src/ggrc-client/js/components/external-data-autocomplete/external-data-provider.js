@@ -3,15 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {notifier} from '../../plugins/utils/notifiers-utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
 /**
  * The component is used to load data for autocomplete component from external sources.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'external-data-provider',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     /**
      * The search that should be used in request.
      * @type {String}
@@ -58,7 +61,7 @@ export default can.Component.extend({
 
       this.attr('loading', true);
 
-      this.attr('request', $.get({
+      this.attr('request', ggrcGet({
         url: GGRC.config.external_services[type],
         data: {
           prefix: searchCriteria,

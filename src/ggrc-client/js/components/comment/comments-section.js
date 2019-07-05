@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {isChangeableExternally} from '../../plugins/utils/ggrcq-utils';
 import template from './comments-section.stache';
 import './comment-data-provider';
@@ -11,11 +14,11 @@ import './mapped-comments';
 import './comments-paging';
 import Permission from '../../permission';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'comments-section',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       notification: {
         value: 'Send Notifications',

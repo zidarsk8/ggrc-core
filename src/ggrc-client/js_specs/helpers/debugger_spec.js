@@ -3,7 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('can.stache.helper.debugger', () => {
+import canStache from 'can-stache';
+describe('canStache.helper.debugger', () => {
   let fakeOptions;
   let helper;
 
@@ -12,7 +13,7 @@ describe('can.stache.helper.debugger', () => {
       fn: jasmine.createSpy(),
     };
 
-    helper = can.stache.getHelper('debugger').fn;
+    helper = canStache.getHelper('debugger').fn;
   });
 
   it('does not throw an error when called with more than one argument', () => {

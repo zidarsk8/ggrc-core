@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './mandatory-fields-modal';
 import {
   buildModifiedACL,
@@ -10,11 +13,11 @@ import {
 } from '../../plugins/utils/object-history-utils';
 import template from './templates/restore-revision.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'restore-revision',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: {},
     restoredRevision: {},
     loading: false,
@@ -39,20 +42,12 @@ export default can.Component.extend({
       // use legacy approach to save custom attribute
       this.applyCustomAttributes(instance, attrValues);
 
-      if (this.isInstanceValid(instance)) {
+      if (instance.validateGCAs()) {
         this.saveInstance(element);
       } else {
         // fill in mandatory fields
         this.attr('modalState.open', true);
       }
-    },
-    isInstanceValid(instance) {
-      let gcas = instance.customAttr().each((caObject) => caObject.validate());
-      let gcaValid = _.find(gcas, (caObject) =>
-        caObject.validationState.hasGCAErrors
-      ) === undefined;
-
-      return gcaValid;
     },
     saveInstance(element) {
       this.attr('instance').save().then(() => {
@@ -63,7 +58,7 @@ export default can.Component.extend({
       });
     },
     applyFields(instance, modifiedFields) {
-      const fieldNames = can.Map.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
 
       fieldNames.forEach((fieldName) => {
         const modifiedField = modifiedFields[fieldName];
@@ -75,7 +70,7 @@ export default can.Component.extend({
       instance.attr('access_control_list', modifiedACL);
     },
     applyListFields(instance, modifiedFields) {
-      const fieldNames = can.Map.keys(modifiedFields);
+      const fieldNames = canMap.keys(modifiedFields);
       fieldNames.forEach((fieldName) => {
         const items = instance.attr(fieldName);
         const modifiedItems = modifiedFields.attr(fieldName);

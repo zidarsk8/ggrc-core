@@ -3,13 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
 import template from './test-template.stache';
 import '../modal-form';
 
 describe('Flash message', function () {
   it('should trigger ajax:flash with extra data', function () {
     let triggerData = {
-      error: can.stache(template),
+      error: canStache(template),
       data: {
         errors: [
           {

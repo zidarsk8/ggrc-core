@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../custom-roles/custom-roles-modal';
 import {
   getRolesForType,
@@ -10,11 +13,11 @@ import {
 } from '../../plugins/utils/acl-utils';
 import template from './access-control-list-roles-helper.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'access-control-list-roles-helper',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: {},
     isNewInstance: false,
     isProposal: false,

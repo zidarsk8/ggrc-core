@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import Component from '../mapper-results-columns-configuration';
@@ -89,12 +91,12 @@ describe('mapper-results-columns-configuration component', function () {
     let availableColumns;
 
     beforeAll(function () {
-      selectedColumns = new can.makeArray([
-        new can.Map({attr_name: 'title'}),
+      selectedColumns = new makeArray([
+        new canMap({attr_name: 'title'}),
       ]);
-      availableColumns = new can.makeArray([
-        new can.Map({attr_name: 'title'}),
-        new can.Map({attr_name: 'date'}),
+      availableColumns = new makeArray([
+        new canMap({attr_name: 'title'}),
+        new canMap({attr_name: 'date'}),
       ]);
     });
 

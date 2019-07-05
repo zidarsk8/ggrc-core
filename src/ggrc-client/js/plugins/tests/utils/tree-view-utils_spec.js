@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
 import * as ImportExportUtils from '../../../plugins/utils/import-export-utils';
@@ -188,7 +189,7 @@ describe('TreeViewUtils module', function () {
       };
       pageInfo = {};
       filter = {testFilter: true};
-      request = new can.List();
+      request = new canList();
       transformToSnapshot = false;
       operation = 'owned';
       source = {type: 'Program'};
@@ -252,7 +253,7 @@ describe('TreeViewUtils module', function () {
         id: 'testParentId',
       };
       filter = {testFilter: true};
-      request = new can.List();
+      request = new canList();
       transformToSnapshot = '';
       operation = 'owned';
     });
@@ -270,7 +271,7 @@ describe('TreeViewUtils module', function () {
     });
 
     it('runs export correctly', () => {
-      request = new can.List(['testRequest1']);
+      request = new canList(['testRequest1']);
       ImportExportUtils.fileSafeCurrentDate
         .and.returnValue('testFileSafeCurrentDate');
       QueryApiUtils.buildParam

@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canMap from 'can-map';
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
@@ -38,7 +40,7 @@ describe('ACL utils peopleWithRoleName() method', () => {
       {person: {id: 9}, ac_role_id: 9},
     ];
 
-    instance = new can.Map({
+    instance = new canMap({
       id: 42,
       type: 'Audit',
       'class': {model_singular: 'Audit'},
@@ -48,14 +50,14 @@ describe('ACL utils peopleWithRoleName() method', () => {
 
   it('returns users that have a role granted on a particular instance', () => {
     const result = peopleWithRoleName(instance, 'Role B');
-    expect(can.makeArray(result.map((person) => person.id).sort()))
+    expect(makeArray(result.map((person) => person.id).sort()))
       .toEqual([2, 5]);
   }
   );
 
   it('returns empty array if role name not found', () => {
     const result = peopleWithRoleName(instance, 'Role X');
-    expect(can.makeArray(result)).toEqual([]);
+    expect(makeArray(result)).toEqual([]);
   });
 
   it('returns empty array if no users are granted a particular role', () => {
@@ -66,7 +68,7 @@ describe('ACL utils peopleWithRoleName() method', () => {
 
     result = peopleWithRoleName(instance, 'Role A');
 
-    expect(can.makeArray(result)).toEqual([]);
+    expect(makeArray(result)).toEqual([]);
   }
   );
 });

@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canBatch from 'can-event/batch/batch';
+import canMap from 'can-map';
 import StateValidator from '../state-validator-utils';
 import {
   CUSTOM_ATTRIBUTE_TYPE,
@@ -49,14 +51,14 @@ const controlRelationshipType = {
 export default class CustomAttributeObject {
   /**
    * Creates CustomAttributeObject instance.
-   * @param {can.Map} instance - An instance of some object.
-   * @param {can.Map} caDefinition - A custom attribute definition owned by instance.
-   * @param {can.Map=} caValue - A custom attribute value owned by instance.
+   * @param {canMap} instance - An instance of some object.
+   * @param {canMap} caDefinition - A custom attribute definition owned by instance.
+   * @param {canMap=} caValue - A custom attribute value owned by instance.
    */
   constructor(
     instance,
     caDefinition,
-    caValue = new can.Map()
+    caValue = new canMap()
   ) {
     this._instance = instance;
     this._caDefinition = caDefinition;
@@ -198,7 +200,7 @@ export default class CustomAttributeObject {
 
   /**
    * Returns the custom attribute validation state.
-   * @return {can.Map} - The custom attribute validation state.
+   * @return {canMap} - The custom attribute validation state.
    */
   get validationState() {
     return this._validationState;
@@ -208,12 +210,12 @@ export default class CustomAttributeObject {
    * Updates CAV object entirely through passed CAV
    * object. Use it only in situation, when you want to update
    * each property CAV object.
-   * @param {can.Map|Object} cav - Custom attribute value.
+   * @param {canMap|Object} cav - Custom attribute value.
    * @param {boolean} removeOtherFields - Remove other fields from the current
    * CAV object.
    */
   updateCaValue(cav, removeOtherFields) {
-    const caValue = new can.Map(cav);
+    const caValue = new canMap(cav);
     this._setupCaValue(caValue);
     this._caValue.attr(caValue.attr(), removeOtherFields);
   }
@@ -247,7 +249,7 @@ export default class CustomAttributeObject {
    * Above is specified the necessary MINIMUM for the back-end.
    *
    * @private
-   * @param {can.Map} caValue - The custom attriubte value object.
+   * @param {canMap} caValue - The custom attriubte value object.
    */
   _setupCaValue(caValue) {
     const caDefinition = this._caDefinition;
@@ -260,9 +262,9 @@ export default class CustomAttributeObject {
       context: instance.attr('context'),
       custom_attribute_id: caDefinition.attr('id'),
     };
-    const caValueKeys = can.Map.keys(caValue);
+    const caValueKeys = canMap.keys(caValue);
 
-    can.batch.start();
+    canBatch.start();
     // set for caValue requiered fields if they were missed
     _.forEach(requiredDefaultFields, (requiredValue, key) => {
       const hasMissedRequieredField = !caValueKeys.includes(key);
@@ -270,12 +272,12 @@ export default class CustomAttributeObject {
         caValue.attr(key, requiredValue);
       }
     });
-    can.batch.stop();
+    canBatch.stop();
   }
 
   /**
    * Initializes caValue property.
-   * @param {can.Map} caValue - Custom attribute value object.
+   * @param {canMap} caValue - Custom attribute value object.
    */
   _initCaValue(caValue) {
     this._setupCaValue(caValue);
@@ -343,6 +345,6 @@ export default class CustomAttributeObject {
      * after each validation, if this property is changed with help
      * attr method then template will update itself.
      */
-    this._validationState = new can.Map(validator.validationState);
+    this._validationState = new canMap(validator.validationState);
   }
 }

@@ -18,7 +18,6 @@
 
   "globals": {
     "_": false,
-    "can": false,
     "GGRC": false,
     "moment": false,
     "MutationObserver": false,
@@ -112,11 +111,17 @@
       "allow": ["warn", "error"]
     }],
     "no-restricted-properties": [2, {
-      "object": "can",
-      "property": "Deferred"
+      "object": "jQuery",
+      "property": "ajax"
     }, {
-      "object": "can",
-      "property": "when"
+        "object": "$",
+        "property": "ajax"
+    }, {
+      "object": "$",
+      "property": "get"
+    }, {
+      "object": "$",
+      "property": "post"
     }]
   }
 }

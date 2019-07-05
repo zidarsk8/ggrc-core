@@ -4,6 +4,7 @@
 """Module contains a workflow Cycle model
 """
 import itertools
+import urllib
 from urlparse import urljoin
 
 from sqlalchemy import orm, inspect
@@ -260,12 +261,15 @@ class Cycle(roleable.Roleable,
     )
 
   def _get_cycle_url(self, widget_name):
+    """Returns url for Cycle with filtering by slug"""
+    query = u'"cycle slug"="{slug}"'.format(slug=self.slug)
+    query = urllib.quote(query.encode('utf-8'))
     return urljoin(
         get_url_root(),
-        "workflows/{workflow_id}#{widget_name}/cycle/{cycle_id}".format(
+        u'workflows/{workflow_id}#{widget_name}&query={query}'.format(
             workflow_id=self.workflow.id,
-            cycle_id=self.id,
-            widget_name=widget_name
+            widget_name=widget_name,
+            query=query,
         )
     )
 

@@ -3,16 +3,18 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../inline/base-inline-control-title';
 import {confirm} from '../../../plugins/utils/modals';
 
 const EDITABLE_STATES = [
   'In Progress', 'Not Started', 'Rework Needed', 'Deprecated'];
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'confirm-edit-action',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: {},
     setInProgress: null,
     editMode: false,

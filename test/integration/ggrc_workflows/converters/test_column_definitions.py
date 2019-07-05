@@ -199,6 +199,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Send by default",
         "Comments",
         "Recipients",
+        "Last Comment"
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)

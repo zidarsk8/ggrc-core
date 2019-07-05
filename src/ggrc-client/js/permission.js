@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from './plugins/ajax_extensions';
+import canCompute from 'can-compute';
+import canConstruct from 'can-construct';
 import {getPageInstance} from './plugins/utils/current-page-utils';
 import Stub from '../js/models/stub';
 import {getInstance} from '../js/plugins/utils/models-utils';
@@ -52,9 +55,9 @@ let _CONDITIONS_MAP = {
     return !(instance.attr(args.property_name) === args.prevent_if);
   },
 };
-let permissionsCompute = can.compute(GGRC.permissions);
+let permissionsCompute = canCompute(GGRC.permissions);
 
-const Permission = can.Construct.extend({
+const Permission = canConstruct.extend({
   _admin_permission_for_context: function (contextId) {
     return new Permission(
       ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, contextId);
@@ -213,7 +216,7 @@ const Permission = can.Construct.extend({
   },
 
   refresh: function () {
-    return $.ajax({
+    return ggrcAjax({
       url: '/permissions',
       type: 'get',
       dataType: 'json',

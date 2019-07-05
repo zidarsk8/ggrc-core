@@ -14,7 +14,9 @@ import pytest
 
 from lib import base, users, factory
 from lib.constants import objects, element
-from lib.service import webui_facade, rest_facade, webui_service
+from lib.entities import entities_factory, entity
+from lib.service import (webui_facade, rest_facade, webui_service,
+                         emails_digest_service)
 
 
 class TestObjectsReview(base.Test):
@@ -138,3 +140,17 @@ class TestObjectsReview(base.Test):
         selenium, program_with_approved_review)
     actual_program = webui_facade.get_object(selenium, expected_program)
     self.general_equal_assert(expected_program.repr_ui(), actual_program)
+
+  @pytest.mark.smoke_tests
+  def test_review_request_notification(self, second_creator,
+                                       program_with_review, selenium):
+    """Confirm user gets email notification when assigned as reviewer
+    for an object."""
+    users.set_current_user(entities_factory.PeopleFactory.superuser)
+    expected_email = entity.ReviewEmailUI(
+        recipient_email=second_creator.email,
+        obj_type=program_with_review.type,
+        obj_title=program_with_review.title)
+    actual_emails = (emails_digest_service.ReviewDigestService().
+                     get_review_request_emails())
+    self.general_contain_assert(expected_email, actual_emails)

@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 import {
   buildChangeDescriptor,
   simpleFieldResolver,
@@ -102,7 +104,7 @@ describe('conflict resolvers', () => {
       baseAttrs = {};
       attrs = {};
       remoteAttrs = {};
-      container = new can.Map();
+      container = new canMap();
     });
 
     it('resolves server change', () => {
@@ -206,7 +208,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 2,
           attribute_value: '2-2',
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -232,7 +234,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_value: '2',
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -257,7 +259,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_value: '1',
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -282,7 +284,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_value: '2',
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -307,7 +309,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_value: '3',
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -342,7 +344,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 2,
           attribute_object: {id: 2},
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -368,7 +370,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_object: {id: 2},
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -393,7 +395,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_object: {id: 1},
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -418,7 +420,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_object: {id: 2},
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,
@@ -443,7 +445,7 @@ describe('conflict resolvers', () => {
           custom_attribute_id: 1,
           attribute_object: {id: 3},
         }];
-        container = new can.List(remoteValue);
+        container = new canList(remoteValue);
 
         let hasConflict = customAttributeResolver(
           previousValue,

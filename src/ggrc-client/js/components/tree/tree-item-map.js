@@ -3,10 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/tree-item-map.stache';
 import {trigger} from 'can-event';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     title: {
       type: String,
@@ -24,9 +27,9 @@ let viewModel = can.Map.extend({
   disableLink: false,
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-item-map',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

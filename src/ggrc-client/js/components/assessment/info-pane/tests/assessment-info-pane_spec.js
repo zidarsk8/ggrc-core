@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 import Component from '../assessment-info-pane';
 import {getComponentVM, makeFakeInstance} from '../../../../../js_specs/spec_helpers';
 import tracker from '../../../../tracker';
@@ -680,7 +682,7 @@ describe('assessment-info-pane component', () => {
   describe('removeItems() method', () => {
     const itemsType = 'comments';
 
-    let items = new can.List([...Array(3).keys()]).map((item, index) => {
+    let items = new canList([...Array(3).keys()]).map((item, index) => {
       return {
         id: index,
         type: itemsType,
@@ -734,7 +736,7 @@ describe('assessment-info-pane component', () => {
       const beforeInvoke = vm.attr(type).serialize();
       const expectedResult = event.items.concat(beforeInvoke);
 
-      event.items = new can.List(event.items);
+      event.items = new canList(event.items);
       vm.addItems(event, type);
 
       expect(vm
@@ -799,7 +801,7 @@ describe('assessment-info-pane component', () => {
       dfd = $.Deferred();
       type = 'type';
       event = {
-        item: new can.Map({
+        item: new canMap({
           id: 1,
           type: 'Type',
         }),
@@ -808,7 +810,7 @@ describe('assessment-info-pane component', () => {
         id: event.item.attr('id'),
         type: event.item.attr('type'),
       };
-      assessment = new can.Map({
+      assessment = new canMap({
         actions: [],
       });
 
@@ -976,7 +978,7 @@ describe('assessment-info-pane component', () => {
       const countOfItems = 3;
       dfd = $.Deferred();
       type = 'type';
-      items = new can.List(
+      items = new canList(
         Array(...Array(countOfItems).keys())
       ).map((item, index) => {
         return {
@@ -989,7 +991,7 @@ describe('assessment-info-pane component', () => {
         id: item.attr('id'),
         type: item.attr('type'),
       };
-      assessment = new can.Map({
+      assessment = new canMap({
         actions: [],
       });
       vm.attr(type, items);
@@ -1465,7 +1467,7 @@ describe('assessment-info-pane component', () => {
     });
 
     it('sets global custom attributes', function () {
-      const expectedResult = new can.List([]);
+      const expectedResult = new canList([]);
       const customAttr = vm.attr('instance').customAttr;
       customAttr.and.returnValue(expectedResult);
 
@@ -1597,15 +1599,20 @@ describe('assessment-info-pane component', () => {
       instanceSave = $.Deferred();
       method = vm.onStateChange.bind(vm);
       spyOn(tracker, 'start').and.returnValue(() => {});
-      vm.attr('instance', {
-        save() {
-          return instanceSave;
+      vm.attr('instance', makeFakeInstance({
+        model: businessModels.Assessment,
+        instanceProps: {
+          save() {
+            return instanceSave;
+          },
+          validateGCAs: jasmine.createSpy('validateGCAs'),
         },
-      });
+      })());
       vm.attr('deferredSave', new DeferredTransaction((resolve, reject) => {
         vm.attr('instance').save().done(resolve).fail(reject);
       }, 0, true));
       spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
+      spyOn(NotifiersUtils, 'notifier');
     });
 
     it('prevents state change to deprecated for archived instance', (done) => {
@@ -1631,6 +1638,17 @@ describe('assessment-info-pane component', () => {
         done();
       });
     });
+
+    it('prevents completing assessment when mandatory GCAs are not filled in',
+      () => {
+        let instance = vm.attr('instance');
+        instance.attr('status', 'In Progress');
+
+        method({state: 'In Review'});
+
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('error', jasmine.any(String));
+      });
 
     it('should set status from response', (done) => {
       const newStatus = 'new status';
@@ -1703,7 +1721,7 @@ describe('assessment-info-pane component', () => {
       });
 
       it('sets global custom attributes from passed event object', function () {
-        event.globalAttributes = new can.Map({
+        event.globalAttributes = new canMap({
           '123': 'Value',
           '2': 'Value2',
         });
@@ -1718,7 +1736,7 @@ describe('assessment-info-pane component', () => {
     let event;
 
     beforeEach(function () {
-      const field = new can.Map({
+      const field = new canMap({
         title: 'Perfect Title',
         type: 'Perfect Type',
         options: [],
@@ -1754,7 +1772,7 @@ describe('assessment-info-pane component', () => {
 
       it('"fields" field', function () {
         const errors = field.errorsMap;
-        const expectedResult = can.Map.keys(errors)
+        const expectedResult = canMap.keys(errors)
           .map((error) => errors[error] ? error : null)
           .filter((errorCode) => !!errorCode);
         vm.showRequiredInfoModal(event);
@@ -2061,7 +2079,7 @@ describe('assessment-info-pane component', () => {
     it('pushes callback into deferredSave which calls customAttr method',
       () => {
         event = {
-          globalAttributes: new can.Map({'1': true}),
+          globalAttributes: new canMap({'1': true}),
         };
 
         method(event);
@@ -2134,7 +2152,7 @@ describe('assessment-info-pane component', () => {
         {id: 3, value: 'text_val #3'},
       ];
 
-      let updatedFormFields = new can.List([
+      let updatedFormFields = new canList([
         {id: 1, value: 'text_val #1'},
         {id: 2, value: 'text_val #_2'},
         {id: 3, value: 'text_val #3'},
@@ -2160,7 +2178,7 @@ describe('assessment-info-pane component', () => {
         {id: 3, value: 'text_val #3'},
       ];
 
-      let updatedFormFields = new can.List([
+      let updatedFormFields = new canList([
         {id: 11, value: 'text_val #11'},
         {id: 2, value: 'text_val #_2'},
         {id: 33, value: 'text_val #33'},
@@ -2189,7 +2207,7 @@ describe('assessment-info-pane component', () => {
         {id: 3, value: 'text_val #3'},
       ];
 
-      let updatedFormFields = new can.List([
+      let updatedFormFields = new canList([
         {id: 1, value: 'text_val #1'},
         {id: 2, value: 'text_val #22'},
         {id: 3, value: 'text_val #3'},

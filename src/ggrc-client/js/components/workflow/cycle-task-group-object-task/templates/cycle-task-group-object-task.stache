@@ -149,28 +149,28 @@
                   <dropdown-component name:bind="instance.selected_response_options.0"
                             className:from="'noop'" {{! to not use default from component}}
                             optionsList:from="instance.response_options"
-                            isDisabled:from="{{#if instance.responseOptionsEditable}}{false}{{else}}{true}{{/if}}">
+                            isDisabled:from="isDisabled"
+                            on:el:change="save">
                   </dropdown-component>
                 </ggrc-quick-update>
               {{/is}}
               {{#is(instance.task_type, "checkbox")}}
                 <h6>Response Options</h6>
-                <ggrc-quick-update instance:from="instance">
-                  {{#each instance.response_options}}
+                <ggrc-quick-update instance:from="instance"
+                  options:from="instance.response_options"
+                  selectedOptions:bind="instance.selected_response_options">
+                  {{#each checkboxOptions}}
                     <div class="row-fluid wrap-row">
                       <div class="span12">
                         <label><input
                           type="checkbox"
-                          {{^if instance.responseOptionsEditable}}
-                            disabled="disabled"
-                          {{/if}}
                           multiple="multiple"
                           name="selected_response_options"
-                          value="{{.}}"
-                          {{#in_array this instance.selected_response_options}}
-                            checked="checked"
-                          {{/in_array}}>
-                        {{.}}
+                          value="{{value}}"
+                          on:el:change="checkboxChanged(value)"
+                          {{#if isSelected}} checked="checked" {{/if}}
+                          {{#if isDisabled}} disabled="disabled" {{/if}}>
+                        {{value}}
                         </label>
                       </div>
                     </div>

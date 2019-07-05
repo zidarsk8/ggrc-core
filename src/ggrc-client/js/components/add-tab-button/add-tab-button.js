@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './add-tab-button.stache';
 import {
   isMyWork,
@@ -12,7 +15,7 @@ import Permission from '../../permission';
 import {shouldBeMappedExternally} from '../../models/mappers/mappings';
 import '../questionnaire-mapping-link/questionnaire-mapping-link';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     isAuditInaccessibleAssessment: {
       get() {
@@ -42,9 +45,9 @@ const viewModel = can.Map.extend({
   addTabTitle: '',
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'add-tab-button',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

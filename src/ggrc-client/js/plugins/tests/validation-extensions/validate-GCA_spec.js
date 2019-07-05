@@ -3,13 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import CanModel from 'can-model/src/can-model';
+import canModel from 'can-model/src/can-model';
 
 describe('validateGCA extension', () => {
   let TestModel;
 
   beforeAll(() => {
-    TestModel = CanModel.extend({
+    TestModel = canModel.extend({
       is_custom_attributable: true,
     }, {
       define: {

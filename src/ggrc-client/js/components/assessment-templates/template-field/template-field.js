@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   ddValidationValueToMap,
   ddValidationMapToValue,
@@ -14,11 +17,11 @@ import template from './template-field.stache';
  *
  * Represents each `field` passed from assessment-template-attributes `fields`
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'template-field',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     types: [],
     field: null,
     /*
@@ -61,7 +64,7 @@ export default can.Component.extend({
       }
 
       return _.zip(options, vals).map(function (zip) {
-        let attr = new can.Map();
+        let attr = new canMap();
         let val = parseInt(zip[1], 10);
         attr.attr('type', field.attr('attribute_type'));
         attr.attr('value', zip[0]);

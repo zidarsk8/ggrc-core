@@ -86,14 +86,14 @@ $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
 });
 
 // Set up default failure callbacks if nonesuch exist.
-let _oldAjax = $.ajax;
+let _oldAjax = $.ajax; // eslint-disable-line no-restricted-properties
 
 // Here we break the deferred pattern a bit by piping back to original AJAX deferreds when we
 // set up a failure handler on a later transformation of that deferred.  Why?  The reason is that
 //  we have a default failure handler that should only be called if no other one is registered,
 //  unless it's also explicitly asked for.  If it's registered in a transformed one, though (after
 //  then() or pipe()), then the original one won't normally be notified of failure.
-can.ajax = $.ajax = function (options) {
+const ggrcAjax = function () {
   let _ajax = _oldAjax.apply($, arguments);
 
   function setup(newAjax, oldAjax) {
@@ -130,6 +130,17 @@ can.ajax = $.ajax = function (options) {
   return _ajax;
 };
 
+const jqueryRequest = (type, url, data) => {
+  return ggrcAjax({
+    type,
+    url,
+    data,
+  });
+};
+
+const ggrcGet = jqueryRequest.bind(null, 'get');
+const ggrcPost = jqueryRequest.bind(null, 'post');
+
 $(document).ajaxError(function (event, jqxhr, settings, exception) {
   if (!isExpectedError(jqxhr)) {
     tracker.trackError(getAjaxErrorInfo(jqxhr, exception));
@@ -143,3 +154,9 @@ $(document).ajaxError(function (event, jqxhr, settings, exception) {
     }
   }
 });
+
+export {
+  ggrcAjax,
+  ggrcGet,
+  ggrcPost,
+};

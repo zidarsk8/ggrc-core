@@ -322,6 +322,7 @@ class QueryHelper(object):
       )
       if filter_expression is not None:
         query = query.filter(filter_expression)
+
     if object_query.get("order_by"):
       with benchmark("Sorting: _get_ids > order_by"):
         query = pagination.apply_order_by(
@@ -330,6 +331,7 @@ class QueryHelper(object):
             object_query["order_by"],
             tgt_class,
         )
+
     with benchmark("Apply limit"):
       limit = object_query.get("limit")
       if limit:

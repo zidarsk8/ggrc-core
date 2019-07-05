@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import moment from 'moment';
+
 /**
  @description
  Date formats for the actual selected value, and for the date as

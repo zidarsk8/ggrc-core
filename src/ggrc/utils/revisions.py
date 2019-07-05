@@ -12,6 +12,31 @@ from ggrc.models import all_models
 logger = getLogger(__name__)
 
 
+def get_revisions_by_type(type_):
+  """Get latest revisions for all existing objects
+
+  Args:
+    type_ (str): the resource_type of revisions to fetch.
+
+  Returns:
+    dict with object_id as key and revision_id of the latest revision as value.
+  """
+
+  revisions = db.session.execute(
+      """
+      SELECT * FROM (
+          SELECT id, resource_id
+          FROM revisions
+          WHERE resource_type = :type
+          ORDER BY resource_id, id DESC
+      ) AS revs
+      GROUP BY resource_id
+      """,
+      [{"type": type_}]
+  )
+  return {row.resource_id: row.id for row in revisions}
+
+
 def _get_new_objects():
   """Returns list of new objects"""
   result = db.session.execute("""

@@ -3,20 +3,22 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 /**
  * Advanced Search Container view model.
  * Contains logic used in container components.
  * @constructor
  */
-export default can.Map.extend({
+export default canMap.extend({
   /**
    * Contains Advanced Search Items.
-   * @type {can.List}
+   * @type {canList}
    */
-  items: can.List(),
+  items: canList(),
   /**
    * Removes Filter Operator and Advanced Search mapping item from the collection.
-   * @param {can.Map} item - Advanced Search mapping item.
+   * @param {canMap} item - Advanced Search mapping item.
    * @param {boolean} isGroup - Flag indicates that current component is group.
    */
   removeItem: function (item, isGroup) {

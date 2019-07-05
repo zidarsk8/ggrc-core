@@ -14,18 +14,8 @@ from lib.app_entity_factory import regulation_entity_factory
 from lib.constants import objects
 from lib.entities.entity import Representation
 from lib.page.modal import unified_mapper
-from lib.page.widget import controls_tab
 from lib.service import webui_service, webui_facade
 from lib.ui import ui_facade
-from lib.utils import selenium_utils
-
-
-@pytest.fixture()
-def dashboard_controls_tab(selenium):
-  """Open My Work Dashboard Controls Tab URL and
-  return Controls Tab page objects model."""
-  selenium_utils.open_url(url.Urls().dashboard_controls_tab)
-  return controls_tab.ControlsTab()
 
 
 @pytest.fixture()

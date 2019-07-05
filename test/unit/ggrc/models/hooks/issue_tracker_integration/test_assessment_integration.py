@@ -225,38 +225,29 @@ class TestUtilityFunctions(unittest.TestCase):
       'ggrc.models.hooks.issue_tracker.assessment_integration.'
       'AssessmentTrackerHandler._get_issue_from_assmt_template'
   )
-  @mock.patch(
-      'ggrc.models.hooks.issue_tracker.assessment_integration.'
-      'AssessmentTrackerHandler._is_tracker_enabled'
-  )
   @ddt.data(
-      # cases: issue tracker is OFF in audit
-      (False, None, None, False),
-      (False, {'enabled': True}, {'enabled': True}, False),
-      # cases: issue tracker is ON in audit, OFF in API
-      (True, {'enabled': False}, {'enabled': True}, False),
-      (True, {'enabled': False}, {'enabled': False}, False),
-      (True, {'enabled': False}, None, False),
-      # cases: issue tracker is ON in audit, ON in API
-      (True, {'enabled': True}, {'enabled': True}, True),
-      (True, {'enabled': True}, {'enabled': False}, True),
-      (True, {'enabled': True}, None, True),
-      # cases: issue tracker is ON in audit, no "enable" flag in API
-      (True, None, {'enabled': True}, True),
-      (True, None, {'enabled': False}, False),
-      (True, None, None, True),
+      # cases: issue tracker is OFF in API
+      ({'enabled': False}, {'enabled': True}, False),
+      ({'enabled': False}, {'enabled': False}, False),
+      ({'enabled': False}, None, False),
+      # cases: issue tracker ON in API
+      ({'enabled': True}, {'enabled': True}, True),
+      ({'enabled': True}, {'enabled': False}, True),
+      ({'enabled': True}, None, True),
+      # cases: no "enable" flag in API
+      (None, {'enabled': True}, True),
+      (None, {'enabled': False}, False),
+      (None, None, True),
   )
   @ddt.unpack
-  def test_is_issue_on_create_enabled(self, is_tracker_enabled, api_issue_dict,
-                                      tmpl_issue_dict, expected,
-                                      mock_tracker_enabled, mock_template):
-    """Test _is_issue_on_create_enabled(in_audit={0}, api={1}, tmpl={2})"""
+  def test_is_issue_on_create_enabled(self, api_issue_dict, tmpl_issue_dict,
+                                      expected, mock_template):
+    """Test _is_issue_on_create_enabled(api={0}, tmpl={1})"""
     # pylint: disable=protected-access,too-many-arguments
 
     # prepare Assessment instance
     asmt = mock.Mock()
     asmt.audit = mock.Mock()
-    mock_tracker_enabled.return_value = is_tracker_enabled
 
     # prepare API dictionary
     api_dict = {}
@@ -272,7 +263,7 @@ class TestUtilityFunctions(unittest.TestCase):
 
     # test result
     tracker_handler = assessment_integration.AssessmentTrackerHandler()
-    ret = tracker_handler._is_issue_on_create_enabled(asmt, api_dict)
+    ret = tracker_handler._is_issue_on_create_enabled(api_dict)
 
     self.assertEqual(ret, expected)
 

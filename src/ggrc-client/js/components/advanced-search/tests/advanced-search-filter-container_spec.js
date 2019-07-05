@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
@@ -36,7 +37,7 @@ describe('advanced-search-filter-container component', function () {
   describe('addFilterCriterion() method', function () {
     it('adds only attribute if list is empty', function () {
       let items;
-      viewModel.attr('items', can.List());
+      viewModel.attr('items', canList());
 
       viewModel.addFilterCriterion();
 
@@ -64,7 +65,7 @@ describe('advanced-search-filter-container component', function () {
     it('transforms attribute to group with 2 attributes and operator inside',
       function () {
         let viewItems;
-        viewModel.attr('items', new can.List([
+        viewModel.attr('items', new canList([
           AdvancedSearch.create.attribute({field: 'first'}),
           AdvancedSearch.create.operator(),
           AdvancedSearch.create.attribute({field: 'second'}),

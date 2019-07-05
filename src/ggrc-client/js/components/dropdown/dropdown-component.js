@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/dropdown-component.stache';
 
 /*
@@ -11,11 +14,11 @@ import template from './templates/dropdown-component.stache';
   It receives `name` of the attribute that should be set and `optionsList`
   with titles and values
 */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'dropdown-component',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       options: {
         get: function () {
@@ -45,7 +48,7 @@ export default can.Component.extend({
               }
             );
           } else {
-            list = can.Map.keys(optionsGroups).map(function (key) {
+            list = canMap.keys(optionsGroups).map(function (key) {
               let group = optionsGroups.attr(key);
               return {
                 group: group.attr('name'),

@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import TreeViewControl from './tree-view';
 import TreeViewOptions from './tree-view-options';
 import {reify} from '../../plugins/utils/reify-utils';
@@ -20,7 +25,7 @@ function _firstElementChild(el) {
   }
 }
 
-export default can.Control.extend({
+export default canControl.extend({
   defaults: {
     model: null,
     parent: null,
@@ -37,7 +42,7 @@ export default can.Control.extend({
     if (typeof this._super === 'function') {
       this._super(el);
     }
-    if (opts instanceof can.Map) {
+    if (opts instanceof canMap) {
       this.options = opts;
       _.forEach(this.constructor.defaults, function (v, k) {
         if (!that.options.hasOwnProperty(k)) {
@@ -92,11 +97,11 @@ export default can.Control.extend({
     // determine it from the presemce of the corresponding CSS class
     let isActive = this.element.hasClass('active');
 
-    $.ajax({
+    ggrcAjax({
       url: this.options.show_view,
       dataType: 'text',
     }).then((view) => {
-      return can.stache(view)(this.options);
+      return canStache(view)(this.options);
     }).then(this._ifNotRemoved((frag) => {
       this.replace_element(frag);
       this.add_control();
@@ -116,14 +121,14 @@ export default can.Control.extend({
     if (this.options.attr('_added_child_list')) {
       return;
     }
-    this.options.attr('child_options', new can.List());
+    this.options.attr('child_options', new canList());
 
     if (originalChildList.length === null) {
       originalChildList = [originalChildList];
     }
 
     _.forEach(originalChildList, function (data, i) {
-      let options = new can.Map();
+      let options = new canMap();
       data.each(function (v, k) {
         options.attr(k, v);
       });
@@ -179,7 +184,7 @@ export default can.Control.extend({
       } else {
         findParams['parent.id'] = item.instance.id;
       }
-      data.attr('find_params', new can.Map(findParams));
+      data.attr('find_params', new canMap(findParams));
     }
   },
 

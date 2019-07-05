@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './advanced-search-filter-operator.stache';
 
 /**
@@ -10,7 +13,7 @@ import template from './advanced-search-filter-operator.stache';
  * Contains logic used in Filter Operator component
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   /**
    * Contains operation name.
    * @type {string}
@@ -24,9 +27,9 @@ let viewModel = can.Map.extend({
 /**
  * Filter Operator is a component representing operation connecting Advanced Search items.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-operator',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
 });
