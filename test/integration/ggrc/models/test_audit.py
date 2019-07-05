@@ -83,7 +83,7 @@ class TestAudit(TestCase):
     ).delete()
     db.session.commit()
     response, _ = self.gen.generate_relationship(audit, control)
-    self.assert200(response)
+    self.assert500(response)
     self.assertEqual(response.json, errors.MISSING_REVISION)
 
   def test_delete_audit_asmnt_tmpl(self):

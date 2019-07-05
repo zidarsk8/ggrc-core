@@ -88,11 +88,13 @@ class TestCollectionPost(TestCase):
         "ggrc.services.common.Resource.collection_post_loop",
         side_effect=lambda args, opts: Exception()
     ):
+      request_headers = self.get_headers()
+      request_headers.append(('X-GGRC-BackgroundTask', 'true'))
       response = self.client.post(
           self.mock_url(),
           content_type='application/json',
           data=data,
-          headers=self.get_headers(),
+          headers=request_headers,
       )
     self.assert200(response)
 
