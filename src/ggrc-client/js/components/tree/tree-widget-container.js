@@ -528,7 +528,7 @@ let viewModel = canMap.extend({
     appliedMappingItems: canList(),
     parentItems: canList(),
     appliedParentItems: canList(),
-    parent: null,
+    parentInstance: null,
   },
   openAdvancedFilter: function () {
     this.attr('advancedSearch.filterItems',
@@ -541,12 +541,12 @@ let viewModel = canMap.extend({
       this.attr('advancedSearch.appliedParentItems').attr());
 
     if (isObjectContextPage()) {
-      this.attr('advancedSearch.parent',
-        AdvancedSearch.create.parent(this.attr('parent_instance')));
+      this.attr('advancedSearch.parentInstance',
+        AdvancedSearch.create.parentInstance(this.attr('parent_instance')));
 
       // remove duplicates
       const parentItems = filterParentItems(
-        this.attr('advancedSearch.parent'),
+        this.attr('advancedSearch.parentInstance'),
         this.attr('advancedSearch.parentItems'));
 
       this.attr('advancedSearch.parentItems', parentItems);
@@ -913,15 +913,15 @@ const loadSavedSearch = (viewModel) => {
 };
 
 /**
- * Filter parent items to remove duplicates
- * @param {Object} parent - parent attribute of Advanced search
+ * Filter parentInstance items to remove duplicates
+ * @param {Object} parentInstance - parent instance attribute of Advanced search
  * @param {Array} parentItems - parentItems attribute of Advanced search
  * @return {Array} - filtered parentItems
  */
-const filterParentItems = (parent, parentItems) => {
+const filterParentItems = (parentInstance, parentItems) => {
   return parentItems = parentItems.filter((item) =>
-    item.value.id !== parent.value.id ||
-    item.value.type !== parent.value.type);
+    item.value.id !== parentInstance.value.id ||
+    item.value.type !== parentInstance.value.type);
 };
 
 /**
@@ -930,10 +930,10 @@ const filterParentItems = (parent, parentItems) => {
  * @param {Object} savedSearch - saved search
  */
 const selectSavedSearchFilter = (advancedSearch, savedSearch) => {
-  const parent = advancedSearch.attr('parent');
-  if (parent && savedSearch.parentItems) {
+  const parentInstance = advancedSearch.attr('parentInstance');
+  if (parentInstance && savedSearch.parentItems) {
     savedSearch.parentItems =
-      filterParentItems(parent, savedSearch.parentItems);
+      filterParentItems(parentInstance, savedSearch.parentItems);
   }
 
   advancedSearch.attr('filterItems', savedSearch.filterItems);

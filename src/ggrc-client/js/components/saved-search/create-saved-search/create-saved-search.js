@@ -21,7 +21,7 @@ export default canComponent.extend({
     mappingItems: null,
     statusItem: null,
     parentItems: null,
-    parent: null,
+    parentInstance: null,
     type: null,
     searchName: '',
     objectType: '',
@@ -36,13 +36,13 @@ export default canComponent.extend({
 
       let parentItems = this.attr('parentItems') &&
         this.attr('parentItems').serialize();
-      let parent = this.attr('parent');
-      if (parent) {
-        parent = parent.serialize();
+      let parentInstance = this.attr('parentInstance') &&
+        this.attr('parentInstance').serialize();
+      if (parentInstance) {
         if (parentItems) {
-          parentItems.push(parent);
+          parentItems.push(parentInstance);
         } else {
-          parentItems = [parent];
+          parentItems = [parentInstance];
         }
       }
 

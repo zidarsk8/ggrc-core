@@ -77,11 +77,11 @@
           <h4>Filter by Mapping</h4>
         </div>
         <div class="simple-modal__body">
-          {{#advancedSearch.parent}}
+          {{#advancedSearch.parentInstance}}
             <div class="advanced-search__parent-filter">
               <h6>Mapped to {{value.type}}:</h6><span>{{value.title}}</span>
             </div>
-          {{/advancedSearch.parent}}
+          {{/advancedSearch.parentInstance}}
 
           {{#advancedSearch.parentItems}}
             <div class="advanced-search__parent-filter">
@@ -101,7 +101,7 @@
             filterItems:from="advancedSearch.filterItems"
             mappingItems:from="advancedSearch.mappingItems"
             parentItems:from="advancedSearch.parentItems"
-            parent:from="advancedSearch.parent"
+            parentInstance:from="advancedSearch.parentInstance"
             objectType:from="model.model_singular"
           ></create-saved-search>
         {{/if}}

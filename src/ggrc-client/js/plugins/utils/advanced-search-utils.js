@@ -66,9 +66,9 @@ export const create = {
       value: value || { },
     };
   },
-  parent: (value) => {
+  parentInstance: (value) => {
     return {
-      type: 'parent',
+      type: 'parentInstance',
       value: value || { },
     };
   },
