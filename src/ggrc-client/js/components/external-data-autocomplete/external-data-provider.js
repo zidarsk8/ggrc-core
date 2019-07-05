@@ -61,12 +61,12 @@ export default canComponent.extend({
 
       this.attr('loading', true);
 
-      this.attr('request', ggrcGet({
-        url: GGRC.config.external_services[type],
-        data: {
+      this.attr('request', ggrcGet(
+        GGRC.config.external_services[type],
+        {
           prefix: searchCriteria,
-        },
-      }).done(executeForLastRequest((response) => {
+        }
+      ).done(executeForLastRequest((response) => {
         this.attr('values', response);
       })).fail(executeForLastRequest(() => {
         notifier('error', `Unable to load ${type}s`);
