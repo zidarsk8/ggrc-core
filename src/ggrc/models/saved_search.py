@@ -64,24 +64,23 @@ class SavedSearch(CreationTimeTracked, Dictable, Identifiable, db.Model):
 
   @staticmethod
   def validate_name_uniqueness(user, name, search_type, object_type):
-    """
-      Check that for given user there are no saved searches
-      with given name.
-    """
+    """Check that for given user there are no saved searches with name."""
     if search_type == SavedSearch.GLOBAL_SEARCH:
-      if user.saved_searches.filter(
+      saved_seqrch_q = user.saved_searches.filter(
           SavedSearch.name == name,
-          SavedSearch.search_type == search_type
-      ).count() > 0:
+          SavedSearch.search_type == search_type,
+      )
+      if db.session.query(saved_seqrch_q.exists()).scalar():
         raise ValidationError(
             u"Global Saved search with name '{}' already exists".format(name)
         )
     else:
-      if user.saved_searches.filter(
+      saved_seqrch_q = user.saved_searches.filter(
           SavedSearch.name == name,
           SavedSearch.search_type == search_type,
-          SavedSearch.object_type == object_type
-      ).count() > 0:
+          SavedSearch.object_type == object_type,
+      )
+      if db.session.query(saved_seqrch_q.exists()).scalar():
         raise ValidationError(
             u"Advanced Saved search for {} with "
             u"name '{}' already exists".format(object_type, name)
