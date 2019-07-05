@@ -86,10 +86,6 @@ const ObjectOperationsBaseVM = canMap.extend({
         delete resultConfig.type;
 
         this.update(resultConfig);
-        if (_.isNull(this.attr('freezedConfigTillSubmit'))) {
-          this.attr('freezedConfigTillSubmit', resultConfig);
-        }
-
         this.attr('currConfig', resultConfig);
 
         return mapType;
@@ -107,16 +103,6 @@ const ObjectOperationsBaseVM = canMap.extend({
     general: {},
     special: [],
   },
-  /**
-   * There is situation when user switch type from one two another.
-   * After it current config is changed immediately. It leads to the fact
-   * that all things in the templates are rerendered.
-   * But several controls must not be rerenderd till submit action will not be
-   * occurred (for example it's a results in unified mapper - when we switch
-   * object type the results should not be painted in another color (if
-   * unified mapper operates with a snapshots and usual objects)).
-   */
-  freezedConfigTillSubmit: null,
   currConfig: null,
   showSearch: true,
   showResults: true,

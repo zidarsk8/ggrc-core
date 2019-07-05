@@ -153,19 +153,6 @@ describe('object-mapper component', function () {
       spyObj = jasmine.createSpy();
     });
 
-    it('updates freezed config to the current config', function () {
-      _.assign(viewModel, {
-        updateFreezedConfigToLatest:
-          jasmine.createSpy('updateFreezedConfigToLatest'),
-      });
-
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-      }, []);
-      expect(viewModel.updateFreezedConfigToLatest).toHaveBeenCalled();
-    });
-
     it('calls mapObjects to map results', function () {
       handler.call({
         viewModel: viewModel,

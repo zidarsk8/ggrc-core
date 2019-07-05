@@ -150,6 +150,16 @@ export default canComponent.extend({
         defaultValue: config.general.megaRelation || 'child',
       },
       pubSub,
+      /**
+       * There is situation when user switch type from one two another.
+       * After it current config is changed immediately. It leads to the fact
+       * that all things in the templates are rerendered.
+       * But several controls must not be rerenderd till submit action will not be
+       * occurred (for example it's a results in unified mapper - when we switch
+       * object type the results should not be painted in another color (if
+       * unified mapper operates with a snapshots and usual objects)).
+       */
+      freezedConfigTillSubmit: {},
       showAsSnapshots: function () {
         if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
           return true;
@@ -236,10 +246,6 @@ export default canComponent.extend({
       self.viewModel.onSubmit();
     },
     map(objects, options) {
-      const viewModel = this.viewModel;
-
-      viewModel.updateFreezedConfigToLatest();
-
       if (this.viewModel.attr('deferred')) {
         // postpone map operation unless target object is saved
         this.deferredSave(objects);
