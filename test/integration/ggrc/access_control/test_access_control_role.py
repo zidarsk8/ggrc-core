@@ -208,19 +208,25 @@ class TestAccessControlRole(TestCase):
     response = self.api.delete(acr)
     self.assertEqual(response.status_code, 405)
 
-  def test_create_with_wrong_options(self):
+  @ddt.data(
+      {"name": "Test 1", "update": False, "read": False, "delete": True},
+      {"name": "Test 2", "update": True, "read": False, "delete": False},
+      {"name": "Test 3", "update": True, "read": False, "delete": True},
+  )
+  @ddt.unpack
+  def test_create_with_wrong_options(self, name, update, read, delete):
     """ Test if user create ACR with wrong options."""
     options = [{
         'access_control_role':
             {
-                'name': 'Test',
                 'modal_title': 'Add Custom Role to type Regulation',
-                'read': False,
                 'object_type': 'Regulation',
                 'parent_type': 'Regulation',
-                'update': True,
                 'context': {'id': None},
-                'delete': True
+                'delete': delete,
+                'update': update,
+                'read': read,
+                'name': name
             }
     }]
     response = self.api.post(AccessControlRole, options)
