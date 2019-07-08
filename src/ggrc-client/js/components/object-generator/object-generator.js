@@ -57,6 +57,7 @@ export default canComponent.extend({
       // show loading indicator before actual
       // Assessment Template is loading
       this.viewModel.attr('is_loading', true);
+      this.viewModel.attr('resultsRequested', true);
     },
     closeModal: function () {
       this.viewModel.attr('is_saving', false);

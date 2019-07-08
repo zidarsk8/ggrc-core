@@ -24,11 +24,6 @@ $items-separator-color: #e0e0e0;
 mapper-results {
   display: block;
 
-  .well-small {
-    font-size: 13px;
-    padding: 9px 16px 7px;
-  }
-
   .tree-pagination {
     display: flex;
     justify-content: flex-end;
@@ -530,13 +525,14 @@ mapper-results-columns-configuration {
       select, input, .input-block-level {
         margin: 0;
       }
+    }
+    .modal-footer {
+      border-top: 1px solid #E0E0E0;
+
       .well.well-small {
         font-size: 13px;
         padding: 9px 16px 7px;
       }
-    }
-    .modal-footer {
-      border-top: 1px solid #E0E0E0;
 
       .search-results {
         margin-top: 20px;

@@ -75,6 +75,10 @@ const ObjectOperationsBaseVM = canMap.extend({
      * general config, otherwise special config.
      */
       set(mapType) {
+        if (mapType === this.attr('type')) {
+          return mapType;
+        }
+
         let config = this.attr('config') || {};
         let resultConfig = ObjectOperationsBaseVM.extractConfig(
           mapType,
@@ -87,6 +91,8 @@ const ObjectOperationsBaseVM = canMap.extend({
 
         this.update(resultConfig);
         this.attr('currConfig', resultConfig);
+        this.attr('resultsRequested', false);
+        this.attr('entriesTotalCount', '');
 
         return mapType;
       },
@@ -106,6 +112,7 @@ const ObjectOperationsBaseVM = canMap.extend({
   currConfig: null,
   showSearch: true,
   showResults: true,
+  resultsRequested: false,
   type: 'Control', // We set default as Control
   availableTypes: function () {
     let list = getMappingList(this.attr('object'));
@@ -117,11 +124,15 @@ const ObjectOperationsBaseVM = canMap.extend({
   join_object_id: '',
   selected: [],
   entries: [],
+  entriesTotalCount: '',
   options: [],
   relevant: [],
   useSnapshots: false,
   onSearchCallback: $.noop(),
   onSubmit: function () {
+    this.attr('is_loading', true);
+    this.attr('entries').replace([]);
+    this.attr('resultsRequested', true);
     if (this.onSearchCallback) {
       this.onSearchCallback();
     }
