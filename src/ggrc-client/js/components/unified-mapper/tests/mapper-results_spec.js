@@ -81,16 +81,6 @@ describe('mapper-results component', function () {
       });
     });
 
-    it('sets data of loaded items to viewModel.entries', function (done) {
-      viewModel.attr('entries', []);
-      viewModel.setItems().then(() => {
-        expect(viewModel.attr('entries').length).toEqual(1);
-        expect(viewModel.attr('entries')[0])
-          .toEqual('mockData');
-        done();
-      });
-    });
-
     it('calls setColumnsConfiguration and setRelatedAssessments',
       function (done) {
         viewModel.setItems().then(() => {

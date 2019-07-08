@@ -96,7 +96,7 @@
         selected:from="selected"
         @onSearch:to="onSearchCallback"
         paging.total:to="scope.vars.totalObjects"
-        entries:bind="entries"
+        items:bind="entries"
         filterItems:from="scope.vars.filterItems"
         mappingItems:from="scope.vars.mappingItems"
         statusItem:from="scope.vars.statusItem">

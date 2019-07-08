@@ -89,7 +89,7 @@
                       @onSearch:to="onSearchCallback"
                       paging.total:to="scope.vars.totalObjects"
                       useSnapshots:from="useSnapshots"
-                      entries:bind="entries"
+                      items:bind="entries"
                       relevantTo:from="relevantTo"
                       objectGenerator:from="true"
                       filterItems:from="scope.vars.filterItems"

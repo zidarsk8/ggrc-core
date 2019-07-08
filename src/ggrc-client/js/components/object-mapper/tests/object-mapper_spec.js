@@ -246,7 +246,6 @@ describe('object-mapper component', function () {
     beforeEach(function () {
       viewModel.attr({
         selected: [1, 2, 3],
-        entries: [3, 2, 1],
         onSubmit: function () {},
       });
       that = {
@@ -258,11 +257,6 @@ describe('object-mapper component', function () {
     it('sets empty array to selected', function () {
       handler.call(that);
       expect(viewModel.attr('selected').length)
-        .toEqual(0);
-    });
-    it('sets empty array to entries', function () {
-      handler.call(that);
-      expect(viewModel.attr('entries').length)
         .toEqual(0);
     });
   });

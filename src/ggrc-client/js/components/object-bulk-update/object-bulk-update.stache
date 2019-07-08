@@ -64,7 +64,7 @@
         @onSearch:to="onSearchCallback"
         defaultSort:from="defaultSort"
         paging.total:to="scope.vars.totalObjects"
-        entries:bind="entries"
+        items:bind="entries"
         filterItems:from="scope.vars.filterItems"
         statusItem:from="scope.vars.statusItem"
         on:loaded="onLoaded()"

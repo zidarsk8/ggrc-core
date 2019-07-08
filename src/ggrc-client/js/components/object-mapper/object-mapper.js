@@ -226,24 +226,21 @@ export default canComponent.extend({
     '{pubSub} mapAsChild'(el, ev) {
       this.viewModel.attr('megaRelationObj')[ev.id] = ev.val;
     },
-    inserted: function () {
-      let self = this;
-      let deferredToList;
+    inserted() {
       this.viewModel.attr('selected').replace([]);
-      this.viewModel.attr('entries').replace([]);
 
       if (this.viewModel.attr('deferred_to.list')) {
-        deferredToList = this.viewModel.attr('deferred_to.list')
-          .map(function (item) {
-            return {
+        let deferredToList = this.viewModel.attr('deferred_to.list')
+          .map((item) => {
+            return ({
               id: item.id,
               type: item.type,
-            };
+            });
           });
         this.viewModel.attr('deferred_list', deferredToList);
       }
 
-      self.viewModel.onSubmit();
+      this.viewModel.onSubmit();
     },
     map(objects, options) {
       if (this.viewModel.attr('deferred')) {
