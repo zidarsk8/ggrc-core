@@ -61,6 +61,8 @@
               types:from="types"
               editMode:from="editMode" />
           </li>
+        {{else}}
+          <li>None</li>
         {{/fields}}
       {{/if}}
     </ul>
