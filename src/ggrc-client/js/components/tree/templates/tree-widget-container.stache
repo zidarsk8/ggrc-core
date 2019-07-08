@@ -52,7 +52,7 @@
                   modalTitle:from="'{{model.title_singular}} Advanced Search'"
                   extraCssClass:from="'advanced-search'">
 
-      <div class="advanced-search__wrapper">
+      <div class="advanced-search__body">
       {{#if isSavedSearchShown}}
         <aside>
           <saved-search-list
