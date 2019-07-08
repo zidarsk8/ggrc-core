@@ -722,8 +722,15 @@ class Folderable(WithProtectedAttributes):
       reflection.Attribute('folder', update=False),
   )
   _fulltext_attrs = ['folder']
-  _aliases = {"folder": "Folder"}
-
+  _aliases = {
+      "folder": {
+          "display_name": "Gdrive Folder ID",
+          "description": ("Add 'Folder ID' that is part of "
+                          "drive link to a folder "
+                          "'https://drive.google.com/corp/drive/folders/XXX', "
+                          "where XXX is a 'Folder ID'")
+      }
+  }
   PROTECTED_ATTRIBUTES = {"folder"}
 
 
