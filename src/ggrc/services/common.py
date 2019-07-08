@@ -1318,6 +1318,7 @@ class Resource(ModelView):
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
+            result.status_code = 200
       return result
 
   @classmethod
