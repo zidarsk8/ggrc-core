@@ -61,7 +61,7 @@
           Title
           <i class="fa fa-asterisk"></i>
         </label>
-        <input data-id="title_txtbx" type="text" tabindex="2"
+        <input type="text" tabindex="2"
                class="input-block-level" placeholder="Enter Title"
                name="title" value:from="title" autofocus>
         {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
