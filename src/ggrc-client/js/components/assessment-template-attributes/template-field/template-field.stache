@@ -10,7 +10,7 @@
     {{#attrs}}
       <div class="row">
         <div class="span4">
-          <span class="block single-line" title="{{value}}">{{value}}</span>
+          <span class="single-line" title="{{value}}">{{value}}</span>
         </div>
         {{#is(type, "Dropdown")}}
           <div class="span4 centered checkbox-wrap">

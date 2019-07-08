@@ -10,36 +10,30 @@
       margin-left: 1.2%;
     }
   }
+
   label.warning {
     margin-top: 8px;
     font-size: 11px;
     font-weight: bold;
   }
-  select {
-    width: 100px;
-  }
+
   h6 {
     font-size: 9px;
   }
-  .centered {
-    text-align: center;
-  }
+
   .checkbox-wrap {
     input {
       margin-top: 3px;
       margin-bottom: 0;
     }
   }
-  .block {
-    display: block;
-  }
   .single-line {
+    display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .attr-titles {
-    @extend %clearfix;
     ul {
       @extend %reset-list;
     }
