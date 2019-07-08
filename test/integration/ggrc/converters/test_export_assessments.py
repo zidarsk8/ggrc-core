@@ -14,6 +14,7 @@ from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
+from integration.ggrc import query_helper
 
 COPIED_TITLE = 'test_name'
 COPIED_LINK = 'http://mega.doc'
@@ -27,7 +28,7 @@ def dummy_gdrive_response(*args, **kwargs):
 
 
 @ddt
-class TestExport(TestCase):
+class TestExport(query_helper.WithQueryApi, TestCase):
   """Test imports for assessment objects."""
 
   model = all_models.Assessment
@@ -94,27 +95,22 @@ class TestExport(TestCase):
           attribute_type="Text",
       )
 
-    export_query = [
-        {
-            "object_name": "Assessment",
-            "filters": {
-                "expression": {
-                    "left": "code",
-                    "op": {
-                        "name": "="
-                    },
-                    "right": assessment1_slug
-                }
-            },
-            "fields": [
-                'title',
-                '__object_custom__:test lcad1',
-                '__object_custom__:test lcad12',
-                '__custom__:test gca'
-            ]
-        }
-    ]
-    response = self.export_csv(export_query)
+    export_query = self._make_query_dict(
+        "Assessment",
+        expression=[
+            "code",
+            "=",
+            assessment1_slug,
+        ],
+        fields=[
+            'title',
+            '__object_custom__:test lcad1',
+            '__object_custom__:test lcad12',
+            '__custom__:test gca',
+        ]
+    )
+
+    response = self.export_csv([export_query])
     self.assertIn("test assessment", response.data)
     self.assertIn("Test LCAD1", response.data)
     self.assertIn("Test GCA", response.data)

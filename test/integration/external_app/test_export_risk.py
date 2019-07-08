@@ -8,9 +8,10 @@ from ggrc.models import all_models
 from integration.external_app import external_api_helper
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
+from integration.ggrc import query_helper
 
 
-class TestExportRisk(TestCase):
+class TestExportRisk(query_helper.WithQueryApi, TestCase):
   """Basic Risk export tests."""
 
   def setUp(self):
@@ -140,21 +141,17 @@ class TestExportRisk(TestCase):
             "end_date", "workflow_state", "preconditions_failed"
         )
     )
-    data = [
-        {
-            "object_name": "Risk",
-            "filters": {
-                "expression": {
-                    "left": "code",
-                    "op": {
-                        "name": "="
-                    },
-                    "right": response.json["risk"]["slug"]
-                }
-            },
-            "fields": "all"
-        }
-    ]
-    response = self.export_csv(data)
+
+    export_query = self._make_query_dict(
+        "Risk",
+        expression=[
+            "code",
+            "=",
+            response.json["risk"]["slug"],
+        ],
+        fields="all",
+    )
+
+    response = self.export_csv([export_query])
     self.assertIn("any treat source NEW", response.data)
     self.assertIn("any description upd 1", response.data)
