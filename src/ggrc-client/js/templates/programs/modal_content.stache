@@ -49,7 +49,7 @@
         <access-control-list-roles-helper
           instance:from="instance"
           isNewInstance:from="new_object_form"
-          orderOfRoles:from="instance.class.orderOfRoles">
+          orderOfRoles:from="instance.constructor.orderOfRoles">
         </access-control-list-roles-helper>
       {{/new_object_form}}
       {{^new_object_form}}
@@ -57,12 +57,12 @@
           instance:from="instance"
           isNewInstance:from="new_object_form"
           readOnly:from="instance.readOnlyProgramRoles"
-          includeRoles:from="instance.class.programRoles">
+          includeRoles:from="instance.constructor.programRoles">
         </access-control-list-roles-helper>
         <access-control-list-roles-helper
           instance:from="instance"
           isNewInstance:from="new_object_form"
-          excludeRoles:from="instance.class.programRoles">
+          excludeRoles:from="instance.constructor.programRoles">
         </access-control-list-roles-helper>
       {{/new_object_form}}
     </div>

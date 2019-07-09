@@ -6,8 +6,8 @@
 
   <div class="row-fluid">
     <div class="span12">
-      {{^if class.isChangeableExternally}}
-        <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+      {{^if constructor.isChangeableExternally}}
+        <a class="main-title {{constructor.category}} oneline" href="{{viewLink}}">
           {{title}}
         </a>
       {{else}}
@@ -62,18 +62,18 @@
 
   <div class="links">
     <div class="row-fluid">
-        {{^if class.isChangeableExternally}}
+        {{^if constructor.isChangeableExternally}}
           <div class="span6">
             <a class="secondary" href="{{viewLink}}">
-              View {{class.title_singular}}
+              View {{constructor.title_singular}}
             </a>
           </div>
         {{else}}
           <a class="secondary" href="{{viewLink}}">
-            Open Original {{class.title_singular}}
+            Open Original {{constructor.title_singular}}
           </a>
           <questionnaire-link instance:from="instance" cssClasses:from="'secondary'">
-            Open {{class.title_singular}} in new frontend
+            Open {{constructor.title_singular}} in new frontend
           </questionnaire-link>
         {{/if}}
     </div>

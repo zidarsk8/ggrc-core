@@ -48,7 +48,7 @@
               <div class="rtf-block">
                 <read-more
                   text:from="instance.description"
-                  handleMarkdown:from="instance.class.isChangeableExternally">
+                  handleMarkdown:from="instance.constructor.isChangeableExternally">
                 </read-more>
               </div>
             </div>
