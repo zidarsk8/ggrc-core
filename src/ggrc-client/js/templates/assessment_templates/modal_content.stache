@@ -25,13 +25,14 @@
             name:bind="assessmentType">
           </dropdown-component>
         </assessment-object-type-dropdown>
-
-        <label class="inline-check pull-left">
-          <input type="checkbox" class="js-toggle-controlplans"
+         <div class="ggrc-form-item__checkbox-item assessment-procedure-message">
+          <label class="assessment-procedure-message__label">
+           <input type="checkbox" class="assessment-procedure-message__checkbox"
                  el:checked:bind="instance.test_plan_procedure"/>
-	        Copy Assessment Procedure from mapped object
-        </label>
-
+	         Copy Assessment Procedure from mapped object
+          </label>
+          <i class="fa fa-question-circle assessment-procedure-message__icon" rel="tooltip" title="Assessment procedure will be copied at the moment of mapping object"></i>
+         </div>
       </div>
     </div>
 
