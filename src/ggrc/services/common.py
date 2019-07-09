@@ -1076,14 +1076,14 @@ class Resource(ModelView):
     return accumulator
 
   def _build_request_stub_cache(self, data):
+    """Query objects from `data` and store them in cache."""
     objects = self._gather_referenced_objects(data)
     flask.g.referenced_objects = {}
     for class_name, ids in objects.items():
-      class_ = getattr(ggrc.models, class_name, None)
-      if hasattr(class_, "query"):
-        flask.g.referenced_objects[class_] = {
-            obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
-        }
+      utils.referenced_objects.mark_to_cache(class_name, ids)
+    utils.referenced_objects.rewarm_cache(
+        undefer=True,
+    )
 
   def _check_post_create_options(self, body):
     """Do NOTHING by default"""
