@@ -3,6 +3,8 @@
 
 """Helper to use /query api endpoint."""
 
+# pylint: disable=too-many-arguments
+
 import json
 import operator
 
@@ -81,7 +83,7 @@ class WithQueryApi(object):
     return result
 
   @staticmethod
-  def _make_query_dict_base(object_name, type_=None, filters=None,
+  def _make_query_dict_base(object_name, type_=None, filters=None, fields=None,
                             limit=None, order_by=None):
     """Make a dict with query for object_name with optional parameters."""
     query = {
@@ -90,6 +92,8 @@ class WithQueryApi(object):
     }
     if type_:
       query["type"] = type_
+    if fields:
+      query["fields"] = fields
     if limit:
       query["limit"] = limit
     if order_by:
