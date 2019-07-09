@@ -78,13 +78,13 @@ describe('people-autocomplete-wrapper component', () => {
 
         vm.getResult(value);
 
-        expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith({
-          url: GGRC.config.external_services[modelName],
-          data: {
+        expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(
+          GGRC.config.external_services[modelName],
+          {
             prefix: value,
             limit: 10,
           },
-        });
+        );
       });
 
       it('calls processItems with passed value and received data after get',
