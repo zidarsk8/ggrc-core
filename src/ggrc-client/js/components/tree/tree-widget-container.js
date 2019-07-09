@@ -437,6 +437,12 @@ let viewModel = canMap.extend({
 
     // timeout required to let server correctly calculate changed counts
     const _refreshCounts = _.debounce(() => {
+      // do not refresh counts for Workflow. There are additional filters
+      // for history and active tabs which are handled in workflow components
+      if (self.attr('parent_instance').type === 'Workflow') {
+        return;
+      }
+
       if (isMyWork() || isAllObjects()) {
         const location = window.location.pathname;
         const widgetModels = getWidgetModels('Person', location);
