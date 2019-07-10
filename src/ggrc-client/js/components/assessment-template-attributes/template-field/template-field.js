@@ -40,8 +40,6 @@ export default canComponent.extend({
         type: 'remove',
         field: this.attr('field'),
       });
-
-      this.attr('_pending_delete', true);
     },
     /*
      * Denormalize field.multi_choice_mandatory into opts

@@ -3,38 +3,36 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{^field._pending_delete}}
-  <div class="span-custom2-and-half">{{field.title}}</div>
-  <div class="span-custom1-and-half">{{field.attribute_name}}</div>
-  <div class="span5">
-    {{#attrs}}
-      <div class="row">
-        <div class="span4">
-          <span class="single-line" title="{{value}}">{{value}}</span>
+<div class="span-custom2-and-half">{{field.title}}</div>
+<div class="span-custom1-and-half">{{field.attribute_name}}</div>
+<div class="span5">
+  {{#attrs}}
+    <div class="row">
+      <div class="span4">
+        <span class="single-line" title="{{value}}">{{value}}</span>
+      </div>
+      {{#is(type, "Dropdown")}}
+        <div class="span4 centered checkbox-wrap">
+          <input type="checkbox" el:checked:bind="attachment" {{^if editMode}}disabled{{/if}}>
         </div>
-        {{#is(type, "Dropdown")}}
-          <div class="span4 centered checkbox-wrap">
-            <input type="checkbox" el:checked:bind="attachment" {{^if editMode}}disabled{{/if}}>
-          </div>
-          <div class="span2 centered checkbox-wrap">
-            <input type="checkbox" el:checked:bind="url" {{^if editMode}}disabled{{/if}}>
-          </div>
-          <div class="span2 centered checkbox-wrap">
-            <input type="checkbox" el:checked:bind="comment" {{^if editMode}}disabled{{/if}}>
-          </div>
-        {{/is}}
-      </div>
-    {{/attrs}}
-  </div>
-
-  <div class="span1 centered checkbox-wrap">
-    <input type="checkbox" el:checked:bind="field.mandatory" {{^if editMode}}disabled{{/if}}>
-  </div>
-  {{#if editMode}}
-    <div class="span2">
-      <div class="pull-right">
-        <a on:el:click="removeField()"><i class="fa fa-trash"></i></a>
-      </div>
+        <div class="span2 centered checkbox-wrap">
+          <input type="checkbox" el:checked:bind="url" {{^if editMode}}disabled{{/if}}>
+        </div>
+        <div class="span2 centered checkbox-wrap">
+          <input type="checkbox" el:checked:bind="comment" {{^if editMode}}disabled{{/if}}>
+        </div>
+      {{/is}}
     </div>
-  {{/if}}
-{{/field._pending_delete}}
+  {{/attrs}}
+</div>
+
+<div class="span1 centered checkbox-wrap">
+  <input type="checkbox" el:checked:bind="field.mandatory" {{^if editMode}}disabled{{/if}}>
+</div>
+{{#if editMode}}
+  <div class="span2">
+    <div class="pull-right">
+      <a on:el:click="removeField()"><i class="fa fa-trash"></i></a>
+    </div>
+  </div>
+{{/if}}

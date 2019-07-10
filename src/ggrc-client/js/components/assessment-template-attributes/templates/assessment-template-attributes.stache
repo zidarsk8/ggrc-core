@@ -44,14 +44,12 @@
           </add-template-field>
         </li>
         {{#fields}}
-          {{^if _pending_delete}}
-              <li class="row-fluid sortable-item" {{canData 'field'}}>
-                  <template-field
-                    field:from="{.}"
-                    types:from="types"
-                    on:remove="fieldRemoved" />
-              </li>
-          {{/if}}
+          <li class="row-fluid sortable-item" {{canData 'field'}}>
+              <template-field
+                field:from="{.}"
+                types:from="types"
+                on:remove="fieldRemoved" />
+          </li>
         {{/fields}}
       {{else}}
         {{#fields}}
