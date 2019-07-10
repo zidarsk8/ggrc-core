@@ -525,144 +525,6 @@ Examples
           }
       }
 
-Request
--------
-
-Overview
-~~~~~~~~
-
-+---------------------+-----------------------------+
-| URL                 | /api/requests               |
-+---------------------+-----------------------------+
-| Methods supported   | ``POST``, ``DELETE``        |
-+---------------------+-----------------------------+
-| Description         | Creates a program object.   |
-+---------------------+-----------------------------+
-
-Elements
-~~~~~~~~
-
-+----------------------------------+----------------------+---------------------------------------+
-| Field name                       | Type                 | Description                           |
-+==================================+======================+=======================================+
-| **Required**                     |                      |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| title                            | str                  | Request title                         |
-+----------------------------------+----------------------+---------------------------------------+
-| audit                            | :ref:`ggrc-object`   | Audit mapped to this request object   |
-+----------------------------------+----------------------+---------------------------------------+
-| start_date                       | str                  | ISO-8601 formatted effective date     |
-+----------------------------------+----------------------+---------------------------------------+
-| end_date                         | str                  | ISO-8601 formatted stop date          |
-+----------------------------------+----------------------+---------------------------------------+
-| **Optional**                     |                      |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| status                           | str                  |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| custom_attribute_definitions     | list                 |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| custom_attributes                |                      |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| validate_requester               | bool                 |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| validate_assignee                | bool                 |                                       |
-+----------------------------------+----------------------+---------------------------------------+
-| description                      | str                  | Request description                   |
-+----------------------------------+----------------------+---------------------------------------+
-| test                             | str                  | Test message                          |
-+----------------------------------+----------------------+---------------------------------------+
-| notes                            | str                  | Notes for the request                 |
-+----------------------------------+----------------------+---------------------------------------+
-| slug                             | str                  | Unique identifier for this request    |
-+----------------------------------+----------------------+---------------------------------------+
-
-Examples
-~~~~~~~~
-
--  create a new request object
-
-   Request:
-
-   .. code-block:: json
-
-       {
-           "request": {
-               "status": "Not Started",
-               "start_date": "2016-05-20",
-               "end_date": "2016-05-27",
-               "custom_attribute_definitions": [],
-               "custom_attributes": {},
-               "validate_requester": true,
-               "validate_assignee": true,
-               "title": "Example title",
-               "audit": {
-                   "id": 1,
-                   "href": "/api/audits/1",
-                   "type": "Audit"
-               },
-               "description": "Example description",
-               "test": "Example test message",
-               "notes": "Example notes",
-               "slug": "test code",
-           }
-       }
-
-   Response:
-
-   .. code-block:: json
-
-      {
-          "request": {
-              "custom_attribute_values": [],
-              "people": [],
-              "updated_at": "2016-05-20T10:14:42",
-              "id": 1,
-              "related_sources": [
-                  {
-                      "href": "/api/relationships/14",
-                      "type": "Relationship",
-                      "id": 14
-                  }
-              ],
-              "finished_date": null,
-              "object_folders": [],
-              "documents": [],
-              "modified_by": {
-                  "href": "/api/people/1",
-                  "type": "Person",
-                  "id": 1
-              },
-              "recipients": null,
-              "title": "Example title",
-              "verified": false,
-              "requestor": null,
-              "object_people": [],
-              "test": "Example test message",
-              "type": "Request",
-              "start_date": "2016-05-20",
-              "viewLink": "/requests/1",
-              "status": "Not Started",
-              "verified_date": null,
-              "description": "Example description",
-              "end_date": "2016-05-27",
-              "workflow_state": null,
-              "object_documents": [],
-              "gdrive_upload_path": null,
-              "related_destinations": [],
-              "slug": "test code",
-              "audit": {
-                  "href": "/api/audits/1",
-                  "type": "Audit",
-                  "id": 1
-              },
-              "send_by_default": null,
-              "task_groups": [],
-              "notes": "Example notes",
-              "created_at": "2016-05-20T10:14:42",
-              "selfLink": "/api/requests/1"
-          }
-      }
-
 Workflow
 ~~~~~~~~
 
@@ -1190,8 +1052,6 @@ GGRC object Type
 * Project
 * Regulation
 * Relationship
-* Request
-* Request
 * Risk
 * Section
 * Standard
@@ -1246,15 +1106,6 @@ Program status
 * In Scope
 * Not in Scope
 * Deprecated
-
-
-.. _request:
-
-Request
-~~~~~~~
-
-* documentation
-* interview
 
 
 .. _workflow-frequency:
