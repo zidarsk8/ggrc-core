@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loCompact from 'lodash/compact';
 import loIsNull from 'lodash/isNull';
 import loUniq from 'lodash/uniq';
 import loTrim from 'lodash/trim';
@@ -192,7 +191,7 @@ function exists(obj, key) {
 * @param {Object} options - Additional options
 *                           - Unique - returns only unique values
 *                           - Compact - removes `falsy` values
-* @return {Array} - Returns array of splited values
+* @return {Array} - Returns array of splitted values
 */
 function splitTrim(values, splitter, options) {
   if (!values || !values.length) {
@@ -209,12 +208,8 @@ function splitTrim(values, splitter, options) {
   values = values.split(splitter);
   values = loMap(values, loTrim);
 
-  options = options || {};
   if (options.unique) {
     values = loUniq(values);
-  }
-  if (options.compact) {
-    values = loCompact(values);
   }
   return values;
 }

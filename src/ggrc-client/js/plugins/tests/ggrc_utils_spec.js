@@ -84,21 +84,6 @@ describe('splitTrim() method', function () {
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', '']);
     });
-
-    it('return compact values without spaces', function () {
-      let result = splitTrim(input, splitter, {
-        compact: true,
-      });
-      expect(result).toEqual(['a', 'b', 'c', 'd', 'a', 'b', 'b']);
-    });
-
-    it('return compact and uniquee values without spaces', function () {
-      let result = splitTrim(input, splitter, {
-        unique: true,
-        compact: true,
-      });
-      expect(result).toEqual(['a', 'b', 'c', 'd']);
-    });
   });
 
   describe('Given an string with commas given default splitter', function () {
@@ -114,21 +99,6 @@ describe('splitTrim() method', function () {
         unique: true,
       });
       expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', '', 'f']);
-    });
-
-    it('return compact split values without spaces', function () {
-      let result = splitTrim(input, {
-        compact: true,
-      });
-      expect(result).toEqual(['a', 'b', 'c', 'd', 'c', 'a  b', 'f']);
-    });
-
-    it('return unique and compact split values without spaces', function () {
-      let result = splitTrim(input, {
-        compact: true,
-        unique: true,
-      });
-      expect(result).toEqual(['a', 'b', 'c', 'd', 'a  b', 'f']);
     });
   });
 
