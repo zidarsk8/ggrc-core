@@ -45,8 +45,11 @@ import '../../components/proposal/create-proposal';
 import '../../components/input-filter/input-filter';
 import '../../components/workflow/cycle-task-modal/cycle-task-modal';
 import '../../components/person-modal/person-modal';
+import '../../components/custom-attributes-modal/custom-attributes-modal';
+import '../../components/modal-autocomplete/modal-autocomplete';
 import {
   bindXHRToButton,
+  bindXHRToDisableElement,
   BUTTON_VIEW_DONE,
 } from '../../plugins/utils/modals';
 import {
@@ -62,8 +65,10 @@ import {
 } from '../../plugins/utils/display-prefs-utils';
 import Person from '../../models/business-models/person';
 import Assessment from '../../models/business-models/assessment';
-import Stub from '../../models/stub';
-import {getInstance} from '../../plugins/utils/models-utils';
+import {
+  getInstance,
+  initAuditTitle,
+} from '../../plugins/utils/models-utils';
 import {getUrlParams, changeHash} from '../../router';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 
@@ -73,22 +78,18 @@ export default canControl.extend({
     header_view: GGRC.templates_path + '/modals/modal_header.stache',
     custom_attributes_view:
     GGRC.templates_path + '/custom_attributes/modal_content.stache',
-    button_view: null,
+    button_view: BUTTON_VIEW_DONE,
     model: null, // model class to use when finding or creating new
     instance: null, // model instance to use instead of finding/creating (e.g. for update)
     new_object_form: false,
-    find_params: {},
     add_more: false,
     ui_array: [],
     reset_visible: false,
+    // used for revision-comparer
     extraCssClass: '',
     afterFetch: function () {},
     isProposal: false,
     isSaving: false, // is there a save/map operation currently in progress
-  },
-
-  init: function () {
-    this.defaults.button_view = BUTTON_VIEW_DONE;
   },
 }, {
   init: function () {
@@ -153,33 +154,17 @@ export default canControl.extend({
           this.element.trigger('preload');
         }
       })
-      .then((el) => this.autocomplete(el))
       .then(() => {
         if (!this.wasDestroyed()) {
           this.options.afterFetch(this.element);
           this.restore_ui_status_from_storage();
-          if (this.is_audit_modal()) {
-            this.init_audit_title();
-          }
+          initAuditTitle(this.options.instance, this.options.new_object_form);
         }
       })
       .fail((error) => {
         notifierXHR('error', error);
         this.element.modal_form('hide');
       });
-  },
-
-  is_audit_modal: function () {
-    const {instance} = this.options;
-    return instance.constructor
-      && instance.constructor.model_singular === 'Audit';
-  },
-
-  init_audit_title: function () {
-    const {instance, new_object_form: isNewObjectForm} = this.options;
-    if (isNewObjectForm) {
-      instance.initTitle();
-    }
   },
 
   apply_object_params: function () {
@@ -191,120 +176,22 @@ export default canControl.extend({
     }, this);
   },
 
-  'input[data-lookup] focus': function (el, ev) {
-    this.autocomplete(el);
-  },
-
-  'input[data-lookup] keyup': function (el, ev) {
-    // Set the transient field for validation
-    let name;
-    let instance;
-    let value;
-
-    // * in some cases we want to disable automapping the selected item to the
-    // * modal's underlying object (e.g. we don't want to map the picked Persons
-    // * to an AssessmentTemplates object)
-    // ** does nothing after press tab to not lose deafault value in input
-    if (el.data('no-automap') || ev.keyCode === 9) {
-      return;
-    }
-
-    name = el.attr('name').split('.');
-    instance = this.options.instance;
-    value = el.val();
-
-    name.pop(); // set the owner to null, not the email
-
-    if (!instance._transient) {
-      instance.attr('_transient', new canMap({}));
-    }
-
-    _.reduce(name.slice(0, -1), function (current, next) {
-      current = current + '.' + next;
-      if (!instance.attr(current)) {
-        instance.attr(current, new canMap({}));
-      }
-      return current;
-    }, '_transient');
-
-    if (name.length) {
-      instance.attr(['_transient'].concat(name).join('.'), value);
-    }
-  },
-
-  autocomplete: function (el) {
-    $.cms_autocomplete.call(this, el);
-  },
-
-  autocomplete_select: function (el, event, ui) {
-    let path;
-    let instance;
-    let index;
-    let cb;
-    $('#extended-info').trigger('mouseleave'); // Make sure the extra info tooltip closes
-
-    path = el.attr('name').split('.');
-    instance = this.options.instance;
-    index = 0;
-    path.pop(); // remove the prop
-    cb = el.data('lookup-cb');
-
-    if (cb) {
-      cb = cb.split(' ');
-      instance[cb[0]](...cb.slice(1).concat([ui.item]));
-      setTimeout(function () {
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-      }, 0);
-      return;
-    }
-
-    if (/^\d+$/.test(path[path.length - 1])) {
-      index = parseInt(path.pop(), 10);
-      path = path.join('.');
-      if (!instance.attr(path)) {
-        instance.attr(path, []);
-      }
-      instance.attr(path).splice(index, 1, new Stub(ui.item));
-    } else {
-      path = path.join('.');
-      setTimeout(function () {
-        el.val(ui.item.name || ui.item.email || ui.item.title, ui.item);
-      }, 0);
-
-      instance.attr(path, null).attr(path, ui.item);
-      if (this.is_audit_modal()) {
-        this.init_audit_title();
-      }
-      if (!instance._transient) {
-        instance.attr('_transient', canMap());
-      }
-      instance.attr('_transient.' + path, ui.item);
-    }
-  },
-
   fetch_templates: function (dfd) {
-    dfd = dfd ? dfd.then(() => {
-      return this.options;
-    }) : $.when(this.options);
-
     return $.when(
       ggrcAjax({url: this.options.content_view, dataType: 'text'}),
       ggrcAjax({url: this.options.header_view, dataType: 'text'}),
       ggrcAjax({url: this.options.button_view, dataType: 'text'}),
       ggrcAjax({url: this.options.custom_attributes_view, dataType: 'text'}),
-      dfd,
+      dfd.then(() => this.options),
     ).then((content, header, footer, customAttributes, context) => {
       this.draw(content, header, footer, customAttributes, context);
     });
   },
 
-  fetch_data: function (params) {
+  fetch_data: function () {
     let that = this;
     let dfd;
     let instance = this.options.attr('instance');
-
-    params = params || this.find_params();
-    params = params && params.serialize ? params.serialize() : params;
 
     if (this.options.skip_refresh && instance) {
       return new $.Deferred().resolve(instance);
@@ -312,6 +199,8 @@ export default canControl.extend({
       dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
+        const params = {};
+
         if (this.options.extendNewInstance) {
           let extendedInstance = this.options.extendNewInstance.attr ?
             this.options.extendNewInstance.attr() :
@@ -327,7 +216,7 @@ export default canControl.extend({
         }.bind(this));
       }
     } else {
-      this.options.attr('instance', new canMap(params));
+      this.options.attr('instance', {});
       that.on();
       dfd = new $.Deferred().resolve(instance);
     }
@@ -380,12 +269,7 @@ export default canControl.extend({
   },
 
   fetch_all: function () {
-    return this.fetch_templates(this.fetch_data(this.find_params()));
-  },
-
-  find_params: function () {
-    let findParams = this.options.find_params;
-    return findParams.serialize ? findParams.serialize() : findParams;
+    return this.fetch_templates(this.fetch_data());
   },
 
   draw: function (content, header, footer, customAttributes, context) {
@@ -444,7 +328,7 @@ export default canControl.extend({
     }
   },
 
-  'input, textarea, select change':
+  'input:not([data-lookup]), textarea, select change':
     function (el) {
       const instance = this.options.instance;
       if (instance.isNew && instance.isNew()) {
@@ -454,13 +338,8 @@ export default canControl.extend({
       } else {
         instance.removeAttr('_suppress_errors');
       }
-      // Set the value if it isn't a search field
-      if (!el.hasClass('search-icon') ||
-        el.is('[null-if-empty]') &&
-        (!el.val() || !el.val().length)
-      ) {
-        this.set_value_from_element(el);
-      }
+
+      this.set_value_from_element(el);
     },
 
   'input:not([data-lookup]), textarea keyup':
@@ -475,63 +354,25 @@ export default canControl.extend({
       }
     },
 
-  /**
-   * The onChange handler for the custom attribute type dropdown.
-   *
-   * This handler is specific to the Custom Attribute Edit modal.
-   *
-   * @param {jQuery} $el - the dropdown DOM element
-   * @param {$.Event} ev - the event object
-   */
-  'dropdown[data-purpose="ca-type"] change': function ($el, ev) {
-    let instance = this.options.instance;
-
-    if (instance.attribute_type !== 'Dropdown' &&
-      instance.attribute_type !== 'Multiselect') {
-      instance.attr('multi_choice_options', undefined);
-    }
-  },
-
   serialize_form: function () {
     let $form = $(this.options.contentEl).find('form');
     let $elements = $form
-      .find(':input');
+      .find(':input:not([data-lookup])');
 
     $elements.toArray().forEach((el) => this.set_value_from_element(el));
   },
   set_value_from_element: function (el) {
-    let name;
-    let value;
-    let cb;
-    let instance = this.options.instance;
-    el = el instanceof jQuery ? el : $(el);
-    name = el.attr('name');
-    value = el.val();
-    cb = el.data('lookup-cb');
-
     // If no model is specified, short circuit setting values
     // Used to support ad-hoc form elements in confirmation dialogs
     if (!this.options.model) {
       return;
     }
-    // if data was populated in a callback, use that data from the instance
-    // except if we are editing an instance and some fields are already populated
-    if (!_.isUndefined(el.attr('data-populated-in-callback')) &&
-      value === '') {
-      if (!_.isUndefined(instance[name])) {
-        if (typeof instance[name] === 'object' && instance[name] !== null) {
-          this.set_value({name: name, value: instance[name].id});
-        } else {
-          this.set_value({name: name, value: instance[name]});
-        }
-        return;
-      }
-    }
-    if (cb) {
-      cb = cb.split(' ');
-      instance[cb[0]](...cb.slice(1).concat([value]));
-    } else if (name) {
-      this.set_value({name: name, value: value});
+
+    const $el = $(el);
+    const name = $el.attr('name');
+
+    if (name) {
+      this.set_value({name, value: $el.val()});
     }
   },
   set_value: function (item) {
@@ -546,6 +387,7 @@ export default canControl.extend({
         new this.options.model(instance && instance.serialize ?
           instance.serialize() : instance);
     }
+
     $elem = $(this.options.contentEl)
       .find("[name='" + item.name + "']");
     model = $elem.attr('model');
@@ -564,21 +406,10 @@ export default canControl.extend({
       value = item.value;
     }
 
-    if ($elem.is('[null-if-empty]') && (!value || !value.length)) {
-      value = null;
-    }
-
     if (name.length > 1) {
       if (Array.isArray(value)) {
         value = new canList(_.filteredMap(value,
           (v) => new canMap({}).attr(name.slice(1).join('.'), v)));
-      } else if ($elem.is('[data-lookup]')) {
-        if (!value) {
-          value = null;
-        } else {
-          // Setting a "lookup field is handled in the autocomplete() method"
-          return;
-        }
       } else {
         value = new canMap({}).attr(name.slice(1).join('.'), value);
       }
@@ -851,20 +682,6 @@ export default canControl.extend({
       return false;
     }
   },
-  // make element non-clickable when saving
-  bindXHRToDisableElement(xhr, el) {
-    // binding of an ajax to a click is something we do manually
-    const $el = $(el);
-
-    if (!$el.length) {
-      return;
-    }
-
-    $el.addClass('disabled');
-    xhr.always(() => {
-      $el.removeClass('disabled');
-    });
-  },
 
   triggerSave(el, ev) {
     if (this.wasDestroyed()) {
@@ -896,9 +713,7 @@ export default canControl.extend({
 
       ajd.always(() => {
         this.options.attr('isSaving', false);
-        if (this.is_audit_modal()) {
-          this.init_audit_title();
-        }
+        initAuditTitle(this.options.instance, this.options.new_object_form);
       });
       if (this.options.add_more) {
         bindXHRToButton(ajd, saveCloseBtn);
@@ -908,9 +723,9 @@ export default canControl.extend({
         bindXHRToButton(ajd, saveAddmoreBtn);
       }
 
-      this.bindXHRToDisableElement(ajd, deleteBtn);
-      this.bindXHRToDisableElement(ajd, modalBackdrop);
-      this.bindXHRToDisableElement(ajd, modalCloseBtn);
+      bindXHRToDisableElement(ajd, deleteBtn);
+      bindXHRToDisableElement(ajd, modalBackdrop);
+      bindXHRToDisableElement(ajd, modalCloseBtn);
     }
   },
 
@@ -928,7 +743,6 @@ export default canControl.extend({
       $.when(this.options.attr('instance', newInstance))
         .then(() => this.apply_object_params())
         .then(() => this.serialize_form())
-        .then((el) => this.autocomplete(el))
         .then(() => this.options.attr('instance').backup());
     });
 
@@ -936,8 +750,7 @@ export default canControl.extend({
   },
 
   prepareInstance: function () {
-    let params = this.find_params();
-    let instance = new this.options.model(params);
+    let instance = new this.options.model({});
     let saveContactModels = ['TaskGroup', 'TaskGroupTask'];
 
     instance.attr('_suppress_errors', true);
@@ -978,23 +791,19 @@ export default canControl.extend({
     ajd = instance.save();
     ajd.fail(this.save_error.bind(this))
       .done(function (obj) {
-        function finish() {
-          // enable ui after clicking on save & other
-          that.disableEnableContentUI(false);
-          delete that.disable_hide;
-          if (that.options.add_more) {
-            if (that.options.$trigger && that.options.$trigger.length) {
-              that.options.$trigger.trigger('modal:added', [obj]);
-            }
-            that.new_instance();
-          } else {
-            that.element.trigger('modal:success', [obj])
-              .modal_form('hide');
-            that.update_hash_fragment();
+        // enable ui after clicking on save & other
+        that.disableEnableContentUI(false);
+        delete that.disable_hide;
+        if (that.options.add_more) {
+          if (that.options.$trigger && that.options.$trigger.length) {
+            that.options.$trigger.trigger('modal:added', [obj]);
           }
+          that.new_instance();
+        } else {
+          that.element.trigger('modal:success', [obj])
+            .modal_form('hide');
+          that.update_hash_fragment();
         }
-
-        finish();
       });
     this.save_ui_status();
     return ajd;

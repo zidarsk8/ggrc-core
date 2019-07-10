@@ -11,7 +11,6 @@ export default ModalsController.extend({
     content_view: GGRC.templates_path + '/gdrive/auth_button.stache',
   },
   init: function () {
-    this._super(...arguments);
     this.defaults.button_view =
       GGRC.templates_path + '/base_objects/empty.stache';
   },
