@@ -90,7 +90,6 @@ export default canComponent.extend({
     },
     searchOnly: false,
     useSnapshots: false,
-    entries: [],
     relevantTo: [],
     objectGenerator: false,
     deferredList: [],
@@ -106,9 +105,6 @@ export default canComponent.extend({
       return this.load()
         .then((items) => {
           this.attr('items', items);
-          this.attr('entries', items.map(function (item) {
-            return item.data;
-          }));
           this.setColumnsConfiguration();
           this.setRelatedAssessments();
           this.attr('isBeforeLoad', false);
