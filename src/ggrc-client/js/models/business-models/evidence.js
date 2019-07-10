@@ -68,7 +68,6 @@ export default Cacheable.extend({
       {
         attr_title: 'Description',
         attr_name: 'description',
-        disable_sorting: true,
       }],
   },
 }, {
