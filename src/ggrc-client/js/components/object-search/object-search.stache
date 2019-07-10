@@ -16,7 +16,6 @@
   <aside>
     <saved-search-list
       objectType:from="model.model_singular"
-      selectedSearchId:from="selectedSavedSearchId"
       searchType:from="'GlobalSearch'"
     ></saved-search-list>
   </aside>

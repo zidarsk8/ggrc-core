@@ -560,21 +560,18 @@ let viewModel = canMap.extend({
     this.attr('savedSearchPermalink', null);
     this.attr('appliedSavedSearch', null);
   },
-  checkAppliedSavedSearch(appliedSavedSearch) {
-    if (!appliedSavedSearch) {
+  applySavedSearch(selectedSavedSearch) {
+    if (!selectedSavedSearch || this.attr('filterIsDirty')) {
       this.clearAppliedSavedSearch();
+      return;
     }
 
-    if (!this.attr('filterIsDirty') && this.attr('selectedSavedSearchId')) {
-      const modelName = this.attr('model').table_singular;
-      const permalink = AdvancedSearch
-        .buildSearchPermalink(appliedSavedSearch.id, modelName);
+    const modelName = this.attr('model').table_singular;
+    const permalink = AdvancedSearch
+      .buildSearchPermalink(selectedSavedSearch.id, modelName);
 
-      this.attr('savedSearchPermalink', permalink);
-      this.attr('appliedSavedSearch', appliedSavedSearch.attr());
-    } else {
-      this.clearAppliedSavedSearch();
-    }
+    this.attr('savedSearchPermalink', permalink);
+    this.attr('appliedSavedSearch', selectedSavedSearch.attr());
   },
   applyAdvancedFilters: function () {
     const filters = this.attr('advancedSearch.filterItems').attr();
@@ -599,7 +596,7 @@ let viewModel = canMap.extend({
 
     this.attr('advancedSearch.open', false);
 
-    this.checkAppliedSavedSearch(
+    this.applySavedSearch(
       this.attr('advancedSearch.selectedSavedSearch')
     );
     this.onFilter();

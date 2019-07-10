@@ -28,16 +28,7 @@ export default canComponent.extend({
     statusItem: AdvancedSearch.create.state(),
     relevantTo: [],
     pubSub,
-    savedSearchSelected(savedSearch) {
-      if (!savedSearch) {
-        // reset selected search ID
-        this.dispatch({
-          type: 'savedSearchSelected',
-          savedSearchId: null,
-        });
-        return;
-      }
-
+    selectSavedSearchFilter(savedSearch) {
       this.attr('filterItems', savedSearch.filterItems || []);
       this.attr('mappingItems', savedSearch.mappingItems || []);
       this.attr('statusItem', savedSearch.statusItem);
@@ -46,11 +37,6 @@ export default canComponent.extend({
         this.attr('modelName', savedSearch.modelName);
         this.attr('modelDisplayName', savedSearch.modelDisplayName);
       }
-
-      this.dispatch({
-        type: 'savedSearchSelected',
-        savedSearchId: savedSearch.id,
-      });
     },
     availableAttributes: function () {
       return getAvailableAttributes(this.attr('modelName'));
@@ -94,20 +80,20 @@ export default canComponent.extend({
   },
   events: {
     '{viewModel.filterItems} change'() {
-      this.viewModel.savedSearchSelected(null);
+      pubSub.dispatch('resetSelectedSavedSearch');
     },
     '{viewModel.mappingItems} change'() {
-      this.viewModel.savedSearchSelected(null);
+      pubSub.dispatch('resetSelectedSavedSearch');
     },
     '{viewModel.statusItem} change'() {
-      this.viewModel.savedSearchSelected(null);
+      pubSub.dispatch('resetSelectedSavedSearch');
     },
     '{pubSub} savedSearchSelected'(pubSub, ev) {
       if (ev.searchType !== 'GlobalSearch') {
         return;
       }
 
-      this.viewModel.savedSearchSelected(ev.savedSearch);
+      this.viewModel.selectSavedSearchFilter(ev.savedSearch);
     },
   },
 });

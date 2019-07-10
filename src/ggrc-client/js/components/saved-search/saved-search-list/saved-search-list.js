@@ -70,6 +70,10 @@ export default canComponent.extend({
         selectedSavedSearch.modelDisplayName = model.title_plural;
       }
 
+      // Can be set from parent component.
+      // For example: tree-widget-container
+      this.attr('selectedSearchId', search.id);
+
       pubSub.dispatch({
         type: 'savedSearchSelected',
         savedSearch: selectedSavedSearch,
@@ -131,6 +135,9 @@ export default canComponent.extend({
       this.viewModel.loadSavedSearches().then(() => {
         this.viewModel.selectSearch(ev.search);
       });
+    },
+    '{pubSub} resetSelectedSavedSearch'() {
+      this.viewModel.attr('selectedSearchId', null);
     },
   },
   helpers: {

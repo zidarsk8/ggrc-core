@@ -25,10 +25,6 @@ export default canComponent.extend({
     return ObjectOperationsBaseVM.extend({
       object: 'MultitypeSearch',
       type: 'Control',
-      selectedSavedSearchId: null,
-      savedSearchSelected({savedSearchId}) {
-        this.attr('selectedSavedSearchId', savedSearchId);
-      },
     });
   },
   helpers: {
