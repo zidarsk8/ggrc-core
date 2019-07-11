@@ -8,7 +8,7 @@ import loToArray from 'lodash/toArray';
 import loReduce from 'lodash/reduce';
 import {ggrcAjax} from './plugins/ajax_extensions';
 import canCompute from 'can-compute';
-import {getPageInstance} from './plugins/utils/current-page-utils';
+import './plugins/utils/current-page-utils'; // fixes a cyclic dependency and should be fixed in a proper way
 import Stub from '../js/models/stub';
 import {getInstance} from '../js/plugins/utils/models-utils';
 import {reify} from '../js/plugins/utils/reify-utils';
@@ -219,12 +219,6 @@ function isAllowedAny(action, resourceType) {
   return !!allowed;
 }
 
-function pageContextId() {
-  let pageInstance = getPageInstance();
-  return (pageInstance && pageInstance.context &&
-          pageInstance.context.id) || null;
-}
-
 function refreshPermissions() {
   return ggrcAjax({
     url: '/permissions',
@@ -246,6 +240,5 @@ export {
   isAllowed,
   isAllowedFor,
   isAllowedAny,
-  pageContextId,
   refreshPermissions,
 };

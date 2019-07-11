@@ -7,7 +7,6 @@ import loMap from 'lodash/map';
 import * as AjaxExtensions from '../plugins/ajax_extensions';
 import * as Permission from '../permission';
 import {makeFakeInstance} from '../../js_specs/spec_helpers';
-import * as CurrentPageUtils from '../plugins/utils/current-page-utils';
 import UserRole from '../models/service-models/user-role';
 import Audit from '../models/business-models/audit';
 import {getInstance} from '../plugins/utils/models-utils';
@@ -558,20 +557,6 @@ describe('Permission', function () {
       };
       expect(Permission.isAllowedAny('read', 'Program'))
         .toEqual(false);
-    });
-  });
-
-  describe('pageContextId() method', function () {
-    it('return page instance context id', function () {
-      let context = {
-        id: 711,
-      };
-      spyOn(CurrentPageUtils, 'getPageInstance')
-        .and.returnValue({context: context});
-      expect(Permission.pageContextId()).toEqual(context.id);
-    });
-    it('return null if page instance context is undefined', function () {
-      expect(Permission.pageContextId()).toEqual(null);
     });
   });
 
