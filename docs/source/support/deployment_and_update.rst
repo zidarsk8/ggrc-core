@@ -219,7 +219,7 @@ change, so during upgrades, verify rather than add the APIs and keys.
 
     Your screen should now look like the following:
 
-    .. figure:: /_static/res/deployment1.png
+    .. figure:: /docs/source/_static/res/deployment1.png
        :alt: Enable APIs
 
 3.  Select “Credentials” in the left-hand column, and click “Create
@@ -233,7 +233,7 @@ change, so during upgrades, verify rather than add the APIs and keys.
 
       Your screen should look like the following:
 
-      .. figure:: /_static/res/deployment2.png
+      .. figure:: /docs/source/_static/res/deployment2.png
          :alt: Create Client ID
 
     * Click “Create Client ID”. You'll see a popup with new Client ID
