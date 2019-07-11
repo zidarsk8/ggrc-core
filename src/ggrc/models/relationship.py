@@ -231,8 +231,12 @@ class Relationship(base.ContextRBAC, Base, db.Model):
   @classmethod
   def validate_delete(cls, mapper, connection, target):
     """Validates is delete of Relationship is allowed."""
+    from ggrc.utils.user_generator import is_ext_app_request
     cls.validate_relation_by_type(target.source_type,
                                   target.destination_type)
+    if is_ext_app_request() and not target.is_external:
+      raise ValidationError(
+          'External application can delete only external relationships.')
 
   @classmethod
   def validate_relation_by_type(cls, source_type, destination_type):
