@@ -926,6 +926,39 @@ class TestAssessmentImport(TestCase):
         "text", assessment.custom_attribute_values[0].attribute_value
     )
 
+  @ddt.data("user@example.com", "--")
+  def test_asmt_state_updating_verifiers_with_map_fields(self, new_verifier):
+    """Test assessment In Progress after updating Verifiers and map fields"""
+    audit = factories.AuditFactory()
+    objective = factories.ObjectiveFactory()
+    factories.SnapshotFactory(
+        parent=audit,
+        child_id=objective.id,
+        child_type=objective.__class__.__name__,
+        revision=factories.RevisionFactory()
+    )
+    assessment = \
+        factories.AssessmentFactory(audit=audit,
+                                    status=all_models.Assessment.DONE_STATE,
+                                    )
+    person = factories.PersonFactory(email="verifier@example.com")
+    factories.AccessControlPersonFactory(
+        ac_list=assessment.acr_name_acl_map["Verifiers"],
+        person=person,
+    )
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.DONE_STATE)
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", new_verifier),
+        ("map:objective versions", objective.slug)
+    ]))
+    self.assertEqual(
+        all_models.Assessment.query.get(assessment.id).status,
+        all_models.Assessment.PROGRESS_STATE)
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):
