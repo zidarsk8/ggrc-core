@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './simple-modal.stache';
 
 /**
@@ -12,11 +15,11 @@ import template from './simple-modal.stache';
  * Simple Modal provides only logic less basic markup. All business logic should be placed on the level of inner components.
  * To simplify styling additional helper CSS classes were created: 'simple-modal__footer', 'simple-modal__body' and 'simple-modal__header'
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'simple-modal',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     extraCssClass: '',
     instance: {},
     modalTitle: '',

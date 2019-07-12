@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
 import Component from './template-field';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 
@@ -15,7 +18,7 @@ describe('template-field component', function () {
 
   describe('denormalizeMandatory() method', function () {
     it('returns correct denormalized field', function () {
-      let field = new can.Map({
+      let field = new canMap({
         multi_choice_options: 'foo,bar,baz,bam',
         multi_choice_mandatory: '0,1,2,3',
       });
@@ -34,7 +37,7 @@ describe('template-field component', function () {
 
     it('returns false for attachment and comment for missing mandatory',
       function () {
-        let field = new can.Map({
+        let field = new canMap({
           multi_choice_options: 'one,two,three,four,five',
           multi_choice_mandatory: '0,1,2',
         });
@@ -55,7 +58,7 @@ describe('template-field component', function () {
       });
 
     it('returns values only for defined options', function () {
-      let field = new can.Map({
+      let field = new canMap({
         multi_choice_options: 'one,two,three',
         multi_choice_mandatory: '0,1,2,2,0',
       });
@@ -73,7 +76,7 @@ describe('template-field component', function () {
 
   describe('normalizeMandatory() method', function () {
     it('returns correct normalized attrs', function () {
-      let attrs = new can.List([
+      let attrs = new canList([
         {attachment: false, comment: false},
         {attachment: true, comment: false},
         {attachment: false, comment: true},
@@ -107,8 +110,8 @@ describe('template-field component', function () {
           '</template-field>',
         ].join('');
 
-        templateContext = new can.Map({
-          types: new can.List([
+        templateContext = new canMap({
+          types: new canList([
             {
               type: 'Text',
               name: 'Text',
@@ -121,7 +124,7 @@ describe('template-field component', function () {
           fieldRemoved: onRemoveCallback,
         });
 
-        renderer = can.stache(htmlSnippet);
+        renderer = canStache(htmlSnippet);
         docFragment = renderer(templateContext);
         $body.append(docFragment);
 

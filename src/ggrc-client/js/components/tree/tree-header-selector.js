@@ -3,10 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-export default can.Component.extend({
+import canMap from 'can-map';
+import canComponent from 'can-component';
+export default canComponent.extend({
   tag: 'tree-header-selector',
   leakScope: true,
-  viewModel: can.Map.extend({}),
+  viewModel: canMap.extend({}),
   events: {
     init: function (element, options) {
       this.viewModel.attr('controller', this);

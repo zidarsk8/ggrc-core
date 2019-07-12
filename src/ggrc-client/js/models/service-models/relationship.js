@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../../plugins/ajax_extensions';
 import Cacheable from '../cacheable';
 import Stub from '../stub';
 import {trigger} from 'can-event';
@@ -54,7 +55,7 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/relationships/{id}',
 }, {
   unmap: function (cascade) {
-    return $.ajax({
+    return ggrcAjax({
       type: 'DELETE',
       url: '/api/relationships/' + this.attr('id') +
         '?cascade=' + cascade,

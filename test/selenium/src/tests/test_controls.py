@@ -33,6 +33,12 @@ class TestControls(base.Test):
                       "can_delete": three_bbs.delete_option.exists}
     assert actual_options == expected_options
 
+  def test_user_cannot_edit_control_from_tree_view(self, control,
+                                                   dashboard_controls_tab):
+    """Confirm that user cannot edit Control from tree view."""
+    assert not dashboard_controls_tab.get_control(control).is_editable, (
+        "Edit option should not be available for Control in tree view")
+
   def test_user_cannot_add_person_to_custom_role(self, control,
                                                  controls_service):
     """Tests that user cannot add a person to custom Role."""

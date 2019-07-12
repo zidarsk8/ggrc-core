@@ -3,15 +3,17 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-people-access-control-group',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       canEdit: {
         get: function () {

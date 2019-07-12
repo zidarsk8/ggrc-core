@@ -417,8 +417,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     audit_issue_tracker_info = audit.issuetracker_issue.to_dict()
     assmt_issue_tracker_info = assmt.issuetracker_issue.to_dict()
 
-    integration_utils.set_values_for_missed_fields(assmt,
-                                                   assmt_issue_tracker_info)
+    integration_utils.populate_issue_tracker_fields(assmt,
+                                                    assmt_issue_tracker_info)
 
     fields_to_check = ["component_id", "hotlist_id", "issue_type",
                        "issue_priority", "issue_severity"]
@@ -477,8 +477,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     assmt_issue_tracker_info = assmt.issuetracker_issue.to_dict()
 
-    integration_utils.set_values_for_missed_fields(assmt,
-                                                   assmt_issue_tracker_info)
+    integration_utils.populate_issue_tracker_fields(assmt,
+                                                    assmt_issue_tracker_info)
 
     fields_to_check = ["component_id", "hotlist_id", "issue_type",
                        "issue_priority", "issue_severity"]
@@ -501,8 +501,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     assmt_issue_tracker_info = assmt.issuetracker_issue.to_dict()
 
-    integration_utils.set_values_for_missed_fields(assmt,
-                                                   assmt_issue_tracker_info)
+    integration_utils.populate_issue_tracker_fields(assmt,
+                                                    assmt_issue_tracker_info)
 
     self.assertEqual(assmt_issue_tracker_info["title"],
                      assmt.title)
@@ -730,13 +730,24 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     )
     self.assertNotEqual(int(issue_tracker_issue.issue_id), TICKET_ID)
 
+  @ddt.data(
+      ('Completed', 'VERIFIED'),
+      ('In Progress', 'ASSIGNED'),
+      ('Rework Needed', 'ASSIGNED'),
+      ('Deprecated', 'OBSOLETE'),
+      ('In Review', 'FIXED'),
+  )
+  @ddt.unpack
   @mock.patch('ggrc.integrations.issues.Client.create_issue')
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
-  def test_complete_assessment_create_issue(self, mock_create_issue):
-    """Test the creation of issue for completed assessment."""
+  def test_complete_assessment_create_issue(self,
+                                            assmt_status,
+                                            expected_status,
+                                            mock_create_issue):
+    """Test the creation of ticket for assessment in {0} state."""
     audit = factories.AuditFactory()
-
-    self.api.post(all_models.Assessment, {
+    # self._create_assessment_via_api(audit, assmt_status)
+    response = self.api.post(all_models.Assessment, {
         'assessment': {
             'title': 'Assessment1',
             'context': None,
@@ -744,10 +755,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
                 'id': audit.id,
                 'type': audit.type,
             },
-            'status': 'Completed',
+            'status': assmt_status,
         }
     })
-    asmt = all_models.Assessment.query.filter_by(title='Assessment1').one()
+    self.assert201(response)
+    asmt = all_models.Assessment.query.one()
 
     with mock.patch.object(
         assessment_integration.AssessmentTrackerHandler,
@@ -765,9 +777,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       }
       self.api.put(asmt, {'issue_tracker': issue_params})
       mock_create_issue.assert_called_once()
-      # pylint: disable=W0212
-      self.assertEqual(mock_create_issue._mock_call_args[0][0]['status'],
-                       'VERIFIED')
+      self.assertEqual(mock_create_issue.call_args[0][0]['status'],
+                       expected_status)
 
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_update_issuetracker_info(self):
@@ -1271,6 +1282,39 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
           issue.issue_tracked_obj.id
       )
       self.assertEqual(issue_obj.enabled, issue_tracker_enabled)
+
+  def test_values_updated_from_audit(self):
+    """Check assessment values updated with latest audit values"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=audit,
+          component_id=self.DEFAULT_ASSESSMENT_ATTRS["component_id"],
+          hotlist_id=self.DEFAULT_ASSESSMENT_ATTRS["hotlist_id"],
+          issue_priority=self.DEFAULT_ASSESSMENT_ATTRS["issue_priority"],
+          issue_severity=self.DEFAULT_ASSESSMENT_ATTRS["issue_severity"],
+          issue_type=self.DEFAULT_ASSESSMENT_ATTRS["issue_type"],
+      )
+      asmt = factories.AssessmentFactory(audit=audit)
+      factories.IssueTrackerIssueFactory(
+          issue_tracked_obj=asmt,
+          component_id=4321,
+          hotlist_id=1234,
+          issue_priority="P2",
+          issue_severity="S1",
+      )
+    audit_issue_tracker_info = audit.issuetracker_issue.to_dict()
+    assmt_issue_tracker_info = asmt.issuetracker_issue.to_dict()
+
+    integration_utils.populate_issue_tracker_fields(asmt,
+                                                    assmt_issue_tracker_info,
+                                                    with_update=True)
+
+    fields_to_check = ["component_id", "hotlist_id", "issue_type",
+                       "issue_priority", "issue_severity"]
+    for field in fields_to_check:
+      self.assertEqual(assmt_issue_tracker_info[field],
+                       audit_issue_tracker_info[field])
 
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'

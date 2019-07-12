@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../object-list-item/comment-list-item';
 import '../object-list/object-list';
 import template from './mapped-comments.stache';
@@ -10,11 +13,11 @@ import template from './mapped-comments.stache';
 /**
  * Assessment specific mapped controls view component
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'mapped-comments',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: false,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       noItemsText: {
         type: 'string',

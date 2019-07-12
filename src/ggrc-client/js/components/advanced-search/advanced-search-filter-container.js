@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './advanced-search-filter-attribute';
 import './advanced-search-filter-group';
 import './advanced-search-filter-operator';
@@ -22,15 +26,15 @@ let viewModel = AdvancedSearchContainer.extend({
     /**
      * Contains Filter Attributes, Groups and Operators.
      * Initializes Items with State Attribute by default.
-     * @type {can.List}
+     * @type {canList}
      */
     items: {
       type: '*',
-      Value: can.List,
+      Value: canList,
       get: function (items) {
         if (this.attr('defaultStatusFilter') && items && !items.length &&
           StateUtils.hasFilter(this.attr('modelName'))) {
-          const statusItem = new can.Map(AdvancedSearch.create.state());
+          const statusItem = new canMap(AdvancedSearch.create.state());
           statusItem.value = AdvancedSearch.setDefaultStatusConfig(
             statusItem.value, this.attr('modelName')
           );
@@ -65,9 +69,9 @@ let viewModel = AdvancedSearchContainer.extend({
   modelName: null,
   /**
    * Contains available attributes for specific model.
-   * @type {can.List}
+   * @type {canList}
    */
-  availableAttributes: can.List(),
+  availableAttributes: canList(),
   /**
    * Adds Filter Operator and Filter Attribute to the collection.
    */
@@ -80,7 +84,7 @@ let viewModel = AdvancedSearchContainer.extend({
   },
   /**
    * Transforms Filter Attribute to Filter Group.
-   * @param {can.Map} attribute - Filter Attribute.
+   * @param {canMap} attribute - Filter Attribute.
    */
   createGroup: function (attribute) {
     let items = this.attr('items');
@@ -96,9 +100,9 @@ let viewModel = AdvancedSearchContainer.extend({
 /**
  * Filter Container is a component allowing to compose Filter Attributes, Groups and Operators.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-container',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
 });

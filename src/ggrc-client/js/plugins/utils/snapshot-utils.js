@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canConstruct from 'can-construct';
+import canList from 'can-list';
+import canMap from 'can-map';
 import {
   buildParam,
 } from './query-api-utils';
@@ -14,6 +17,7 @@ import Audit from '../../models/business-models/audit';
 import Stub from '../../models/stub';
 import tracker from '../../tracker';
 import * as businessModels from '../../models/business-models';
+import {ggrcGet} from '../ajax_extensions';
 
 /**
  * Util methods for work with Snapshots.
@@ -102,11 +106,11 @@ function isAuditScopeModel(model) {
  * @return {Object} The object
  */
 function toObject(instance) {
-  let content = instance.revision.content instanceof can.Construct ?
+  let content = instance.revision.content instanceof canConstruct ?
     instance.revision.content.attr() : instance.revision.content;
 
   content.originalLink = getParentUrl(instance);
-  content.snapshot = new can.Map(instance);
+  content.snapshot = new canMap(instance);
   content.related_sources = [];
   content.related_destinations = [];
   content.viewLink = content.snapshot.viewLink;
@@ -177,7 +181,7 @@ function getParentUrl(instance) {
  * @return {Object} The array of objects
  */
 function toObjects(values) {
-  return new can.List(values.map(toObject));
+  return new canList(values.map(toObject));
 }
 
 /**
@@ -266,7 +270,7 @@ function getSnapshotsCounts(widgets, instance) {
     tracker.USER_JOURNEY_KEYS.API,
     tracker.USER_ACTIONS[instance.type.toUpperCase()].SNAPSHOTS_COUNT);
 
-  return $.get(url)
+  return ggrcGet(url)
     .then((counts) => {
       stopFn();
       let countsMap = {};

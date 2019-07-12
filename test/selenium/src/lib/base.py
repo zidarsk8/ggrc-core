@@ -784,11 +784,9 @@ class TreeViewItem(Element):
 
   def expand(self):
     """Expand Tree View item if it is not expanded already."""
-    from lib.page.widget.widget_base import CustomAttributesItemContent
     if not self.is_expanded:
       self.item_btn.click()
       selenium_utils.wait_until_stops_moving(self.item_btn)
-    return CustomAttributesItemContent(self._driver, self.text)
 
   def collapse(self):
     """Collapse Tree View item if it is expanded."""

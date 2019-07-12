@@ -3,16 +3,19 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './clipboard-link';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'shortlink-component',
-  view: can.stache(
+  view: canStache(
     '<clipboard-link text:from="text">' +
     '<i class="fa fa-google"/>Get Short Url</clipboard-link>'
   ),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: null,
     define: {
       text: {

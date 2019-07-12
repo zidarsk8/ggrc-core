@@ -3,10 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-export default can.Component.extend({
+import canMap from 'can-map';
+import canComponent from 'can-component';
+export default canComponent.extend({
   tag: 'issue-tracker-switcher',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isIntegrationEnabled: {
         set: function (newValue, setValue) {

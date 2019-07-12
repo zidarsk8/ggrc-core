@@ -3,10 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
 import PersonProfile from '../../models/service-models/person-profile';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   instance: null,
   isNewInstance: false,
   turnOnCalendarEvents: true,
@@ -52,7 +54,7 @@ const events = {
   },
 };
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'person-modal',
   leakScope: true,
   viewModel,

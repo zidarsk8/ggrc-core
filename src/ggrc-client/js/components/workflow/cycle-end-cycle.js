@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   getPageInstance,
 } from '../../plugins/utils/current-page-utils';
@@ -25,9 +27,9 @@ import {trigger} from 'can-event';
  *
  */
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'cycle-end-cycle',
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     cycle: null,
   }),
   events: {
@@ -47,9 +49,8 @@ export default can.Component.extend({
           trigger.call(el[0], 'refreshTree');
 
           return initCounts(
-            [workflowCountsMap.history],
-            pageInstance.type,
-            pageInstance.id);
+            [workflowCountsMap.activeCycles, workflowCountsMap.history],
+            pageInstance.type, pageInstance.id);
         });
     },
   },

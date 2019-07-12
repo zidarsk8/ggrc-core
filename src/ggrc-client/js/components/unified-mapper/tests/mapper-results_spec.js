@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canList from 'can-list';
+import canMap from 'can-map';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
@@ -159,7 +162,7 @@ describe('mapper-results component', function () {
       viewModel.attr('object', 'Program');
       viewModel.attr('type', 'Control');
       viewModel.setColumnsConfiguration();
-      expect(can.makeArray(viewModel.attr('columns.service'))).toEqual([]);
+      expect(makeArray(viewModel.attr('columns.service'))).toEqual([]);
     });
   });
 
@@ -335,9 +338,9 @@ describe('mapper-results component', function () {
       key: 'mock3',
       direction: 'mock4',
     };
-    let mockFilterItems = new can.List(['filterItem']);
-    let mockMappingItems = new can.List(['mappingItem']);
-    let mockStatusItem = new can.Map({
+    let mockFilterItems = new canList(['filterItem']);
+    let mockMappingItems = new canList(['mappingItem']);
+    let mockStatusItem = new canMap({
       value: {
         items: ['statusItem'],
       },
@@ -628,13 +631,6 @@ describe('mapper-results component', function () {
       viewModel.setSelectedItems(allItems);
       expect(allItems).toEqual(expectedResult);
     });
-
-    it('uses prevSelected if prevSelected.length > 0', function () {
-      viewModel.attr('prevSelected', [{id: 123}]);
-      viewModel.setSelectedItems(allItems);
-      expect(allItems).toEqual(expectedResult);
-      expect(viewModel.attr('prevSelected').length).toEqual(0);
-    });
   });
 
   describe('setMegaRelations() method', function () {
@@ -709,7 +705,7 @@ describe('mapper-results component', function () {
         id: 123,
       });
       viewModel.disableItself(isMegaMapping, allItems);
-      expect(can.makeArray(viewModel.attr('disabledIds'))).toEqual([123]);
+      expect(makeArray(viewModel.attr('disabledIds'))).toEqual([123]);
     });
 
     it('assigns true to "isDisabled" for allItems ' +
@@ -1230,6 +1226,65 @@ describe('mapper-results component', function () {
       });
       expect(viewModel.attr('relatedAssessments.state.open'))
         .toEqual(true);
+    });
+  });
+
+  describe('onItemDestroyed() method', () => {
+    beforeEach(() => {
+      spyOn(viewModel, 'setItems');
+    });
+
+    it('removes selected item based on passed item\'s id from "selected" ' +
+    'collection', () => {
+      viewModel.attr('selected', [
+        {id: 123},
+        {id: 1234},
+        {id: 12345},
+      ]);
+
+      viewModel.onItemDestroyed({itemId: 1234});
+
+      expect(viewModel.attr('selected').serialize()).toEqual([
+        {id: 123},
+        {id: 12345},
+      ]);
+    });
+
+    it('sets previous page if destroyed item was single on the page', () => {
+      viewModel.attr('items', [{}]);
+      viewModel.attr('paging', {current: 3});
+
+      viewModel.onItemDestroyed({itemId: 1});
+
+      expect(viewModel.attr('paging.current')).toBe(2);
+    });
+
+    describe('doesn\'t set previous page', () => {
+      it('if destroyed item was single on the page and current page is ' +
+      'first', () => {
+        viewModel.attr('items', [{}]);
+        viewModel.attr('paging', {current: 1});
+
+        viewModel.onItemDestroyed({itemId: 1});
+
+        expect(viewModel.attr('paging.current')).toBe(1);
+      });
+
+      it('if count of items placed on the page without destroyed item is ' +
+      'more than 1', () => {
+        viewModel.attr('items', [{}, {}]);
+        viewModel.attr('paging', {current: 3});
+
+        viewModel.onItemDestroyed({itemId: 1});
+
+        expect(viewModel.attr('paging.current')).toBe(3);
+      });
+    });
+
+    it('refreshes the list of items', () => {
+      viewModel.onItemDestroyed({itemId: 1});
+
+      expect(viewModel.setItems).toHaveBeenCalled();
     });
   });
 

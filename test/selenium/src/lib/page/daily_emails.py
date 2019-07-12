@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Daily emails."""
 
-from lib import base, constants, environment
+from lib import base, constants, url, environment
 from lib.entities import entity
 from lib.utils import selenium_utils
 
@@ -11,10 +11,10 @@ class DailyEmails(base.WithBrowser):
   """Daily emails page."""
   def __init__(self, driver=None):
     super(DailyEmails, self).__init__(driver)
-    self.daily_emails_url = (environment.app_url +
-                             "_notifications/show_daily_digest")
+    self.daily_emails_url = (environment.app_url + url.NOTIFICATIONS +
+                             "/show_daily_digest")
 
-  def open_daily_emails_page(self):
+  def open_digest_page(self):
     """Open page with daily emails."""
     selenium_utils.open_url(self.daily_emails_url)
     selenium_utils.wait_for_doc_is_ready(self._driver)

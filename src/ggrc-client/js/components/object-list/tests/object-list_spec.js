@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../object-list';
 
@@ -28,7 +30,7 @@ describe('object-list component', function () {
   });
 
   describe('modifySelection() method ', function () {
-    let scope = new can.Map({
+    let scope = new canMap({
       instance: {
         type: 'a',
         id: 1,
@@ -36,7 +38,7 @@ describe('object-list component', function () {
       isSelected: false,
     });
 
-    let items = new can.List([
+    let items = new canList([
       scope, {
         instance: {
           type: 'b',
@@ -66,14 +68,14 @@ describe('object-list component', function () {
     let items;
 
     beforeEach(function () {
-      scope = new can.Map({
+      scope = new canMap({
         instance: {
           type: 'a',
           id: 1,
         },
         isSelected: false,
       });
-      items = new can.List([scope, {
+      items = new canList([scope, {
         instance: {
           type: 'b',
           id: 1,
@@ -85,7 +87,7 @@ describe('object-list component', function () {
       // Set some not null default value selectedItem for each test execution
       viewModel.attr('selectedItem', {
         el: 'some object',
-        data: new can.Map({
+        data: new canMap({
           field: 'someData',
         }),
       });

@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../form/fields/checkbox-form-field';
 import '../form/fields/multiselect-form-field';
 import '../form/fields/date-form-field';
@@ -12,11 +15,11 @@ import '../form/fields/rich-text-form-field';
 import '../form/fields/text-form-field';
 import template from './custom-attributes-field.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'custom-attributes-field',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       disabled: {
         type: 'htmlbool',

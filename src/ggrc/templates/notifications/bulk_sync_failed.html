@@ -34,7 +34,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         {% for obj in sync_data.objects %}
           <tr>
 
-            <td><a href="{{ obj.url }}">{{ obj.title }}</a></td>
+            <td><a href="{{ obj.url }}">{{ obj.title|e }}</a></td>
             <td>&emsp;
               <span {{ style.header_color() }}>Code:</span> {{ obj.code }}
             </td>

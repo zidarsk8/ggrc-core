@@ -176,6 +176,30 @@ class TestUserGenerator(TestCase):
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  @freeze_time("2019-05-17 17:52:44")
+  def test_creation_with_empty_name(self):
+    """Test user creation with empty name."""
+    with mock.patch.multiple(
+        PersonClient,
+        _post=self._mock_post
+    ):
+      data = json.dumps([{'person': {
+          'name': '',
+          'email': 'aturing@example.com',
+          'context': None,
+          'external': True
+      }}])
+      response = self._post(data)
+      self.assertStatus(response, 200)
+
+      user = Person.query.filter_by(email='aturing@example.com').first()
+      self.assertEquals(user.name, 'aturing')
+
+    # checks person profile restrictions
+    self.assert_profiles_restrictions()
+
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
   @freeze_time("2018-05-20 10:22:22")
   def test_person_import(self):
     """Test for mapped person"""

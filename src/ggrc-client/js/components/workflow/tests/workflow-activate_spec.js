@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../workflow-activate';
 import * as helpers from '../../../plugins/utils/workflow-utils';
@@ -45,7 +46,7 @@ describe('workflow-activate component', function () {
     let workflow;
 
     beforeEach(function () {
-      workflow = new can.Map();
+      workflow = new canMap();
       workflow.refresh_all = jasmine.createSpy('refresh_all');
       spyOn(viewModel, 'initWorkflow');
       spyOn(Permission, 'refresh');
@@ -155,7 +156,7 @@ describe('workflow-activate component', function () {
     let workflow;
 
     beforeEach(function () {
-      workflow = new can.Map({});
+      workflow = new canMap({});
       Object.assign(workflow, {
         refresh: jasmine.createSpy('refresh'),
         save: jasmine.createSpy('save'),
@@ -234,16 +235,18 @@ describe('workflow-activate component', function () {
     let workflow;
 
     beforeEach(function () {
-      workflow = new can.Map();
+      workflow = new canMap();
       workflow.refresh = jasmine.createSpy('refresh');
       workflow.save = jasmine.createSpy('save');
+      spyOn(viewModel, 'updateActiveCycleCounts');
       spyOn(helpers, 'generateCycle');
     });
 
-    it('should be in waiting state while refresh is in progress', function () {
-      viewModel.repeatOffHandler(workflow);
-      expect(viewModel.attr('waiting')).toBe(true);
-    });
+    it('should be in waiting state while refresh is in progress',
+      async function () {
+        viewModel.repeatOffHandler(workflow);
+        expect(viewModel.attr('waiting')).toBe(true);
+      });
 
     it('generates cycle for passed workflow before workflow refreshing',
       async function (done) {
@@ -277,6 +280,11 @@ describe('workflow-activate component', function () {
       await viewModel.repeatOffHandler(workflow);
       expect(viewModel.attr('waiting'), false);
       done();
+    });
+
+    it('should try to update counts for active cycles tab', async function () {
+      await viewModel.repeatOffHandler(workflow);
+      expect(viewModel.updateActiveCycleCounts).toHaveBeenCalledWith(workflow);
     });
 
     it('should restore button when cycle generating fails',

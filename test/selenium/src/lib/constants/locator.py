@@ -1169,7 +1169,7 @@ class AdminCustomAttributes(object):
 class CustomAttributesItemContent(AdminCustomAttributes):
   """Locators for expanded view of custom attribute group
   in admin dashboard."""
-  _TREE_ITEM = ".tree-item.tree-view-node"
+  _TREE_ITEM = ".tree-item"
   TREE_ITEM_EL_OPENED_CSS = (By.CSS_SELECTOR, _TREE_ITEM + ".item-open")
   CONTENT_OPEN = ".content-open .tier-2-info-content"
   TREE_STRUCTURE = (

@@ -3,14 +3,17 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../rich-text/rich-text';
 import template from './rich-text-form-field.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'rich-text-form-field',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     _value: '',
     _oldValue: null,
     placeholder: '',

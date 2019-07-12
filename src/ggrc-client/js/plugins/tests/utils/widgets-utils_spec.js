@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as AjaxExtensions from '../../../plugins/ajax_extensions';
 import * as TreeViewUtils from '../../utils/tree-view-utils';
 import * as SnapshotUtils from '../../utils/snapshot-utils';
 import * as CurrentPageUtils from '../../utils/current-page-utils';
@@ -397,7 +398,7 @@ describe('GGRC Utils Widgets', function () {
       spyOn(WidgetList, 'get_widget_list_for')
         .and.returnValue(widgets);
 
-      spyOn(can, 'ajax')
+      spyOn(AjaxExtensions, 'ggrcAjax')
         .and.returnValues(
           $.Deferred().resolve(
             [
@@ -417,9 +418,10 @@ describe('GGRC Utils Widgets', function () {
         .then(function (counts) {
           let reqParams;
           let reqParamNames;
+          let ggrcAjax = AjaxExtensions.ggrcAjax;
 
-          expect(can.ajax.calls.count()).toEqual(1);
-          reqParams = JSON.parse(can.ajax.calls.argsFor(0)[0].data);
+          expect(ggrcAjax.calls.count()).toEqual(1);
+          reqParams = JSON.parse(ggrcAjax.calls.argsFor(0)[0].data);
           reqParamNames = _.map(reqParams,
             function (param) {
               return param.object_name;

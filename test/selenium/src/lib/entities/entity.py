@@ -689,6 +689,17 @@ class PersonEntity(Entity):
   def __lt__(self, other):
     return self.email < other.email
 
+  def people_tree_item_representation(self):
+    """Make object's copy and convert it to the view of people tree item."""
+    from lib.constants import roles
+    origin_obj = copy.deepcopy(self)
+    origin_obj.__dict__.update({k: None for k in (
+        'modified_by', 'description', 'created_at', 'updated_at',
+        'custom_attributes')})
+    if self.system_wide_role == roles.NO_ACCESS:
+      origin_obj.system_wide_role = roles.NO_ROLE
+    return origin_obj
+
 
 class UserRoleEntity(Representation):
   """Class that represents model for user role entity"""
@@ -878,6 +889,14 @@ class ProposalEmailUI(Representation):
     super(ProposalEmailUI, self).__init__()
     self.set_attrs(
         "recipient_email", "author", "obj_type", "changes", "comment", **attrs)
+
+
+class ReviewEmailUI(Representation):
+  """Review request notification email."""
+  def __init__(self, **attrs):
+    super(ReviewEmailUI, self).__init__()
+    self.set_attrs(
+        "recipient_email", "obj_type", "obj_title", "comment", **attrs)
 
 
 class DailyEmailUI(Representation):

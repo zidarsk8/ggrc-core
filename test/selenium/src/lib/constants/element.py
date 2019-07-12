@@ -142,7 +142,8 @@ class Base(object):
 class Common(object):
   """Common elements' labels and properties for objects."""
   TITLE = "Title"
-  TITLE_EDITED_PART = "[EDITED]"
+  EDITED_PART = "edited"
+  TITLE_EDITED_PART = "[" + EDITED_PART.upper() + "]"
   DESCRIPTION = "Description"
   CODE = "Code"
   STATE = Base.STATE

@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../sortable-column/sortable-column';
 import {
   REFRESH_RELATED,
@@ -17,10 +20,10 @@ import Pagination from '../base-objects/pagination';
 
 let defaultOrderBy = 'created_at';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-objects',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       noRelatedObjectsMessage: {
         type: 'string',
@@ -39,7 +42,7 @@ export default can.Component.extend({
         },
       },
       relatedObjects: {
-        Value: can.List,
+        Value: canList,
       },
       predefinedFilter: {
         type: '*',

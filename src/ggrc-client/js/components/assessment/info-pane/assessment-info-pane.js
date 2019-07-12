@@ -3,6 +3,12 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
+import canBatch from 'can-event/batch/batch';
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../controls-toolbar/assessment-controls-toolbar';
 import '../assessment-local-ca';
 import '../assessment-custom-attributes';
@@ -73,11 +79,11 @@ import {getAjaxErrorInfo} from '../../../plugins/utils/errors-utils';
 /**
  * Assessment Specific Info Pane View Component
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'assessment-info-pane',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       verifiers: {
         get: function () {
@@ -120,7 +126,7 @@ export default can.Component.extend({
         value: false,
       },
       mappedSnapshots: {
-        Value: can.List,
+        Value: canList,
       },
       assessmentTypeNameSingular: {
         get: function () {
@@ -155,13 +161,13 @@ export default can.Component.extend({
         },
       },
       comments: {
-        Value: can.List,
+        Value: canList,
       },
       urls: {
-        Value: can.List,
+        Value: canList,
       },
       files: {
-        Value: can.List,
+        Value: canList,
       },
       editMode: {
         type: 'boolean',
@@ -311,14 +317,14 @@ export default can.Component.extend({
       return this.requestQuery(query, 'urls');
     },
     updateItems: function () {
-      can.makeArray(arguments).forEach(function (type) {
+      makeArray(arguments).forEach(function (type) {
         this.attr(type).replace(this['load' + _.capitalize(type)]());
       }.bind(this));
     },
     removeItems: function (event, type) {
       let items = this.attr(type);
 
-      can.batch.start();
+      canBatch.start();
       let resultItems = items.filter((item) => {
         let newItemIndex = _.findIndex(event.items, (newItem) => {
           return newItem === item;
@@ -327,12 +333,12 @@ export default can.Component.extend({
       });
 
       items.replace(resultItems);
-      can.batch.stop();
+      canBatch.stop();
     },
     addItems: function (event, type) {
       let items = event.items;
       this.attr('isUpdating' + _.capitalize(type), true);
-      return this.attr(type).unshift(...can.makeArray(items));
+      return this.attr(type).unshift(...makeArray(items));
     },
     getEvidenceAdditionFilter: function (kind) {
       return kind ?
@@ -595,12 +601,19 @@ export default can.Component.extend({
       const deprecatedState = this.attr('deprecatedState');
       const isArchived = instance.attr('archived');
       const previousStatus = this.attr('previousStatus');
+      const doneStatuses = instance.constructor.doneStatuses;
       const stopFn = tracker.start(instance.type,
         tracker.USER_JOURNEY_KEYS.INFO_PANE,
         tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
 
       if (isArchived && [initialState, deprecatedState].includes(newStatus)) {
         return $.Deferred().resolve();
+      }
+
+      if (doneStatuses.includes(newStatus) && !instance.validateGCAs()) {
+        notifier('error', `Please fill in the required fields at 
+          'Other Attributes' tab to complete assessment.`);
+        return $.Deferred().reject();
       }
 
       this.attr('onStateChangeDfd', $.Deferred());
@@ -650,7 +663,7 @@ export default can.Component.extend({
     showRequiredInfoModal: function (e, field) {
       let scope = field || e.field;
       let errors = scope.attr('errorsMap');
-      let errorsList = can.Map.keys(errors)
+      let errorsList = canMap.keys(errors)
         .map(function (error) {
           return errors[error] ? error : null;
         })
@@ -669,10 +682,10 @@ export default can.Component.extend({
 
       let title = 'Required ' + getLCAPopupTitle(errors);
 
-      can.batch.start();
+      canBatch.start();
       this.attr('modal.content', data);
       this.attr('modal.modalTitle', title);
-      can.batch.stop();
+      canBatch.stop();
       this.attr('modal.state.open', true);
     },
     setVerifierRoleId: function () {

@@ -3,8 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Model.extend({
-  ajax: $.ajax,
+import {ggrcAjax} from '../../plugins/ajax_extensions';
+import canModel from 'can-model';
+import canList from 'can-list';
+
+export default canModel.extend({
+  ajax: ggrcAjax,
   root_object: 'search',
   findOne: 'GET /search',
   init: function () {
@@ -63,7 +67,7 @@ export default can.Model.extend({
     let entries;
 
     if (!(this.entries instanceof Array ||
-      this.entries instanceof can.List)) {
+      this.entries instanceof canList)) {
       entries = this.entries[modelName] || [];
     } else {
       entries = _.filteredMap(this.entries, (v) => {

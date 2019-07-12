@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canComponent from 'can-component';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
 import '../../components/advanced-search/advanced-search-mapping-container';
@@ -13,9 +15,9 @@ import '../../components/collapsible-panel/collapsible-panel';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from './object-search.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'object-search',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: function () {
     return ObjectOperationsBaseVM.extend({

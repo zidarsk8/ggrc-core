@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canComponent from 'can-component';
 import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import template from './advanced-search-filter-group.stache';
@@ -15,9 +18,9 @@ import template from './advanced-search-filter-group.stache';
 let viewModel = AdvancedSearchContainer.extend({
   /**
    * Contains available attributes for specific model.
-   * @type {can.List}
+   * @type {canList}
    */
-  availableAttributes: can.List(),
+  availableAttributes: canList(),
   /**
    * Adds Filter Operator and Filter Attribute to the collection.
    */
@@ -31,9 +34,9 @@ let viewModel = AdvancedSearchContainer.extend({
 /**
  * Filter Group is a component allowing to compose Filter Attributes and Operators.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-group',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
 });

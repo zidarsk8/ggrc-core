@@ -101,3 +101,8 @@ class TreeItem(object):
     actions_el = self._root.element(tag_name="tree-item-actions")
     js_script = "return $(arguments[0]).viewModel().expanded"
     return actions_el.execute_script(js_script, actions_el) is True
+
+  @property
+  def is_editable(self):
+    """Returns whether tree item can be edited."""
+    return self._root.element(text="Edit object").exists

@@ -346,6 +346,7 @@ class TestBasicCsvImport(TestCase):
 
     expected_errors = {
         errors.MISSING_VALUE_ERROR.format(line=8, column_name="Email"),
+        errors.MISSING_VALUE_ERROR.format(line=9, column_name="Name"),
         errors.WRONG_VALUE_ERROR.format(line=10, column_name="Email"),
         errors.WRONG_VALUE_ERROR.format(line=11, column_name="Email"),
     }

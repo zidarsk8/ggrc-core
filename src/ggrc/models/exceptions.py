@@ -8,6 +8,8 @@ from logging import getLogger
 
 from sqlalchemy.exc import IntegrityError
 
+from ggrc.utils.errors import INTERNAL_SERVER_ERROR
+
 logger = getLogger(__name__)
 
 
@@ -27,7 +29,12 @@ def translate_message(exception):
   """
   Translates db exceptions to something a user can understand.
   """
-  message = exception.message
+  if exception.message:
+    message = exception.message
+  elif len(exception.args) > 1:
+    message = exception.args[1]
+  else:
+    message = INTERNAL_SERVER_ERROR.format(job_type='Request')
 
   if isinstance(exception, IntegrityError):
     # TODO: Handle not null, foreign key, uniqueness errors with compound keys

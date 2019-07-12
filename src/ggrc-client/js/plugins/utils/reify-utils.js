@@ -3,27 +3,30 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canModel from 'can-model';
+import canList from 'can-list';
+import canMap from 'can-map';
 import allModels from '../../models/all-models';
 
 function reify(obj) {
-  if (obj instanceof can.List) {
+  if (obj instanceof canList) {
     return reifyList(obj);
   }
 
-  if (obj instanceof can.Map) {
+  if (obj instanceof canMap) {
     return reifyMap(obj);
   }
 }
 
 function isReifiable(obj) {
-  return obj instanceof can.Map;
+  return obj instanceof canMap;
 }
 
 function reifyMap(obj) {
   const type = obj.type;
   const model = allModels[type];
 
-  if (obj instanceof can.Model) {
+  if (obj instanceof canModel) {
     return obj;
   }
 
@@ -35,7 +38,7 @@ function reifyMap(obj) {
 }
 
 function reifyList(obj) {
-  return new can.List(_.map(obj, function (item) {
+  return new canList(_.map(obj, function (item) {
     return reifyMap(item);
   }));
 }

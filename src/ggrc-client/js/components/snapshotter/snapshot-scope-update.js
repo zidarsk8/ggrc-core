@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   confirm,
   BUTTON_VIEW_CONFIRM_CANCEL,
@@ -15,10 +17,10 @@ import {
 } from '../../plugins/utils/widgets-utils';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'snapshot-scope-update',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: null,
     upsertIt: function (scope, el, ev) {
       confirm({

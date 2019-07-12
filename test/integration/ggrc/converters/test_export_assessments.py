@@ -3,6 +3,9 @@
 
 
 """Tests for task group task specific export."""
+
+# pylint: disable=too-many-public-methods
+
 import datetime
 from ddt import data, ddt, unpack
 from mock import mock
@@ -11,6 +14,7 @@ from ggrc import db
 from ggrc.models import all_models
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
+from integration.ggrc import query_helper
 
 COPIED_TITLE = 'test_name'
 COPIED_LINK = 'http://mega.doc'
@@ -24,7 +28,7 @@ def dummy_gdrive_response(*args, **kwargs):
 
 
 @ddt
-class TestExport(TestCase):
+class TestExport(query_helper.WithQueryApi, TestCase):
   """Test imports for assessment objects."""
 
   model = all_models.Assessment
@@ -60,6 +64,56 @@ class TestExport(TestCase):
     """Assert slugs for each date format ent datetime"""
     for date_string in self.generate_date_strings(datetime_value, formats):
       self.assert_slugs(alias, date_string, slugs, operator)
+
+  def test_export_with_missing_lca(self):
+    """Check export assessment with LCA
+    In case of export assessments via /export endpoint user can specify
+    list of attributes (local or global), export should work even
+    if particular assessment specified attribute is missing.
+    """
+    with factories.single_commit():
+      assessment1 = factories.AssessmentFactory(
+          title="test assessment",
+      )
+      assessment1_slug = assessment1.slug
+      factories.CustomAttributeDefinitionFactory(
+          title="Test LCAD1",
+          definition_type="assessment",
+          definition_id=assessment1.id,
+          attribute_type="Text",
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title="Test GCA",
+          definition_type="assessment",
+          attribute_type="Text",
+      )
+      assessment2 = factories.AssessmentFactory()
+      factories.CustomAttributeDefinitionFactory(
+          title="Test LCAD2",
+          definition_type="assessment",
+          definition_id=assessment2.id,
+          attribute_type="Text",
+      )
+
+    export_query = self._make_query_dict(
+        "Assessment",
+        expression=[
+            "code",
+            "=",
+            assessment1_slug,
+        ],
+        fields=[
+            'title',
+            '__object_custom__:test lcad1',
+            '__object_custom__:test lcad12',
+            '__custom__:test gca',
+        ]
+    )
+
+    response = self.export_csv([export_query])
+    self.assertIn("test assessment", response.data)
+    self.assertIn("Test LCAD1", response.data)
+    self.assertIn("Test GCA", response.data)
 
   def test_search_by_comment(self):
     self.assert_slugs("comment",

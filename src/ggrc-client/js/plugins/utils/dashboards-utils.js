@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import {reify} from '../../plugins/utils/reify-utils';
 
 /**
@@ -69,8 +70,8 @@ function instanceHasValidCas(instance, caNameRegexp, caValueRegexp) {
 }
 
 function getDashboardsFromCas(instance, caNameRegexp, caValueRegexp) {
-  let cads = can.makeArray(instance.attr('custom_attribute_definitions'));
-  let cavs = can.makeArray(instance.attr('custom_attribute_values'));
+  let cads = makeArray(instance.attr('custom_attribute_definitions'));
+  let cavs = makeArray(instance.attr('custom_attribute_values'));
   if (!cads.length || !cavs.length) {
     return [];
   }

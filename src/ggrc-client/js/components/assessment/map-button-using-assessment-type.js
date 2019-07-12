@@ -3,12 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {trigger} from 'can-event';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'map-button-using-assessment-type',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     instance: {},
     deferredTo: {},
     openMapper: function () {

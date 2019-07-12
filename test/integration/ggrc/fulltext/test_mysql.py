@@ -172,5 +172,6 @@ class TestMysql(TestCase):
         sorted([
             (searchable_person.email, "{}-email".format(searchable_person.id)),
             (searchable_person.email, "__sort__"),
+            (searchable_person.name, "{}-name".format(searchable_person.id)),
         ]),
         sorted(searchable_contents))

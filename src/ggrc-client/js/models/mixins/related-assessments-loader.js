@@ -5,6 +5,7 @@
 
 import Mixin from './mixin';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
 export default Mixin.extend({}, {
   /**
@@ -30,6 +31,6 @@ export default Mixin.extend({}, {
     if (orderAsString) {
       params.order_by = orderAsString;
     }
-    return $.get('/api/related_assessments', params);
+    return ggrcGet('/api/related_assessments', params);
   },
 });

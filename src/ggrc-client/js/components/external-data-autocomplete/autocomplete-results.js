@@ -3,17 +3,21 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../spinner-component/spinner-component';
 import template from './autocomplete-results.stache';
 
 /**
  * The component is used to show autocomplete results and handle user's clicks.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'autocomplete-results',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       /**
        * Collection containing a list of results.
@@ -21,10 +25,10 @@ export default can.Component.extend({
        * - title {String} - The property containing title of element.
        * - info {String} - The property containing additional info.
        * - value {Object} - The object that should be passed when user picks corresponding element.
-       * @type {can.List}
+       * @type {canList}
        */
       results: {
-        Value: can.List,
+        Value: canList,
         get() {
           let values = this.attr('values');
           let titleFieldPath = this.attr('titleFieldPath');
@@ -60,7 +64,7 @@ export default can.Component.extend({
 
     /**
      * The list of results which should be displayed.
-     * @type {can.List}
+     * @type {canList}
      */
     values: [],
     /**

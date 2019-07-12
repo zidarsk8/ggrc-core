@@ -291,7 +291,7 @@ def iso_to_us_date(date_string):
 
 def generate_query_chunks(query, chunk_size=CHUNK_SIZE, needs_ordering=True):
   """Make a generator splitting `query` into chunks of size `chunk_size`."""
-  count = query.count()
+  count = len(query.all())
   if needs_ordering:
     query = query.order_by("id")
   for offset in range(0, count, chunk_size):

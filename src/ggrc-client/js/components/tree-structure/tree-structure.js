@@ -2,9 +2,12 @@
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {BUTTON_VIEW_SAVE_CANCEL_DELETE} from '../../plugins/utils/modals';
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   element: null,
   parentModel: null,
   contentViewPath: '',
@@ -60,7 +63,7 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-structure',
   viewModel,
   init(el) {

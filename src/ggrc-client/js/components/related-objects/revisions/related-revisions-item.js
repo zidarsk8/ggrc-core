@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../../diff/instance-fields-diff';
 import '../../diff/instance-acl-diff';
 import '../../diff/instance-gca-diff';
@@ -12,11 +15,11 @@ import '../../revision-history/restored-revision-comparer-config';
 import {getPersonInfo} from '../../../plugins/utils/user-utils';
 import template from './templates/related-revisions-item.stache';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-revisions-item',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       revision: {
         set(newValue) {

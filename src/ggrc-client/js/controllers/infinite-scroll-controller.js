@@ -3,9 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canControl from 'can-control';
 const MOUSEENTER_THROTTLE = 300;
 
-const InfiniteScrollControl = can.Control.extend({}, {
+const InfiniteScrollControl = canControl.extend({}, {
   init: function () {},
   ' DOMMouseScroll': 'prevent_overscroll',
   ' mousewheel': 'prevent_overscroll',
@@ -60,7 +63,7 @@ const InfiniteScrollControl = can.Control.extend({}, {
   },
 });
 
-const LhnTooltipsControl = can.Control.extend({
+const LhnTooltipsControl = canControl.extend({
   defaults: {
     tooltip_view: GGRC.templates_path + '/base_objects/extended_info.stache',
     trigger_selector: '.show-extended',
@@ -150,11 +153,11 @@ const LhnTooltipsControl = can.Control.extend({
     let tooltipView = this.get_tooltip_view(el);
     if (tooltipView) {
       this.fade_in_timeout = null;
-      $.ajax({
+      ggrcAjax({
         url: tooltipView,
         dataType: 'text',
       }).then((view) => {
-        let frag = can.stache(view)({instance: instance});
+        let frag = canStache(view)({instance: instance});
         let tooltipWidth = this.options.$extended.outerWidth();
         let offset = el.parent().offset();
         let elLeft = offset ? offset.left : 0;

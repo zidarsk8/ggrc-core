@@ -3,11 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canMap from 'can-map';
 import Component from './delete-button';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import {Snapshot} from '../../models/service-models';
 import * as ErrorsUtils from '../../plugins/utils/errors-utils';
 import * as ModalsUtils from '../../plugins/utils/modals';
+import * as AjaxUtils from '../../plugins/ajax_extensions';
 
 describe('delete-button component', () => {
   let vm;
@@ -42,7 +44,7 @@ describe('delete-button component', () => {
     });
 
     it('returns setted instance if it has class', () => {
-      const instance = new can.Map({
+      const instance = new canMap({
         id: 2,
         'class': 'mockClass',
       });
@@ -52,7 +54,7 @@ describe('delete-button component', () => {
     });
 
     it('returns setted instance if it is not type of "Snapshot"', () => {
-      const instance = new can.Map({
+      const instance = new canMap({
         id: 3,
         'class': 'mockClass',
         type: 'mockType',
@@ -71,7 +73,7 @@ describe('delete-button component', () => {
     beforeEach(() => {
       refreshDfd = $.Deferred();
       destroyDfd = $.Deferred();
-      instance = new can.Map({
+      instance = new canMap({
         refresh: jasmine.createSpy('refresh').and.returnValue(refreshDfd),
         destroy: jasmine.createSpy('destroy').and.returnValue(destroyDfd),
       });
@@ -140,7 +142,7 @@ describe('delete-button component', () => {
 
     beforeEach(() => {
       getDfd = $.Deferred();
-      spyOn($, 'get').and.returnValue(getDfd);
+      spyOn(AjaxUtils, 'ggrcGet').and.returnValue(getDfd);
     });
 
     it('fetches related objects for instance', () => {
@@ -149,7 +151,7 @@ describe('delete-button component', () => {
       const url = `/api/snapshots/${instance.id}/related_objects`;
       vm.fetchRelatedObjects();
 
-      expect($.get).toHaveBeenCalledWith(url);
+      expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(url);
     });
 
     describe('after data fetch', () => {

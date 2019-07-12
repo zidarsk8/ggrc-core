@@ -25,5 +25,6 @@ class TestComputedAttributes(TestCase):
             ("Control", "last_assessment_date"),
             ("Objective", "last_assessment_date"),
             ("Assessment", "last_comment"),
+            ("CycleTaskGroupObjectTask", "last_comment"),
         }
     )

@@ -3,16 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/dropdown-wrap-text.stache';
 import {isInnerClick} from '../../plugins/ggrc_utils';
 
 const DefaultNoValueLabel = '--';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'dropdown-wrap-text',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     /*
       Options list should be an `array` of object containing `title` and `value`
       [{

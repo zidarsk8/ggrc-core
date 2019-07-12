@@ -23,6 +23,7 @@ from lib.constants import element, roles, workflow_repeat_units
 from lib.custom_pytest_scheduling import CustomPytestScheduling
 from lib.entities import entities_factory
 from lib.page import dashboard
+from lib.page.widget import controls_tab
 from lib.rest_services import workflow_rest_service
 from lib.rest_facades import (
     control_rest_facade, person_rest_facade, workflow_rest_facade)
@@ -229,6 +230,14 @@ def header_dashboard(selenium):
   return Header Dashboard page objects model."""
   selenium_utils.open_url(url.Urls().dashboard)
   return dashboard.Header(selenium)
+
+
+@pytest.fixture()
+def dashboard_controls_tab(selenium):
+  """Open My Work Dashboard Controls Tab URL and
+  return Controls Tab page objects model."""
+  selenium_utils.open_url(url.Urls().dashboard_controls_tab)
+  return controls_tab.ControlsTab()
 
 
 @pytest.fixture(scope="function")

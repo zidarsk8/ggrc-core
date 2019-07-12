@@ -3,13 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../three-dots-menu/three-dots-menu';
 
 import template from './people-list-info.stache';
 import '../../models/service-models/role';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   instance: null,
   profile: null,
   isOpen: false,
@@ -50,9 +53,9 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'people-list-info',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel,
   events: {

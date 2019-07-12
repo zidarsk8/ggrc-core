@@ -5,6 +5,7 @@
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../external-data-provider';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
+import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 describe('external-data-provider component', () => {
   let viewModel;
@@ -43,7 +44,7 @@ describe('external-data-provider component', () => {
           },
         };
         requestDfd = $.Deferred();
-        $getSpy = spyOn($, 'get');
+        $getSpy = spyOn(AjaxUtils, 'ggrcGet');
         $getSpy.and.returnValue(requestDfd);
       });
 
@@ -69,12 +70,12 @@ describe('external-data-provider component', () => {
 
         viewModel.loadData();
 
-        expect($.get).toHaveBeenCalledWith({
-          url: 'testUrl',
-          data: {
+        expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(
+          'testUrl',
+          {
             prefix: 'someText',
           },
-        });
+        );
       });
 
       it('sets response to "values" property', (done) => {

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
 import accessControlList from '../mixins/access-control-list';
@@ -172,7 +173,7 @@ export default Cacheable.extend({
   findRoles: function (roleName) {
     const auditRole = getRole('Audit', roleName);
 
-    return new can.List(this.access_control_list.filter((item) => {
+    return new canList(this.access_control_list.filter((item) => {
       return item.ac_role_id === auditRole.id;
     }));
   },

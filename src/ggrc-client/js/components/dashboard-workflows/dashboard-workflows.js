@@ -3,14 +3,18 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/dashboard-workflows.stache';
 import isFunction from 'can-util/js/is-function/is-function';
 import {DATE_FORMAT, getFormattedLocalDate} from '../../plugins/utils/date-utils';
 import {getTruncatedList} from '../../plugins/ggrc_utils';
+import {ggrcGet} from '../../plugins/ajax_extensions';
 
 const SHOWN_WORKFLOWS_COUNT = 5;
 
-const viewModel = can.Map.extend({
+const viewModel = canMap.extend({
   define: {
     showAllWorkflows: {
       type: 'boolean',
@@ -64,7 +68,7 @@ const viewModel = can.Map.extend({
   },
   async initMyWorkflows() {
     this.attr('isLoading', true);
-    const {workflows: rawWorkflows} = await $.get(
+    const {workflows: rawWorkflows} = await ggrcGet(
       `/api/people/${GGRC.current_user.id}/my_workflows`
     );
     this.attr('isLoading', false);
@@ -74,10 +78,10 @@ const viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'dashboard-workflows',
   leakScope: true,
-  view: can.stache(template),
+  view: canStache(template),
   viewModel,
   init() {
     this.viewModel.initMyWorkflows();

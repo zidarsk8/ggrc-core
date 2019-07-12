@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   buildParam,
   batchRequests,
@@ -13,18 +17,18 @@ import template from './related-comments.stache';
 /**
  * Mapped objects view component
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-comments',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       emptyMessage: {
         type: 'string',
         value: 'None',
       },
       mappedItems: {
-        Value: can.List,
+        Value: canList,
       },
       requireLimit: {
         get: function () {
@@ -32,7 +36,7 @@ export default can.Component.extend({
         },
       },
       showItems: {
-        type: can.List,
+        type: canList,
         get: function () {
           return this.attr('showAll') ?
             this.attr('mappedItems') :

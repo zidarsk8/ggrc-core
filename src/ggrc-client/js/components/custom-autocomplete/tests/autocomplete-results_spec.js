@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canList from 'can-list';
 import baseAutocompleteResults from '../autocomplete-results';
 import {KEY_MAP} from '../autocomplete-input';
 
@@ -17,7 +18,7 @@ describe('autocomplete-results viewModel', () => {
     it('should assign an array to "_items" field which should contain ' +
     'all elements from "items" collection + appropriate ' +
     '"_index" attr for each element', () => {
-      const fakeData = new can.List([
+      const fakeData = new canList([
         {name: 'zxc'},
         {name: 'asd'},
         {name: 'qwert'},
@@ -38,7 +39,7 @@ describe('autocomplete-results viewModel', () => {
     });
 
     it('should return passed items', () => {
-      const items = new can.List([
+      const items = new canList([
         {name: 'zxc'},
         {name: 'asd'},
         {name: 'qwert'},
@@ -110,7 +111,7 @@ describe('autocomplete-results viewModel', () => {
 
   describe('selectItem() method', () => {
     it('should dispatch "selectItem" event', () => {
-      const items = new can.List([
+      const items = new canList([
         {name: 'zxc'},
         {name: 'asd'},
         {name: 'qwert'},
@@ -129,7 +130,7 @@ describe('autocomplete-results viewModel', () => {
     });
 
     it('should call "hide" method', () => {
-      const items = new can.List([
+      const items = new canList([
         {name: 'zxc'},
         {name: 'asd'},
         {name: 'qwert'},

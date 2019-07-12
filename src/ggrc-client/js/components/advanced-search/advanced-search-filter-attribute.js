@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../dropdown/autocomplete-dropdown';
 import template from './advanced-search-filter-attribute.stache';
 
@@ -11,7 +15,7 @@ import template from './advanced-search-filter-attribute.stache';
  * Contains logic used in Filter Attribute component
  * @constructor
  */
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   define: {
     isUnary: {
       get() {
@@ -22,11 +26,11 @@ let viewModel = can.Map.extend({
     /**
      * Contains available attributes for specific model.
      * Initializes component with first attribute in the list.
-     * @type {can.List}
+     * @type {canList}
      */
     availableAttributes: {
       type: '*',
-      Value: can.List,
+      Value: canList,
       set: function (attributes) {
         let attribute = this.attr('attribute');
         if (attributes.length &&
@@ -91,9 +95,9 @@ let viewModel = can.Map.extend({
  * Criterion has the following form:
  * field - operator - value
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'advanced-search-filter-attribute',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: viewModel,
   events: {

@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {sortByName} from '../../plugins/utils/label-utils';
 import template from './templates/multi-select-label.stache';
 import './../custom-autocomplete/autocomplete-input';
@@ -10,11 +14,11 @@ import './label-autocomplete-results';
 
 import './label-autocomplete-wrapper';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'multi-select-label',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       onlyEditMode: {
         type: 'boolean',
@@ -23,7 +27,7 @@ export default can.Component.extend({
           if (value) {
             this.attr('editMode', true);
             this.attr('labelsBackup',
-              new can.List(this.attr('instance.labels')));
+              new canList(this.attr('instance.labels')));
           }
           return value;
         },
@@ -31,7 +35,7 @@ export default can.Component.extend({
       labels: {
         value: [],
         set: function (value) {
-          return new can.List(value);
+          return new canList(value);
         },
       },
       _labels: {

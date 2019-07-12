@@ -236,3 +236,43 @@ class TestImportIssues(TestCase):
 
     market_counts = models.Market.query.count()
     self.assertEqual(market_counts, 1)
+
+  def test_import_issue_with_snapshot(self):
+    """Test checks impossibility to map snapshot to issue via import"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      control = factories.ControlFactory()
+      factories.RelationshipFactory(source=program, destination=control)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", ""),
+        ("Title", "New Audit"),
+        ("State", "Planned"),
+        ("Audit Captains", "user@example.com"),
+        ("Program", program.slug),
+        ("map:control versions", control.slug),
+    ]))
+    self._check_csv_response(response, {})
+
+    test_due_date = "15/06/2018"
+    audit = models.Audit.query.first()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", ""),
+        ("Title*", "Test issue due_date"),
+        ("Admin*", "user@example.com"),
+        ("Due Date", test_due_date),
+        ("map:Audit", audit.slug),
+        ("map:control versions", control.slug),
+    ]))
+    expected_errors = {
+        "Issue": {
+            "row_warnings": {
+                errors.ISSUE_SNAPSHOT_MAP_WARNING.format(
+                    line=3, column_name=control.__class__.__name__
+                ),
+            }
+        }
+    }
+    self._check_csv_response(response, expected_errors)

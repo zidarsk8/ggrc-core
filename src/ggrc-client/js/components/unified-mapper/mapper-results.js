@@ -2,6 +2,11 @@
     Copyright (C) 2019 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import makeArray from 'can-util/js/make-array/make-array';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './mapper-results-item';
 import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
@@ -32,11 +37,11 @@ import {isMegaMapping as isMegaMappingUtil} from '../../plugins/utils/mega-objec
 
 const DEFAULT_PAGE_SIZE = 10;
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'mapper-results',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       paging: {
         value: function () {
@@ -324,15 +329,8 @@ export default can.Component.extend({
       }
     },
     setSelectedItems: function (allItems) {
-      let selectedItems;
+      let selectedItems = makeArray(this.attr('selected'));
 
-      // get items which were selected before adding of new entries
-      if (this.attr('prevSelected') && this.attr('prevSelected').length > 0) {
-        this.attr('selected', this.attr('prevSelected').slice());
-        this.attr('prevSelected', []);
-      }
-
-      selectedItems = can.makeArray(this.attr('selected'));
       allItems.forEach(function (item) {
         item.isSelected =
           selectedItems.some(function (selectedItem) {
@@ -528,6 +526,30 @@ export default can.Component.extend({
     showRelatedAssessments: function (ev) {
       this.attr('relatedAssessments.instance', ev.instance);
       this.attr('relatedAssessments.state.open', true);
+    },
+    onItemDestroyed({itemId}) {
+      const selectedItems = this.attr('selected');
+      const selectedIndex = _.findIndex(selectedItems,
+        (item) => item.attr('id') === itemId);
+
+      // remove selection of destroyed item
+      // if it was selected before deletion
+      if (selectedIndex !== -1) {
+        selectedItems.splice(selectedIndex, 1);
+      }
+
+      const paging = this.attr('paging');
+      const currentPageNumber = paging.attr('current');
+      const needToGoToPrevPage = (
+        currentPageNumber > 1 &&
+        this.attr('items.length') === 1
+      );
+
+      if (needToGoToPrevPage) {
+        paging.attr('current', currentPageNumber - 1);
+      }
+
+      this.setItems();
     },
   }),
   events: {

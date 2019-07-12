@@ -99,6 +99,15 @@ STATUSES_MAPPING = {
     "Deprecated": "OBSOLETE"
 }
 
+CREATE_STATUSES_MAPPING = {
+    "Not Started": "ASSIGNED",
+    "In Progress": "ASSIGNED",
+    "In Review": "FIXED",
+    "Rework Needed": "ASSIGNED",
+    "Completed": "VERIFIED",
+    "Deprecated": "OBSOLETE"
+}
+
 # Status transitions map for assessment with verifier.
 VERIFIER_STATUSES = {
     # (from_status, to_status, verified): 'issue_tracker_status'

@@ -3,12 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canComponent from 'can-component';
 import '../people-autocomplete-results/people-autocomplete-results';
 
 import baseAutocompleteWrapper from '../../custom-autocomplete/autocomplete-wrapper';
 import PersonModel from '../../../models/business-models/person';
+import {ggrcGet} from '../../../plugins/ajax_extensions';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'people-autocomplete-wrapper',
   leakScope: true,
   viewModel: baseAutocompleteWrapper.extend({
@@ -39,13 +41,13 @@ export default can.Component.extend({
       const externalServiceUrl = GGRC.config.external_services[type];
 
       if (externalServiceUrl) {
-        $.get({
-          url: externalServiceUrl,
-          data: {
+        ggrcGet(
+          externalServiceUrl,
+          {
             prefix: value,
             limit: 10,
           },
-        }).then(this.processItems.bind(this, value));
+        ).then(this.processItems.bind(this, value));
       } else {
         return this.requestItems(value)
           .then((data) => data[type].values)

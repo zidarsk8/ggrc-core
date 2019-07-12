@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import makeArray from 'can-util/js/make-array/make-array';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../repeat-on-button';
 
@@ -85,7 +86,7 @@ describe('repeat-on-button component', function () {
 
         viewModel.updateRepeatEveryOptions();
 
-        actualTitles = can.makeArray(viewModel.attr('repeatOptions'))
+        actualTitles = makeArray(viewModel.attr('repeatOptions'))
           .map(getTitle);
         expect(actualTitles).toEqual(expectedTitles);
       });
@@ -98,7 +99,7 @@ describe('repeat-on-button component', function () {
 
         viewModel.updateRepeatEveryOptions();
 
-        actualTitles = can.makeArray(viewModel.attr('repeatOptions'))
+        actualTitles = makeArray(viewModel.attr('repeatOptions'))
           .map(getTitle);
         expect(actualTitles).toEqual(expectedTitles);
       });
@@ -211,7 +212,7 @@ describe('repeat-on-button component', function () {
 
         unitChanged.apply(context);
 
-        actualTitles = can.makeArray(context.viewModel.attr('repeatOptions'))
+        actualTitles = makeArray(context.viewModel.attr('repeatOptions'))
           .map(getTitle);
         expect(actualTitles).toEqual(expectedTitles);
       });

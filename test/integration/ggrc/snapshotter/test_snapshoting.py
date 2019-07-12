@@ -1,6 +1,8 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+# pylint: disable=too-many-lines
+
 """Test for snapshoter"""
 
 import collections
@@ -962,3 +964,51 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     snapshot = models.Snapshot.query.get(snapshot_id)
     self.assertTrue(snapshot.original_object_deleted)
     self.assertEqual(revision_id, response_data['Snapshot'][0]['revision_id'])
+
+  def test_snapshot_is_latest_revision(self):
+    """Check that is_latest_revision flag is properly set when updating
+       snapshot with {"update_revision": latest}."""
+    program = self.create_object(models.Program, {
+        "title": "Test Program Snapshot 1"
+    })
+    control = self.create_object(models.Control, {
+        "title": "Test Control Snapshot 1"
+    })
+
+    self.create_mapping(program, control)
+
+    control = self.refresh_object(control)
+
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 EDIT 1"
+      })
+
+    self.create_audit(program)
+
+    audit = db.session.query(models.Audit).filter(
+        models.Audit.title.like("%Snapshotable audit%")).one()
+
+    control_snapshot = db.session.query(models.Snapshot).filter(
+        models.Snapshot.child_id == control.id,
+        models.Snapshot.child_type == "Control",
+        models.Snapshot.parent_type == "Audit",
+        models.Snapshot.parent_id == audit.id)
+
+    self.assertEqual(control_snapshot[0].is_latest_revision, True)
+
+    with self.api.as_external():
+      self.api.put(control, {
+          "title": "Test Control Snapshot 1 EDIT"
+      })
+    self.assertEqual(control_snapshot[0].is_latest_revision, False)
+
+    self.api.modify_object(control_snapshot[0], {"update_revision": "latest"})
+
+    control_snapshot = db.session.query(models.Snapshot).filter(
+        models.Snapshot.child_id == control.id,
+        models.Snapshot.child_type == "Control",
+        models.Snapshot.parent_type == "Audit",
+        models.Snapshot.parent_id == audit.id)
+
+    self.assertEqual(control_snapshot[0].is_latest_revision, True)

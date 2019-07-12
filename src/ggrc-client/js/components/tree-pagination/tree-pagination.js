@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './tree-pagination.stache';
 
 /**
@@ -10,9 +13,9 @@ import template from './tree-pagination.stache';
  * Usage: <tree-pagination paging:from="paging"></tree-pagination>
  * Optional parameter: placement:from="'top'" - to display content above the control
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-pagination',
-  view: can.stache(template),
+  view: canStache(template),
   init: function () {
     /**
      * Entrance object validation
@@ -31,7 +34,7 @@ export default can.Component.extend({
     }
   },
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     placement: '',
     setCurrentPage: function (pageNumber) {
       this.paging.attr('current', pageNumber);

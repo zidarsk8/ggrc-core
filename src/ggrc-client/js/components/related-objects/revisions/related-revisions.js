@@ -3,16 +3,19 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import Pagination from '../../base-objects/pagination';
 import template from './templates/related-revisions.stache';
 import './related-revisions-item';
 import Revision from '../../../models/service-models/revision.js';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'related-revisions',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       paging: {
         value: function () {

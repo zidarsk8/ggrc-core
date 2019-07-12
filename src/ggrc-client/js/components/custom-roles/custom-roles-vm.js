@@ -3,9 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
 import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 
-export default can.Map.extend({
+export default canMap.extend({
   define: {
     isReadonly: {
       get() {

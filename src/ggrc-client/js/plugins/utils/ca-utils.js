@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canCompute from 'can-compute';
+import canList from 'can-list';
+import canMap from 'can-map';
 let customAttributesType = {
   Text: 'input',
   'Rich Text': 'text',
@@ -246,11 +249,11 @@ function convertToCaValue(type, value) {
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
  * Converts CA values array to form fields.
- * @param {can.List|undefined} customAttributeValues - Custom attributes values
+ * @param {canList|undefined} customAttributeValues - Custom attributes values
  * @return {Array} From fields array
  */
 function convertValuesToFormFields(customAttributeValues) {
-  return (customAttributeValues || new can.List([]))
+  return (customAttributeValues || new canList([]))
     .map(convertToEditableField);
 }
 
@@ -304,7 +307,7 @@ function convertToEditableField(attr) {
     validation: attr.validation.attr(),
     validationConfig: attr.validationConfig,
     errorsMap: attr.errorsMap.attr(),
-    valueId: can.compute(function () {
+    valueId: canCompute(function () {
       return attr.attr('id');
     }),
   };
@@ -314,7 +317,7 @@ function convertToEditableField(attr) {
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
  * Gets local or global custom attributes from the instance
- * @param  {can.Map} instance object instance
+ * @param  {canMap} instance object instance
  * @param  {Number}  type     types of custom attributes we want to get
  *                            can be either CUSTOM_ATTRIBUTE_TYPE.LOCAL or
  *                            CUSTOM_ATTRIBUTE_TYPE.GLOBAL
@@ -367,7 +370,7 @@ function setCustomAttributeValue(ca, value) {
  * @param {*} changes
  */
 function applyChangesToCAValue(values, changes) {
-  can.Map.keys(changes).forEach(function (fieldId) {
+  canMap.keys(changes).forEach(function (fieldId) {
     values.each(function (item, key) {
       if (item.def.id === Number(fieldId)) {
         if (!item) {
@@ -385,7 +388,7 @@ function applyChangesToCAValue(values, changes) {
  * @deprecated Use CustomAttributeObject API to get access to the necessary custom
  * attribute field and make some manipulations with it.
  * Ensures that the Global Custom Attributes are present in the instance
- * @param  {can.Map} instance assessment instance
+ * @param  {canMap} instance assessment instance
  * @return {Promise} Promise whichi is resolved when GCAs are present in
  *                   the assessment instance
  */

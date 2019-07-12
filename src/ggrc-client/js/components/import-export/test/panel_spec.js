@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
 import panelModel from '../panel';
 
 describe('panel model', () => {
@@ -123,9 +124,9 @@ describe('panel model', () => {
     });
 
     it('should set attributes', () => {
-      panel.attr('attributes', new can.List());
-      panel.attr('mappings', new can.List());
-      panel.attr('localAttributes', new can.List());
+      panel.attr('attributes', new canList());
+      panel.attr('mappings', new canList());
+      panel.attr('localAttributes', new canList());
 
       panel.setAttributes();
 

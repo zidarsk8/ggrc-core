@@ -3,19 +3,23 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-const originalControlSetup = can.Control.setup;
-const originListReplace = can.List.prototype.replace;
-const defaultValidator = can.validate.validator();
+import canModel from 'can-model';
+import canList from 'can-list';
+import canControl from 'can-control';
+import canValidate from 'can-validate-legacy/can-validate';
+const originalControlSetup = canControl.setup;
+const originListReplace = canList.prototype.replace;
+const defaultValidator = canValidate.validator();
 const originalOnce = defaultValidator.once;
 
 // Set "attributes" field
-if (!can.Model.attributes) {
-  can.Model.attributes = {};
+if (!canModel.attributes) {
+  canModel.attributes = {};
 }
 
 // Returns a function which will be halted unless `this.element` exists
 // - useful for callbacks which depend on the controller's presence in the DOM
-can.Control.prototype._ifNotRemoved = function (fn) {
+canControl.prototype._ifNotRemoved = function (fn) {
   let isPresent = this.element;
   return function () {
     return isPresent ? fn.apply(this, arguments) : null;
@@ -23,7 +27,7 @@ can.Control.prototype._ifNotRemoved = function (fn) {
 };
 
 // Insert current Control instance into element's data
-can.Control.setup = function () {
+canControl.setup = function () {
   let originalInit = this.prototype.init;
   let init = function (el) {
     let $el = $(el);
@@ -41,7 +45,7 @@ can.Control.setup = function () {
   originalControlSetup.apply(this, arguments);
 };
 
-can.List.prototype.replace = function (items) {
+canList.prototype.replace = function (items) {
   if (!items || !items.then || !_.isFunction(items.then)) {
     originListReplace.call(this, items);
     return;
@@ -61,7 +65,7 @@ defaultValidator.once = function (value, options, name) {
   return originalOnce.apply(this, arguments);
 };
 
-can.List.prototype.sort = function (predicate) {
+canList.prototype.sort = function (predicate) {
   const array = _.map(this, (item) => item);
   this.replace(array.sort(predicate));
   return this;

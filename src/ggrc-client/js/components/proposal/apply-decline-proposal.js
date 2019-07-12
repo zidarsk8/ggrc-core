@@ -3,16 +3,19 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import template from './templates/apply-decline-proposal.stache';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import {formatDate} from '../../plugins/utils/date-utils';
 import Proposal from '../../models/service-models/proposal';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'apply-decline-proposal',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       canDisplayApplyButton: {
         get() {

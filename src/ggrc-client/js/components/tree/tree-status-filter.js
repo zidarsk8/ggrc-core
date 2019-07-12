@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import router from '../../router';
 import {
@@ -10,7 +12,7 @@ import {
   setTreeViewStates,
 } from '../../plugins/utils/display-prefs-utils';
 
-let viewModel = can.Map.extend({
+let viewModel = canMap.extend({
   disabled: false,
   options: {
     name: 'status',
@@ -97,7 +99,7 @@ let viewModel = can.Map.extend({
   },
 });
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'tree-status-filter',
   leakScope: true,
   viewModel: viewModel,

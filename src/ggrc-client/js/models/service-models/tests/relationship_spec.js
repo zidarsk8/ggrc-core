@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as AjaxExtensions from '../../../plugins/ajax_extensions';
 import canEvent from 'can-event';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Relationship from '../relationship';
@@ -18,29 +19,31 @@ describe('Relationship model', function () {
     });
 
     it('sends correct request if not cascade', function () {
-      spyOn($, 'ajax').and.returnValue(jasmine.createSpyObj(['done']));
+      spyOn(AjaxExtensions, 'ggrcAjax')
+        .and.returnValue(jasmine.createSpyObj(['done']));
 
       instance.unmap(false);
 
-      expect($.ajax).toHaveBeenCalledWith({
+      expect(AjaxExtensions.ggrcAjax).toHaveBeenCalledWith({
         type: 'DELETE',
         url: '/api/relationships/testId?cascade=false',
       });
     });
 
     it('sends correct request if cascade', function () {
-      spyOn($, 'ajax').and.returnValue(jasmine.createSpyObj(['done']));
+      spyOn(AjaxExtensions, 'ggrcAjax')
+        .and.returnValue(jasmine.createSpyObj(['done']));
 
       instance.unmap(true);
 
-      expect($.ajax).toHaveBeenCalledWith({
+      expect(AjaxExtensions.ggrcAjax).toHaveBeenCalledWith({
         type: 'DELETE',
         url: '/api/relationships/testId?cascade=true',
       });
     });
 
     it('triggers "destroyed" event', function () {
-      spyOn($, 'ajax').and.returnValue($.Deferred().resolve());
+      spyOn(AjaxExtensions, 'ggrcAjax').and.returnValue($.Deferred().resolve());
       spyOn(canEvent, 'trigger');
 
       instance.unmap(true);

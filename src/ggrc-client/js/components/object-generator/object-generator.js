@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canComponent from 'can-component';
 import '../assessment-templates/assessment-templates-dropdown/assessment-templates-dropdown';
 import '../../components/advanced-search/advanced-search-filter-container';
 import '../../components/advanced-search/advanced-search-filter-state';
@@ -20,9 +22,9 @@ import {groupTypes} from '../../plugins/utils/models-utils';
  * A component implementing a modal for mapping objects to other objects,
  * taking the object type mapping constraints into account.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'object-generator',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
   viewModel: function (attrs, parentViewModel) {
     return ObjectOperationsBaseVM.extend({

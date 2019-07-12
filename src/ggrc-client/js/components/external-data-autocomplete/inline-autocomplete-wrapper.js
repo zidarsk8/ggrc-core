@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 /**
  * The component is used to integrate separate autocomplete component
  * with some old pards of code which are working with autocomplete plugin
@@ -10,10 +12,10 @@
  *
  * Generally it emulates autocomplete_select handlers from several controllers.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'inline-autocomplete-wrapper',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     /**
      * Contains a model.
      * @type {Can.Map}
@@ -78,7 +80,7 @@ export default can.Component.extend({
       let instance = this.attr('instance');
       let path = this.attr('path');
       if (!instance.attr('_transient')) {
-        instance.attr('_transient', can.Map());
+        instance.attr('_transient', canMap());
       }
       instance.attr('_transient.' + path, value);
     },

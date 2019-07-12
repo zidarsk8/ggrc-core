@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {
   CUSTOM_ATTRIBUTE_TYPE,
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
@@ -13,10 +15,10 @@ import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 /**
  * Global Custom Attributes is a component representing custom attributes.
  */
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'global-custom-attributes',
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     isAttributesDisabled: false,
     define: {
       redirectionEnabled: {
@@ -43,7 +45,7 @@ export default can.Component.extend({
     instance: null,
     /**
      * Contains custom attributes.
-     * @type {can.List}
+     * @type {canList}
      */
     items: [],
     isReadOnlyForInstance(instance) {

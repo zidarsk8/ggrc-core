@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ggrcAjax} from '../plugins/ajax_extensions';
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canControl from 'can-control';
 import DashboardWidgets from './dashboard_widgets_controller';
 import InfoPin from './info_pin_controller';
 import {
@@ -14,7 +18,7 @@ import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 import TreeViewConfig from '../apps/base_widgets';
 import pubSub from '../pub-sub';
 
-const DashboardControl = can.Control.extend({
+const DashboardControl = canControl.extend({
   defaults: {
     widget_descriptors: null,
     innerNavDescriptors: [],
@@ -30,7 +34,7 @@ const DashboardControl = can.Control.extend({
   },
 }, {
   init: function (el, options) {
-    this.options = new can.Map(this.options);
+    this.options = new canMap(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
@@ -50,7 +54,7 @@ const DashboardControl = can.Control.extend({
       return;
     }
 
-    validModels = can.Map.keys(TreeViewConfig.attr('base_widgets_by_type'));
+    validModels = canMap.keys(TreeViewConfig.attr('base_widgets_by_type'));
     // only change the display list
     validModels.forEach( function (mName) {
       savedChildTreeDisplayList = getChildTreeDisplayList(mName);
@@ -76,11 +80,11 @@ const DashboardControl = can.Control.extend({
   init_page_header: function () {
     let $pageHeader = $('#page-header');
     if (this.options.header_view && $pageHeader.length) {
-      $.ajax({
+      ggrcAjax({
         url: this.options.header_view,
         dataType: 'text',
       }).then((view) => {
-        let frag = can.stache(view)();
+        let frag = canStache(view)();
         $pageHeader.html(frag);
       });
     }
@@ -96,12 +100,12 @@ const DashboardControl = can.Control.extend({
         instance: pageInstance,
         showWidgetArea: this.showWidgetArea.bind(this),
       };
-      $.ajax({
+      ggrcAjax({
         url: this.options.innernav_view,
         dataType: 'text',
         async: false,
       }).then((view) => {
-        let render = can.stache(view);
+        let render = canStache(view);
         $innernav.html(render(options));
       });
       return;

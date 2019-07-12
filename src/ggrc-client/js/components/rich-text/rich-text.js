@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './people-mention/people-mention';
 
 import template from './rich-text.stache';
@@ -11,11 +14,11 @@ const URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
 const URL_TYPE_REGEX = /https?:\/\/[^\s]+$/;
 const EMAIL_REGEX = /^[+|@]\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+/;
 
-export default can.Component.extend('richText', {
+export default canComponent.extend('richText', {
   tag: 'rich-text',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       disabled: {
         set(disabled) {

@@ -3,15 +3,19 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canList from 'can-list';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import '../dropdown/dropdown-component';
 import template from './templates/repeat-on-button.stache';
 import * as config from '../../apps/workflow-config';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'repeat-on-button',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       buttonText: {
         get: function () {
@@ -33,10 +37,10 @@ export default can.Component.extend({
         },
       },
       repeatOptions: {
-        Value: can.List,
+        Value: canList,
       },
       unitOptions: {
-        Value: can.List,
+        Value: canList,
       },
       canSave: {
         type: 'boolean',

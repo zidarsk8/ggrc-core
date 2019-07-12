@@ -3,15 +3,18 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import './export-panel';
 import template from './templates/export-group.stache';
 import panelModel from './panel';
 
-export default can.Component.extend('exportGroup', {
+export default canComponent.extend('exportGroup', {
   tag: 'export-group',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       isRemovable: {
         get() {

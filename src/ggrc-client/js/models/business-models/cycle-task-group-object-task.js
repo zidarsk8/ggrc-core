@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import moment from 'moment';
 import Cacheable from '../cacheable';
 import CycleTaskGroup from './cycle-task-group';
 import Workflow from './workflow';
@@ -138,6 +139,11 @@ export default Cacheable.extend({
         attr_title: 'Needs Verification',
         attr_name: 'is_verification_needed',
         attr_sort_field: 'needs verification',
+      },
+      {
+        attr_title: 'Last Comment',
+        attr_name: 'last_comment',
+        attr_sort_field: 'last comment',
       },
     ],
     display_attr_names: ['title',

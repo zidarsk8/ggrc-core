@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../dropdown-component';
 
@@ -13,7 +14,7 @@ describe('dropdown component', function () {
     let template;
 
     beforeAll(function () {
-      template = can.stache(
+      template = canStache(
         '<dropdown-component optionsList:from="list"></dropdown-component>');
     });
 

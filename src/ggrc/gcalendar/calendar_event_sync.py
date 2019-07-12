@@ -59,9 +59,10 @@ class CalendarEventsSync(object):
       for query_chunk in generate_query_chunks(
           events, chunk_size=self.chunk_size, needs_ordering=False
       ):
-        handled += query_chunk.count()
+        chunk_objects = query_chunk.all()
+        handled += len(chunk_objects)
         logger.info("Sync of calendar events: %s/%s", handled, all_count)
-        for event in query_chunk:
+        for event in chunk_objects:
           if not event.needs_sync:
             continue
           if event.id not in event_mappings or not event_mappings[event.id]:

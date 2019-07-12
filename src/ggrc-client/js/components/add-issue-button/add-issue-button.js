@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import canStache from 'can-stache';
+import canMap from 'can-map';
+import canComponent from 'can-component';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.stache';
 import {
@@ -11,11 +14,11 @@ import {
 import {initCounts} from '../../plugins/utils/widgets-utils';
 import Issue from '../../models/business-models/issue';
 
-export default can.Component.extend({
+export default canComponent.extend({
   tag: 'add-issue-button',
-  view: can.stache(template),
+  view: canStache(template),
   leakScope: true,
-  viewModel: can.Map.extend({
+  viewModel: canMap.extend({
     define: {
       prepareJSON: {
         get: function () {

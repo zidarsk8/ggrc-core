@@ -92,6 +92,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "link": handlers.TextColumnHandler,
     "means": handlers.OptionColumnHandler,
     "modified_by": handlers.DirecPersonMappingColumnHandler,
+    "created_by": handlers.ExportOnlyPersonColumnHandler,
     "name": handlers.TextColumnHandler,
     "network_zone": handlers.OptionColumnHandler,
     "notes": handlers.TextColumnHandler,
@@ -122,6 +123,12 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "threat_source": handlers.TextColumnHandler,
     "threat_event": handlers.TextColumnHandler,
     "vulnerability": handlers.TextColumnHandler,
+
+    # External app attributes
+    "last_submitted_at": handlers.ExportOnlyDateColumnHandler,
+    "last_submitted_by": handlers.ExportOnlyPersonColumnHandler,
+    "last_verified_at": handlers.ExportOnlyDateColumnHandler,
+    "last_verified_by": handlers.ExportOnlyPersonColumnHandler,
 
     # IssueTracker fields
     "component_id": issue_tracker.IssueTrackerAddsColumnHandler,

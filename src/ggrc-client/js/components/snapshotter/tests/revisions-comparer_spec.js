@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import canList from 'can-list';
+import canMap from 'can-map';
 import * as caUtils from '../../../plugins/utils/ca-utils';
 import Component from '../revisions-comparer';
 import Revision from '../../../models/service-models/revision';
@@ -25,11 +27,11 @@ describe('revisions-comparer component', function () {
       fakeData = [
         {
           id: 1,
-          content: new can.Map({id: 1}),
+          content: new canMap({id: 1}),
           resource_type: 'Control',
         }, {
           id: 2,
-          content: new can.Map({id: 1}),
+          content: new canMap({id: 1}),
           resource_type: 'Control',
         },
       ];
@@ -61,7 +63,7 @@ describe('revisions-comparer component', function () {
       let result;
 
       fakeData.forEach(function (item, i) {
-        let acl = new can.List([
+        let acl = new canList([
           {ac_role_id: i * 10, person_id: i * 10},
           {ac_role_id: i * 10, person_id: i * 10},
         ]);
@@ -218,12 +220,12 @@ describe('revisions-comparer component', function () {
     it('highlights "documents_file" value', () => {
       const revisionsList = [
         [
-          {instance: {documents_file: new can.Map({value: 'doc1'})}},
-          {instance: {documents_file: new can.Map({value: 'doc2'})}},
+          {instance: {documents_file: new canMap({value: 'doc1'})}},
+          {instance: {documents_file: new canMap({value: 'doc2'})}},
         ],
         [
           {instance: {documents_file: undefined}},
-          {instance: {documents_file: new can.Map({value: 'doc3'})}},
+          {instance: {documents_file: new canMap({value: 'doc3'})}},
         ],
       ];
 
@@ -239,12 +241,12 @@ describe('revisions-comparer component', function () {
     it('highlights "documents_reference_url" value', () => {
       const revisionsList = [
         [
-          {instance: {documents_reference_url: new can.Map({value: 'url1'})}},
-          {instance: {documents_reference_url: new can.Map({value: 'url2'})}},
+          {instance: {documents_reference_url: new canMap({value: 'url1'})}},
+          {instance: {documents_reference_url: new canMap({value: 'url2'})}},
         ],
         [
           {instance: {documents_reference_url: undefined}},
-          {instance: {documents_reference_url: new can.Map({value: 'url3'})}},
+          {instance: {documents_reference_url: new canMap({value: 'url3'})}},
         ],
       ];
 
@@ -275,9 +277,9 @@ describe('revisions-comparer component', function () {
     it('prepares custom attributes', () => {
       revisions = [
         {
-          instance: new can.Map(),
+          instance: new canMap(),
         }, {
-          instance: new can.Map(),
+          instance: new canMap(),
         },
       ];
       let $target = $('<div/>');
