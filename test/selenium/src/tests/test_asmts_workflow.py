@@ -627,16 +627,6 @@ class TestAssessmentsWorkflow(base.Test):
 class TestRelatedAssessments(base.Test):
   """Tests for related assessments"""
 
-  @classmethod
-  def check_ggrc_6524(cls, exp_related_asmts, act_related_asmts):
-    """Check related asmt contents regardless of order."""
-    is_order_valid = exp_related_asmts == act_related_asmts
-    is_data_valid = sorted(exp_related_asmts) == sorted(act_related_asmts)
-    if not is_order_valid and is_data_valid:
-      pytest.xfail(reason="\nGGRC-6524. Incorrect order of related asmts.")
-    if not is_order_valid and not is_data_valid:
-      pytest.fail(msg="Related asmts are not equal.")
-
   @staticmethod
   def _related_asmts_of_obj(obj, selenium):
     """Return related assessments of obj (Control or Objective)"""
@@ -812,9 +802,8 @@ class TestRelatedAssessments(base.Test):
                                  objs_to_map=[control_mapped_to_program])
       related_asmts_titles.append(
           (asmt.title, control_mapped_to_program.title, audit.title))
-    self.check_ggrc_6524(
-        related_asmts_titles[::-1],
-        self._related_asmts_of_obj(control_mapped_to_program, selenium))
+    assert related_asmts_titles[::-1] == self._related_asmts_of_obj(
+        control_mapped_to_program, selenium)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -839,9 +828,8 @@ class TestRelatedAssessments(base.Test):
     related_asmts_titles = [
         (assessment.title, obj.title, audit.title)
         for assessment in assessments]
-    self.check_ggrc_6524(
-        related_asmts_titles[::-1],
-        self._related_asmts_of_obj(obj, selenium))
+    assert related_asmts_titles[::-1] == self._related_asmts_of_obj(
+        obj, selenium)
 
   @pytest.mark.smoke_tests
   def test_related_asmts_on_control_snapshot_page(
