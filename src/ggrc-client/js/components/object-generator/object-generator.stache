@@ -14,7 +14,7 @@
 <div class="modal-filter modal-body">
   <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
     <advanced-search-wrapper
-      modelName:from="model.model_singular"
+      modelName:bind="type"
       modelDisplayName:from="model.title_plural"
       mappingItems:to="scope.vars.mappingItems"
       filterItems:to="scope.vars.filterItems"
@@ -33,7 +33,8 @@
           <div class="object-controls__type">
             <h6>Object type</h6>
             <mapping-type-selector types:from="availableTypes"
-                                   selectedType:bind="type"
+                                   on:selectedTypeChanged="modelNameChanged(scope.event)"
+                                   selectedType:from="type"
                                    disabled:from="isLoadingOrSaving">
             </mapping-type-selector>
           </div>

@@ -101,7 +101,6 @@ let handlers = {
     let formTarget = $trigger.data('form-target');
     let objectParams = $trigger.attr('data-object-params');
     let extendNewInstance = $trigger.attr('data-extend-new-instance');
-    let triggerParent = $trigger.closest('.add-button');
     let model = modalModels[$trigger.attr('data-object-singular')];
     let isProposal = $trigger.data('is-proposal');
     let instance;
@@ -194,10 +193,6 @@ let handlers = {
             console.warn(WARN_MSG);
             return;
           }
-        }
-
-        if (triggerParent && triggerParent.length) {
-          $trigger = triggerParent;
         }
 
         Permission.refresh().then(function () {

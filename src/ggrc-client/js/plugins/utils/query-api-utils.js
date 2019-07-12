@@ -197,7 +197,7 @@ function makeRequest(params) {
   });
 }
 
-function _makeRelevantFilter(filter) {
+function makeRelevantFilter(filter) {
   let relevantFilter = QueryParser.parse('#' + filter.type + ',' +
     filter.id + '#');
 
@@ -222,7 +222,7 @@ function _makeFilter(filter, relevant) {
       relevant :
       makeArray(relevant);
     relevantFilters = relevant.map(function (filter) {
-      return _makeRelevantFilter(filter);
+      return makeRelevantFilter(filter);
     });
     filterList = filterList.concat(relevantFilters);
   }
@@ -340,6 +340,7 @@ function _processObjectsResponse(response) {
 }
 
 export {
+  makeRelevantFilter,
   buildParam,
   buildRelevantIdsQuery,
   batchRequests,

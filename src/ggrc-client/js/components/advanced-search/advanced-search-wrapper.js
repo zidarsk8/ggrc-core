@@ -8,6 +8,7 @@ import canComponent from 'can-component';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getAvailableAttributes} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+import pubSub from '../../pub-sub';
 
 export default canComponent.extend({
   tag: 'advanced-search-wrapper',
@@ -26,6 +27,17 @@ export default canComponent.extend({
     mappingItems: [],
     statusItem: AdvancedSearch.create.state(),
     relevantTo: [],
+    pubSub,
+    selectSavedSearchFilter(savedSearch) {
+      this.attr('filterItems', savedSearch.filterItems || []);
+      this.attr('mappingItems', savedSearch.mappingItems || []);
+      this.attr('statusItem', savedSearch.statusItem);
+
+      if (savedSearch.modelName && savedSearch.modelDisplayName) {
+        this.attr('modelName', savedSearch.modelName);
+        this.attr('modelDisplayName', savedSearch.modelDisplayName);
+      }
+    },
     availableAttributes: function () {
       return getAvailableAttributes(this.attr('modelName'));
     },
@@ -58,13 +70,30 @@ export default canComponent.extend({
         this.attr('statusItem', AdvancedSearch.create.state());
       }
     },
-  }),
-  events: {
-    '{viewModel} modelName': function () {
-      this.viewModel.resetFilters();
+    modelNameChanged(ev) {
+      this.attr('modelName', ev.modelName);
+      this.resetFilters();
     },
-  },
+  }),
   init: function () {
     this.viewModel.setDefaultStatusItem();
+  },
+  events: {
+    '{viewModel.filterItems} change'() {
+      pubSub.dispatch('resetSelectedSavedSearch');
+    },
+    '{viewModel.mappingItems} change'() {
+      pubSub.dispatch('resetSelectedSavedSearch');
+    },
+    '{viewModel.statusItem} change'() {
+      pubSub.dispatch('resetSelectedSavedSearch');
+    },
+    '{pubSub} savedSearchSelected'(pubSub, ev) {
+      if (ev.searchType !== 'GlobalSearch') {
+        return;
+      }
+
+      this.viewModel.selectSavedSearchFilter(ev.savedSearch);
+    },
   },
 });

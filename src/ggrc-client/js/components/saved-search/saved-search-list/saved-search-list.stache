@@ -1,0 +1,42 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="saved-search-list__items">
+  <h3>
+    Saved Searches
+    <spinner-component toggle:from="isLoading"></spinner-component>
+  </h3>
+
+  <ul>
+    {{#each searches}}
+      <li class="{{#if isLoading}}disabled{{/if}}"}>
+        <div on:el:click="selectSearch(.)"
+          class="saved-search-item {{#if isSelectedSearch(.)}}selected{{/if}}">
+            <span class="saved-search-item__title single-line" title="{{name}}">
+              {{name}}
+            </span>
+
+            {{#is(searchType, 'AdvancedSearch')}}
+              {{#permalinkBuilder .}}
+                <clipboard-link text:from="permalink" on:el:click="copyLink">
+                  <i class="fa fa-link"></i>
+                </clipboard-link>
+              {{/permalinkBuilder}}
+            {{/is}}
+
+              <i class="fa fa-trash-o" on:el:click="removeSearch(., scope.event)"></i>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+
+{{#if isPagingShown}}
+  <div class="saved-search-list__pagination">
+    <tree-pagination
+      paging:from="searchesPaging"
+    ></tree-pagination>
+  </div>
+{{/if}}

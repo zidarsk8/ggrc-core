@@ -5,6 +5,7 @@
 
 import * as StateUtils from './state-utils';
 import QueryParser from '../../generated/ggrc_filter_query_parser';
+import {makeRelevantFilter} from './query-api-utils';
 
 /**
  * Factory allowing to create Advanced Search Filter Items.
@@ -62,6 +63,12 @@ export const create = {
   mappingCriteria: (value) => {
     return {
       type: 'mappingCriteria',
+      value: value || { },
+    };
+  },
+  parentInstance: (value) => {
+    return {
+      type: 'parentInstance',
       value: value || { },
     };
   },
@@ -188,6 +195,9 @@ export const builders = {
       },
     };
   },
+  parentInstance: (parentInstance) => {
+    return makeRelevantFilter(parentInstance);
+  },
 };
 
 /**
@@ -213,4 +223,41 @@ export const setDefaultStatusConfig = (state, modelName) => {
   state.attr('operator', 'ANY');
   state.attr('modelName', modelName);
   return state;
+};
+
+/**
+ * Build permalink for saved search
+ * @param {Number} searchId - saved search ID
+ * @param {String} modelName - model name
+ * @return {String} - permalink
+ */
+export const buildSearchPermalink = (searchId, modelName) => {
+  const origin = window.location.origin;
+  const pathName = window.location.pathname;
+  const url = `${origin}${pathName}`;
+  const hash = `#!${modelName}&saved_search=${searchId}`;
+  const permalink = `${url}${hash}`;
+
+  return permalink;
+};
+
+/**
+ * Convert JSON filter to Object
+ * @param {string} json - JSON string
+ * @return {Object} - parsed advanced search filter
+ */
+export const parseFilterJson = (json) => {
+  let {
+    filterItems,
+    mappingItems,
+    statusItem,
+    parentItems,
+  } = JSON.parse(json);
+
+  return {
+    filterItems,
+    mappingItems,
+    statusItem,
+    parentItems,
+  };
 };

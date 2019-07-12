@@ -12,92 +12,118 @@
   </h2>
 </div>
 
-<div class="modal-filter modal-body">
-  <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
-    <advanced-search-wrapper modelName:from="model.model_singular"
-                             modelDisplayName:from="model.title_plural"
-                             mappingItems:to="scope.vars.mappingItems"
-                             filterItems:to="scope.vars.filterItems"
-                             statusItem:to="scope.vars.statusItem"
-                             on:el:enter="onSubmit()">
-      <div class="object-controls">
-        <div class="object-controls__row">
-          <div class="object-controls__type">
-            <h6>Object type</h6>
-            <mapping-type-selector types:from="availableTypes"
-                                   selectedType:bind="type"
-                                   disabled:from="is_loading">
-            </mapping-type-selector>
-          </div>
-          {{#if hasStatusFilter}}
-            <div class="object-controls__state">
-              <advanced-search-filter-state
+<div class="modal-body-wrapper">
+  <aside>
+    <saved-search-list
+      objectType:from="model.model_singular"
+      searchType:from="'GlobalSearch'"
+    ></saved-search-list>
+  </aside>
+
+  <main>
+    <div class="modal-filter modal-body">
+      <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
+        <advanced-search-wrapper modelName:bind="type"
+                                modelDisplayName:from="model.title_plural"
+                                mappingItems:to="scope.vars.mappingItems"
+                                filterItems:to="scope.vars.filterItems"
+                                statusItem:to="scope.vars.statusItem"
+                                on:el:enter="onSubmit()"
+                                on:savedSearchSelected="savedSearchSelected(scope.event)">
+          <div class="object-controls">
+            <div class="object-controls__row">
+              <div class="object-controls__type">
+                <h6>Object type</h6>
+                <mapping-type-selector types:from="availableTypes"
+                                      on:selectedTypeChanged="modelNameChanged(scope.event)"
+                                      selectedType:from="type"
+                                      disabled:from="is_loading">
+                </mapping-type-selector>
+              </div>
+              {{#if hasStatusFilter}}
+                <div class="object-controls__state">
+                  <advanced-search-filter-state
+                    modelName:from="modelName"
+                    stateModel:bind="statusItem.value"
+                    showOperator:from="false">
+                  </advanced-search-filter-state>
+                </div>
+              {{/if}}
+            </div>
+
+            <div class="object-controls__filters">
+              <advanced-search-filter-container
+                items:bind="filterItems"
+                availableAttributes:from="availableAttributes"
                 modelName:from="modelName"
-                stateModel:bind="statusItem.value"
-                showOperator:from="false">
-              </advanced-search-filter-state>
+                defaultStatusFilter:from="false"
+                showAddButton:from="mappingItems.length">
+              </advanced-search-filter-container>
+            </div>
+
+            {{#if mappingItems.length}}
+              <div class="object-controls__mappings">
+                <advanced-search-mapping-container
+                  items:bind="mappingItems"
+                  modelName:from="modelName"
+                  showAddButton:from="false">
+                </advanced-search-mapping-container>
+              </div>
+            {{/if}}
+
+            <div class="object-controls__actions">
+              <div class="object-controls__actions-filter">
+                {{^if mappingItems.length}}
+                  <button type="button" class="btn btn-small btn-white" on:el:click="addFilterAttribute">Add Attribute</button>
+                {{/if}}
+                <button type="button" class="btn btn-small btn-white" on:el:click="addMappingFilter">Add Mapping Filter</button>
+              </div>
+              <div class="object-controls__actions-search">
+                <create-saved-search
+                  type:from="'GlobalSearch'"
+                  filterItems:from="filterItems"
+                  mappingItems:from="mappingItems"
+                  statusItem:from="statusItem"
+                  objectType:from="model.model_singular"
+                ></create-saved-search>
+
+                <div class="object-controls__actions--right">
+                  <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
+                  <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="onSubmit()">Search</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </advanced-search-wrapper>
+      </collapsible-panel>
+    </div>
+
+    <div class="modal-footer {{#if showResults}}expanded{{/if}}">
+      <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount scope.vars.totalObjects}}'" expanded:bind="showResults">
+        <div class="search-results">
+          {{#if resultsRequested}}
+            <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
+                            baseInstance:from="parentInstance"
+                            isLoading:bind="is_loading"
+                            type:from="type"
+                            @onSearch:to="onSearchCallback"
+                            paging.total:to="scope.vars.totalObjects"
+                            searchOnly:from="true"
+                            useSnapshots:from="useSnapshots"
+                            items:bind="entries"
+                            filterItems:from="scope.vars.filterItems"
+                            mappingItems:from="scope.vars.mappingItems"
+                            on:loaded="onLoaded()"
+                            statusItem:from="scope.vars.statusItem">
+            </mapper-results>
+          {{else}}
+            <div class="well well-small">
+              No results
             </div>
           {{/if}}
         </div>
-        <div class="object-controls__filters">
-          <advanced-search-filter-container
-            items:bind="filterItems"
-            availableAttributes:from="availableAttributes"
-            modelName:from="modelName"
-            defaultStatusFilter:from="false"
-            showAddButton:from="mappingItems.length">
-          </advanced-search-filter-container>
-        </div>
-        {{#if mappingItems.length}}
-          <div class="object-controls__mappings">
-            <advanced-search-mapping-container
-              items:bind="mappingItems"
-              modelName:from="modelName"
-              showAddButton:from="false">
-            </advanced-search-mapping-container>
-          </div>
-        {{/if}}
-        <div class="object-controls__actions">
-          <div class="object-controls__actions--left">
-            {{^if mappingItems.length}}
-              <button type="button" class="btn btn-small btn-white" on:el:click="addFilterAttribute">Add Attribute</button>
-            {{/if}}
-            <button type="button" class="btn btn-small btn-white" on:el:click="addMappingFilter">Add Mapping Filter</button>
-          </div>
-          <div class="object-controls__actions--right">
-            <button type="reset" class="btn btn-small btn-white" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="resetFilters()">Reset</button>
-            <button type="submit" class="btn btn-small btn-lightBlue" {{#if is_loading}}disabled="disabled"{{/if}} on:el:click="onSubmit()">Search</button>
-          </div>
-        </div>
-      </div>
-    </advanced-search-wrapper>
-  </collapsible-panel>
-</div>
-
-<div class="modal-footer {{#if showResults}}expanded{{/if}}">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount entriesTotalCount}}'" expanded:bind="showResults">
-    <div class="search-results">
-      {{#if resultsRequested}}
-        <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
-                        baseInstance:from="parentInstance"
-                        isLoading:bind="is_loading"
-                        type:from="type"
-                        @onSearch:to="onSearchCallback"
-                        submitCbs:from="submitCbs"
-                        paging.total:to="entriesTotalCount"
-                        searchOnly:from="true"
-                        useSnapshots:from="useSnapshots"
-                        items:bind="entries"
-                        filterItems:from="scope.vars.filterItems"
-                        mappingItems:from="scope.vars.mappingItems"
-                        on:loaded="onLoaded()"
-                        statusItem:from="scope.vars.statusItem">
-        </mapper-results>
-      {{else}}
-        <div class="well well-small">
-          No results
-        </div>
-      {{/if}}
+      </collapsible-panel>
     </div>
-  </collapsible-panel>
+  </main>
 </div>
