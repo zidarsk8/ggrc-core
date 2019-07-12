@@ -145,6 +145,7 @@
               </label>
               <assessment-template-attributes
                 fields:from="assessmentTemplate.custom_attribute_definitions"
+                isLoading:from="isAttributesLoading"
                 editMode:from="false" />
           </div>
         </div>

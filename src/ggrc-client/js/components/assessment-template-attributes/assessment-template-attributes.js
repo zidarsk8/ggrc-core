@@ -11,6 +11,7 @@ import canStache from 'can-stache';
 import template from './templates/assessment-template-attributes.stache';
 import './template-field/template-field';
 import './add-template-field/add-template-field';
+import '../spinner-component/spinner-component';
 
 /*
  * Assessment template main component
@@ -24,6 +25,7 @@ export default canComponent.extend({
   viewModel: canMap.extend({
     fields: [],
     editMode: true,
+    isLoading: false,
     types: [{
       type: 'Text',
       name: 'Text',

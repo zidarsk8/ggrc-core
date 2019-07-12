@@ -48,17 +48,19 @@
       {{/fields}}
     </div>
   {{else}}
-    {{#fields}}
-      <div class="assessment-template-attributes__attribute-item">
-        <template-field
-          field:from="{.}"
-          types:from="types"
-          editMode:from="editMode" />
-      </div>
-    {{else}}
-      <div class="assessment-template-attributes__attribute-item">
+    {{^if isLoading}}
+      {{#fields}}
+        <div class="assessment-template-attributes__attribute-item">
+          <template-field
+            field:from="{.}"
+            types:from="types"
+            editMode:from="editMode" />
+        </div>
+      {{else}}
         <div class="empty-message">None</div>
-      </div>
-    {{/fields}}
+      {{/fields}}
+    {{else}}
+      <spinner-component toggle:from="isLoading" />
+    {{/if}}
   {{/if}}
 </div>

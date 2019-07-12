@@ -12,6 +12,8 @@ import {
   extendSnapshot,
 } from '../../plugins/utils/snapshot-utils';
 import {loadObjectsByStubs} from '../../plugins/utils/query-api-utils';
+import {notifier} from '../../plugins/utils/notifiers-utils';
+import {getAjaxErrorInfo} from '../../plugins/utils/errors-utils';
 
 export default canComponent.extend({
   tag: 'assessment-modal',
@@ -21,6 +23,7 @@ export default canComponent.extend({
     isNewInstance: false,
     mappedObjects: [],
     assessmentTemplate: null,
+    isAttributesLoading: false,
     loadData() {
       return this.attr('instance').getRelatedObjects()
         .then((data) => {
@@ -39,17 +42,25 @@ export default canComponent.extend({
         id: templateId,
         type: 'AssessmentTemplate',
       };
-      const [loadedTemplate] = await loadObjectsByStubs(
-        [templateStub],
-        ['custom_attribute_definitions'],
-        {
-          type: audit.attr('type'),
-          id: audit.attr('id'),
-        },
-      );
 
-      instance.attr('template', templateStub);
-      this.attr('assessmentTemplate', loadedTemplate);
+      this.attr('isAttributesLoading', true);
+      try {
+        const [loadedTemplate] = await loadObjectsByStubs(
+          [templateStub],
+          ['custom_attribute_definitions'],
+          {
+            type: audit.attr('type'),
+            id: audit.attr('id'),
+          },
+        );
+
+        instance.attr('template', templateStub);
+        this.attr('assessmentTemplate', loadedTemplate);
+      } catch (xhr) {
+        notifier('error', getAjaxErrorInfo(xhr).details);
+      } finally {
+        this.attr('isAttributesLoading', false);
+      }
     },
     onAssessmentTemplateChanged({template}) {
       if (!template) {
