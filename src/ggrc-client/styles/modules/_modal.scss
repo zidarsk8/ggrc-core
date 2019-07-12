@@ -660,3 +660,17 @@
 .control-offset {
   margin-left: 4px;
 }
+
+.template-select {
+  display: flex;
+  align-items: center;
+
+  &__dropdown {
+    margin: 0;
+  }
+
+  &__spinner {
+    height: 18px;
+    margin-left: 5px;
+  }
+}

@@ -132,9 +132,15 @@
           <label class="ggrc-form-item__label">
             Select Assessment Template
           </label>
-          <assessment-templates-dropdown
-            instance:from="instance.audit"
-            on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
+          <div class="template-select">
+            <assessment-templates-dropdown
+              instance:from="instance.audit"
+              extraClassName:from="'template-select__dropdown'"
+              on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
+            <spinner-component
+              class="template-select__spinner"
+              toggle:from="isInitialTemplateLoading" />
+          </div>
         </div>
       </div>
       {{#if assessmentTemplate}}

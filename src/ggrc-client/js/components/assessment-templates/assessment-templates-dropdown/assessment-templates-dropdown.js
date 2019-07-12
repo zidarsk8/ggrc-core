@@ -20,6 +20,7 @@ export default canComponent.extend({
   tag: 'assessment-templates-dropdown',
   view: canStache(template),
   leakScope: true,
+  extraClassName: '',
   viewModel: canMap.extend({
     /**
      * List of dropdown items, which represent assessment templates

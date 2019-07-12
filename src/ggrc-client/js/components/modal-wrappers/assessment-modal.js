@@ -5,6 +5,7 @@
 
 import '../assessment-template-attributes/assessment-template-attributes';
 import '../assessment-templates/assessment-templates-dropdown/assessment-templates-dropdown';
+import '../spinner-component/spinner-component';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
@@ -19,6 +20,22 @@ export default canComponent.extend({
   tag: 'assessment-modal',
   leakScope: true,
   viewModel: canMap.extend({
+    define: {
+      /**
+       * Indicates the situation, when the user chooses some assessment
+       * template and in the same time it did not have some another preselected
+       * template before choosing.
+       */
+      isInitialTemplateLoading: {
+        get() {
+          return (
+            true &&
+            this.attr('isAttributesLoading') &&
+            !this.attr('assessmentTemplate')
+          );
+        },
+      },
+    },
     instance: null,
     isNewInstance: false,
     mappedObjects: [],
