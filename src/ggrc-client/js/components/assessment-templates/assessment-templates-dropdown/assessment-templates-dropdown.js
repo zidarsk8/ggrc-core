@@ -27,6 +27,7 @@ export default canComponent.extend({
     optionsList: [],
     instance: null,
     assessmentTemplate: '',
+    needToSelectInitialTemplate: false,
     onTemplateChanged(value) {
       let template = null;
 
@@ -114,7 +115,11 @@ export default canComponent.extend({
 
       batchRequests(param).then(({AssessmentTemplate: {values}}) => {
         this.initDropdownOptions(values);
-        this.selectInitialTemplate();
+
+        if (this.attr('needToSelectInitialTemplate')) {
+          this.selectInitialTemplate();
+        }
+
         this.dispatch('assessmentTemplateLoaded');
       });
     },
