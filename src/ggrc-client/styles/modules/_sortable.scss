@@ -4,18 +4,18 @@
  */
 
 .sortable-list {
-
   .sortable-item {
-    text-indent: 7px;
+    position:relative;
 
     &::before {
       content: $fa-var-arrows-v;
       font: normal normal normal 16px/26px FontAwesome;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      position: absolute;
-      margin: 0 0 0 -13px;
       color: #999;
+      cursor: grab;
+      position: absolute;
+      left: -7px;
+      top: 5px;
     }
   }
   .sortable-placeholder {
@@ -23,7 +23,12 @@
     height: 31px;
     display: block;
   }
+
   .ui-sortable-helper {
     background: rgba(255, 255, 255, 0.5);
+
+    &::before {
+      cursor: grabbing;
+    }
   }
 }

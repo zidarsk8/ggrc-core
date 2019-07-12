@@ -78,13 +78,13 @@ export default canComponent.extend({
       let el = $(this.element);
       let list = el.find('.sortable-list');
       list.sortable({
-        items: 'li.sortable-item',
+        items: '.sortable-item',
         placeholder: 'sortable-placeholder',
       });
     },
     '.sortable-list sortstop': function () {
       let el = $(this.element);
-      let sortables = el.find('li.sortable-item');
+      let sortables = el.find('.sortable-item');
       // It's not nice way to rely on DOM for sorting,
       // but it was easiest for implementation
       this.viewModel.fields.replace(loMap(sortables,

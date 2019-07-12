@@ -4,65 +4,61 @@
 }}
 
 <div class="assessment-template-attributes">
-  <div class="attr-titles">
-    <ul>
-      <li class="row-fluid">
-        <div class="span-custom2-and-half">
-          <h6>Attribute Title</h6>
-        </div>
-        <div class="span-custom1-and-half">
-          <h6>Attribute type</h6>
-        </div>
-        <div class="span2">
-          <h6>Attribute values</h6>
-        </div>
-        <div class="span1 centered">
-          <h6>Evidence File Required</h6>
-        </div>
-        <div class="span1 centered">
-          <h6>Evidence URL Required</h6>
-        </div>
-        <div class="span1 centered">
-          <h6>Comment required</h6>
-        </div>
-        <div class="span1 centered">
-          <h6>Mandatory</h6>
-        </div>
-        <div class="span2">
-          &nbsp;
-        </div>
-      </li>
-    </ul>
+  <div class="template-grid__row assessment-template-attributes__header">
+    <div class="template-grid__row-item">
+      <h6>Attribute Title</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_attr-type">
+      <h6>Attribute type</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_attr-values">
+      <h6>Attribute values</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Evidence File Required</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Evidence URL Required</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Comment required</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Mandatory</h6>
+    </div>
+    {{#if editMode}}
+      <div class="template-grid__row-item"></div>
+    {{/if}}
   </div>
-  <div class="{{#if editMode}}sortable-list{{/if}} new-attr-list">
-    <ul>
-      {{#if editMode}}
-        <li class="row-fluid add-field">
-          <add-template-field
+  {{#if editMode}}
+    <div class="sortable-list">
+      <div class="assessment-template-attributes__attribute-item">
+        <add-template-field
+          types:from="types"
+          fields:from="fields">
+        </add-template-field>
+      </div>
+      {{#fields}}
+        <div class="assessment-template-attributes__attribute-item sortable-item" {{canData 'field'}}>
+          <template-field
+            field:from="{.}"
             types:from="types"
-            fields:from="fields">
-          </add-template-field>
-        </li>
-        {{#fields}}
-          <li class="row-fluid sortable-item" {{canData 'field'}}>
-              <template-field
-                field:from="{.}"
-                types:from="types"
-                on:remove="fieldRemoved" />
-          </li>
-        {{/fields}}
-      {{else}}
-        {{#fields}}
-          <li class="row-fluid">
-            <template-field
-              field:from="{.}"
-              types:from="types"
-              editMode:from="editMode" />
-          </li>
-        {{else}}
-          <li>None</li>
-        {{/fields}}
-      {{/if}}
-    </ul>
-  </div>
+            on:remove="fieldRemoved" />
+        </div>
+      {{/fields}}
+    </div>
+  {{else}}
+    {{#fields}}
+      <div class="assessment-template-attributes__attribute-item">
+        <template-field
+          field:from="{.}"
+          types:from="types"
+          editMode:from="editMode" />
+      </div>
+    {{else}}
+      <div class="assessment-template-attributes__attribute-item">
+        <div class="empty-message">None</div>
+      </div>
+    {{/fields}}
+  {{/if}}
 </div>

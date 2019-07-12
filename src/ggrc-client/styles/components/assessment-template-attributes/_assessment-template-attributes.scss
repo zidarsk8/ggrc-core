@@ -5,65 +5,51 @@
 
 .assessment-template-attributes {
   font-size: 11px;
-  .row-fluid {
-    [class*="span"] {
-      margin-left: 1.2%;
+
+  &__header {
+    border-top: 1px solid $templateGridBorder;
+    border-bottom: 1px solid $templateGridBorder;
+
+    h6 {
+      font-size: 9px;
     }
   }
 
-  label.warning {
-    margin-top: 8px;
-    font-size: 11px;
-    font-weight: bold;
+  &__attribute-item:not(:last-child) {
+    border-bottom: 1px solid $templateGridBorder;
   }
 
-  h6 {
-    font-size: 9px;
+  .empty-message {
+    font-size: 12px;
   }
+}
 
-  .checkbox-wrap {
-    input {
-      margin-top: 3px;
-      margin-bottom: 0;
+.template-grid__row {
+  display: flex;
+
+  &-item {
+    flex: 1 1;
+    // By default, flex items won’t shrink below their minimum content size.
+    // In order to have columns with equal sizes even if some cell contains
+    // a lot of data, min-width should be set to 0 - this is a common
+    // workaround for such situation.
+    min-width: 0;
+
+    &:not(:last-child) {
+      margin-right: 20px;
     }
-  }
-  .single-line {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .attr-titles {
-    ul {
-      @extend %reset-list;
+
+    &_attr-type {
+      flex-grow: 0.6;
     }
-  }
-  .new-attr-list {
-    @extend .attr-titles;
-    li {
-      padding: 6px 0;
-      line-height: 24px;
-      border-top: 1px solid $tabBorder;
+
+    &_attr-values {
+      flex-grow: 0.8;
     }
-    .add-field {
-      input,
-      select {
-        margin-bottom: 0;
-      }
-      .ca-values {
-        input {
-          float: left;
-          width: 80%;
-        }
-        i.fa {
-          float: left;
-          margin: 6px 0 0 6px;
-          opacity: 0.2;
-          &:hover {
-            opacity: 0.7;
-          };
-        }
-      }
+
+    &_checkbox {
+      flex-grow: 0.3;
+      text-align: center;
     }
   }
 }
