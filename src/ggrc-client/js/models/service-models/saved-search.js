@@ -32,7 +32,4 @@ export default canModel.extend({
       dataType: 'json',
     });
   },
-}, {
-  object_type: '',
-  name: '',
-});
+}, {});

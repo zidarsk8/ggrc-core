@@ -109,8 +109,18 @@ let viewModel = canMap.extend({
     },
     isSavedSearchShown: {
       get() {
-        // do NOT show Advanced saved searche list on Dashboard tab
-        return !isMyWork();
+        if (isMyWork()) {
+          // do NOT show Advanced saved search list on Dashboard page
+          return false;
+        }
+
+        if (isAllObjects() &&
+          this.model.model_plural === 'CycleTaskGroupObjectTasks') {
+          // do NOT show Advanced saved search list on AllOjbects page (Tasks tab)
+          return false;
+        }
+
+        return true;
       },
     },
     modelName: {
@@ -531,16 +541,19 @@ let viewModel = canMap.extend({
     parentInstance: null,
   },
   openAdvancedFilter: function () {
+    // serialize "appliedFilterItems" before set to prevent changing of
+    // "appliedFilterItems" object by changing of "filterItems" object.
+    // Without "serialization" we copy reference of "appliedFilterItems" to "filterItems".
     this.attr('advancedSearch.filterItems',
-      this.attr('advancedSearch.appliedFilterItems').attr());
+      this.attr('advancedSearch.appliedFilterItems').serialize());
 
     this.attr('advancedSearch.mappingItems',
-      this.attr('advancedSearch.appliedMappingItems').attr());
+      this.attr('advancedSearch.appliedMappingItems').serialize());
 
     this.attr('advancedSearch.parentItems',
-      this.attr('advancedSearch.appliedParentItems').attr());
+      this.attr('advancedSearch.appliedParentItems').serialize());
 
-    if (isObjectContextPage()) {
+    if (isObjectContextPage() && !this.attr('advancedSearch.parentInstance')) {
       this.attr('advancedSearch.parentInstance',
         AdvancedSearch.create.parentInstance(this.attr('parent_instance')));
 
@@ -571,12 +584,12 @@ let viewModel = canMap.extend({
       .buildSearchPermalink(selectedSavedSearch.id, modelName);
 
     this.attr('savedSearchPermalink', permalink);
-    this.attr('appliedSavedSearch', selectedSavedSearch.attr());
+    this.attr('appliedSavedSearch', selectedSavedSearch.serialize());
   },
   applyAdvancedFilters: function () {
-    const filters = this.attr('advancedSearch.filterItems').attr();
-    const mappings = this.attr('advancedSearch.mappingItems').attr();
-    const parents = this.attr('advancedSearch.parentItems').attr();
+    const filters = this.attr('advancedSearch.filterItems').serialize();
+    const mappings = this.attr('advancedSearch.mappingItems').serialize();
+    const parents = this.attr('advancedSearch.parentItems').serialize();
     let request = canList();
 
     this.attr('advancedSearch.appliedFilterItems', filters);
@@ -737,7 +750,6 @@ let viewModel = canMap.extend({
       });
   },
   searchModalClosed() {
-    // remove advancedSearch.selectedSavedSearch attr
     this.attr('advancedSearch.selectedSavedSearch', null);
   },
 });

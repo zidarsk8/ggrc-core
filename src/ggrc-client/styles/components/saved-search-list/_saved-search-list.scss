@@ -52,10 +52,6 @@ saved-search-list {
 
           .saved-search-item__title {
             display: block;
-            max-width: calc(100% - 13px);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
             line-height: 20px;
           }
 

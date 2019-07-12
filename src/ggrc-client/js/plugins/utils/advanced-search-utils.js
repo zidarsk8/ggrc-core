@@ -195,8 +195,8 @@ export const builders = {
       },
     };
   },
-  parent: (parent) => {
-    return makeRelevantFilter(parent);
+  parentInstance: (parentInstance) => {
+    return makeRelevantFilter(parentInstance);
   },
 };
 

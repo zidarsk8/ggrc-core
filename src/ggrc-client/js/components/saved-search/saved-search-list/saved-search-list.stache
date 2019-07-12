@@ -14,7 +14,7 @@
       <li class="{{#if isLoading}}disabled{{/if}}"}>
         <div on:el:click="selectSearch(.)"
           class="saved-search-item {{#if isSelectedSearch(.)}}selected{{/if}}">
-            <span class="saved-search-item__title" title="{{name}}">
+            <span class="saved-search-item__title single-line" title="{{name}}">
               {{name}}
             </span>
 
