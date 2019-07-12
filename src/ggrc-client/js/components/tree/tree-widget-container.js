@@ -869,7 +869,9 @@ export default canComponent.extend({
       }
     },
     '{pubSub} savedSearchSelected'(pubSub, ev) {
-      if (ev.searchType !== 'AdvancedSearch') {
+      const currentModelName = this.viewModel.attr('model').model_singular;
+      const isCurrentModelName = currentModelName === ev.savedSearch.modelName;
+      if (ev.searchType !== 'AdvancedSearch' || !isCurrentModelName) {
         return;
       }
 

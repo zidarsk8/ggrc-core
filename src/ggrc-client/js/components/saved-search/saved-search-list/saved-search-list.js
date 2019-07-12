@@ -65,7 +65,7 @@ export default canComponent.extend({
         id: search.id,
       };
 
-      if (this.attr('isGlobalSearch') && model) {
+      if (model) {
         selectedSavedSearch.modelName = model.model_singular;
         selectedSavedSearch.modelDisplayName = model.title_plural;
       }
