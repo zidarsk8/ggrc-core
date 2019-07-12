@@ -24,6 +24,36 @@
   }
 }
 
+.sortable-list {
+  .sortable-item {
+    position:relative;
+
+    &::before {
+      content: $fa-var-arrows-v;
+      font: normal normal normal 16px/26px FontAwesome;
+      -webkit-font-smoothing: antialiased;
+      color: #999;
+      cursor: grab;
+      position: absolute;
+      left: -7px;
+      top: 5px;
+    }
+  }
+  .sortable-placeholder {
+    background: #fafafa;
+    height: 31px;
+    display: block;
+  }
+
+  .ui-sortable-helper {
+    background: rgba(255, 255, 255, 0.5);
+
+    &::before {
+      cursor: grabbing;
+    }
+  }
+}
+
 .template-grid__row {
   display: flex;
 
