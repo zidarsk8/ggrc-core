@@ -7,16 +7,24 @@
   We are applying assessment template properties and make
   new relationships and custom attributes
 """
+
+from datetime import datetime
 import collections
 import itertools
 import logging
 
-from sqlalchemy import orm
+import flask
 
-from ggrc import db
 from ggrc import access_control
+from ggrc import db
+from ggrc import login
+from ggrc import utils
+from ggrc.access_control import list as ggrc_acl
+from ggrc.access_control import people as ggrc_acp
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
+from ggrc.models import cache as ggrc_cache
+from ggrc.models import custom_attribute_definition as ggrc_cad
 from ggrc.models.hooks import common
 from ggrc.models.hooks.issue_tracker import assessment_integration
 from ggrc.models.hooks.issue_tracker import integration_utils
@@ -51,8 +59,12 @@ def _handle_assessment(assessment, src):
       src.get('template', {}).get('type'),
       src.get('template', {}).get('id'),
   )
-  if template:
-    relate_ca(assessment, template)
+
+  if template is not None:
+    _mark_cads_to_batch_insert(
+        ca_definitions=template.custom_attribute_definitions,
+        attributable=assessment,
+    )
 
   if not src.get('_generated') and not snapshot:
     return
@@ -61,7 +73,9 @@ def _handle_assessment(assessment, src):
       src['audit']['type'],
       src['audit']['id'],
   )
-  relate_assignees(assessment, snapshot, template, audit)
+
+  _relate_assignees(assessment, snapshot, template, audit)
+
   assessment.title = u'{} assessment for {}'.format(
       snapshot.revision.content['title'],
       audit.title,
@@ -102,6 +116,9 @@ def init_hook():
     for assessment, src in itertools.izip(objects, sources):
       _handle_assessment(assessment, src)
 
+    _batch_insert_cads(attributables=objects)
+    _batch_insert_acps(assessments=objects)
+
     # Flush roles objects for generated assessments.
     db.session.flush()
 
@@ -134,10 +151,10 @@ def init_hook():
       raise error
 
 
-def generate_assignee_relations(assessment,
-                                assignee_ids,
-                                verifier_ids,
-                                creator_ids):
+def _generate_assignee_relations(assessment,
+                                 assignee_ids,
+                                 verifier_ids,
+                                 creator_ids):
   """Generates db relations to assessment for sent role ids.
 
     Args:
@@ -156,11 +173,11 @@ def generate_assignee_relations(assessment,
     if person is None:
       continue
     if person.id in assignee_ids:
-      assessment.add_person_with_role_name(person, "Assignees")
+      _mark_acps_to_batch_insert(person, "Assignees", assessment)
     if person_id in verifier_ids:
-      assessment.add_person_with_role_name(person, "Verifiers")
+      _mark_acps_to_batch_insert(person, "Verifiers", assessment)
     if person_id in creator_ids:
-      assessment.add_person_with_role_name(person, "Creators")
+      _mark_acps_to_batch_insert(person, "Creators", assessment)
 
 
 def get_people_ids_based_on_role(assignee_role,
@@ -217,7 +234,7 @@ def generate_role_object_dict(snapshot, audit):
   return acl_dict
 
 
-def relate_assignees(assessment, snapshot, template, audit):
+def _relate_assignees(assessment, snapshot, template, audit):
   """Generates assignee list and relates them to Assessment objects
 
     Args:
@@ -240,10 +257,10 @@ def relate_assignees(assessment, snapshot, template, audit):
                                               "Auditors",  # default verifier
                                               template_settings,
                                               acl_dict)
-  generate_assignee_relations(assessment,
-                              assignee_ids,
-                              verifier_ids,
-                              [get_current_user_id()])
+  _generate_assignee_relations(assessment,
+                               assignee_ids,
+                               verifier_ids,
+                               [get_current_user_id()])
 
 
 def relate_ca(assessment, template):
@@ -256,16 +273,8 @@ def relate_ca(assessment, template):
   if not template:
     return None
 
-  ca_definitions = all_models.CustomAttributeDefinition.query.options(
-      orm.undefer_group('CustomAttributeDefinition_complete'),
-  ).filter_by(
-      definition_id=template.id,
-      definition_type="assessment_template",
-  ).order_by(
-      all_models.CustomAttributeDefinition.id
-  )
   created_cads = []
-  for definition in ca_definitions:
+  for definition in template.custom_attribute_definitions:
     cad = all_models.CustomAttributeDefinition(
         title=definition.title,
         definition=assessment,
@@ -279,6 +288,169 @@ def relate_ca(assessment, template):
     db.session.add(cad)
     created_cads.append(cad)
   return created_cads
+
+
+def _mark_cads_to_batch_insert(ca_definitions, attributable):
+  """Mark custom attribute definitions for batch insert.
+
+  Create stubs of `ca_defintions` with definition set to `attributable` and add
+  them to `flask.g.cads_to_batch_insert` list. All CAD stubs presented in
+  `flask.g.cads_to_batch_insert` will be inserted in custom attribute
+  defintiions table upon `_batch_insert_cads` call.
+
+  Args:
+    ca_definitions (List[models.CustomAttributeDefinition]): List of CADs to
+      be marked for batch insert.
+    attributable (db.Model): Model instance for which CADs should be created.
+  """
+
+  def clone_cad_stub(cad_stub, target):
+    """Create a copy of `cad_stub` CAD and assign it to `target`."""
+    now = datetime.utcnow()
+    current_user_id = login.get_current_user_id()
+
+    clone_stub = dict(cad_stub)
+    clone_stub["definition_type"] = target._inflector.table_singular
+    clone_stub["definition_id"] = target.id
+    clone_stub["created_at"] = now
+    clone_stub["updated_at"] = now
+    clone_stub["modified_by_id"] = current_user_id
+    clone_stub["id"] = None
+
+    return clone_stub
+
+  if not hasattr(flask.g, "cads_to_batch_insert"):
+    flask.g.cads_to_batch_insert = []
+
+  for ca_definition in ca_definitions:
+    stub = ca_definition.to_dict()
+    new_ca_stub = clone_cad_stub(stub, attributable)
+    flask.g.cads_to_batch_insert.append(new_ca_stub)
+
+
+def _batch_insert_cads(attributables):
+  """Insert custom attribute definitions marked for batch insert.
+
+  Insert CADs stored in `flask.g.cads_to_batch_insert` in custom attribute
+  definitions table. Attributables are passed here to obtain inserted CADs from
+  DB so they could be placed in cache.
+
+  Args:
+    attributables (List[db.Model]): List of model instances for which CADs
+      should be inserted.
+  """
+  cads_to_batch_insert = getattr(flask.g, "cads_to_batch_insert", [])
+  if not cads_to_batch_insert:
+    return
+  with utils.benchmark("Insert CADs in batch"):
+    flask.g.cads_to_batch_insert = []
+    inserter = ggrc_cad.CustomAttributeDefinition.__table__.insert()
+    db.session.execute(
+        inserter.values([stub for stub in cads_to_batch_insert])
+    )
+
+    # Add inserted CADs into new objects collection of the cache, so that
+    # they will be logged within event and appropriate revisions will be
+    # created. At this point it is safe to query CADs by definition_type and
+    # definition_id since this batch insert will be called only at assessment
+    # creation time and there will be no other LCAs for it.
+    new_cads_q = ggrc_cad.CustomAttributeDefinition.query.filter(
+        ggrc_cad.CustomAttributeDefinition.definition_type == "assessment",
+        ggrc_cad.CustomAttributeDefinition.definition_id.in_([
+            attributable.id for attributable in attributables
+        ])
+    )
+
+    _add_objects_to_cache(new_cads_q)
+
+
+def _mark_acps_to_batch_insert(assignee, role_name, assessment):
+  """Mark access control people for batch insert.
+
+  Create stub of ACP with person set to `assignee` and access control role to
+  ACL of `assessment` object with `role_name` role. Add created stub to
+  `flask.g.acps_to_batch_insert` list. All ACP stubs presented in
+  `flask.g.acps_to_batch_insert` will be inserted in access control people
+  table upon `_batch_insert_acps` call.
+
+  Args:
+    assignee (models.Person): Person for new ACP.
+    role_name (str): ACR role name.
+    assessment (models.Assessment): Assessment where person should be added.
+  """
+
+  def add_person_to_acl(person, ac_list):
+    """Add `person` person to `ac_list` ACL."""
+    now = datetime.utcnow()
+    current_user_id = login.get_current_user_id()
+    return {
+        "id": None,
+        "person_id": person.id,
+        "ac_list_id": ac_list.id,
+        "created_at": now,
+        "updated_at": now,
+        "modified_by_id": current_user_id,
+    }
+
+  if not hasattr(flask.g, "acps_to_batch_insert"):
+    flask.g.acps_to_batch_insert = []
+
+  acl = assessment.get_acl_with_role_name(role_name)
+  if not acl:
+    return
+
+  acp_stub = add_person_to_acl(assignee, acl)
+  flask.g.acps_to_batch_insert.append(acp_stub)
+
+
+def _batch_insert_acps(assessments):
+  """Insert access control people marked for batch insert.
+
+  Insert ACPs stored in `flask.g.acps_to_batch_insert` in access control people
+  table. Assessments are passed here to obtain inserted ACPs from DB so they
+  could be placed in cache.
+
+  Args:
+    assessments (List[models.Assessment]): List of model instances for which
+      ACPs should be inserted.
+  """
+  acps_to_batch_insert = getattr(flask.g, "acps_to_batch_insert", [])
+  if not acps_to_batch_insert:
+    return
+  with utils.benchmark("Insert ACPs in batch"):
+    flask.g.acps_to_batch_insert = []
+    inserter = ggrc_acp.AccessControlPerson.__table__.insert()
+    db.session.execute(
+        inserter.values([stub for stub in acps_to_batch_insert])
+    )
+
+    # Add inserted ACPs into new objects collection of the cache, so that
+    # they will be logged within event and appropriate revisions will be
+    # created. At this point it is safe to query ACPs by ac_list_id since
+    # this batch insert will be called only at assessment creation time and
+    # there will be no other ACPs for it.
+    new_acls_q = db.session.query(
+        ggrc_acl.AccessControlList.id,
+    ).filter(
+        ggrc_acl.AccessControlList.object_type == "Assessment",
+        ggrc_acl.AccessControlList.object_id.in_([
+            assessment.id for assessment in assessments
+        ]),
+    )
+    new_acps_q = ggrc_acp.AccessControlPerson.query.filter(
+        ggrc_acp.AccessControlPerson.ac_list_id.in_([
+            new_acl.id for new_acl in new_acls_q
+        ])
+    )
+
+    _add_objects_to_cache(new_acps_q)
+
+
+def _add_objects_to_cache(objs_q):
+  """Add objects from `objs_q` query to cache."""
+  cache = ggrc_cache.Cache.get_cache(create=True)
+  if cache:
+    cache.new.update((obj, obj.log_json()) for obj in objs_q)
 
 
 def copy_snapshot_plan(assessment, snapshot):

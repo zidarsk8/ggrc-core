@@ -4,6 +4,7 @@
 """Custom attribute definition module"""
 
 import re
+
 import flask
 import sqlalchemy as sa
 from sqlalchemy import func
