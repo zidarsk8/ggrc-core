@@ -4,7 +4,6 @@
 */
 
 import loIsNumber from 'lodash/isNumber';
-import loIsUndefined from 'lodash/isUndefined';
 import loForEach from 'lodash/forEach';
 import loMap from 'lodash/map';
 import {ggrcAjax} from '../plugins/ajax_extensions';
@@ -147,7 +146,7 @@ export default canConstruct.extend({
       bucketName = type + (obj.run_in_background ? '_bg' : '');
       bucket = this._buckets[bucketName];
 
-      if (loIsUndefined(bucket)) {
+      if (bucket === undefined) {
         plural = obj.constructor.table_plural;
         bucket = {
           objs: [],

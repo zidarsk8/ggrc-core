@@ -4,8 +4,6 @@
 */
 
 import loOrderBy from 'lodash/orderBy';
-import loIncludes from 'lodash/includes';
-import loIsUndefined from 'lodash/isUndefined';
 import loFilter from 'lodash/filter';
 import moment from 'moment';
 import Cacheable from '../cacheable';
@@ -279,7 +277,7 @@ export default Cacheable.extend({
       }
     } else {
       cycle = reify(form.cycle);
-      if (!loIsUndefined(cycle.workflow)) {
+      if (cycle.workflow !== undefined) {
         form.attr('workflow', reify(cycle.workflow));
       }
     }
@@ -296,6 +294,6 @@ export default Cacheable.extend({
     const status = this.attr('status');
 
     return cycle.attr('is_current') &&
-      !loIncludes(['Finished', 'Verified'], status);
+      !['Finished', 'Verified'].includes(status);
   },
 });

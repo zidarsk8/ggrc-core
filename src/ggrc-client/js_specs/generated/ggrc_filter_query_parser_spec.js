@@ -335,7 +335,7 @@ describe('QueryParser', function () {
         'title ~ "test\\""',
       ];
 
-      loForEach(queries, function (query) {
+      queries.forEach((query) => {
         let value = query.split('~')[1].trim().replace(/^"|"$/g, '');
         let result = QueryParser.parse(query);
 

@@ -3,8 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loIsNull from 'lodash/isNull';
-import loIsUndefined from 'lodash/isUndefined';
 import canStache from 'can-stache';
 import canControl from 'can-control';
 import '../../components/assessment-template-clone/assessment-template-clone';
@@ -72,8 +70,7 @@ const ObjectMapper = canControl.extend({
       return;
     }
 
-    if (loIsUndefined(data.join_object_type) ||
-      loIsNull(data.join_object_type)) {
+    if (data.join_object_type === undefined || data.join_object_type === null) {
       throw new Error(OBJECT_REQUIRED_MESSAGE);
     }
 
@@ -113,10 +110,7 @@ const ObjectMapper = canControl.extend({
         return;
       }
 
-      if (
-        loIsUndefined(data.join_object_id) ||
-        loIsNull(data.join_object_id)
-      ) {
+      if (data.join_object_id === undefined || data.join_object_id === null) {
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
 

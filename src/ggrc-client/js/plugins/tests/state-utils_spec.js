@@ -28,7 +28,7 @@ describe('StateUtils', function () {
       }
     );
 
-    it('statesFilter should not update Assessmnet statuses',
+    it('statesFilter should not update Assessment statuses',
       function () {
         let statuses = [
           'Not Started', 'In Progress', 'In Review',
@@ -208,7 +208,7 @@ describe('StateUtils', function () {
           'AssessmentTemplate', 'Person', 'TaskGroup', 'TaskGroupTask',
           'Cycle', 'CycleTaskGroup', 'KeyReport', 'AccountBalance'];
 
-        loForEach(models, function (model) {
+        models.forEach((model) => {
           expect(StateUtils.getStatusFieldName(model))
             .toEqual('Status');
         });

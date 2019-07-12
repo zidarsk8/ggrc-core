@@ -3,11 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loIsNull from 'lodash/isNull';
 import loUniq from 'lodash/uniq';
-import loTrim from 'lodash/trim';
 import loIsObject from 'lodash/isObject';
-import loIsUndefined from 'lodash/isUndefined';
 import loMap from 'lodash/map';
 import loValues from 'lodash/values';
 import loFind from 'lodash/find';
@@ -178,7 +175,7 @@ function exists(obj, key) {
     keys = key.split('.');
   }
   return keys.reduce(function (base, memo) {
-    return (loIsUndefined(base) || loIsNull(base)) ? base : base[memo];
+    return (base === undefined || base === null) ? base : base[memo];
   }, obj);
 }
 
@@ -193,20 +190,18 @@ function exists(obj, key) {
 *                           - Compact - removes `falsy` values
 * @return {Array} - Returns array of splitted values
 */
-function splitTrim(values, splitter, options) {
+function splitTrim(values, splitter = ',', options = {}) {
   if (!values || !values.length) {
     return [];
   }
-  if (loIsUndefined(splitter)) {
-    splitter = ',';
-  }
+
   if (loIsObject(splitter)) {
     options = splitter;
     splitter = ',';
   }
 
   values = values.split(splitter);
-  values = loMap(values, loTrim);
+  values = loMap(values, (val) => val.trim());
 
   if (options.unique) {
     values = loUniq(values);
@@ -222,7 +217,7 @@ function splitTrim(values, splitter, options) {
  */
 function filteredMap(items, predicate) {
   return loMap(items, predicate)
-    .filter((item) => !loIsNull(item) && !loIsUndefined(item));
+    .filter((item) => item !== null && item !== undefined);
 }
 
 export {

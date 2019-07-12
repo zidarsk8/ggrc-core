@@ -3,7 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loIsNull from 'lodash/isNull';
 import loUniq from 'lodash/uniq';
 import loMap from 'lodash/map';
 import loFilter from 'lodash/filter';
@@ -161,7 +160,7 @@ export default canComponent.extend({
         return;
       }
       success = loFilter(this._results, function (assessment) {
-        return !loIsNull(assessment) &&
+        return assessment !== null &&
           !(assessment.state && assessment.state() === 'rejected');
       }).length;
       errors = loFilter(this._results, function (assessment) {

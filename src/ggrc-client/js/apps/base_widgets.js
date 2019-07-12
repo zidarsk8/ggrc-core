@@ -3,9 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loEach from 'lodash/each';
 import loDifference from 'lodash/difference';
-import loMap from 'lodash/map';
 import canMap from 'can-map';
 import * as businessModels from '../models/business-models';
 import {getRelatedWidgetNames} from '../plugins/utils/mega-object-utils';
@@ -69,7 +67,7 @@ let defaultOrderTypes = {
 };
 // Items allowed for mapping via snapshot.
 let snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
-let objectVersions = loMap(snapshotWidgetsConfig, function (obj) {
+let objectVersions = snapshotWidgetsConfig.map((obj) => {
   return obj + '_version';
 });
 
@@ -134,7 +132,7 @@ baseWidgetsByType = {
   Vendor: filteredTypes,
 };
 
-loEach(baseWidgetsByType, (val, widget) => {
+Object.keys(baseWidgetsByType).forEach((widget) => {
   if (businessModels[widget] && businessModels[widget].isMegaObject) {
     baseWidgetsByType[widget] = baseWidgetsByType[widget]
       .concat(getRelatedWidgetNames(widget));

@@ -5,10 +5,6 @@
 
 import loGet from 'lodash/get';
 import loReduce from 'lodash/reduce';
-import loIsArray from 'lodash/isArray';
-import loIsString from 'lodash/isString';
-import loIncludes from 'lodash/includes';
-import loTrim from 'lodash/trim';
 import loFind from 'lodash/find';
 import moment from 'moment';
 import makeArray from 'can-util/js/make-array/make-array';
@@ -89,23 +85,16 @@ $.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
  * Builds class name of two segments - prefix and computed value
  * @param  {String|computed} prefix class prefix
  * @param  {String|computed} compute some computed value
- * @param  {Object} [options={}] options
- * @param  {Object} [options.separator='-'] separator between prefix and comuted value
- * @param  {Object} [options.computeSeparator=''] separator which replaces whitespaces in computed value
  * @return {String} computed class string
  */
-canStache.registerHelper('addclass', function (prefix, compute, options = {}) {
+canStache.registerHelper('addclass', function (prefix, compute) {
   prefix = resolveComputed(prefix);
-  let computeVal = resolveComputed(compute);
-  let opts = options.hash || {};
-  let separator = loIsString(opts.separator) ? opts.separator : '-';
-  let computeSeparator = loIsString(opts.computeSeparator)
-    ? opts.computeSeparator : '';
-  let classSegment = loTrim(computeVal)
-    .replace(/[\s\t]+/g, computeSeparator)
+  let computeVal = resolveComputed(compute) || '';
+  let classSegment = computeVal.trim()
+    .replace(/[\s\t]+/g, '')
     .toLowerCase();
 
-  return [prefix, classSegment].join(separator);
+  return [prefix, classSegment].join('-');
 });
 
 // Resolve and return the first computed value from a list
@@ -690,7 +679,7 @@ canStache.registerHelper('isScopeModel', function (instance, options) {
 canStache.registerHelper('if_recurring_workflow', function (object, options) {
   object = isFunction(object) ? object() : object;
   if (object.type === 'Workflow' &&
-      loIncludes(['day', 'week', 'month'], object.unit)) {
+      ['day', 'week', 'month'].includes(object.unit)) {
     return options.fn(this);
   }
   return options.inverse(this);
@@ -733,7 +722,7 @@ canStache.registerHelper('isValidAttr',
 canStache.registerHelper('isArray', (items, options) => {
   items = isFunction(items) ? items() : items;
 
-  return loIsArray(items) || items instanceof canList ?
+  return Array.isArray(items) || items instanceof canList ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
 });

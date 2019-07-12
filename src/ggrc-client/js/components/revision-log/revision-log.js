@@ -207,8 +207,8 @@ export default canComponent.extend({
       };
     },
     reifyObject(object) {
-      loForEach(['modified_by', 'source', 'destination'],
-        function (field) {
+      ['modified_by', 'source', 'destination'].forEach(
+        (field) => {
           if (object[field] && isReifiable(object[field])) {
             object.attr(field, reifyUtil(object[field]));
           }

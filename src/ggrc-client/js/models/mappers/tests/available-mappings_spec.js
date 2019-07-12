@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loConcat from 'lodash/concat';
 import loDifference from 'lodash/difference';
 import * as Mappings from '../mappings';
 import MappingsConfig from '../mappings-ggrc';
@@ -52,8 +51,11 @@ describe('Mappings', () => {
     ],
   };
 
-  const coreObjectsRules = loConcat(modules.core, modules.workflow,
-    ['Assessment', 'Audit', 'Document', 'Person', 'Program']);
+  const coreObjectsRules = [
+    ...modules.core,
+    ...modules.workflow,
+    'Assessment', 'Audit', 'Document', 'Person', 'Program',
+  ];
   const snapshotableObjects = loDifference(modules.core, ['Project']);
 
   const mappingRules = {

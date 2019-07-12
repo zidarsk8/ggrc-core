@@ -4,7 +4,6 @@
  */
 
 import {exists, filteredMap} from '../../plugins/ggrc_utils';
-import loIncludes from 'lodash/includes';
 import loIsFunction from 'lodash/isFunction';
 import loForEach from 'lodash/forEach';
 import loFilter from 'lodash/filter';
@@ -761,7 +760,7 @@ export default canControl.extend({
     instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
-      loIncludes(saveContactModels, this.options.model.model_singular)) {
+      saveContactModels.includes(this.options.model.model_singular)) {
       instance.attr('contact', this.options.attr('instance.contact'));
     }
 

@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loIsUndefined from 'lodash/isUndefined';
 import canList from 'can-list';
 import canMap from 'can-map';
 /**
@@ -19,7 +18,7 @@ export default canMap.extend({
         let disabled = this.attr('disabled');
         let count = this.attr('count');
         if (newValue >= 1 &&
-          (loIsUndefined(count) || newValue <= count) &&
+          (count === undefined || newValue <= count) &&
           !disabled) {
           return newValue;
         }

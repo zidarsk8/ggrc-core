@@ -3,9 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loIncludes from 'lodash/includes';
 import loForEach from 'lodash/forEach';
-import loFind from 'lodash/find';
 import loSortBy from 'lodash/sortBy';
 import {notifier} from './notifiers-utils';
 import RefreshQueue from '../../models/refresh_queue';
@@ -88,8 +86,8 @@ const inferObjectType = (data) => {
   if (!data) {
     return null;
   } else {
-    let obj = loFind(Object.keys(data), (key) => objectTypeDecisionTree[key]);
-    return objectTypeDecisionTree[obj];
+    const objectType = Object.keys(data)[0];
+    return objectTypeDecisionTree[objectType];
   }
 };
 
@@ -99,7 +97,7 @@ const inferObjectType = (data) => {
  * @return {Boolean}
  */
 const hasRelatedAssessments = (type) => {
-  return loIncludes(relatedAssessmentsTypes, type);
+  return relatedAssessmentsTypes.includes(type);
 };
 
 const getInstance = (objectType, objectId) => {

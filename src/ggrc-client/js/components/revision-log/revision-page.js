@@ -4,15 +4,12 @@
  */
 
 import {exists, splitTrim} from '../../plugins/ggrc_utils';
-import loJoin from 'lodash/join';
 import loCompact from 'lodash/compact';
-import loConcat from 'lodash/concat';
 import loMapValues from 'lodash/mapValues';
 import loGroupBy from 'lodash/groupBy';
 import loReverse from 'lodash/reverse';
 import loFlow from 'lodash/flow';
 import loXor from 'lodash/xor';
-import loKeys from 'lodash/keys';
 import loKeyBy from 'lodash/keyBy';
 import loMerge from 'lodash/merge';
 import loUniq from 'lodash/uniq';
@@ -82,13 +79,12 @@ export default canComponent.extend({
       this._loadACLPeople(revisions.object);
 
       // combine all the changes and sort them by date descending
-      let changeHistory = loConcat(
-        [],
-        makeArray(this._computeObjectChanges(
+      let changeHistory = [
+        ...makeArray(this._computeObjectChanges(
           revisions.object,
           revisions.revisionsForCompare)),
-        makeArray(this._computeMappingChanges(revisions.mappings))
-      );
+        ...makeArray(this._computeMappingChanges(revisions.mappings)),
+      ];
       changeHistory = loSortBy(changeHistory, 'updatedAt');
       changeHistory = loReverse(changeHistory);
 
@@ -226,13 +222,13 @@ export default canComponent.extend({
               value = splitTrim(value, ',');
               value = value.sort();
               value = loCompact(value);
-              value = loJoin(value, ', ');
+              value = value.join(', ');
             }
             if (origVal) {
               origVal = splitTrim(origVal, ',');
               origVal = origVal.sort();
               origVal = loCompact(origVal);
-              origVal = loJoin(origVal, ', ');
+              origVal = origVal.join(', ');
             }
           }
           if (origVal || value) {
@@ -361,7 +357,7 @@ export default canComponent.extend({
       newValues = loKeyBy(newValues, 'custom_attribute_id');
       newDefs = loKeyBy(newDefs, 'id');
 
-      ids = loUniq(loKeys(origValues).concat(loKeys(newValues)));
+      ids = loUniq(Object.keys(origValues).concat(Object.keys(newValues)));
       defs = loMerge(origDefs, newDefs);
 
       let resultIds = loFilter(ids, (id) => !!defs[id]);

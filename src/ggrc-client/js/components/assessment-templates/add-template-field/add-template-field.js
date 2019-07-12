@@ -4,12 +4,8 @@
 */
 
 import {splitTrim} from '../../../plugins/ggrc_utils';
-import loHead from 'lodash/head';
 import loIndexOf from 'lodash/indexOf';
-import loIncludes from 'lodash/includes';
 import loSome from 'lodash/some';
-import loTrim from 'lodash/trim';
-import loForEach from 'lodash/forEach';
 import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -28,7 +24,7 @@ export default canComponent.extend({
       isDisplayValues: {
         get() {
           let type = this.attr('selected.type');
-          return loIncludes(multiChoiceable, type);
+          return multiChoiceable.includes(type);
         },
       },
     },
@@ -48,8 +44,8 @@ export default canComponent.extend({
     addField() {
       let fields = this.attr('fields');
       let selected = this.attr('selected');
-      let title = loTrim(selected.title);
-      let type = loTrim(selected.type);
+      let title = selected.title && selected.title.trim();
+      let type = selected.type && selected.type.trim();
       let values = splitTrim(selected.values, {
         unique: true,
       }).join(',');
@@ -73,10 +69,11 @@ export default canComponent.extend({
         attribute_type: type,
         multi_choice_options: values,
       });
-      loForEach(['title', 'values', 'multi_choice_options'],
+      ['title', 'values', 'multi_choice_options'].forEach(
         (type) => {
           selected.attr(type, '');
-        });
+        }
+      );
     },
     validateValues(values) {
       let invalidValues = this.attr('isDisplayValues') && !values;
@@ -110,7 +107,7 @@ export default canComponent.extend({
     init() {
       let types = this.viewModel.attr('types');
       if (!this.viewModel.attr('selected.type')) {
-        this.viewModel.attr('selected.type', loHead(types).attr('type'));
+        this.viewModel.attr('selected.type', types[0].attr('type'));
       }
     },
   },

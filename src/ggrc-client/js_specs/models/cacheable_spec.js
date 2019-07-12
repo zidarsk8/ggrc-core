@@ -4,7 +4,6 @@
 */
 
 import {filteredMap} from '../../js/plugins/ggrc_utils';
-import loIncludes from 'lodash/includes';
 import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import canModel from 'can-model';
 import canList from 'can-list';
@@ -230,7 +229,7 @@ describe('Cacheable model', () => {
       spyOn(DummyModel, 'models').and.callFake(function (items) {
         let ids = filteredMap(items, (item) => item.id);
         return filteredMap(dummyInsts, (inst) =>
-          loIncludes(ids, inst.id) ? inst : undefined);
+          ids.includes(inst.id) ? inst : undefined);
       });
       DummyModel.findAll().then(() => {
         // finally, we show that with the 100ms gap between pushing ids 3 and 4, we force a separate push.

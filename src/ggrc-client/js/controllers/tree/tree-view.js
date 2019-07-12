@@ -4,7 +4,6 @@
  */
 
 import loReduce from 'lodash/reduce';
-import loIncludes from 'lodash/includes';
 import loForEach from 'lodash/forEach';
 import loMap from 'lodash/map';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
@@ -225,7 +224,7 @@ const TreeViewControl = TreeLoader.extend({
       v = new TreeViewOptions();
       v.attr('instance', tmp);
       this.options.each(function (val, k) {
-        if (!loIncludes(that.constructor.do_not_propagate, k)) {
+        if (!that.constructor.do_not_propagate.includes(k)) {
           v.attr(k, val);
         }
       });

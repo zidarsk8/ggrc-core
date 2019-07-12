@@ -4,7 +4,6 @@
 */
 
 import loRemove from 'lodash/remove';
-import loKeys from 'lodash/keys';
 import loGroupBy from 'lodash/groupBy';
 import loUnion from 'lodash/union';
 import loFindIndex from 'lodash/findIndex';
@@ -65,7 +64,7 @@ const buildModifiedACL = (instance, modifiedRoles) => {
 
   aclRoles = loGroupBy(instance.access_control_list, 'ac_role_id');
   allRoles = loUnion(
-    loKeys(aclRoles).map((key) => Number(key)),
+    Object.keys(aclRoles).map((key) => Number(key)),
     modifiedRolesKeys
   );
 

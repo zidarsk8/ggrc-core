@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loHead from 'lodash/head';
 import loSortBy from 'lodash/sortBy';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -125,7 +124,7 @@ let viewModel = canMap.extend({
     let types = loSortBy(mappings, 'model_singular');
 
     if (!this.attr('criteria.objectName')) {
-      this.attr('criteria.objectName', loHead(types).model_singular);
+      this.attr('criteria.objectName', types[0].model_singular);
     }
 
     return types;

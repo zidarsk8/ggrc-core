@@ -5,7 +5,6 @@
 
 import loDebounce from 'lodash/debounce';
 import loGet from 'lodash/get';
-import loIsNull from 'lodash/isNull';
 import loFindIndex from 'lodash/findIndex';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
@@ -381,7 +380,7 @@ let viewModel = canMap.extend({
     let total = this.attr('pageInfo.total');
     let counts = loGet(getCounts(), countsName);
 
-    if (!loIsNull(loaded) && (total !== counts)) {
+    if (loaded !== null && (total !== counts)) {
       this.loadItems();
     }
 

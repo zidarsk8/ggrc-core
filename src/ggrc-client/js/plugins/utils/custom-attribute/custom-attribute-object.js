@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loIsNull from 'lodash/isNull';
 import loForEach from 'lodash/forEach';
 import canBatch from 'can-event/batch/batch';
 import canMap from 'can-map';
@@ -174,7 +173,7 @@ export default class CustomAttributeObject {
    */
   get type() {
     const caDef = this._caDefinition;
-    const isGlobalCustomAttribute = loIsNull(caDef.attr('definition_id'));
+    const isGlobalCustomAttribute = caDef.attr('definition_id') === null;
     return isGlobalCustomAttribute
       ? CUSTOM_ATTRIBUTE_TYPE.GLOBAL
       : CUSTOM_ATTRIBUTE_TYPE.LOCAL;
