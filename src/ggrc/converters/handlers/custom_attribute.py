@@ -162,7 +162,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
   def get_multiselect_values(self):
     """Get valid value for multiselect fields."""
     if not self.raw_value:  # empty value
-      return ""
+      return None
 
     definition = self.get_ca_definition()
     choices_set = set(definition.multi_choice_options.lower().split(","))

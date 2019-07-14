@@ -24,7 +24,7 @@
   </div>
   {{^if isUnary}}
     <div class="filter-attribute__value">
-      <input tabindex="3"
+      <input
         placeholder="Type here..."
         name="right"
         type="text"

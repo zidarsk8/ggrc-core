@@ -14,7 +14,7 @@
 <div class="modal-filter modal-body">
   <collapsible-panel softMode:from="true" titleText:from="'filter'" expanded:bind="showSearch">
     <advanced-search-wrapper
-      modelName:from="model.model_singular"
+      modelName:bind="type"
       modelDisplayName:from="model.title_plural"
       mappingItems:to="scope.vars.mappingItems"
       filterItems:to="scope.vars.filterItems"
@@ -33,7 +33,8 @@
           <div class="object-controls__type">
             <h6>Object type</h6>
             <mapping-type-selector types:from="availableTypes"
-                                   selectedType:bind="type"
+                                   on:selectedTypeChanged="modelNameChanged(scope.event)"
+                                   selectedType:from="type"
                                    disabled:from="isLoadingOrSaving">
             </mapping-type-selector>
           </div>
@@ -78,49 +79,58 @@
 </div>
 
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{scope.vars.totalObjects}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{entriesTotalCount}})'" expanded:bind="showResults">
+  
     <div class="search-results">
-      <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
-                      baseInstance:from="parentInstance"
-                      isLoading:bind="is_loading"
-                      object:from="object"
-                      type:from="type"
-                      selected:from="selected"
-                      @onSearch:to="onSearchCallback"
-                      paging.total:to="scope.vars.totalObjects"
-                      useSnapshots:from="useSnapshots"
-                      entries:bind="entries"
-                      relevantTo:from="relevantTo"
-                      objectGenerator:from="true"
-                      filterItems:from="scope.vars.filterItems"
-                      mappingItems:from="scope.vars.mappingItems"
-                      on:loaded="onLoaded()"
-                      statusItem:from="scope.vars.statusItem">
-      </mapper-results>
-    </div>
-    <div class="control-buttons row-fluid">
-      <div class="span5">
-        <div class="deny-buttons"></div>
-      </div>
-      <div class="span7">
-        <div class="confirm-buttons">
-          <spinner-component toggle:from="is_saving"></spinner-component>
-          <span class="confirm-buttons__objects-count">
-            {{selected.length}}
-            assessment(s) will be generated for each selection
-          </span>
+      <div class="{{^if resultsRequested}} hidden {{/if}}">
+        <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
+                        baseInstance:from="parentInstance"
+                        isLoading:bind="is_loading"
+                        object:from="object"
+                        type:from="type"
+                        selected:from="selected"
+                        @onSearch:to="onSearchCallback"
+                        paging.total:to="entriesTotalCount"
+                        useSnapshots:from="useSnapshots"
+                        items:bind="entries"
+                        relevantTo:from="relevantTo"
+                        objectGenerator:from="true"
+                        filterItems:from="scope.vars.filterItems"
+                        mappingItems:from="scope.vars.mappingItems"
+                        on:loaded="onLoaded()"
+                        statusItem:from="scope.vars.statusItem">
+        </mapper-results>
+        <div class="control-buttons row-fluid">
+          <div class="span5">
+            <div class="deny-buttons"></div>
+          </div>
+          <div class="span7">
+            <div class="confirm-buttons">
+              <spinner-component toggle:from="is_saving"></spinner-component>
+              <span class="confirm-buttons__objects-count">
+                {{selected.length}}
+                assessment(s) will be generated for each selection
+              </span>
 
-          <button type="button"
-                  class="btn-map btn btn-small btn-green"
-                  {{^if selected.length}}disabled="disabled"{{/if}}>
-            {{#if is_saving}}
-              Saving, please wait...
-            {{else}}
-              Generate Assessments
-            {{/if}}
-          </button>
+              <button type="button"
+                      class="btn-map btn btn-small btn-green"
+                      {{^if selected.length}}disabled="disabled"{{/if}}>
+                {{#if is_saving}}
+                  Saving, please wait...
+                {{else}}
+                  Generate Assessments
+                {{/if}}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+    {{^if resultsRequested}}
+      <div class="well well-small">
+        No results
+      </div>
+    {{/if}}
     </div>
+  
   </collapsible-panel>
 </div>

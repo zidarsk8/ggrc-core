@@ -17,6 +17,16 @@ export default canComponent.extend({
     readonly: false,
     types: [],
     selectedType: '',
+    // Dispatch event after change of "selectedType" to know
+    // that "selectedType" was changed via dropdown (currnet component).
+    // Because that property can be changed via "saved-search-list".
+    // Both cases need different ways to handle "change" event
+    onChanged() {
+      this.dispatch({
+        type: 'selectedTypeChanged',
+        modelName: this.attr('selectedType'),
+      });
+    },
   }),
   init: function () {
     let selectedType = this.viewModel.selectedType;

@@ -9,8 +9,6 @@ import canComponent from 'can-component';
  * The component is used to integrate separate autocomplete component
  * with some old pards of code which are working with autocomplete plugin
  * and controllers.
- *
- * Generally it emulates autocomplete_select handlers from several controllers.
  */
 export default canComponent.extend({
   tag: 'inline-autocomplete-wrapper',

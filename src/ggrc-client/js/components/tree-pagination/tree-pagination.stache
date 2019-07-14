@@ -4,6 +4,7 @@
 }}
 
 <div class="tree-pagination flex-box">
+  {{#if isPageSizeSelectShown}}
   <div class="pagination dropdown-container">
     <div class="dropdown-container__wrapper">
       <simple-popover buttonText:from="paging.pageSize"
@@ -20,6 +21,7 @@
       </simple-popover>
     </div>
   </div>
+  {{/if}}
   <div class="pagination">
     <div class="pagination-item {{#is(paging.current, 1)}}disabled{{/is}}">
       <a on:el:click="setFirstPage">

@@ -8,6 +8,7 @@ There are other tests for verifying completeness of the results and that focus
 more on verifying the related SQL query.
 """
 
+import json
 import mock
 import ddt
 
@@ -56,13 +57,32 @@ class TestRelatedAssessments(TestCase):
     kwargs["object_id"] = obj.id
     return self.client.get(self.URL_BASE, query_string=kwargs)
 
+  def test_creator_read_access(self):
+    """Test related assessments visible for Creator"""
+    creator = self.create_user_with_role("Creator")
+    with factories.single_commit():
+      self.assessment1.audit.add_person_with_role_name(creator, "Auditors")
+      self.assessment2.audit.add_person_with_role_name(creator, "Auditors")
+    control_id = self.control.id
+    control = models.Control.query.get(control_id)
+
+    headers = {
+        "X-ggrc-user": json.dumps({
+            "name": creator.name, "email": creator.email
+        })
+    }
+    self.client.get("/login", headers=headers)
+
+    response_json = self._get_related_assessments(control).json
+    self.assertEqual(response_json["total"], 2)
+
   @ddt.data("2018-06-06 16:38:17", None)
   def test_verified_status(self, verified_date):
     """Test verified flag defines correctly"""
     self.assessment2.verified_date = verified_date
     db.session.commit()
-    response = self._get_related_assessments(self.assessment1).json
-    self.assertEqual(bool(verified_date), response["data"][0]["verified"])
+    response_json = self._get_related_assessments(self.assessment1).json
+    self.assertEqual(bool(verified_date), response_json["data"][0]["verified"])
 
   def test_permission_query(self):
     """Test basic response users without global read access."""
@@ -74,19 +94,19 @@ class TestRelatedAssessments(TestCase):
     db.session.commit()
     with mock.patch("ggrc.rbac.permissions.has_system_wide_read",
                     return_value=False):
-      response = self._get_related_assessments(self.assessment1).json
-      self.assertEqual(response["total"], 1)
-      self.assertEqual(response["data"][0]["title"], assessment2_title)
+      response_json = self._get_related_assessments(self.assessment1).json
+      self.assertEqual(response_json["total"], 1)
+      self.assertEqual(response_json["data"][0]["title"], assessment2_title)
 
   def test_basic_response(self):
     """Test basic response for a valid query."""
     assessment2_title = self.assessment2.title
-    response = self._get_related_assessments(self.assessment1).json
-    self.assertIn("total", response)
-    self.assertIn("data", response)
-    self.assertEqual(response["total"], 1)
-    self.assertEqual(len(response["data"]), 1)
-    self.assertEqual(response["data"][0]["title"], assessment2_title)
+    response_json = self._get_related_assessments(self.assessment1).json
+    self.assertIn("total", response_json)
+    self.assertIn("data", response_json)
+    self.assertEqual(response_json["total"], 1)
+    self.assertEqual(len(response_json["data"]), 1)
+    self.assertEqual(response_json["data"][0]["title"], assessment2_title)
 
   @ddt.data(
       ({}, 2),
@@ -117,8 +137,8 @@ class TestRelatedAssessments(TestCase):
     with mock.patch("ggrc.views.start_compute_attributes"):
       views.do_full_reindex()
 
-    response = self._get_related_assessments(self.control, **limit).json
-    self.assertEqual(response["total"], expected_count)
+    response_json = self._get_related_assessments(self.control, **limit).json
+    self.assertEqual(response_json["total"], expected_count)
 
   @ddt.data(
       {},
@@ -147,9 +167,9 @@ class TestRelatedAssessments(TestCase):
   @ddt.unpack
   def test_limit_clause(self, limit, expected_count):
     """Test limit clause for {0}."""
-    response = self._get_related_assessments(self.control, **limit).json
-    self.assertEqual(response["total"], 2)
-    self.assertEqual(len(response["data"]), expected_count)
+    response_json = self._get_related_assessments(self.control, **limit).json
+    self.assertEqual(response_json["total"], 2)
+    self.assertEqual(len(response_json["data"]), expected_count)
 
   @ddt.data(
       ({"order_by": "title,asc"}, ["A_1", "A_2"]),
@@ -160,8 +180,11 @@ class TestRelatedAssessments(TestCase):
   @ddt.unpack
   def test_order_by_clause(self, order_by, titles_order):
     """Test order by for {0}."""
-    response = self._get_related_assessments(self.control, **order_by).json
-    titles = [assessment["title"] for assessment in response["data"]]
+    response_json = self._get_related_assessments(
+        self.control,
+        **order_by
+    ).json
+    titles = [assessment["title"] for assessment in response_json["data"]]
     self.assertEqual(titles, titles_order)
 
   def test_self_link(self):
@@ -174,15 +197,15 @@ class TestRelatedAssessments(TestCase):
         self.assessment2._inflector.table_plural,
         self.assessment2.id,
     )
-    response = self._get_related_assessments(self.assessment1).json
-    self.assertIn("viewLink", response["data"][0]["audit"])
-    self.assertIn("viewLink", response["data"][0])
+    response_json = self._get_related_assessments(self.assessment1).json
+    self.assertIn("viewLink", response_json["data"][0]["audit"])
+    self.assertIn("viewLink", response_json["data"][0])
     self.assertEqual(
-        response["data"][0]["audit"]["viewLink"],
+        response_json["data"][0]["audit"]["viewLink"],
         audit_self_link,
     )
     self.assertEqual(
-        response["data"][0]["viewLink"],
+        response_json["data"][0]["viewLink"],
         assessment_self_link,
     )
 
@@ -205,8 +228,8 @@ class TestRelatedAssessments(TestCase):
       )
       cav.attribute_object = person
 
-    response = self._get_related_assessments(self.assessment2).json
-    data_json = response["data"]
+    response_json = self._get_related_assessments(self.assessment2).json
+    data_json = response_json["data"]
 
     self.assertEqual(len(data_json), 1)
 

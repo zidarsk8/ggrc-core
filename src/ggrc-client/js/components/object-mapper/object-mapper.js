@@ -150,6 +150,16 @@ export default canComponent.extend({
         defaultValue: config.general.megaRelation || 'child',
       },
       pubSub,
+      /**
+       * There is situation when user switch type from one two another.
+       * After it current config is changed immediately. It leads to the fact
+       * that all things in the templates are rerendered.
+       * But several controls must not be rerenderd till submit action will not be
+       * occurred (for example it's a results in unified mapper - when we switch
+       * object type the results should not be painted in another color (if
+       * unified mapper operates with a snapshots and usual objects)).
+       */
+      freezedConfigTillSubmit: {},
       showAsSnapshots: function () {
         if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
           return true;
@@ -216,30 +226,23 @@ export default canComponent.extend({
     '{pubSub} mapAsChild'(el, ev) {
       this.viewModel.attr('megaRelationObj')[ev.id] = ev.val;
     },
-    inserted: function () {
-      let self = this;
-      let deferredToList;
+    inserted() {
       this.viewModel.attr('selected').replace([]);
-      this.viewModel.attr('entries').replace([]);
 
       if (this.viewModel.attr('deferred_to.list')) {
-        deferredToList = this.viewModel.attr('deferred_to.list')
-          .map(function (item) {
-            return {
+        let deferredToList = this.viewModel.attr('deferred_to.list')
+          .map((item) => {
+            return ({
               id: item.id,
               type: item.type,
-            };
+            });
           });
         this.viewModel.attr('deferred_list', deferredToList);
       }
 
-      self.viewModel.onSubmit();
+      this.viewModel.onSubmit();
     },
     map(objects, options) {
-      const viewModel = this.viewModel;
-
-      viewModel.updateFreezedConfigToLatest();
-
       if (this.viewModel.attr('deferred')) {
         // postpone map operation unless target object is saved
         this.deferredSave(objects);

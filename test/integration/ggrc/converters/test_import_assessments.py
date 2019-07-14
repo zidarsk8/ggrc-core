@@ -886,6 +886,46 @@ class TestAssessmentImport(TestCase):
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.PROGRESS_STATE)
 
+  def test_assmt_with_multiselect_gca(self):
+    """Import of assessment with multiselect CAD shouldn't add assmt.CAV"""
+    assess_slug = "TestAssessment"
+    with factories.single_commit():
+      # create 2 GCA's
+      cad_text = factories.CustomAttributeDefinitionFactory(
+          title="text_GCA",
+          definition_type="assessment",
+          attribute_type="Text",
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title="multiselect_GCA",
+          definition_type="assessment",
+          attribute_type="Multiselect",
+          multi_choice_options="1,2,3"
+      )
+
+      # create assessment with 1 CAV
+      assessment = factories.AssessmentFactory(
+          slug=assess_slug,
+      )
+      factories.CustomAttributeValueFactory(
+          custom_attribute=cad_text,
+          attributable=assessment,
+          attribute_value="text",
+      )
+      assessment_id = assessment.id
+    # update given assessment with empty GCA multiselect type
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assess_slug),
+        ("multiselect_GCA", ""),
+    ]))
+    self._check_csv_response(response, {})
+    assessment = all_models.Assessment.query.get(assessment_id)
+    self.assertEquals(1, len(assessment.custom_attribute_values))
+    self.assertEquals(
+        "text", assessment.custom_attribute_values[0].attribute_value
+    )
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):

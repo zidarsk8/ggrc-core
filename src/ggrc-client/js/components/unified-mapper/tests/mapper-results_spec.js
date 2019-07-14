@@ -81,16 +81,6 @@ describe('mapper-results component', function () {
       });
     });
 
-    it('sets data of loaded items to viewModel.entries', function (done) {
-      viewModel.attr('entries', []);
-      viewModel.setItems().then(() => {
-        expect(viewModel.attr('entries').length).toEqual(1);
-        expect(viewModel.attr('entries')[0])
-          .toEqual('mockData');
-        done();
-      });
-    });
-
     it('calls setColumnsConfiguration and setRelatedAssessments',
       function (done) {
         viewModel.setItems().then(() => {
@@ -431,7 +421,7 @@ describe('mapper-results component', function () {
     it('transform query to snapshot if useSnapshots is true', function () {
       let result;
       viewModel.attr('useSnapshots', true);
-      spyOn(SnapshotUtils, 'transformQuery')
+      spyOn(SnapshotUtils, 'transformQueryToSnapshot')
         .and.returnValue({mockData: 'snapshot'});
       result = viewModel.getQuery();
       expect(result.request[0]).toEqual(jasmine.objectContaining({

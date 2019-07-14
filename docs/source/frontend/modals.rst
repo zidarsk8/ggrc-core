@@ -66,8 +66,6 @@ the modals
 -  autocomplete
 -  extended jQuery UI plugin applied to every input that has data-lookup
    defined on it
--  ``autocomplete_select`` is the callback called when the autocomplete
-   value is selected
 
 -  set_value():
 -  keeping TBD

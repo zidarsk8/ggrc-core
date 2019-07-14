@@ -12,28 +12,9 @@ describe('advanced-search-wrapper component', function () {
   'use strict';
 
   let viewModel;
-  let events;
   let spy;
   beforeEach(() => {
     viewModel = getComponentVM(Component);
-    events = Component.prototype.events;
-  });
-
-  describe('"{viewModel} modelName" handler', function () {
-    let that;
-    let handler;
-    beforeEach(function () {
-      that = {
-        viewModel: viewModel,
-      };
-      handler = events['{viewModel} modelName'];
-    });
-
-    it('calls resetFilters() method', function () {
-      spyOn(viewModel, 'resetFilters');
-      handler.call(that);
-      expect(viewModel.resetFilters).toHaveBeenCalled();
-    });
   });
 
   describe('setDefaultStatusItem method', () => {

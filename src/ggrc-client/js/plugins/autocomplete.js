@@ -12,7 +12,6 @@ import {
 } from './utils/query-api-utils';
 import RefreshQueue from '../models/refresh_queue';
 import Search from '../models/service-models/search';
-import {bindXHRToButton} from '../plugins/utils/modals';
 import {getInstance} from '../plugins/utils/models-utils';
 import * as businessModels from '../models/business-models';
 import {InfiniteScrollControl, LhnTooltipsControl} from '../controllers/infinite-scroll-controller';
@@ -69,10 +68,6 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
           }
         }.bind(this));
       }.bind(this));
-
-      if (this.options.controller) {
-        bindXHRToButton(dfd, $(this.element), null, false);
-      }
     }, SEARCH_DEBOUNCE),
 
     apply_filter: function (objects) {
@@ -126,34 +121,25 @@ $.widget('ggrc.autocomplete', $.ui.autocomplete, {
     },
 
     select: function (ev, ui) {
-      let origEvent;
       let $this = $(this);
       let widgetName = $this.data('autocomplete-widget-name');
-      let ctl = $this.data(widgetName).options.controller;
+      const {onSelectCallback = null} = $this.data(widgetName).options;
 
       if (ui.item) {
         $this.trigger('autocomplete:select', [ui]);
-        if (ctl) {
-          if (ctl.scope && ctl.scope.autocomplete_select) {
-            return ctl.scope.autocomplete_select($this, ev, ui);
-          } else if (ctl.autocomplete_select) {
-            return ctl.autocomplete_select($this, ev, ui);
-          }
+
+        if (onSelectCallback) {
+          onSelectCallback($this, ui.item);
         }
       } else {
-        origEvent = ev;
         $(document.body)
           .off('.autocomplete')
           .one('modal:success.autocomplete', function (_ev, newObj) {
-            if (ctl) {
-              if (ctl.scope && ctl.scope.autocomplete_select) {
-                return ctl.scope.autocomplete_select(
-                  $this, origEvent, {item: newObj});
-              } else if (ctl.autocomplete_select) {
-                return ctl.autocomplete_select(
-                  $this, origEvent, {item: newObj});
-              }
+            if (onSelectCallback) {
+              onSelectCallback($this, newObj);
+              return;
             }
+
             $this.trigger('autocomplete:select', [{
               item: newObj,
             }]);
@@ -327,37 +313,3 @@ $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
 });
 
 $.widget.bridge('ggrc_query_autocomplete', $.ggrc.query_autocomplete);
-
-/**
- * Convert an input element to an autocomplete field.
- *
- * If an element is not given, it tries to use the first suitable element
- * within the current DOM context (i.e. a DOM node containing form elements),
- * if such context exists.
- *
- * @param {DOM.Element} el - the element to convert
- */
-$.cms_autocomplete = function (el) {
-  let ctl = this;
-  // Add autocomplete to the owner field
-  if (!el) {
-    if (!this.element) {
-      // It can happen that this.element is already null when we want to init
-      // autocomplete on it, e.g. when its containing modal form is already
-      // being destroyed. In such cases we simply don't do anything.
-      return;
-    }
-    el = this.element.find('input[data-lookup]');
-  } else {
-    el = $(el);
-  }
-  el.filter("[name][name!='']:not([data-query])")
-    .ggrc_autocomplete({
-      controller: ctl,
-    });
-
-  el.filter('[data-query]')
-    .ggrc_query_autocomplete({
-      controller: ctl,
-    });
-};

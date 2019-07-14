@@ -36,38 +36,10 @@
   top: 12%;
   overflow: visible;
 
-  .small-info {
-    h3 {
-      font-weight:normal;
-      padding-bottom:12px;
-    }
-    h6 {
-      margin-bottom:0;
-      padding-bottom:0;
-      text-align:left;
-      margin-left:0;
-      margin-right:0;
-      padding-left:0;
-      padding-right:0;
-      border:none;
-      background:none;
-    }
-    p {
-      line-height:18px;
-    }
-  }
-  select.inline-select {
-    width:auto;
-    font-size:16px;
-    margin-bottom:0;
-  }
   &:focus,
   &:active {
     outline: none;
     outline: 0;
-  }
-  .member-failure {
-    background: lighten($error,45%);
   }
   .help-inline {
     color:$error;
@@ -92,11 +64,6 @@
       margin-left: 0;
       left: 3% !important;
     }
-  }
-  &.modal-xwide {
-    width: 1260px;
-    margin-left: -630px;
-    left: 50%;
   }
   &.modal-selector {
     .content {
@@ -126,7 +93,6 @@
     .row-fluid {
       [class*="span"] {
         margin-right: 2.127659574468085%;
-        *margin-right: 2.074468085106383%;
         margin-left: 0;
         &:last-child {
           margin-right: 0;
@@ -140,10 +106,6 @@
     }
   }
   .hidden {
-    display: none;
-  }
-
-  .if-dropdown {
     display: none;
   }
   .modal-search {
@@ -200,36 +162,6 @@
         font-weight:bold;
       }
     }
-    &.modal-alert {
-      @include gradient-vertical(darken($darkGray,30%), $black);
-      @include box-shadow(inset 0 -1px 0 $modalHeaderShadow);
-      border-bottom: 1px solid $modalHeaderBorder;
-    }
-  }
-  .wrap-modal-spacing {
-    margin: 0 20px 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid $itemBorder;
-  }
-  .modal-custom-spacing,
-  .results-num {
-    margin: 0 10px;
-  }
-  .results-num {
-    margin-bottom: 30px;
-  }
-  .check-all {
-    color: $gray;
-    margin-right: 15px;
-    .spinner {
-      color: $black;
-    }
-    .disabled {
-      color: $gray;
-      &:hover {
-        text-decoration: none;
-      }
-    }
   }
   .modal-body {
     max-height:none;
@@ -237,40 +169,6 @@
     overflow: visible;
     &.ui-disabled {
       @include disabled(0.5);
-    }
-    .add-button {
-      margin-bottom: 20px;
-    }
-    &.modal-filter {
-      padding-bottom: 0;
-    }
-    .filter-actions {
-      margin-bottom: 0;
-      border-bottom: 1px solid $itemBorder;
-      padding-bottom: 20px;
-    }
-    .small {
-      font-size:$f-small;
-      display: inline-block;
-      margin-left: 6px;
-      &.autogenerate-result {
-        display: none;
-        &.active {
-          display: inline-block;
-        }
-      }
-    }
-    .large {
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .icon-field {
-      margin-right: 4px;
-      margin-top: 6px;
-    }
-    .icon-text {
-      margin-right: 4px;
-      margin-top: 1px;
     }
     input,
     textarea,
@@ -308,24 +206,31 @@
         width: 418px;
       }
     }
+    .assessment-procedure-message {
+      display: flex;
+      align-items: center;
+      height: 26px;
+
+      &__icon {
+        margin-left: 6px;
+        line-height: 16px;
+      }
+
+      &__label {
+        display: flex;
+        align-items: center;
+        margin: 0 0 0 6px;
+
+        .assessment-procedure-message__checkbox {
+          margin: 0 4px 0 0;
+        }
+      }
+    }
     label {
       font-weight: normal;
       color: #111;
       font-size: 16px;
       margin-bottom: 7px;
-      &.inline-check {
-        line-height: 26px;
-        margin-bottom: 0;
-        input {
-          margin-top: 5px;
-        }
-        i {
-          margin: 6px 0 0 0;
-        }
-        &.pull-left {
-          margin-left: 5px;
-        }
-      }
       .required {
         color: $red;
         font-weight: bold;
@@ -668,16 +573,6 @@
   }
 }
 
-.checkbox-area {
-  padding:6px 0 16px 0;
-}
-
-.object-url {
-  @extend %oneline;
-  margin-bottom:10px;
-  font-size:12px;
-}
-
 .ui-autocomplete {
   @extend %reset-list;
   width: 300px;
@@ -720,43 +615,6 @@
 .note {
   font-size: $f-medium;
 }
-.workflow-accordion {
-  .accordion-group {
-    @include border-radius(0);
-    border: none;
-    border-bottom: 1px solid $footerBorder;
-    &:last-child {
-      border-bottom: none;
-    }
-  }
-  .accordion-heading {
-    .accordion-toggle  {
-      padding: 4px 0;
-      font-weight: bold;
-    }
-  }
-  .accordion-inner {
-    border-top: none;
-    padding-left: 19px;
-    button {
-      border: none;
-      background: none;
-      padding: 0;
-      i {
-        margin-top: 5px;
-      }
-      &:focus,
-      &:active {
-        outline: 0;
-      }
-    }
-    .workflow-repeat {
-      float: left;
-      line-height: 26px;
-      margin-right: 4px;
-    }
-  }
-}
 
 .define-attr {
   .hidden-fields-area {
@@ -771,82 +629,6 @@
   .all-check {
     text-align: right;
     padding-right: 15px;
-  }
-}
-
-.results-wrap {
-  height: 240px;
-  overflow-y: auto;
-  &.custom-height {
-    min-height: 100px;
-    height: auto !important;
-  }
-  .info {
-    @include box-shadow(none);
-    display: block;
-    text-align: center;
-    padding-top: 95px;
-    color: $gray;
-    font-size: $f-medium;
-    font-weight: bold;
-  }
-  ul.new-tree {
-    li.tree-item {
-      min-height: 24px;
-      line-height: 24px;
-      margin: 0 10px;
-
-      [class*="fa-"] {
-        margin-top: 4px;
-      }
-      .show-details i {
-        margin-top: 0;
-      }
-      [class*="span"] {
-        min-height: 22px;
-      }
-      .object-check {
-        text-align: right;
-        padding-right: 15px;
-      }
-      .url-link {
-        display: none;
-      }
-      .item-wrap {
-        margin: 0;
-      }
-      > .item-main {
-        background: transparent;
-      }
-      &:nth-child(even) {
-        background: #fafafa;
-      }
-      .openclose {
-        i {
-          margin-top: 4px !important;
-        }
-      }
-    }
-    &.tree-open {
-      li.tree-item {
-        &.item-open {
-          @include box-shadow(none);
-          margin: 0 10px;
-          > .item-main {
-            > .item-wrap {
-              border-bottom: 1px solid $itemBorder;
-            }
-          }
-        }
-      }
-      .content-open {
-        border-bottom: 2px solid $textGray;
-        padding: 14px 10px 0 10px;
-        .tier-2-info-content {
-          padding: 0 0 0 32px;
-        }
-      }
-    }
   }
 }
 
@@ -879,10 +661,6 @@
       margin-bottom:0px;
     }
   }
-}
-
-label.second-in-column {
-  margin-top:20px;
 }
 
 .control-offset {

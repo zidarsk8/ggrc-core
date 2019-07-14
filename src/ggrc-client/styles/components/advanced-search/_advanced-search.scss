@@ -65,6 +65,49 @@
 }
 
 .advanced-search {
+  &__body {
+    display: flex;
+
+    aside {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 220px;
+      border-top: 1px solid $itemBorder;
+      border-right: 1px solid $itemBorder;
+      padding: 10px;
+    }
+
+    main {
+      flex: 4;
+      display: flex;
+      flex-direction: column;
+    }
+
+    saved-search-list {
+      flex: 1;
+    }
+
+    create-saved-search {
+      input {
+        margin: 0 5px 0 0;
+      }
+    }
+  }
+
+  &__parent-filter {
+    margin-bottom: 20px;
+
+    h6 {
+      display: inline;
+      margin-right: 8px;
+    }
+
+    span {
+      font-size: 13px;
+    }
+  }
+
   $simple-modal-header-height: 48px;
   $simple-modal-footer-height: 64px;
 
@@ -72,7 +115,7 @@
     max-height: 85%;
     max-width: 90%;
     .simple-modal__body {
-      padding-right: 48px;
+      padding: 20px 16px 24px;
       overflow: visible;
     }
     .simple-modal__header  {
@@ -90,21 +133,24 @@
     }
   }
   &__content {
-    overflow: auto;
-    height: calc(100% - #{$simple-modal-header-height} - #{$simple-modal-footer-height});
+    border-top: 1px solid $itemBorder;
     min-height: 200px;
+    overflow: auto;
+    flex: 1;
   }
   &__mapping-header {
-    margin-top: 14px;
-    padding: 24px 16px 14px 16px;
-    border-top: 1px solid #E0E0E0;
+    padding: 20px 16px 4px;
+    border-top: 1px solid $itemBorder;
   }
   &__controls {
     float: right;
     button {
-      height: 24px;
-      padding: 0px 12px;
-      line-height: 12px;
+      padding: 4px 14px;
+      line-height: 18px;
+
+      &:last-child {
+        margin-left: 5px;
+      }
     }
   }
 }
@@ -159,6 +205,7 @@
 
 .filter-container {
   &__state {
+    min-width: 560px;
     margin-bottom: 24px;
   }
   &__operator {

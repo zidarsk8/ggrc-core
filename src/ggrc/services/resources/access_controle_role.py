@@ -21,9 +21,11 @@ class AccessControlRoleResource(common.Resource):
       access_control_role_options = item.get('access_control_role', {})
       if all(role in access_control_role_options for role in ROLE_PERMISSIONS):
         if (
-            access_control_role_options['delete'] and
-            access_control_role_options['update'] and not
+            (
+                access_control_role_options['delete'] or
+                access_control_role_options['update']
+            ) and not
             access_control_role_options['read']
         ):
           raise ValueError(u"User can't create role with permissions: "
-                           u"delete, edit and no read")
+                           u"delete or edit and no read")
