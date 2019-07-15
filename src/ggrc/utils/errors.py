@@ -10,7 +10,13 @@ WRONG_STATUS = u"Wrong status."
 
 EXPORT_STOPPED_WARNING = u"Export already canceled. Please wait."
 
+EXPORT_FINISHED_WARNING = (u"Export has already finished. "
+                           u"Please refresh this page.")
+
 IMPORT_STOPPED_WARNING = u"Import already canceled. Please wait."
+
+IMPORT_FINISHED_WARNING = (u"Import has already finished. "
+                           u"Please refresh this page.")
 
 BAD_PARAMS = u"Bad request parameters."
 
