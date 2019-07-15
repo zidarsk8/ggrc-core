@@ -8,6 +8,7 @@ import RefreshQueue from '../../models/refresh_queue';
 import * as businessModels from '../../models/business-models';
 import * as serviceModels from '../../models/service-models';
 import allModels from '../../models/all-models';
+import {reify} from './reify-utils';
 
 const relatedAssessmentsTypes = Object.freeze(['Control', 'Objective']);
 
@@ -158,6 +159,34 @@ function getCustomAttributableModels() { // eslint-disable-line
     .map((modelName) => businessModels[modelName]);
 }
 
+
+async function initAuditTitle(instance, isNewInstance) {
+  const isAuditInstance = (
+    instance.constructor
+    && instance.constructor.model_singular === 'Audit'
+  );
+  const needToInitTitle = (
+    isAuditInstance &&
+    isNewInstance &&
+    instance.program
+  );
+
+  if (!needToInitTitle) {
+    return;
+  }
+
+  const program = reify(instance.program);
+  const currentYear = (new Date()).getFullYear();
+  const title = `${currentYear}: ${program.title} - Audit`;
+
+  const result = await serviceModels.Search.counts_for_types(title, ['Audit']);
+  // Next audit index should be bigger by one than previous, we have unique name policy
+  const newAuditId = result.getCountFor('Audit') + 1;
+  if (!instance.title) {
+    instance.attr('title', `${title} ${newAuditId}`);
+  }
+}
+
 /**
  * Return grouped types.
  * @param {Array} types - array of base model types
@@ -225,4 +254,5 @@ export {
   getRoleableModels,
   getCustomAttributableModels,
   groupTypes,
+  initAuditTitle,
 };

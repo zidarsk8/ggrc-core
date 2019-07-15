@@ -12,13 +12,21 @@ export default canComponent.extend({
   tag: 'object-loader',
   leakSkope: true,
   viewModel: canMap.extend({
+    isObjectLoading: false,
     define: {
       path: {
         set(value) {
           if (value && isReifiable(value)) {
-            new RefreshQueue().enqueue(reify(value)).trigger().then(
-              (response) => {
+            this.attr('isObjectLoading', true);
+
+            new RefreshQueue()
+              .enqueue(reify(value))
+              .trigger()
+              .then((response) => {
                 this.attr('loadedObject', response[0]);
+              })
+              .always(() => {
+                this.attr('isObjectLoading', false);
               });
           } else {
             this.attr('loadedObject', null);

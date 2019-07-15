@@ -78,7 +78,7 @@
     button {
       cursor: pointer;
       height: 100%;
-      padding: 0 25px;
+      min-width: 110px;
       background-color: $white;
       color: $textGray;
       border-radius: 0;

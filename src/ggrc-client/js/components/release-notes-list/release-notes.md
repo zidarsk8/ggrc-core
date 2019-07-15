@@ -1,8 +1,12 @@
-[//]: <> (updated 07/01/2019)
+[//]: <> (updated 07/16/2019)
 
 Our product team is working hard to engineer compliance @ scale and make your day to day user journeys easier. We have been adding key capabilities to the product as listed here below.
 
-[Introducing ‘Propose changes’ on Programs (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.xl1ok43woard)
+[New rules for Ticket Tracker integration for Assessments (v2.8.0, 07/16/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.uqfpjeprd5w4)
+
+[Custom Attributes of the Person type are no longer available  (v2.8.0, 07/16/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.t4zaayd0kt5s)
+
+[Introducing ‘Propose changes’ on Programs (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.sjp0brar3kok)
 
 [Possibility to revert to any version of a Program (v2.7.0, 07/01/2019)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.22hdzqmnzr7x)
 
@@ -103,6 +107,14 @@ Our product team is working hard to engineer compliance @ scale and make your da
 [Linking assessments with other issue tracking systems (v0.10.36, 12/12/2017)](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.9ry21bbez6aa)
 
 [Performance improvements](https://docs.google.com/document/d/1Tm1nRVDIgUArjezZSnCvcwCm3gLcXdB6wRJKUaF6VUA/edit?ts=5d10d7f4#heading=h.m9vl04nitn8)
+
+### New rules for Ticket Tracker integration for Assessments (v2.8.0, 07/16/2019)
+
+Earlier a user could trigger a new ticket autogeneration for Assessments in completed statuses. It could confuse users who had already completed an Assessment because they received a notification from the Ticket Tracker system that they should complete the same Assessment again. From now, autogeneration of tickets for Assessments that are in the 'In Review', 'Completed (no verification)', 'Completed and Verified' and 'Deprecated' statuses is restricted.
+
+### Custom Attributes of the Person type are no longer available  (v2.8.0, 07/16/2019)
+
+Creating Custom Attributes of the Person type will not be available in the system anymore.
 
 ### Introducing ‘Propose changes’ on Programs (v2.7.0, 07/01/2019)
 

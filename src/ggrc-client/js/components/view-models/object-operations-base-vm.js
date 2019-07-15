@@ -74,10 +74,12 @@ const ObjectOperationsBaseVM = canMap.extend({
      * For example, if not set a special config for type [TYPE] then is used
      * general config, otherwise special config.
      */
-      set: function (mapType) {
+      set(mapType) {
+        if (mapType === this.attr('type')) {
+          return mapType;
+        }
+
         let config = this.attr('config') || {};
-        let type = this.attr('type');
-        let configHandler;
         let resultConfig = ObjectOperationsBaseVM.extractConfig(
           mapType,
           config.serialize()
@@ -87,19 +89,10 @@ const ObjectOperationsBaseVM = canMap.extend({
         // type)
         delete resultConfig.type;
 
-        // if we set type first time then update config immediately
-        if (!type) {
-          configHandler = this.update.bind(this);
-        } else {
-          configHandler = this.prepareConfig.bind(this);
-        }
-
-        configHandler(resultConfig);
-        if (_.isNull(this.attr('freezedConfigTillSubmit'))) {
-          this.attr('freezedConfigTillSubmit', resultConfig);
-        }
-
+        this.update(resultConfig);
         this.attr('currConfig', resultConfig);
+        this.attr('resultsRequested', false);
+        this.attr('entriesTotalCount', '');
 
         return mapType;
       },
@@ -116,19 +109,10 @@ const ObjectOperationsBaseVM = canMap.extend({
     general: {},
     special: [],
   },
-  /**
-   * There is situation when user switch type from one two another.
-   * After it current config is changed immediately. It leads to the fact
-   * that all things in the templates are rerendered.
-   * But several controls must not be rerenderd till submit action will not be
-   * occurred (for example it's a results in unified mapper - when we switch
-   * object type the results should not be painted in another color (if
-   * unified mapper operates with a snapshots and usual objects)).
-   */
-  freezedConfigTillSubmit: null,
   currConfig: null,
   showSearch: true,
   showResults: true,
+  resultsRequested: false,
   type: 'Control', // We set default as Control
   availableTypes: function () {
     let list = getMappingList(this.attr('object'));
@@ -137,16 +121,18 @@ const ObjectOperationsBaseVM = canMap.extend({
   object: '',
   is_loading: false,
   is_saving: false,
-  assessmentTemplate: '',
   join_object_id: '',
   selected: [],
   entries: [],
+  entriesTotalCount: '',
   options: [],
-  newEntries: [],
   relevant: [],
   useSnapshots: false,
   onSearchCallback: $.noop(),
   onSubmit: function () {
+    this.attr('is_loading', true);
+    this.attr('entries').replace([]);
+    this.attr('resultsRequested', true);
     if (this.onSearchCallback) {
       this.onSearchCallback();
     }
@@ -156,9 +142,6 @@ const ObjectOperationsBaseVM = canMap.extend({
     $('.modal:visible')
       .last()
       .focus();
-  },
-  prepareConfig: function (config) {
-    this.update(config);
   },
   /**
    * Updates view model fields to values from config.

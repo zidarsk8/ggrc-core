@@ -7,7 +7,6 @@
   <input type="text"
          data-lookup="{{searchItemsType}}"
          data-no-automap="{{automappingOff}}"
-         null-if-empty="true"
          {{#if disable}}disabled{{/if}}
          class="{{^if context.isEdit}}autocomplete_wide{{/if}} autocomplete--input"
          placeholder="{{placeholder}}"

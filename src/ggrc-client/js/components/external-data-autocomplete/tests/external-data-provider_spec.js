@@ -70,12 +70,12 @@ describe('external-data-provider component', () => {
 
         viewModel.loadData();
 
-        expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith({
-          url: 'testUrl',
-          data: {
+        expect(AjaxUtils.ggrcGet).toHaveBeenCalledWith(
+          'testUrl',
+          {
             prefix: 'someText',
           },
-        });
+        );
       });
 
       it('sets response to "values" property', (done) => {

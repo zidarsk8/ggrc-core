@@ -346,6 +346,7 @@ class TestBasicCsvImport(TestCase):
 
     expected_errors = {
         errors.MISSING_VALUE_ERROR.format(line=8, column_name="Email"),
+        errors.MISSING_VALUE_ERROR.format(line=9, column_name="Name"),
         errors.WRONG_VALUE_ERROR.format(line=10, column_name="Email"),
         errors.WRONG_VALUE_ERROR.format(line=11, column_name="Email"),
     }
@@ -586,3 +587,27 @@ class TestImportPermissions(TestCase):
     self.assertEqual(perm_ids, set())
     user_perm = self.memcache_client.get(user_perm_key)
     self.assertIsNone(user_perm)
+
+  def test_import_without_code_object(self):
+    """Test import csv without 'Code' but with existing title."""
+    title = 'program 1'
+    factories.ProgramFactory(title=title)
+    self.assertEqual(len(models.Program.query.all()), 1)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Program"),
+        ("Code*", ""),
+        ("title", title),
+        ("Program managers", "user@example.com"),
+    ]))
+
+    expected_errors = {
+        "Program": {
+            "row_errors": {
+                errors.DUPLICATE_VALUE.format(
+                    line=3, column_name='title', value=title
+                ),
+            }
+        }
+    }
+    self._check_csv_response(response, expected_errors)
+    self.assertEqual(len(models.Program.query.all()), 1)

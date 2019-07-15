@@ -7,24 +7,20 @@ from datetime import datetime
 from random import random
 
 from freezegun import freeze_time
-from flask_testing import TestCase
 
 from ggrc import db
 from ggrc.app import app
 from ggrc.models.saved_search import SavedSearch
 from ggrc.models.person import Person
 
+from integration.ggrc.views.saved_searches.base import SavedSearchBaseTest
 from integration.ggrc.views.saved_searches.initializers import (
     setup_user_role,
     get_client_and_headers,
 )
 
 
-class TestSavedSearchGet(TestCase):
-
-  @staticmethod
-  def create_app():
-    return app
+class TestSavedSearchGet(SavedSearchBaseTest):
 
   @classmethod
   def setUpClass(cls):
@@ -45,13 +41,6 @@ class TestSavedSearchGet(TestCase):
 
     db.session.flush()
 
-    cls._valid_query = [{
-        "object_name": "Assessment",
-        "filters": {"expression": {}},
-        "limit": [0, 10],
-        "order_by": [{"name": "updated_at", "desc": True}]
-    }]
-
     locked_time = {
         "year": 2025,
         "month": 1,
@@ -66,9 +55,9 @@ class TestSavedSearchGet(TestCase):
 
         saved_search = SavedSearch(
             name="test_ss_{}".format(i),
-            query=cls._valid_query,
             object_type="Assessment",
             user=user,
+            search_type=cls.SAVED_SEARCH_TYPE
         )
         user.saved_searches.append(saved_search)
         db.session.flush()
@@ -82,18 +71,21 @@ class TestSavedSearchGet(TestCase):
 
         frozen_time.move_to(datetime(**locked_time))
 
+      saved_search_program = SavedSearch(
+          name="test_program_ss",
+          object_type="Program",
+          user=cls._person_0,
+          search_type=cls.SAVED_SEARCH_TYPE
+      )
+      cls._person_0.saved_searches.append(saved_search_program)
+      db.session.flush()
+
     cls._user_role = setup_user_role(cls._person_0)
     db.session.commit()
 
     cls._client, cls._headers = get_client_and_headers(
         app, cls._person_0,
     )
-
-  def setUp(self):
-    self._client.get("/login", headers=self._headers)
-
-  def tearDown(self):
-    self._client.get("/logout", headers=self._headers)
 
   @classmethod
   def tearDownClass(cls):
@@ -110,7 +102,8 @@ class TestSavedSearchGet(TestCase):
 
   def test_0_get_only_user_specific_saved_searches(self):
     response = self._client.get(
-        "/api/saved_searches/Assessment",
+        self.API_URL.format(object_type="Assessment",
+                            search_type=self.SAVED_SEARCH_TYPE),
         headers=self._headers,
     )
 
@@ -123,10 +116,12 @@ class TestSavedSearchGet(TestCase):
 
   def test_1_get_saved_searches_with_pagination(self):
     response = self._client.get(
-        "/api/saved_searches/Assessment?offset=1&limit=2",
+        self.SAVED_SEARCH_URI +
+        "/{search_type}?offset=1&limit=2&object_type=Assessment".format(
+            search_type=self.SAVED_SEARCH_TYPE
+        ),
         headers=self._headers,
     )
-
     data = json.loads(response.data)
 
     self.assertEqual(len(data["values"]), 2)
@@ -136,7 +131,25 @@ class TestSavedSearchGet(TestCase):
     self.assertEqual(data["values"][0]["name"], "test_ss_2")
     self.assertEqual(data["values"][1]["name"], "test_ss_1")
     self.assertEqual(data["values"][0]["object_type"], "Assessment")
-    self.assertEqual(data["values"][0]["query"], json.dumps(self._valid_query))
     self.assertEqual(data["values"][0]["person_id"], self._person_0.id)
     self.assertIn("id", data["values"][0])
     self.assertIn("created_at", data["values"][0])
+
+  def test_2_get_saved_searches_total_only_type(self):
+    """Test that total returns only count of specific object type objects"""
+    data_program = self._get_saved_search(object_type="Program")
+    data_assessment = self._get_saved_search(object_type="Assessment")
+
+    self.assertEqual(data_program["total"], 1)
+    self.assertEqual(data_assessment["total"], 3)
+
+  def test_3_get_saved_search_by_id(self):
+    data_assessment = self._get_saved_search(object_type="Assessment")
+    assmt = data_assessment["values"][0]
+    response = self._client.get("{uri}/{id}".format(uri=self.SAVED_SEARCH_URI,
+                                                    id=assmt["id"]),
+                                headers=self._headers)
+    saved_search = json.loads(response.data)["SavedSearch"]
+    self.assertEqual(assmt["name"], saved_search["name"])
+    self.assertEqual(assmt["id"], saved_search["id"])
+    self.assertEqual(assmt["object_type"], saved_search["object_type"])

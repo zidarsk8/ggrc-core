@@ -23,9 +23,9 @@ from sqlalchemy import and_
 from ggrc import db
 from ggrc import models
 from ggrc import utils
-from ggrc.login import get_current_user_id
+from ggrc.login import get_current_user_id, get_current_user
 from ggrc.utils import benchmark
-from ggrc.rbac import permissions
+from ggrc.rbac import permissions, SystemWideRoles
 from ggrc.services import common
 from ggrc.query import pagination
 from ggrc.query.exceptions import BadQueryException
@@ -57,12 +57,14 @@ class RelatedAssessmentsResource(common.Resource):
     request GET parameters.
     """
 
+    user_role = get_current_user().system_wide_role
     ids_query = model.get_similar_objects_query(object_id, "Assessment")
     order_by = self._get_order_by_parameter()
     limit = self._get_limit_parameters()
 
     if not permissions.has_system_wide_read():
-      if not permissions.is_allowed_read(object_type, object_id, None):
+      if not permissions.is_allowed_read(object_type, object_id, None) and \
+         user_role != SystemWideRoles.CREATOR:
         raise Forbidden()
       acl = models.all_models.AccessControlList
       acr = models.all_models.AccessControlRole

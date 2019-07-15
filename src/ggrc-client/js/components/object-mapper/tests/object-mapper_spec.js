@@ -153,19 +153,6 @@ describe('object-mapper component', function () {
       spyObj = jasmine.createSpy();
     });
 
-    it('updates freezed config to the current config', function () {
-      _.assign(viewModel, {
-        updateFreezedConfigToLatest:
-          jasmine.createSpy('updateFreezedConfigToLatest'),
-      });
-
-      handler.call({
-        viewModel: viewModel,
-        mapObjects: spyObj,
-      }, []);
-      expect(viewModel.updateFreezedConfigToLatest).toHaveBeenCalled();
-    });
-
     it('calls mapObjects to map results', function () {
       handler.call({
         viewModel: viewModel,
@@ -259,7 +246,6 @@ describe('object-mapper component', function () {
     beforeEach(function () {
       viewModel.attr({
         selected: [1, 2, 3],
-        entries: [3, 2, 1],
         onSubmit: function () {},
       });
       that = {
@@ -271,11 +257,6 @@ describe('object-mapper component', function () {
     it('sets empty array to selected', function () {
       handler.call(that);
       expect(viewModel.attr('selected').length)
-        .toEqual(0);
-    });
-    it('sets empty array to entries', function () {
-      handler.call(that);
-      expect(viewModel.attr('entries').length)
         .toEqual(0);
     });
   });

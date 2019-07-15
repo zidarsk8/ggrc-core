@@ -41,13 +41,13 @@ export default canComponent.extend({
       const externalServiceUrl = GGRC.config.external_services[type];
 
       if (externalServiceUrl) {
-        ggrcGet({
-          url: externalServiceUrl,
-          data: {
+        ggrcGet(
+          externalServiceUrl,
+          {
             prefix: value,
             limit: 10,
           },
-        }).then(this.processItems.bind(this, value));
+        ).then(this.processItems.bind(this, value));
       } else {
         return this.requestItems(value)
           .then((data) => data[type].values)

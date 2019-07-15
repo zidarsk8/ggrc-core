@@ -1,0 +1,11 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<input type="text" placeholder="Type to Save Search" value:bind="searchName"/>
+<button type="button"
+        class="btn btn-small btn-green {{#if isDisabled}}disabled{{/if}}"
+        on:el:click="saveSearch()">
+          Save Search
+</button>

@@ -85,3 +85,15 @@ class WorkflowInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   def select_archive(self):
     """Selects `Archive workflow` option."""
     self._three_bbs.option_by_text("Archive workflow").click()
+
+
+class ControlInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Control info widget."""
+
+
+class PersonTreeItemThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Person tree item widget."""
+
+  def select_edit_authorizations(self):
+    """Selects `Edit Authorizations` option."""
+    self._three_bbs.option_by_text("Edit System Authorizations").click()

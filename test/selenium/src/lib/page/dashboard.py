@@ -9,6 +9,7 @@ from lib import base, decorator
 from lib.constants import locator
 from lib.element import tab_element
 from lib.page import widget_bar, lhn
+from lib.page.modal import global_search
 from lib.page.widget import object_modal
 from lib.utils import selenium_utils
 
@@ -133,6 +134,11 @@ class GenericHeader(base.Component):
     """Clicks "All Objects" button."""
     self._browser.element(id="allObjectView").click()
     return AllObjectsDashboard(self._driver)
+
+  def open_global_search(self):
+    """Clicks 'Global Search' button."""
+    self.button_search.click()
+    return global_search.GlobalSearch()
 
 
 class Header(GenericHeader):

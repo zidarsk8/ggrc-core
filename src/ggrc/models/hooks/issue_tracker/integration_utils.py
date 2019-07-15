@@ -41,7 +41,7 @@ def normalize_issue_tracker_info(info):
 
 
 def populate_issue_tracker_fields(assmt, issue_tracker_info,
-                                  with_update=False):
+                                  with_update=False, create_mode=False):
   """Populate issue tracker fields values.
 
   Current list of fields with default values: component_id, hotlist_id,
@@ -81,9 +81,9 @@ def populate_issue_tracker_fields(assmt, issue_tracker_info,
     issue_tracker_info["title"] = assmt.title
 
   if not issue_tracker_info.get("status"):
-    issue_tracker_info["status"] = constants.STATUSES_MAPPING.get(
-        assmt.status
-    )
+    status_mapping = constants.CREATE_STATUSES_MAPPING if create_mode else \
+        constants.STATUSES_MAPPING
+    issue_tracker_info["status"] = status_mapping.get(assmt.status)
 
   if not issue_tracker_info.get('due_date'):
     issue_tracker_info['due_date'] = assmt.start_date

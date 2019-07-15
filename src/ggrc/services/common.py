@@ -441,7 +441,7 @@ class Resource(ModelView):
           elif method == 'HEAD':
             if self.pk in kwargs and kwargs[self.pk] is not None:
               return self.head(*args, **kwargs)
-            raise NotImplementedError()
+            raise MethodNotAllowed()
           elif method == 'POST':
             if self.pk in kwargs and kwargs[self.pk] is not None:
               return self.post(*args, **kwargs)
@@ -1214,6 +1214,11 @@ class Resource(ModelView):
 
       # auto generation of user with Creator role if external flag is set
       if body and 'person' in body[0]:
+
+        if not body[0]["person"].get("name") and \
+           body[0]["person"].get("email"):
+          body[0]["person"]["name"] = body[0]["person"]["email"].split("@")[0]
+
         ext_flags_passed = {p.get("person", {}).get("external", False)
                             for p in body}
         if ext_flags_passed == {True, False}:
@@ -1313,6 +1318,7 @@ class Resource(ModelView):
             task.finish("Success", result)
           else:
             task.finish("Failure", result)
+            result.status_code = 200
       return result
 
   @classmethod
