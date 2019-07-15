@@ -89,3 +89,11 @@ class WorkflowInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
 
 class ControlInfoWidgetThreeBbbs(InfoWidgetThreeBbbs):
   """3bbs element for Control info widget."""
+
+
+class PersonTreeItemThreeBbbs(InfoWidgetThreeBbbs):
+  """3bbs element for Person tree item widget."""
+
+  def select_edit_authorizations(self):
+    """Selects `Edit Authorizations` option."""
+    self._three_bbs.option_by_text("Edit System Authorizations").click()
