@@ -34,7 +34,6 @@ CHANGETRACKED_MODELS = (
     'Project',
     'Regulation',
     'Risk',
-    'RiskAssessment',
     'Requirement',
     'Standard',
     'System',

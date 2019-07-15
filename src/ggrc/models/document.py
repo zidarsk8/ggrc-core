@@ -96,7 +96,6 @@ class Document(Roleable, Relatable, mixins.Titled,
   ALLOWED_PARENTS = {
       'Control',
       'Issue',
-      'RiskAssessment',
       'AccessGroup',
       'AccountBalance',
       'Contract',

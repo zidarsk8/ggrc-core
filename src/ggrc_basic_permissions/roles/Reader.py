@@ -47,7 +47,6 @@ permissions = {
         "Option",
         "OrgGroup",
         "Risk",
-        "RiskAssessment",
         "Threat",
         "Vendor",
         "PopulationSample",
