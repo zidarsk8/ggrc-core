@@ -4,13 +4,14 @@
 */
 
 import canMap from 'can-map';
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import {getComponentVM, makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Component from '../issue-unmap-item';
 import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import Relationship from '../../../models/service-models/relationship';
 import * as businessModels from '../../../models/business-models';
+import Issue from '../../../models/business-models/issue';
 
 describe('issue-unmap-item component', () => {
   let viewModel;
@@ -343,32 +344,33 @@ describe('issue-unmap-item component', () => {
   });
 
   describe('showNoRelationshipError() method', () => {
-    const issueTitle = 'TEST_ISSUE_TITLE';
-    const targetType = 'TEST_TARGET_TYPE';
-    const targetTitle = 'TEST_TARGET_TITLE';
+    let sourceInstance;
+    let destinationInstance;
 
     beforeEach(() => {
-      viewModel.attr('source', {
+      sourceInstance = makeFakeInstance({model: Issue})({
         type: 'Issue',
-        title: issueTitle,
+        title: 'Issue_title',
       });
-      viewModel.attr('destination', {
-        type: targetType,
-        title: targetTitle,
-        'class': {
-          title_singular: targetType,
-        },
+      viewModel.attr('source', sourceInstance);
+
+      destinationInstance = makeFakeInstance({model: Issue})({
+        type: 'Target_type',
+        title: 'Target_title',
       });
+      viewModel.attr('destination', destinationInstance);
+
       spyOn(NotifiersUtils, 'notifier');
     });
 
     it('shows correct message', () => {
       viewModel.showNoRelationshipError();
 
+      const destinationType = destinationInstance.constructor.title_singular;
       expect(NotifiersUtils.notifier).toHaveBeenCalledWith('error',
         `Unmapping cannot be performed.
-        Please unmap Issue (${issueTitle})
-        from ${targetType} version (${targetTitle}),
+        Please unmap Issue (${sourceInstance.title})
+        from ${destinationType} version (${destinationInstance.title}),
         then mapping with original object will be automatically reverted.`);
     });
   });

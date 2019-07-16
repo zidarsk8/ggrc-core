@@ -516,7 +516,6 @@ describe('deferred-mapper component', function () {
         let snapshotObject = {
           title: 'title',
           description: 'description',
-          'class': 'class',
           originalLink: 'originalLink',
         };
         let item = {snapshotObject};
@@ -527,7 +526,6 @@ describe('deferred-mapper component', function () {
         let expected = jasmine.objectContaining({
           title: snapshotObject.title,
           description: snapshotObject.description,
-          'class': snapshotObject.class,
           viewLink: snapshotObject.originalLink,
         });
         expect(vm.attr('list').serialize()).toEqual([expected]);
