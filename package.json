@@ -100,7 +100,7 @@
     "JavaScript"
   ],
   "author": "Google, Inc.",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/google/ggrc-core/issues"
   },
