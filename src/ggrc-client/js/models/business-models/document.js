@@ -81,7 +81,7 @@ export default Cacheable.extend({
   },
   kindTitle() {
     let value = this.attr('kind');
-    let title = loFind(this.class.kinds, {value}).title;
+    let title = loFind(this.constructor.kinds, {value}).title;
     return title;
   },
   save() {

@@ -172,7 +172,7 @@ export default canComponent.extend({
     },
     filterByIncludeExclude(includeRoles, excludeRoles) {
       const instance = this.attr('instance');
-      const objectRoles = getRolesForType(instance.class.model_singular);
+      const objectRoles = getRolesForType(instance.constructor.model_singular);
 
       return objectRoles.filter((item) => {
         return loIndexOf(includeRoles, item.name) > -1 &&
@@ -181,14 +181,14 @@ export default canComponent.extend({
     },
     filterByInclude(includeRoles) {
       const instance = this.attr('instance');
-      const objectRoles = getRolesForType(instance.class.model_singular);
+      const objectRoles = getRolesForType(instance.constructor.model_singular);
 
       return objectRoles.filter((item) =>
         loIndexOf(includeRoles, item.name) > -1);
     },
     filterByExclude(excludeRoles) {
       const instance = this.attr('instance');
-      const objectRoles = getRolesForType(instance.class.model_singular);
+      const objectRoles = getRolesForType(instance.constructor.model_singular);
 
       return objectRoles.filter((item) =>
         loIndexOf(excludeRoles, item.name) === -1);
@@ -206,7 +206,7 @@ export default canComponent.extend({
       } else if (excludeRoles.length) {
         roles = this.filterByExclude(excludeRoles);
       } else {
-        roles = getRolesForType(instance.class.model_singular);
+        roles = getRolesForType(instance.constructor.model_singular);
       }
 
       return roles;
