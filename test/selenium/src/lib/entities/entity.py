@@ -906,3 +906,7 @@ class DailyEmailUI(Representation):
     self.set_attrs(
         "email_recipient", "assigned_tasks", "due_soon_tasks", "new_wf_cycles",
         **attrs)
+
+
+class StandardEntity(Entity):
+  """Class that represent model for Standard entity."""

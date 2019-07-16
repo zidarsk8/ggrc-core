@@ -6,7 +6,7 @@
 import copy
 import pytest
 
-from lib import base, browsers
+from lib import base, browsers, url
 from lib.constants import element
 from lib.service import webui_service
 
@@ -95,14 +95,17 @@ class TestControls(base.Test):
     actual_conditions["same_url_for_new_tab"] = (old_tab.url == new_tab.url)
     assert expected_conditions == actual_conditions
 
-  def test_cannot_unmap_control_from_scope_obj(self,
-                                               product_mapped_to_control,
-                                               selenium):
-    """Test that user cannot unmap control from scope object."""
-    widget = webui_service.ControlsService(
-        selenium).open_widget_of_mapped_objs(product_mapped_to_control)
-    assert not widget.three_bbs.option_by_text("Unmap").exists, (
-        "Unmap should not be available for scope objects.")
+  @pytest.mark.parametrize(
+      'obj', ["product_mapped_to_control", "standard_mapped_to_control"],
+      indirect=True)
+  def test_cannot_unmap_control(self, control, obj, selenium):
+    """Checks that user cannot unmap Control from Scope Objects/Directives and
+    new tab opens."""
+    webui_service.ControlsService(selenium).open_info_panel_of_mapped_obj(
+        obj, control).three_bbs.select_unmap_in_new_frontend()
+    old_tab, new_tab = browsers.get_browser().windows()
+    expected_url = old_tab.url.replace(url.Widget.CONTROLS, url.Widget.INFO)
+    assert new_tab.url == expected_url
 
   def test_review_details_for_disabled_obj(self, control, controls_service):
     """Check that new browser tab is displayed after clicking Review

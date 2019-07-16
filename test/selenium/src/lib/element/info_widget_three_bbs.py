@@ -40,6 +40,15 @@ class InfoWidgetThreeBbbs(object):
     """Returns `Unmap` option."""
     return self._three_bbs.option_by_text("Unmap")
 
+  @property
+  def unmap_in_new_frontend_option(self):
+    """Returns `Unmap in new frontend` option."""
+    return self._three_bbs.option_by_text("Unmap in new frontend")
+
+  def select_unmap_in_new_frontend(self):
+    """Selects `Unmap in new frontend` option."""
+    self.unmap_in_new_frontend_option.click()
+
   def select_delete(self):
     """Selects `Delete` option.
     Return: modal.delete_object.DeleteObjectModal
