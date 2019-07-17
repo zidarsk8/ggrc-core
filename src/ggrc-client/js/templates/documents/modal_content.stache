@@ -65,7 +65,7 @@
         <label class="ggrc-form-item__label">
           Code
         </label>
-        <input disabled class="input-block-level" name="slug" placeholder="DOCUMENT-XXX" type="text" value:from="slug">
+        <input disabled class="input-block-level" type="text" value:from="slug">
       </div>
     </div>
   </form>
