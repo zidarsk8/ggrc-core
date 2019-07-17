@@ -59,6 +59,8 @@ class Snapshot(rest_handable.WithDeleteHandable,
       reflection.Attribute("original_object_deleted",
                            create=False,
                            update=False),
+      reflection.Attribute("is_identical_revision", create=False,
+                           update=False),
       reflection.Attribute("update_revision", read=False),
   )
 
@@ -136,6 +138,11 @@ class Snapshot(rest_handable.WithDeleteHandable,
         issubclass(inflector.get_model(self.child_type), Synchronizable)
     )
     return bool(deleted or external_deleted)
+
+  @builder.simple_property
+  def is_identical_revision(self):
+    """Flag if the snapshot has the identical revision."""
+    return not any(self.revision.diff_with_current().values())
 
   @classmethod
   def eager_query(cls, **kwargs):

@@ -386,10 +386,10 @@ class TestCreateRevisionAfterDeleteCAD(TestCase):
 
   @ddt.data(True, False)
   def test_latest_revision_delete_cad(self, is_add_cav):
-    """Test creating new revision after deleting CAD.
+    """Test not creating new revision after deleting CAD.
 
     In case of deleting CAD, snapshot attribute is_latest_revision
-    must be False
+    must be True
     """
     with factories.single_commit():
       objective = factories.ObjectiveFactory()
@@ -436,7 +436,8 @@ class TestCreateRevisionAfterDeleteCAD(TestCase):
 
     snapshot = models.Snapshot.query.filter().first()
 
-    self.assertEqual(snapshot.is_latest_revision, False)
+    self.assertTrue(snapshot.is_latest_revision or
+                    snapshot.is_identical_revision)
 
 
 class TestCADUpdate(TestCase):
