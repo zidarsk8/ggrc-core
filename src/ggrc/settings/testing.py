@@ -19,4 +19,5 @@ LOGIN_MANAGER = 'ggrc.login.noop'
 MEMCACHE_MECHANISM = False
 EXTERNAL_APP_USER = 'External App <external_app@example.com>'
 SYNC_SERVICE_USER = 'Sync Service <sync_service@example.com>'
+ALLOWED_QUERYAPI_APP_IDS = ["ext_app.com"]
 ENABLE_RELEASE_NOTES = False
