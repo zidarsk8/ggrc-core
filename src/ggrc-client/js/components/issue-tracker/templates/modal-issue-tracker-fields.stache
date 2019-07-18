@@ -28,54 +28,40 @@
           optionsList:from="instance.constructor.issue_tracker_enable_options"
           name:bind="isIntegrationEnabled"
       ></dropdown-component>
-      {{#if_instance_of instance 'Audit'}}
-        {{#if instance.issue_tracker.enabled}}
-          <div class="ggrc-form-item__note people-sync">
-            <label class="people-sync__label">
-              <input type="checkbox" el:checked:bind="instance.issue_tracker.people_sync_enabled"
-              >Sync people with Ticket Tracker
-            </label>
-            <i class="fa fa-question-circle" rel="tooltip"
-              title="Check the box to enable sync between Audit roles and Ticket Tracker. Uncheck the box to disable the sync."></i>
-          </div>
-        {{/if}}
-      {{/if_instance_of}}
     </div>
   </div>
 </div>
 
 {{#if instance.issue_tracker.enabled}}
-  {{#if allowToChangeId}}
-    <div class="ggrc-form-item">
-      <div class="ggrc-form-item__row">
-        <label class="ggrc-form-item__label">
-          Ticket ID
-          {{#isTicketIdMandatory}}
-            <i class="fa fa-asterisk"></i>
-          {{/isTicketIdMandatory}}
-        </label>
-        <div class="ggrc-form-item__multiple-row--double">
-          <div class="ggrc-form-item__note">
-            {{^if isTicketIdMandatory}}
-              {{{linkingNote}}}
-            {{else}}
-              {{{mandatoryTicketIdNote}}}
-            {{/if}}
-          </div>
-        </div>
-        <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.issue_id"}}field-failure{{/isValidAttr}}">
-          <numberbox-component
-                     additionalClass:from="'input-block-level'"
-                     placeholder:from="'Enter Ticket ID'"
-                     value:bind="instance.issue_tracker.issue_id">
-          </numberbox-component>
-          {{#validateAttr instance "issue_tracker.issue_id"}}
-            <label class="help-inline warning">{{this}}</label>
-          {{/validateAttr}}
+  <div class="ggrc-form-item">
+    <div class="ggrc-form-item__row">
+      <label class="ggrc-form-item__label">
+        Ticket ID
+        {{#isTicketIdMandatory}}
+          <i class="fa fa-asterisk"></i>
+        {{/isTicketIdMandatory}}
+      </label>
+      <div class="ggrc-form-item__multiple-row--double">
+        <div class="ggrc-form-item__note">
+          {{^if isTicketIdMandatory}}
+            {{{linkingNote}}}
+          {{else}}
+            {{{mandatoryTicketIdNote}}}
+          {{/if}}
         </div>
       </div>
+      <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.issue_id"}}field-failure{{/isValidAttr}}">
+        <numberbox-component
+                    additionalClass:from="'input-block-level'"
+                    placeholder:from="'Enter Ticket ID'"
+                    value:bind="instance.issue_tracker.issue_id">
+        </numberbox-component>
+        {{#validateAttr instance "issue_tracker.issue_id"}}
+          <label class="help-inline warning">{{this}}</label>
+        {{/validateAttr}}
+      </div>
     </div>
-  {{/if}}
+  </div>
 
   <div class="ggrc-form-item">
     <div class="ggrc-form-item__multiple-row">
@@ -131,21 +117,19 @@
       </dropdown-component>
     </div>
 
-    {{#if setIssueTitle}}
-      <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.title"}}field-failure{{/isValidAttr}}">
-        <label class="form-label ggrc-form-item__label">
-          Ticket Title
-          <i class="fa fa-asterisk"></i>
-        </label>
-        <input class="input-block-level"
-               placeholder="Enter Ticket Title"
-               type="text"
-               el:value:bind="instance.issue_tracker.title"
-        />
-        {{#validateAttr instance "issue_tracker.title"}}
-          <label class="help-inline warning">{{this}}</label>
-        {{/validateAttr}}
-      </div>
-    {{/if}}
+    <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.title"}}field-failure{{/isValidAttr}}">
+      <label class="form-label ggrc-form-item__label">
+        Ticket Title
+        <i class="fa fa-asterisk"></i>
+      </label>
+      <input class="input-block-level"
+              placeholder="Enter Ticket Title"
+              type="text"
+              el:value:bind="instance.issue_tracker.title"
+      />
+      {{#validateAttr instance "issue_tracker.title"}}
+        <label class="help-inline warning">{{this}}</label>
+      {{/validateAttr}}
+    </div>
   </div>
 {{/if}}

@@ -19,8 +19,6 @@ export default canComponent.extend({
     note: '',
     linkingNote: '',
     mandatoryTicketIdNote: '',
-    setIssueTitle: false,
-    allowToChangeId: false,
     isTicketIdMandatory: false,
     setTicketIdMandatory() {
       let instance = this.attr('instance');
