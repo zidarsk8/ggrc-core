@@ -244,10 +244,9 @@
             <issue-tracker-switcher
               instance:from="instance"
               isIntegrationEnabled:bind="instance.issue_tracker.enabled">
-                <modal-issue-tracker-fields
-                  instance:from="instance"
-                  note:from="'Turns on Ticket Tracker integration.'">
-                </modal-issue-tracker-fields>
+                <modal-issue-tracker-config-fields
+                  instance:from="instance">
+                </modal-issue-tracker-config-fields>
             </issue-tracker-switcher>
           </div>
         </div>

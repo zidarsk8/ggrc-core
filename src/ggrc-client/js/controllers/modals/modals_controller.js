@@ -14,6 +14,7 @@ import canList from 'can-list';
 import canMap from 'can-map';
 import canControl from 'can-control';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
+import '../../components/issue-tracker/modal-issue-tracker-config-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access-control-list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
