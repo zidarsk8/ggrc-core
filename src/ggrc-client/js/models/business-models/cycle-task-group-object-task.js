@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loOrderBy from 'lodash/orderBy';
+import loFilter from 'lodash/filter';
 import moment from 'moment';
 import Cacheable from '../cacheable';
 import CycleTaskGroup from './cycle-task-group';
@@ -39,7 +41,7 @@ function populateFromWorkflow(form, workflow) {
   }
 
   workflow.refresh_all('cycles').then(function (cycleList) {
-    let activeCycleList = _.filter(cycleList, {is_current: true});
+    let activeCycleList = loFilter(cycleList, {is_current: true});
     let activeCycle;
 
     if (!activeCycleList.length) {
@@ -49,7 +51,7 @@ function populateFromWorkflow(form, workflow) {
       );
       return;
     }
-    activeCycleList = _.orderBy(
+    activeCycleList = loOrderBy(
       activeCycleList, ['start_date'], ['desc']);
     activeCycle = activeCycleList[0];
     form.attr('workflow', {id: workflow.id, type: 'Workflow'});
@@ -275,7 +277,7 @@ export default Cacheable.extend({
       }
     } else {
       cycle = reify(form.cycle);
-      if (!_.isUndefined(cycle.workflow)) {
+      if (cycle.workflow !== undefined) {
         form.attr('workflow', reify(cycle.workflow));
       }
     }
@@ -292,6 +294,6 @@ export default Cacheable.extend({
     const status = this.attr('status');
 
     return cycle.attr('is_current') &&
-      !_.includes(['Finished', 'Verified'], status);
+      !['Finished', 'Verified'].includes(status);
   },
 });

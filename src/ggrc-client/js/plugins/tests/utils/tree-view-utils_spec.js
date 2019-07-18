@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFilter from 'lodash/filter';
 import canList from 'can-list';
 import * as module from '../../../plugins/utils/tree-view-utils';
 import * as aclUtils from '../../../plugins/utils/acl-utils';
@@ -69,7 +70,7 @@ describe('TreeViewUtils module', function () {
 
     it('includes custom roles info in the result ', function () {
       let result = method('Audit', null);
-      result = _.filter(result.available, {attr_type: 'role'});
+      result = loFilter(result.available, {attr_type: 'role'});
 
       ['Role 3', 'Role 9'].forEach(function (title) {
         let expected = {
@@ -93,7 +94,7 @@ describe('TreeViewUtils module', function () {
         };
 
         let result = method('Market', null);
-        result = _.filter(result.available, {attr_type: 'custom'});
+        result = loFilter(result.available, {attr_type: 'custom'});
 
         expect(result).toContain(jasmine.objectContaining(expected));
       });
@@ -110,7 +111,7 @@ describe('TreeViewUtils module', function () {
       };
 
       let result = method('Market', null);
-      result = _.filter(result.available, {attr_type: 'custom'});
+      result = loFilter(result.available, {attr_type: 'custom'});
 
       expect(result).toContain(jasmine.objectContaining(expected));
     });

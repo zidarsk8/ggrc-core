@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim, filteredMap} from '../../../plugins/ggrc_utils';
+import loZip from 'lodash/zip';
+import loRange from 'lodash/range';
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -48,22 +52,22 @@ export default canComponent.extend({
      * ]
      */
     denormalizeMandatory: function (field) {
-      let options = _.splitTrim(field.attr('multi_choice_options'));
-      let vals = _.splitTrim(field.attr('multi_choice_mandatory'));
+      let options = splitTrim(field.attr('multi_choice_options'));
+      let vals = splitTrim(field.attr('multi_choice_mandatory'));
       let isEqualLength = options.length === vals.length;
       let range;
 
       if (!isEqualLength && options.length < vals.length) {
         vals.length = options.length;
       } else if (!isEqualLength && options.length > vals.length) {
-        range = _.range(options.length - vals.length);
+        range = loRange(options.length - vals.length);
         range = range.map(function () {
           return '0';
         });
         vals = vals.concat(range);
       }
 
-      return _.zip(options, vals).map(function (zip) {
+      return loZip(options, vals).map(function (zip) {
         let attr = new canMap();
         let val = parseInt(zip[1], 10);
         attr.attr('type', field.attr('attribute_type'));
@@ -81,7 +85,7 @@ export default canComponent.extend({
      * is normalized into "2, 3" (10b, 11b).
      */
     normalizeMandatory: function (attrs) {
-      return _.filteredMap(attrs, ddValidationMapToValue).join(',');
+      return filteredMap(attrs, ddValidationMapToValue).join(',');
     },
   }),
   events: {
@@ -96,7 +100,7 @@ export default canComponent.extend({
       const field = this.viewModel.attr('field');
       const denormalized = this.viewModel.denormalizeMandatory(field);
       const types = this.viewModel.attr('types');
-      const item = _.find(types, function (obj) {
+      const item = loFind(types, function (obj) {
         return obj.type === field.attr('attribute_type');
       });
       this.viewModel.field.attr('attribute_name', item.name);

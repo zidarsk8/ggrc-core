@@ -3,6 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loSortBy from 'lodash/sortBy';
+import loCompact from 'lodash/compact';
+import loMap from 'lodash/map';
+import loConcat from 'lodash/concat';
+import loForEach from 'lodash/forEach';
+import loFind from 'lodash/find';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -46,12 +52,11 @@ export default canComponent.extend({
         TreeViewConfig.attr('base_widgets_by_type')
       );
 
-      return _(workflowRelatedTypes)
-        .concat(baseWidgetsTypes)
-        .map((mapping) => businessModels[mapping])
-        .compact()
-        .sortBy('model_singular')
-        .value();
+      let relatedTypes = loConcat(workflowRelatedTypes, baseWidgetsTypes);
+      relatedTypes = loMap(relatedTypes, (mapping) => businessModels[mapping]);
+      relatedTypes = loCompact(relatedTypes);
+      relatedTypes = loSortBy(relatedTypes, 'model_singular');
+      return relatedTypes;
     },
     optionHidden: function (option) {
       let type = option.model_singular;
@@ -72,7 +77,7 @@ export default canComponent.extend({
       this.viewModel.attr('relevant').replace([]);
 
       const relevantTo = this.viewModel.attr('relevantTo') || [];
-      _.forEach(relevantTo, function (item) {
+      loForEach(relevantTo, function (item) {
         let model = new businessModels[item.type](item);
         this.viewModel.attr('relevant').push({
           readOnly: item.readOnly,
@@ -102,7 +107,7 @@ export default canComponent.extend({
     },
     '{viewModel.relevant} change': function (list, item, which) {
       this.viewModel.attr('has_parent',
-        _.find(this.viewModel.attr('relevant'),
+        loFind(this.viewModel.attr('relevant'),
           {model_name: '__previous__'}));
       if (!/model_name/gi.test(which)) {
         return;

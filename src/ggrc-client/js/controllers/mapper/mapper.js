@@ -70,8 +70,7 @@ const ObjectMapper = canControl.extend({
       return;
     }
 
-    if (_.isUndefined(data.join_object_type) ||
-      _.isNull(data.join_object_type)) {
+    if (data.join_object_type === undefined || data.join_object_type === null) {
       throw new Error(OBJECT_REQUIRED_MESSAGE);
     }
 
@@ -93,11 +92,11 @@ const ObjectMapper = canControl.extend({
         config: getConfigForCommonObjects(data).general,
       }];
 
-      _.assign(config.general, {useSnapshots: true});
-      _.assign(config.special, special);
+      Object.assign(config.general, {useSnapshots: true});
+      Object.assign(config.special, special);
 
       if (data.is_new) {
-        _.assign(config.general, {
+        Object.assign(config.general, {
           object: data.join_object_type,
           type: data.join_option_type,
           isNew: true,
@@ -111,10 +110,7 @@ const ObjectMapper = canControl.extend({
         return;
       }
 
-      if (
-        _.isUndefined(data.join_object_id) ||
-        _.isNull(data.join_object_id)
-      ) {
+      if (data.join_object_id === undefined || data.join_object_id === null) {
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
 
@@ -131,7 +127,7 @@ const ObjectMapper = canControl.extend({
         return;
       }
 
-      _.assign(config.general, {
+      Object.assign(config.general, {
         object: data.join_object_type,
         'join-object-id': data.join_object_id,
         type: data.join_option_type,
@@ -160,7 +156,7 @@ const ObjectMapper = canControl.extend({
 
       const {relation} = getMegaObjectRelation(data.mega_object_widget);
 
-      _.assign(config.general, {
+      Object.assign(config.general, {
         isMegaObject: data.mega_object,
         megaRelation: relation,
       });
@@ -186,7 +182,7 @@ const ObjectMapper = canControl.extend({
     function getConfigForCommonObjects(data) {
       let base = getBaseConfig();
 
-      _.assign(base.general, {
+      Object.assign(base.general, {
         object: data.join_object_type,
         type: data.join_option_type,
         'join-object-id': data.join_object_id,

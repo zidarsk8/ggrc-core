@@ -29,7 +29,7 @@ export default canComponent.extend({
       }.bind(this));
     },
     isInEditableState: function () {
-      return _.includes(EDITABLE_STATES, this.attr('instance.status'));
+      return EDITABLE_STATES.includes(this.attr('instance.status'));
     },
     showConfirm: function () {
       let self = this;

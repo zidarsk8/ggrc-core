@@ -257,7 +257,7 @@ describe('issue-unmap-item component', () => {
         let oldRelatedObjectType = relatedObject.type;
         let expectedUrl;
 
-        _.assign(relatedObject, {
+        Object.assign(relatedObject, {
           type: relatedObjectType,
           child_type: oldRelatedObjectType,
           child_id: 54321,

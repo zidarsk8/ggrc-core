@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loMap from 'lodash/map';
 import * as AjaxExtensions from '../plugins/ajax_extensions';
 import Permission from '../permission';
 import {makeFakeInstance} from '../../js_specs/spec_helpers';
@@ -63,7 +64,7 @@ describe('Permission', function () {
       });
     it('returns false if permissions does not contain specified permission',
       function () {
-        let permissionCollection = _.map([
+        let permissionCollection = loMap([
           ['create', 'Program', 111],
           ['delete', 'Program', 1],
           ['create', 'Control', 1],
@@ -75,7 +76,7 @@ describe('Permission', function () {
           };
         });
 
-        _.forEach(permissionCollection, function (permission) {
+        permissionCollection.forEach((permission) => {
           expect(Permission._permission_match(permissions, permission))
             .toEqual(false);
         });
