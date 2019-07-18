@@ -116,6 +116,21 @@ def _get_updated_roles(new_list, old_list, roles):
   return role_data
 
 
+def _get_updated_evidence(attr_name, new_val, old_val):
+  """Get difference between old and new evidence data"""
+  new_links = set()
+  old_links = set()
+  for val in new_val:
+    new_links.add(val.get("link", ""))
+  for val in old_val:
+    old_links.add(val.get("link", ""))
+  return (
+      attr_name,
+      list(new_links - old_links),
+      list(old_links - new_links),
+  )
+
+
 def _get_revisions(obj, created_at):
   """Get current revision and revision before notification is created"""
   filtered_revisions = db.session.query(models.Revision).filter_by(
@@ -168,6 +183,7 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
   old_attrs = old_rev.content
 
   updated_roles = []
+  updated_evidence = []
   for attr_name, new_val in new_attrs.iteritems():
     if attr_name in notifications.IGNORE_ATTRS:
       continue
@@ -181,9 +197,18 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
       if attr_name == "access_control_list":
         updated_roles = _get_updated_roles(new_val, old_val, roles)
         continue
+      if attr_name in ("evidences_url", "evidences_file"):
+        updated_evidence.append(_get_updated_evidence(
+            attr_name, new_val, old_val,
+        ))
+        continue
       fields.append(attr_name)
   updated_data = {}
   for attr_name, new_val, old_val in updated_roles:
+    updated_data.update(
+        _get_displayed_updated_data(attr_name, new_val, old_val, definitions)
+    )
+  for attr_name, new_val, old_val in updated_evidence:
     updated_data.update(
         _get_displayed_updated_data(attr_name, new_val, old_val, definitions)
     )

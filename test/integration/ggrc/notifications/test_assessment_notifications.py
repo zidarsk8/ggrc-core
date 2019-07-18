@@ -140,6 +140,38 @@ class TestAssessmentNotification(TestCase):
         ("test_description", "")
     )
 
+  def test_evidence_change_assmt(self):
+    """Test notification updated data when evidence values is changed"""
+    with factories.single_commit():
+      evidence_url = "test.com"
+      evidence_file = "test_gdrive.file"
+      evidence_1 = factories.EvidenceUrlFactory(link=evidence_url)
+      evidence_2 = factories.EvidenceFileFactory(link=evidence_file)
+    response = self.api.put(self.assessment, {
+        "actions": {"add_related": [
+            {
+                "id": evidence_1.id,
+                "type": "Evidence",
+            },
+            {
+                "id": evidence_2.id,
+                "type": "Evidence",
+            },
+        ]}
+    })
+    self.assert200(response)
+    notifs, notif_data = common.get_daily_notifications()
+    updated = notif_data["user@example.com"]["assessment_updated"]
+    self.assertEqual(len(notifs), 1)
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["EVIDENCE URL"],
+        ([evidence_url], [])
+    )
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["EVIDENCE FILE"],
+        ([evidence_file], [])
+    )
+
   def test_ca_change_by_import(self):
     """Test notification when custom attribute value is changed by import"""
 
