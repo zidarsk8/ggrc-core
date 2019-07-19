@@ -49,6 +49,7 @@ class TestCycleTaskStatusChange(TestCase):
         all_models.Notification.__init__)
 
   def test_task_declined_notification_created(self):
+    """Test declined cycle task notifications"""
     with freeze_time("2015-05-01"):
       _, workflow = self.wf_generator.generate_workflow(
           self.one_time_workflow_1)
@@ -66,6 +67,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
   def test_all_tasks_finished_notification_created(self):
+    """Test all task completed notifications"""
     with freeze_time("2015-05-01 13:20:34"):
       _, workflow = self.wf_generator.generate_workflow(
           self.one_time_workflow_1)
@@ -90,6 +92,7 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertEqual(notif, [])
 
   def test_multi_all_tasks_finished_notification_created(self):
+    """Test several all task completed notifications"""
 
     with freeze_time("2015-05-01 13:20:34"):
       _, workflow = self.wf_generator.generate_workflow(

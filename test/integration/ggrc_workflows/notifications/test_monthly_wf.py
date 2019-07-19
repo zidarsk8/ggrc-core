@@ -44,6 +44,7 @@ class TestMonthlyWorkflowNotification(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_auto_generate_cycle(self, mock_mail):
+    """Test auto recurring cycles"""
 
     with freeze_time("2015-04-01"):
       _, wf = self.wf_generator.generate_workflow(self.monthly_workflow_1)
@@ -89,6 +90,7 @@ class TestMonthlyWorkflowNotification(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_manual_generate_cycle(self, mock_mail):
+    """Test generation of manual cycles"""
 
     with freeze_time("2015-04-01"):
       _, wf = self.wf_generator.generate_workflow(self.monthly_workflow_1)

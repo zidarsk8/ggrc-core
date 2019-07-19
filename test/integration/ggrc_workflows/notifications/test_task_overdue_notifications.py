@@ -312,7 +312,6 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
                                             self.user.id),
                     acl_helper.get_acl_json(task_sec_assignee_role_id,
                                             self.secondary_assignee.id),
-
                 ],
             }, {
                 "title": "task 2",

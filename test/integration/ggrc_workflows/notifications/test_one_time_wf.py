@@ -44,8 +44,8 @@ class TestOneTimeWorkflowNotification(TestCase):
         all_models.Notification.__init__)
 
   def test_one_time_wf_activate(self):
-    def get_person(person_id):
-      return db.session.query(Person).filter(Person.id == person_id).one()
+    """Test one time wf activation"""
+
     with freeze_time("2015-04-10"):
       _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
       _, cycle = self.wf_generator.generate_cycle(wf)
@@ -68,14 +68,14 @@ class TestOneTimeWorkflowNotification(TestCase):
         self.assertIn("my_tasks",
                       notif_data[user.email]["cycle_data"][cycle.id])
 
-    with freeze_time("2015-05-03"):  # two days befor due date
+    with freeze_time("2015-05-03"):  # two days before due date
       _, notif_data = common.get_daily_notifications()
       for user in task_assignees:
         self.assertIn(user.email, notif_data)
         self.assertNotIn("due_in", notif_data[user.email])
         self.assertNotIn("due_today", notif_data[user.email])
 
-    with freeze_time("2015-05-04"):  # one day befor due date
+    with freeze_time("2015-05-04"):  # one day before due date
       _, notif_data = common.get_daily_notifications()
       for user in task_assignees:
         self.assertEqual(len(notif_data[user.email]["due_in"]), 1)
@@ -91,6 +91,7 @@ class TestOneTimeWorkflowNotification(TestCase):
 
   @patch("ggrc.notifications.common.send_email")
   def test_one_time_wf_activate_single_person(self, mock_mail):
+    """Test one time wf activation with single person"""
 
     with freeze_time("2015-04-10"):
       user = "user@example.com"
