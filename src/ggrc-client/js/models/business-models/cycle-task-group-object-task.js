@@ -135,7 +135,6 @@ export default Cacheable.extend({
       {
         attr_title: 'Task Description',
         attr_name: 'description',
-        disable_sorting: true,
       },
       {
         attr_title: 'Needs Verification',

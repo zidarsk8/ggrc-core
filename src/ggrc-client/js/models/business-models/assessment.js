@@ -133,12 +133,10 @@ export default Cacheable.extend({
     }, {
       attr_title: 'Notes',
       attr_name: 'notes',
-      disable_sorting: true,
       order: 19,
     }, {
       attr_title: 'Assessment Procedure',
       attr_name: 'test_plan',
-      disable_sorting: true,
       order: 20,
     }],
     display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
