@@ -23,8 +23,8 @@
               href="javascript://"
               data-toggle="modal-ajax-form"
               data-modal-reset="reset"
-              data-object-singular="{{class.model_singular}}"
-              data-object-plural="{{class.table_plural}}"
+              data-object-singular="{{constructor.model_singular}}"
+              data-object-plural="{{constructor.table_plural}}"
               data-object-id="{{id}}"
               data-object-params='{
                 "parent_type": "{{parent_instance.model_singular}}"

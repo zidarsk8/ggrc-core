@@ -9,7 +9,7 @@
       data-placement="left"
       data-toggle="unified-mapper"
       data-join-object-id="{{instance.id}}"
-      data-join-object-type="{{instance.class.model_singular}}"
+      data-join-object-type="{{instance.constructor.model_singular}}"
   >
     <i class="fa fa-code-fork"></i>
     {{title}}

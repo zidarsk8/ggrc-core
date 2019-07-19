@@ -58,7 +58,8 @@ export default canComponent.extend({
           let instance = this.attr('instance');
           if (instance) {
             return 'No copy will be created. Original files will be added to ' +
-              'the destination ' + instance.class.title_singular + ' folder.';
+              'the destination ' + instance.constructor.title_singular +
+              ' folder.';
           }
         },
       },

@@ -227,7 +227,7 @@ export default canControl.extend({
 
     dfd.then(function () {
       if (instance &&
-        exists(instance, 'class.is_custom_attributable') &&
+        exists(instance, 'constructor.is_custom_attributable') &&
         !(instance instanceof Assessment)) {
         return $.when(
           instance.load_custom_attribute_definitions &&

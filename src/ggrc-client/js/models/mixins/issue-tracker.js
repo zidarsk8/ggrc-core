@@ -31,8 +31,8 @@ export default Mixin.extend(
         this.attr('issue_tracker', new canMap({}));
       }
 
-      let config = this.class.buildIssueTrackerConfig
-        ? this.class.buildIssueTrackerConfig(this)
+      let config = this.constructor.buildIssueTrackerConfig
+        ? this.constructor.buildIssueTrackerConfig(this)
         : {enabled: false};
 
       issueTrackerUtils.initIssueTrackerObject(

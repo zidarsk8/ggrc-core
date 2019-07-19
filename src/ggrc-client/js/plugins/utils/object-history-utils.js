@@ -182,7 +182,7 @@ const getInstanceView = (instance) => {
     return '';
   }
 
-  typeView = `${instance.class.table_plural}/info`;
+  typeView = `${instance.constructor.table_plural}/info`;
 
   if (typeView in GGRC.Templates) {
     view = `${GGRC.templates_path}/${typeView}.stache`;

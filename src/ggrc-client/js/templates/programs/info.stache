@@ -18,10 +18,10 @@
               <div class="row-fluid wrap-row">
                 <div>
                   <custom-roles readOnly:from="instance.readOnlyProgramRoles"
-                                includeRoles:from="instance.class.programRoles"
+                                includeRoles:from="instance.constructor.programRoles"
                                 instance:from="instance">
                   </custom-roles>
-                  <custom-roles excludeRoles:from="instance.class.programRoles"
+                  <custom-roles excludeRoles:from="instance.constructor.programRoles"
                                 instance:from="instance">
                   </custom-roles>
                 </div>

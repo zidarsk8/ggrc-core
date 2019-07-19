@@ -483,7 +483,6 @@ export default canModel.extend({
       !isSnapshot(this)) {
       cache[this[idKey]] = this;
     }
-    this.attr('class', this.constructor);
     this.notifier = new PersistentNotifier();
 
     if (this.isCustomAttributable()) {

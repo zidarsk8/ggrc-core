@@ -16,7 +16,7 @@ export default canMap.extend({
         }
 
         let readonly = this.attr('readOnly');
-        return instance.class.isProposable
+        return instance.constructor.isProposable
             || readonly
             || instance.attr('readonly');
       },

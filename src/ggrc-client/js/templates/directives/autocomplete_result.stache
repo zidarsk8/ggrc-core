@@ -7,7 +7,7 @@
   <li {{canData 'ui-autocomplete-item'}} class="ui-menu-item">
     <a
       href="javascript://" class='show-extended' {{canData 'model'}}>
-      <i class="fa fa-{{class.table_singular}} color"></i>
+      <i class="fa fa-{{constructor.table_singular}} color"></i>
       {{firstnonempty title name email}}
     </a>
   </li>

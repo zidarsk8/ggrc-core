@@ -7,14 +7,14 @@
     <h6>Description</h6>
     <read-more
       text:from="itemData.description"
-      handleMarkdown:from="instance.class.isChangeableExternally">
+      handleMarkdown:from="instance.constructor.isChangeableExternally">
     </read-more>
 </div>
 <div class="mapped-object-info__item">
     <h6>Notes</h6>
     <read-more
       text:from="itemData.notes"
-      handleMarkdown:from="instance.class.isChangeableExternally">
+      handleMarkdown:from="instance.constructor.isChangeableExternally">
     </read-more>
 </div>
 <div class="mapped-object-info__attributes">

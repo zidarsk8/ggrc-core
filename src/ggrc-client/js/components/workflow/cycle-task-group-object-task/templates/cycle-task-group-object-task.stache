@@ -124,7 +124,7 @@
                   data-toggle="unified-mapper"
                   data-is-refresh-counts-needed="false"
                   data-join-object-id="{{instance.id}}"
-                  data-join-object-type="{{instance.class.model_singular}}">
+                  data-join-object-type="{{instance.constructor.model_singular}}">
                   Map Objects
                 </a>
               {{/if}}
@@ -138,7 +138,7 @@
                 <div class="rtf-block">
                   <read-more
                     text:from="instance.description"
-                    handleMarkdown:from="instance.class.isChangeableExternally">
+                    handleMarkdown:from="instance.constructor.isChangeableExternally">
                   </read-more>
                 </div>
               {{/is}}

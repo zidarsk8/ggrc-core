@@ -34,7 +34,7 @@
                         <read-more
                           text:from="instance.description"
                           maxLinesNumber:from="2"
-                          handleMarkdown:from="instance.class.isChangeableExternally">
+                          handleMarkdown:from="instance.constructor.isChangeableExternally">
                         </read-more>
                     </div>
                 </div>

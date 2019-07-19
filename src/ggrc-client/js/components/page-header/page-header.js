@@ -97,7 +97,7 @@ let viewModel = canMap.extend({
     },
     model: {
       get() {
-        return this.attr('instance').class;
+        return this.attr('instance').constructor;
       },
     },
     instance: {

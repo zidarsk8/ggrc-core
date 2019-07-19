@@ -31,7 +31,7 @@ export default canComponent.extend({
     setAutoPopulatedRoles: function () {
       let instance = this.attr('instance');
       let autoPopulatedRoles =
-        loFilter(getRolesForType(instance.class.model_singular), {
+        loFilter(getRolesForType(instance.constructor.model_singular), {
           default_to_current_user: true,
         });
 

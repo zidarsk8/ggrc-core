@@ -5,7 +5,7 @@
 
 import loAttempt from 'lodash/attempt';
 import loIsError from 'lodash/isError';
-import {getComponentVM} from '../../../../js_specs/spec_helpers';
+import {getComponentVM, makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Component from '../add-issue-button';
 import '../add-issue-button';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
@@ -78,12 +78,6 @@ describe('add-issue-button component', function () {
   describe('prepareJSON get() method', function () {
     let isJson;
 
-    beforeEach(function () {
-      viewModel.attr('relatedInstance', {
-        'class': {},
-      });
-    });
-
     beforeAll(function () {
       isJson = function (str) {
         return !loIsError(loAttempt(JSON.parse, str));
@@ -98,15 +92,11 @@ describe('add-issue-button component', function () {
     describe('for returned json-format string', function () {
       it('sets assessment field', function () {
         let result;
-        let relatedInstance = {
+        let relatedInstance = makeFakeInstance({model: Issue})({
           title: 'title',
           id: 1,
           type: 'type',
-          'class': {
-            title_singular: 'title singular',
-            table_singular: 'table singular',
-          },
-        };
+        });
 
         viewModel.attr('relatedInstance', relatedInstance);
         result = viewModel.attr('prepareJSON');
@@ -114,8 +104,8 @@ describe('add-issue-button component', function () {
           title: relatedInstance.title,
           id: relatedInstance.id,
           type: relatedInstance.type,
-          title_singular: relatedInstance.class.title_singular,
-          table_singular: relatedInstance.class.table_singular,
+          title_singular: relatedInstance.constructor.title_singular,
+          table_singular: relatedInstance.constructor.table_singular,
         });
       });
     });

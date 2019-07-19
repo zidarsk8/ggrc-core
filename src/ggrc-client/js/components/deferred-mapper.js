@@ -10,6 +10,7 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
   isSnapshotType,
+  extendSnapshot,
 } from '../plugins/utils/snapshot-utils';
 import * as MapperUtils from '../plugins/utils/mapper-utils';
 import {
@@ -188,15 +189,8 @@ export default canComponent.extend({
       this.attr('list').splice(indexInList, 1);
     },
     addListItem(item) {
-      let snapshotObject;
-
-      if (isSnapshotType(item) &&
-        item.snapshotObject) {
-        snapshotObject = item.snapshotObject;
-        item.attr('title', snapshotObject.title);
-        item.attr('description', snapshotObject.description);
-        item.attr('class', snapshotObject.class);
-        item.attr('viewLink', snapshotObject.originalLink);
+      if (isSnapshotType(item) && item.snapshotObject) {
+        item = extendSnapshot(item, item.snapshotObject);
       } else if (!isSnapshotType(item) && isReifiable(item)) {
         // add full item object from cache
         // if it isn't snapshot

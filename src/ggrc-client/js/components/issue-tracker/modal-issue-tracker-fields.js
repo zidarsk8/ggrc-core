@@ -25,9 +25,9 @@ export default canComponent.extend({
     setTicketIdMandatory() {
       let instance = this.attr('instance');
 
-      if (instance.class.unchangeableIssueTrackerIdStatuses) {
+      if (instance.constructor.unchangeableIssueTrackerIdStatuses) {
         this.attr('isTicketIdMandatory',
-          instance.class.unchangeableIssueTrackerIdStatuses
+          instance.constructor.unchangeableIssueTrackerIdStatuses
             .includes(instance.attr('status')));
       }
     },

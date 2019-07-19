@@ -75,7 +75,7 @@ export default canControl.extend({
           instance: instance,
           isSnapshot: !!instance.snapshot || instance.isRevision,
           parentInstance: parentInstance,
-          model: instance.class,
+          model: instance.constructor,
           confirmEdit: confirmEdit,
           is_info_pin: true,
           options: options,
@@ -103,7 +103,7 @@ export default canControl.extend({
     let instance = opts.attr('instance');
     let options = this.findOptions(el);
     let populatedOpts = opts.attr('options');
-    let confirmEdit = instance.class.confirmEditModal || {};
+    let confirmEdit = instance.constructor.confirmEditModal || {};
     let view = getInstanceView(instance);
 
     if (populatedOpts && !options.attr('result')) {

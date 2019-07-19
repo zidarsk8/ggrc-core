@@ -69,7 +69,7 @@ function peopleWithRoleName(instance, roleName) {
   // get role ID by roleName
   modelRoles = loFilter(
     GGRC.access_control_roles,
-    {object_type: instance.class.model_singular, name: roleName});
+    {object_type: instance.constructor.model_singular, name: roleName});
 
   if (modelRoles.length === 0) {
     console.warn('peopleWithRole: role not found for instance type');

@@ -19,7 +19,7 @@
         <assessment-template-clone-button
           objectType:from="'AssessmentTemplate'"
           parentId:from="instance.id"
-          parentType:from="instance.class.model_singular">
+          parentType:from="instance.constructor.model_singular">
           <i class="fa fa-sliders"></i>
           Define Assessment template
         </assessment-template-clone-button>
@@ -28,7 +28,7 @@
   {{/if}}
 
   {{#is_allowed 'update' program context='for'}}
-    {{#if instance.class.is_clonable}}
+    {{#if instance.constructor.is_clonable}}
       {{#is_allowed 'update' instance context='for'}}
         <li>
           <object-cloner instance:from="instance"
@@ -83,7 +83,7 @@
       <li>
         <a href="{{instance.viewLink}}">
           <i class="fa fa-long-arrow-right"></i>
-          Open {{instance.class.title_singular}}
+          Open {{instance.constructor.title_singular}}
         </a>
       </li>
     {{/if}}
