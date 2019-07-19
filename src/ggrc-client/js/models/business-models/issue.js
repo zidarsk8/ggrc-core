@@ -94,6 +94,9 @@ export default Cacheable.extend({
     issue_tracker: {
       value: {},
       validate: {
+        validateIssueTrackerEnabled() {
+          return 'Issue';
+        },
         validateIssueTrackerComponentId: true,
         validateIssueTrackerTitle: true,
         validateIssueTrackerIssueId() {

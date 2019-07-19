@@ -89,6 +89,13 @@ export default Mixin.extend(
         auditItr.enabled
       );
     },
+    setDefaultHotlistAndComponent() {
+      let config = this.attr('audit.issue_tracker');
+      this.attr('issue_tracker').attr({
+        hotlist_id: config.hotlist_id,
+        component_id: config.component_id,
+      });
+    },
     issueCreated() {
       return this.attr('can_use_issue_tracker')
         && issueTrackerUtils.isIssueCreated(this);

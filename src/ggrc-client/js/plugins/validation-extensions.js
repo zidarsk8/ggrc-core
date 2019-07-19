@@ -48,11 +48,22 @@ validatejs.validators.validateAssignee = (value, roleType, key, attributes) => {
   }
 };
 
+validatejs.validators.validateIssueTrackerEnabled = (value,
+  type, key, attributes) => {
+  if (value.enabled && value._initialized === false) {
+    return {
+      enabled: `Turn Off or link ${type} to a Buganizer Ticket by 
+      generating a new ticket or linking to an existing one.`,
+    };
+  }
+};
+
 validatejs.validators.validateIssueTrackerComponentId = (value,
   options, key, attributes) => {
   if (attributes.can_use_issue_tracker &&
       value.enabled &&
-      !value.component_id) {
+      !value.component_id &&
+      !value._linking) { // user is in progress with generating new ticket
     return {
       component_id: blankMessage,
     };
@@ -144,11 +155,9 @@ validatejs.validators.validateDefaultVerifiers = (value) => {
 
 validatejs.validators.validateIssueTrackerIssueId = (value,
   statuses, key, attributes) => {
-  if (!statuses.includes(attributes.status)) {
-    return;
-  }
-
-  if (value.enabled && !value.issue_id) {
+  if (value.enabled &&
+    (statuses.includes(attributes.status) || value._linking) &&
+    !value.issue_id) {
     return {
       issue_id: blankMessage,
     };

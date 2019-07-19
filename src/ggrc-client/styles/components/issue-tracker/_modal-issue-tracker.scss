@@ -26,6 +26,14 @@ modal-issue-tracker-config-fields {
     }
   }
 
+  .issue-tracker__toolbar {
+    margin: 4px 0;
+
+    .btn {
+      margin-right: 6px;
+    }
+  }
+
   .people-sync {
     display: flex;
     align-items: center;
