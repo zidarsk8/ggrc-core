@@ -22,6 +22,10 @@ describe('assessmentIssueTracker mixin', () => {
       id: 123,
       title: 'Audit',
       type: 'Audit',
+      issue_tracker: {
+        hotlist_id: 'hotlist_id',
+        component_id: 'component_id',
+      },
     });
   });
 
@@ -229,4 +233,27 @@ describe('assessmentIssueTracker mixin', () => {
       );
     }
   );
+
+  describe('setDefaultHotlistAndComponent() method', () => {
+    let method;
+
+    beforeAll(() => {
+      method = Assessment.prototype.setDefaultHotlistAndComponent;
+    });
+
+    it('should set up default hotlist and component ids', () => {
+      spyOn(Assessment.prototype, 'getParentAudit').and.returnValue(audit);
+      const stub = makeFakeInstance({model: Assessment})();
+
+      stub.attr('issue_tracker').attr({
+        hotlist_id: null,
+        component_id: null,
+      });
+
+      method.apply(stub);
+
+      expect(stub.issue_tracker.hotlist_id).toBe('hotlist_id');
+      expect(stub.issue_tracker.component_id).toBe('component_id');
+    });
+  });
 });
