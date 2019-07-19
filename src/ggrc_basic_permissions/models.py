@@ -130,8 +130,11 @@ class UserRole(base.ContextRBAC, Base, db.Model):
       'Person', backref=backref('user_roles', cascade='all, delete-orphan'))
 
   @staticmethod
-  def _extra_table_args(cls):
-    return (db.Index('ix_user_roles_person', 'person_id'),)
+  def _extra_table_args(model):
+    return (db.UniqueConstraint('person_id',
+                                name='uq_{}'.format(model.__tablename__)),
+            db.Index('ix_user_roles_person', 'person_id')
+            )
 
   _api_attrs = reflection.ApiAttributes('role', 'person')
 
