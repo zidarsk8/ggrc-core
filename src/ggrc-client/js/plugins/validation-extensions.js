@@ -48,15 +48,7 @@ validatejs.validators.validateAssignee = (value, roleType, key, attributes) => {
   }
 };
 
-validatejs.validators.validateIssueTracker = (value) => {
-  if (value.enabled && !value.component_id) {
-    return {
-      component_id: blankMessage,
-    };
-  }
-};
-
-validatejs.validators.validateAssessmentIssueTracker = (value,
+validatejs.validators.validateIssueTrackerComponentId = (value,
   options, key, attributes) => {
   if (attributes.can_use_issue_tracker &&
       value.enabled &&
