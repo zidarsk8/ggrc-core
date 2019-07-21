@@ -500,6 +500,21 @@ class TestBasicCsvImport(TestCase):
     self.assertEqual(models.all_models.Assessment.query.count(), 0)
     self.assertEqual(models.all_models.Revision.query.count(), 0)
 
+  def test_import_object_with_folder(self):
+    """Test checks to add folder via import"""
+    folder_id = '1WXB8oulc68ZWdFhX96Tv1PBLi8iwALR3'
+    response = self.import_data(OrderedDict([
+        ("object_type", "Program"),
+        ("Code*", "program-1"),
+        ("Program managers", "user@example.com"),
+        ("Title", "program-1"),
+        ("Gdrive Folder ID", folder_id)
+
+    ]))
+    self._check_csv_response(response, {})
+    program = models.Program.query.first()
+    self.assertEqual(program.folder, folder_id)
+
 
 @base.with_memcache
 class TestImportPermissions(TestCase):

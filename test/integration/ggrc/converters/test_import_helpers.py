@@ -104,7 +104,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
     }
     expected_names = element_names.union(mapping_names)
     self.assertEqual(expected_names, display_names)
@@ -157,7 +157,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Send by default",
         "Recipients",
         "Comments",
@@ -352,7 +352,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Send by default",
         "Recipients",
         "Comments",
@@ -391,7 +391,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Last Deprecated Date",
         "Component ID",
         "Hotlist ID",
@@ -549,7 +549,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated Date",
         "Last Updated By",
         "Ticket Tracker",
-        "Folder",
+        "Gdrive Folder ID",
         "Component ID",
         "Hotlist ID",
         "Severity",
@@ -597,7 +597,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
     }
     self._test_single_object(all_models.Policy, names, self.COMMON_EXPECTED)
 
@@ -626,7 +626,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Assessment Procedure",
         "Last Deprecated Date",
         "Effective Date",
-        "Folder",
+        "Gdrive Folder ID",
     }
     self._test_single_object(all_models.Requirement, names,
                              self.COMMON_EXPECTED)
@@ -663,7 +663,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
     }
 
     # Control has additional mandatory field - Assertions
@@ -696,7 +696,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Updated By",
         "Last Deprecated Date",
         "Effective Date",
-        "Folder",
+        "Gdrive Folder ID",
     }
     self._test_single_object(all_models.Objective, names, self.COMMON_EXPECTED)
 
@@ -746,7 +746,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Primary Contacts",
         "Secondary Contacts",
         "Line of Defense One Contacts",
@@ -780,7 +780,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Primary Contacts",
         "Secondary Contacts",
     }
@@ -812,7 +812,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Primary Contacts",
         "Secondary Contacts",
     }
@@ -839,7 +839,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Threat Source",
         "Vulnerability",
         "Threat Event",
@@ -895,7 +895,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Document File",
         "Primary Contacts",
         "Secondary Contacts",
@@ -932,7 +932,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
     }
     self._test_single_object(model, names, self.COMMON_EXPECTED)
 
@@ -970,7 +970,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Created Date",
         "Last Updated Date",
         "Last Updated By",
-        "Folder",
+        "Gdrive Folder ID",
         "Primary Contacts",
         "Secondary Contacts",
     }
