@@ -5,10 +5,7 @@ from datetime import datetime
 from freezegun import freeze_time
 from mock import patch
 
-from ggrc.app import db
 from ggrc.notifications import common
-from ggrc.models import Notification
-from ggrc.models import Person
 from ggrc.models import all_models
 from ggrc_workflows.models import Cycle
 from integration.ggrc import TestCase
@@ -31,9 +28,9 @@ class TestOneTimeWorkflowNotification(TestCase):
     self.object_generator = ObjectGenerator()
 
     self.random_objects = self.object_generator.generate_random_objects()
-    self.random_people = self.object_generator.generate_random_people(
-        user_role="Administrator"
-    )
+    self.person_1 = self.create_user_with_role(role="Administrator")
+    self.person_2 = self.create_user_with_role(role="Administrator")
+    self.secondary_assignee = self.create_user_with_role(role="Reader")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -43,42 +40,54 @@ class TestOneTimeWorkflowNotification(TestCase):
           self.created_at = datetime.now()
       return new_init
 
-    Notification.__init__ = init_decorator(Notification.__init__)
+    all_models.Notification.__init__ = init_decorator(
+        all_models.Notification.__init__)
 
   def test_one_time_wf_activate(self):
     def get_person(person_id):
       return db.session.query(Person).filter(Person.id == person_id).one()
     with freeze_time("2015-04-10"):
       _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
-
       _, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
 
-      person_2 = get_person(self.random_people[2].id)
+      person_1, person_2 = self.person_1, self.person_2
+      secondary_assignee = self.secondary_assignee
 
+    task_assignees = [person_1, person_2, secondary_assignee]
     with freeze_time("2015-04-11"):
       _, notif_data = common.get_daily_notifications()
+
       self.assertIn(person_2.email, notif_data)
+
+      # cycle started notifs available only for contact
       self.assertIn("cycle_started", notif_data[person_2.email])
       self.assertIn(cycle.id, notif_data[person_2.email]["cycle_started"])
-      self.assertIn("my_tasks",
-                    notif_data[person_2.email]["cycle_data"][cycle.id])
 
-      person_1 = get_person(self.random_people[0].id)
+      for user in task_assignees:
+        self.assertIn("my_tasks",
+                      notif_data[user.email]["cycle_data"][cycle.id])
 
     with freeze_time("2015-05-03"):  # two days befor due date
       _, notif_data = common.get_daily_notifications()
-      self.assertIn(person_1.email, notif_data)
-      self.assertNotIn("due_in", notif_data[person_1.email])
-      self.assertNotIn("due_today", notif_data[person_1.email])
+      for user in task_assignees:
+        self.assertIn(user.email, notif_data)
+        self.assertNotIn("due_in", notif_data[user.email])
+        self.assertNotIn("due_today", notif_data[user.email])
 
     with freeze_time("2015-05-04"):  # one day befor due date
       _, notif_data = common.get_daily_notifications()
-      self.assertEqual(len(notif_data[person_1.email]["due_in"]), 1)
+      for user in task_assignees:
+        self.assertEqual(len(notif_data[user.email]["due_in"]), 1)
 
     with freeze_time("2015-05-05"):  # due date
       _, notif_data = common.get_daily_notifications()
-      self.assertEqual(len(notif_data[person_1.email]["due_today"]), 1)
+      for user in task_assignees:
+        self.assertEqual(len(notif_data[user.email]["due_today"]), 1)
+
+    with freeze_time("2015-05-10"):
+      _, notif_data = common.get_daily_notifications()
+      self.assertEqual(len(notif_data[secondary_assignee.email]["due_in"]), 2)
 
   @patch("ggrc.notifications.common.send_email")
   def test_one_time_wf_activate_single_person(self, mock_mail):
@@ -135,8 +144,13 @@ class TestOneTimeWorkflowNotification(TestCase):
           "type": "Person"
       }
 
-    role_id = all_models.AccessControlRole.query.filter(
+    task_assignee_role_id = all_models.AccessControlRole.query.filter(
         all_models.AccessControlRole.name == "Task Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
+
+    secondary_task_assignee_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Secondary Assignees",
         all_models.AccessControlRole.object_type == "TaskGroupTask",
     ).one().id
     self.one_time_workflow_1 = {
@@ -146,12 +160,15 @@ class TestOneTimeWorkflowNotification(TestCase):
         # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
-            "contact": person_dict(self.random_people[2].id),
+            "contact": person_dict(self.person_2.id),
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.random_people[0].id)
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.person_1.id),
+                    acl_helper.get_acl_json(secondary_task_assignee_id,
+                                            self.secondary_assignee.id),
                 ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
@@ -159,7 +176,10 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": "task 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.random_people[1].id)
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.person_1.id),
+                    acl_helper.get_acl_json(secondary_task_assignee_id,
+                                            self.secondary_assignee.id),
                 ],
                 "start_date": date(2015, 5, 4),
                 "end_date": date(2015, 5, 7),
@@ -167,12 +187,13 @@ class TestOneTimeWorkflowNotification(TestCase):
             "task_group_objects": self.random_objects[:2]
         }, {
             "title": "another one time task group",
-            "contact": person_dict(self.random_people[2].id),
+            "contact": person_dict(self.person_2.id),
             "task_group_tasks": [{
                 "title": "task 1 in tg 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.random_people[0].id)
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.person_1.id)
                 ],
                 "start_date": date(2015, 5, 8),  # friday
                 "end_date": date(2015, 5, 12),
@@ -180,7 +201,8 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": "task 2 in tg 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.random_people[2].id)
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.person_2.id)
                 ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
@@ -189,7 +211,9 @@ class TestOneTimeWorkflowNotification(TestCase):
         }]
     }
 
-    user = Person.query.filter(Person.email == "user@example.com").one().id
+    user = all_models.Person.query.filter(
+        all_models.Person.email == "user@example.com"
+    ).one().id
 
     self.one_time_workflow_single_person = {
         "title": "one time test workflow",
@@ -203,7 +227,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": u"task 1 \u2062 WITH AN UMBRELLA ELLA ELLA. \u2062",
                 "description": "some task. ",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user)
+                    acl_helper.get_acl_json(task_assignee_role_id, user)
                 ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
@@ -211,7 +235,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": "task 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user)
+                    acl_helper.get_acl_json(task_assignee_role_id, user)
                 ],
                 "start_date": date(2015, 5, 4),
                 "end_date": date(2015, 5, 7),
@@ -224,7 +248,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": u"task 1 \u2062 WITH AN UMBRELLA ELLA ELLA. \u2062",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user)
+                    acl_helper.get_acl_json(task_assignee_role_id, user)
                 ],
                 "start_date": date(2015, 5, 8),  # friday
                 "end_date": date(2015, 5, 12),
@@ -232,7 +256,7 @@ class TestOneTimeWorkflowNotification(TestCase):
                 "title": "task 2 in tg 2",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, user)
+                    acl_helper.get_acl_json(task_assignee_role_id, user)
                 ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
