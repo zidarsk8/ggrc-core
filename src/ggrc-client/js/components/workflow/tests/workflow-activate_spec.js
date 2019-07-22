@@ -243,43 +243,43 @@ describe('workflow-activate component', function () {
     });
 
     it('should be in waiting state while refresh is in progress',
-      async function () {
+      (done) => {
+        viewModel.updateActiveCycleCounts
+          .and.returnValue(new Promise(() => {}));
+
         viewModel.repeatOffHandler(workflow);
+
         expect(viewModel.attr('waiting')).toBe(true);
+        done();
       });
 
     it('generates cycle for passed workflow before workflow refreshing',
-      async function (done) {
+      async function () {
         await viewModel.repeatOffHandler(workflow);
         expect(helpers.generateCycle).toHaveBeenCalledWith(workflow);
         expect(helpers.generateCycle).toHaveBeenCalledBefore(
           workflow.refresh
         );
-        done();
       });
 
-    it('refreshes workflow', async function (done) {
+    it('refreshes workflow', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.refresh).toHaveBeenCalled();
-      done();
     });
 
-    it('sets active status for passed workflow', async function (done) {
+    it('sets active status for passed workflow', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.attr('status')).toBe('Active');
-      done();
     });
 
-    it('saves workflow', async function (done) {
+    it('saves workflow', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.save).toHaveBeenCalled();
-      done();
     });
 
-    it('should restore button after workflow saving', async function (done) {
+    it('should restore button after workflow saving', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(viewModel.attr('waiting'), false);
-      done();
     });
 
     it('should try to update counts for active cycles tab', async function () {
@@ -288,35 +288,32 @@ describe('workflow-activate component', function () {
     });
 
     it('should restore button when cycle generating fails',
-      async function (done) {
+      async function () {
         helpers.generateCycle.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOffHandler(workflow);
         } catch (err) {
           expect(viewModel.attr('waiting')).toBe(false);
-          done();
         }
       });
 
     it('should restore button when workflow refreshing fails',
-      async function (done) {
+      async function () {
         workflow.refresh.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOffHandler(workflow);
         } catch (err) {
           expect(viewModel.attr('waiting')).toBe(false);
-          done();
         }
       });
 
     it('should restore button when workflow saving fails',
-      async function (done) {
+      async function () {
         workflow.save.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOffHandler(workflow);
         } catch (err) {
           expect(viewModel.attr('waiting')).toBe(false);
-          done();
         }
       });
   });
