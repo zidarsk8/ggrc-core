@@ -1,7 +1,6 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate objects via UI."""
-import os
 import re
 
 from dateutil import parser, tz
@@ -11,7 +10,7 @@ from lib.constants import objects, messages, element, regex
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Representation
-from lib.page import dashboard, export_page, widget_bar
+from lib.page import dashboard, widget_bar, export_page
 from lib.page.modal import unified_mapper
 from lib.page.modal.request_review import RequestReviewModal
 from lib.page.widget import generic_widget, object_modal
@@ -120,8 +119,9 @@ class BaseWebUiService(object):
     return self.build_obj_from_page()
 
   def open_widget_of_mapped_objs(self, src_obj):
-    """Navigate to generic widget URL of mapped objects according to URL of
-    source object and return generic widget class of mapped objects.
+    """Navigates to generic widget URL of mapped objects according to URL of
+    source object.
+    Returns: generic widget class of mapped objects.
     """
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
     # todo fix freezing when navigate through tabs by URLs and using driver.get
@@ -131,9 +131,15 @@ class BaseWebUiService(object):
         self, "is_versions_widget") else self.generic_widget_cls(
         self.driver, self.obj_name)
 
+  def open_obj_dashboard_tab(self):
+    """Navigates to dashboard tab URL of object according to object name.
+    Returns: generic widget class object."""
+    dashboard.Dashboard().open_objs_tab_via_url(self.obj_type)
+    return self.generic_widget_cls(self.driver, self.obj_name)
+
   def open_info_page_of_obj(self, obj):
-    """Navigate to info page URL of object according to URL of object and
-    return info widget class of object.
+    """Navigates to info page URL of object according to URL of object.
+    Returns: info widget class of object.
     """
     info_page_url = self.url_obj_info_page.format(
         obj_url=obj.url)
@@ -142,7 +148,8 @@ class BaseWebUiService(object):
 
   def open_info_panel_of_mapped_obj(self, src_obj, obj):
     """Navigates to info panel URL of object according to URL of source object
-    and URL of mapped object return generic widget class of mapped objects.
+    and URL of mapped object.
+    Returns: generic widget class of mapped objects.
     """
     return self.open_widget_of_mapped_objs(
         src_obj).tree_view.select_member_by_title(title=obj.title)
@@ -200,11 +207,21 @@ class BaseWebUiService(object):
             isinstance(objs, list) else
             get_obj_from_info_panel(src_obj, objs))
 
+  def _normalize_list_scopes_from_csv(self, list_obj_scopes):
+    """Returns objects scopes list from CSV with properly formatted keys."""
+    list_scopes = []
+    for item in list_obj_scopes:
+      list_scopes.append({objects.get_normal_form(k).replace("*", ""): v
+                          for k, v in item.iteritems()})
+    if self.obj_name == objects.CONTROLS:
+      for scope in list_scopes:
+        scope["REVIEW_STATUS_DISPLAY_NAME"] = scope["Review Status"]
+    return list_scopes
+
   def get_list_objs_from_csv(self, path_to_exported_file):
     """Get and return list of objects from CSV file of exported objects in
     test's temporary directory 'path_to_export_dir'.
     """
-    # pylint: disable=invalid-name
     dict_list_objs_scopes = file_utils.get_list_objs_scopes_from_csv(
         path_to_csv=path_to_exported_file)
     dict_key = dict_list_objs_scopes.iterkeys().next()
@@ -212,12 +229,11 @@ class BaseWebUiService(object):
     obj_name_from_dict = objects.get_plural(
         StringMethods.get_first_word_from_str(dict_key))
     if self.obj_name == obj_name_from_dict:
-      if self.obj_name == objects.CONTROLS:
-        dict_list_objs_scopes[dict_key][0]["REVIEW_STATUS_DISPLAY_NAME"] = (
-            dict_list_objs_scopes[dict_key][0]["Review Status"])
+      list_scopes = self._normalize_list_scopes_from_csv(
+          dict_list_objs_scopes[dict_key])
       return self._create_list_objs(
           entity_factory=self.entities_factory_cls,
-          list_scopes=dict_list_objs_scopes[dict_key])
+          list_scopes=list_scopes)
     else:
       raise ValueError(messages.ExceptionsMessages.err_csv_format.
                        format(dict_list_objs_scopes))
@@ -228,29 +244,6 @@ class BaseWebUiService(object):
     """
     self.open_widget_of_mapped_objs(src_obj).tree_view.open_create()
     object_modal.get_modal_obj(obj.type, self.driver).submit_obj(obj)
-
-  def export_objs_via_tree_view(self, path_to_export_dir, src_obj):
-    # pylint: disable=fixme
-    """Open generic widget of mapped objects
-    and export objects to test's temporary directory as CSV file.
-    Get and return path to the exported file.
-    """
-    objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    objs_widget.tree_view.open_3bbs().select_export()
-    export_page_object = export_page.ExportPage(self.driver)
-    export_page_object.open_export_page()
-    path_to_exported_file = export_page_object.download_obj_to_csv(
-        path_to_export_dir)
-    # FIXME: Filename was "{obj_type} {snapshot_obj_type}
-    # before migration of export page on background job.
-    # Current behavior may be a bug.
-    if self.snapshot_obj_type:
-      obj_part = self.snapshot_obj_type
-    else:
-      obj_part = self.obj_type
-    obj_part = "{}_".format(obj_part)
-    assert os.path.basename(path_to_exported_file).startswith(obj_part) is True
-    return path_to_exported_file
 
   def _get_unified_mapper(self, src_obj):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -317,6 +310,16 @@ class BaseWebUiService(object):
     # pylint: disable=invalid-name
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     return objs_widget.tree_view.get_list_members_as_list_scopes()
+
+  def exported_objs_via_tree_view(self, path_to_export_dir, widget):
+    """Exports objects to test's temporary directory as CSV file.
+    Returns: list of objects from CSV file in test's temporary directory
+    'path_to_export_dir'."""
+    widget.tree_view.open_3bbs().select_export()
+    page = export_page.ExportPage(self.driver)
+    page.open_export_page()
+    return self.get_list_objs_from_csv(
+        page.download_obj_to_csv(path_to_export_dir))
 
   def get_scope_from_info_page(self, obj):
     """Open Info page of obj and get object scope as dict with titles (keys)
