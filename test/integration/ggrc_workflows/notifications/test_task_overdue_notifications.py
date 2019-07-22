@@ -17,7 +17,8 @@ from freezegun import freeze_time
 import ddt
 from mock import patch
 
-from ggrc import db, models
+from ggrc import db
+from ggrc.models import all_models
 from ggrc.notifications import common
 from ggrc_workflows.models import CycleTaskGroupObjectTask, Workflow
 
@@ -50,7 +51,8 @@ class TestTaskOverdueNotifications(TestCase):
           self.created_at = datetime.now()
       return new_init
 
-    models.Notification.__init__ = init_decorator(models.Notification.__init__)
+    all_models.Notification.__init__ = init_decorator(
+        all_models.Notification.__init__)
 
 
 @ddt.ddt
@@ -64,13 +66,13 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
-    models.Notification.query.delete()
+    all_models.Notification.query.delete()
 
     self._fix_notification_init()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(
-        user_role="Administrator")
+    self.user = self.create_user_with_role(role="Administrator")
+    self.secondary_assignee = self.create_user_with_role(role="Reader")
     self._create_test_cases()
 
   @ddt.data(True, False)
@@ -93,45 +95,49 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
     task1_id = tasks[0].id
     task2_id = tasks[1].id
 
-    user = models.Person.query.get(self.user.id)
-
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2017-05-14 08:09:10"):
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertNotIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertNotIn("task_overdue", user_notifs)
 
     with freeze_time("2017-05-15 08:09:10"):  # task 1 due date
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertNotIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertNotIn("task_overdue", user_notifs)
 
     with freeze_time("2017-05-16 08:09:10"):  # task 2 due date
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
 
-      overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
-      self.assertEqual(overdue_task_ids, [task1_id])
+        overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
+        self.assertEqual(overdue_task_ids, [task1_id])
 
     with freeze_time("2017-05-17 08:09:10"):  # after both tasks' due dates
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
 
-      overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
-      self.assertEqual(overdue_task_ids, [task1_id, task2_id])
+        overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
+        self.assertEqual(overdue_task_ids, [task1_id, task2_id])
 
-      common.send_daily_digest_notifications()
+    common.send_daily_digest_notifications()
 
     # even after sending the overdue notifications, they are sent again the
     # day after, too
     with freeze_time("2017-05-18 08:09:10"):
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
 
-      overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
-      self.assertEqual(overdue_task_ids, [task1_id, task2_id])
+        overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
+        self.assertEqual(overdue_task_ids, [task1_id, task2_id])
 
   @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
@@ -151,26 +157,28 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       task1, task2 = tasks
       self.wf_generator.modify_object(task2, {"end_date": date(2099, 12, 31)})
 
-      user = models.Person.query.get(self.user.id)
-
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2017-05-16 08:09:10"):  # a day after task1 due date
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertIn("task_overdue", user_notifs)
-      self.assertEqual(len(user_notifs["task_overdue"]), 1)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
+        self.assertEqual(len(user_notifs["task_overdue"]), 1)
 
       # change task1 due date, there should be no overdue notification anymore
       self.wf_generator.modify_object(task1, {"end_date": date(2017, 5, 16)})
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertNotIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertNotIn("task_overdue", user_notifs)
 
-      # change task1 due date to the past there should a notification again
+        # change task1 due date to the past there should a notification again
       self.wf_generator.modify_object(task1, {"end_date": date(2017, 5, 14)})
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertIn("task_overdue", user_notifs)
-      self.assertEqual(len(user_notifs["task_overdue"]), 1)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
+        self.assertEqual(len(user_notifs["task_overdue"]), 1)
 
   @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
@@ -190,8 +198,6 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       task1, task2 = tasks
       self.wf_generator.modify_object(task2, {"end_date": date(2099, 12, 31)})
 
-      user = models.Person.query.get(self.user.id)
-      user_email = user.email
     if is_vf_needed:
       non_final_states = [CycleTaskGroupObjectTask.ASSIGNED,
                           CycleTaskGroupObjectTask.IN_PROGRESS,
@@ -203,19 +209,21 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
                           CycleTaskGroupObjectTask.IN_PROGRESS]
       final_state = CycleTaskGroupObjectTask.FINISHED
 
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2017-05-16 08:09:10"):  # a day after task1 due date
       for state in non_final_states:
         # clear all notifications before before changing the task status
-        models.Notification.query.delete()
+        all_models.Notification.query.delete()
         _, notif_data = common.get_daily_notifications()
         self.assertEqual(notif_data, {})
 
         self.wf_generator.modify_object(task1, {"status": state})
 
         _, notif_data = common.get_daily_notifications()
-        user_notifs = notif_data.get(user_email, {})
-        self.assertIn("task_overdue", user_notifs)
-        self.assertEqual(len(user_notifs["task_overdue"]), 1)
+        for user in task_assignees:
+          user_notifs = notif_data.get(user.email, {})
+          self.assertIn("task_overdue", user_notifs)
+          self.assertEqual(len(user_notifs["task_overdue"]), 1)
 
       # WITHOUT clearing the overdue notifications, move the task to "verified"
       # state, and the overdue notification should disappear.
@@ -223,8 +231,9 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       self.wf_generator.modify_object(task1, {"status": final_state})
       common.generate_cycle_tasks_notifs()
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user_email, {})
-      self.assertNotIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertNotIn("task_overdue", user_notifs)
 
   @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
@@ -243,29 +252,30 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
     tasks = workflow.cycles[0].cycle_task_group_object_tasks
     task1, task2 = tasks
 
-    user = models.Person.query.get(self.user.id)
-    user_email = user.email
-
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2017-10-16 08:09:10"):  # long after both task due dates
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user_email, {})
-      self.assertIn("task_overdue", user_notifs)
-      self.assertEqual(len(user_notifs["task_overdue"]), 2)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
+        self.assertEqual(len(user_notifs["task_overdue"]), 2)
 
       db.session.delete(task2)
       db.session.commit()
 
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user_email, {})
-      self.assertIn("task_overdue", user_notifs)
-      self.assertEqual(len(user_notifs["task_overdue"]), 1)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertIn("task_overdue", user_notifs)
+        self.assertEqual(len(user_notifs["task_overdue"]), 1)
 
       db.session.delete(task1)
       db.session.commit()
 
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
-      self.assertNotIn("task_overdue", user_notifs)
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
+        self.assertNotIn("task_overdue", user_notifs)
 
   def _create_test_cases(self):
     """Create configuration to use for generating a new workflow."""
@@ -275,9 +285,14 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
           "id": person_id,
           "type": "Person"
       }
-    role_id = models.all_models.AccessControlRole.query.filter(
-        models.all_models.AccessControlRole.name == "Task Assignees",
-        models.all_models.AccessControlRole.object_type == "TaskGroupTask",
+    task_assignee_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
+
+    task_sec_assignee_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Secondary Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
     ).one().id
     self.one_time_workflow = {
         "title": "one time test workflow",
@@ -293,14 +308,23 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
                 "start_date": date(2017, 5, 5),  # Friday
                 "end_date": date(2017, 5, 15),
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_sec_assignee_role_id,
+                                            self.secondary_assignee.id),
+
+                ],
             }, {
                 "title": "task 2",
                 "description": "some task 2",
                 "start_date": date(2017, 5, 5),  # Friday
                 "end_date": date(2017, 5, 16),
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_sec_assignee_role_id,
+                                            self.secondary_assignee.id),
+                ],
             }],
             "task_group_objects": self.random_objects
         }]
@@ -324,7 +348,7 @@ class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
     """Overdue notifications should be created for tasks created with imports.
     """
     Workflow.query.delete()
-    models.Notification.query.delete()
+    all_models.Notification.query.delete()
     db.session.commit()
 
     filename = join(self.CSV_DIR, "workflow_small_sheet.csv")
@@ -334,8 +358,8 @@ class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
     self.wf_generator.generate_cycle(workflow)
     response, workflow = self.wf_generator.activate_workflow(workflow)
 
-    user = models.Person.query.filter(
-        models.Person.email == 'user1@ggrc.com').one()
+    user = all_models.Person.query.filter(
+        all_models.Person.email == 'user1@ggrc.com').one()
 
     with freeze_time("2020-01-01 00:00:00"):  # afer all tasks' due dates
       _, notif_data = common.get_daily_notifications()
@@ -347,7 +371,7 @@ class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
   def test_overdue_notifications_when_task_due_date_is_changed(self, _):
     """Overdue notifications should adjust to task due date changes."""
     Workflow.query.delete()
-    models.Notification.query.delete()
+    all_models.Notification.query.delete()
     db.session.commit()
 
     filename = join(self.CSV_DIR, "workflow_small_sheet.csv")
@@ -357,8 +381,8 @@ class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
     self.wf_generator.generate_cycle(workflow)
     response, workflow = self.wf_generator.activate_workflow(workflow)
 
-    user = models.Person.query.filter(
-        models.Person.email == 'user1@ggrc.com').one()
+    user = all_models.Person.query.filter(
+        all_models.Person.email == 'user1@ggrc.com').one()
 
     with freeze_time("2015-01-01 00:00:00"):  # before all tasks' due dates
       _, notif_data = common.get_daily_notifications()
