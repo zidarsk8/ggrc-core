@@ -39,6 +39,17 @@ class TestControls(base.Test):
     assert not dashboard_controls_tab.get_control(control).is_editable, (
         "Edit option should not be available for Control in tree view")
 
+  def test_user_cannot_edit_or_del_control_from_gl_search(self, control,
+                                                          header_dashboard):
+    """Confirm that user cannot edit or delete Control from global search."""
+    three_bbs = (header_dashboard.open_global_search().search_obj(control).
+                 get_three_bbs(control.type))
+    actual_options = {"can_edit": three_bbs.edit_option.exists,
+                      "can_delete": three_bbs.delete_option.exists}
+    expected_options = {"can_edit": False,
+                        "can_delete": False}
+    assert expected_options == actual_options
+
   def test_user_cannot_add_person_to_custom_role(self, control,
                                                  controls_service):
     """Tests that user cannot add a person to custom Role."""

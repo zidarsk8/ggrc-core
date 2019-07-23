@@ -53,7 +53,7 @@
 </div>
 
 <div class="modal-body">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{scope.vars.totalObjects}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{entriesTotalCount}})'" expanded:bind="showResults">
     <div class="search-results">
       <mapper-results
         baseInstance:from="parentInstance"
@@ -63,8 +63,8 @@
         selected:from="selected"
         @onSearch:to="onSearchCallback"
         defaultSort:from="defaultSort"
-        paging.total:to="scope.vars.totalObjects"
-        entries:bind="entries"
+        paging.total:to="entriesTotalCount"
+        items:bind="entries"
         filterItems:from="scope.vars.filterItems"
         statusItem:from="scope.vars.statusItem"
         on:loaded="onLoaded()"

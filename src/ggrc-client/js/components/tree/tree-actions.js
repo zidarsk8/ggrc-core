@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../clipboard-link/clipboard-link';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -16,8 +17,7 @@ import {
   isAuditor,
 } from '../../plugins/utils/acl-utils';
 import {
-  isSnapshotModel,
-  isSnapshotScope,
+  isSnapshotRelated,
 } from '../../plugins/utils/snapshot-utils';
 import Permission from '../../permission';
 import template from './templates/tree-actions.stache';
@@ -53,9 +53,8 @@ export default canComponent.extend({
           let parentInstance = this.attr('parentInstance');
           let model = this.attr('model');
 
-          return (isSnapshotScope(parentInstance) &&
-            isSnapshotModel(model.model_singular)) ||
-            this.attr('options.objectVersion');
+          return (isSnapshotRelated(parentInstance.type, model.model_singular)
+            || this.attr('options.objectVersion'));
         },
       },
       showGenerateAssessments: {
@@ -110,6 +109,7 @@ export default canComponent.extend({
     options: null,
     model: null,
     showedItems: [],
+    savedSearchPermalink: '',
   }),
   export() {
     this.dispatch('export');

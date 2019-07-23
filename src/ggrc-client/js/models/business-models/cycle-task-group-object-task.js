@@ -244,7 +244,7 @@ export default Cacheable.extend({
       return workflow;
     });
   },
-  set_properties_from_workflow: function (workflow) {
+  setValueFromInput: function (workflow) {
     // The form sometimes returns plaintext instead of object,
     // return in that case
     // If workflow is empty form should be invalidated

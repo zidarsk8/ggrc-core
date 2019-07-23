@@ -4,7 +4,7 @@
 
 from lib import cache, constants, exception
 from lib.constants import objects, element
-from lib.element import tree_view, tree_view_item
+from lib.element import tree_view, tree_view_item, info_widget_three_bbs
 
 
 def _filter_out_underscore(object_name):
@@ -132,6 +132,13 @@ def get_cls_3bbs_dropdown_settings(object_name):
   """Get and return class of 3BBS dropdown settings for Tree View."""
   base_cls = tree_view.CommonDropdownSettings
   return _factory(cls_name=object_name, parent_cls=base_cls)
+
+
+def get_cls_3bbs_dropdown_info(object_name):
+  """Get and return class of 3BBS dropdown settings for Info widget."""
+  base_cls = info_widget_three_bbs.InfoWidgetThreeBbbs
+  class_name = object_name + base_cls.__name__
+  return _factory(cls_name=class_name, parent_cls=base_cls)
 
 
 def get_cls_dropdown_tree_view_item(object_name):

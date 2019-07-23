@@ -79,7 +79,6 @@ describe('object-operations-base viewModel', function () {
           ],
         },
         update: jasmine.createSpy('update'),
-        prepareConfig: jasmine.createSpy('prepareConfig'),
       });
       method = ObjectOperationsBaseVM
         .prototype
@@ -94,7 +93,7 @@ describe('object-operations-base viewModel', function () {
       expect(result).toBe(type);
     });
 
-    it('calls update method if type is set for the first time',
+    it('calls update method',
       function () {
         let type = 'Type1';
         method(type);
@@ -111,13 +110,6 @@ describe('object-operations-base viewModel', function () {
         type: jasmine.any(String),
       }));
     });
-
-    it('calls prepareConfig method if type is defined',
-      function () {
-        vm.attr('type', 'Type1');
-        method('Type1');
-        expect(vm.prepareConfig).toHaveBeenCalled();
-      });
   });
 
   describe('update() method', function () {
@@ -160,25 +152,6 @@ describe('object-operations-base viewModel', function () {
       expect(_.every(allArgs, function (args) {
         return args.length === 1;
       })).toBe(true);
-    });
-  });
-
-  describe('prepareConfig() method', function () {
-    let method;
-    let vm;
-
-    beforeEach(function () {
-      vm = {
-        update: jasmine.createSpy('update'),
-      };
-      method = baseVM.prepareConfig.bind(vm);
-    });
-
-    it('calls update method with config from param', function () {
-      let config = {};
-      method(config);
-
-      expect(vm.update).toHaveBeenCalledWith(config);
     });
   });
 

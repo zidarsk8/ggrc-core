@@ -5,6 +5,7 @@
 <select el:value:bind="selectedType"
         class="input-block-level"
         name="type-select"
+        on:el:change="onChanged"
         {{#disabled}}disabled{{/disabled}}>
   {{#each types}}
     {{#if items}}

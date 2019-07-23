@@ -1,6 +1,10 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Elements of search / mapper modal."""
+# pylint: disable=too-few-public-methods
+
+from lib import factory
+from lib.constants import element, value_aliases
 from lib.page.widget import table_with_headers
 
 
@@ -10,37 +14,42 @@ class SearchFilterArea(object):
   def __init__(self, container):
     self._root = container
     self._search_btn = self._root.button(text="Search")
+    self.type_select_option = self._root.select(name="type-select")
+    self.filter_row = self._root.element(
+        class_name="filter-container__attribute")
+    self.filter_name = self._root.element(
+        class_name="autocomplete-dropdown__input-container")
+    self.filter_operator = self._root.element(
+        class_name="filter-attribute__operator")
 
-  def search_obj(self, obj):
-    """Searches for object."""
-    self.select_obj_type(obj.obj_type())
-    self._set_title(obj.title)
+  def search_obj(self, obj, filter_value=None,
+                 search_attr=element.Common.TITLE,
+                 filter_operator=value_aliases.EQUAL_OP):
+    """Searches for object by title. Optionally search by any other
+    specified attribute."""
+    if not filter_value:
+      filter_value = obj.title
+    self._select_obj_type(obj)
+    self._select_search_criteria(search_attr, filter_operator)
+    self._set_filter_value(filter_value)
     self._click_search()
     self._wait_for_search_results()
 
-  def select_obj_type(self, obj_type):
+  def _select_obj_type(self, obj):
     """Selects object type."""
-    self._root.select(name="type-select").wait_until(
+    obj_type = obj.type if hasattr(obj, "type") else obj.obj_type()
+    self.type_select_option.wait_until(
         lambda e: e.exists).option(value=obj_type).click()
 
-  def _set_title(self, title):
-    """Types in title into search criteria text box.
-    This is a very simple implementation of attribute filtering
-    that doesn't assert chosen attribute, operator,
-    is not able to add other attrs, etc. and will have to be drastically
-    improved when tests that use these features will be added.
-    """
-    filter_row = self._root.element(class_name="filter-container__attribute")
-    title = self._escape_filter_string(title)
-    filter_row.text_field(name="right").set(title)
+  def _select_search_criteria(self, search_attr, filter_operator):
+    """Selects search criteria for object."""
+    self.filter_name.click()
+    self.filter_name.parent().element(text=search_attr).click()
+    self.filter_operator.option(value=filter_operator).click()
 
-  @staticmethod
-  def _escape_filter_string(str_to_escape):
-    """Returns an escaped string for searching.
-    Some special symbols should be escaped (GGRC-3004).
-    """
-    backslash = "\\"
-    return str_to_escape.replace(backslash, backslash + backslash)
+  def _set_filter_value(self, value):
+    """Types value in to search criteria text box."""
+    self.filter_row.text_field(name="right").set(value)
 
   def _click_search(self):
     """Clicks `Search` button."""
@@ -73,14 +82,9 @@ class SearchResultsArea(object):
     return [_SearchResultRow(row_el, self._table.table_header_names())
             for row_el in self._root.elements(class_name="object-list__item")]
 
-  def click_map_selected(self):
-    """Clicks `Map Selected` button."""
-    self._root.button(text="Map Selected").click()
-    self._root.wait_until(lambda modal: not modal.exists)
-
 
 class _SearchResultRow(object):
-  """Represents a search result item in object mapper."""
+  """Represents a search result item in object search / mapper."""
 
   def __init__(self, container, table_header_names):
     self._root = container
@@ -98,3 +102,18 @@ class _SearchResultRow(object):
     """Selects search result for mapping."""
     self._root.element(
         tag_name="object-selection-item").checkbox().set()
+
+  def expand(self):
+    """Expands an item if it is not expanded already."""
+    if not self.is_expanded:
+      self._root.click()
+
+  @property
+  def is_expanded(self):
+    return self._root.element(tag_name="mapper-results-item-details").exists
+
+  def get_three_bbs(self, obj_type):
+    """Expands an item if necessary in order to get 3bbs element.
+    Returns 3bbs element."""
+    self.expand()
+    return factory.get_cls_3bbs_dropdown_info(object_name=obj_type)(self._root)

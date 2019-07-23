@@ -11,7 +11,6 @@ $related-assessment-button-width: 95px;
 $object-selection-item-width: 102px;
 $object-selection-item-with-related-assessments-width: 16px;
 $first-column-width: 25%;
-$items-separator-color: #e0e0e0;
 
 @mixin cell-styles() {
   flex: 1 1;
@@ -23,11 +22,6 @@ $items-separator-color: #e0e0e0;
 
 mapper-results {
   display: block;
-
-  .well-small {
-    font-size: 13px;
-    padding: 9px 16px 7px;
-  }
 
   .tree-pagination {
     display: flex;
@@ -102,7 +96,7 @@ mapper-results {
     > object-list {
       > .object-list__item {
         color: $black;
-        border-bottom: 1px solid $items-separator-color;
+        border-bottom: 1px solid $itemBorder;
 
         object-selection-item {
           align-items: center;
@@ -117,7 +111,7 @@ mapper-results {
 
       > .object-list__item:first-child,
       spinner-component + .object-list__item {
-        border-top: 1px solid $items-separator-color;
+        border-top: 1px solid $itemBorder;
       }
     }
   }
@@ -521,22 +515,52 @@ mapper-results-columns-configuration {
         margin: 0px;
       }
     }
+
+    .modal-body-wrapper {
+      display: flex;
+
+      aside {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        max-width: 20%;
+        border-top: 1px solid $itemBorder;
+        border-right: 1px solid $itemBorder;
+        padding: 10px;
+      }
+
+      main {
+        flex: 4;
+      }
+
+      saved-search-list {
+        flex: 1;
+      }
+    }
+
     .modal-body {
       .autocomplete-dropdown__input {
         margin: 10px 14px 14px 12px;
       }
-      border-top: 1px solid #E0E0E0;
+      border-top: 1px solid $itemBorder;
       padding: 20px !important;
       select, input, .input-block-level {
         margin: 0;
       }
+    }
+    .modal-footer {
+      border-top: 1px solid #E0E0E0;
+
       .well.well-small {
         font-size: 13px;
         padding: 9px 16px 7px;
       }
+      &.modal-filter {
+        padding-bottom: 0;
+      }
     }
     .modal-footer {
-      border-top: 1px solid #E0E0E0;
+      border-top: 1px solid $itemBorder;
 
       .search-results {
         margin-top: 20px;
@@ -601,6 +625,13 @@ mapper-results-columns-configuration {
   }
   &__actions {
     margin-top: 24px;
+
+    &-filter {
+      @include controls-row(8px);
+    }
+    &-search {
+      margin-top: 24px;
+    }
     &--right {
       @include controls-row(8px);
       float: right;

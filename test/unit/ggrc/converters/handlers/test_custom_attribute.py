@@ -134,11 +134,17 @@ class GetValueTestCase(CustomAttributeColumHandlerTestCase):
     result = self.handler.get_value()
     self.assertEqual(result, u"")
 
-  @ddt.data("", "yes", "no")
-  def test_multiselect_values_acceptabe(self, input_data, get_ca_definition):
+  @ddt.data(
+      ("", None),
+      ("yes", "yes"),
+      ("no", "no")
+  )
+  @ddt.unpack
+  def test_multiselect_values_acceptabe(self, input_data,
+                                        expected_value, get_ca_definition):
     """The method should return correct value for multiselect CAs."""
     get_ca_definition.return_value = MagicMock(id=117,
                                                multi_choice_options="yes,no")
     self.handler.raw_value = input_data
     result = self.handler.get_multiselect_values()
-    self.assertEqual(result, input_data)
+    self.assertEqual(result, expected_value)

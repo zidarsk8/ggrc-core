@@ -88,6 +88,9 @@ export default Cacheable.extend({
         validateUniqueTitle: true,
       },
     },
+    _directive: {
+      value: null,
+    },
   },
   created() {
     this._super(...arguments);

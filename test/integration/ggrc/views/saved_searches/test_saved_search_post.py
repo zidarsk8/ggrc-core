@@ -5,38 +5,24 @@
 import json
 from random import random
 
-from flask_testing import TestCase
-
 from ggrc import db
 from ggrc.app import app
 from ggrc.models.person import Person
 
+from integration.ggrc.views.saved_searches.base import SavedSearchBaseTest
 from integration.ggrc.views.saved_searches.initializers import (
     setup_user_role,
     get_client_and_headers,
 )
 
 
-class TestSavedSearchPost(TestCase):
-
-  @staticmethod
-  def create_app():
-    return app
+class TestSavedSearchPost(SavedSearchBaseTest):
+  """Tests for saved search POST view."""
 
   @classmethod
   def setUpClass(cls):
-    """
-      Set up read-only test data to test GET requests.
-    """
-
+    """Set up read-only test data to test GET requests."""
     super(TestSavedSearchPost, cls).setUpClass()
-
-    cls._valid_query = [{
-        "object_name": "Assessment",
-        "filters": {"expression": {}},
-        "limit": [0, 10],
-        "order_by": [{"name": "updated_at", "desc": True}]
-    }]
 
     email_0 = "aniki_baniki_{}@test.com".format(random())
     cls._person_0 = Person(name="Aniki", email=email_0)
@@ -50,18 +36,9 @@ class TestSavedSearchPost(TestCase):
         app, cls._person_0,
     )
 
-  def setUp(self):
-    self._client.get("/login", headers=self._headers)
-
-  def tearDown(self):
-    self._client.get("/logout", headers=self._headers)
-
   @classmethod
   def tearDownClass(cls):
-    """
-      Clean up created user and related saved searches.
-    """
-
+    """Clean up created user and related saved searches."""
     super(TestSavedSearchPost, cls).tearDownClass()
 
     db.session.delete(cls._user_role)
@@ -69,12 +46,13 @@ class TestSavedSearchPost(TestCase):
     db.session.commit()
 
   def test_0_successful_creation_of_saved_search(self):
+    """Test that saved search could be created."""
     response = self._client.post(
         "/api/saved_searches",
         data=json.dumps({
             "name": "test_ss_3",
             "object_type": "Assessment",
-            "query": self._valid_query,
+            "search_type": "AdvancedSearch"
         }),
         headers=self._headers,
     )
@@ -82,7 +60,7 @@ class TestSavedSearchPost(TestCase):
     self.assertEqual(response.status, "200 OK")
 
     response = self._client.get(
-        "/api/saved_searches/Assessment?limit=1",
+        "/api/saved_searches/AdvancedSearch?limit=1&object_type=Assessment",
         headers=self._headers,
     )
 
@@ -92,52 +70,57 @@ class TestSavedSearchPost(TestCase):
     self.assertEqual(data["values"][0]["name"], "test_ss_3")
 
   def test_1_saved_search_creation_failure_due_not_unique_name(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "test_ss_3",
-            "object_type": "Assessment",
-            "query": self._valid_query,
-        }),
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    """Test saved search creation failure if provided name is alredy taken."""
+    data = self._post_saved_search({
+        "name": "test_ss_3",
+        "object_type": "Assessment",
+        "search_type": "AdvancedSearch"
+    })
 
     self.assertEqual(
         data["message"],
-        u"Saved search with name 'test_ss_3' already exists",
+        u"Advanced Saved search for Assessment with "
+        u"name 'test_ss_3' already exists",
     )
     self.assertEqual(data["code"], 400)
 
-  def test_2_saved_search_creation_failure_due_to_empty_name(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "",
-            "object_type": "Assessment",
-            "query": self._valid_query,
-        }),
-        headers=self._headers,
-    )
+  def test_global_search_unique_names(self):
+    """Test that we unable to save GlobalSearch with already existing name."""
+    self._post_saved_search({
+        "name": "test_ss_3",
+        "object_type": "Assessment",
+        "search_type": "GlobalSearch"
+    })
+    glob2 = self._post_saved_search({
+        "name": "test_ss_3",
+        "object_type": "Assessment",
+        "search_type": "GlobalSearch"
+    })
 
-    data = json.loads(response.data)
+    self.assertEqual(
+        glob2["message"],
+        u"Global Saved search with name 'test_ss_3' already exists",
+    )
+    self.assertEqual(glob2["code"], 400)
+
+  def test_2_saved_search_creation_failure_due_to_empty_name(self):
+    """Test saved search creation failure if provided name is empty."""
+    data = self._post_saved_search({
+        "name": "",
+        "object_type": "Assessment",
+        "search_type": "AdvancedSearch"
+    })
 
     self.assertEqual(data["message"], "Saved search name can't be blank")
     self.assertEqual(data["code"], 400)
 
   def test_3_saved_search_creation_failure_due_invalid_object_type(self):
-    response = self._client.post(
-        "/api/saved_searches",
-        data=json.dumps({
-            "name": "test_ss_1",
-            "object_type": "Overwatch",
-            "query": self._valid_query,
-        }),
-        headers=self._headers,
-    )
-
-    data = json.loads(response.data)
+    """Test saved search creation failure with invalid object_type."""
+    data = self._post_saved_search({
+        "name": "test_ss_1",
+        "object_type": "Overwatch",
+        "search_type": "AdvancedSearch"
+    })
 
     self.assertEqual(
         data["message"],
@@ -145,18 +128,50 @@ class TestSavedSearchPost(TestCase):
     )
     self.assertEqual(data["code"], 400)
 
-  def test_4_save_search_creation_failure_due_to_malformed_query(self):
+  def test_4_successful_creation_of_saved_search_with_filters(self):
+    """Test that we able to write and read values to filters field."""
+    _filter = {"expression":
+               {"left":
+                {"left": "Title",
+                 "op": {"name": "~"},
+                 "right": "one"
+                 },
+                "op": {"name": "AND"},
+                "right": {"left": "Status",
+                          "op": {"name": "IN"},
+                          "right": ["Active", "Draft", "Deprecated"]
+                          }
+                }
+               }
     response = self._client.post(
         "/api/saved_searches",
         data=json.dumps({
-            "name": "test_ss_1",
+            "name": "test_ss_4",
             "object_type": "Assessment",
-            "query": "MalformedQueryFromHeaven",
+            "filters": _filter,
+            "search_type": "GlobalSearch"
         }),
         headers=self._headers,
     )
 
-    data = json.loads(response.data)
+    self.assertEqual(response.status, "200 OK")
 
-    self.assertIn("Malformed query", data["message"])
+    data = self._get_saved_search("Assessment")
+
+    for saved_search in data["values"]:
+      if saved_search["name"] == "test_ss_4":
+        self.assertEqual(json.loads(saved_search["filters"]), _filter)
+
+  def test_5_saved_search_creation_failure_due_invalid_type(self):
+    """Test saved search creation failure with invalud search_type."""
+    data = self._post_saved_search({
+        "name": "test_ss_1",
+        "object_type": "Assessment",
+        "search_type": "Invalid Type"
+    })
+
+    self.assertEqual(
+        data["message"],
+        u"Invalid saved search type",
+    )
     self.assertEqual(data["code"], 400)

@@ -100,3 +100,46 @@ class TestProposalEmail(TestCase):
     self.assertListEqual(
         [2] * 2,
         [len(a[1]["proposals"]) for a in bodybuilder_mock.call_args_list])
+
+  @ddt.data(
+      'Program Managers',
+      'Program Editors',
+      'Primary Contacts'
+  )
+  def test_email_proposal_program(self, role_name):
+    """Test sending email to Program manager/Editor/Primary Contacts"""
+    from ggrc.models import all_models
+
+    role_1 = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == role_name,
+        all_models.AccessControlRole.object_type == 'Program',
+    ).one()
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      person_1 = factories.PersonFactory()  # has 1 role
+      factories.AccessControlPersonFactory(
+          ac_list=program.acr_acl_map[role_1],
+          person=person_1
+      )
+      proposal_1 = factories.ProposalFactory(
+          instance=program,
+          content={
+              "fields": {"title": "a"},
+              "access_control_list": {},
+              "custom_attribute_values": {},
+              "mapping_fields": {},
+              "mapping_list_fields": {},
+          },
+          agenda="agenda 1")
+    self.assertIsNone(proposal_1.proposed_notified_datetime)
+    with mock.patch("google.appengine.api.mail.send_mail") as mailer_mock:
+      with mock.patch.object(fast_digest.DIGEST_TMPL,
+                             "render") as bodybuilder_mock:
+        fast_digest.send_notification()
+    self.assertIsNotNone(proposal_1.proposed_notified_datetime)
+    self.assertEqual(1, len(bodybuilder_mock.call_args_list))
+    self.assertEqual(1, len(mailer_mock.call_args_list))
+    # email to each required person
+    self.assertEqual(
+        [person_1.email],
+        [a[1]["to"] for a in mailer_mock.call_args_list])
