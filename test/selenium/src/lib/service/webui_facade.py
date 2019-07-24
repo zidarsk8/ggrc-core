@@ -1,16 +1,18 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Facade for Web UI services"""
+# pylint: disable=invalid-name
 import copy
 import random
 import re
 
-from lib import url, users, base
+from lib import url, users, base, browsers
 from lib.constants import objects, element
 from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.page.modal import unified_mapper
-from lib.page.widget import generic_widget, object_modal, import_page
+from lib.page.widget import (generic_widget, object_modal, import_page,
+                             related_proposals)
 from lib.service import (webui_service, rest_service, rest_facade,
                          admin_webui_service)
 from lib.utils import selenium_utils, ui_utils, string_utils
@@ -329,3 +331,48 @@ def edit_gca(selenium, old_ca_type, new_ca_type):
   actual_ca = admin_webui_service.CustomAttributeWebUiService(
       selenium).edit_custom_attribute(new_ca, expected_ca)
   return {"actual_ca": actual_ca, "expected_ca": expected_ca}
+
+
+def are_tabs_urls_equal():
+  """Returns whether 2 tab urls are equal."""
+  old_tab, new_tab = browsers.get_browser().windows()
+  return old_tab.url == new_tab.url
+
+
+def soft_assert_cannot_make_proposal(info_page, soft_assert):
+  """Performs soft assertion that user cannot make a proposal for disabled
+  object."""
+  soft_assert.expect(not info_page.is_propose_changes_btn_exists,
+                     "'Propose Changes' button should not be displayed.")
+
+
+def soft_assert_cannot_view_proposals(info_page, soft_assert):
+  """Performs soft assertion that user cannot view proposals for disabled
+  object."""
+  info_page.click_change_proposals()
+  soft_assert.expect(
+      info_page.proposals_tab_or_link_name not in info_page.tabs.tab_names,
+      "'Change Proposals' tab should not be displayed.")
+  soft_assert.expect(are_tabs_urls_equal(), "Tabs urls should be equal.")
+  for tab_num, tab in enumerate(browsers.get_browser().windows(), start=1):
+    tab.use()
+    soft_assert.expect(
+        not related_proposals.RelatedProposals().are_proposals_displayed(),
+        "Proposals should not be displayed in browser tab number {}.".
+        format(tab_num))
+
+
+def soft_assert_no_modals_present(modal_obj, soft_assert):
+  """Performs soft assertion that there is no modal objects in 2 browser
+  tabs."""
+  assert issubclass(modal_obj.__class__, object_modal.BaseObjectModal), (
+      "Object should be derived from BaseObjectModal.")
+  tabs = browsers.get_browser().windows()
+  soft_assert.expect(
+      len(tabs) == 2, "Only 2 window tabs should be opened but it is found "
+                      "{} tab(s).".format(len(tabs)))
+  for tab_num, tab in enumerate(tabs, start=1):
+    tab.use()
+    soft_assert.expect(not modal_obj.is_present,
+                       "There should be no modal windows in browser "
+                       "tab number {}.".format(tab_num))
