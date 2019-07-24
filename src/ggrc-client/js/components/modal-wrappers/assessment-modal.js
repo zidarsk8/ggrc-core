@@ -54,7 +54,6 @@ export default canComponent.extend({
     },
     async setAssessmentTemplate(templateId) {
       const instance = this.attr('instance');
-      const audit = instance.attr('audit');
       const templateStub = {
         id: templateId,
         type: 'AssessmentTemplate',
@@ -64,11 +63,7 @@ export default canComponent.extend({
       try {
         const [loadedTemplate] = await loadObjectsByStubs(
           [templateStub],
-          ['custom_attribute_definitions'],
-          {
-            type: audit.attr('type'),
-            id: audit.attr('id'),
-          },
+          ['custom_attribute_definitions']
         );
 
         instance.attr('template', templateStub);
