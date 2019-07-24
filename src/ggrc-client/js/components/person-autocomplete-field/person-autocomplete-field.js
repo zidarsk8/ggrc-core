@@ -21,6 +21,7 @@ export default canComponent.extend({
     personEmail: '',
     personName: '',
     showResults: false,
+    autocompleteEnabled: true,
     inputId: '',
     tabindex: -1,
     placeholder: '',

@@ -38,7 +38,10 @@
           placeholder:from="'email@company.com'"
           tabindex:from="2"
           on:vm:personSelected="personSelected(scope.event)"
-          on:vm:keyDown="onEmailFieldKeyDown(scope.event)">
+          on:vm:keyDown="onEmailFieldKeyDown(scope.event)"
+          {{^if_config_exist 'external_services.Person'}}
+            autocompleteEnabled:from="false"
+          {{/if_config_exist}}>
         </person-autocomplete-field>
         <span class="help-inline">
         </span>

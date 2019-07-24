@@ -13,9 +13,11 @@
     value:bind="personEmail"
     on:el:keydown="onKeyDown(scope.event)"
     on:el:keyup="onKeyUp(scope.event)">
-  <people-autocomplete-dropdown currentValue:from="searchValue"
-    showResults:bind="showResults"
-    actionKey:from="actionKey"
-    on:vm:personSelected="personSelected(scope.event)">
-  </people-autocomplete-dropdown>
+  {{#if autocompleteEnabled}}
+    <people-autocomplete-dropdown currentValue:from="searchValue"
+      showResults:bind="showResults"
+      actionKey:from="actionKey"
+      on:vm:personSelected="personSelected(scope.event)">
+    </people-autocomplete-dropdown>
+  {{/if}}
 </div>
