@@ -22,6 +22,12 @@
   .empty-message {
     font-size: 12px;
   }
+
+  template-field {
+    &.readonly {
+      color: $gray;
+    }
+  }
 }
 
 .sortable-list {
