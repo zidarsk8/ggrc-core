@@ -121,9 +121,10 @@ class BaseRestService(object):
         if isinstance(resp_text, dict) and len(resp_text) == 1:
           # {key: {value}} to {value}
           resp_text = resp_text.itervalues().next()
-          resp_text = resp_text["values"][0] if is_query_resp else resp_text
           try:
-            return dict(resp_text.items() + get_extra_items(resp_text).items())
+            return (dict(resp_text.items() +
+                         ({}.items() if is_query_resp else
+                          get_extra_items(resp_text).items())))
           except AttributeError:
             raise requests.exceptions.RequestException(
                 messages.ExceptionsMessages.err_server_req_resp.format(

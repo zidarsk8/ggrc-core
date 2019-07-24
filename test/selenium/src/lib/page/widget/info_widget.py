@@ -18,8 +18,7 @@ from lib.page import dashboard
 from lib.page.modal import apply_decline_proposal, set_value_for_asmt_ca
 from lib.page.widget import (
     info_panel, object_modal, object_page, related_proposals)
-from lib.page.widget.page_mixins import (
-    WithAssignFolder, WithObjectReview, WithPageElements)
+from lib.page.widget import page_mixins
 from lib.utils import selenium_utils, help_utils, ui_utils
 
 
@@ -33,8 +32,8 @@ def get_widget_bar(obj_name):
   return mapping.get(obj_name, InfoWidget)()
 
 
-class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
-                 object_page.ObjectPage):
+class InfoWidget(page_mixins.WithObjectReview, page_mixins.WithPageElements,
+                 base.Widget, object_page.ObjectPage):
   """Abstract class of common info for Info pages and Info panels."""
   # pylint: disable=too-many-public-methods
   # pylint: disable=too-many-instance-attributes
@@ -392,7 +391,7 @@ class InfoWidget(WithObjectReview, WithPageElements, base.Widget,
     return dashboard.CreateObjectDropdown()
 
 
-class Programs(InfoWidget):
+class Programs(InfoWidget, page_mixins.WithProposals):
   """Model for program object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoProgram
@@ -413,6 +412,12 @@ class Programs(InfoWidget):
             self.three_bbs.edit_option,
             self.comment_area.add_section,
             self.reference_urls.add_button] + list(self.inline_edit_controls)
+
+  def related_proposals(self):
+    """Open related proposals tab."""
+    self.tabs.ensure_tab(self.proposals_tab_name)
+    selenium_utils.wait_for_js_to_load(self._driver)
+    return related_proposals.RelatedProposals()
 
 
 class Workflow(InfoWidget):
@@ -520,7 +525,7 @@ class CycleTask(InfoWidget):
     return self._related_people_list("Task Assignees")
 
 
-class Audits(WithAssignFolder, InfoWidget):
+class Audits(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Audit object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoAudit
@@ -802,7 +807,7 @@ class Requirements(InfoWidget):
     super(Requirements, self).__init__(driver)
 
 
-class Controls(WithAssignFolder, InfoWidget):
+class Controls(page_mixins.WithAssignFolder, InfoWidget):
   """Model for Control object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoControl
@@ -979,7 +984,6 @@ class Risks(InfoWidget):
   def __init__(self, driver, root_elem=None):
     super(Risks, self).__init__(driver)
     self.root_element = root_elem if root_elem else self._browser
-    self.proposals_tab = "Change Proposals"
 
   @property
   def _root(self):
@@ -1000,16 +1004,6 @@ class Risks(InfoWidget):
   def risk_type(self):
     """Returns the text of risk type."""
     return self._simple_field("Risk Type").text
-
-  def click_propose_changes(self):
-    """Click on Propose Changes button."""
-    self._browser.link(text="Propose Changes").click()
-
-  def related_proposals(self):
-    """Open related proposals tab."""
-    self.tabs.ensure_tab(self.proposals_tab)
-    selenium_utils.wait_for_js_to_load(self._driver)
-    return related_proposals.RelatedProposals()
 
 
 class Threat(InfoWidget):

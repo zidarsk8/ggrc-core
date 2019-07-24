@@ -7,7 +7,7 @@ from lib import constants, url
 from lib.constants import objects
 from lib.service import rest_service
 from lib.service.rest import query
-from lib.utils import string_utils
+from lib.utils import string_utils, test_utils
 
 
 class ProposalsService(rest_service.HelpRestService):
@@ -26,14 +26,19 @@ class ProposalsService(rest_service.HelpRestService):
             order_by=[
                 {"name": "status", "desc": True},
                 {"name": "created_at", "desc": True}]),
-        timeout=constants.ux.TWO_MIN_USER_WAIT)
+        timeout=constants.ux.TWO_MIN_USER_WAIT).get("values")
 
   def get_proposal_creation_date(self, obj, proposal):
     """Get proposal creation date."""
-    proposals = self.get_obj_proposals(obj)
     prop_value = string_utils.escape_html(
         proposal.changes[0]["proposed_value"])
-    actual_proposal = proposals if prop_value in proposals["content"][
-        "fields"]["description"] else None
-    return parser.parse(actual_proposal["created_at"]).replace(
+
+    def needed_proposal():
+      """Get proposal with needed proposal value."""
+      return [prop for prop in self.get_obj_proposals(obj)
+              if prop_value in prop["content"]["fields"]["description"]]
+
+    actual_proposal = test_utils.wait_for(
+        needed_proposal, constants.ux.MAX_USER_WAIT_SECONDS)
+    return parser.parse(actual_proposal[0]["created_at"]).replace(
         tzinfo=tz.tzutc())

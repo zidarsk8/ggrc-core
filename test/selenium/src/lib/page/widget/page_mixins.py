@@ -136,3 +136,15 @@ class WithObjectReview(base.WithBrowser):
   def get_review_status(self):
     """Get review status."""
     return self.review_status.text.title()
+
+
+class WithProposals(base.WithBrowser):
+  """A mixin for proposals elements."""
+
+  @property
+  def proposals_tab_name(self):
+    return "Change Proposals"
+
+  def click_propose_changes(self):
+    """Click on Propose Changes button."""
+    self._browser.link(text="Propose Changes").click()
