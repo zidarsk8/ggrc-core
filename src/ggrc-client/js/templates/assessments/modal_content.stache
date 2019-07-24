@@ -129,8 +129,12 @@
     {{#if new_object_form}}
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
-          <label class="ggrc-form-item__label">
+          <label class="ggrc-form-item__label assessment-template-dropdown">
             Select Assessment Template
+            <i class="fa fa-question-circle"
+              rel="tooltip"
+              title="The following local custom attributes will be added to Assessment from chosen Assessment template.">
+            </i>
           </label>
           <div class="template-select">
             <assessment-templates-dropdown
