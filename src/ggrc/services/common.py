@@ -29,12 +29,12 @@ from sqlalchemy.orm import load_only
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import (
-    BadRequest,
-    Forbidden,
-    HTTPException,
-    NotFound,
-    MethodNotAllowed,
-)
+  BadRequest,
+  Forbidden,
+  HTTPException,
+  NotFound,
+  MethodNotAllowed,
+  ServiceUnavailable)
 
 import ggrc.builder.json
 import ggrc.models
@@ -152,6 +152,7 @@ class ModelView(View):
 
   @staticmethod
   def _get_type_where_clause(model):
+    """Helper for where clause"""
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:
       return True
@@ -165,6 +166,7 @@ class ModelView(View):
 
   @staticmethod
   def get_match_columns(model):
+    """Returns matching columns"""
     mapper = model._sa_class_manager.mapper
     columns = []
     columns.append(mapper.primary_key[0].label('id'))
@@ -1273,6 +1275,9 @@ class Resource(ModelView):
           self.collection_post_loop(body, res, no_result)
         except (IntegrityError, ValidationError, ValueError) as error:
           res.append(self._make_error_from_exception(error))
+          db.session.rollback()
+        except ServiceUnavailable as error:
+          res.append((503, error.description or ""))
           db.session.rollback()
         except gdrive.GdriveUnauthorized as error:
           headers["X-Expected-Error"] = True

@@ -109,7 +109,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     payload_attrs = dict(self.DEFAULT_TICKET_ATTRS, **ticket_attrs)
     payload = {"issueState": {
         "component_id": payload_attrs["component_id"],
-        "hotlist_id": payload_attrs["hotlist_id"],
+        # "hotlist_id": payload_attrs["hotlist_id"], #hotlist_ids wtf??
+        "hotlist_ids": [payload_attrs["hotlist_id"]],
         "issue_id": payload_attrs["issue_id"],
         "status": payload_attrs["status"],
         "issue_type": payload_attrs["issue_type"],
@@ -204,8 +205,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       ({"issue_type": "type1"}, {"issue_type": "process"}),
       ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
       ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
-      ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
-      ({"component_id": 1234}, {"component_id": 4321}),
       ({"status": "Draft"}, {"status": "fixed"}),
   )
   @ddt.unpack
@@ -729,6 +728,60 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
         issue_id,
     )
     self.assertNotEqual(int(issue_tracker_issue.issue_id), TICKET_ID)
+
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_link_to_existing_ticket(self):
+    """Check linking to existing ticket"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      assess = factories.AssessmentFactory(audit=audit)
+
+    issue_request_payload = self.put_request_payload_builder(
+        {"issue_id": 9999}
+    )
+
+    get_issue_resp = self.response_payload_builder(
+        {"component_id": 77, "hotlist_id": 44}
+    )
+
+    get_issue_mock_cm = mock.patch(
+        "ggrc.integrations.issues.Client.get_issue",
+        return_value=get_issue_resp
+    )
+    update_issue_mock_cm = mock.patch(
+        "ggrc.integrations.issues.Client.update_issue"
+    )
+
+    with get_issue_mock_cm, update_issue_mock_cm as update_issue_mock:
+      response = self.api.put(assess, issue_request_payload)
+      self.assert200(response)
+      called_param1, called_param2 = update_issue_mock.call_args[0]
+      self.assertEquals(9999, called_param1)
+      self.assertEquals(77, called_param2["component_id"])
+      self.assertEquals(44, called_param2["hotlist_ids"][0])
+
+      # should be fixed
+      self.assertEquals(
+          issue_request_payload["issue_tracker"]["issue_priority"],
+          called_param2["priority"]
+      )
+      self.assertEquals(
+          issue_request_payload["issue_tracker"]["issue_severity"],
+          called_param2["severity"]
+      )
+      self.assertEquals(
+          issue_request_payload["issue_tracker"]["issue_type"],
+          called_param2["type"]
+      )
+      self.assertEquals("ASSIGNED", called_param2["status"])
+      self.assertEquals(
+          issue_request_payload["issue_tracker"]["title"],
+          called_param2["title"]
+      )
 
   @ddt.data(
       ('Completed', 'VERIFIED'),

@@ -8,6 +8,7 @@
 import urlparse
 import logging
 
+from werkzeug import exceptions as flask_exceptions
 import html2text
 
 from ggrc import utils as ggrc_utils
@@ -226,17 +227,29 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
       self.params.status = res["issueState"]["status"]
       self._add_link_message(obj)
       self.handle_issue_tracker_info(obj, it_info)
-      self._populate_hotlist(it_info, res)
+      self._populate_hotlist_id(res)
+      self._populate_component_id(res)
       self._handle_emails_from_response(res)
       self.params.reporter = obj.modified_by.email
 
     return self.params
 
-  def _populate_hotlist(self, it_info, ticket_info):
-    """Set IssueTracker ticket hotlist if user doesn't specified it."""
-    if not it_info.get("hotlist_id"):
-      ticket_hotlists = ticket_info["issueState"].get("hotlist_ids")
-      self.params.hotlist_id = ticket_hotlists[0] if ticket_hotlists else None
+  def _populate_hotlist_id(self, ticket_info):
+    """Extract hotlist_id form ticket info"""
+    try:
+      self.params.hotlist_id = ticket_info["issueState"]["hotlist_ids"][0]
+    except IndexError:
+      self.params.hotlist_id = ""
+
+  def _populate_component_id(self, ticket_info):
+    """Extract component_id form ticket info"""
+    try:
+      self.params.component_id = ticket_info["issueState"]["component_id"]
+    except KeyError:
+      raise flask_exceptions.ServiceUnavailable(
+          "component_id attribute is mandatory. "
+          "Please check if integration service API changed."
+      )
 
   def build_update_issue_tracker_params(self,
                                         obj,
