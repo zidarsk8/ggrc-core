@@ -33,7 +33,7 @@ def open_create_obj_modal(obj_type):
 
 
 def create_asmt(selenium, audit):
-  """Create audit via UI."""
+  """Create assessment via UI."""
   expected_asmt = entities_factory.AssessmentsFactory().create()
   asmts_ui_service = webui_service.AssessmentsService(selenium)
   asmts_ui_service.create_obj_via_tree_view(
@@ -277,3 +277,24 @@ def map_object_via_unified_mapper(
       dest_obj_modal.submit_obj(obj_to_map)
     if proceed_in_new_tab:
       object_modal.WarningModal().proceed_in_new_tab()
+
+
+def create_audit(selenium, program, **kwargs):
+  """Create audit via UI."""
+  audit = entities_factory.AuditsFactory().create(**kwargs)
+  audits_service = webui_service.AuditsService(selenium)
+  audits_service.create_obj_via_tree_view(program, audit)
+  audit.url = audits_service.open_widget_of_mapped_objs(
+      program).tree_view.tree_view_items()[0].url()
+  return audit
+
+
+def get_controls_snapshots_count(selenium, src_obj):
+  """Return dictionary with controls snapshots actual count and count taken
+  from tab title."""
+  controls_ui_service = webui_service.ControlsService(selenium)
+  return {
+      "controls_tab_count": controls_ui_service.get_count_objs_from_tab(
+          src_obj=src_obj),
+      "controls_count": len(controls_ui_service.get_list_objs_from_tree_view(
+          src_obj=src_obj))}
