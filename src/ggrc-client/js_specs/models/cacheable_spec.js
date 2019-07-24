@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../../js/plugins/ggrc_utils';
 import * as AjaxExtensions from '../../js/plugins/ajax_extensions';
 import canModel from 'can-model';
 import canList from 'can-list';
@@ -226,9 +227,9 @@ describe('Cacheable model', () => {
       //  models calls new DummyModel.List() which we're already spying out,
       //  so spy models() out in order to *not* call it.
       spyOn(DummyModel, 'models').and.callFake(function (items) {
-        let ids = _.filteredMap(items, (item) => item.id);
-        return _.filteredMap(dummyInsts, (inst) =>
-          _.includes(ids, inst.id) ? inst : undefined);
+        let ids = filteredMap(items, (item) => item.id);
+        return filteredMap(dummyInsts, (inst) =>
+          ids.includes(inst.id) ? inst : undefined);
       });
       DummyModel.findAll().then(() => {
         // finally, we show that with the 100ms gap between pushing ids 3 and 4, we force a separate push.

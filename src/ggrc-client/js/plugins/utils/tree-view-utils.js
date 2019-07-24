@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loMap from 'lodash/map';
+import loSortBy from 'lodash/sortBy';
+import loLast from 'lodash/last';
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -113,17 +116,14 @@ const NO_DEFAULT_SORTING_LIST = Object.freeze([
 
 allTypes.forEach(function (type) {
   let related = baseWidgets[type].slice(0);
-
-  orderedModelsForSubTier[type] = _.chain(related)
-    .map(function (type) {
-      return {
-        name: type,
-        order: defaultOrderTypes[type],
-      };
-    })
-    .sortBy(['order', 'name'])
-    .map('name')
-    .value();
+  let types = loMap(related, (type) => {
+    return {
+      name: type,
+      order: defaultOrderTypes[type],
+    };
+  });
+  types = loSortBy(types, ['order', 'name']);
+  orderedModelsForSubTier[type] = loMap(types, 'name');
 });
 
 // Define specific rules for Workflow models
@@ -161,7 +161,7 @@ function getAvailableAttributes(modelType) {
   ).filter(function (attr) {
     return !attr.deny;
   }).map(function (attr) {
-    attr = _.assign({}, attr);
+    attr = Object.assign({}, attr);
     if (!attr.attr_sort_field) {
       attr.attr_sort_field = attr.attr_name;
     }
@@ -414,7 +414,7 @@ function loadFirstTierItems(modelName,
   requestData.push(params);
   return $.when(...requestData.attr().map((el) => batchRequests(el)))
     .then((...response) => {
-      response = _.last(response)[requestedType];
+      response = loLast(response)[requestedType];
 
       response.values = response.values.map(function (source) {
         return _createInstance(source, modelName);

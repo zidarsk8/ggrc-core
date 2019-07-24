@@ -24,7 +24,7 @@
                     <div class="rtf-block">
                       <read-more
                         text:from="description"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -41,7 +41,7 @@
                     <div class="rtf-block">
                       <read-more
                         text:from="test_plan"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>
@@ -57,7 +57,7 @@
                   >
                     <read-more
                       text:from="risk_type"
-                      handleMarkdown:from="instance.class.isChangeableExternally">
+                      handleMarkdown:from="instance.constructor.isChangeableExternally">
                     </read-more>
                   </proposable-attribute>
                 </div>
@@ -72,7 +72,7 @@
                   >
                     <read-more
                       text:from="threat_source"
-                      handleMarkdown:from="instance.class.isChangeableExternally">
+                      handleMarkdown:from="instance.constructor.isChangeableExternally">
                     </read-more>
                   </proposable-attribute>
                 </div>
@@ -87,7 +87,7 @@
                   >
                     <read-more
                       text:from="threat_event"
-                      handleMarkdown:from="instance.class.isChangeableExternally">
+                      handleMarkdown:from="instance.constructor.isChangeableExternally">
                     </read-more>
                   </proposable-attribute>
                 </div>
@@ -102,7 +102,7 @@
                   >
                     <read-more
                       text:from="vulnerability"
-                      handleMarkdown:from="instance.class.isChangeableExternally">
+                      handleMarkdown:from="instance.constructor.isChangeableExternally">
                     </read-more>
                   </proposable-attribute>
                 </div>
@@ -118,7 +118,7 @@
                     <div class="rtf-block">
                       <read-more
                         text:from="notes"
-                        handleMarkdown:from="instance.class.isChangeableExternally">
+                        handleMarkdown:from="instance.constructor.isChangeableExternally">
                       </read-more>
                     </div>
                   </proposable-attribute>

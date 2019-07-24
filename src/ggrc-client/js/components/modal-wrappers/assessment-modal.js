@@ -7,6 +7,7 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
   toObject,
+  extendSnapshot,
 } from '../../plugins/utils/snapshot-utils';
 
 export default canComponent.extend({
@@ -20,14 +21,8 @@ export default canComponent.extend({
       return this.attr('instance').getRelatedObjects()
         .then((data) => {
           let snapshots = data.Snapshot.map((snapshot) => {
-            let object = toObject(snapshot);
-
-            snapshot.class = object.class;
-            snapshot.title = object.title;
-            snapshot.description = object.description;
-            snapshot.viewLink = object.originalLink;
-
-            return snapshot;
+            let snapshotObject = toObject(snapshot);
+            return extendSnapshot(snapshot, snapshotObject);
           });
 
           this.attr('mappedObjects', snapshots);

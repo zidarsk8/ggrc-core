@@ -86,20 +86,10 @@ export default canComponent.extend({
         null :
         this.attr('objectType');
 
-      const paging = this.attr('searchesPaging');
       const searchType = this.attr('searchType');
-
-      const needToGoToPrevPage = (
-        paging.attr('current') > 1 &&
-        this.attr('searches.length') === 1
-      );
-
-      if (needToGoToPrevPage) {
-        paging.attr('current', paging.attr('current') - 1);
-      }
-
       this.attr('isLoading', true);
-      return SavedSearch.findBy(searchType, paging, type)
+
+      return SavedSearch.findBy(searchType, this.attr('searchesPaging'), type)
         .then(({total, values}) => {
           this.attr('searchesPaging.total', total);
 
@@ -113,7 +103,21 @@ export default canComponent.extend({
       event.stopPropagation();
 
       search.destroy().then(() => {
-        this.loadSavedSearches();
+        const paging = this.attr('searchesPaging');
+
+        const needToGoToPrevPage = (
+          paging.attr('current') > 1 &&
+          this.attr('searches.length') === 1
+        );
+
+        if (needToGoToPrevPage) {
+          // move to prev page when current page contains only one item (it was removed)
+          // "loadSavedSearches" will be
+          // triggered by "'{viewModel.searchesPaging} current'" handler
+          paging.attr('current', paging.attr('current') - 1);
+        } else {
+          this.loadSavedSearches();
+        }
       });
     },
     isSelectedSearch(search) {

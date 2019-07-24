@@ -6,6 +6,7 @@
 import {makeFakeInstance} from '../../../js_specs/spec_helpers';
 import * as SnapshotUtils from '../utils/snapshot-utils';
 import Audit from '../../models/business-models/audit';
+import canMap from 'can-map';
 
 describe('SnapshotUtils', function () {
   describe('isSnapshotType() method', function () {
@@ -89,6 +90,51 @@ describe('SnapshotUtils', function () {
       let result = toObject(snapshot);
 
       expect(result.attr('updated_at')).toBe(snapshot.updated_at);
+    });
+  });
+
+  describe('extendSnapshot() method', function () {
+    let snapshot = {
+      title: 'title',
+      description: 'description',
+      originalLink: 'originalLink',
+      constructor: {},
+    };
+
+    let expected = jasmine.objectContaining({
+      title: snapshot.title,
+      description: snapshot.description,
+      viewLink: snapshot.originalLink,
+      constructor: snapshot.constructor,
+    });
+
+    let instance;
+    let result;
+
+    it('object should contain properties from snapshot ' +
+      'if object instance of Object', function () {
+      instance = {};
+
+      result = SnapshotUtils.extendSnapshot(
+        instance,
+        snapshot,
+      );
+
+      expect(result).toEqual(expected);
+      expect(result instanceof canMap).toBe(true);
+    });
+
+    it('returns object with properties from snapshot ' +
+      ' if object instance of canMap', function () {
+      instance = new canMap();
+
+      result = SnapshotUtils.extendSnapshot(
+        instance,
+        snapshot,
+      );
+
+      expect(result).toEqual(expected);
+      expect(result instanceof canMap).toBe(true);
     });
   });
 });

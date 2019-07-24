@@ -40,7 +40,7 @@ export default Mixin.extend({}, {
 
     let confirmation = $.Deferred();
 
-    if (_.includes(IGNORED_STATES, this.status)) {
+    if (IGNORED_STATES.includes(this.status)) {
       confirmation.resolve();
     } else {
       confirm({

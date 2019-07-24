@@ -10,7 +10,7 @@
         on:refreshTree="loadItems()"
         objectType:from="model.model_singular"
         parentId:from="parent_instance.id"
-        parentType:from="parent_instance.class.model_singular">
+        parentType:from="parent_instance.constructor.model_singular">
         Create
       </assessment-template-clone-button>
     {{/if}}

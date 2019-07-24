@@ -119,8 +119,8 @@ const viewModel = canMap.extend({
       'CycleTaskGroup',
       'CycleTaskGroupObjectTask',
     ];
-    return _.includes(pages, getPageType()) &&
-      _.includes(instanceTypes, this.attr('instance').type);
+    return pages.includes(getPageType()) &&
+      instanceTypes.includes(this.attr('instance').type);
   },
   showReducedOptions() {
     let pages = ['Workflow'];
@@ -128,8 +128,8 @@ const viewModel = canMap.extend({
       'Cycle',
       'CycleTaskGroup',
     ];
-    return _.includes(pages, getPageType()) &&
-      _.includes(instanceTypes, this.attr('instance').type);
+    return pages.includes(getPageType()) &&
+      instanceTypes.includes(this.attr('instance').type);
   },
 });
 

@@ -17,6 +17,7 @@ class ExternalApiClient(object):
       "X-Requested-By": "SYNC_SERVICE",
       "Content-Type": "application/json",
       "X-URLFetch-Service-Id": "GOOGLEPLEX",
+      "X-Appengine-Inbound-Appid": settings.ALLOWED_QUERYAPI_APP_IDS
   }
 
   def __init__(self, user_headers=None, use_ggrcq_service_account=False):
@@ -124,12 +125,30 @@ class ExternalApiClient(object):
 
   def delete(self, obj, obj_id, url=None):
     """Simulates ext_app DELETE request"""
+    assert self._use_ggrcq_service_account,\
+        "sync service is not use delete request"
+
     obj_type = self._get_object_type(obj)
     if not url:
       url = self._build_api_link(obj_type, obj_id)
 
     headers = self._build_headers()
     precondition_headers = self._get_precondition_headers(obj_type, obj_id)
+    g.user_cache = {}
 
     headers.update(precondition_headers)
     return self.client.delete(url, headers=headers)
+
+  def unmap(self, obj1, obj2):
+    """Sync service uses special endpoint to delete relationships"""
+
+    assert not self._use_ggrcq_service_account,\
+        "external app is not use unmap endpoint use 'delete' instead"
+
+    data = {
+        "first_object_id": obj1.id,
+        "first_object_type": obj1.type,
+        "second_object_id": obj2.id,
+        "second_object_type": obj2.type,
+    }
+    return self.post(url="/api/relationships/unmap", data=data)

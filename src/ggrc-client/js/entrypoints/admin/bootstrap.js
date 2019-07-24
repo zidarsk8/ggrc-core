@@ -24,12 +24,15 @@ import ListView from '../../controllers/tree/list_view_controller';
 import TreeViewControl from '../../controllers/tree/tree-view';
 import {DashboardControl} from '../../controllers/dashboard_controller';
 
+const trimValue = (value) => (value || '').trim();
+
 const sortByNameEmail = (list) => {
   return new list.constructor(makeArray(list).sort(function (a, b) {
     a = a.person || a;
     b = b.person || b;
-    a = (_.trim(a.name) || _.trim(a.email)).toLowerCase();
-    b = (_.trim(b.name) || _.trim(b.email)).toLowerCase();
+    a = (trimValue(a.name) || trimValue(a.email)).toLowerCase();
+    b = (trimValue(b.name) || trimValue(b.email)).toLowerCase();
+
     if (a > b) {
       return 1;
     }

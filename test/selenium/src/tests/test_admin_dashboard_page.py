@@ -159,7 +159,9 @@ class TestEventLogTabDestructive(base.Test):
       acl_roles_len = len(ACLRolesIDs.object_roles(objctv1.type)) - 4
       exp_event_data = [
           {"actions": sorted(
-              [objctv1_creator.email + " created", u"PersonProfile created"]),
+              [objctv1_creator.email + " created",
+               u"AccessControlList created", u"AccessControlPerson created",
+               u"PersonProfile created"]),
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
               objctv1_creator.updated_at)},
@@ -168,7 +170,9 @@ class TestEventLogTabDestructive(base.Test):
            "time": date_utils.iso8601_to_local_datetime(
               objctv1_creator.updated_at)},
           {"actions": sorted(
-              [objctv2_creator.email + " created", u"PersonProfile created"]),
+              [objctv2_creator.email + " created",
+               u"AccessControlList created", u"AccessControlPerson created",
+               u"PersonProfile created"]),
            "user_email": admin.email,
            "time": date_utils.iso8601_to_local_datetime(
               objctv2_creator.updated_at)},
@@ -324,3 +328,17 @@ class TestPeopleAdministration(base.Test):
     act_person = ppl_admin_service.expand_found_person(creator).get_person()
     self.general_equal_assert(creator.people_tree_item_representation(),
                               act_person)
+
+  def test_second_tier_opening(self, creator, person_tree_item_data):
+    """Check that the second tier of the tree view is opening after clicking.
+    """
+    self.general_equal_assert(creator.people_tree_item_representation(),
+                              person_tree_item_data)
+
+  def test_edit_authorizations(self, creator, selenium):
+    """Check that person role can be edited."""
+    exp_person = creator.people_tree_item_representation()
+    exp_person.system_wide_role = roles.ADMINISTRATOR
+    act_person = admin_webui_service.PeopleAdminWebUiService(
+        selenium).edit_authorizations(creator, roles.ADMINISTRATOR)
+    self.general_equal_assert(exp_person, act_person)

@@ -151,7 +151,7 @@ export default canComponent.extend({
     showNoRelationshipError() {
       const issueTitle = this.attr('issueInstance.title');
       const targetTitle = this.attr('target.title');
-      const targetType = this.attr('target').class.title_singular;
+      const targetType = this.attr('target').constructor.title_singular;
 
       notifier('error',
         `Unmapping cannot be performed.

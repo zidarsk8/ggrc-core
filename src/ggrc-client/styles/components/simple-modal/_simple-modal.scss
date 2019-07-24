@@ -23,6 +23,7 @@ simple-modal {
   height: 100%;
   z-index: zIndex(simple-model-overlay);
   flex-direction: column;
+  overflow: auto;
 }
 
 .simple-modal {

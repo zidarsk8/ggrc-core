@@ -14,7 +14,7 @@
         Role name
         <i class="fa fa-asterisk"></i>
         <i class="fa fa-question-circle" rel="tooltip"
-           title="Set a name for the {{class.title_singular}}."></i>
+           title="Set a name for the {{constructor.title_singular}}."></i>
       </label>
       <input-filter
         name:from="'name'"

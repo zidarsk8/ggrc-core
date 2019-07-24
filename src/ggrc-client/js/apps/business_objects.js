@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loForEach from 'lodash/forEach';
 import canMap from 'can-map';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
@@ -45,7 +46,7 @@ let CoreExtension = {};
 
 CoreExtension.name = 'core"';
 widgetModules.push(CoreExtension);
-_.assign(CoreExtension, {
+Object.assign(CoreExtension, {
   init_widgets: function () {
     let baseWidgetsByType = TreeViewConfig.attr('base_widgets_by_type');
     let widgetList = new WidgetList('ggrc_core');
@@ -95,7 +96,7 @@ _.assign(CoreExtension, {
       // Initialize child_model_list, and child_display_list each model_type
       wList = baseWidgetsByType[name];
 
-      _.forEach(wList, function (item) {
+      loForEach(wList, function (item) {
         let childConfig;
         if (possibleModelType.indexOf(item) !== -1) {
           childConfig = getWidgetConfig(name);
@@ -187,7 +188,7 @@ _.assign(CoreExtension, {
       },
     };
 
-    _.forEach(farModels, function (modelName) {
+    loForEach(farModels, function (modelName) {
       let widgetConfig = getWidgetConfig(modelName);
       modelName = widgetConfig.name;
 

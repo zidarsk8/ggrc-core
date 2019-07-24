@@ -4,9 +4,13 @@
 */
 
 import ViewModel from '../custom-roles-vm';
+import Program from '../../../models/business-models/program';
+import Assessment from '../../../models/business-models/assessment';
+import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 
 describe('custom-roles view model', () => {
   let vm;
+  let instance;
 
   beforeEach(() => {
     vm = new ViewModel();
@@ -22,58 +26,50 @@ describe('custom-roles view model', () => {
       });
     });
 
-    it('returns value of instance.class.isProposable if instance is defined ' +
-      'and readonly is FALSE',
+    it('returns false if instance is defined, isProposable is false and ' +
+    'readonly is false',
     () => {
-      vm.attr('readOnly', false);
-      let instance = {
-        'class': {
-          isProposable: true,
-        },
+      instance = makeFakeInstance({model: Assessment})({
         readonly: false,
-      };
+      });
       vm.attr('instance', instance);
+      vm.attr('readOnly', false);
 
-      expect(vm.attr('isReadonly')).toBe(true);
-
-      vm.attr('instance.class.isProposable', false);
       expect(vm.attr('isReadonly')).toBe(false);
     });
 
-    it('returns value of readOnly prop if instance is defined ' +
-      'and instance.class.isProposable is FALSE',
+    it('returns true if instance is defined, isProposable is true and ' +
+    'readonly is false',
     () => {
-      let instance = {
-        'class': {
-          isProposable: false,
-        },
+      instance = makeFakeInstance({model: Program})({
         readonly: false,
-      };
+      });
       vm.attr('instance', instance);
-
       vm.attr('readOnly', false);
-      expect(vm.attr('isReadonly')).toBe(false);
 
+      expect(vm.attr('isReadonly')).toBe(true);
+    });
+
+    it('returns true if instance is defined, isProposable is false and ' +
+    'readonly is true',
+    () => {
+      instance = makeFakeInstance({model: Assessment})({
+        readonly: true,
+      });
+      vm.attr('instance', instance);
+      vm.attr('readOnly', false);
+      expect(vm.attr('isReadonly')).toBe(true);
+    });
+
+    it('returns true if instance is defined, isProposable is false, ' +
+    'readonly is false and component readOnly is true',
+    () => {
+      instance = makeFakeInstance({model: Assessment})({
+        readonly: false,
+      });
+      vm.attr('instance', instance);
       vm.attr('readOnly', true);
       expect(vm.attr('isReadonly')).toBe(true);
-    });
-
-    it('returns value of instance readonly prop if ' +
-      'component readOnly is FALSE and instance.class.isProposable is FALSE',
-    () => {
-      vm.attr('readOnly', );
-      let instance = {
-        'class': {
-          isProposable: false,
-        },
-        readonly: true,
-      };
-      vm.attr('instance', instance);
-
-      expect(vm.attr('isReadonly')).toBe(true);
-
-      vm.attr('instance.readonly', false);
-      expect(vm.attr('isReadonly')).toBe(false);
     });
   });
 

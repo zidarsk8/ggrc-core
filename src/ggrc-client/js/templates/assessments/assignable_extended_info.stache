@@ -6,7 +6,7 @@
 {{#instance}}
   <div class="row-fluid">
     <div class="span12">
-      <a class="main-title {{class.category}} oneline" href="{{viewLink}}">
+      <a class="main-title {{constructor.category}} oneline" href="{{viewLink}}">
         {{title}}
       </a>
     </div>
@@ -58,7 +58,7 @@
   <div class="links">
     <div class="row-fluid">
       <div class="span12">
-        <a class="secondary oneline {{instance.class.category}}" href="{{instance.program.viewLink}}#audit/audit/{{id}}">
+        <a class="secondary oneline {{instance.constructor.category}}" href="{{instance.program.viewLink}}#audit/audit/{{id}}">
           View {{instance.title}}
         </a>
       </div>

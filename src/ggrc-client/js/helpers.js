@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loGet from 'lodash/get';
+import loReduce from 'lodash/reduce';
+import loFind from 'lodash/find';
 import moment from 'moment';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
@@ -18,7 +21,6 @@ import {
   isAuditor,
 } from './plugins/utils/acl-utils';
 import Permission from './permission';
-import _ from 'lodash';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
 import {
@@ -83,23 +85,16 @@ $.ajaxTransport('text', function (options, _originalOptions, _jqXHR) {
  * Builds class name of two segments - prefix and computed value
  * @param  {String|computed} prefix class prefix
  * @param  {String|computed} compute some computed value
- * @param  {Object} [options={}] options
- * @param  {Object} [options.separator='-'] separator between prefix and comuted value
- * @param  {Object} [options.computeSeparator=''] separator which replaces whitespaces in computed value
  * @return {String} computed class string
  */
-canStache.registerHelper('addclass', function (prefix, compute, options = {}) {
+canStache.registerHelper('addclass', function (prefix, compute) {
   prefix = resolveComputed(prefix);
-  let computeVal = resolveComputed(compute);
-  let opts = options.hash || {};
-  let separator = _.isString(opts.separator) ? opts.separator : '-';
-  let computeSeparator = _.isString(opts.computeSeparator)
-    ? opts.computeSeparator : '';
-  let classSegment = _.trim(computeVal)
-    .replace(/[\s\t]+/g, computeSeparator)
+  let computeVal = resolveComputed(compute) || '';
+  let classSegment = computeVal.trim()
+    .replace(/[\s\t]+/g, '')
     .toLowerCase();
 
-  return [prefix, classSegment].join(separator);
+  return [prefix, classSegment].join('-');
 });
 
 // Resolve and return the first computed value from a list
@@ -428,8 +423,8 @@ canStache.registerHelper('urlPath', function () {
   FIXME: Only synchronous helpers (those which call options.fn() or options.inverse()
     without yielding the thread through defer_render or otherwise) can currently be used
     with if_helpers.  if_helpers should support all helpers by changing the walk through
-    conjunctions and disjunctions to one using a _.reduce(Array, function (Deferred, item) {}, $.when())
-    pattern instead of _.reduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
+    conjunctions and disjunctions to one using a loReduce(Array, function (Deferred, item) {}, $.when())
+    pattern instead of loReduce(Array, function (Boolean, item) {}, Boolean) pattern. --BM 8/29/2014
 */
 canStache.registerHelper('if_helpers', function (...args) {
   let options = args[args.length - 1];
@@ -503,13 +498,13 @@ canStache.registerHelper('if_helpers', function (...args) {
 
   if (disjunctions.length) {
     // Evaluate statements
-    let result = _.reduce(disjunctions,
+    let result = loReduce(disjunctions,
       function (disjunctiveResult, conjunctions) {
         if (disjunctiveResult) {
           return true;
         }
 
-        let conjunctiveResult = _.reduce(conjunctions,
+        let conjunctiveResult = loReduce(conjunctions,
           function (currentResult, stmt) {
             if (!currentResult) {
               return false;
@@ -560,7 +555,7 @@ canStache.registerHelper('if_instance_of', function (inst, cls, options) {
     cls = [cls];
   }
 
-  result = _.find(cls, (cl) => inst instanceof cl);
+  result = loFind(cls, (cl) => inst instanceof cl);
   return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
@@ -573,12 +568,12 @@ canStache.registerHelper('ggrc_config_value',
     }
     default_ = resolveComputed(default_);
     default_ = default_ || '';
-    return _.get(GGRC.config, key) || default_;
+    return loGet(GGRC.config, key) || default_;
   });
 
 canStache.registerHelper('if_config_exist', function (key, options) {
   key = resolveComputed(key);
-  let configValue = _.get(GGRC.config, key);
+  let configValue = loGet(GGRC.config, key);
 
   return configValue ?
     options.fn(options.contexts) :
@@ -606,7 +601,7 @@ Example:
 */
 canStache.registerHelper('add_to_current_scope', function (options) {
   return options.fn(options.contexts
-    .add(_.assign({}, options.context, options.hash)));
+    .add(Object.assign({}, options.context, options.hash)));
 });
 
 /*
@@ -657,7 +652,7 @@ canStache.registerHelper('has_role', function (role, instance, options) {
     return options.inverse(options.contexts);
   }
 
-  const hasRole = !!_.find(instance.access_control_list, (item) => {
+  const hasRole = !!loFind(instance.access_control_list, (item) => {
     return item.ac_role_id === acr.id &&
       item.person_id === GGRC.current_user.id;
   });
@@ -684,7 +679,7 @@ canStache.registerHelper('isScopeModel', function (instance, options) {
 canStache.registerHelper('if_recurring_workflow', function (object, options) {
   object = isFunction(object) ? object() : object;
   if (object.type === 'Workflow' &&
-      _.includes(['day', 'week', 'month'], object.unit)) {
+      ['day', 'week', 'month'].includes(object.unit)) {
     return options.fn(this);
   }
   return options.inverse(this);
@@ -727,7 +722,7 @@ canStache.registerHelper('isValidAttr',
 canStache.registerHelper('isArray', (items, options) => {
   items = isFunction(items) ? items() : items;
 
-  return _.isArray(items) || items instanceof canList ?
+  return Array.isArray(items) || items instanceof canList ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
 });

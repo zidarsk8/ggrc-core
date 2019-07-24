@@ -30,3 +30,17 @@ class BasePersonModal(base.Modal):
       getattr(self, field + "_field").value = kwargs[field]
     self.name_field.click()
     self._save_and_close()
+
+
+class UserRoleAssignmentsModal(base.Modal):
+  """Modal window for editing person role."""
+
+  def __init__(self, driver=None):
+    super(UserRoleAssignmentsModal, self).__init__(driver)
+    self.modal = self._browser.div(class_name="modal")
+
+  def select_and_submit_role(self, role):
+    """Click specified role to select it and save."""
+    self.modal.label(text=role.capitalize()).click()
+    self.modal.link(text="Save").click()
+    self.modal.wait_until_not(method=lambda e: e.present)

@@ -53,7 +53,7 @@ export default canComponent.extend({
         return false;
       }
 
-      return instance.class.isProposable || instance.attr('readonly');
+      return instance.constructor.isProposable || instance.attr('readonly');
     },
     initCustomAttributes: function () {
       const instance = this.attr('instance');

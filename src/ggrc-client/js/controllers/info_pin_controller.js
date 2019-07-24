@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loIsEmpty from 'lodash/isEmpty';
+import loSome from 'lodash/some';
 import {ggrcAjax} from '../plugins/ajax_extensions';
 import canStache from 'can-stache';
 import canControl from 'can-control';
@@ -73,7 +75,7 @@ export default canControl.extend({
           instance: instance,
           isSnapshot: !!instance.snapshot || instance.isRevision,
           parentInstance: parentInstance,
-          model: instance.class,
+          model: instance.constructor,
           confirmEdit: confirmEdit,
           is_info_pin: true,
           options: options,
@@ -101,14 +103,14 @@ export default canControl.extend({
     let instance = opts.attr('instance');
     let options = this.findOptions(el);
     let populatedOpts = opts.attr('options');
-    let confirmEdit = instance.class.confirmEditModal || {};
+    let confirmEdit = instance.constructor.confirmEditModal || {};
     let view = getInstanceView(instance);
 
     if (populatedOpts && !options.attr('result')) {
       options = populatedOpts;
     }
 
-    if (!_.isEmpty(confirmEdit)) {
+    if (!loIsEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;
     }
 
@@ -200,7 +202,7 @@ export default canControl.extend({
     const insideInfoPane = $target.closest('.pin-content').length > 0;
     const excludeForEscapeKey = ['button', '[role=button]', '.btn', 'input',
       'textarea'];
-    const isExcludingControl = _.some(excludeForEscapeKey, (typeName) =>
+    const isExcludingControl = loSome(excludeForEscapeKey, (typeName) =>
       $target.is(typeName)
     );
     return (

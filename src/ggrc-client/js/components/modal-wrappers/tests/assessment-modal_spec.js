@@ -18,7 +18,6 @@ describe('<assessment-modal/> component', () => {
     vm = getComponentVM(Component);
 
     spyOn(SnapshotUtils, 'toObject').and.returnValue({
-      'class': {},
       title: 'Foo',
       description: 'Bar',
       originalLink: 'Baz',

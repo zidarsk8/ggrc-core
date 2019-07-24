@@ -4,7 +4,7 @@
 }}
 
 
-{{#instance.class.is_custom_attributable}}
+{{#instance.constructor.is_custom_attributable}}
   {{^if_instance_of instance 'Assessment'}}
     <div class="ggrc-form">
       <gca-controls instance:from="instance"
@@ -12,4 +12,4 @@
       ></gca-controls>
     </div>
   {{/if_instance_of}}
-{{/instance.class.is_custom_attributable}}
+{{/instance.constructor.is_custom_attributable}}

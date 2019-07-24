@@ -3,6 +3,25 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {exists, splitTrim} from '../../plugins/ggrc_utils';
+import loCompact from 'lodash/compact';
+import loMapValues from 'lodash/mapValues';
+import loGroupBy from 'lodash/groupBy';
+import loReverse from 'lodash/reverse';
+import loFlow from 'lodash/flow';
+import loXor from 'lodash/xor';
+import loKeyBy from 'lodash/keyBy';
+import loMerge from 'lodash/merge';
+import loUniq from 'lodash/uniq';
+import loCapitalize from 'lodash/capitalize';
+import loIsObject from 'lodash/isObject';
+import loForEach from 'lodash/forEach';
+import loFind from 'lodash/find';
+import loFindIndex from 'lodash/findIndex';
+import loSortBy from 'lodash/sortBy';
+import loIsEqual from 'lodash/isEqual';
+import loMap from 'lodash/map';
+import loFilter from 'lodash/filter';
 import makeArray from 'can-util/js/make-array/make-array';
 import canStache from 'can-stache';
 import canMap from 'can-map';
@@ -60,13 +79,15 @@ export default canComponent.extend({
       this._loadACLPeople(revisions.object);
 
       // combine all the changes and sort them by date descending
-      let changeHistory = _([]).concat(
-        makeArray(this._computeObjectChanges(revisions.object,
+      let changeHistory = [
+        ...makeArray(this._computeObjectChanges(
+          revisions.object,
           revisions.revisionsForCompare)),
-        makeArray(this._computeMappingChanges(revisions.mappings)))
-        .sortBy('updatedAt')
-        .reverse()
-        .value();
+        ...makeArray(this._computeMappingChanges(revisions.mappings)),
+      ];
+      changeHistory = loSortBy(changeHistory, 'updatedAt');
+      changeHistory = loReverse(changeHistory);
+
       this.attr('changeHistory', changeHistory);
     },
     /**
@@ -118,13 +139,13 @@ export default canComponent.extend({
         prevRevision = revisionsForCompare[0];
       }
 
-      revisions = _.reverse(revisions);
-      let diffList = _.map(revisions, function (revision, i) {
+      revisions = loReverse(revisions);
+      let diffList = loMap(revisions, function (revision, i) {
         // default to empty revision
         let prev = revisions[i - 1] || prevRevision;
         return this._objectChangeDiff(prev, revision);
       }.bind(this));
-      return _.filter(diffList, 'changes.length');
+      return loFilter(diffList, 'changes.length');
     },
     /**
      * A helper function for computing the difference between the two Revisions
@@ -165,13 +186,13 @@ export default canComponent.extend({
       diff.updatedAt = rev2.updated_at;
       diff.role = 'none';
 
-      _.forEach(rev2.content, function (value, fieldName) {
+      loForEach(rev2.content, function (value, fieldName) {
         let origVal = rev1.content[fieldName];
         let displayName;
         let unifyValue = function (value) {
           value = value || EMPTY_DIFF_VALUE;
           value = value.length ? value : EMPTY_DIFF_VALUE;
-          if (_.isObject(value)) {
+          if (loIsObject(value)) {
             value = value.map(function (item) {
               return item.display_name;
             });
@@ -179,7 +200,7 @@ export default canComponent.extend({
           return value;
         };
         if (attrDefs) {
-          displayName = (_.find(attrDefs, function (attr) {
+          displayName = (loFind(attrDefs, function (attr) {
             return attr.attr_name === fieldName;
           }) || {}).display_name;
         } else {
@@ -198,18 +219,24 @@ export default canComponent.extend({
           }
           if (LIST_FIELDS[fieldName]) {
             if (value) {
-              value = _(value).splitTrim(',').sort().compact().join(', ');
+              value = splitTrim(value, ',');
+              value = value.sort();
+              value = loCompact(value);
+              value = value.join(', ');
             }
             if (origVal) {
-              origVal = _(origVal).splitTrim(',').sort().compact().join(', ');
+              origVal = splitTrim(origVal, ',');
+              origVal = origVal.sort();
+              origVal = loCompact(origVal);
+              origVal = origVal.join(', ');
             }
           }
           if (origVal || value) {
             origVal = unifyValue(origVal);
             value = unifyValue(value);
             let isDifferent = false;
-            if (_.isObject(origVal) && _.isObject(value)) {
-              isDifferent = !_.isEqual(_.sortBy(origVal), _.sortBy(value));
+            if (loIsObject(origVal) && loIsObject(value)) {
+              isDifferent = !loIsEqual(loSortBy(origVal), loSortBy(value));
             } else {
               isDifferent = origVal !== value;
             }
@@ -271,9 +298,9 @@ export default canComponent.extend({
         let roleDiff;
 
         // if arrays are not equal by person id
-        let idsDiff = _.xor(
-          _.map(rev1people, (person) => person.id),
-          _.map(rev2people, (person) => person.id)
+        let idsDiff = loXor(
+          loMap(rev1people, (person) => person.id),
+          loMap(rev2people, (person) => person.id)
         );
         if (idsDiff.length) {
           roleDiff = new canMap({
@@ -303,7 +330,7 @@ export default canComponent.extend({
         let obj;
         switch (def.attribute_type) {
           case 'Checkbox':
-            return _.flow(Number, Boolean)(value.attribute_value)
+            return loFlow(Number, Boolean)(value.attribute_value)
               ? '✓'
               : undefined;
           case 'Map:Person':
@@ -325,32 +352,31 @@ export default canComponent.extend({
         }
       };
 
-      origValues = _.keyBy(origValues, 'custom_attribute_id');
-      origDefs = _.keyBy(origDefs, 'id');
-      newValues = _.keyBy(newValues, 'custom_attribute_id');
-      newDefs = _.keyBy(newDefs, 'id');
+      origValues = loKeyBy(origValues, 'custom_attribute_id');
+      origDefs = loKeyBy(origDefs, 'id');
+      newValues = loKeyBy(newValues, 'custom_attribute_id');
+      newDefs = loKeyBy(newDefs, 'id');
 
-      ids = _.uniq(_.keys(origValues).concat(_.keys(newValues)));
-      defs = _.merge(origDefs, newDefs);
+      ids = loUniq(Object.keys(origValues).concat(Object.keys(newValues)));
+      defs = loMerge(origDefs, newDefs);
 
-      return _.chain(ids)
-        .filter((id) => !!defs[id])
-        .map((id) => {
-          const def = defs[id];
-          const diff = {
-            fieldName: def.title,
-            origVal:
-              showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,
-            newVal:
-              showValue(newValues[id] || {}, def) || EMPTY_DIFF_VALUE,
-          };
-          if (diff.origVal === diff.newVal) {
-            return undefined;
-          }
-          return diff;
-        })
-        .filter()
-        .value();
+      let resultIds = loFilter(ids, (id) => !!defs[id]);
+      resultIds = loMap(resultIds, (id) => {
+        const def = defs[id];
+        const diff = {
+          fieldName: def.title,
+          origVal:
+            showValue(origValues[id] || {}, def) || EMPTY_DIFF_VALUE,
+          newVal:
+            showValue(newValues[id] || {}, def) || EMPTY_DIFF_VALUE,
+        };
+        if (diff.origVal === diff.newVal) {
+          return undefined;
+        }
+        return diff;
+      });
+      resultIds = loFilter(resultIds);
+      return resultIds;
     },
     /**
      * Compute the instance's object mapping-related changes from the list of
@@ -364,14 +390,13 @@ export default canComponent.extend({
      *   method.
      */
     _computeMappingChanges: function (revisions) {
-      let chains = _.chain(revisions)
-        .groupBy('resource_id')
-        .mapValues(function (chain) {
-          return _.sortBy(chain, 'updated_at');
-        }).value();
-      return _.map(revisions, function (revision) {
-        return this._mappingChange(revision, chains[revision.resource_id]);
-      }.bind(this));
+      let chains = loGroupBy(revisions, 'resource_id');
+      chains = loMapValues(chains, (chain) => {
+        return loSortBy(chain, 'updated_at');
+      });
+
+      return loMap(revisions, (revision) =>
+        this._mappingChange(revision, chains[revision.resource_id]));
     },
     /**
      * A helper function for extracting the mapping change information from a
@@ -423,13 +448,13 @@ export default canComponent.extend({
 
       fieldName = 'Mapping to ' + displayType + ': ' + displayName;
       origVal = EMPTY_DIFF_VALUE;
-      newVal = _.capitalize(revision.action);
-      previous = chain[_.findIndex(chain, revision) - 1];
+      newVal = loCapitalize(revision.action);
+      previous = chain[loFindIndex(chain, revision) - 1];
       if (revision.action !== 'deleted' &&
-        _.exists(revision.content, 'attrs.AssigneeType')) {
+        exists(revision.content, 'attrs.AssigneeType')) {
         newVal = revision.content.attrs.AssigneeType;
       }
-      if (_.exists(previous, 'content.attrs.AssigneeType')) {
+      if (exists(previous, 'content.attrs.AssigneeType')) {
         origVal = previous.content.attrs.AssigneeType;
       } else if (revision.action === 'deleted') {
         origVal = 'Created';

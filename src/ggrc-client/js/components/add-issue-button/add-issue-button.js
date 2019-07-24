@@ -28,8 +28,8 @@ export default canComponent.extend({
               title: instance.title,
               id: instance.id,
               type: instance.type,
-              title_singular: instance.class.title_singular,
-              table_singular: instance.class.table_singular,
+              title_singular: instance.constructor.title_singular,
+              table_singular: instance.constructor.table_singular,
             },
           };
 

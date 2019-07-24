@@ -16,7 +16,7 @@
         <inline-edit-control
           on:inlineSave="checkTicketId(scope.event)"
           isEditIconDenied:from="isEditDenied"
-          dropdownOptions:from="instance.class.issue_tracker_enable_options"
+          dropdownOptions:from="instance.constructor.issue_tracker_enable_options"
           instance:from="instance"
           value:from="issueTrackerEnabled"
           type:from="'dropdown'">
@@ -140,7 +140,7 @@
       isConfirmationNeeded:from="false"
       setInProgress:from="@setInProgressState"
       onStateChangeDfd:from="onStateChangeDfd"
-      dropdownOptions:from="instance.class.issue_tracker_priorities"
+      dropdownOptions:from="instance.constructor.issue_tracker_priorities"
       isEditIconDenied:from="isEditDenied"
       value:from="instance.issue_tracker.issue_priority"
       instance:from="instance">
@@ -154,7 +154,7 @@
       isConfirmationNeeded:from="false"
       setInProgress:from="@setInProgressState"
       onStateChangeDfd:from="onStateChangeDfd"
-      dropdownOptions:from="instance.class.issue_tracker_severities"
+      dropdownOptions:from="instance.constructor.issue_tracker_severities"
       isEditIconDenied:from="isEditDenied"
       value:from="instance.issue_tracker.issue_severity"
       instance:from="instance">

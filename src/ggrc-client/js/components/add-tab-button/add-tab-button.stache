@@ -31,7 +31,7 @@
                 data-object-singular="{{model.title_singular}}"
                 data-object-plural="{{model.table_plural}}"
                 data-object-params='{
-                  "{{instance.class.table_singular}}": {
+                  "{{instance.constructor.table_singular}}": {
                     "id": {{instance.id}},
                     "type": "{{instance.type}}"
                   },
@@ -67,8 +67,8 @@
                       data-toggle="unified-mapper"
                       data-join-option-type="{{model.model_singular}}"
                       data-join-object-id="{{instance.id}}"
-                      data-join-object-type="{{instance.class.model_singular}}"
-                      {{#if instance.class.isMegaObject}}
+                      data-join-object-type="{{instance.constructor.model_singular}}"
+                      {{#if instance.constructor.isMegaObject}}
                         {{#is instance.type model.model_singular}}
                           data-mega-object="true"
                           data-mega-object-widget="{{id}}"

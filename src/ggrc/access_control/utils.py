@@ -41,12 +41,6 @@ def insert_select_acls(select_statement):
   acl_table = all_models.AccessControlList.__table__
   inserter = acl_table.insert().prefix_with("IGNORE")
 
-  to_insert = db.session.execute(select_statement).fetchall()
-
-  if to_insert:
-    # TODO: investigate whether the select above sets locks on any tables
-    db.session.plain_commit()
-
   def to_dict(record):
     """Match selected and inserted columns."""
     return dict(
@@ -69,7 +63,8 @@ def insert_select_acls(select_statement):
   # process to_insert in chunks, retry failed inserts, allow maximum of
   # PROPAGATION_RETRIES total retries
   failures = 0
-  for chunk in utils.list_chunks(to_insert, chunk_size=10000):
+  result_proxy = db.session.execute(select_statement)
+  for chunk in utils.result_proxy_chunks(result_proxy, chunk_size=10000):
     inserted_successfully = False
     while not inserted_successfully:
       try:

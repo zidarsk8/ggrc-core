@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loFilter from 'lodash/filter';
 import canList from 'can-list';
+
 const ACL = GGRC.access_control_roles.reduce((aclMap, role) => {
   if (!aclMap[role.object_type]) {
     aclMap[role.object_type] = {};
@@ -65,9 +67,9 @@ function peopleWithRoleName(instance, roleName) {
   let roleId;
 
   // get role ID by roleName
-  modelRoles = _.filter(
+  modelRoles = loFilter(
     GGRC.access_control_roles,
-    {object_type: instance.class.model_singular, name: roleName});
+    {object_type: instance.constructor.model_singular, name: roleName});
 
   if (modelRoles.length === 0) {
     console.warn('peopleWithRole: role not found for instance type');

@@ -58,7 +58,7 @@ export default canComponent.extend({
       let predefinedFilter = this.attr('predefinedFilter');
       let filters;
 
-      let hasSimilar = _.includes(['Assessment', 'Control', 'Objective'],
+      let hasSimilar = ['Assessment', 'Control', 'Objective'].includes(
         this.attr('baseInstance.type'));
 
       if (predefinedFilter) {
