@@ -9,7 +9,7 @@ from lib.constants import objects, element
 from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.page.modal import unified_mapper
-from lib.page.widget import generic_widget, object_modal
+from lib.page.widget import generic_widget, object_modal, import_page
 from lib.service import webui_service, rest_service, rest_facade
 from lib.service.webui_service import ControlsService
 from lib.utils import selenium_utils, ui_utils, string_utils
@@ -298,3 +298,11 @@ def get_controls_snapshots_count(selenium, src_obj):
           src_obj=src_obj),
       "controls_count": len(controls_ui_service.get_list_objs_from_tree_view(
           src_obj=src_obj))}
+
+
+def get_available_templates_list():
+  """Returns list of objects templates available for downloading from
+  import page."""
+  page = import_page.ImportPage()
+  page.open()
+  return page.open_download_template_modal().available_templates_list
