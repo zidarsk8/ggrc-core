@@ -270,12 +270,10 @@ function _resolveBatch(queue) {
  * should be loaded
  * @param {string[]} fields Fields, which should be presented in response
  * for each object
- * @param {{id: number, type: string}} relevant Information about relevant
- * object
  * @return {Promise<object[]>} Loaded objects
  */
-async function loadObjectsByStubs(stubs, fields, relevant = null) {
-  const batchedRequest = _buildMappedObjectsRequest(stubs, fields, relevant);
+async function loadObjectsByStubs(stubs, fields) {
+  const batchedRequest = _buildMappedObjectsRequest(stubs, fields);
   const response = await Promise.all(batchedRequest);
   return _processObjectsResponse(response);
 }
@@ -310,14 +308,14 @@ function _buildAllMappedObjectsRequest(relevant, types, fields) { // eslint-disa
   );
 }
 
-function _buildMappedObjectsRequest(stubs, fields, relevant) { // eslint-disable-line
+function _buildMappedObjectsRequest(stubs, fields) { // eslint-disable-line
   const groupedStubsByType = loGroupBy(stubs, 'type');
 
   return loMap(groupedStubsByType, (stubs, objectsType) =>
     batchRequests(buildParam(
       objectsType,
       {},
-      relevant,
+      null,
       fields,
       _buildObjectsFilter(stubs),
     ))
