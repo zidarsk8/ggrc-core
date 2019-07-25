@@ -8,7 +8,7 @@ import canStache from 'can-stache';
 import template from './person-autocomplete-field.stache';
 import actionKeyable from '../view-models/action-keyable';
 
-const DROPDOWN_ACTION_KEYS = ['ArrowUp', 'ArrowDown', 'Enter'];
+const DROPDOWN_ACTION_KEYS = ['ArrowUp', 'ArrowDown', 'Enter', 'Tab'];
 
 /**
  * Another person autocomplete field
@@ -49,6 +49,10 @@ export default canComponent.extend({
       if (!DROPDOWN_ACTION_KEYS.includes(event.code)) {
         this.attr('searchValue', inputValue);
       }
+    },
+    onInputFocus() {
+      // hide suggestions
+      this.attr('searchValue', null);
     },
   }),
 });
