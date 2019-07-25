@@ -11,7 +11,8 @@ from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
 
-class DefaultPersonColumnHandler(handlers.ColumnHandler):
+class DefaultPersonColumnHandler(handlers.PersonColumnHandlerMixin,
+                                 handlers.ColumnHandler):
   """Handler for default verifiers and assignees."""
 
   KEY_MAP = {
@@ -32,10 +33,6 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
 
     This is the "other" option in the default assignee dropdown menu.
     """
-    # This is not good and fast, because it executes query for each
-    # field from each row that contains people list.
-    # If the feature is used actively, it should be refactored
-    # and optimized.
     new_objects = self.row_converter.block_converter.converter.new_objects
     new_people = new_objects[all_models.Person]
 
@@ -54,8 +51,9 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
         emails.append(email)
 
     if emails:
-      from ggrc.utils import user_generator
-      for person in user_generator.find_users(emails):
+      people_cache = self.row_converter.block_converter.people_cache
+      cached_people = [people_cache[e] for e in emails if e in people_cache]
+      for person in cached_people:
         people.append(person.id)
         emails.remove(person.email)
       if emails:
@@ -84,8 +82,8 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
     """Parse values for default assignees."""
     if "@" in self.raw_value:
       return self._parse_email_values()
-    else:
-      return self._parse_label_values()
+
+    return self._parse_label_values()
 
   def set_obj_attr(self):
     """Set default_assignees and default_verifiers attributes.
@@ -123,4 +121,5 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
           all_models.Person.id.in_(value),
       ).all()
       value = "\n".join(p.email for p in people)
+
     return value

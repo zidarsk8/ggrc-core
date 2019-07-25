@@ -37,7 +37,5 @@ class UserColumnHandlerTestCase(unittest.TestCase):
   @ddt.unpack
   def test_email_parse(self, data_to_parse, expected_result):
     """Tests multiply emails parse correctly."""
-    self.handler.raw_value = data_to_parse
-    # pylint: disable=protected-access
-    result = self.handler._parse_raw_data_to_emails()
-    self.assertEquals(result, expected_result)
+    result = self.handler.get_people_emails_from_value(data_to_parse)
+    self.assertEqual(result, expected_result)

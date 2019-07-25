@@ -528,7 +528,7 @@ class TestUserGenerator(TestCase):
   @mock.patch('ggrc.utils.user_generator.search_user', return_value='user')
   def test_invalid_email_import(self, _):
     """Test import of invalid email."""
-    wrong_email = "some wrong email"
+    wrong_email = "some_wrong_email"
     audit = factories.AuditFactory()
 
     response = self.import_data(OrderedDict([

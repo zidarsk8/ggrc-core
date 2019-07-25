@@ -52,6 +52,7 @@ class RowConverter(object):
     self.block_converter = block_converter
     self.object_class = object_class
     self.headers = headers
+    self.idx = options.get("idx")
     self.obj = options.get("obj")
     self.attrs = collections.OrderedDict()
     self.objects = collections.OrderedDict()

@@ -19,13 +19,34 @@ from ggrc.models.exceptions import ValidationError
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-lines
 from ggrc.services import signals
 
 logger = getLogger(__name__)
 
 MAPPING_PREFIX = "__mapping__:"
 CUSTOM_ATTR_PREFIX = "__custom__:"
+
+
+class PersonColumnHandlerMixin(object):
+  """Mixin providing base functionality for people column handlers."""
+
+  @staticmethod
+  def get_people_emails_from_value(value):
+    # type: (str) -> List[str]
+    """Return list of people emails from `value`."""
+    email_list = re.split("[, ;\n]+", value.lower().strip())
+    email_list = filter(None, email_list)
+    return sorted(email_list)
+
+  @classmethod
+  def validate_email(cls, email):
+    # type: (str) -> None
+    """Validate email. If not valid, `ValidationError` will be raised."""
+    empty_values = getattr(cls, "EXPLICIT_EMPTY_VALUE", set())
+    if not (email in empty_values or all_models.Person.is_valid_email(email)):
+      message = "Email address '{}' is invalid. Valid email must be provided"
+      raise ValidationError(message.format(email))
 
 
 class ColumnHandler(object):
@@ -222,7 +243,7 @@ class StatusColumnHandler(ColumnHandler):
     return status
 
 
-class UserColumnHandler(ColumnHandler):
+class UserColumnHandler(PersonColumnHandlerMixin, ColumnHandler):
   """Handler for a single user fields.
 
   Used for primary and secondary contacts.
@@ -242,25 +263,11 @@ class UserColumnHandler(ColumnHandler):
     return list(users)
 
   def get_person(self, email):
-    from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
     if email not in new_objects[all_models.Person]:
-      try:
-        new_objects[all_models.Person][email] = user_generator.find_user(email)
-      except ValueError as ex:
-        self.add_error(
-            errors.VALIDATION_ERROR,
-            column_name=self.display_name,
-            message=ex.message
-        )
-        return None
+      people_cache = self.row_converter.block_converter.people_cache
+      new_objects[all_models.Person][email] = people_cache.get(email)
     return new_objects[all_models.Person].get(email)
-
-  def _parse_raw_data_to_emails(self):
-    """Parse raw data: split emails if necessary"""
-    email_list = re.split("[, ;\n]+", self.raw_value.lower().strip())
-    email_list = filter(None, email_list)
-    return sorted(email_list)
 
   def _parse_emails(self, email_list):
     """Parse user email. If it were multiply emails in this column parse them.
@@ -297,7 +304,15 @@ class UserColumnHandler(ColumnHandler):
     return person
 
   def parse_item(self):
-    email_list = self._parse_raw_data_to_emails()
+    people_errors = self.row_converter.block_converter.gather_people_errors(
+        row_idx=self.row_converter.idx, attr_name=self.key
+    )
+    if people_errors:
+      for template, kwargs in people_errors:
+        self.add_error(template, **kwargs)
+      return None
+
+    email_list = self.get_people_emails_from_value(self.raw_value)
 
     if len(email_list) > 1:
       self.add_warning(
@@ -323,6 +338,13 @@ class UsersColumnHandler(UserColumnHandler):
 
   def parse_item(self):
     """Parses multi users field."""
+    people_errors = self.row_converter.block_converter.gather_people_errors(
+        row_idx=self.row_converter.idx, attr_name=self.key
+    )
+    if people_errors:
+      for template, kwargs in people_errors:
+        self.add_error(template, **kwargs)
+
     people = set()
     if self.value_explicitly_empty(self.raw_value):
       if not self.mandatory:
