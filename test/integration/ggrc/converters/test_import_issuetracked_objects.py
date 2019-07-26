@@ -11,6 +11,7 @@ import ddt
 import mock
 
 from ggrc import settings, models, db
+from ggrc.integrations import constants
 from ggrc.models import all_models
 from ggrc.converters import errors
 from ggrc.converters.handlers import issue_tracker
@@ -20,6 +21,17 @@ from ggrc.integrations.constants import DEFAULT_ISSUETRACKER_VALUES as \
 from integration import ggrc
 from integration.ggrc.models import factories
 from integration.ggrc.api_helper import Api
+
+
+def expected_warning_for_default(line, column_name, alias):
+  """Generate expected warning message"""
+  if alias in ("Severity", "Issue Type", "Priority"):
+    return errors.WRONG_VALUE_DEFAULT_CUSTOM.format(
+        line=line,
+        column_name=alias,
+        default_value=constants.DEFAULT_ISSUETRACKER_VALUES.get(column_name)
+    )
+  return errors.WRONG_VALUE_DEFAULT.format(line=line, column_name=alias)
 
 
 @ddt.ddt
@@ -194,9 +206,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.unpack
   def test_default_value_set_correctly(self, missed_field, alias, value):
     """Test correct default value was set if csv."{1}"={2!r} during import."""
-    expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-    )
+    expected_warning = expected_warning_for_default(line=3,
+                                                    column_name=missed_field,
+                                                    alias=alias)
     expected_messages = {
         "Issue": {
             "row_warnings": {expected_warning},
@@ -279,9 +291,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
   def test_audit_default_value_set_correctly(self, missed_field, alias, value):
     """Test correct default value was set to Audit {1} during import"""
     program = factories.ProgramFactory()
-    expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-    )
+    expected_warning = expected_warning_for_default(line=3,
+                                                    column_name=missed_field,
+                                                    alias=alias)
     expected_messages = {
         "Audit": {
             "row_warnings": {expected_warning},
@@ -508,9 +520,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
                                            value,
                                            audit_value):
     """Test correct default value was set from audit to {0}"""
-    expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-    )
+    expected_warning = expected_warning_for_default(line=3,
+                                                    column_name=missed_field,
+                                                    alias=alias)
     expected_messages = {
         "Assessment": {
             "row_warnings": {expected_warning},
@@ -555,10 +567,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
                                              alias,
                                              value):
     """Test correct default value was set to {0} if audit doesn't have one"""
-    expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-    )
-
+    expected_warning = expected_warning_for_default(line=3,
+                                                    column_name=missed_field,
+                                                    alias=alias)
     expected_messages = {
         "Assessment": {
             "row_warnings": {expected_warning},
@@ -603,9 +614,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
                                                 value,
                                                 audit_value):
     """Test default value was set from audit to {0} for Assesment Template"""
-    expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-    )
+    expected_warning = expected_warning_for_default(line=3,
+                                                    column_name=missed_field,
+                                                    alias=alias)
     expected_messages = {
         "Assessment Template": {
             "row_warnings": {expected_warning},
@@ -649,10 +660,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
                                                   alias,
                                                   value):
     """Test default value was set to Assessment Template {0}"""
-    expected_warning = (
-        errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-    )
-
+    expected_warning = expected_warning_for_default(line=3,
+                                                    column_name=missed_field,
+                                                    alias=alias)
     expected_messages = {
         "Assessment Template": {
             "row_warnings": {expected_warning},
@@ -730,9 +740,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
 
     if value is not None:
       # ensure that warning is returned
-      expected_warning = (
-          errors.WRONG_VALUE_DEFAULT.format(line=3, column_name=alias)
-      )
+      expected_warning = expected_warning_for_default(line=3,
+                                                      column_name=field,
+                                                      alias=alias)
       expected_messages = {"Assessment": {"row_warnings": {expected_warning}}}
       self._check_csv_response(response, expected_messages)
 
