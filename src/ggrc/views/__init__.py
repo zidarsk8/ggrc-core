@@ -191,6 +191,29 @@ def run_children_issues_generation(task):
 
 
 @app.route(
+    "/_background_tasks/run_children_issues_updater", methods=["POST"]
+)
+@background_task.queued_task
+def run_children_issues_updater(task):
+  """
+    Send comments to IssueTracker issues for objects of child type in parent.
+  """
+  try:
+    params = getattr(task, "parameters", {})
+    parent_type = params.get("parent", {}).get("type")
+    parent_id = params.get("parent", {}).get("id")
+    child_type = params.get("child_type")
+
+    from ggrc.integrations import issuetracker_bulk_sync
+    bulk_creator = issuetracker_bulk_sync.IssueTrackerAuditChildUpdated()
+    return bulk_creator.sync_issuetracker(parent_type, parent_id, child_type)
+  except integrations_errors.Error as error:
+    logger.error('Sending comments to issues failed with error: %s',
+                 error.message)
+    raise exceptions.BadRequest(error.message)
+
+
+@app.route(
     "/_background_tasks/run_issues_generation", methods=["POST"]
 )
 @background_task.queued_task
@@ -352,6 +375,23 @@ def start_update_audit_issues(audit_id, message):
       },
       method=u'POST',
       queued_callback=update_audit_issues,
+  )
+  db.session.commit()
+
+
+def start_update_children_issues(parent_type, parent_id, child_type):
+  """Start a background task to send comments to IssueTracker issues
+     related to Audit child items
+  """
+  background_task.create_task(
+      name="delete_children_issues",
+      url=flask.url_for(run_children_issues_updater.__name__),
+      queued_callback=run_children_issues_updater,
+      parameters={
+          "parent": {"type": parent_type, "id": parent_id},
+          "child_type": child_type
+      },
+      operation_type="delete_children_issues",
   )
   db.session.commit()
 

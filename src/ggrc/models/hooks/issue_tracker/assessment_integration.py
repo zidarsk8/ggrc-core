@@ -467,7 +467,8 @@ class AssessmentTrackerHandler(object):
     )
 
   def handle_audit_update(self, audit, audit_src):
-    """Handle audit update for Issue Tracker.
+    """Handle audit update for Issue Tracker. Send comments to Issue for
+    child Assessments if parent Audit was disabled
 
     This function MUST NOT be called during import background task execution
 
@@ -479,10 +480,22 @@ class AssessmentTrackerHandler(object):
         audit,
         audit_src
     )
+
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         audit,
         issue_db_info
     )
+    if audit.issuetracker_issue:
+      is_changing_state = audit.issuetracker_issue.enabled != \
+          issue_db_info.get("enabled")
+      if bool(audit.assessments and
+              is_changing_state and
+              not audit.issuetracker_issue.enabled):
+        import ggrc
+        # run background task for send comment to issues,
+        # associated with assessments
+        ggrc.views.start_update_children_issues(audit.type, audit.id,
+                                                audit.assessments[0].type)
 
   def handle_audit_issues_update(self, audit, initial_state):
     """Handle audit issues update for Issue Tracker.
@@ -2045,12 +2058,22 @@ class AssessmentTrackerHandler(object):
     return new_issuetracker_issues
 
   @staticmethod
-  def load_issuetracked_objects(parent_type, parent_id):
-    """Fetch issuetracked objects from db."""
+  def load_issuetracked_objects(parent_type, parent_id, is_synced=False):
+    """
+      Fetch issuetracked objects from db.
+
+      Args:
+        parent_id: id of a parent object
+        parent_type: type of a parent object (should be Audit)
+        is_synced: flag indicates that issue was created (True if issue id
+          is not none)
+
+      Returns:
+        list of Assessment objects
+    """
     if parent_type != "Audit":
       return []
-
-    return all_models.Assessment.query.join(
+    query = all_models.Assessment.query.join(
         all_models.IssuetrackerIssue,
         sa.and_(
             all_models.IssuetrackerIssue.object_type == "Assessment",
@@ -2059,10 +2082,19 @@ class AssessmentTrackerHandler(object):
     ).join(
         all_models.Audit,
         all_models.Audit.id == all_models.Assessment.audit_id
-    ).filter(
-        all_models.Audit.id == parent_id,
-        all_models.IssuetrackerIssue.issue_id.is_(None)
-    ).options(
+    )
+
+    if is_synced:
+      query = query.filter(
+          all_models.Audit.id == parent_id,
+          all_models.IssuetrackerIssue.issue_id.isnot(None)
+      )
+    else:
+      query = query.filter(
+          all_models.Audit.id == parent_id,
+          all_models.IssuetrackerIssue.issue_id.is_(None)
+      )
+    return query.options(
         sa.orm.Load(all_models.Assessment).undefer_group(
             "Assessment_complete",
         ).subqueryload(
@@ -2089,6 +2121,21 @@ class AssessmentTrackerHandler(object):
     if not audit_tracker_info.get("enabled"):
       return False
     return True
+
+  @staticmethod
+  def _is_state_updated(audit, initial_state):
+    """Returns a boolean whether issue tracker integration feature that is
+    updated.
+
+    Args:
+      audit: object from Audit model
+      initial_state: object state before update
+
+    Returns:
+      A boolean, True if feature state is changed or False otherwise.
+    """
+    return audit.issue_tracker.get("enabled") != \
+        initial_state.issue_tracker.get("enabled")
 
   @staticmethod
   def _is_people_sync_enabled(audit):

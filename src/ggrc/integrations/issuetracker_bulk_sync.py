@@ -666,6 +666,46 @@ class IssueTrackerBulkChildCreator(IssueTrackerBulkCreator):
     common.send_email(receiver.email, self.ISSUETRACKER_SYNC_TITLE, body)
 
 
+class IssueTrackerAuditChildUpdated(IssueTrackerBulkUpdater):
+  """Class for updating child items for IssueTracker object"""
+
+  # pylint: disable=arguments-differ
+  def sync_issuetracker(self, parent_type, parent_id, child_type):
+    """Send comments to IssueTracker issues for child objects.
+
+    Args:
+        parent_type: type of parent object
+        parent_id: id of parent object
+        child_type: type of child object
+
+    Returns:
+        flask.wrappers.Response - response with result of generation.
+    """
+    errors = []
+    try:
+      with benchmark("Update issue tracker object for Audit child"):
+        handler = self.INTEGRATION_HANDLERS[child_type]
+        if not hasattr(handler, "load_issuetracked_objects"):
+          raise integrations_errors.Error(
+              "Updating issues for {} in scope of {} is not supported.".format(
+                  parent_type, child_type
+              )
+          )
+
+        for obj in handler.load_issuetracked_objects(parent_type, parent_id,
+                                                     is_synced=True):
+          # pylint: disable=protected-access
+          handler()._add_disable_comment(
+              obj,
+              obj.issuetracker_issue.issue_id)
+
+    except:  # pylint: disable=bare-except
+      self.send_notification(parent_type, parent_id, failed=True)
+    else:
+      self.send_notification(parent_type, parent_id, errors=errors)
+    return self.make_response(errors)
+
+
 class IssuetrackedObjInfo(collections.namedtuple(
     "IssuetrackedObjInfo", ["obj", "hotlist_ids", "component_id"]
 )):
