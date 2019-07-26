@@ -211,6 +211,17 @@ class StatusColumnHandler(ColumnHandler):
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if status is not None:
+      if status == "Deprecated" and isinstance(
+          self.row_converter.obj, all_models.Metric
+      ):
+        from ggrc.settings.default import GGRC_Q_INTEGRATION_URL
+
+        self.add_warning(
+            errors.DEPRECATED_METRIC_STATUS,
+            object_type=self.row_converter.obj.__class__.__name__,
+            object_title=self.row_converter.obj.title,
+            ggrc_q_link=GGRC_Q_INTEGRATION_URL,
+        )
       return status
     if self.row_converter.obj.status:
       status = self.row_converter.obj.status
