@@ -20,7 +20,7 @@ import pubSub from '../../../pub-sub';
 
 export default canComponent.extend({
   tag: 'saved-search-list',
-  template: canStache(template),
+  view: canStache(template),
   leakScope: false,
   viewModel: canMap.extend({
     pubSub,

@@ -39,32 +39,36 @@ describe('workflow-start-cycle component', () => {
     it('should update TaskGroups when cycle was generated', async () => {
       const activeCycleCount = workflowCountsMap.activeCycles;
       workflowCountsMap.activeCycles = 1234;
+      generateDfd.resolve();
 
-      handler();
-      generateDfd.resolve().then(() => {
-        expect(WidgetsUtils.initCounts)
-          .toHaveBeenCalledWith([1234], workflow.type, workflow.id);
-        workflowCountsMap.activeCycles = activeCycleCount;
-      });
+      await handler();
+
+      expect(WidgetsUtils.initCounts)
+        .toHaveBeenCalledWith([1234], workflow.type, workflow.id);
+      workflowCountsMap.activeCycles = activeCycleCount;
     });
 
     it('should update TaskGroups when cycle was generated', async () => {
       WidgetsUtils.initCounts.and.returnValue(Promise.resolve());
-      handler();
-      generateDfd.resolve().then(() => {
-        expect(helpers.generateCycle).toHaveBeenCalled();
-        expect(workflow.refresh_all)
-          .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
-      });
-    });
+      generateDfd.resolve();
 
-    it('shouldn\'t update TaskGroups when cycle wasn\'t generated', () => {
-      handler();
-      generateDfd.reject();
+      await handler();
 
       expect(helpers.generateCycle).toHaveBeenCalled();
       expect(workflow.refresh_all)
-        .not.toHaveBeenCalled();
+        .toHaveBeenCalledWith('task_groups', 'task_group_tasks');
     });
+
+    it('shouldn\'t update TaskGroups when cycle wasn\'t generated',
+      async () => {
+        generateDfd.reject();
+
+        try {
+          await handler();
+        } catch (e) {
+          expect(helpers.generateCycle).toHaveBeenCalled();
+          expect(workflow.refresh_all).not.toHaveBeenCalled();
+        }
+      });
   });
 });
