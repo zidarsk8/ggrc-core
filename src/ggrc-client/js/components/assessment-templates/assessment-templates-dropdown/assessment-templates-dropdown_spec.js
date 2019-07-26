@@ -14,11 +14,9 @@ describe('assessment-templates-dropdown component', () => {
     viewModel = getComponentVM(Component);
   });
 
-  describe('_selectInitialTemplate() method', function () {
-    let templates;
-
+  describe('selectInitialTemplate() method', function () {
     beforeEach(() => {
-      templates = [
+      viewModel.attr('optionsList', [
         {
           title: 'No Template',
           value: '',
@@ -39,19 +37,19 @@ describe('assessment-templates-dropdown component', () => {
             {title: 'Tiny Mouse', value: 'mouse'},
           ],
         },
-      ];
+      ]);
     });
 
     it('selects the first item from the first option group if it was empty',
       () => {
         viewModel.attr('assessmentTemplate', null);
-        viewModel._selectInitialTemplate(templates);
+        viewModel.selectInitialTemplate();
         expect(viewModel.attr('assessmentTemplate')).toEqual('foo');
       });
 
     it('leaves item if the option was not empty', () => {
       viewModel.attr('assessmentTemplate', 'template-123');
-      viewModel._selectInitialTemplate(templates);
+      viewModel.selectInitialTemplate();
       expect(viewModel.attr('assessmentTemplate')).toEqual('template-123');
     });
 
@@ -59,9 +57,9 @@ describe('assessment-templates-dropdown component', () => {
       the templates list`,
     () => {
       viewModel.attr('assessmentTemplate', 'template-123');
-      templates.splice(1); // keep only the 1st (dummy) option
+      viewModel.attr('optionsList').splice(1); // keep only the 1st (dummy) option
 
-      viewModel._selectInitialTemplate(templates);
+      viewModel.selectInitialTemplate();
 
       expect(viewModel.attr('assessmentTemplate')).toEqual('template-123');
     });
@@ -69,10 +67,10 @@ describe('assessment-templates-dropdown component', () => {
     it('leaves the current template unchanged if first object group empty',
       () => {
         viewModel.attr('assessmentTemplate', 'template-123');
-        templates[1].subitems.length = 0;
+        viewModel.attr('optionsList')[1].subitems.length = 0;
         spyOn(console, 'warn'); // just to silence it
 
-        viewModel._selectInitialTemplate(templates);
+        viewModel.selectInitialTemplate();
 
         expect(viewModel.attr('assessmentTemplate')).toEqual('template-123');
       }
@@ -85,9 +83,9 @@ describe('assessment-templates-dropdown component', () => {
       ].join('');
 
       spyOn(console, 'warn');
-      templates[1].subitems.length = 0;
+      viewModel.attr('optionsList')[1].subitems.length = 0;
 
-      viewModel._selectInitialTemplate(templates);
+      viewModel.selectInitialTemplate();
 
       expect(console.warn).toHaveBeenCalledWith(expectedMsg);
     });
@@ -95,9 +93,10 @@ describe('assessment-templates-dropdown component', () => {
     it('selects the first non-dummy value if it precedes all object groups',
       () => {
         viewModel.attr('assessmentTemplate', null);
-        templates.splice(1, 0, {title: 'No Group Template', value: 'single'});
+        viewModel.attr('optionsList').splice(1, 0, {
+          title: 'No Group Template', value: 'single'});
 
-        viewModel._selectInitialTemplate(templates);
+        viewModel.selectInitialTemplate();
 
         expect(viewModel.attr('assessmentTemplate')).toEqual('single');
       }
@@ -126,7 +125,6 @@ describe('assessment-templates-dropdown component', () => {
         .and.returnValue(reqParam);
       spyOn(QueryAPI, 'batchRequests')
         .and.returnValue(batchRequestsDfd);
-      spyOn(viewModel, '_selectInitialTemplate');
     });
 
     it('makse relevant call', () => {
@@ -138,8 +136,11 @@ describe('assessment-templates-dropdown component', () => {
         .toHaveBeenCalledWith(reqParam);
     });
 
-    it('sets initial Assessment Template', (done) => {
+    it('sets initial Assessment Template when needToSelectInitialTemplate ' +
+    'is true', (done) => {
       spyOn(viewModel, 'dispatch');
+      spyOn(viewModel, 'selectInitialTemplate');
+      viewModel.attr('needToSelectInitialTemplate', true);
 
       method();
 
@@ -148,7 +149,7 @@ describe('assessment-templates-dropdown component', () => {
           values: [],
         },
       }).then(() => {
-        expect(viewModel._selectInitialTemplate)
+        expect(viewModel.selectInitialTemplate)
           .toHaveBeenCalled();
         done();
       });

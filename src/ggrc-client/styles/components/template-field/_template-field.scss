@@ -1,0 +1,17 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+.template-field {
+  padding: 6px 0;
+  line-height: 24px;
+
+  &__title {
+    text-indent: 7px;
+  }
+
+  &__section-values {
+    flex-grow: 2;
+  }
+}

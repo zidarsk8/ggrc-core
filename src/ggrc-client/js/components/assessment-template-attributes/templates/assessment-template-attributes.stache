@@ -1,0 +1,67 @@
+{{!
+    Copyright (C) 2019 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="assessment-template-attributes">
+  <div class="template-grid__row assessment-template-attributes__header">
+    <div class="template-grid__row-item">
+      <h6>Attribute Title</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_attr-type">
+      <h6>Attribute type</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_attr-values">
+      <h6>Attribute values</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Evidence File Required</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Evidence URL Required</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Comment required</h6>
+    </div>
+    <div class="template-grid__row-item template-grid__row-item_checkbox">
+      <h6>Mandatory</h6>
+    </div>
+    {{#if editMode}}
+      <div class="template-grid__row-item"></div>
+    {{/if}}
+  </div>
+  {{#if editMode}}
+    <div class="sortable-list">
+      <div class="assessment-template-attributes__attribute-item">
+        <add-template-field
+          types:from="types"
+          fields:from="fields">
+        </add-template-field>
+      </div>
+      {{#fields}}
+        <div class="assessment-template-attributes__attribute-item sortable-item" {{canData 'field'}}>
+          <template-field
+            field:from="{.}"
+            types:from="types"
+            on:remove="fieldRemoved" />
+        </div>
+      {{/fields}}
+    </div>
+  {{else}}
+    {{^if isLoading}}
+      {{#fields}}
+        <div class="assessment-template-attributes__attribute-item">
+          <template-field
+            class="readonly"
+            field:from="{.}"
+            types:from="types"
+            editMode:from="editMode" />
+        </div>
+      {{else}}
+        <div class="empty-message">None</div>
+      {{/fields}}
+    {{else}}
+      <spinner-component toggle:from="isLoading" />
+    {{/if}}
+  {{/if}}
+</div>

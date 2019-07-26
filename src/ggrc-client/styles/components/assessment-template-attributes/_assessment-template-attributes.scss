@@ -1,0 +1,91 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+.assessment-template-attributes {
+  font-size: 11px;
+
+  &__header {
+    border-top: 1px solid $templateGridBorder;
+    border-bottom: 1px solid $templateGridBorder;
+
+    h6 {
+      font-size: 9px;
+    }
+  }
+
+  &__attribute-item:not(:last-child) {
+    border-bottom: 1px solid $templateGridBorder;
+  }
+
+  .empty-message {
+    font-size: 12px;
+  }
+
+  template-field {
+    &.readonly {
+      color: $gray;
+    }
+  }
+}
+
+.sortable-list {
+  .sortable-item {
+    position:relative;
+
+    &::before {
+      content: $fa-var-arrows-v;
+      font: normal normal normal 16px/26px FontAwesome;
+      -webkit-font-smoothing: antialiased;
+      color: #999;
+      cursor: grab;
+      position: absolute;
+      left: -7px;
+      top: 5px;
+    }
+  }
+  .sortable-placeholder {
+    background: #fafafa;
+    height: 31px;
+    display: block;
+  }
+
+  .ui-sortable-helper {
+    background: rgba(255, 255, 255, 0.5);
+
+    &::before {
+      cursor: grabbing;
+    }
+  }
+}
+
+.template-grid__row {
+  display: flex;
+
+  &-item {
+    flex: 1 1;
+    // By default, flex items won’t shrink below their minimum content size.
+    // In order to have columns with equal sizes even if some cell contains
+    // a lot of data, min-width should be set to 0 - this is a common
+    // workaround for such situation.
+    min-width: 0;
+
+    &:not(:last-child) {
+      margin-right: 20px;
+    }
+
+    &_attr-type {
+      flex-grow: 0.6;
+    }
+
+    &_attr-values {
+      flex-grow: 0.8;
+    }
+
+    &_checkbox {
+      flex-grow: 0.3;
+      text-align: center;
+    }
+  }
+}

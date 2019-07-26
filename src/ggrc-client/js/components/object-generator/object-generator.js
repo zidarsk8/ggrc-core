@@ -3,7 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import loIsEmpty from 'lodash/isEmpty';
 import canStache from 'can-stache';
 import canComponent from 'can-component';
 import '../assessment-templates/assessment-templates-dropdown/assessment-templates-dropdown';
@@ -29,7 +28,17 @@ export default canComponent.extend({
   leakScope: true,
   viewModel: function (attrs, parentViewModel) {
     return ObjectOperationsBaseVM.extend({
-      assessmentTemplate: '',
+      /**
+       * @type {
+       *  {
+       *    id: number,
+       *    objectType: string
+       *  }
+       * }
+       * @description Selected assessment template with appropriate type
+       * (objectType field) and id.
+       */
+      assessmentTemplate: null,
       object: attrs.object,
       join_object_id: attrs.joinObjectId,
       type: attrs.type,
@@ -46,6 +55,15 @@ export default canComponent.extend({
       },
       availableTypes() {
         return groupTypes(GGRC.config.snapshotable_objects);
+      },
+      onAssessmentTemplateChanged({template}) {
+        if (!template) {
+          this.attr('block_type_change', false);
+        } else {
+          this.attr('block_type_change', true);
+          this.attr('type', template.objectType);
+          this.attr('assessmentTemplate', template);
+        }
       },
     });
   },
@@ -85,20 +103,9 @@ export default canComponent.extend({
         type: type,
         target: object,
         instance: instance,
-        assessmentTemplate: assessmentTemplate,
+        assessmentTemplate,
         context: this,
       });
-    },
-    '{viewModel} assessmentTemplate': function ([viewModel], ev, val) {
-      let type;
-      if (loIsEmpty(val)) {
-        return this.viewModel.attr('block_type_change', false);
-      }
-
-      val = val.split('-');
-      type = val[1];
-      this.viewModel.attr('block_type_change', true);
-      this.viewModel.attr('type', type);
     },
   },
 });

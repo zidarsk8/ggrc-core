@@ -1,0 +1,45 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="add-template-field template-grid__row">
+  <div class="template-grid__row-item{{#if selected.invalidTitleError}} field-failure{{/if}}">
+    <input type="text" class="add-template-field__input"
+          el:value:bind="selected.title"
+          placeholder="Enter title">
+      {{#if selected.invalidTitleError}}
+        <label class="warning">{{selected.invalidTitleError}}</label>
+      {{/if}}
+  </div>
+
+  <div class="template-grid__row-item template-grid__row-item_attr-type">
+    <select class="add-template-field__input" el:value:bind="selected.type">
+      {{#types}}
+        <option value="{{type}}">{{name}}</option>
+      {{/types}}
+    </select>
+  </div>
+
+  <div class="template-grid__row-item template-grid__row-item_attr-values{{#selected.invalidValues}}
+              field-failure{{/selected.invalidValues}}
+              add-template-field__section-values">
+    {{#if isDisplayValues}}
+      <input type="text" class="add-template-field__input"
+            el:value:bind="selected.values"
+            placeholder="{{placeholder}}"/>
+        <i class="fa fa-question-circle" rel="tooltip" title="{{placeholder}}"></i>
+        {{#selected.invalidValues}}
+          <label class="warning">Cannot be blank</label>
+        {{/selected.invalidValues}}
+    {{else}}
+      N/A
+    {{/if}}
+  </div>
+
+  <div class="template-grid__row-item add-template-field__section-add-field">
+    <div class="pull-right">
+      <a on:el:click="addField()" class="btn btn-small btn-lightBlue">Add field</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="template-field template-grid__row">
+  <div class="template-grid__row-item template-field__title">{{field.title}}</div>
+  <div class="template-grid__row-item template-grid__row-item_attr-type">{{field.attribute_name}}</div>
+
+  <div class="template-grid__row-item template-field__section-values">
+    {{#attrs}}
+      <div class="template-grid__row">
+        <div class="template-grid__row-item template-grid__row-item_attr-values single-line">
+          <span title="{{value}}">{{value}}</span>
+        </div>
+        {{#is(type, "Dropdown")}}
+          <div class="template-grid__row-item template-grid__row-item_checkbox">
+            <input type="checkbox" el:checked:bind="attachment" {{^if editMode}}disabled{{/if}}>
+          </div>
+          <div class="template-grid__row-item template-grid__row-item_checkbox">
+            <input type="checkbox" el:checked:bind="url" {{^if editMode}}disabled{{/if}}>
+          </div>
+          <div class="template-grid__row-item template-grid__row-item_checkbox">
+            <input type="checkbox" el:checked:bind="comment" {{^if editMode}}disabled{{/if}}>
+          </div>
+        {{/is}}
+      </div>
+    {{/attrs}}
+  </div>
+
+  <div class="template-grid__row-item template-grid__row-item_checkbox">
+    <input type="checkbox" el:checked:bind="field.mandatory" {{^if editMode}}disabled{{/if}}>
+  </div>
+
+  {{#if editMode}}
+    <div class="template-grid__row-item">
+      <div class="pull-right">
+        <a on:el:click="removeField()"><i class="fa fa-trash"></i></a>
+      </div>
+    </div>
+  {{/if}}
+</div>
