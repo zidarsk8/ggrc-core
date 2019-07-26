@@ -78,15 +78,6 @@ def all_cache_entries():
       resource('roles', 'Role'),
       resource('user_roles', 'UserRole'),
 
-      # ggrc_risk_assessments models
-      resource('templates', 'Template'),
-      resource('risk_assessments', 'RiskAssessment'),
-      resource('risk_assessment_mappings', 'RiskAssessmentMapping'),
-      resource('risk_assessment_control_mappings',
-               'RiskAssessmentControlMapping'),
-      resource('threats', 'Threat'),
-      resource('vulnerabilities', 'Vulnerability'),
-
       # ggrc_workflows models
       resource('cycle_task_group_object_tasks', 'CycleTaskGroupObjectTask'),
       resource('cycle_task_groups', 'CycleTaskGroup'),
@@ -125,9 +116,6 @@ def all_mapping_entries():
       mapping('CycleTaskGroupObjectTask', 'cycle_task_group'),
       mapping('CycleTaskGroupObjectTask', 'task_group_task'),
       mapping('CycleTaskGroupObjectTask', 'cycle_task_objects_for_cache'),
-
-      # mapping('RiskAssessmentMapping'),
-      # mapping('RiskAssessmentControlMapping'),
   ]
 
   return ret

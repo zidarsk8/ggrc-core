@@ -63,7 +63,7 @@ class TestMappingRules(BaseTestMappingRules):
                  'DataAsset', 'Facility', 'Issue', 'Market',
                  'Objective', 'OrgGroup', 'Policy',
                  'Process', 'Product', 'Program', 'Project',
-                 'Regulation', 'Risk', 'RiskAssessment', 'Requirement',
+                 'Regulation', 'Risk', 'Requirement',
                  'Standard', 'System', 'Threat', 'Vendor', 'Metric',
                  'ProductGroup', 'TechnologyEnvironment', 'KeyReport',
                  'AccountBalance']
@@ -196,7 +196,7 @@ class TestUnMappingRules(BaseTestMappingRules):
                  'DataAsset', 'Facility', 'Issue', 'Market',
                  'Objective', 'OrgGroup', 'Policy',
                  'Process', 'Product', 'Program', 'Project',
-                 'Regulation', 'Risk', 'RiskAssessment', 'Requirement',
+                 'Regulation', 'Risk', 'Requirement',
                  'Standard', 'System', 'Threat', 'Vendor', 'Metric',
                  'ProductGroup', 'TechnologyEnvironment', 'KeyReport',
                  'AccountBalance']

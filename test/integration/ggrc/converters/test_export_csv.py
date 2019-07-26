@@ -645,7 +645,6 @@ class TestExportMultipleObjects(TestCase):
       "Org Group",
       "Project",
       "Vendor",
-      "Risk Assessment",
       "Threat",
       "Key Report",
       "Account Balance",

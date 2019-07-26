@@ -492,9 +492,6 @@ def get_public_config():
       "enable_release_notes": settings.ENABLE_RELEASE_NOTES,
   }
 
-  if permissions.is_admin():
-    if hasattr(settings, "RISK_ASSESSMENT_URL"):
-      public_config["RISK_ASSESSMENT_URL"] = settings.RISK_ASSESSMENT_URL
   return public_config
 
 
