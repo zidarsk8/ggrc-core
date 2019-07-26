@@ -140,4 +140,17 @@ export default Cacheable.extend({
 
     return loadPersonProfile(this);
   },
+  save: function () {
+    const {name, email} = this;
+
+    if (name) {
+      this.attr('name', name.trim());
+    }
+
+    if (email) {
+      this.attr('email', email.toLowerCase());
+    }
+
+    return this._super.apply(this, ...arguments);
+  },
 });
