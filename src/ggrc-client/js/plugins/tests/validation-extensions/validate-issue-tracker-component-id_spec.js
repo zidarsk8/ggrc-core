@@ -6,16 +6,16 @@
 import canModel from 'can-model/src/can-model';
 import canMap from 'can-map/can-map';
 
-describe('validateAssessmentIssueTracker extension', () => {
+describe('validateIssueTrackerComponentId extension', () => {
   let TestModel;
 
-  beforeAll(() => {
+  beforeEach(() => {
     TestModel = canModel.extend({}, {
       define: {
         issue_tracker: {
           value: {},
           validate: {
-            validateAssessmentIssueTracker: true,
+            validateIssueTrackerComponentId: true,
           },
         },
         can_use_issue_tracker: {
@@ -25,12 +25,27 @@ describe('validateAssessmentIssueTracker extension', () => {
     });
   });
 
+  it('should return TRUE. issue tracker is disabled', () => {
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new canMap({
+      enabled: false,
+    }));
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
+  });
+
+  it('should return TRUE. issue tracker is empty object', () => {
+    const instance = new TestModel();
+    instance.attr('issue_tracker', {});
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
+  });
+
   it('should return FALSE. issue tracker does not have component id', () => {
     const instance = new TestModel();
     instance.attr('issue_tracker', new canMap({
       enabled: true,
     }));
-    instance.attr('can_use_issue_tracker', true);
     expect(instance.validate()).toBeFalsy();
     expect(instance.errors.issue_tracker[0].component_id)
       .toEqual('cannot be blank');
@@ -42,7 +57,6 @@ describe('validateAssessmentIssueTracker extension', () => {
       enabled: true,
       component_id: 1,
     }));
-    instance.attr('can_use_issue_tracker', true);
     expect(instance.validate()).toBeTruthy();
     expect(instance.errors.issue_tracker).toBeUndefined();
   });
@@ -53,7 +67,6 @@ describe('validateAssessmentIssueTracker extension', () => {
       instance.attr('issue_tracker', new canMap({
         enabled: false,
       }));
-      instance.attr('can_use_issue_tracker', true);
       expect(instance.validate()).toBeTruthy();
       expect(instance.errors.issue_tracker).toBeUndefined();
     }

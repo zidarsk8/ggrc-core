@@ -3,7 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-modal-issue-tracker-fields {
+modal-issue-tracker-fields,
+modal-issue-tracker-config-fields {
   .people-sync-state {
     display: inline-block;
     background-color: $status-draft;
@@ -22,6 +23,14 @@ modal-issue-tracker-fields {
   .issue-tracker__dropdown {
     .input-block-level {
       margin-bottom: 8px !important;
+    }
+  }
+
+  .issue-tracker__toolbar {
+    margin: 4px 0;
+
+    .btn {
+      margin-right: 6px;
     }
   }
 

@@ -147,7 +147,7 @@ export default canComponent.extend({
       assessmentModel = new Assessment(data);
 
       // force remove issue_tracker field
-      delete assessmentModel.issue_tracker;
+      assessmentModel.removeAttr('issue_tracker');
 
       return assessmentModel.save();
     },

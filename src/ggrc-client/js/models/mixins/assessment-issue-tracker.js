@@ -3,14 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loGet from 'lodash/get';
 import canMap from 'can-map';
 import Mixin from './mixin';
 import * as issueTrackerUtils from '../../plugins/utils/issue-tracker-utils';
-import {
-  buildParam,
-  batchRequests,
-} from '../../plugins/utils/query-api-utils';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {reify} from '../../plugins/utils/reify-utils';
 
@@ -18,9 +13,8 @@ export default Mixin.extend(
   issueTrackerUtils.issueTrackerStaticFields,
   {
     'after:init': function () {
-      this.initIssueTracker().then(() => {
-        this.trackAuditUpdates();
-      });
+      this.initIssueTracker();
+      this.trackAuditUpdates();
     },
     'before:refresh'() {
       issueTrackerUtils.cleanUpWarnings(this);
@@ -52,45 +46,23 @@ export default Mixin.extend(
         this.attr('issue_tracker', new canMap({}));
       }
 
-      let dfd = $.Deferred();
-
-      this.ensureParentAudit().then((audit) => {
-        if (audit) {
-          this.attr('audit', audit);
-          this.initIssueTrackerForAssessment();
-          dfd.resolve();
-        } else {
-          dfd.reject();
-        }
-      });
-      return dfd;
+      let audit = this.getParentAudit();
+      this.attr('audit', audit);
+      this.initIssueTrackerForAssessment();
     },
-    ensureParentAudit() {
-      const pageInstance = getPageInstance();
-      const dfd = new $.Deferred();
+    getParentAudit() {
       if (this.audit) {
-        return dfd.resolve(this.audit);
+        return this.audit;
       }
 
       if (this.isNew()) {
-        if (pageInstance && pageInstance.type === 'Audit') {
-          dfd.resolve(pageInstance);
+        const pageInstance = getPageInstance();
+        if (pageInstance.type !== 'Audit') {
+          throw new Error('Assessment must be created from Audit page only');
         }
-      } else {
-        // audit is not page instane if AssessmentTemplate is edited
-        // from Global Search results
-        const param = buildParam('Audit', {}, {
-          type: this.type,
-          id: this.id,
-        }, ['id', 'title', 'type', 'context', 'issue_tracker']);
 
-        batchRequests(param).then((response) => {
-          this.audit = loGet(response, 'Audit.values[0]');
-          dfd.resolve(this.audit);
-        });
+        return pageInstance;
       }
-
-      return dfd;
     },
     /**
      * Initializes Issue Tracker for Assessment and Assessment Template
@@ -116,6 +88,13 @@ export default Mixin.extend(
         issueTracker,
         auditItr.enabled
       );
+    },
+    setDefaultHotlistAndComponent() {
+      let config = this.attr('audit.issue_tracker');
+      this.attr('issue_tracker').attr({
+        hotlist_id: config.hotlist_id,
+        component_id: config.component_id,
+      });
     },
     issueCreated() {
       return this.attr('can_use_issue_tracker')

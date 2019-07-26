@@ -10,18 +10,56 @@ import '../dropdown/dropdown-component';
 import '../numberbox/numberbox-component';
 import template from './templates/modal-issue-tracker-fields.stache';
 
+const state = {
+  NOT_SELECTED: 0,
+  GENERATE_NEW: 1,
+  LINK_TO_EXISTING: 2,
+  LINKED: 3,
+};
+
 export default canComponent.extend({
   tag: 'modal-issue-tracker-fields',
   view: canStache(template),
   leakScope: true,
   viewModel: canMap.extend({
+    define: {
+      displayFields: {
+        get() {
+          return this.attr('instance.issue_tracker.enabled') &&
+            this.attr('currentState') !== state.NOT_SELECTED;
+        },
+      },
+    },
     instance: {},
     note: '',
-    linkingNote: '',
     mandatoryTicketIdNote: '',
-    setIssueTitle: false,
-    allowToChangeId: false,
     isTicketIdMandatory: false,
+    state,
+    currentState: state.NOT_SELECTED,
+    generateNewTicket() {
+      if (this.attr('currentState') === state.GENERATE_NEW) {
+        return;
+      }
+
+      this.attr('currentState', state.GENERATE_NEW);
+      this.setValidationFlags({linking: false, initialized: true});
+
+      this.attr('instance').setDefaultHotlistAndComponent();
+      this.attr('instance.issue_tracker.issue_id', null);
+    },
+    linkToExistingTicket() {
+      if (this.attr('currentState') === state.LINK_TO_EXISTING) {
+        return;
+      }
+
+      this.attr('currentState', state.LINK_TO_EXISTING);
+      this.setValidationFlags({linking: true, initialized: true});
+
+      this.attr('instance.issue_tracker').attr({
+        hotlist_id: null,
+        component_id: null,
+      });
+    },
     setTicketIdMandatory() {
       let instance = this.attr('instance');
 
@@ -31,13 +69,43 @@ export default canComponent.extend({
             .includes(instance.attr('status')));
       }
     },
+    setValidationFlags({initialized, linking}) {
+      this.attr('instance.issue_tracker').attr({
+        _linking: linking,
+        _initialized: initialized,
+      });
+    },
+    statusChanged() {
+      this.setTicketIdMandatory();
+
+      if (this.attr('currentState') === state.GENERATE_NEW &&
+        this.attr('isTicketIdMandatory')) {
+        this.linkToExistingTicket();
+      }
+    },
   }),
   events: {
     inserted() {
-      this.viewModel.setTicketIdMandatory();
+      let vm = this.viewModel;
+
+      vm.setTicketIdMandatory();
+      if (vm.attr('instance').issueCreated()) {
+        vm.attr('currentState', state.LINKED);
+        vm.setValidationFlags({initialized: true, linking: false});
+        return;
+      }
+
+      vm.setValidationFlags({initialized: false, linking: false});
     },
     '{viewModel.instance} status'() {
-      this.viewModel.setTicketIdMandatory();
+      this.viewModel.statusChanged();
+    },
+    removed() {
+      let instance = this.viewModel.attr('instance');
+      if (instance) {
+        instance.removeAttr('issue_tracker._linking');
+        instance.removeAttr('issue_tracker._initialized');
+      }
     },
   },
 });
