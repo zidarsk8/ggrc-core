@@ -13,7 +13,7 @@ from ggrc.data_platform import computed_attributes
 from ggrc.models import person
 from ggrc.models.reflection import AttributeInfo
 from ggrc.converters import errors
-from ggrc.converters import get_exportables
+from ggrc.converters import get_exportables, get_importables
 from ggrc.converters.column_handlers import model_column_handlers
 from ggrc.converters.handlers import handlers
 
@@ -215,16 +215,18 @@ def count_objects(csv_data):
     }
     if error:
       info["block_errors"].append(errors.WRONG_OBJECT_TYPE.format(**error))
+      if name == '':
+        info["block_warnings"].append(errors.SNAPSHOT_IMPORT_WARNING.format(**error))
     return info
 
-  exportables = get_exportables()
+  importables = get_importables()
   offsets_and_data_blocks = split_blocks(csv_data)
   blocks_info = []
   failed = False
   counts = {}
   for offset, data, _ in offsets_and_data_blocks:
     class_name = data[1][0].strip().lower()
-    object_class = exportables.get(class_name, "")
+    object_class = importables.get(class_name, "")
     rows = len(data) - 2
     if object_class:
       object_name = object_class.__name__
