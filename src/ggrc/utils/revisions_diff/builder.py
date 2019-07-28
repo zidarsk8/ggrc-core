@@ -327,6 +327,17 @@ def prepare(instance, content):
   )
 
 
+def is_identical_revision(context_1, context_2):
+  """Checks revisions contexts for identity."""
+  attr_to_exclude = 'updated_at'
+  for key, value in context_1.items():
+    if key == attr_to_exclude:
+      continue
+    if key in context_2 and context_2[key] != value:
+      return False
+  return True
+
+
 def prepare_content_full_diff(instance_meta_info, l_content, r_content):
   """Prepare diff between two revisions contents of same instance.
 

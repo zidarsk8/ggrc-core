@@ -27,6 +27,7 @@ from ggrc.models.mixins import with_last_assessment_date
 from ggrc.models.mixins.synchronizable import Synchronizable
 from ggrc.utils import benchmark
 from ggrc.utils import errors
+from ggrc.utils.revisions_diff import builder as revisions_diff
 
 
 class Snapshot(rest_handable.WithDeleteHandable,
@@ -142,7 +143,10 @@ class Snapshot(rest_handable.WithDeleteHandable,
   @builder.simple_property
   def is_identical_revision(self):
     """Flag if the snapshot has the identical revision."""
-    return not any(self.revision.diff_with_current().values())
+    return self.revisions and revisions_diff.is_identical_revision(
+        self.revision.content,
+        self.revisions[-1].content
+    )
 
   @classmethod
   def eager_query(cls, **kwargs):
