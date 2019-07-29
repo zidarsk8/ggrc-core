@@ -36,12 +36,6 @@ export default canComponent.extend({
         this.onActionKey(event.keyCode);
         event.preventDefault();
       }
-      this.dispatch({
-        type: 'keyDown',
-        key: event.key,
-        code: event.code,
-        keyCode: event.keyCode,
-      });
     },
     onKeyUp(event) {
       const inputValue = event.target.value;
@@ -49,6 +43,12 @@ export default canComponent.extend({
       if (!DROPDOWN_ACTION_KEYS.includes(event.code)) {
         this.attr('searchValue', inputValue);
       }
+      this.dispatch({
+        type: 'keyUp',
+        key: event.key,
+        code: event.code,
+        keyCode: event.keyCode,
+      });
     },
     onInputFocus() {
       // hide suggestions

@@ -63,9 +63,9 @@ const viewModel = canMap.extend({
     this.attr('instance.name', person.name);
     this.setIsNameReadOnly();
   },
-  onEmailFieldKeyDown({key}) {
+  onEmailFieldKeyUp({key}) {
     if (!NO_RESET_KEYS.includes(key)) {
-      this.attr('isNameReadOnly', false);
+      this.setIsNameReadOnly();
     }
   },
   init() {

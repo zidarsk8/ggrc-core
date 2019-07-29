@@ -43,15 +43,6 @@ describe('person-autocomplete-field', () => {
       };
     });
 
-    it('dispatches keyDown event with original key and code', (done) => {
-      vm.bind('keyDown', (localEvent) => {
-        expect(localEvent.key).toBe(1);
-        expect(localEvent.code).toBe(2);
-        done();
-      });
-      vm.onKeyDown({...event, key: 1, code: 2});
-    });
-
     it('prevents default browser behavior when arrow is clicked', () => {
       const preventDefaultSpy = spyOn(event, 'preventDefault');
       vm.onKeyDown({...event, code: 'ArrowUp'});
@@ -90,6 +81,16 @@ describe('person-autocomplete-field', () => {
       vm.attr('searchValue', '');
       vm.onKeyUp({...event, code: 'ArrowDown'});
       expect(vm.attr('searchValue')).toBe('');
+    });
+
+    it('dispatches keyUp event with original key, code and keyCode', (done) => {
+      vm.bind('keyUp', (localEvent) => {
+        expect(localEvent.key).toBe(1);
+        expect(localEvent.code).toBe(2);
+        expect(localEvent.keyCode).toBe(3);
+        done();
+      });
+      vm.onKeyUp({...event, key: 1, code: 2, keyCode: 3});
     });
   });
 });
