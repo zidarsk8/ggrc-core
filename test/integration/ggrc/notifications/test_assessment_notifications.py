@@ -165,11 +165,11 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(len(notifs), 1)
     self.assertEqual(
         updated[self.assessment.id]["updated_data"]["EVIDENCE URL"],
-        ([evidence_url], [])
+        (evidence_url, "")
     )
     self.assertEqual(
         updated[self.assessment.id]["updated_data"]["EVIDENCE FILE"],
-        ([evidence_file], [])
+        (evidence_file, "")
     )
 
   def test_ca_change_by_import(self):
@@ -243,11 +243,11 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(len(notifs), 1)
     self.assertEqual(
         updated[self.assessment.id]["updated_data"]["PRIMARY CONTACTS"],
-        ([], ["user@example.com"])
+        ("", "user@example.com")
     )
     self.assertEqual(
         updated[self.assessment.id]["updated_data"]["SECONDARY CONTACTS"],
-        (["user@example.com"], [])
+        ("user@example.com", "")
     )
 
   def test_multiply_updates(self):

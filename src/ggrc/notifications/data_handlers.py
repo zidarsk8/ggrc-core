@@ -160,6 +160,8 @@ def _get_displayed_updated_data(attr_name, new_val, old_val, definitions):
   definition = definitions.get(attr_name, None)
   updated_data = {}
   if new_val or old_val:
+    new_val = ','.join(new_val) if isinstance(new_val, list) else new_val
+    old_val = ','.join(old_val) if isinstance(old_val, list) else old_val
     if definition:
       updated_data[definition["display_name"].upper()] = (
           new_val,
