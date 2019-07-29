@@ -27,6 +27,7 @@ export default canComponent.extend({
   leakScope: true,
   viewModel: canMap.extend({
     types: [],
+    editMode: true,
     field: null,
     /*
      * Removes `field` from `fields`
@@ -39,8 +40,6 @@ export default canComponent.extend({
         type: 'remove',
         field: this.attr('field'),
       });
-
-      this.attr('_pending_delete', true);
     },
     /*
      * Denormalize field.multi_choice_mandatory into opts

@@ -149,66 +149,12 @@
 
     <div class="spacing-top row-fluid hidable">
       <label>Custom Attributes</label>
-      <div class="custom-attr-wrap define-attr">
-        <div>
-          <div class="row-fluid">
-            <div class="custom-attr-list span12">
-              <assessment-template-attributes fields:from="instance.custom_attribute_definitions">
-                <div class="attr-titles">
-                  <ul>
-                    <li class="row-fluid">
-                      <div class="span-custom2-and-half">
-                        <h6>Attribute Title</h6>
-                      </div>
-                      <div class="span-custom1-and-half">
-                        <h6>Attribute type</h6>
-                      </div>
-                      <div class="span2">
-                        <h6>Attribute values</h6>
-                      </div>
-                      <div class="span1 centered">
-                        <h6>Evidence File Required</h6>
-                      </div>
-                      <div class="span1 centered">
-                        <h6>Evidence URL Required</h6>
-                      </div>
-                      <div class="span1 centered">
-                        <h6>Comment required</h6>
-                      </div>
-                      <div class="span1 centered">
-                        <h6>Mandatory</h6>
-                      </div>
-                      <div class="span2">
-                        &nbsp;
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-                <div class="sortable-list new-attr-list">
-                  <ul>
-                    <li class="row-fluid add-field">
-                      <add-template-field
-                        types:from="types"
-                        fields:from="fields">
-                      </add-template-field>
-                    </li>
-                    {{#fields}}
-                      {{^if _pending_delete}}
-                          <li class="row-fluid sortable-item" {{canData 'field'}}>
-                              <template-field
-                                field:from="{.}"
-                                types:from="types"
-                                on:remove="fieldRemoved"></template-field>
-                          </li>
-                      {{/if}}
-                    {{/fields}}
-                  </ul>
-                </div>
-              </assessment-template-attributes>
-            </div>
-          </div>
+      <div class="row-fluid">
+        <div class="span12">
+          <assessment-template-attributes fields:from="instance.custom_attribute_definitions">
+          </assessment-template-attributes>
         </div>
-      </div><!-- custom-attr-wrap end -->
+      </div>
     </div>
 
     {{#if instance.can_use_issue_tracker}}
@@ -232,10 +178,9 @@
               <issue-tracker-switcher
                 instance:from="instance"
                 isIntegrationEnabled:bind="instance.issue_tracker.enabled">
-                  <modal-issue-tracker-fields
-                    instance:from="instance"
-                    note:from="'Turns on Ticket Tracker integration.'">
-                  </modal-issue-tracker-fields>
+                  <modal-issue-tracker-config-fields
+                    instance:from="instance">
+                  </modal-issue-tracker-config-fields>
               </issue-tracker-switcher>
             </div>
           </div>

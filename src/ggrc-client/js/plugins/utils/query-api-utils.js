@@ -327,7 +327,7 @@ function _buildObjectsFilter(stubs) {
     expression: {
       left: 'id',
       op: {name: 'IN'},
-      right: stubs.map((stub) => stub.attr('id')),
+      right: stubs.map((stub) => stub.id),
     },
   };
 }

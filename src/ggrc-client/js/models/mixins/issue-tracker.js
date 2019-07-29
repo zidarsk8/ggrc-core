@@ -41,6 +41,16 @@ export default Mixin.extend(
         true
       );
     },
+    setDefaultHotlistAndComponent() {
+      let config = this.constructor.buildIssueTrackerConfig ?
+        this.constructor.buildIssueTrackerConfig(this) :
+        {};
+
+      this.attr('issue_tracker').attr({
+        hotlist_id: config.hotlist_id,
+        component_id: config.component_id,
+      });
+    },
     issueCreated() {
       return GGRC.ISSUE_TRACKER_ENABLED
         && issueTrackerUtils.isIssueCreated(this);

@@ -96,10 +96,9 @@ export default canComponent.extend({
 
       this._results = null;
       que.enqueue(list).trigger().then(function (items) {
-        let results = loMap(items, function (item) {
-          let id = options.assessmentTemplate.split('-')[0];
-          return this.generateModel(item, id);
-        }.bind(this));
+        let results = loMap(items, (item) =>
+          this.generateModel(item, options.assessmentTemplate)
+        );
         this._results = results;
         $.when(...results)
           .then(function () {
@@ -140,14 +139,14 @@ export default canComponent.extend({
 
       if (template) {
         data.template = {
-          id: Number(template),
+          id: template.id,
           type: 'AssessmentTemplate',
         };
       }
       assessmentModel = new Assessment(data);
 
       // force remove issue_tracker field
-      delete assessmentModel.issue_tracker;
+      assessmentModel.removeAttr('issue_tracker');
 
       return assessmentModel.save();
     },

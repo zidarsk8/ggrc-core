@@ -1,0 +1,90 @@
+{{!
+  Copyright (C) 2019 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="ggrc-form-item">
+  <div class="ggrc-form-item__row">
+    <label class="ggrc-form-item__label">
+      Ticket Tracker
+    </label>
+    <div class="ggrc-form-item__note">
+      <span class="issue-tracker__note">Turns on Ticket Tracker integration.</span>
+    </div>
+    <div class="ggrc-form-item__multiple-row">
+      <dropdown-component class="issue-tracker__dropdown"
+          optionsList:from="instance.constructor.issue_tracker_enable_options"
+          name:bind="isIntegrationEnabled"
+      ></dropdown-component>
+      {{#if_instance_of instance 'Audit'}}
+        {{#if instance.issue_tracker.enabled}}
+          <div class="ggrc-form-item__note people-sync">
+            <label class="people-sync__label">
+              <input type="checkbox" el:checked:bind="instance.issue_tracker.people_sync_enabled"
+              >Sync people with Ticket Tracker
+            </label>
+            <i class="fa fa-question-circle" rel="tooltip"
+              title="Check the box to enable sync between Audit roles and Ticket Tracker. Uncheck the box to disable the sync."></i>
+          </div>
+        {{/if}}
+      {{/if_instance_of}}
+    </div>
+  </div>
+</div>
+
+{{#if instance.issue_tracker.enabled}}
+  <div class="ggrc-form-item">
+    <div class="ggrc-form-item__multiple-row">
+      <label class="ggrc-form-item__label">
+        Hotlist ID
+      </label>
+      <numberbox-component
+                 additionalClass:from="'input-block-level'"
+                 placeholder:from="'Enter Hotlist ID'"
+                 value:bind="instance.issue_tracker.hotlist_id">
+      </numberbox-component>
+    </div>
+    <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.component_id"}}field-failure{{/isValidAttr}}">
+      <label class="form-label ggrc-form-item__label">
+        Component ID
+        <i class="fa fa-asterisk"></i>
+      </label>
+      <numberbox-component
+                 additionalClass:from="'input-block-level'"
+                 placeholder:from="'Enter Component ID'"
+                 value:bind="instance.issue_tracker.component_id">
+      </numberbox-component>
+      {{#validateAttr instance "issue_tracker.component_id"}}
+        <label class="help-inline warning">{{this}}</label>
+      {{/validateAttr}}
+    </div>
+    <div class="ggrc-form-item__multiple-row">
+      <label class="ggrc-form-item__label">
+        Ticket Type
+      </label>
+      <div>
+        {{instance.issue_tracker.issue_type}}
+      </div>
+    </div>
+  </div>
+
+  <div class="ggrc-form-item">
+    <div class="ggrc-form-item__multiple-row">
+      <label class="ggrc-form-item__label">
+        Ticket Priority
+      </label>
+      <dropdown-component optionsList:from="instance.constructor.issue_tracker_priorities"
+                name:bind="instance.issue_tracker.issue_priority">
+      </dropdown-component>
+    </div>
+    <div class="ggrc-form-item__multiple-row">
+      <label class="ggrc-form-item__label">
+        Ticket Severity
+      </label>
+      <dropdown-component instance:from="instance"
+                optionsList:from="instance.constructor.issue_tracker_severities"
+                name:bind="instance.issue_tracker.issue_severity">
+      </dropdown-component>
+    </div>
+  </div>
+{{/if}}

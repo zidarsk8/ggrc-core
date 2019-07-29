@@ -126,6 +126,42 @@
       </div>
     </div>
 
+    {{#if new_object_form}}
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__row">
+          <label class="ggrc-form-item__label assessment-template-dropdown">
+            Select Assessment Template
+            <i class="fa fa-question-circle"
+              rel="tooltip"
+              title="The following local custom attributes will be added to Assessment from chosen Assessment template.">
+            </i>
+          </label>
+          <div class="template-select">
+            <assessment-templates-dropdown
+              instance:from="instance.audit"
+              extraClassName:from="'template-select__dropdown'"
+              on:vm:onTemplateChanged="onAssessmentTemplateChanged(scope.event)" />
+            <spinner-component
+              class="template-select__spinner"
+              toggle:from="isInitialTemplateLoading" />
+          </div>
+        </div>
+      </div>
+      {{#if assessmentTemplate}}
+        <div class="ggrc-form-item">
+          <div class="ggrc-form-item__row">
+              <label class="ggrc-form-item__label">
+                Custom Attributes
+              </label>
+              <assessment-template-attributes
+                fields:from="assessmentTemplate.custom_attribute_definitions"
+                isLoading:from="isAttributesLoading"
+                editMode:from="false" />
+          </div>
+        </div>
+      {{/if}}
+    {{/if}}
+
     <div class="ggrc-form-item">
       <div class="ggrc-form-item__row">
         <deferred-mapper class="width-100"
@@ -230,10 +266,7 @@
             isIntegrationEnabled:bind="instance.issue_tracker.enabled">
               <modal-issue-tracker-fields
                 instance:from="instance"
-                allowToChangeId:from="true"
-                linkingNote:from="'Please leave this empty for a new ticket to be generated and linked to this assessment. If you would like to link to an existing ticket please provide the ticket number.'"
-                mandatoryTicketIdNote:from="'You are not allowed to generate new ticket for Issues at statuses &quot;In Review&quot;, &quot;Completed (no verification)&quot;, &quot;Completed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform. If you would like to keep the existing ticket linked to this issue do not edit this attribute. If you would like to link to a different ticket provide an existing ticket number.'"
-                setIssueTitle:from="setIssueTitle"
+                mandatoryTicketIdNote:from="'You are not allowed to generate new ticket for Issues at statuses &quot;In Review&quot;, &quot;Completed (no verification)&quot;, &quot;Completed and Verified&quot; and &quot;Deprecated&quot;, only manual linking is allowed to perform.'"
                 note:from="'Turns on Ticket Tracker integration.'">
               </modal-issue-tracker-fields>
           </issue-tracker-switcher>

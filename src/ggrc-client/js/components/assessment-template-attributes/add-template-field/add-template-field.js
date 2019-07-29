@@ -135,8 +135,7 @@ const isEqualTitle = (title, attr) => {
 
 const isDublicateTitle = (fields, selectedTitle) => {
   let duplicateField = loSome(fields, (item) => {
-    return item.title.toLowerCase() === selectedTitle.toLowerCase() &&
-      !item._pending_delete;
+    return item.title.toLowerCase() === selectedTitle.toLowerCase();
   });
   return fields.length && duplicateField ?
     'A custom attribute with this title already exists' :

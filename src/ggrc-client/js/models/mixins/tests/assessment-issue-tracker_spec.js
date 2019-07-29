@@ -3,10 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import loSet from 'lodash/set';
 import canMap from 'can-map';
 import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
-import * as queryApiUtils from '../../../plugins/utils/query-api-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import assessmentIssueTracker from '../assessment-issue-tracker';
@@ -24,39 +22,33 @@ describe('assessmentIssueTracker mixin', () => {
       id: 123,
       title: 'Audit',
       type: 'Audit',
+      issue_tracker: {
+        hotlist_id: 'hotlist_id',
+        component_id: 'component_id',
+      },
     });
   });
 
   describe('"after:init" event', () => {
     const asmtProto = Assessment.prototype;
 
-    it('should call "initIssueTrackerForAssessment" for audit', (done) => {
-      let dfd = new $.Deferred();
-      spyOn(asmtProto, 'ensureParentAudit').and.returnValue(dfd);
+    it('should call "initIssueTrackerForAssessment" for audit', () => {
+      spyOn(asmtProto, 'getParentAudit').and.returnValue(audit);
       spyOn(asmtProto, 'initIssueTrackerForAssessment');
       makeFakeInstance({model: Assessment})({type: 'Assessment'});
 
-      dfd.resolve(audit).then(() => {
-        expect(asmtProto.initIssueTrackerForAssessment).toHaveBeenCalled();
-        done();
-      });
+      expect(asmtProto.initIssueTrackerForAssessment).toHaveBeenCalled();
     });
 
-    it('should call "trackAuditUpdates" method', (done) => {
-      let dfd = $.Deferred();
-      spyOn(asmtProto, 'initIssueTracker').and.returnValue(dfd);
+    it('should call "trackAuditUpdates" method', () => {
+      spyOn(asmtProto, 'initIssueTracker');
       spyOn(asmtProto, 'trackAuditUpdates');
       makeFakeInstance({model: Assessment})({type: 'Assessment'});
-      dfd.then(() => {
-        expect(asmtProto.trackAuditUpdates).toHaveBeenCalled();
-        done();
-      });
-
-      dfd.resolve();
+      expect(asmtProto.trackAuditUpdates).toHaveBeenCalled();
     });
   });
 
-  describe('ensureParentAudit() method: ', function () {
+  describe('getParentAudit() method: ', function () {
     let method;
     let assessment;
 
@@ -64,46 +56,24 @@ describe('assessmentIssueTracker mixin', () => {
       assessment = new canMap({
         audit,
       });
-      method = Mixin.prototype.ensureParentAudit;
+      method = Mixin.prototype.getParentAudit;
     });
 
-    it('should resolve to assigned audit property', function (done) {
-      method.apply(assessment).then((resolvedAudit) => {
-        expect(resolvedAudit).toEqual(audit);
-        done();
-      });
+    it('should resolve to assigned audit property', function () {
+      let resolvedAudit = method.apply(assessment);
+
+      expect(resolvedAudit).toEqual(audit);
     });
 
-    it('should resolve to audit from page instance', function (done) {
+    it('should resolve to audit from page instance', function () {
       spyOn(CurrentPageUtils, 'getPageInstance')
         .and.returnValue(audit);
 
       assessment.isNew = () => true;
       assessment.attr('audit', null);
 
-      method.apply(assessment).then((resolvedAudit) => {
-        expect(resolvedAudit).toEqual(audit);
-        done();
-      });
-    });
-
-    it('should fetch audit from server if not assigned and not in' +
-       ' page instance', function (done) {
-      spyOn(CurrentPageUtils, 'getPageInstance')
-        .and.returnValue({ });
-
-      let dfd = new $.Deferred();
-      dfd.resolve(loSet({}, 'Audit.values[0]', audit));
-      spyOn(queryApiUtils, 'batchRequests').and.returnValue(dfd);
-
-      assessment.attr('audit', null);
-      assessment.isNew = () => false;
-
-      method.apply(assessment).then((resolvedAudit) => {
-        expect(queryApiUtils.batchRequests).toHaveBeenCalled();
-        expect(resolvedAudit).toEqual(audit);
-        done();
-      });
+      let resolvedAudit = method.apply(assessment);
+      expect(resolvedAudit).toEqual(audit);
     });
   });
 
@@ -263,4 +233,27 @@ describe('assessmentIssueTracker mixin', () => {
       );
     }
   );
+
+  describe('setDefaultHotlistAndComponent() method', () => {
+    let method;
+
+    beforeAll(() => {
+      method = Assessment.prototype.setDefaultHotlistAndComponent;
+    });
+
+    it('should set up default hotlist and component ids', () => {
+      spyOn(Assessment.prototype, 'getParentAudit').and.returnValue(audit);
+      const stub = makeFakeInstance({model: Assessment})();
+
+      stub.attr('issue_tracker').attr({
+        hotlist_id: null,
+        component_id: null,
+      });
+
+      method.apply(stub);
+
+      expect(stub.issue_tracker.hotlist_id).toBe('hotlist_id');
+      expect(stub.issue_tracker.component_id).toBe('component_id');
+    });
+  });
 });

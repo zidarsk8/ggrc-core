@@ -81,4 +81,34 @@ describe('issueTracker mixin', () => {
       expect(stub.attr('issue_tracker.enabled')).toBeFalsy();
     });
   });
+
+  describe('setDefaultHotlistAndComponent() method', () => {
+    let method;
+
+    beforeAll(() => {
+      method = Mixin.prototype.setDefaultHotlistAndComponent;
+    });
+
+    it('should set up default hotlist and component ids', () => {
+      const stub = makeFakeInstance({
+        model: Cacheable,
+        staticProps: {
+          buildIssueTrackerConfig() {
+            return {
+              hotlist_id: 'hotlist_id',
+              component_id: 'component_id',
+            };
+          },
+        },
+        instanceProps: {
+          issue_tracker: {},
+        },
+      })();
+
+      method.apply(stub);
+
+      expect(stub.issue_tracker.hotlist_id).toBe('hotlist_id');
+      expect(stub.issue_tracker.component_id).toBe('component_id');
+    });
+  });
 });

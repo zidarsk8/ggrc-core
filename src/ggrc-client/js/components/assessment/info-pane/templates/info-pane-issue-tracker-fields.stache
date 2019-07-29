@@ -91,37 +91,32 @@
 </div>
 <div class="ggrc-form-item">
   <div class="ggrc-form-item__multiple-row">
-    <assessment-inline-item
-      type:from="'number'"
-      propName:from="'issue_tracker.hotlist_id'"
-      isConfirmationNeeded:from="false"
-      setInProgress:from="@setInProgressState"
-      onStateChangeDfd:from="onStateChangeDfd"
-      isEditIconDenied:from="isEditDenied"
-      value:from="instance.issue_tracker.hotlist_id"
-      instance:from="instance">
-        <div class="ggrc-form__title">Hotlist ID</div>
-    </assessment-inline-item>
+    {{! use "inline-edit-control" to save styles... }}
+    <inline-edit-control value:from="instance.issue_tracker.hotlist_id">
+      <div class="inline">
+        <base-inline-control-title class="inline__header"
+                                   isEditIconDenied:from="true">
+            <div class="ggrc-form__title">Hotlist ID</div>
+        </base-inline-control-title>
+      </div>
+    </inline-edit-control>
   </div>
   <div class="ggrc-form-item__multiple-row">
-    <assessment-inline-item
-      type:from="'number'"
-      propName:from="'issue_tracker.component_id'"
-      mandatory:from="true"
-      isConfirmationNeeded:from="false"
-      setInProgress:from="@setInProgressState"
-      onStateChangeDfd:from="onStateChangeDfd"
-      isEditIconDenied:from="isEditDenied"
-      value:from="instance.issue_tracker.component_id"
-      instance:from="instance">
-        <div class="ggrc-form__title form-label form-label__extended">
+    {{! use "inline-edit-control" to save styles... }}
+    <inline-edit-control value:from="instance.issue_tracker.component_id">
+      <div class="inline">
+        <base-inline-control-title class="inline__header"
+                                   isEditIconDenied:from="true">
+          <div class="ggrc-form__title form-label form-label__extended">
             Component ID
-          <i class="fa fa-asterisk"></i>
-        </div>
-    </assessment-inline-item>
+            <i class="fa fa-asterisk"></i>
+          </div>
+        </base-inline-control-title>
+      </div>
+    </inline-edit-control>
   </div>
   <div class="ggrc-form-item__multiple-row">
-    <!-- use "inline-edit-control" to save styles... -->
+    {{! use "inline-edit-control" to save styles... }}
     <inline-edit-control value:from="instance.issue_tracker.issue_type">
       <div class="inline">
         <base-inline-control-title class="inline__header"

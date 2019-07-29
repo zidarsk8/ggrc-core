@@ -234,7 +234,10 @@ export default Cacheable.extend({
     issue_tracker: {
       value: {},
       validate: {
-        validateAssessmentIssueTracker: true,
+        validateIssueTrackerEnabled() {
+          return 'Assessment';
+        },
+        validateIssueTrackerComponentId: true,
         validateIssueTrackerTitle: true,
         validateIssueTrackerIssueId() {
           return this.constructor.unchangeableIssueTrackerIdStatuses;

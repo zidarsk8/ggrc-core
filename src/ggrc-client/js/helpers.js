@@ -702,7 +702,7 @@ canStache.registerHelper('validateAttr',
     attrName = isFunction(attrName) ? attrName() : attrName;
     const errorMessage = validateAttr(instance, attrName);
 
-    return errorMessage ?
+    return errorMessage && !instance._suppress_errors ?
       options.fn(errorMessage) :
       options.inverse(options.contexts);
   }
@@ -713,7 +713,7 @@ canStache.registerHelper('isValidAttr',
     instance = isFunction(instance) ? instance() : instance;
     attrName = isFunction(attrName) ? attrName() : attrName;
 
-    return isValidAttr(instance, attrName) ?
+    return (isValidAttr(instance, attrName) || instance._suppress_errors) ?
       options.fn(options.context) :
       options.inverse(options.contexts);
   }

@@ -72,9 +72,12 @@
 @import "components/proposable-control/proposable-control";
 @import "components/general-page-header/general-page-header";
 @import "components/people-autocomplete/people-autocomplete";
-@import "components/issue-tracker/_modal-issue-tracker-fields";
+@import "components/issue-tracker/_modal-issue-tracker";
 @import "components/issue-tracker/_info-issue-tracker-fields";
 @import "components/issue-tracker/_info-pane-issue-tracker-fields";
 @import "components/mapped-controls/mapped-controls";
 @import "components/dropdown-wrap-text/dropdown-wrap-text";
 @import "components/saved-search-list/saved-search-list";
+@import "components/assessment-template-attributes/assessment-template-attributes";
+@import "components/add-template-field/add-template-field";
+@import "components/template-field/template-field";

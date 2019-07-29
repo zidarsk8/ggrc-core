@@ -3,8 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<h6>Assessment template</h6>
-<dropdown-component className:from="'assessment-templates'"
-                    optionsList:from="templates"
+<dropdown-component className:from="extraClassName"
+                    optionsList:from="optionsList"
                     name:bind="assessmentTemplate">
 </dropdown-component>
