@@ -13,7 +13,7 @@ from ggrc.data_platform import computed_attributes
 from ggrc.models import person
 from ggrc.models.reflection import AttributeInfo
 from ggrc.converters import errors
-from ggrc.converters import get_exportables, get_importables
+from ggrc.converters import get_importables
 from ggrc.converters.column_handlers import model_column_handlers
 from ggrc.converters.handlers import handlers
 
@@ -216,7 +216,9 @@ def count_objects(csv_data):
     if error:
       info["block_errors"].append(errors.WRONG_OBJECT_TYPE.format(**error))
       if name == '':
-        info["block_warnings"].append(errors.SNAPSHOT_IMPORT_WARNING.format(**error))
+        info["block_warnings"].append(
+            errors.SNAPSHOT_IMPORT_WARNING.format(**error)
+        )
     return info
 
   importables = get_importables()
