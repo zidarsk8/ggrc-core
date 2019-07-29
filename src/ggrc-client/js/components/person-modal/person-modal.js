@@ -55,7 +55,7 @@ const viewModel = canMap.extend({
   },
   setIsNameReadOnly() {
     const email = this.attr('instance.email') || '';
-    const isEmailInternal = email.includes('@google.com');
+    const isEmailInternal = email.endsWith('@google.com');
     this.attr('isNameReadOnly', isEmailInternal);
   },
   personSelected({person}) {

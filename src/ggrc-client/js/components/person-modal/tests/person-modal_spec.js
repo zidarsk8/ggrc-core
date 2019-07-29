@@ -94,7 +94,7 @@ describe('person-modal component', () => {
   });
 
   describe('setIsNameReadOnly() method', () => {
-    it('sets true for internal emails', () => {
+    it('sets true for internal emails (which ends with @google.com)', () => {
       viewModel.attr('isNameReadOnly', false);
       viewModel.attr('instance.email', 'test@google.com');
       viewModel.setIsNameReadOnly();
@@ -104,6 +104,14 @@ describe('person-modal component', () => {
     it('sets false for external emails', () => {
       viewModel.attr('isNameReadOnly', true);
       viewModel.attr('instance.email', 'test@gmail.com');
+      viewModel.setIsNameReadOnly();
+      expect(viewModel.attr('isNameReadOnly')).toBe(false);
+    });
+
+    it('sets false if email contains,' +
+      'but doesn\'t end with @google.com', () => {
+      viewModel.attr('isNameReadOnly', false);
+      viewModel.attr('instance.email', 'test@google.commercial');
       viewModel.setIsNameReadOnly();
       expect(viewModel.attr('isNameReadOnly')).toBe(false);
     });
