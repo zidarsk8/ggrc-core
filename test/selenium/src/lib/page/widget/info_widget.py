@@ -808,7 +808,8 @@ class Requirements(InfoWidget):
 
 
 class Controls(page_mixins.WithAssignFolder,
-               page_mixins.WithDisabledProposals, InfoWidget):
+               page_mixins.WithDisabledProposals,
+               page_mixins.WithDisabledVersionHistory, InfoWidget):
   """Model for Control object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoControl
@@ -982,7 +983,8 @@ class Markets(InfoWidget):
     super(Markets, self).__init__(driver)
 
 
-class Risks(page_mixins.WithDisabledProposals, InfoWidget):
+class Risks(page_mixins.WithDisabledProposals,
+            page_mixins.WithDisabledVersionHistory, InfoWidget):
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
 

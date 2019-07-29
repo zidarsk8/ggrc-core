@@ -167,3 +167,18 @@ class WithProposals(WithDisabledProposals):
   def click_propose_changes(self):
     """Click on Propose Changes button."""
     self.propose_changes_btn.click()
+
+
+class WithDisabledVersionHistory(base.WithBrowser):
+  """A mixin for disabled objects pages with version history elements."""
+  # pylint: disable=invalid-name
+
+  @property
+  def version_history_tab_or_link_name(self):
+    """Returns a name of version history tab/link for active/disabled
+    objects."""
+    return "Version History"
+
+  def click_version_history(self):
+    """Click 'Version History' link or tab."""
+    self._browser.element(text=self.version_history_tab_or_link_name).click()
