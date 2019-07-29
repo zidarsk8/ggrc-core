@@ -94,7 +94,7 @@ class ProposalRow(object):
     comment = self._row_element.element(
         xpath=("//related-proposals-item/div[@class='flex-size-1 "
                "object-history__attr']")).text
-    return None if comment == "" else comment
+    return None if comment == "None" else comment
 
   def has_review_apply_btn(self):
     """Check if proposal Review&Apply button exists."""
