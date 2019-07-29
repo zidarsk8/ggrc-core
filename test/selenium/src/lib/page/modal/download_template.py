@@ -32,4 +32,7 @@ class DownloadTemplateModal(base.Modal):
   def available_templates_list(self):
     """Returns list of templates available for downloading."""
     self.expand_dropdown()
-    return sorted(self.dropdown.text.lower().splitlines())
+    self.dropdown.element(
+        class_name="multiselect-dropdown__body-wrapper").wait_until(
+        lambda e: e.present)
+    return sorted(self.dropdown.text.title().splitlines())
