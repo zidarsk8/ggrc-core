@@ -66,6 +66,8 @@ class IssueTrackerWithValidStates(IssueTrackerColumnHandler):
 
   def parse_item(self):
     value = self.raw_value.upper()
+    if not value:
+      return None
     if value not in self.valid_states:
       self.add_warning(
           errors.WRONG_VALUE_DEFAULT_CUSTOM,
@@ -80,6 +82,8 @@ class IssueTrackerAddsColumnHandler(IssueTrackerColumnHandler):
   """Column handler for hotlist and components ids"""
 
   def parse_item(self):
+    if not self.raw_value:
+      return None
     try:
       value = int(self.raw_value)
     except ValueError:
@@ -94,7 +98,9 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
-    value = self.raw_value or ""
+    value = self.raw_value
+    if not value:
+      return ""
     value = self.clean_whitespaces(value)
     if not value:
       value = self.row_converter.obj.title or \
@@ -175,6 +181,8 @@ class IssueTrackerEnabledHandler(IssueTrackerColumnHandler):
 
   def parse_item(self):
     value = self.raw_value.strip().lower()
+    if not value:
+      return None
     if value in self.TRUE_VALUES:
       if self._needs_status_check() and self._wrong_status():
         self.add_warning(self._get_err_message(),
