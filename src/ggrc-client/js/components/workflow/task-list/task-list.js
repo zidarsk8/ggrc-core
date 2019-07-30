@@ -8,7 +8,7 @@ import canMap from 'can-map';
 import canComponent from 'can-component';
 import template from './templates/task-list.stache';
 import Pagination from '../../base-objects/pagination';
-import Permission from '../../../permission';
+import {isAllowedFor} from '../../../permission';
 import {REFRESH_RELATED} from '../../../events/eventTypes';
 import TaskGroupTask from '../../../models/business-models/task-group-task';
 
@@ -24,7 +24,7 @@ const viewModel = canMap.extend({
       get() {
         const workflow = this.attr('workflow');
         return (
-          Permission.is_allowed_for('update', this.attr('baseInstance')) &&
+          isAllowedFor('update', this.attr('baseInstance')) &&
           workflow && workflow.attr('status') !== 'Inactive'
         );
       },

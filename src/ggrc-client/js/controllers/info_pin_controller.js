@@ -127,8 +127,8 @@ export default canControl.extend({
 
     this.prepareView(opts, el, maximizedState);
 
-    if (instance.info_pane_preload) {
-      instance.info_pane_preload();
+    if (instance.infoPanePreload) {
+      instance.infoPanePreload();
     }
 
     this.changeMaximizedState(maximizedState);

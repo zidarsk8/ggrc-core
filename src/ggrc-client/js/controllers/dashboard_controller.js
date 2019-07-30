@@ -35,7 +35,6 @@ const DashboardControl = canControl.extend({
   },
 }, {
   init: function (el, options) {
-    this.options = new canMap(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
@@ -132,7 +131,7 @@ const DashboardControl = canControl.extend({
   },
 
   tryToRefetchOnce(descriptor) {
-    const refetchOnce = this.options.attr('refetchOnce');
+    const refetchOnce = this.options.refetchOnce;
 
     if (!refetchOnce.size) {
       return false;
@@ -143,7 +142,7 @@ const DashboardControl = canControl.extend({
 
   addRefetchOnceItems(modelNames) {
     modelNames = typeof modelNames === 'string' ? [modelNames] : modelNames;
-    const refetchOnce = this.options.attr('refetchOnce');
+    const refetchOnce = this.options.refetchOnce;
 
     modelNames.forEach((modelName) => {
       refetchOnce.add(modelName);

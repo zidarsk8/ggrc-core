@@ -5,20 +5,22 @@
 
 import Mixin from './mixin';
 
-export default Mixin.extend({}, {
-  save_error: function (val) {
+export default class UniqueTitle extends Mixin {
+  saveError(val) {
     if (/title values must be unique\.$/.test(val)) {
       this.attr('_transient_title', val);
     }
-  },
-  after_save: function () {
+  }
+
+  afterSave() {
     this.removeAttr('_transient_title');
-  },
-  'before:attr': function (key, val) {
+  }
+
+  'before:attr'(key, val) {
     if (key === 'title' &&
       arguments.length > 1 &&
       this._transient) {
       this.attr('_transient_title', null);
     }
-  },
-});
+  }
+}

@@ -5,7 +5,7 @@
 
 import Component from '../task-list';
 import {getComponentVM} from '../../../../../js_specs/spec_helpers';
-import Permission from '../../../../permission';
+import * as Permission from '../../../../permission';
 import {REFRESH_RELATED} from '../../../../events/eventTypes';
 import TaskGroupTask from '../../../../models/business-models/task-group-task';
 
@@ -25,10 +25,10 @@ describe('task-list component', () => {
       describe('returns false', () => {
         it('when there are no "update" permissions for the passed task group',
           function () {
-            spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+            spyOn(Permission, 'isAllowedFor').and.returnValue(false);
             const result = viewModel.attr('showCreateTaskButton');
             expect(result).toBe(false);
-            expect(Permission.is_allowed_for).toHaveBeenCalledWith(
+            expect(Permission.isAllowedFor).toHaveBeenCalledWith(
               'update',
               viewModel.attr('baseInstance')
             );

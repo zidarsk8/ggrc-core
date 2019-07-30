@@ -5,7 +5,7 @@
 
 import {saveReview} from '../../../plugins/utils/object-review-utils';
 import Review from '../../../models/service-models/review';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 
 describe('object-review-utils', () => {
   let review;
@@ -22,7 +22,7 @@ describe('object-review-utils', () => {
 
       spyOn(review, 'save').and.returnValue(saveDfd.resolve(review));
       spyOn(review, 'refresh').and.returnValue(refreshDfd.resolve(review));
-      spyOn(Permission, 'refresh').and.returnValue($.when());
+      spyOn(Permission, 'refreshPermissions').and.returnValue($.when());
       reviewableInstance = jasmine.createSpyObj('reviewableInstance',
         {refresh: $.when()});
     });
@@ -42,7 +42,7 @@ describe('object-review-utils', () => {
 
       it('should refresh Permissions and reviewable object', (done) => {
         saveReview(review, reviewableInstance).then(() => {
-          expect(Permission.refresh).toHaveBeenCalled();
+          expect(Permission.refreshPermissions).toHaveBeenCalled();
           expect(reviewableInstance.refresh).toHaveBeenCalled();
           done();
         });
@@ -62,7 +62,7 @@ describe('object-review-utils', () => {
 
       it('should not refresh Permissions and reviewable object', () => {
         saveReview(review, reviewableInstance);
-        expect(Permission.refresh).not.toHaveBeenCalled();
+        expect(Permission.refreshPermissions).not.toHaveBeenCalled();
         expect(reviewableInstance.refresh).not.toHaveBeenCalled();
       });
     });

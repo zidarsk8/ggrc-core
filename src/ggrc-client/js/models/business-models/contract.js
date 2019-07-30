@@ -4,7 +4,7 @@
 */
 
 import Directive from './directive';
-import accessControlList from '../mixins/access-control-list';
+import AccessControlList from '../mixins/access-control-list';
 
 export default Directive.extend({
   root_object: 'contract',
@@ -20,7 +20,7 @@ export default Directive.extend({
   create: 'POST /api/contracts',
   update: 'PUT /api/contracts/{id}',
   destroy: 'DELETE /api/contracts/{id}',
-  mixins: [accessControlList],
+  mixins: [AccessControlList],
   is_custom_attributable: true,
   isRoleable: true,
   attributes: {

@@ -4,7 +4,7 @@
  */
 
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../related-people-access-control-group';
 
@@ -18,7 +18,7 @@ describe('related-people-access-control-group component', () => {
 
   describe('canEdit prop', () => {
     it('returns "false" when instance is snapshot', () => {
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(true);
       viewModel.instance.attr('archived', false);
       viewModel.attr('updatableGroupId', null);
       viewModel.attr('isNewInstance', false);
@@ -30,7 +30,7 @@ describe('related-people-access-control-group component', () => {
 
     it('returns "false" when instance is archived', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(true);
       viewModel.attr('updatableGroupId', null);
       viewModel.attr('isNewInstance', false);
 
@@ -43,7 +43,7 @@ describe('related-people-access-control-group component', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
       viewModel.instance.attr('archived', false);
       viewModel.attr('isNewInstance', false);
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
       viewModel.attr('updatableGroupId', 'groupId');
 
@@ -56,14 +56,14 @@ describe('related-people-access-control-group component', () => {
       viewModel.attr('updatableGroupId', null);
       viewModel.attr('isNewInstance', false);
 
-      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(false);
 
       expect(viewModel.attr('canEdit')).toEqual(false);
     });
 
     it('returns "false" when is readonly', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(false);
       viewModel.instance.attr('archived', false);
       viewModel.attr('updatableGroupId', null);
       viewModel.attr('isNewInstance', true);
@@ -74,7 +74,7 @@ describe('related-people-access-control-group component', () => {
 
     it('returns "true" when new instance', () => {
       spyOn(SnapshotUtils, 'isSnapshot').and.returnValue(false);
-      spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(false);
       viewModel.instance.attr('archived', false);
       viewModel.attr('updatableGroupId', null);
 
@@ -89,7 +89,7 @@ describe('related-people-access-control-group component', () => {
       viewModel.attr('updatableGroupId', null);
       viewModel.attr('isNewInstance', false);
 
-      spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
       expect(viewModel.attr('canEdit')).toEqual(true);
     });

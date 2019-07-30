@@ -5,8 +5,11 @@
 
 import Mixin from '../mixin';
 
-export default Mixin.extend({
+export default class ProgramNotifications extends Mixin {
+}
+
+Object.assign(ProgramNotifications.prototype, {
   send_by_default: true,
   recipients: 'Program Managers,Program Editors,Program Readers,' +
-  'Primary Contacts,Secondary Contacts',
+    'Primary Contacts,Secondary Contacts',
 });

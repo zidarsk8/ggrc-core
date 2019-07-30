@@ -6,7 +6,7 @@
 import canMap from 'can-map';
 import Component from '../related-urls';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import * as UrlUtils from '../../../plugins/utils/url-utils';
 
@@ -24,11 +24,11 @@ describe('related-urls component', () => {
 
   describe('canAddUrl get() method', () => {
     beforeEach(() => {
-      spyOn(Permission, 'is_allowed_for');
+      spyOn(Permission, 'isAllowedFor');
     });
 
     it('returns false if user can not update instance', () => {
-      Permission.is_allowed_for.and.returnValue(false);
+      Permission.isAllowedFor.and.returnValue(false);
       viewModel.attr('instance').isNew.and.returnValue(false);
 
       let result = viewModel.attr('canAddUrl');
@@ -38,7 +38,7 @@ describe('related-urls component', () => {
 
     it(`returns false if user can update instance 
         but edit is disabled in the component`, () => {
-      Permission.is_allowed_for.and.returnValue(true);
+      Permission.isAllowedFor.and.returnValue(true);
       viewModel.attr('instance').isNew.and.returnValue(false);
       viewModel.attr('isNotEditable', true);
 
@@ -49,7 +49,7 @@ describe('related-urls component', () => {
 
     it('returns true if user can update instance and edit is not denied',
       () => {
-        Permission.is_allowed_for.and.returnValue(true);
+        Permission.isAllowedFor.and.returnValue(true);
         viewModel.attr('instance').isNew.and.returnValue(false);
         viewModel.attr('isNotEditable', false);
 
@@ -59,7 +59,7 @@ describe('related-urls component', () => {
       });
 
     it('returns true if user creates new instance', () => {
-      Permission.is_allowed_for.and.returnValue(false);
+      Permission.isAllowedFor.and.returnValue(false);
       viewModel.attr('instance').isNew.and.returnValue(true);
 
       let result = viewModel.attr('canAddUrl');
@@ -70,11 +70,11 @@ describe('related-urls component', () => {
 
   describe('canRemoveUrl get() method', () => {
     beforeEach(() => {
-      spyOn(Permission, 'is_allowed_for');
+      spyOn(Permission, 'isAllowedFor');
     });
 
     it('returns false if user can not update instance', () => {
-      Permission.is_allowed_for.and.returnValue(false);
+      Permission.isAllowedFor.and.returnValue(false);
       viewModel.attr('instance').isNew.and.returnValue(false);
 
       let result = viewModel.attr('canRemoveUrl');
@@ -84,7 +84,7 @@ describe('related-urls component', () => {
 
     it(`returns false if user can update instance 
         but edit is disabled in the component`, () => {
-      Permission.is_allowed_for.and.returnValue(true);
+      Permission.isAllowedFor.and.returnValue(true);
       viewModel.attr('instance').isNew.and.returnValue(false);
       viewModel.attr('isNotEditable', true);
 
@@ -95,7 +95,7 @@ describe('related-urls component', () => {
 
     it(`returns false if user can update instance, edit is is not denied,
         but removal is disabled by flag`, () => {
-      Permission.is_allowed_for.and.returnValue(true);
+      Permission.isAllowedFor.and.returnValue(true);
       viewModel.attr('instance').isNew.and.returnValue(false);
       viewModel.attr('isNotEditable', false);
       viewModel.attr('allowToRemove', false);
@@ -107,7 +107,7 @@ describe('related-urls component', () => {
 
     it(`returns true if user can update instance, edit is not denied,
         and removal is not disabled`, () => {
-      Permission.is_allowed_for.and.returnValue(true);
+      Permission.isAllowedFor.and.returnValue(true);
       viewModel.attr('instance').isNew.and.returnValue(false);
       viewModel.attr('isNotEditable', false);
       viewModel.attr('allowToRemove', true);
@@ -118,7 +118,7 @@ describe('related-urls component', () => {
     });
 
     it('returns true if user creates instance', () => {
-      Permission.is_allowed_for.and.returnValue(false);
+      Permission.isAllowedFor.and.returnValue(false);
       viewModel.attr('instance').isNew.and.returnValue(true);
 
       let result = viewModel.attr('canRemoveUrl');

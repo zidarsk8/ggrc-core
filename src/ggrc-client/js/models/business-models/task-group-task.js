@@ -8,8 +8,8 @@ import Cacheable from '../cacheable';
 import Workflow from './workflow';
 import TaskGroup from './task-group';
 import {getClosestWeekday} from '../../plugins/utils/date-utils';
-import contactable from '../mixins/contactable';
-import accessControlList from '../mixins/access-control-list';
+import Contactable from '../mixins/contactable';
+import AccessControlList from '../mixins/access-control-list';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -20,7 +20,7 @@ export default Cacheable.extend({
   update: 'PUT /api/task_group_tasks/{id}',
   destroy: 'DELETE /api/task_group_tasks/{id}',
 
-  mixins: [contactable, accessControlList],
+  mixins: [Contactable, AccessControlList],
   attributes: {
     context: Stub,
     modified_by: Stub,

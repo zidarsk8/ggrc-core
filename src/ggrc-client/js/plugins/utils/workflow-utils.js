@@ -5,7 +5,7 @@
 
 import loForEach from 'lodash/forEach';
 import {confirm} from '../../plugins/utils/modals';
-import Permission from '../../permission';
+import {refreshPermissions} from '../../permission';
 import Cycle from '../../models/business-models/cycle';
 import Stub from '../../models/stub';
 import {changeHash} from '../../router';
@@ -100,7 +100,7 @@ async function updateStatus(instance, status) {
 }
 
 function refreshTGRelatedItems(taskGroup) {
-  Permission.refresh();
+  refreshPermissions();
   taskGroup.refresh_all_force('workflow', 'context');
 }
 

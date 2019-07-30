@@ -19,7 +19,7 @@ import * as commentsUtils from '../../../../plugins/utils/comments-utils';
 import * as aclUtils from '../../../../plugins/utils/acl-utils';
 import * as caUtils from '../../../../plugins/utils/ca-utils';
 import * as DeferredTransactionUtil from '../../../../plugins/utils/deferred-transaction-utils';
-import Permission from '../../../../permission';
+import * as Permission from '../../../../permission';
 import {CUSTOM_ATTRIBUTE_TYPE} from '../../../../plugins/utils/custom-attribute/custom-attribute-config';
 import * as NotifiersUtils from '../../../../plugins/utils/notifiers-utils';
 import * as businessModels from '../../../../models/business-models';
@@ -248,17 +248,17 @@ describe('assessment-info-pane component', () => {
 
   describe('isEditDenied get() method', () => {
     beforeEach(function () {
-      spyOn(Permission, 'is_allowed_for');
+      spyOn(Permission, 'isAllowedFor');
       vm.attr('instance', {});
     });
 
     it('returns true if there are no update permissions for the ' +
     'current instance', function () {
       let result;
-      Permission.is_allowed_for.and.returnValue(false);
+      Permission.isAllowedFor.and.returnValue(false);
       result = vm.attr('isEditDenied');
       expect(result).toBe(true);
-      expect(Permission.is_allowed_for).toHaveBeenCalledWith(
+      expect(Permission.isAllowedFor).toHaveBeenCalledWith(
         'update',
         vm.attr('instance')
       );
@@ -267,7 +267,7 @@ describe('assessment-info-pane component', () => {
     describe('when there are update permissions for the current instance',
       () => {
         beforeEach(function () {
-          Permission.is_allowed_for.and.returnValue(true);
+          Permission.isAllowedFor.and.returnValue(true);
         });
 
         it('returns true if the current instance is archived', function () {
@@ -654,7 +654,7 @@ describe('assessment-info-pane component', () => {
       it('returns true if there is audit and it is allowed to read ' +
       'instance.audit', () => {
         vm.attr('instance.audit', {});
-        spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+        spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
         let result = vm.attr('isAllowedToMap');
 
@@ -671,7 +671,7 @@ describe('assessment-info-pane component', () => {
       it('returns false if there is audit but it is not allowed ' +
       'to read instance.audit', () => {
         vm.attr('instance.audit', {});
-        spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+        spyOn(Permission, 'isAllowedFor').and.returnValue(false);
 
         let result = vm.attr('isAllowedToMap');
 

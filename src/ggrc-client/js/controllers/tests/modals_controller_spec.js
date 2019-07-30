@@ -196,28 +196,28 @@ describe('ModalsController', function () {
         expect(ctrlInst.element.trigger).toHaveBeenCalledWith('loaded');
       });
 
-      it('calls form_preload of instance if it is defined', () => {
+      it('calls formPreload of instance if it is defined', () => {
         let pageInstance = {};
         spyOn(currentPageUtils, 'getPageInstance')
           .and.returnValue(pageInstance);
-        instance.form_preload = jasmine.createSpy();
+        instance.formPreload = jasmine.createSpy();
 
         method(instance);
 
-        expect(instance.form_preload).toHaveBeenCalledWith(
+        expect(instance.formPreload).toHaveBeenCalledWith(
           ctrlInst.options.new_object_form,
           ctrlInst.options.object_params,
           pageInstance
         );
       });
 
-      describe('if form_preload returns deferred', () => {
+      describe('if formPreload returns deferred', () => {
         let formPreloadDfd;
 
         beforeEach(() => {
           formPreloadDfd = $.Deferred();
           instance.backup = jasmine.createSpy('backup');
-          instance.form_preload = jasmine.createSpy('form_preload').and
+          instance.formPreload = jasmine.createSpy('formPreload').and
             .returnValue(formPreloadDfd);
         });
 
@@ -237,7 +237,7 @@ describe('ModalsController', function () {
         });
       });
 
-      it('returns resolved deferred if form_preload is not defined', (done) => {
+      it('returns resolved deferred if formPreload is not defined', (done) => {
         method(instance).done(() => {
           done();
         });

@@ -4,10 +4,10 @@
 */
 
 import Cacheable from '../cacheable';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/notifications/base-notifications';
-import issueTracker from '../mixins/issue-tracker';
+import CaUpdate from '../mixins/ca-update';
+import AccessControlList from '../mixins/access-control-list';
+import BaseNotifications from '../mixins/notifications/base-notifications';
+import IssueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -20,10 +20,10 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/issues/{id}',
   create: 'POST /api/issues',
   mixins: [
-    caUpdate,
-    accessControlList,
-    baseNotifications,
-    issueTracker,
+    CaUpdate,
+    AccessControlList,
+    BaseNotifications,
+    IssueTracker,
   ],
   is_custom_attributable: true,
   isRoleable: true,

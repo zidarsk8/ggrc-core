@@ -5,11 +5,12 @@
 
 import Mixin from './mixin';
 
-export default Mixin.extend({}, {
-  after_save: function () {
+export default class CaUpdate extends Mixin {
+  afterSave() {
     this.dispatch('readyForRender');
-  },
-  info_pane_preload: function () {
+  }
+
+  infoPanePreload() {
     this.refresh();
-  },
-});
+  }
+}

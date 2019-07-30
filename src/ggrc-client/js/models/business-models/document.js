@@ -7,8 +7,8 @@ import loFind from 'lodash/find';
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {backendGdriveClient} from '../../plugins/ggrc-gapi-client';
-import accessControlList from '../mixins/access-control-list';
-import caUpdate from '../mixins/ca-update';
+import AccessControlList from '../mixins/access-control-list';
+import CaUpdate from '../mixins/ca-update';
 import Stub from '../stub';
 
 const getAccessControlList = () => {
@@ -32,8 +32,8 @@ export default Cacheable.extend({
   update: 'PUT /api/documents/{id}',
   destroy: 'DELETE /api/documents/{id}',
   mixins: [
-    accessControlList,
-    caUpdate,
+    AccessControlList,
+    CaUpdate,
   ],
   statuses: [
     'Active',

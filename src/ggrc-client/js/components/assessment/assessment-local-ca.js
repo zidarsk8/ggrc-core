@@ -14,7 +14,7 @@ import {
 } from '../../plugins/utils/ca-utils';
 import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
 import tracker from '../../tracker';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import isFunction from 'can-util/js/is-function/is-function';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
 import {getPlainText} from '../../plugins/ggrc_utils';
@@ -45,7 +45,7 @@ export default canComponent.extend({
         value: false,
         get: function () {
           return this.attr('editMode') &&
-            Permission.is_allowed_for('update', this.attr('instance'));
+            isAllowedFor('update', this.attr('instance'));
         },
       },
       evidenceAmount: {
