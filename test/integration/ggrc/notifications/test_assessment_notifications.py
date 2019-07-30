@@ -145,8 +145,10 @@ class TestAssessmentNotification(TestCase):
     with factories.single_commit():
       evidence_url = "test.com"
       evidence_file = "test_gdrive.file"
-      evidence_1 = factories.EvidenceUrlFactory(link=evidence_url)
-      evidence_2 = factories.EvidenceFileFactory(link=evidence_file)
+      evidence_1 = factories.EvidenceUrlFactory(link=evidence_url,
+                                                title=evidence_url)
+      evidence_2 = factories.EvidenceFileFactory(link=evidence_file,
+                                                 title=evidence_file)
     response = self.api.put(self.assessment, {
         "actions": {"add_related": [
             {
@@ -170,6 +172,23 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(
         updated[self.assessment.id]["updated_data"]["EVIDENCE FILE"],
         (evidence_file, "")
+    )
+
+  def test_labels_change(self):
+    """Test notification updated data when labels are changed"""
+    label_new = factories.LabelFactory(name="test_label",
+                                       object_type='Assessment')
+    response = self.api.put(self.assessment, {'labels': [{
+        "name": label_new.name,
+        "id": label_new.id
+    }]})
+    self.assert200(response)
+    notifs, notif_data = common.get_daily_notifications()
+    updated = notif_data["user@example.com"]["assessment_updated"]
+    self.assertEqual(len(notifs), 1)
+    self.assertEqual(
+        updated[self.assessment.id]["updated_data"]["LABELS"],
+        ("test_label", "")
     )
 
   def test_ca_change_by_import(self):
