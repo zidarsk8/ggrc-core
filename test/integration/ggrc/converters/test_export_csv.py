@@ -69,6 +69,25 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Requirement", response.data)
     self.assertIn("Org Group", response.data)
 
+  @ddt.data("Program", "Regulation", "Objective", "Contract",
+            "Policy", "Standard", "Threat", "Requirement")
+  def test_empty_template_columns(self, object_name):
+    """Test review state/reviewers not exist in empty template"""
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": object_name, "fields": "all"},
+        ],
+    }
+
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertEqual(response.status_code, 200)
+    self.assertIn("Title*", response.data)
+    self.assertIn(object_name, response.data)
+    self.assertNotIn("Review State", response.data)
+    self.assertNotIn("Reviewers", response.data)
+
   @ddt.data("Assessment", "Issue")
   def test_ticket_tracker_field_order(self, model):
     """Tests if Ticket Tracker fields come before mapped objects for {}."""

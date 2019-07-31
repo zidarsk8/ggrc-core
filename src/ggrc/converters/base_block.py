@@ -20,6 +20,7 @@ from ggrc import utils
 from ggrc.models import exceptions
 from ggrc.models import all_models
 from ggrc.models import reflection
+from ggrc.models import review
 from ggrc.models import mixins
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
@@ -591,6 +592,10 @@ class ExportBlockConverter(BlockConverter):
     """Setup fields property."""
     if fields == "all":
       fields = self.object_headers.keys()
+    if not self.object_ids and issubclass(self.object_class,
+                                          review.Reviewable):
+      fields.remove("review_status")
+      fields.remove("reviewers")
     self.fields = import_helper.get_column_order(fields)
 
   def generate_csv_header(self):

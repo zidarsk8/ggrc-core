@@ -1000,7 +1000,11 @@ class ExportOnlyColumnHandler(ColumnHandler):
     super(ExportOnlyColumnHandler, self).__init__(*args, **kwargs)
 
   def parse_item(self):
-    pass
+    if self.raw_value:
+      self.add_warning(
+          errors.REVIEWABLE_WILL_BE_IGNORED,
+          column_name=self.display_name
+      )
 
   def set_obj_attr(self):
     pass
@@ -1009,7 +1013,7 @@ class ExportOnlyColumnHandler(ColumnHandler):
     pass
 
   def set_value(self):
-    pass
+    self.parse_item()
 
 
 class DirecPersonMappingColumnHandler(ExportOnlyColumnHandler):
