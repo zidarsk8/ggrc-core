@@ -200,7 +200,7 @@ class TestCountObjects(unittest.TestCase):
     test_data = [
         ['Object type',
          '', '', '', '', '', '', '', '', '', '', ''],
-        ['snapshot', 'Code', 'Audit', 'Revision Date', 'Title',
+        ['objective snapshot', 'Code', 'Audit', 'Revision Date', 'Title',
          'Description', 'Notes', 'Assessment Procedure',
          'Effective Date', 'Last Deprecated', 'Archived', 'State'],
         ['', '*OBJECTIVE-2', 'AUDIT-2', '7/22/2019', 'Objective Test1',
@@ -210,9 +210,9 @@ class TestCountObjects(unittest.TestCase):
     counts, blocks_info, failed = import_helper.count_objects(test_data)
     self.assertEqual(len(counts), 0)
     self.assertEqual(blocks_info[0]['block_errors'][0],
-                     "Line 2: Object type 'snapshot' "
+                     "Line 2: Object type 'objective snapshot' "
                      "doesn't exist or can't be imported.")
     self.assertEqual(blocks_info[0]['block_warnings'][0],
-                     "Line 2: Import for 'snapshot' "
+                     "Line 2: Import for 'objective snapshot' "
                      "object is not available in GGRC.")
     self.assertEqual(failed, True)
