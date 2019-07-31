@@ -362,12 +362,6 @@ let viewModel = canMap.extend({
 
     this._triggerListeners();
 
-    // load saved search if router has saved_search id
-    if (isLoadSavedSearch(this)) {
-      loadSavedSearch(this);
-      return;
-    }
-
     if (this.attr('refetch') ||
       router.attr('refetch') ||
       this.attr('options.forceRefetch') ||
@@ -839,7 +833,12 @@ export default canComponent.extend({
       this.element.closest('.widget')
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
       viewModel._triggerListeners();
-      viewModel.loadItems();
+
+      if (isLoadSavedSearch(this.viewModel)) {
+        loadSavedSearch(this.viewModel);
+      } else {
+        viewModel.loadItems();
+      }
     },
     '{viewModel.parent_instance} displayTree'([scope], {destinationType}) {
       this.viewModel.refresh(destinationType);
