@@ -1000,11 +1000,7 @@ class ExportOnlyColumnHandler(ColumnHandler):
     super(ExportOnlyColumnHandler, self).__init__(*args, **kwargs)
 
   def parse_item(self):
-    if self.raw_value:
-      self.add_warning(
-          errors.REVIEWABLE_WILL_BE_IGNORED,
-          column_name=self.display_name
-      )
+    pass
 
   def set_obj_attr(self):
     pass
@@ -1013,7 +1009,7 @@ class ExportOnlyColumnHandler(ColumnHandler):
     pass
 
   def set_value(self):
-    self.parse_item()
+    pass
 
 
 class DirecPersonMappingColumnHandler(ExportOnlyColumnHandler):
@@ -1046,7 +1042,21 @@ class ExportOnlyIssueTrackerColumnHandler(ExportOnlyColumnHandler):
     return cache.get(self.row_converter.obj.id, "")
 
 
-class ReviewersColumnHandler(ExportOnlyColumnHandler):
+class ReviewableColumnHandler(ExportOnlyColumnHandler):
+  """Only on export handler for Reviewable columns"""
+
+  def parse_item(self):
+    if self.raw_value and self.raw_value != self.get_value():
+      self.add_warning(
+          errors.REVIEWABLE_WILL_BE_IGNORED,
+          column_name=self.display_name
+      )
+
+  def set_value(self):
+    self.parse_item()
+
+
+class ReviewersColumnHandler(ReviewableColumnHandler):
   """Only on export handler for Reviewers column"""
 
   def get_value(self):
