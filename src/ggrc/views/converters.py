@@ -662,10 +662,14 @@ def handle_import_stop(**kwargs):
       return make_import_export_response(ie_job.log_json())
     if ie_job.status == "Stopped":
       raise models_exceptions.ImportStoppedException()
+    if ie_job.status == "Finished":
+      raise models_exceptions.ImportFinishedException()
   except wzg_exceptions.Forbidden:
     raise
   except models_exceptions.ImportStoppedException:
     raise wzg_exceptions.BadRequest(app_errors.IMPORT_STOPPED_WARNING)
+  except models_exceptions.ImportFinishedException:
+    raise wzg_exceptions.BadRequest(app_errors.IMPORT_FINISHED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
@@ -689,10 +693,14 @@ def handle_export_stop(**kwargs):
       return make_import_export_response(ie_job.log_json())
     if ie_job.status == "Stopped":
       raise models_exceptions.ExportStoppedException()
+    if ie_job.status == "Finished":
+      raise models_exceptions.ExportFinishedException()
   except wzg_exceptions.Forbidden:
     raise
   except models_exceptions.ExportStoppedException:
     raise wzg_exceptions.BadRequest(app_errors.EXPORT_STOPPED_WARNING)
+  except models_exceptions.ExportFinishedException:
+    raise wzg_exceptions.BadRequest(app_errors.EXPORT_FINISHED_WARNING)
   except Exception as e:
     logger.exception(e.message)
     raise wzg_exceptions.BadRequest(
