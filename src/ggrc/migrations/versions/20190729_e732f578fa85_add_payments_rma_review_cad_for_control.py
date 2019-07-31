@@ -2,29 +2,31 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
-Creator reads Program Proposals
+Add Payments RMA Review CAD for Control
 
-Create Date: 2019-07-25 11:55:57.361793
+Create Date: 2019-07-29 20:54:12.643551
 """
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
-from ggrc.migrations.utils import (
-    acr_propagation_constants_program_proposals as acr_constants
-)
-from ggrc.migrations.utils import acr_propagation
+from alembic import op
+
+from ggrc.migrations.utils import custom_attributes as cad_utils
 
 
 # revision identifiers, used by Alembic.
-revision = 'f00343450894'
-down_revision = '91d3ba424a6b'
+revision = 'e732f578fa85'
+down_revision = '17fbb17f7cec'
 
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  acr_propagation.propagate_roles(
-      acr_constants.GGRC_NEW_ROLES_PROPAGATION,
-      with_update=True
+  connection = op.get_bind()
+  cad_utils.create_custom_attribute(
+      connection,
+      name='Payments RMA Review',
+      attribute_type='Date',
+      for_object='control',
   )
 
 

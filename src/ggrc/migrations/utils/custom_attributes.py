@@ -9,7 +9,7 @@ from ggrc.migrations.utils import migrator
 
 
 # pylint: disable=too-many-arguments
-def create_custom_attribute(conn, name, definition_type, for_object,
+def create_custom_attribute(conn, name, attribute_type, for_object,
                             helptext=None, placeholder=None,
                             is_mandatory=False):
   """ Create custom attribute for given object."""
@@ -33,7 +33,7 @@ def create_custom_attribute(conn, name, definition_type, for_object,
       helptext=helptext,
       placeholder=placeholder,
       definition_type=for_object,
-      attribute_type=definition_type,
+      attribute_type=attribute_type,
       mandatory=is_mandatory
   )
   cad_id = utils.last_insert_id(conn)
