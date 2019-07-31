@@ -1,0 +1,10 @@
+# Copyright (C) 2019 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+[mysqld]
+thread_cache_size = 48
+max_allowed_packet = 32MB
+max_binlog_size = 100MB
+max_connections = 4000
+slave_net_timeout = 30
+host_cache_size = 803
