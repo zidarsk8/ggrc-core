@@ -17,7 +17,7 @@ from ggrc.migrations.utils import acr_propagation
 
 # revision identifiers, used by Alembic.
 revision = 'f00343450894'
-down_revision = '17fbb17f7cec'
+down_revision = '91d3ba424a6b'
 
 
 def upgrade():
