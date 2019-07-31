@@ -6,90 +6,60 @@
 import canMap from 'can-map';
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
+import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../snapshot-scope-update';
+import pubSub from '../../../pub-sub';
 
-describe('snapshot-scope-update component', function () {
-  'use strict';
+describe('snapshot-scope-update component', () => {
+  let viewModel;
 
-  let updaterViewModel;
-  let containerVM;
-  let originalHtml;
-
-  beforeAll(function () {
-    originalHtml = document.body.innerHTML;
-  });
-
-  afterAll(function () {
-    document.body.innerHTML = originalHtml;
-  });
-
-  beforeEach(function () {
-    updaterViewModel = getComponentVM(Component);
-    document.body.innerHTML =
-      '<tree-widget-container></tree-widget-container>' +
-      '<tree-widget-container></tree-widget-container>';
-    containerVM = {
-      setRefreshFlag: jasmine.createSpy('setRefreshFlag'),
-      display: jasmine.createSpy('display'),
-      model: {
-        model_singular: 'Control',
-      },
-    };
-    Object.assign(updaterViewModel, {
+  beforeEach(() => {
+    viewModel = getComponentVM(Component);
+    Object.assign(viewModel, {
       instance: new canMap({
         title: 'TITLE',
-        refresh: jasmine
-          .createSpy('refresh'),
+        refresh: jasmine.createSpy('refresh'),
         save: jasmine.createSpy('save'),
       }),
     });
-    spyOn($.prototype, 'viewModel').and.returnValue(containerVM);
   });
 
-  describe('upsertIt() method', function () {
-    let method;
-
-    beforeEach(function () {
-      method = updaterViewModel.upsertIt.bind(updaterViewModel);
+  describe('upsertIt() method', () => {
+    beforeEach(() => {
       spyOn(ModalsUtils, 'confirm').and.callThrough();
     });
 
-    describe('calls confirm method', function () {
-      it('one time', function () {
-        method(updaterViewModel);
+    describe('calls confirm method', () => {
+      it('one time', () => {
+        viewModel.upsertIt(viewModel);
 
         expect(ModalsUtils.confirm).toHaveBeenCalled();
       });
 
-      it('with given params', function () {
-        method(updaterViewModel);
+      it('with given params', () => {
+        viewModel.upsertIt(viewModel);
 
         expect(ModalsUtils.confirm.calls.argsFor(0)).toEqual([
           jasmine.objectContaining({
-            instance: updaterViewModel.instance,
+            instance: viewModel.instance,
             button_view: ModalsUtils.BUTTON_VIEW_CONFIRM_CANCEL,
             skip_refresh: true,
           }),
-          jasmine.any(Function),
           jasmine.any(Function),
         ]);
       });
     });
   });
 
-  describe('_refreshContainers() method', function () {
-    let method;
-    let refreshDfd;
-
-    beforeEach(function () {
-      method = updaterViewModel._refreshContainers.bind(updaterViewModel);
-      refreshDfd = new $.Deferred().resolve();
+  describe('refreshContainers() method', () => {
+    beforeEach(() => {
+      let refreshDfd = new $.Deferred().resolve();
       spyOn(WidgetsUtils, 'refreshCounts').and.returnValue(refreshDfd);
     });
 
-    it('refreshes all page counters', function (done) {
-      let result = method();
+    it('refreshes all page counters', (done) => {
+      let result = viewModel.refreshContainers();
       result.then(
         function () {
           expect(WidgetsUtils.refreshCounts).toHaveBeenCalled();
@@ -99,96 +69,68 @@ describe('snapshot-scope-update component', function () {
     });
 
     it('sets refresh flag for each tree-widget-container that contains' +
-    ' snapshots', function (done) {
-      method().then(() => {
-        $('tree-widget-container').each(function () {
-          let viewModel = $(this).viewModel();
-          expect(viewModel.setRefreshFlag).toHaveBeenCalledWith(true);
-          done();
-        });
-      });
-    });
+    ' snapshots', () => {
+      spyOn(pubSub, 'dispatch');
 
-    it('does not set refresh flag for each tree-widget-container that does ' +
-    'not contain snapshots', async function () {
-      Object.assign(containerVM.model, {model_singular: 'Something'});
-      await method();
-      $('tree-widget-container').each(function () {
-        let viewModel = $(this).viewModel();
-        expect(viewModel.setRefreshFlag).not.toHaveBeenCalled();
+      viewModel.refreshContainers();
+
+      expect(pubSub.dispatch).toHaveBeenCalledWith({
+        type: 'refetchOnce',
+        modelNames: GGRC.config.snapshotable_objects,
       });
     });
   });
 
-  describe('_success() method', function () {
-    let method;
-    let refreshDfd;
-
+  describe('success() method', () => {
     beforeEach(function () {
-      method = updaterViewModel._success.bind(updaterViewModel);
-      refreshDfd = new $.Deferred();
-      updaterViewModel.instance.refresh.and.returnValue(refreshDfd);
-      spyOn(updaterViewModel, '_showSuccessMsg');
-      spyOn(updaterViewModel, '_showProgressWindow');
+      let refreshDfd = new $.Deferred().resolve();
+      viewModel.instance.refresh.and.returnValue(refreshDfd);
+      spyOn(NotifiersUtils, 'notifier');
     });
 
-    it('refreshes the instance attached to the component', function () {
-      method();
-      expect(updaterViewModel.instance.refresh).toHaveBeenCalled();
+    it('refreshes the instance attached to the component', () => {
+      viewModel.success();
+      expect(viewModel.instance.refresh).toHaveBeenCalled();
     });
 
-    describe('after instance refresh', function () {
-      it('saves the instance attached to the component', function (done) {
-        let methodChain = method();
-        refreshDfd.resolve().then(() => {
-          methodChain.then(() => {
-            expect(updaterViewModel.instance.save).toHaveBeenCalled();
-            done();
-          });
+    describe('after instance refresh', () => {
+      it('saves the instance attached to the component', (done) => {
+        viewModel.success().then(() => {
+          expect(viewModel.instance.save).toHaveBeenCalled();
+          done();
         });
       });
 
-      it('sets snapshots attr for the instance', function (done) {
+      it('sets snapshots attr for the instance', (done) => {
         let expectedResult = {
           operation: 'upsert',
         };
         let wrongValue = {
           operation: 'wrongValue',
         };
-        updaterViewModel.instance.attr('snapshots', wrongValue);
-        let methodChain = method();
-        refreshDfd.resolve().then(() => {
-          methodChain.then(() => {
-            expect(updaterViewModel.instance.attr('snapshots'))
-              .toEqual(
-                jasmine.objectContaining(expectedResult)
-              );
-            done();
-          });
+        viewModel.instance.attr('snapshots', wrongValue);
+        viewModel.success().then(() => {
+          expect(viewModel.instance.attr('snapshots'))
+            .toEqual(
+              jasmine.objectContaining(expectedResult)
+            );
+          done();
         });
       });
 
-      it('shows progress message',
-        function (done) {
-          let methodChain = method();
-          refreshDfd.resolve().then(() => {
-            methodChain.then(() => {
-              expect(updaterViewModel._showProgressWindow).toHaveBeenCalled();
-              done();
-            });
-          });
-        });
+      it('shows progress message', () => {
+        viewModel.success();
+        expect(NotifiersUtils.notifier)
+          .toHaveBeenCalledWith('progress', jasmine.any(String));
+      });
 
-      it('shows success message',
-        function (done) {
-          let methodChain = method();
-          refreshDfd.resolve().then(() => {
-            methodChain.then(() => {
-              expect(updaterViewModel._showSuccessMsg).toHaveBeenCalled();
-              done();
-            });
-          });
+      it('shows success message', (done) => {
+        viewModel.success().then(() => {
+          expect(NotifiersUtils.notifier)
+            .toHaveBeenCalledWith('success', jasmine.any(String));
+          done();
         });
+      });
     });
   });
 });

@@ -98,7 +98,6 @@ export default canMap.extend({
       model: descriptor.model,
       order: descriptor.order,
       uncountable: descriptor.uncountable,
-      forceRefetch: descriptor.forceRefetch,
       count: 0,
       countsName: !descriptor.uncountable ? countsName : '',
       forceShow: false,

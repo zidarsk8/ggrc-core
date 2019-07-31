@@ -90,8 +90,8 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
     widget_name: 'History',
     widget_icon: 'history',
     model: Cycle,
-    forceRefetch: true,
     content_controller_options: {
+      forceRefetch: true,
       depth: true,
       filterDeepLimit: 2,
       parent_instance: object,
@@ -108,8 +108,8 @@ WorkflowExtension.init_widgets_for_workflow_page = function () {
     widget_name: 'Active Cycles',
     widget_icon: 'cycle',
     model: Cycle,
-    forceRefetch: true,
     content_controller_options: {
+      forceRefetch: true,
       depth: true,
       filterDeepLimit: 2,
       parent_instance: object,
