@@ -60,6 +60,10 @@ WRONG_VALUE = (u"Line {line}: Field '{column_name}' contains invalid data. The"
 WRONG_VALUE_DEFAULT = (u"Line {line}: Field '{column_name}' contains invalid"
                        u" data. The default value will be used.")
 
+WRONG_VALUE_DEFAULT_CUSTOM = (u"Line {line}: Field '{column_name}' contains "
+                              u"invalid data. The default value "
+                              u"'{default_value}' will be used.")
+
 WRONG_VALUE_CURRENT = (u"Line {line}: Field '{column_name}' contains invalid"
                        u" data. The current value will be used.")
 
