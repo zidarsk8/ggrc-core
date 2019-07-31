@@ -2,9 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """General UI facade."""
 # pylint: disable=invalid-name
-from lib import users, browsers
+from lib import users
 from lib.entities import entity_operations
-from lib.page.widget import object_page, object_modal
+from lib.page.widget import object_page
 from lib.ui import internal_ui_operations
 from lib.utils import selenium_utils
 
@@ -38,19 +38,3 @@ def delete_obj(obj):
 def active_tab_name():
   """Returns a tab name of the active tab."""
   return object_page.ObjectPage().top_tabs.active_tab.name
-
-
-def verify_modal_obj_not_present(modal_obj):
-  """Verifies that object is not present in current window."""
-  assert not modal_obj.is_present, ("Modal object {} should not be "
-                                    "present.".format(modal_obj.__class__))
-
-
-def verify_modal_obj_not_present_in_all_windows(modal_obj):
-  """Verifies that object is not present in any window."""
-  assert issubclass(modal_obj.__class__,
-                    object_modal.BaseObjectModal), ("Object should be derived "
-                                                    "from BaseObjectModal.")
-  for window in browsers.get_browser().windows():
-    window.use()
-    verify_modal_obj_not_present(modal_obj)

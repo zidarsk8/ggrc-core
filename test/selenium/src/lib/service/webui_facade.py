@@ -264,7 +264,10 @@ def map_object_via_unified_mapper(
     return_tree_items=False, open_in_new_frontend=False,
     proceed_in_new_tab=False
 ):
-  """Maps selected obj to dest_obj_type via Unified Mapper."""
+  """Maps selected obj to dest_obj_type via Unified Mapper.
+  Returns:
+    MapObjectsModal instance.
+  """
   assert dest_objs_type or obj_to_map, ("At least one of params "
                                         "should be provided.")
   if not dest_objs_type:
@@ -275,13 +278,13 @@ def map_object_via_unified_mapper(
                              return_tree_items=return_tree_items)
   if open_in_new_frontend:
     map_modal.open_in_new_frontend_btn.click()
-    return map_modal
   else:
     if obj_to_map:
       dest_obj_modal = map_modal.click_create_and_map_obj()
       dest_obj_modal.submit_obj(obj_to_map)
     if proceed_in_new_tab:
       object_modal.WarningModal().proceed_in_new_tab()
+  return map_modal
 
 
 def create_audit(selenium, program, **kwargs):
