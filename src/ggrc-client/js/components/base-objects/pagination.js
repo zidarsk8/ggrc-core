@@ -18,7 +18,7 @@ export default canMap.extend({
         let disabled = this.attr('disabled');
         let count = this.attr('count');
         if (newValue >= 1 &&
-          (_.isUndefined(count) || newValue <= count) &&
+          (count === undefined || newValue <= count) &&
           !disabled) {
           return newValue;
         }

@@ -422,10 +422,7 @@ describe('GGRC Utils Widgets', function () {
 
           expect(ggrcAjax.calls.count()).toEqual(1);
           reqParams = JSON.parse(ggrcAjax.calls.argsFor(0)[0].data);
-          reqParamNames = _.map(reqParams,
-            function (param) {
-              return param.object_name;
-            });
+          reqParamNames = reqParams.map((param) => param.object_name);
           expect(reqParams.length).toEqual(3);
           expect(reqParamNames).toContain('Program');
           expect(reqParamNames).toContain('Assessment');
@@ -440,15 +437,15 @@ describe('GGRC Utils Widgets', function () {
   describe('getWidgetConfigs() method', function () {
     it('should return object configs', function () {
       const result = WidgetsUtils.getWidgetConfigs(
-        [{name: 'Program'}, {name: 'Assesment'}]);
+        [{name: 'Program'}, {name: 'Assessment'}]);
       expect(result).toEqual([{
         name: 'Program',
         widgetName: 'Program',
         widgetId: 'Program',
       }, {
-        name: 'Assesment',
-        widgetName: 'Assesment',
-        widgetId: 'Assesment',
+        name: 'Assessment',
+        widgetName: 'Assessment',
+        widgetId: 'Assessment',
       }]);
     });
   });

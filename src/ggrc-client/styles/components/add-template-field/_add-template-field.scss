@@ -1,0 +1,46 @@
+/*
+ * Copyright (C) 2019 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+.add-template-field {
+  padding: 6px 0;
+  line-height: 24px;
+
+  &__input {
+    @extend %input-block-level;
+  }
+
+  &__section {
+    &-add-field {
+      flex-grow: 2.7;
+    }
+
+    &-values {
+      input {
+        float: left;
+        width: 80%;
+      }
+
+      i.fa {
+        float: left;
+        margin: 6px 0 0 6px;
+        opacity: 0.2;
+        &:hover {
+          opacity: 0.7;
+        };
+      }
+    }
+  }
+
+  label.warning {
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  input,
+  select {
+    margin-bottom: 0;
+  }
+}

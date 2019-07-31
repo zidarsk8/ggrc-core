@@ -4,6 +4,7 @@
 */
 
 import canMap from 'can-map';
+import canModel from 'can-model';
 import Component from './delete-button';
 import {getComponentVM} from '../../../js_specs/spec_helpers';
 import {Snapshot} from '../../models/service-models';
@@ -20,6 +21,7 @@ describe('delete-button component', () => {
 
   describe('setter of "instance"', () => {
     let cacheBackup;
+    let instance;
 
     beforeAll(() => {
       cacheBackup = Object.assign({}, Snapshot.cache);
@@ -29,38 +31,55 @@ describe('delete-button component', () => {
       Snapshot.cache = cacheBackup;
     });
 
-    it('returns new instance of Snapshot if setted value does not have class ' +
-    'and its type is "Snapsot"', () => {
-      vm.attr('instance', {
-        type: 'Snapshot',
+    it('returns new instance of Snapshot if it is not instance of canModel ' +
+      'and it is type is "Snapshot"', () => {
+      instance = new canMap({
         id: 1,
-      });
-
-      expect(vm.attr('instance')).toEqual(jasmine.any(Snapshot));
-      expect(vm.attr('instance')).toEqual(jasmine.objectContaining({
         type: 'Snapshot',
-        id: 1,
-      }));
-    });
-
-    it('returns setted instance if it has class', () => {
-      const instance = new canMap({
-        id: 2,
-        'class': 'mockClass',
       });
       vm.attr('instance', instance);
 
-      expect(vm.attr('instance')).toBe(instance);
+      expect(instance instanceof canModel).toBe(false);
+      expect(vm.attr('instance')).toEqual(jasmine.any(Snapshot));
+      expect(vm.attr('instance')).toEqual(jasmine.objectContaining({
+        id: 1,
+        type: 'Snapshot',
+      }));
     });
 
-    it('returns setted instance if it is not type of "Snapshot"', () => {
-      const instance = new canMap({
-        id: 3,
-        'class': 'mockClass',
+    it('returns setted instance if it is not instance of canModel ' +
+      'and it is type is not "Snapshot"', () => {
+      instance = new canMap({
+        id: 2,
         type: 'mockType',
       });
       vm.attr('instance', instance);
 
+      expect(instance instanceof canModel).toBe(false);
+      expect(vm.attr('instance')).toEqual(instance);
+    });
+
+    it('returns setted instance if it is instance of canModel ' +
+      'and it is type is "Snapshot"', () => {
+      instance = new canModel({
+        id: 3,
+        type: 'Snapshot',
+      });
+      vm.attr('instance', instance);
+
+      expect(instance instanceof canModel).toBe(true);
+      expect(vm.attr('instance')).toEqual(instance);
+    });
+
+    it('returns setted instance if it is instance of canModel ' +
+      'and it is not type of "Snapshot"', () => {
+      instance = new canModel({
+        id: 4,
+        type: 'mockType',
+      });
+      vm.attr('instance', instance);
+
+      expect(instance instanceof canModel).toBe(true);
       expect(vm.attr('instance')).toBe(instance);
     });
   });

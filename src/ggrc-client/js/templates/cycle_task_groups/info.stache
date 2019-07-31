@@ -34,11 +34,11 @@
       <div class="pane-content">
         <div class="row-fluid wrap-row">
           <div class="span12">
-            <h6>{{instance.class.title_singular}} description</h6>
+            <h6>{{instance.constructor.title_singular}} description</h6>
             <div class="rtf-block">
               <read-more
                 text:from="instance.description"
-                handleMarkdown:from="instance.class.isChangeableExternally">
+                handleMarkdown:from="instance.constructor.isChangeableExternally">
               </read-more>
             </div>
           </div>

@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {filteredMap} from '../plugins/ggrc_utils';
+import loDebounce from 'lodash/debounce';
+import loForEach from 'lodash/forEach';
 import canCompute from 'can-compute';
 import canStache from 'can-stache';
 import canList from 'can-list';
@@ -35,7 +38,7 @@ const LhnControl = canControl.extend({}, {
     // Set up a scroll handler to capture the current scroll-Y position on the
     // whole LHN search panel.  scroll events do not bubble, so this cannot be
     // set as a delegate on the controller element.
-    let lhsHolderOnscroll = _.debounce(function () {
+    let lhsHolderOnscroll = loDebounce(function () {
       setLHNState({panel_scroll: this.scrollTop});
     }, 250);
     this.element.find('.affix-holder').on('scroll', lhsHolderOnscroll);
@@ -393,7 +396,7 @@ const LhnSearchControl = canControl.extend({
 
     let subLevelElements = this.element.find('.sub-level');
     new InfiniteScrollControl(subLevelElements);
-    subLevelElements.on('scroll', _.debounce(function () {
+    subLevelElements.on('scroll', loDebounce(function () {
       setLHNState({category_scroll: this.scrollTop});
     }, 250));
 
@@ -429,7 +432,7 @@ const LhnSearchControl = canControl.extend({
   },
   post_init: function () {
     let lhnCtr = $('#lhn').control();
-    let refreshCounts = _.debounce(this.refresh_counts.bind(this), 1000, {
+    let refreshCounts = loDebounce(this.refresh_counts.bind(this), 1000, {
       leading: true,
       trailing: false,
     });
@@ -449,7 +452,7 @@ const LhnSearchControl = canControl.extend({
         this.options._hasPendingRefresh = true;
         return;
       }
-      modelNames = _.filteredMap(
+      modelNames = filteredMap(
         this.get_visible_lists(), ($list) => this.get_list_model($list));
       modelName = instance.constructor.model_singular;
 
@@ -837,9 +840,9 @@ const LhnSearchControl = canControl.extend({
     }
 
 
-    models = _.filteredMap(this.get_lists(),
+    models = filteredMap(this.get_lists(),
       ($list) => this.get_list_model($list));
-    extraModels = _.filteredMap(
+    extraModels = filteredMap(
       this.get_lists(), ($list) => this.get_extra_list_model($list));
 
     this.options._hasPendingRefresh = false;
@@ -857,14 +860,14 @@ const LhnSearchControl = canControl.extend({
     let self = this;
     let searchId = this.search_id;
     let lists = this.get_visible_lists();
-    let models = _.filteredMap(lists, ($list) => this.get_list_model($list));
+    let models = filteredMap(lists, ($list) => this.get_list_model($list));
 
     if (!$('.lhn-trigger').hasClass('active')) {
       this.options._hasPendingRefresh = true;
       return $.Deferred().resolve();
     }
 
-    models = _.filteredMap(models, (modelName) => {
+    models = filteredMap(models, (modelName) => {
       if (self.options.loaded_lists.indexOf(modelName) === -1) {
         return modelName;
       }
@@ -898,10 +901,10 @@ const LhnSearchControl = canControl.extend({
 
     if (term !== this.current_term || extraParams !== this.current_params) {
       // Clear current result lists
-      _.forEach(this.options.results_lists, function (list) {
+      loForEach(this.options.results_lists, function (list) {
         list.replace([]);
       });
-      _.forEach(this.options.visible_lists, function (list) {
+      loForEach(this.options.visible_lists, function (list) {
         list.replace([]);
         list.attr('is_loading', true);
       });
@@ -942,7 +945,7 @@ const LhnSearchControl = canControl.extend({
   },
   get_visible_lists: function () {
     let self = this;
-    return _.filteredMap(this.get_lists(), ($list) => {
+    return filteredMap(this.get_lists(), ($list) => {
       $list = $($list);
       if ($list.find([self.options.list_content_selector,
         self.options.list_mid_level_selector].join(',')).hasClass('in')) {

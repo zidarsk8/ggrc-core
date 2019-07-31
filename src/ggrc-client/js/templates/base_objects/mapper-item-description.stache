@@ -42,7 +42,7 @@
     <read-more
       class="attr-value"
       text:from="item.description"
-      handleMarkdown:from="instance.class.isChangeableExternally">
+      handleMarkdown:from="instance.constructor.isChangeableExternally">
     </read-more>
   </div>
 </div>

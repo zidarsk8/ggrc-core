@@ -24,7 +24,7 @@ const viewModel = canMap.extend({
       get() {
         const instance = this.attr('instance');
         return (
-          instance.class.isProposable &&
+          instance.constructor.isProposable &&
           !isChangeableExternally(instance) &&
           !isSnapshot(instance)
         );

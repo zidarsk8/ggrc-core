@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim} from '../../../plugins/ggrc_utils';
+import loIndexOf from 'lodash/indexOf';
+import loSome from 'lodash/some';
+import loFind from 'lodash/find';
 import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
@@ -20,7 +24,7 @@ export default canComponent.extend({
       isDisplayValues: {
         get() {
           let type = this.attr('selected.type');
-          return _.includes(multiChoiceable, type);
+          return multiChoiceable.includes(type);
         },
       },
     },
@@ -40,9 +44,9 @@ export default canComponent.extend({
     addField() {
       let fields = this.attr('fields');
       let selected = this.attr('selected');
-      let title = _.trim(selected.title);
-      let type = _.trim(selected.type);
-      let values = _.splitTrim(selected.values, {
+      let title = selected.title && selected.title.trim();
+      let type = selected.type && selected.type.trim();
+      let values = splitTrim(selected.values, {
         unique: true,
       }).join(',');
       this.attr('selected.invalidValues', false);
@@ -65,10 +69,11 @@ export default canComponent.extend({
         attribute_type: type,
         multi_choice_options: values,
       });
-      _.forEach(['title', 'values', 'multi_choice_options'],
+      ['title', 'values', 'multi_choice_options'].forEach(
         (type) => {
           selected.attr(type, '');
-        });
+        }
+      );
     },
     validateValues(values) {
       let invalidValues = this.attr('isDisplayValues') && !values;
@@ -102,7 +107,7 @@ export default canComponent.extend({
     init() {
       let types = this.viewModel.attr('types');
       if (!this.viewModel.attr('selected.type')) {
-        this.viewModel.attr('selected.type', _.head(types).attr('type'));
+        this.viewModel.attr('selected.type', types[0].attr('type'));
       }
     },
   },
@@ -114,7 +119,7 @@ export default canComponent.extend({
      */
     placeholder(options) {
       let types = this.attr('types');
-      let item = _.find(types, {
+      let item = loFind(types, {
         type: this.attr('selected.type'),
       });
       if (item) {
@@ -129,9 +134,8 @@ const isEqualTitle = (title, attr) => {
 };
 
 const isDublicateTitle = (fields, selectedTitle) => {
-  let duplicateField = _.some(fields, (item) => {
-    return item.title.toLowerCase() === selectedTitle.toLowerCase() &&
-      !item._pending_delete;
+  let duplicateField = loSome(fields, (item) => {
+    return item.title.toLowerCase() === selectedTitle.toLowerCase();
   });
   return fields.length && duplicateField ?
     'A custom attribute with this title already exists' :
@@ -145,7 +149,7 @@ const isEmptyTitle = (selectedTitle) => {
 };
 
 const isInvalidTitle = (title) => {
-  if (_.indexOf(title, '*') !== -1) {
+  if (loIndexOf(title, '*') !== -1) {
     return 'A custom attribute title cannot contain *';
   }
   return '';

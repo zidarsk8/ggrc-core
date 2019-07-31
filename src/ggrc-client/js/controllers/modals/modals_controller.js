@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {exists, filteredMap} from '../../plugins/ggrc_utils';
+import loIsFunction from 'lodash/isFunction';
+import loForEach from 'lodash/forEach';
+import loFilter from 'lodash/filter';
 import {ggrcAjax} from '../../plugins/ajax_extensions';
 import canModel from 'can-model';
 import canStache from 'can-stache';
@@ -10,14 +14,13 @@ import canList from 'can-list';
 import canMap from 'can-map';
 import canControl from 'can-control';
 import '../../components/issue-tracker/modal-issue-tracker-fields';
+import '../../components/issue-tracker/modal-issue-tracker-config-fields';
 import '../../components/issue-tracker/issue-tracker-switcher';
 import '../../components/access-control-list/access-control-list-roles-helper';
 import '../../components/assessment/assessment-people';
 import '../../components/assessment/assessment-object-type-dropdown';
-import '../../components/assessment-templates/assessment-template-attributes/assessment-template-attributes';
+import '../../components/assessment-template-attributes/assessment-template-attributes';
 import '../../components/assessment-templates/people-list/people-list';
-import '../../components/assessment-templates/template-field/template-field';
-import '../../components/assessment-templates/add-template-field/add-template-field';
 import '../../components/textarea-array/textarea-array';
 import '../../components/object-list-item/object-list-item-updater';
 import '../../components/related-objects/related-documents';
@@ -223,7 +226,7 @@ export default canControl.extend({
 
     dfd.then(function () {
       if (instance &&
-        _.exists(instance, 'class.is_custom_attributable') &&
+        exists(instance, 'constructor.is_custom_attributable') &&
         !(instance instanceof Assessment)) {
         return $.when(
           instance.load_custom_attribute_definitions &&
@@ -245,7 +248,7 @@ export default canControl.extend({
 
     if (!this.wasDestroyed()) {
       // Do the fields (re-)setting
-      if (_.isFunction(setFieldsCb)) {
+      if (loIsFunction(setFieldsCb)) {
         setFieldsCb();
       }
       // This is to trigger `focus_first_element` in modal_ajax handling
@@ -394,7 +397,7 @@ export default canControl.extend({
 
     if (model) {
       if (item.value instanceof Array) {
-        value = _.filteredMap(item.value, (id) => getInstance(model, id));
+        value = filteredMap(item.value, (id) => getInstance(model, id));
       } else if (item.value instanceof Object) {
         value = getInstance(model, item.value.id);
       } else {
@@ -408,7 +411,7 @@ export default canControl.extend({
 
     if (name.length > 1) {
       if (Array.isArray(value)) {
-        value = new canList(_.filteredMap(value,
+        value = new canList(filteredMap(value,
           (v) => new canMap({}).attr(name.slice(1).join('.'), v)));
       } else {
         value = new canMap({}).attr(name.slice(1).join('.'), value);
@@ -436,7 +439,7 @@ export default canControl.extend({
       after: 'minDate',
     };
 
-    _.forEach(options, (val, key) => {
+    loForEach(options, (val, key) => {
       let targetEl;
       let isInput;
       let targetDate;
@@ -756,7 +759,7 @@ export default canControl.extend({
     instance.attr('_suppress_errors', true);
 
     if (this.options.add_more &&
-      _.includes(saveContactModels, this.options.model.model_singular)) {
+      saveContactModels.includes(this.options.model.model_singular)) {
       instance.attr('contact', this.options.attr('instance.contact'));
     }
 
@@ -852,7 +855,7 @@ export default canControl.extend({
       !this.options.skip_refresh && !instance.isNew()) {
       if (instance.type === 'AssessmentTemplate') {
         cad = instance.attr('custom_attribute_definitions');
-        cad = _.filter(cad, function (attr) {
+        cad = loFilter(cad, function (attr) {
           return attr.id;
         });
         instance.attr('custom_attribute_definitions', cad);

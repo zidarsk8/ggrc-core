@@ -88,7 +88,7 @@ Copyright (C) 2019 Google Inc.
               <li>
                 <a href="{{instance.viewLink}}">
                   <i class="fa fa-long-arrow-right"></i>
-                  Open {{instance.class.title_singular}}
+                  Open {{instance.constructor.title_singular}}
                 </a>
               </li>
             {{/if}}

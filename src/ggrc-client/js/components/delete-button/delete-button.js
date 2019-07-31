@@ -34,7 +34,7 @@ export default canComponent.extend({
     },
     confirmDelete() {
       const instance = this.attr('instance');
-      const model = instance.class;
+      const model = instance.constructor;
       const modalSettings = {
         button_view:
           GGRC.templates_path + '/modals/delete_cancel_buttons.stache',

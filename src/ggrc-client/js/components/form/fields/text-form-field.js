@@ -14,7 +14,7 @@ const TEXT_FORM_FIELD_VM = canMap.extend({
       set(newValue) {
         let _value = this.attr('_value');
         if (_value === newValue ||
-          newValue.length && !_.trim(newValue).length) {
+          newValue.length && !newValue.trim().length) {
           return;
         }
 

@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {filteredMap} from '../plugins/ggrc_utils';
+import loForEach from 'lodash/forEach';
 import canModel from 'can-model';
 import canConstruct from 'can-construct';
 import {reify} from '../plugins/utils/reify-utils';
@@ -74,7 +76,7 @@ const RefreshQueueManager = canConstruct.extend({}, {
     this.queues = [];
   },
   triggered_queues: function () {
-    return _.filteredMap(this.queues, (queue) => {
+    return filteredMap(this.queues, (queue) => {
       if (queue.triggered) {
         return queue;
       }
@@ -158,7 +160,7 @@ const RefreshQueue = canConstruct.extend({
       if (deferred) {
         deferred.then(function (refreshedItems) {
           if (nextProps.length) {
-            _.forEach(refreshedItems, function (item) {
+            loForEach(refreshedItems, function (item) {
               let df = new $.Deferred();
               refreshAll(item, nextProps, df);
               dfds.push(df);
@@ -206,7 +208,7 @@ const RefreshQueue = canConstruct.extend({
       return null;
     }
     if (objs.push) {
-      _.forEach(objs, (obj) => {
+      loForEach(objs, (obj) => {
         this.enqueue(obj, force);
       });
       return this;
@@ -238,7 +240,7 @@ const RefreshQueue = canConstruct.extend({
 
     if (deferreds.length) {
       $.when(...deferreds).then(function () {
-        self.deferred.resolve(_.filteredMap(self.objects, (obj) => reify(obj)));
+        self.deferred.resolve(filteredMap(self.objects, (obj) => reify(obj)));
       }, function () {
         self.deferred.reject(...arguments);
       });

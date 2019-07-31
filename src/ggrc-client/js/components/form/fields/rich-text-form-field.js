@@ -21,7 +21,7 @@ export default canComponent.extend({
     define: {
       value: {
         set(newValue) {
-          if (!_.isNull(newValue) && this.isAllowToSet(newValue)) {
+          if (newValue !== null && this.isAllowToSet(newValue)) {
             this.attr('_oldValue', newValue);
             this.attr('_value', newValue);
           }
@@ -34,7 +34,7 @@ export default canComponent.extend({
         set(newValue) {
           let oldValue = this.attr('_oldValue');
           if (newValue === oldValue ||
-              newValue.length && !_.trim(newValue).length) {
+              newValue.length && !newValue.trim().length) {
             return;
           }
 

@@ -104,6 +104,8 @@ class ImportConverter(BaseConverter):
     self.dry_run = dry_run
     self.csv_data = csv_data or []
     self.indexer = get_indexer()
+    self.comment_created_notif_type = all_models.NotificationType.query. \
+        filter_by(name="comment_created").one().id
     super(ImportConverter, self).__init__(ie_job)
 
   def get_info(self):

@@ -42,7 +42,7 @@
             class="btn btn-small btn-white"
             data-toggle="unified-mapper"
             data-join-object-id="{{instance.id}}"
-            data-join-object-type="{{instance.class.model_singular}}"
+            data-join-object-type="{{instance.constructor.model_singular}}"
             data-join-option-type="Document">
             Attach
         </button>

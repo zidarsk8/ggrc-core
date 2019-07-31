@@ -62,15 +62,12 @@ export default Cacheable.extend({
       {
         attr_title: 'Description',
         attr_name: 'description',
-        disable_sorting: true,
       }, {
         attr_title: 'Notes',
         attr_name: 'notes',
-        disable_sorting: true,
       }, {
         attr_title: 'Assessment Procedure',
         attr_name: 'test_plan',
-        disable_sorting: true,
       }, {
         attr_title: 'Review Status',
         attr_name: 'external_review_status',

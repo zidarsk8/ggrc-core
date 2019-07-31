@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFind from 'lodash/find';
 import canConstruct from 'can-construct';
 import canList from 'can-list';
 import canMap from 'can-map';
@@ -215,7 +216,7 @@ function getSnapshotsCounts(widgets, instance) {
       stopFn();
       let countsMap = {};
       Object.keys(counts).forEach((name) => {
-        let widget = _.find(widgetsObject, (widgetObj) => {
+        let widget = loFind(widgetsObject, (widgetObj) => {
           return widgetObj.name === name;
         });
 
@@ -232,6 +233,26 @@ function getSnapshotsCounts(widgets, instance) {
     });
 }
 
+/**
+ * Extend object properties from snapshot properties
+ * @param {canMap | Object} object - Extendable object
+ * @param {canMap} snapshot - Snapshot object
+ * @return {canMap} Extended object
+ */
+function extendSnapshot(object, snapshot) {
+  const extendedObject = object instanceof canMap ? object : new canMap(object);
+
+  extendedObject.attr('title', snapshot.title);
+  extendedObject.attr('description', snapshot.description);
+  extendedObject.attr('viewLink', snapshot.originalLink);
+
+  // replace extended object constructor with snapshot constructor
+  // to save static properties from it
+  extendedObject.constructor = snapshot.constructor;
+
+  return extendedObject;
+}
+
 export {
   isSnapshot,
   isSnapshotParent,
@@ -245,4 +266,5 @@ export {
   isSnapshotType,
   getParentUrl,
   getSnapshotsCounts,
+  extendSnapshot,
 };

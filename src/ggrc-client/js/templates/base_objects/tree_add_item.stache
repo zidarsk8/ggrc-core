@@ -13,9 +13,9 @@
         data-toggle="unified-mapper"
         data-join-option-type="{{model.model_singular}}"
         data-join-object-id="{{parent_instance.id}}"
-        data-join-object-type="{{parent_instance.class.model_singular}}"
-        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-        {{#if parent_instance.class.isMegaObject}}
+        data-join-object-type="{{parent_instance.constructor.model_singular}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.constructor.title_singular 'Object'}}"
+        {{#if parent_instance.constructor.isMegaObject}}
           {{#is parent_instance.type model.model_singular}}
             data-mega-object="true"
             data-mega-object-widget="{{options.widgetId}}"

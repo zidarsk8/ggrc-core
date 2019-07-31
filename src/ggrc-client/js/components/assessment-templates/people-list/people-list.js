@@ -34,7 +34,7 @@ export default canComponent.extend({
           if (this.attr('selectedValue')) {
             let listName = this.attr('listName');
             let defaultValue = this.attr('instance')
-              .class.defaults.default_people[listName];
+              .constructor.defaults.default_people[listName];
             let currentValue = this.attr('selectedValue');
             let isPresent = newValue.attr().findIndex((el) => {
               return el.value === currentValue;

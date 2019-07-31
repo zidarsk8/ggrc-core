@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFind from 'lodash/find';
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
 import accessControlList from '../mixins/access-control-list';
@@ -68,7 +69,6 @@ export default Cacheable.extend({
       {
         attr_title: 'Description',
         attr_name: 'description',
-        disable_sorting: true,
       }],
   },
 }, {
@@ -82,7 +82,7 @@ export default Cacheable.extend({
   },
   kindTitle() {
     let value = this.attr('kind');
-    let title = _.find(this.class.kinds, {value}).title;
+    let title = loFind(this.constructor.kinds, {value}).title;
     return title;
   },
 });

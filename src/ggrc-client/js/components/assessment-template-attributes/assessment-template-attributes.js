@@ -3,8 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loFindIndex from 'lodash/findIndex';
+import loMap from 'lodash/map';
 import canMap from 'can-map';
 import canComponent from 'can-component';
+import canStache from 'can-stache';
+import template from './templates/assessment-template-attributes.stache';
+import './template-field/template-field';
+import './add-template-field/add-template-field';
+import '../spinner-component/spinner-component';
+
 /*
  * Assessment template main component
  *
@@ -13,9 +21,11 @@ import canComponent from 'can-component';
  */
 export default canComponent.extend({
   tag: 'assessment-template-attributes',
-  leakScope: true,
+  view: canStache(template),
   viewModel: canMap.extend({
     fields: [],
+    editMode: true,
+    isLoading: false,
     types: [{
       type: 'Text',
       name: 'Text',
@@ -56,7 +66,7 @@ export default canComponent.extend({
      *   the definition that was removed
      */
     fieldRemoved: function (field) {
-      let idx = _.findIndex(this.fields, {title: field.title});
+      let idx = loFindIndex(this.fields, {title: field.title});
       if (idx >= 0) {
         this.fields.splice(idx, 1);
       } else {
@@ -70,16 +80,16 @@ export default canComponent.extend({
       let el = $(this.element);
       let list = el.find('.sortable-list');
       list.sortable({
-        items: 'li.sortable-item',
+        items: '.sortable-item',
         placeholder: 'sortable-placeholder',
       });
     },
     '.sortable-list sortstop': function () {
       let el = $(this.element);
-      let sortables = el.find('li.sortable-item');
+      let sortables = el.find('.sortable-item');
       // It's not nice way to rely on DOM for sorting,
       // but it was easiest for implementation
-      this.viewModel.fields.replace(_.map(sortables,
+      this.viewModel.fields.replace(loMap(sortables,
         function (item) {
           return $(item).data('field');
         }

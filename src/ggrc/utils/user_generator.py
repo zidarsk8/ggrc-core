@@ -382,18 +382,41 @@ def get_username_from_header():
   return ""
 
 
-def is_app_2_app_request():
-  """Checks if request from external_app by headers
-
-  X-Appengine-Inbound-Appid -> is request from ext app
-  X-ggrc-user -> is request from external user
-  """
-  request = flask.request
+def check_ext_request_header(request):
+  """Checks if request from external app based on GAE provided header"""
   inbound_appid = request.headers.get("X-Appengine-Inbound-Appid")
+  return bool(
+      inbound_appid and
+      inbound_appid in settings.ALLOWED_QUERYAPI_APP_IDS
+  )
+
+
+def is_app_2_app_request():
+  """Checks if request from external app or sync service
+
+  Based on headers and configuration.
+  """
+  return is_ext_app_request() or is_sync_service_request()
+
+
+def is_ext_app_request():
+  """Checks if request from external app based on headers and config"""
+  request = flask.request
   service_acc = parse_user_email(request, "X-ggrc-user", mandatory=False)
   return (
-      inbound_appid and inbound_appid in settings.ALLOWED_QUERYAPI_APP_IDS
-  ) and is_app_2_app_user_email(service_acc)
+      check_ext_request_header(request) and
+      is_external_app_email(service_acc)
+  )
+
+
+def is_sync_service_request():
+  """Checks if request from sync service based on headers and config"""
+  request = flask.request
+  service_acc = parse_user_email(request, "X-ggrc-user", mandatory=False)
+  return (
+      check_ext_request_header(request) and
+      is_sync_service_app_email(service_acc)
+  )
 
 
 def get_migrator_id():

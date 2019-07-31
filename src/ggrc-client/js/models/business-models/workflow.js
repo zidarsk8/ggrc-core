@@ -51,7 +51,6 @@ export default Cacheable.extend({
       {
         attr_title: 'Description',
         attr_name: 'description',
-        disable_sorting: true,
       }],
     display_attr_names: ['title', 'status', 'updated_at', 'Admin',
       'Workflow Member'],

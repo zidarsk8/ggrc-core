@@ -30,62 +30,63 @@ class TestSavedSearchGet(SavedSearchBaseTest):
 
     super(TestSavedSearchGet, cls).setUpClass()
 
-    email_0 = "aniki_baniki_{}@test.com".format(random())
-    cls._person_0 = Person(name="Aniki", email=email_0)
+    with app.app_context():
+      email_0 = "aniki_baniki_{}@test.com".format(random())
+      cls._person_0 = Person(name="Aniki", email=email_0)
 
-    email_1 = "baniki_aniki_{}@test.com".format(random())
-    cls._person_1 = Person(name="Baniki", email=email_1)
+      email_1 = "baniki_aniki_{}@test.com".format(random())
+      cls._person_1 = Person(name="Baniki", email=email_1)
 
-    db.session.add(cls._person_0)
-    db.session.add(cls._person_1)
+      db.session.add(cls._person_0)
+      db.session.add(cls._person_1)
 
-    db.session.flush()
-
-    locked_time = {
-        "year": 2025,
-        "month": 1,
-        "day": 25,
-        "minute": 0,
-        "second": 0,
-    }
-
-    with freeze_time(datetime(**locked_time)) as frozen_time:
-      for i in range(1, 5):
-        user = cls._person_0 if i != 4 else cls._person_1
-
-        saved_search = SavedSearch(
-            name="test_ss_{}".format(i),
-            object_type="Assessment",
-            user=user,
-            search_type=cls.SAVED_SEARCH_TYPE
-        )
-        user.saved_searches.append(saved_search)
-        db.session.flush()
-        #
-        # we need to test the order in which saved
-        # searches are returned in response to GET
-        # request (descending order by created_at)
-        # created_at precision is seconds
-        #
-        locked_time["second"] = i
-
-        frozen_time.move_to(datetime(**locked_time))
-
-      saved_search_program = SavedSearch(
-          name="test_program_ss",
-          object_type="Program",
-          user=cls._person_0,
-          search_type=cls.SAVED_SEARCH_TYPE
-      )
-      cls._person_0.saved_searches.append(saved_search_program)
       db.session.flush()
 
-    cls._user_role = setup_user_role(cls._person_0)
-    db.session.commit()
+      locked_time = {
+          "year": 2025,
+          "month": 1,
+          "day": 25,
+          "minute": 0,
+          "second": 0,
+      }
 
-    cls._client, cls._headers = get_client_and_headers(
-        app, cls._person_0,
-    )
+      with freeze_time(datetime(**locked_time)) as frozen_time:
+        for i in range(1, 5):
+          user = cls._person_0 if i != 4 else cls._person_1
+
+          saved_search = SavedSearch(
+              name="test_ss_{}".format(i),
+              object_type="Assessment",
+              user=user,
+              search_type=cls.SAVED_SEARCH_TYPE
+          )
+          user.saved_searches.append(saved_search)
+          db.session.flush()
+          #
+          # we need to test the order in which saved
+          # searches are returned in response to GET
+          # request (descending order by created_at)
+          # created_at precision is seconds
+          #
+          locked_time["second"] = i
+
+          frozen_time.move_to(datetime(**locked_time))
+
+        saved_search_program = SavedSearch(
+            name="test_program_ss",
+            object_type="Program",
+            user=cls._person_0,
+            search_type=cls.SAVED_SEARCH_TYPE
+        )
+        cls._person_0.saved_searches.append(saved_search_program)
+        db.session.flush()
+
+      cls._user_role = setup_user_role(cls._person_0)
+      db.session.commit()
+
+      cls._client, cls._headers = get_client_and_headers(
+          app, cls._person_0,
+      )
 
   @classmethod
   def tearDownClass(cls):

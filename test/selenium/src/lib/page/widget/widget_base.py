@@ -187,7 +187,7 @@ class PeopleItemContent(base.Component):
   def __init__(self, driver=None):
     super(PeopleItemContent, self).__init__(driver)
     self._root = self._browser.element(class_name="info")
-    self._3bbs_menu = info_widget_three_bbs.InfoWidgetThreeBbbs(self._root)
+    self._3bbs_menu = info_widget_three_bbs.PersonTreeItemThreeBbbs(self._root)
 
   def get_person(self):
     """Get person from people tree item."""
@@ -202,3 +202,8 @@ class PeopleItemContent(base.Component):
     """Click "Edit Person" in dropdown menu."""
     self._3bbs_menu.select_edit()
     return person_modal.BasePersonModal(self._driver)
+
+  def open_edit_authorizations_modal(self):
+    """Click "Edit Authorizations" in dropdown menu."""
+    self._3bbs_menu.select_edit_authorizations()
+    return person_modal.UserRoleAssignmentsModal()

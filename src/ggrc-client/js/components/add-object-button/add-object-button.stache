@@ -10,7 +10,7 @@
       text:from="text"
       objectType:from="singular"
       parentId:from="instance.id"
-      parentType:from="instance.class.model_singular">
+      parentType:from="instance.constructor.model_singular">
       {{content}}
     </assessment-template-clone-button>
   {{else}}

@@ -3,6 +3,11 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {splitTrim} from '../plugins/ggrc_utils';
+import loCompact from 'lodash/compact';
+import loIsArray from 'lodash/isArray';
+import loUniq from 'lodash/uniq';
+import loSome from 'lodash/some';
 import validatejs from 'validate.js/validate';
 
 import {getRole} from './utils/acl-utils';
@@ -19,7 +24,7 @@ const validateDefaultPeople = (people, attrName, isMandatory) => {
 
   // "people" arg is array in case when selected "other" option.
   // empty array is not valid.
-  if (_.isArray(people)) {
+  if (loIsArray(people)) {
     return !people.length ? validationMessage : undefined;
   }
 
@@ -34,7 +39,7 @@ const validateDefaultPeople = (people, attrName, isMandatory) => {
 
 validatejs.validators.validateAssignee = (value, roleType, key, attributes) => {
   const assigneeRole = getRole(roleType, 'Task Assignees');
-  const hasAssignee = assigneeRole && _.some(attributes.access_control_list, {
+  const hasAssignee = assigneeRole && loSome(attributes.access_control_list, {
     ac_role_id: assigneeRole.id,
   });
 
@@ -43,19 +48,22 @@ validatejs.validators.validateAssignee = (value, roleType, key, attributes) => {
   }
 };
 
-validatejs.validators.validateIssueTracker = (value) => {
-  if (value.enabled && !value.component_id) {
+validatejs.validators.validateIssueTrackerEnabled = (value,
+  type, key, attributes) => {
+  if (value.enabled && value._initialized === false) {
     return {
-      component_id: blankMessage,
+      enabled: `Turn Off or link ${type} to a Buganizer Ticket by 
+      generating a new ticket or linking to an existing one.`,
     };
   }
 };
 
-validatejs.validators.validateAssessmentIssueTracker = (value,
+validatejs.validators.validateIssueTrackerComponentId = (value,
   options, key, attributes) => {
   if (attributes.can_use_issue_tracker &&
       value.enabled &&
-      !value.component_id) {
+      !value.component_id &&
+      !value._linking) { // user is in progress with generating new ticket
     return {
       component_id: blankMessage,
     };
@@ -107,18 +115,18 @@ validatejs.validators.validateMultiChoiceOptions = (value,
     return; // all ok, the value of multi_choice_options not needed
   }
 
-  choices = _.splitTrim(value, ',');
+  choices = splitTrim(value, ',');
 
   if (!choices.length) {
     return 'At least one possible value required.';
   }
 
-  nonBlanks = _.compact(choices);
+  nonBlanks = loCompact(choices);
   if (nonBlanks.length < choices.length) {
     return 'Blank values not allowed.';
   }
 
-  uniques = _.uniq(nonBlanks);
+  uniques = loUniq(nonBlanks);
   if (uniques.length < nonBlanks.length) {
     return 'Duplicate values found.';
   }
@@ -147,11 +155,9 @@ validatejs.validators.validateDefaultVerifiers = (value) => {
 
 validatejs.validators.validateIssueTrackerIssueId = (value,
   statuses, key, attributes) => {
-  if (!statuses.includes(attributes.status)) {
-    return;
-  }
-
-  if (value.enabled && !value.issue_id) {
+  if (value.enabled &&
+    (statuses.includes(attributes.status) || value._linking) &&
+    !value.issue_id) {
     return {
       issue_id: blankMessage,
     };

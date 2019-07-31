@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loReduce from 'lodash/reduce';
 import Stub from '../../models/stub';
 import {initAuditTitle} from '../../plugins/utils/models-utils';
 import canMap from 'can-map';
@@ -26,7 +27,7 @@ export const onAutocompleteKeyup = (instance, el, ev) => {
     instance.attr('_transient', new canMap({}));
   }
 
-  _.reduce(name.slice(0, -1), function (current, next) {
+  loReduce(name.slice(0, -1), function (current, next) {
     current = current + '.' + next;
     if (!instance.attr(current)) {
       instance.attr(current, new canMap({}));

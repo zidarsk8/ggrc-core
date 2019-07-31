@@ -206,6 +206,13 @@
         width: 418px;
       }
     }
+    .assessment-template-dropdown {
+      display: flex;
+
+      .fa-question-circle {
+        margin-left: 6px;
+      }
+    }
     .assessment-procedure-message {
       display: flex;
       align-items: center;
@@ -616,12 +623,6 @@
   font-size: $f-medium;
 }
 
-.define-attr {
-  .hidden-fields-area {
-    padding-left: 0;
-  }
-}
-
 // Mockups Workflow V1.1
 .results {
   margin-left: 10px;
@@ -665,4 +666,18 @@
 
 .control-offset {
   margin-left: 4px;
+}
+
+.template-select {
+  display: flex;
+  align-items: center;
+
+  &__dropdown {
+    margin: 0;
+  }
+
+  &__spinner {
+    height: 18px;
+    margin-left: 5px;
+  }
 }

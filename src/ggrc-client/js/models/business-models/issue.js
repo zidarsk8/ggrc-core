@@ -48,15 +48,12 @@ export default Cacheable.extend({
       {
         attr_title: 'Description',
         attr_name: 'description',
-        disable_sorting: true,
       }, {
         attr_title: 'Notes',
         attr_name: 'notes',
-        disable_sorting: true,
       }, {
         attr_title: 'Remediation Plan',
         attr_name: 'test_plan',
-        disable_sorting: true,
       }]),
     display_attr_names: ['title', 'Admin', 'status', 'updated_at'],
   },
@@ -97,7 +94,10 @@ export default Cacheable.extend({
     issue_tracker: {
       value: {},
       validate: {
-        validateIssueTracker: true,
+        validateIssueTrackerEnabled() {
+          return 'Issue';
+        },
+        validateIssueTrackerComponentId: true,
         validateIssueTrackerTitle: true,
         validateIssueTrackerIssueId() {
           return this.constructor.unchangeableIssueTrackerIdStatuses;

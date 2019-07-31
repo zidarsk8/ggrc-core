@@ -3,10 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import loUniq from 'lodash/uniq';
+import loFindIndex from 'lodash/findIndex';
+import loFilter from 'lodash/filter';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import {
   isSnapshotType,
+  extendSnapshot,
 } from '../plugins/utils/snapshot-utils';
 import * as MapperUtils from '../plugins/utils/mapper-utils';
 import {
@@ -85,7 +89,7 @@ export default canComponent.extend({
     afterDeferredUpdate(objectsToMap, objectsToUnmap) {
       const objects = objectsToMap.concat(objectsToUnmap);
       const instance = this.attr('instance');
-      const objectTypes = _.uniq(objects
+      const objectTypes = loUniq(objects
         .map((object) => object.type)
       );
 
@@ -104,7 +108,7 @@ export default canComponent.extend({
       instance.dispatch(REFRESH_SUB_TREE);
 
       const pageInstance = getPageInstance();
-      const pageInstanceIndex = _.findIndex(objects, ({id, type}) =>
+      const pageInstanceIndex = loFindIndex(objects, ({id, type}) =>
         id === pageInstance.id &&
         type === pageInstance.type
       );
@@ -126,10 +130,10 @@ export default canComponent.extend({
       }
 
       const objectsToMap =
-        _.filter(pendingJoins, ({how}) => how === 'map')
+        loFilter(pendingJoins, ({how}) => how === 'map')
           .map(({what}) => what);
       const objectsToUnmap =
-        _.filter(pendingJoins, ({how}) => how === 'unmap')
+        loFilter(pendingJoins, ({how}) => how === 'unmap')
           .map(({what}) => what);
 
       await Promise.all([
@@ -142,7 +146,7 @@ export default canComponent.extend({
       this.afterDeferredUpdate(objectsToMap, objectsToUnmap);
     },
     _indexOfPendingJoin(object, action) {
-      return _.findIndex(this.attr('instance._pendingJoins'),
+      return loFindIndex(this.attr('instance._pendingJoins'),
         ({what, how}) =>
           what.id === object.id &&
           what.type === object.type &&
@@ -180,20 +184,13 @@ export default canComponent.extend({
         });
       }
 
-      const indexInList = _.findIndex(this.attr('list'),
+      const indexInList = loFindIndex(this.attr('list'),
         ({id, type}) => id === obj.id && type === obj.type);
       this.attr('list').splice(indexInList, 1);
     },
     addListItem(item) {
-      let snapshotObject;
-
-      if (isSnapshotType(item) &&
-        item.snapshotObject) {
-        snapshotObject = item.snapshotObject;
-        item.attr('title', snapshotObject.title);
-        item.attr('description', snapshotObject.description);
-        item.attr('class', snapshotObject.class);
-        item.attr('viewLink', snapshotObject.originalLink);
+      if (isSnapshotType(item) && item.snapshotObject) {
+        item = extendSnapshot(item, item.snapshotObject);
       } else if (!isSnapshotType(item) && isReifiable(item)) {
         // add full item object from cache
         // if it isn't snapshot

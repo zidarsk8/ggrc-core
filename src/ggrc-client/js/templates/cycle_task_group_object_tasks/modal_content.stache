@@ -82,7 +82,7 @@
               data-toggle="unified-mapper"
               data-deferred="true"
               data-join-object-id="{{instance.id}}"
-              data-join-object-type="{{instance.class.model_singular}}"
+              data-join-object-type="{{instance.constructor.model_singular}}"
               tabindex="6">
               Map Objects
             </a>

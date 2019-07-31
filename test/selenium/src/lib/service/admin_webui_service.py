@@ -2,6 +2,8 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate objects via admin UI."""
 
+from nerodia.wait import wait
+
 from lib import url
 from lib.page import dashboard
 from lib.page.modal import person_modal
@@ -19,7 +21,7 @@ class AdminWebUiService(object):
 class PeopleAdminWebUiService(AdminWebUiService):
   """Class for admin people business layer's services objects"""
 
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(PeopleAdminWebUiService, self).__init__(driver)
     self.people_widget = self._open_admin_people_tab()
 
@@ -69,3 +71,14 @@ class PeopleAdminWebUiService(AdminWebUiService):
     new_person data."""
     self.expand_found_person(person_to_edit).open_edit_modal()
     self._fill_and_submit_modal_form(new_person)
+
+  def edit_authorizations(self, person, new_role):
+    """Open User Role Assignments Modal window for selected person and apply
+    new role.
+    Return edited person."""
+    people_tree_item = self.expand_found_person(person)
+    people_tree_item.open_edit_authorizations_modal().select_and_submit_role(
+        new_role)
+    wait.Wait.until(
+        lambda: people_tree_item.get_person().system_wide_role == new_role)
+    return self.expand_found_person(person).get_person()

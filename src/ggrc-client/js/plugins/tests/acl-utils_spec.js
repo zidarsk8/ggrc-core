@@ -4,14 +4,17 @@
 */
 
 import makeArray from 'can-util/js/make-array/make-array';
-import canMap from 'can-map';
 import {
   peopleWithRoleName,
 } from '../../plugins/utils/acl-utils';
+import {makeFakeInstance} from '../../../js_specs/spec_helpers';
+import Audit from '../../models/business-models/audit';
+import Policy from '../../models/business-models/policy';
 
 describe('ACL utils peopleWithRoleName() method', () => {
-  let instance;
   let origRoleList;
+  let acl;
+  let instance;
 
   beforeAll(() => {
     origRoleList = GGRC.access_control_roles;
@@ -23,14 +26,7 @@ describe('ACL utils peopleWithRoleName() method', () => {
       {id: 3, name: 'Role B', object_type: 'Audit'},
       {id: 2, name: 'Role B', object_type: 'Policy'},
     ];
-  });
-
-  afterAll(() => {
-    GGRC.access_control_roles = origRoleList;
-  });
-
-  beforeEach(() => {
-    const acl = [
+    acl = [
       {person: {id: 3}, ac_role_id: 1},
       {person: {id: 5}, ac_role_id: 3},
       {person: {id: 6}, ac_role_id: 9},
@@ -39,36 +35,44 @@ describe('ACL utils peopleWithRoleName() method', () => {
       {person: {id: 5}, ac_role_id: 2},
       {person: {id: 9}, ac_role_id: 9},
     ];
+  });
 
-    instance = new canMap({
-      id: 42,
-      type: 'Audit',
-      'class': {model_singular: 'Audit'},
-      access_control_list: acl,
-    });
+  afterAll(() => {
+    GGRC.access_control_roles = origRoleList;
   });
 
   it('returns users that have a role granted on a particular instance', () => {
+    instance = makeFakeInstance({model: Audit})({
+      id: 42,
+      type: 'Audit',
+      access_control_list: acl,
+    });
+
     const result = peopleWithRoleName(instance, 'Role B');
     expect(makeArray(result.map((person) => person.id).sort()))
       .toEqual([2, 5]);
-  }
-  );
+  });
 
   it('returns empty array if role name not found', () => {
+    instance = makeFakeInstance({model: Audit})({
+      id: 42,
+      type: 'Audit',
+      access_control_list: acl,
+    });
+
     const result = peopleWithRoleName(instance, 'Role X');
     expect(makeArray(result)).toEqual([]);
   });
 
   it('returns empty array if no users are granted a particular role', () => {
-    let result;
+    instance = makeFakeInstance({model: Policy})({
+      id: 43,
+      type: 'Policy',
+      access_control_list: acl,
+    });
 
-    instance.attr('type', 'Policy');
-    instance.attr('class.model_singular', 'Policy');
-
-    result = peopleWithRoleName(instance, 'Role A');
+    let result = peopleWithRoleName(instance, 'Role A');
 
     expect(makeArray(result)).toEqual([]);
-  }
-  );
+  });
 });

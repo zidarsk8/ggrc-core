@@ -6,7 +6,7 @@
 <three-dots-menu>
     {{#is_allowed 'update' instance context='for'}}
       {{^if instance.archived}}
-        {{^if instance.class.isChangeableExternally}}
+        {{^if instance.constructor.isChangeableExternally}}
           {{^if instance.readonly}}
             {{> /static/templates/base_objects/edit_object_link.stache}}
           {{/if}}
@@ -62,23 +62,23 @@
         <li>
           <a href="{{instance.viewLink}}">
             <i class="fa fa-long-arrow-right"></i>
-            Open {{instance.class.title_singular}}
+            Open {{instance.constructor.title_singular}}
           </a>
         </li>
       {{/if}}
     {{/if}}
 
-    {{#if instance.class.isChangeableExternally}}
+    {{#if instance.constructor.isChangeableExternally}}
       <li>
         <questionnaire-link instance:from="instance" showIcon:from="true">
-          Open {{instance.class.title_singular}} in new frontend
+          Open {{instance.constructor.title_singular}} in new frontend
         </questionnaire-link>
       </li>
     {{/if}}
 
     {{#is_allowed 'delete' instance}}
       {{^if instance.archived}}
-        {{^if instance.class.isChangeableExternally}}
+        {{^if instance.constructor.isChangeableExternally}}
           {{^if instance.readonly}}
             <li>
               <a data-toggle="modal-ajax-deleteform"

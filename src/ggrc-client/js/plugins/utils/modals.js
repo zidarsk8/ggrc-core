@@ -75,7 +75,7 @@ const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.stache`;
  * )
  */
 function warning(options, success, fail, extra) {
-  let confirmOptions = _.assign({}, warning.settings, options);
+  let confirmOptions = Object.assign({}, warning.settings, options);
   let confirmResult;
 
   extra = extra || {};

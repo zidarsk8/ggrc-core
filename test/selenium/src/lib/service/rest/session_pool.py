@@ -17,7 +17,7 @@ EXTERNAL_HEADERS = {
     'X-ggrc-user': {'email': 'external_app@example.com'},
     'Content-Type': 'application/json',
     'X-Requested-By': 'GGRC',
-    "X-Appengine-Inbound-Appid": "ggrc-id",
+    'X-Appengine-Inbound-Appid': 'ext_app.com',
     'X-external-user': {'email': None, 'user': None}}
 
 

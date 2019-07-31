@@ -3,6 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import loForEach from 'lodash/forEach';
 import * as StateUtils from '../utils/state-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
 
@@ -27,7 +28,7 @@ describe('StateUtils', function () {
       }
     );
 
-    it('statesFilter should not update Assessmnet statuses',
+    it('statesFilter should not update Assessment statuses',
       function () {
         let statuses = [
           'Not Started', 'In Progress', 'In Review',
@@ -207,7 +208,7 @@ describe('StateUtils', function () {
           'AssessmentTemplate', 'Person', 'TaskGroup', 'TaskGroupTask',
           'Cycle', 'CycleTaskGroup', 'KeyReport', 'AccountBalance'];
 
-        _.forEach(models, function (model) {
+        models.forEach((model) => {
           expect(StateUtils.getStatusFieldName(model))
             .toEqual('Status');
         });
@@ -244,7 +245,7 @@ describe('StateUtils', function () {
           'AssessmentTemplate', 'Person', 'TaskGroup', 'TaskGroupTask',
           'Cycle', 'CycleTaskGroup', 'KeyReport', 'AccountBalance'];
 
-        _.forEach(models, function (model) {
+        loForEach(models, function (model) {
           expect(StateUtils.getBulkStatesForModel(model))
             .toEqual(expected);
         });
