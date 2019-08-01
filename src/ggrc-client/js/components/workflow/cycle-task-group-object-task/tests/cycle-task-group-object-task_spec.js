@@ -10,7 +10,7 @@ import {
   getComponentVM,
   spyProp,
 } from '../../../../../js_specs/spec_helpers';
-import Permission from '../../../../permission';
+import * as Permission from '../../../../permission';
 
 describe('cycle-task-group-object-task component', () => {
   let viewModel;
@@ -22,18 +22,18 @@ describe('cycle-task-group-object-task component', () => {
   describe('isAllowedToUpdate get() method', () => {
     beforeEach(() => {
       viewModel.attr('instance', {});
-      spyOn(Permission, 'is_allowed_for');
+      spyOn(Permission, 'isAllowedFor');
     });
 
     it('returns true if it is allowed to update instance', () => {
-      Permission.is_allowed_for.
+      Permission.isAllowedFor.
         withArgs('update', viewModel.attr('instance')).and.returnValue(true);
 
       expect(viewModel.attr('isAllowedToUpdate')).toBe(true);
     });
 
     it('returns false if it is not allowed to update instance', () => {
-      Permission.is_allowed_for
+      Permission.isAllowedFor
         .withArgs('update', viewModel.attr('instance')).and.returnValue(false);
 
       expect(viewModel.attr('isAllowedToUpdate')).toBe(false);

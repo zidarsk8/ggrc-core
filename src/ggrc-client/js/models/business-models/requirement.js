@@ -4,10 +4,10 @@
 */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/notifications/base-notifications';
+import UniqueTitle from '../mixins/unique-title';
+import CaUpdate from '../mixins/ca-update';
+import AccessControlList from '../mixins/access-control-list';
+import BaseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
 import Relationship from '../service-models/relationship';
 
@@ -30,10 +30,10 @@ export default Cacheable.extend({
   is_custom_attributable: true,
   isRoleable: true,
   mixins: [
-    uniqueTitle,
-    caUpdate,
-    accessControlList,
-    baseNotifications,
+    UniqueTitle,
+    CaUpdate,
+    AccessControlList,
+    BaseNotifications,
   ],
   attributes: {
     context: Stub,

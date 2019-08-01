@@ -12,12 +12,12 @@ import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 import {getRole} from '../../plugins/utils/acl-utils';
 import {sortByName} from '../../plugins/utils/label-utils';
 import tracker from '../../tracker';
-import caUpdate from '../mixins/ca-update';
-import autoStatusChangeable from '../mixins/auto-status-changeable';
-import accessControlList from '../mixins/access-control-list';
-import refetchHash from '../mixins/refetch-hash';
-import assessmentIssueTracker from '../mixins/assessment-issue-tracker';
-import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
+import CaUpdate from '../mixins/ca-update';
+import AutoStatusChangeable from '../mixins/auto-status-changeable';
+import AccessControlList from '../mixins/access-control-list';
+import RefetchHash from '../mixins/refetch-hash';
+import AssessmentIssueTracker from '../mixins/assessment-issue-tracker';
+import RelatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import {REFRESH_MAPPING, REFRESHED} from '../../events/eventTypes';
 
 export default Cacheable.extend({
@@ -30,10 +30,9 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/assessments/{id}',
   create: 'POST /api/assessments',
   mixins: [
-    caUpdate,
-    autoStatusChangeable,
-    accessControlList, refetchHash,
-    assessmentIssueTracker, relatedAssessmentsLoader,
+    CaUpdate, AutoStatusChangeable,
+    AccessControlList, RefetchHash,
+    AssessmentIssueTracker, RelatedAssessmentsLoader,
   ],
   is_custom_attributable: true,
   isRoleable: true,
@@ -256,7 +255,7 @@ export default Cacheable.extend({
       }
     });
   },
-  before_create: function () {
+  beforeCreate: function () {
     if (!this.audit) {
       throw new Error('Cannot save assessment, audit not set.');
     } else if (!this.audit.context) {
@@ -290,7 +289,7 @@ export default Cacheable.extend({
     this._transformBackupProperty(['design', 'operationally']);
     return this._super(checkAssociations);
   },
-  form_preload: function (newObjectForm, params, pageInstance) {
+  formPreload: function (newObjectForm, params, pageInstance) {
     let currentUser = GGRC.current_user;
 
     if (!this.audit || !this.audit.id || !this.audit.type) {
@@ -304,7 +303,7 @@ export default Cacheable.extend({
     }
 
     // Make sure before create is called before save
-    this.before_create();
+    this.beforeCreate();
 
     if (this.audit) {
       const auditors = this.audit.findRoles('Auditors');
@@ -362,7 +361,7 @@ export default Cacheable.extend({
               delete this._pending_refresh;
               if (model) {
                 model = this.constructor.model(model, this);
-                this.after_refresh && this.after_refresh();
+                this.afterRefresh && this.afterRefresh();
                 model.backup();
                 return model;
               }

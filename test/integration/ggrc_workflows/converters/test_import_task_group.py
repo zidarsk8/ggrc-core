@@ -93,6 +93,34 @@ class TestTaskGroupImport(WorkflowTestCase):
     task_group = all_models.TaskGroup.query.one()
     self.assertFalse(task_group.contact)
 
+  def test_import_of_tg_and_person_at_once(self):
+    """Test Task Group import failed when it's assignee is imported bellow."""
+    # pylint: disable=invalid-name
+    tg_data = collections.OrderedDict([
+        ("object_type", "TaskGroup"),
+        ("code", self.TG_SLUG),
+        ("workflow", self.WF_SLUG),
+        ("assignee", "unknownuser@example.com"),
+    ])
+    person_data = collections.OrderedDict([
+        ("object_type", "Person"),
+        ("name", "Unknown User"),
+        ("email", "unknownuser@example.com"),
+    ])
+    expected_errors = {
+        "Task Group": {
+            "row_errors": {
+                errors.NO_VALID_USERS_ERROR.format(
+                    line=3,
+                    column_name="Assignee",
+                )
+            }
+        }
+    }
+
+    response = self.import_data(tg_data, person_data)
+    self._check_csv_response(response, expected_errors)
+
   @ddt.data(
       (all_models.OrgGroup.__name__, "org group", True),
       (all_models.Vendor.__name__, "vendor", True),

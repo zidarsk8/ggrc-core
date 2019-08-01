@@ -12,7 +12,7 @@ import './comment-data-provider';
 import './comment-add-form';
 import './mapped-comments';
 import './comments-paging';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 
 export default canComponent.extend({
   tag: 'comments-section',
@@ -27,7 +27,7 @@ export default canComponent.extend({
         get() {
           const instance = this.attr('instance');
 
-          return !Permission.is_allowed_for('update', instance)
+          return !isAllowedFor('update', instance)
             || instance.attr('archived')
             || isChangeableExternally(instance);
         },

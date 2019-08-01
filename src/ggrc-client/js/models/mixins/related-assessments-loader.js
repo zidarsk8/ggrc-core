@@ -7,7 +7,7 @@ import Mixin from './mixin';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 import {ggrcGet} from '../../plugins/ajax_extensions';
 
-export default Mixin.extend({}, {
+export default class RelatedAssessmentsLoader extends Mixin {
   /**
    *
    * @param {Array} limit - Limit of loaded numbers
@@ -32,5 +32,5 @@ export default Mixin.extend({}, {
       params.order_by = orderAsString;
     }
     return ggrcGet('/api/related_assessments', params);
-  },
-});
+  }
+}

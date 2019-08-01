@@ -6,10 +6,10 @@
 import canList from 'can-list';
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
-import accessControlList from '../mixins/access-control-list';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import issueTracker from '../mixins/issue-tracker';
+import AccessControlList from '../mixins/access-control-list';
+import UniqueTitle from '../mixins/unique-title';
+import CaUpdate from '../mixins/ca-update';
+import IssueTracker from '../mixins/issue-tracker';
 import Stub from '../stub';
 import Program from './program';
 
@@ -23,10 +23,10 @@ export default Cacheable.extend({
   destroy: 'DELETE /api/audits/{id}',
   create: 'POST /api/audits',
   mixins: [
-    accessControlList,
-    uniqueTitle,
-    caUpdate,
-    issueTracker,
+    AccessControlList,
+    UniqueTitle,
+    CaUpdate,
+    IssueTracker,
   ],
   is_custom_attributable: true,
   is_clonable: true,

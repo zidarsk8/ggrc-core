@@ -4,7 +4,7 @@
  */
 
 import Cacheable from '../cacheable';
-import contactable from '../mixins/contactable';
+import Contactable from '../mixins/contactable';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -16,7 +16,7 @@ export default Cacheable.extend({
   create: 'POST /api/task_groups',
   update: 'PUT /api/task_groups/{id}',
   destroy: 'DELETE /api/task_groups/{id}',
-  mixins: [contactable],
+  mixins: [Contactable],
   attributes: {
     workflow: Stub,
     modified_by: Stub,

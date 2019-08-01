@@ -7,7 +7,7 @@ import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../workflow-activate';
 import * as helpers from '../../../plugins/utils/workflow-utils';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
 import {countsMap as workflowCountsMap} from '../../../apps/workflows';
 
@@ -49,7 +49,7 @@ describe('workflow-activate component', function () {
       workflow = new canMap();
       workflow.refresh_all = jasmine.createSpy('refresh_all');
       spyOn(viewModel, 'initWorkflow');
-      spyOn(Permission, 'refresh');
+      spyOn(Permission, 'refreshPermissions');
       spyOn(viewModel, 'updateActiveCycleCounts');
       spyOn(helpers, 'redirectToCycle');
     });
@@ -67,7 +67,7 @@ describe('workflow-activate component', function () {
         await viewModel.repeatOnHandler(workflow);
         expect(viewModel.initWorkflow).toHaveBeenCalledWith(workflow);
         expect(viewModel.initWorkflow).toHaveBeenCalledBefore(
-          Permission.refresh
+          Permission.refreshPermissions
         );
         done();
       }
@@ -75,8 +75,8 @@ describe('workflow-activate component', function () {
 
     it('should refresh permissions', async function (done) {
       await viewModel.repeatOnHandler(workflow);
-      expect(Permission.refresh).toHaveBeenCalled();
-      expect(Permission.refresh).toHaveBeenCalledBefore(
+      expect(Permission.refreshPermissions).toHaveBeenCalled();
+      expect(Permission.refreshPermissions).toHaveBeenCalledBefore(
         viewModel.updateActiveCycleCounts
       );
       done();
@@ -122,7 +122,7 @@ describe('workflow-activate component', function () {
 
     it('should restore button when permission refresh fails',
       async function (done) {
-        Permission.refresh.and.returnValue(Promise.reject());
+        Permission.refreshPermissions.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOnHandler(workflow);
         } catch (err) {
@@ -243,43 +243,43 @@ describe('workflow-activate component', function () {
     });
 
     it('should be in waiting state while refresh is in progress',
-      async function () {
+      (done) => {
+        viewModel.updateActiveCycleCounts
+          .and.returnValue(new Promise(() => {}));
+
         viewModel.repeatOffHandler(workflow);
+
         expect(viewModel.attr('waiting')).toBe(true);
+        done();
       });
 
     it('generates cycle for passed workflow before workflow refreshing',
-      async function (done) {
+      async function () {
         await viewModel.repeatOffHandler(workflow);
         expect(helpers.generateCycle).toHaveBeenCalledWith(workflow);
         expect(helpers.generateCycle).toHaveBeenCalledBefore(
           workflow.refresh
         );
-        done();
       });
 
-    it('refreshes workflow', async function (done) {
+    it('refreshes workflow', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.refresh).toHaveBeenCalled();
-      done();
     });
 
-    it('sets active status for passed workflow', async function (done) {
+    it('sets active status for passed workflow', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.attr('status')).toBe('Active');
-      done();
     });
 
-    it('saves workflow', async function (done) {
+    it('saves workflow', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(workflow.save).toHaveBeenCalled();
-      done();
     });
 
-    it('should restore button after workflow saving', async function (done) {
+    it('should restore button after workflow saving', async function () {
       await viewModel.repeatOffHandler(workflow);
       expect(viewModel.attr('waiting'), false);
-      done();
     });
 
     it('should try to update counts for active cycles tab', async function () {
@@ -288,35 +288,32 @@ describe('workflow-activate component', function () {
     });
 
     it('should restore button when cycle generating fails',
-      async function (done) {
+      async function () {
         helpers.generateCycle.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOffHandler(workflow);
         } catch (err) {
           expect(viewModel.attr('waiting')).toBe(false);
-          done();
         }
       });
 
     it('should restore button when workflow refreshing fails',
-      async function (done) {
+      async function () {
         workflow.refresh.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOffHandler(workflow);
         } catch (err) {
           expect(viewModel.attr('waiting')).toBe(false);
-          done();
         }
       });
 
     it('should restore button when workflow saving fails',
-      async function (done) {
+      async function () {
         workflow.save.and.returnValue(Promise.reject());
         try {
           await viewModel.repeatOffHandler(workflow);
         } catch (err) {
           expect(viewModel.attr('waiting')).toBe(false);
-          done();
         }
       });
   });

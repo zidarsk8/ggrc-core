@@ -6,7 +6,7 @@
 import loIsFunction from 'lodash/isFunction';
 import Cacheable from '../cacheable';
 import tracker from '../../tracker';
-import caUpdate from '../mixins/ca-update';
+import CaUpdate from '../mixins/ca-update';
 import Stub from '../stub';
 import {loadPersonProfile} from '../../plugins/utils/user-utils';
 import {ggrcGet} from '../../plugins/ajax_extensions';
@@ -27,7 +27,7 @@ export default Cacheable.extend({
     language: Stub,
     user_roles: Stub.List,
   },
-  mixins: [caUpdate],
+  mixins: [CaUpdate],
   defaults: {
     name: '',
     email: '',
@@ -133,11 +133,24 @@ export default Cacheable.extend({
         console.warn(`Request on '${url}' failed!`);
       });
   },
-  form_preload(newObjectForm) {
+  formPreload(newObjectForm) {
     if (newObjectForm) {
       return $.Deferred().resolve();
     }
 
     return loadPersonProfile(this);
+  },
+  save: function () {
+    const {name, email} = this;
+
+    if (name) {
+      this.attr('name', name.trim());
+    }
+
+    if (email) {
+      this.attr('email', email.toLowerCase());
+    }
+
+    return this._super.apply(this, ...arguments);
   },
 });

@@ -8,7 +8,7 @@ import Component from '../object-review';
 import Review from '../../../models/service-models/review';
 import * as NotifiersUtils from '../../../plugins/utils/notifiers-utils';
 import * as ObjectReviewUtils from '../../../plugins/utils/object-review-utils';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 import * as AclUtils from '../../../plugins/utils/acl-utils';
 
 describe('object-review component', () => {
@@ -130,15 +130,15 @@ describe('object-review component', () => {
       });
 
       it(`should return true if user has
-      "is_allowed_for update review" permission`, () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      "isAllowedFor update review" permission`, () => {
+        spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
         expect(viewModel.attr('showButtons')).toBeTruthy();
       });
 
       it(`should return false if user does not have
-      "is_allowed_for update review" permission`, () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+      "isAllowedFor update review" permission`, () => {
+        spyOn(Permission, 'isAllowedFor').and.returnValue(false);
 
         expect(viewModel.attr('showButtons')).toBeFalsy();
       });
@@ -152,15 +152,15 @@ describe('object-review component', () => {
       });
 
       it(`should return true if user has
-      "is_allowed_for update instance" permission`, () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+      "isAllowedFor update instance" permission`, () => {
+        spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
         expect(viewModel.attr('showButtons')).toBeTruthy();
       });
 
       it(`should return false if user does not have
-      "is_allowed_for update instance" permission`, () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+      "isAllowedFor update instance" permission`, () => {
+        spyOn(Permission, 'isAllowedFor').and.returnValue(false);
 
         expect(viewModel.attr('showButtons')).toBeFalsy();
       });

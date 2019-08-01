@@ -532,15 +532,6 @@ class ReviewFactory(ModelFactory):
   notification_type = all_models.Review.NotificationTypes.EMAIL_TYPE
 
 
-class RiskAssessmentFactory(TitledFactory):
-
-  class Meta:
-    model = all_models.RiskAssessment
-
-  status = "Draft"
-  program = factory.LazyAttribute(lambda _: ProgramFactory())
-
-
 class ProjectFactory(TitledFactory):
 
   class Meta:
@@ -679,7 +670,6 @@ def get_model_factory(model_name):
       "Risk": RiskFactory,
       "Review": ReviewFactory,
       "Revision": RevisionFactory,
-      "RiskAssessment": RiskAssessmentFactory,
       "Standard": StandardFactory,
       "System": SystemFactory,
       "TaskGroup": wf_factories.TaskGroupFactory,

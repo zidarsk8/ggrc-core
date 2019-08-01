@@ -8,7 +8,7 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import template from './templates/related-urls.stache';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import {sanitizer} from '../../plugins/utils/url-utils';
@@ -22,7 +22,7 @@ export default canComponent.extend({
       canAddUrl: {
         get() {
           let canEditInstance = this.attr('instance').isNew() ||
-            Permission.is_allowed_for('update', this.attr('instance'));
+            isAllowedFor('update', this.attr('instance'));
           let isNotEditable = this.attr('isNotEditable');
 
           return canEditInstance && !isNotEditable;
@@ -31,7 +31,7 @@ export default canComponent.extend({
       canRemoveUrl: {
         get() {
           let canEditInstance = this.attr('instance').isNew() ||
-            Permission.is_allowed_for('update', this.attr('instance'));
+            isAllowedFor('update', this.attr('instance'));
           let isNotEditable = this.attr('isNotEditable');
           let allowToRemove = this.attr('allowToRemove');
 

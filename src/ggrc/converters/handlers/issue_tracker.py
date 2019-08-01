@@ -6,6 +6,7 @@ import re
 
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
+from ggrc.integrations import constants
 from ggrc.models import all_models
 from ggrc.models.hooks.issue_tracker import \
     issue_tracker_params_container as params_container
@@ -66,8 +67,11 @@ class IssueTrackerWithValidStates(IssueTrackerColumnHandler):
   def parse_item(self):
     value = self.raw_value.upper()
     if value not in self.valid_states:
-      self.add_warning(errors.WRONG_VALUE_DEFAULT,
-                       column_name=self.display_name)
+      self.add_warning(
+          errors.WRONG_VALUE_DEFAULT_CUSTOM,
+          column_name=self.display_name,
+          default_value=constants.DEFAULT_ISSUETRACKER_VALUES[self.key]
+      )
       return None
     return value
 

@@ -79,5 +79,13 @@ class ExportStoppedException(RuntimeError):
   pass
 
 
+class ExportFinishedException(RuntimeError):
+  pass
+
+
 class ImportStoppedException(RuntimeError):
+  pass
+
+
+class ImportFinishedException(RuntimeError):
   pass

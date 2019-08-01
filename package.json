@@ -20,7 +20,6 @@
     "can-map-backup": "3.1.1",
     "can-validate-legacy": "2.0.0",
     "can-control": "3.2.0",
-    "can-construct": "3.5.4",
     "can-construct-super": "^3.2.0",
     "can-map-define": "3.1.2",
     "can-simple-observable": "2.4.1",

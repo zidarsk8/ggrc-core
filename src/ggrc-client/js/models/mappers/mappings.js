@@ -10,7 +10,7 @@ import canMap from 'can-map';
 import '../../plugins/utils/models-utils';
 
 import * as businessModels from '../business-models';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import config from './mappings-ggrc';
 
 /*
@@ -46,12 +46,12 @@ function getMappingList(type) {
  * @return {Boolean} whether user has permissions for mappings
  */
 function userHasPermissions(source, target) {
-  let hasPermissions = Permission.is_allowed_for('update', source)
+  let hasPermissions = isAllowedFor('update', source)
     || source.isNew();
 
   if (target instanceof canMap) {
     hasPermissions = hasPermissions
-      && Permission.is_allowed_for('update', target);
+      && isAllowedFor('update', target);
   }
 
   return hasPermissions;

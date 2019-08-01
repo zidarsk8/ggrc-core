@@ -8,16 +8,14 @@ import loToArray from 'lodash/toArray';
 import loReduce from 'lodash/reduce';
 import {ggrcAjax} from './plugins/ajax_extensions';
 import canCompute from 'can-compute';
-import canConstruct from 'can-construct';
-import {getPageInstance} from './plugins/utils/current-page-utils';
+import './plugins/utils/current-page-utils'; // fixes a cyclic dependency and should be fixed in a proper way
 import Stub from '../js/models/stub';
 import {getInstance} from '../js/plugins/utils/models-utils';
 import {reify} from '../js/plugins/utils/reify-utils';
 
-let ADMIN_PERMISSION;
 let _CONDITIONS_MAP = {
   contains: function (instance, args) {
-    let value = Permission._resolve_permission_variable(args.value);
+    let value = _resolvePermissionVariable(args.value);
     let listValue = instance[args.list_property] || [];
     let i;
     for (i = 0; i < listValue.length; i++) {
@@ -28,7 +26,7 @@ let _CONDITIONS_MAP = {
     return false;
   },
   is: function (instance, args) {
-    let value = Permission._resolve_permission_variable(args.value);
+    let value = _resolvePermissionVariable(args.value);
     let propertyValue = loReduce(args.property_name.split('.'),
       function (obj, key) {
         let value = obj.attr(key);
@@ -40,7 +38,7 @@ let _CONDITIONS_MAP = {
     return value === propertyValue;
   },
   'in': function (instance, args) {
-    let value = Permission._resolve_permission_variable(args.value);
+    let value = _resolvePermissionVariable(args.value);
     let propertyValue = instance[args.property_name];
     if (propertyValue instanceof Stub) {
       propertyValue = reify(propertyValue);
@@ -60,184 +58,187 @@ let _CONDITIONS_MAP = {
 };
 let permissionsCompute = canCompute(GGRC.permissions);
 
-const Permission = canConstruct.extend({
-  _admin_permission_for_context: function (contextId) {
-    return new Permission(
-      ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, contextId);
-  },
-
-  _all_resource_permission: function (permission) {
-    return new Permission(
-      permission.action, ADMIN_PERMISSION.resource_type, permission.context_id);
-  },
-
-  _permission_match: function (permissions, permission) {
-    let resourceTypes = permissions[permission.action] || {};
-    let resourceType = resourceTypes[permission.resource_type] || {};
-    let contexts = resourceType.contexts || [];
-
-    return (contexts.indexOf(permission.context_id) > -1);
-  },
-
-  _is_allowed: function (permissions, permission) {
-    if (!permissions) {
-      return false; // ?
-    }
-    if (this._permission_match(
-      permissions,
-      new Permission(
-        permission.action,
-        permission.resource_type, null))) {
-      return true;
-    }
-    if (this._permission_match(permissions, permission)) {
-      return true;
-    }
-    if (this._permission_match(permissions,
-      this._all_resource_permission(permission))) {
-      return true;
-    }
-    if (this._permission_match(permissions, ADMIN_PERMISSION)) {
-      return true;
-    }
-    if (this._permission_match(permissions,
-      this._admin_permission_for_context(permission.context_id))) {
-      return true;
-    }
-    // Check for System Admin permission
-    if (this._permission_match(permissions,
-      this._admin_permission_for_context(0))) {
-      return true;
-    }
-    return false;
-  },
-
-  _resolve_permission_variable: function (value) {
-    if ($.type(value) === 'string') {
-      if (value[0] === '$') {
-        if (value === '$current_user') {
-          return getInstance('Person', GGRC.current_user.id);
-        }
-        throw new Error('unknown permission variable: ' + value);
-      }
-    }
-    return value;
-  },
-
-  _is_allowed_for: function (permissions, instance, action) {
-    // Check for admin permission
-    let checkAdmin = function (contextId) {
-      let permission = this._admin_permission_for_context(contextId);
-      let conditions;
-      let i;
-      let condition;
-      if (this._permission_match(permissions, permission)) {
-        conditions = loToArray(exists(permissions,
-          permission.action,
-          permission.resource_type,
-          'conditions',
-          contextId));
-        if (!conditions.length) {
-          return true;
-        }
-        for (i = 0; i < conditions.length; i++) {
-          condition = conditions[i];
-          if (_CONDITIONS_MAP[condition.condition](
-            instance, condition.terms, action)) {
-            return true;
-          }
-        }
-        return false;
-      }
-      return false;
-    }.bind(this);
-
-    let actionObj = permissions[action] || {};
-    let shortName = instance.constructor && instance.constructor.model_singular;
-    let instanceType = instance.type || shortName;
-    let typeObj = actionObj[instanceType] || {};
-    let conditionsByContext = typeObj.conditions || {};
-    let resources = typeObj.resources || [];
-    let context = instance.context || {id: null};
-    let conditions = conditionsByContext[context.id] || [];
-    let condition;
-    let i;
-
-    conditions = conditions.concat(conditionsByContext.null || []);
-
-    if (checkAdmin(0) || checkAdmin(null)) {
-      return true;
-    }
-    if (~resources.indexOf(instance.id)) {
-      return true;
-    }
-    if (conditions.length === 0 && (this._is_allowed(permissions,
-      new Permission(action, instanceType, null)) ||
-      this._is_allowed(permissions,
-        new Permission(action, instanceType, context.id)))) {
-      return true;
-    }
-    // Check any conditions applied per instance
-    // If there are no conditions, the user has unconditional access to
-    // the current instance. We can safely return true in this case.
-    if (conditions.length === 0) {
-      return false;
-    }
-    for (i = 0; i < conditions.length; i++) {
-      condition = conditions[i];
-      if (_CONDITIONS_MAP[condition.condition](
-        instance, condition.terms, action)) {
-        return true;
-      }
-    }
-    return false;
-  },
-
-  is_allowed: function (action, resourceType, contextId) {
-    return this._is_allowed(
-      permissionsCompute(), new this(action, resourceType, contextId));
-  },
-
-  is_allowed_for: function (action, resource) {
-    return this._is_allowed_for(permissionsCompute(), resource, action);
-  },
-
-  is_allowed_any: function (action, resourceType) {
-    let allowed = this.is_allowed(action, resourceType);
-    let perms = permissionsCompute();
-
-    if (!allowed) {
-      allowed = exists(perms, action, resourceType, 'contexts', 'length');
-    }
-    return !!allowed;
-  },
-
-  page_context_id: function () {
-    let pageInstance = getPageInstance();
-    return (pageInstance && pageInstance.context &&
-            pageInstance.context.id) || null;
-  },
-
-  refresh: function () {
-    return ggrcAjax({
-      url: '/permissions',
-      type: 'get',
-      dataType: 'json',
-    }).then(function (perm) {
-      permissionsCompute(perm);
-      GGRC.permissions = perm;
-    });
-  },
-}, {
-  // prototype
-  setup: function (action, resourceType, contextId) {
+class Permission {
+  constructor(action, resourceType, contextId) {
     this.action = action;
     this.resource_type = resourceType;
     this.context_id = contextId;
-    return this;
-  },
-});
+  }
+}
 
-ADMIN_PERMISSION = new Permission('__GGRC_ADMIN__', '__GGRC_ALL__', 0);
+const ADMIN_PERMISSION = new Permission('__GGRC_ADMIN__', '__GGRC_ALL__', 0);
 
-export default Permission;
+function _adminPermissionForContext(contextId) { // eslint-disable-line id-length
+  return new Permission(
+    ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, contextId);
+}
+
+function _allResourcePermission(permission) {
+  return new Permission(
+    permission.action, ADMIN_PERMISSION.resource_type, permission.context_id);
+}
+
+function _permissionMatch(permissions, permission) {
+  let resourceTypes = permissions[permission.action] || {};
+  let resourceType = resourceTypes[permission.resource_type] || {};
+  let contexts = resourceType.contexts || [];
+
+  return (contexts.indexOf(permission.context_id) > -1);
+}
+
+function _isAllowed(permissions, permission) {
+  if (!permissions) {
+    return false;
+  }
+  if (_permissionMatch(
+    permissions,
+    new Permission(
+      permission.action,
+      permission.resource_type, null))) {
+    return true;
+  }
+  if (_permissionMatch(permissions, permission)) {
+    return true;
+  }
+  if (_permissionMatch(permissions,
+    _allResourcePermission(permission))) {
+    return true;
+  }
+  if (_permissionMatch(permissions, ADMIN_PERMISSION)) {
+    return true;
+  }
+  if (_permissionMatch(permissions,
+    _adminPermissionForContext(permission.context_id))) {
+    return true;
+  }
+  // Check for System Admin permission
+  if (_permissionMatch(permissions,
+    _adminPermissionForContext(0))) {
+    return true;
+  }
+  return false;
+}
+
+function _resolvePermissionVariable(value) { // eslint-disable-line id-length
+  if ($.type(value) === 'string') {
+    if (value[0] === '$') {
+      if (value === '$current_user') {
+        return getInstance('Person', GGRC.current_user.id);
+      }
+      throw new Error('unknown permission variable: ' + value);
+    }
+  }
+  return value;
+}
+
+function _isAllowedFor(permissions, instance, action) {
+  // Check for admin permission
+  let checkAdmin = function (contextId) {
+    let permission = _adminPermissionForContext(contextId);
+    let conditions;
+    let i;
+    let condition;
+    if (_permissionMatch(permissions, permission)) {
+      conditions = loToArray(exists(permissions,
+        permission.action,
+        permission.resource_type,
+        'conditions',
+        contextId));
+      if (!conditions.length) {
+        return true;
+      }
+      for (i = 0; i < conditions.length; i++) {
+        condition = conditions[i];
+        if (_CONDITIONS_MAP[condition.condition](
+          instance, condition.terms, action)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    return false;
+  };
+
+  let actionObj = permissions[action] || {};
+  let shortName = instance.constructor && instance.constructor.model_singular;
+  let instanceType = instance.type || shortName;
+  let typeObj = actionObj[instanceType] || {};
+  let conditionsByContext = typeObj.conditions || {};
+  let resources = typeObj.resources || [];
+  let context = instance.context || {id: null};
+  let conditions = conditionsByContext[context.id] || [];
+  let condition;
+  let i;
+
+  conditions = conditions.concat(conditionsByContext.null || []);
+
+  if (checkAdmin(0) || checkAdmin(null)) {
+    return true;
+  }
+  if (~resources.indexOf(instance.id)) {
+    return true;
+  }
+  if (conditions.length === 0 && (_isAllowed(permissions,
+    new Permission(action, instanceType, null)) ||
+    _isAllowed(permissions,
+      new Permission(action, instanceType, context.id)))) {
+    return true;
+  }
+  // Check any conditions applied per instance
+  // If there are no conditions, the user has unconditional access to
+  // the current instance. We can safely return true in this case.
+  if (conditions.length === 0) {
+    return false;
+  }
+  for (i = 0; i < conditions.length; i++) {
+    condition = conditions[i];
+    if (_CONDITIONS_MAP[condition.condition](
+      instance, condition.terms, action)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isAllowed(action, resourceType, contextId) {
+  return _isAllowed(
+    permissionsCompute(), new Permission(action, resourceType, contextId));
+}
+
+function isAllowedFor(action, resource) {
+  return _isAllowedFor(permissionsCompute(), resource, action);
+}
+
+function isAllowedAny(action, resourceType) {
+  let allowed = isAllowed(action, resourceType);
+  let perms = permissionsCompute();
+
+  if (!allowed) {
+    allowed = exists(perms, action, resourceType, 'contexts', 'length');
+  }
+  return !!allowed;
+}
+
+function refreshPermissions() {
+  return ggrcAjax({
+    url: '/permissions',
+    type: 'get',
+    dataType: 'json',
+  }).then(function (perm) {
+    permissionsCompute(perm);
+    GGRC.permissions = perm;
+  });
+}
+
+export {
+  _adminPermissionForContext,
+  _allResourcePermission,
+  _permissionMatch,
+  _isAllowed,
+  _resolvePermissionVariable,
+  _isAllowedFor,
+  isAllowed,
+  isAllowedFor,
+  isAllowedAny,
+  refreshPermissions,
+};

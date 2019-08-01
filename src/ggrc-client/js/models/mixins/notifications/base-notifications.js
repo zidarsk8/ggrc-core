@@ -5,7 +5,10 @@
 
 import Mixin from '../mixin';
 
-export default Mixin.extend({
+export default class BaseNotifications extends Mixin {
+}
+
+Object.assign(BaseNotifications.prototype, {
   send_by_default: true,
   recipients: 'Admin,Primary Contacts,Secondary Contacts',
 });

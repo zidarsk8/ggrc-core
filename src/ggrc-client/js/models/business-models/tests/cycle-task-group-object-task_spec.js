@@ -88,7 +88,7 @@ describe('CycleTaskGroupObjectTask model', function () {
     );
   });
 
-  describe('form_preload method', function () {
+  describe('formPreload method', function () {
     let instance;
 
     beforeEach(function () {
@@ -121,7 +121,7 @@ describe('CycleTaskGroupObjectTask model', function () {
       spyOn(workflow, 'refresh_all').and
         .returnValue(resolveChain);
 
-      instance.form_preload(true, {workflow: workflow});
+      instance.formPreload(true, {workflow: workflow});
 
       resolveChain.then(() => {
         expect(instance.attr('workflow.id')).toEqual('workflow id');

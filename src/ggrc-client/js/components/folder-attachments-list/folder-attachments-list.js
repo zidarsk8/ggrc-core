@@ -13,7 +13,7 @@ import {
   BEFORE_DOCUMENT_CREATE,
   DOCUMENT_CREATE_FAILED,
 } from '../../events/eventTypes';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import template from './folder-attachments-list.stache';
 
 /**
@@ -44,7 +44,7 @@ export default canComponent.extend({
           }
 
           let isSnapshot = this.attr('isSnapshot');
-          return isSnapshot || !Permission.is_allowed_for('update', instance);
+          return isSnapshot || !isAllowedFor('update', instance);
         },
       },
       showMore: {

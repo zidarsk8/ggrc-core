@@ -215,13 +215,12 @@ let viewModel = canMap.extend({
   router: null,
   $el: null,
   loading: false,
+  refetch: false,
   columns: {
     selected: [],
     available: [],
   },
   filters: [],
-  loaded: null,
-  refreshLoaded: true,
   canOpenInfoPin: true,
   savedSearchPermalink: '',
   pubSub,
@@ -271,23 +270,13 @@ let viewModel = canMap.extend({
       })
       .then(stopFn, stopFn.bind(null, true));
   },
-  display: function (needToRefresh) {
-    // load saved search if router has saved_search id
-    if (isLoadSavedSearch(this)) {
-      loadSavedSearch(this);
-      return;
+  refresh(destinationType) {
+    if (!destinationType || this.attr('modelName') === destinationType) {
+      this.closeInfoPane();
+      return this.loadItems();
     }
 
-    let loadedItems;
-
-    if (!this.attr('loaded') || needToRefresh || router.attr('refetch')) {
-      loadedItems = this.loadItems()
-        .then(() => this.setRefreshFlag(false)); // refreshed
-
-      this.attr('loaded', loadedItems);
-    }
-
-    return this.attr('loaded');
+    return Promise.resolve();
   },
   setColumnsConfiguration: function () {
     let columns = TreeViewUtils.getColumnsForModel(
@@ -322,16 +311,14 @@ let viewModel = canMap.extend({
     this.attr('sortingInfo.sortDirection', event.sortDirection);
 
     this.attr('pageInfo.current', 1);
-    this.loadItems();
-    this.closeInfoPane();
+    this.refresh();
   },
   onFilter: function () {
     const stopFn = tracker.start(this.attr('modelName'),
       tracker.USER_JOURNEY_KEYS.TREEVIEW,
       tracker.USER_ACTIONS.TREEVIEW.FILTER);
     this.attr('pageInfo.current', 1);
-    this.loadItems().then(stopFn);
-    this.closeInfoPane();
+    this.refresh().then(stopFn);
   },
   getDepthFilter: function (deepLevel) {
     let filters = makeArray(this.attr('filters'));
@@ -341,12 +328,6 @@ let viewModel = canMap.extend({
         options.depth &&
         options.filterDeepLimit > deepLevel;
     }).reduce(this._concatFilters, null);
-  },
-  setRefreshFlag: function (refresh) {
-    this.attr('refreshLoaded', refresh);
-  },
-  needToRefresh: function (refresh) {
-    return this.attr('refreshLoaded');
   },
   registerFilter: function (option) {
     this.attr('filters').push(option);
@@ -374,17 +355,21 @@ let viewModel = canMap.extend({
   _widgetHidden: function () {
     this._triggerListeners(true);
   },
-  _widgetShown: function () {
+  _widgetShown() {
     let countsName = this.attr('options.countsName');
-    let loaded = this.attr('loaded');
     let total = this.attr('pageInfo.total');
     let counts = loGet(getCounts(), countsName);
 
-    if (loaded !== null && (total !== counts)) {
-      this.loadItems();
-    }
-
     this._triggerListeners();
+
+    if (this.attr('refetch') ||
+      router.attr('refetch') ||
+      this.attr('options.forceRefetch') ||
+      // this condition is mostly for Issues, Documents and Evidence as they can be created from other object info pane
+      (total !== counts)) {
+      this.loadItems();
+      this.attr('refetch', false);
+    }
   },
   _needToRefreshAfterRelRemove(relationship) {
     const parentInstance = this.attr('parent_instance');
@@ -790,8 +775,7 @@ export default canComponent.extend({
     },
     '{viewModel.pageInfo} current': function () {
       if (!this.viewModel.attr('loading')) {
-        this.viewModel.loadItems();
-        this.viewModel.closeInfoPane();
+        this.viewModel.refresh();
       }
     },
     '{viewModel.pageInfo} pageSize': function () {
@@ -832,21 +816,12 @@ export default canComponent.extend({
     },
     ' refreshTree'(el, ev) {
       ev.stopPropagation();
-      this.reloadTree();
+      this.viewModel.refresh();
     },
-    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`]([scope], ev) {
-      const vm = this.viewModel;
-      let currentModelName;
-
-      if (!vm.attr('model')) {
-        return;
-      }
-
-      currentModelName = vm.attr('model').model_singular;
-
-      if (currentModelName === ev.destinationType) {
-        this.reloadTree();
-      }
+    [`{viewModel.parent_instance} ${REFRESH_MAPPING.type}`](
+      [scope], {destinationType}
+    ) {
+      this.viewModel.refresh(destinationType);
     },
     inserted() {
       let viewModel = this.viewModel;
@@ -857,20 +832,16 @@ export default canComponent.extend({
         .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
       this.element.closest('.widget')
         .on('widget_shown', viewModel._widgetShown.bind(viewModel));
-      viewModel._widgetShown();
-    },
-    reloadTree() {
-      this.viewModel.closeInfoPane();
-      this.viewModel.loadItems();
-    },
-    '{viewModel.parent_instance} displayTree'([scope], event) {
-      const {viewModel} = this;
-      const currentModelName = viewModel.attr('model').model_singular;
+      viewModel._triggerListeners();
 
-      if (currentModelName === event.destinationType) {
-        const forceRefresh = true;
-        viewModel.display(forceRefresh);
+      if (isLoadSavedSearch(this.viewModel)) {
+        loadSavedSearch(this.viewModel);
+      } else {
+        viewModel.loadItems();
       }
+    },
+    '{viewModel.parent_instance} displayTree'([scope], {destinationType}) {
+      this.viewModel.refresh(destinationType);
     },
     '{viewModel.router} saved_search'() {
       if (isLoadSavedSearch(this.viewModel)) {
@@ -888,6 +859,12 @@ export default canComponent.extend({
         this.viewModel.attr('advancedSearch'),
         ev.savedSearch
       );
+    },
+    '{pubSub} refetchOnce'(scope, event) {
+      if (event.modelNames.includes(this.viewModel.attr('modelName'))) {
+        // refresh widget content when tab is opened
+        this.viewModel.attr('refetch', true);
+      }
     },
   },
 });

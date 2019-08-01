@@ -116,6 +116,21 @@ def _get_updated_roles(new_list, old_list, roles):
   return role_data
 
 
+def _get_updated_display_names(attr_name, new_val, old_val):
+  """Get difference between old and new display names data"""
+  new_links = set()
+  old_links = set()
+  for val in new_val:
+    new_links.add(val.get("display_name", ""))
+  for val in old_val:
+    old_links.add(val.get("display_name", ""))
+  return (
+      attr_name,
+      list(new_links - old_links),
+      list(old_links - new_links),
+  )
+
+
 def _get_revisions(obj, created_at):
   """Get current revision and revision before notification is created"""
   filtered_revisions = db.session.query(models.Revision).filter_by(
@@ -145,6 +160,8 @@ def _get_displayed_updated_data(attr_name, new_val, old_val, definitions):
   definition = definitions.get(attr_name, None)
   updated_data = {}
   if new_val or old_val:
+    new_val = ','.join(new_val) if isinstance(new_val, list) else new_val
+    old_val = ','.join(old_val) if isinstance(old_val, list) else old_val
     if definition:
       updated_data[definition["display_name"].upper()] = (
           new_val,
@@ -168,6 +185,7 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
   old_attrs = old_rev.content
 
   updated_roles = []
+  updated_display_names = []
   for attr_name, new_val in new_attrs.iteritems():
     if attr_name in notifications.IGNORE_ATTRS:
       continue
@@ -181,9 +199,18 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
       if attr_name == "access_control_list":
         updated_roles = _get_updated_roles(new_val, old_val, roles)
         continue
+      if attr_name in ("evidences_url", "evidences_file", "labels"):
+        updated_display_names.append(_get_updated_display_names(
+            attr_name, new_val, old_val,
+        ))
+        continue
       fields.append(attr_name)
   updated_data = {}
   for attr_name, new_val, old_val in updated_roles:
+    updated_data.update(
+        _get_displayed_updated_data(attr_name, new_val, old_val, definitions)
+    )
+  for attr_name, new_val, old_val in updated_display_names:
     updated_data.update(
         _get_displayed_updated_data(attr_name, new_val, old_val, definitions)
     )

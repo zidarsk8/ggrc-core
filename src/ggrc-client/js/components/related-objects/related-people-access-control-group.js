@@ -10,7 +10,7 @@ import canComponent from 'can-component';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 
 export default canComponent.extend({
   tag: 'related-people-access-control-group',
@@ -27,7 +27,7 @@ export default canComponent.extend({
             !this.attr('updatableGroupId') &&
             (this.attr('isNewInstance') ||
               this.attr('isProposal') ||
-              Permission.is_allowed_for('update', instance));
+              isAllowedFor('update', instance));
 
           return canEdit;
         },

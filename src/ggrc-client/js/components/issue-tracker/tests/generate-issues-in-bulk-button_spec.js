@@ -7,7 +7,7 @@ import Component from '../generate-issues-in-bulk-button';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import * as notifierUtils from '../../../plugins/utils/notifiers-utils';
 import * as errorsUtils from '../../../plugins/utils/errors-utils';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 import pubSub from '../../../pub-sub';
 
 describe('generate-issues-in-bulk-button component', () => {
@@ -326,7 +326,7 @@ describe('generate-issues-in-bulk-button component', () => {
       });
 
       it('should check status if user has permissions', () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+        spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
         event();
 
@@ -334,7 +334,7 @@ describe('generate-issues-in-bulk-button component', () => {
       });
 
       it('should not check status if user has not permissions', () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+        spyOn(Permission, 'isAllowedFor').and.returnValue(false);
 
         event();
 

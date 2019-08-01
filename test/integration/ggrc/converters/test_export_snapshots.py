@@ -124,7 +124,7 @@ class TestExportSnapshots(TestCase):
                                         control.documents_reference_url),
             "Assertions": u",".join(json.loads(control.assertions)),
             "Categories": u",".join(json.loads(control.categories)),
-            "Folder": u"",
+            "Gdrive Folder ID": u"",
             "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
@@ -257,7 +257,7 @@ class TestExportSnapshots(TestCase):
             'Created Date': control.created_at.strftime(DATE_FORMAT_US),
             'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
             'Last Updated By': "",
-            "Folder": u"",
+            "Gdrive Folder ID": u"",
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -444,7 +444,7 @@ class TestExportSnapshots(TestCase):
           'Created Date': control.created_at.strftime(DATE_FORMAT_US),
           'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
           'Last Updated By': "",
-          "Folder": u"",
+          "Gdrive Folder ID": u"",
           "Archived": u"yes" if audit.archived else u"no",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])

@@ -8,7 +8,7 @@ import canComponent from 'can-component';
 import {
   CUSTOM_ATTRIBUTE_TYPE,
 } from '../../plugins/utils/custom-attribute/custom-attribute-config';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {notifierXHR} from '../../plugins/utils/notifiers-utils';
 import {isProposableExternally} from '../../plugins/utils/ggrcq-utils';
 
@@ -38,7 +38,7 @@ export default canComponent.extend({
             this.attr('instance.archived') ||
             this.attr('isAttributesDisabled') ||
             this.isReadOnlyForInstance(this.attr('instance')) ||
-            !Permission.is_allowed_for('update', this.attr('instance'));
+            !isAllowedFor('update', this.attr('instance'));
         },
       },
     },

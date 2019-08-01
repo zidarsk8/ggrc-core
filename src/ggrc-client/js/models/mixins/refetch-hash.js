@@ -8,8 +8,8 @@ import Mixin from './mixin';
 /**
  * A mixin to generate hash with refetch param.
  */
-export default Mixin.extend({
-  getHashFragment: function () {
+export default class RefetchHash extends Mixin {
+  getHashFragment() {
     let widgetName = this.constructor.table_singular;
     if (window.location.hash
       .startsWith(['#', widgetName].join(''))) {
@@ -18,5 +18,5 @@ export default Mixin.extend({
 
     return [widgetName,
       '&refetch=true'].join('');
-  },
-});
+  }
+}

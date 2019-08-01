@@ -286,7 +286,6 @@ class TestReviewStatusUpdate(TestCase):
       "Program",
       "Project",
       "Audit",
-      "RiskAssessment",
       "AssessmentTemplate",
       "Person",
   )

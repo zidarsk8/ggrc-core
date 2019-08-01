@@ -17,25 +17,14 @@ import {
 import {getChildTreeDisplayList} from '../plugins/utils/display-prefs-utils';
 import {clear as clearLocalStorage} from '../plugins/utils/local-storage-utils';
 import TreeViewConfig from '../apps/base_widgets';
-import pubSub from '../pub-sub';
 
 const DashboardControl = canControl.extend({
   defaults: {
     widget_descriptors: null,
     innerNavDescriptors: [],
-    /*
-      The widget should refetch items when opening
-      if "refetchOnce" has the model name of the widget.
-
-      For example: "refetchOnce" contains "Control" item.
-      The items of "Control" widget should be reloaded.
-    */
-    refetchOnce: new Set(),
-    pubSub,
   },
 }, {
   init: function (el, options) {
-    this.options = new canMap(this.options);
     this.init_tree_view_settings();
     this.init_page_title();
     this.init_page_header();
@@ -124,34 +113,9 @@ const DashboardControl = canControl.extend({
 
       let widgetController = $widget.control();
       if (widgetController && widgetController.display) {
-        let refetch = this.tryToRefetchOnce(widget)
-          || widget.forceRefetch;
-        return widgetController.display(refetch);
+        return widgetController.display();
       }
     }
-  },
-
-  tryToRefetchOnce(descriptor) {
-    const refetchOnce = this.options.attr('refetchOnce');
-
-    if (!refetchOnce.size) {
-      return false;
-    }
-
-    return refetchOnce.delete(descriptor.model.model_singular);
-  },
-
-  addRefetchOnceItems(modelNames) {
-    modelNames = typeof modelNames === 'string' ? [modelNames] : modelNames;
-    const refetchOnce = this.options.attr('refetchOnce');
-
-    modelNames.forEach((modelName) => {
-      refetchOnce.add(modelName);
-    });
-  },
-
-  '{pubSub} refetchOnce'(scope, event) {
-    this.addRefetchOnceItems(event.modelNames);
   },
 
   '.nav-logout click': function () {

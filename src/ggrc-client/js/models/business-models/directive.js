@@ -4,9 +4,9 @@
 */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import baseNotifications from '../mixins/notifications/base-notifications';
+import UniqueTitle from '../mixins/unique-title';
+import CaUpdate from '../mixins/ca-update';
+import BaseNotifications from '../mixins/notifications/base-notifications';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -17,7 +17,7 @@ export default Cacheable.extend({
   root_model: 'Directive',
   findAll: '/api/directives',
   findOne: '/api/directives/{id}',
-  mixins: [uniqueTitle, caUpdate, baseNotifications],
+  mixins: [UniqueTitle, CaUpdate, BaseNotifications],
   tree_view_options: {
     attr_list: Cacheable.attr_list.concat([
       {

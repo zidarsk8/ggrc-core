@@ -65,7 +65,7 @@ import {
   REFRESH_RELATED,
   REFRESHED,
 } from '../../../events/eventTypes';
-import Permission from '../../../permission';
+import {isAllowedFor} from '../../../permission';
 import {
   getPageInstance,
 } from '../../../plugins/utils/current-page-utils';
@@ -199,15 +199,14 @@ export default canComponent.extend({
       },
       isEditDenied: {
         get: function () {
-          return !Permission
-            .is_allowed_for('update', this.attr('instance')) ||
+          return !isAllowedFor('update', this.attr('instance')) ||
             this.attr('instance.archived');
         },
       },
       isAllowedToMap: {
         get: function () {
           let audit = this.attr('instance.audit');
-          return !!audit && Permission.is_allowed_for('read', audit);
+          return !!audit && isAllowedFor('read', audit);
         },
       },
       instance: {},

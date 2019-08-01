@@ -18,7 +18,7 @@ import {
   DOCUMENT_CREATE_FAILED,
   MAP_OBJECTS,
 } from '../../events/eventTypes';
-import Permission from '../../permission';
+import {refreshPermissions} from '../../permission';
 import template from './create-document-button.stache';
 import Document from '../../models/business-models/document';
 import Context from '../../models/service-models/context';
@@ -115,7 +115,7 @@ const viewModel = canMap.extend({
     let dfd = $.Deferred().resolve();
 
     if (documents.length) {
-      dfd = Permission.refresh();
+      dfd = refreshPermissions();
     }
 
     dfd.then(function () {
