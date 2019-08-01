@@ -105,7 +105,7 @@ export default canComponent.extend({
   leakScope: true,
   viewModel: viewModel,
   events: {
-    inserted() {
+    init() {
       let vm = this.viewModel;
 
       vm.attr('router', router);
