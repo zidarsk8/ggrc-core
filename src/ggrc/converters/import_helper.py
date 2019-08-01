@@ -221,14 +221,14 @@ def count_objects(csv_data):
         )
     return info
 
-  importables = get_exportables()
+  exportables = get_exportables()
   offsets_and_data_blocks = split_blocks(csv_data)
   blocks_info = []
   failed = False
   counts = {}
   for offset, data, _ in offsets_and_data_blocks:
     class_name = data[1][0].strip().lower()
-    object_class = importables.get(class_name, "")
+    object_class = exportables.get(class_name, "")
     rows = len(data) - 2
     if object_class:
       object_name = object_class.__name__
