@@ -98,15 +98,11 @@ class IssueTrackerTitleColumnHandler(IssueTrackerColumnHandler):
 
   def parse_item(self):
     """ Remove multiple spaces and new lines from text """
-    value = self.raw_value
-    if not value:
-      return ""
+    value = self.raw_value or ""
     value = self.clean_whitespaces(value)
     if not value:
       value = self.row_converter.obj.title or \
           self.row_converter.attrs["title"].value
-      self.add_warning(errors.WRONG_VALUE_DEFAULT,
-                       column_name=self.display_name)
     return value
 
   @staticmethod
