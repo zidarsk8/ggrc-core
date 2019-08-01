@@ -1706,15 +1706,7 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
       if not can_read:
         return None
     elif resource['type'] == "Revision" and _is_creator():
-      # Make a check for revision objects that are a special case
-      if not hasattr(ggrc.models.all_models, resource['resource_type']):
-        # there are no permissions for old objects
-        return None
-      instance = utils.referenced_objects.get(
-          resource['resource_type'], resource['resource_id']
-      )
-      if instance is None or\
-         not user_permissions.is_allowed_read_for(instance):
+      if not _is_allowed_revision_read(resource, user_permissions):
         return None
     else:
       if not user_permissions.is_allowed_read(resource['type'],
@@ -1722,8 +1714,10 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
         return None
     # Then, filter any typed keys
     for key, value in resource.items():
-      if key == 'context':
-        # Explicitly allow `context` objects to pass through
+      if key in ('context', 'content'):
+        # Explicitly allow `context` and `content` objects to pass through. If
+        # at this point `key` contains `"content"` value, it means that user
+        # has access to a revision and there is no need for further checking.
         pass
       else:
         # Apply filtering to sub-resources
@@ -1734,6 +1728,61 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
     return resource
   else:
     assert False, "Non-object passed to filter_resource"
+
+
+def _is_allowed_revision_read(revision, user_permissions):
+  # type: (Dict[str, Any], ggrc_basic_permissions.UserPermissions) -> bool
+  """Check if it is allowed to read a revision having specific permissions.
+
+  Check if it is allowed to read `revision` revision having `user_permissions`
+  permissions. Read is NOT allowed for revision if:
+    - Revision's resource type does not exist anymore;
+    - Instance revision was created for does not exist;
+    - Read is not allowed on revision's instance OR on any snapshot a revision
+      is attached to.
+
+  Args:
+    revision (Dict[str, Any]): Dictionary representing a revision.
+    user_permissions (ggrc_basic_permissions.UserPermissions): User permission
+      object to use when checking for read permission. If `None` is passed,
+      value will be calculated for current user.
+
+  Returns:
+    `True` if it is allowed to read the revision and `False` otherwise.
+  """
+  if not hasattr(ggrc.models.all_models, revision['resource_type']):
+    # If revision's resource type does not exist anymore, it is not allowed to
+    # read such a revision.
+    return False
+
+  instance = utils.referenced_objects.get(
+      revision['resource_type'],
+      revision['resource_id'],
+  )
+
+  if instance is None:
+    # If an instance the revision was created for does not exist anymore, it is
+    # not allowed to read such a revision.
+    return False
+
+  if user_permissions is None:
+    user_permissions = permissions.permissions_for(
+        get_current_user(use_external_user=False)
+    )
+
+  def allowed_read_resource(instance):
+    """Check if it is allowed to read `instance` for current user."""
+    return user_permissions.is_allowed_read_for(instance)
+
+  def allowed_read_snapshot(revision):
+    """Check if it is allowed to read any snapshot revision is attached to."""
+    snapshot_model = ggrc.models.snapshot.Snapshot
+    return any(
+        s and user_permissions.is_allowed_read_for(s)
+        for s in snapshot_model.query.filter_by(revision_id=revision['id'])
+    )
+
+  return allowed_read_resource(instance) or allowed_read_snapshot(revision)
 
 
 def _is_creator():
