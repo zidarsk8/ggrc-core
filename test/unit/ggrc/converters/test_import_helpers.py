@@ -210,9 +210,6 @@ class TestCountObjects(unittest.TestCase):
     counts, blocks_info, failed = import_helper.count_objects(test_data)
     self.assertEqual(len(counts), 0)
     self.assertEqual(blocks_info[0]['block_errors'][0],
-                     "Line 2: Object type 'objective snapshot' "
-                     "doesn't exist or can't be imported.")
-    self.assertEqual(blocks_info[0]['block_warnings'][0],
-                     "Line 2: Import for 'objective snapshot' "
+                     "Line 2: Import for Snapshot "
                      "object is not available in GGRC.")
     self.assertEqual(failed, True)

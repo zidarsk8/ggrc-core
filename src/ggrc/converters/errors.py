@@ -243,5 +243,5 @@ STATE_WILL_BE_IGNORED = (u"Line {line}: State will be set to 'In progress' "
                          u"due to change of verifier/creator/assignee. "
                          u"Column 'State' will be ignored.")
 
-SNAPSHOT_IMPORT_WARNING = (u"Line {line}: Import for '{object_name}' "
+SNAPSHOT_IMPORT_ERROR = (u"Line {line}: Import for Snapshot "
                            u"object is not available in GGRC.")

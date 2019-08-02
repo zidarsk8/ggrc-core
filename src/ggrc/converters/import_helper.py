@@ -214,11 +214,12 @@ def count_objects(csv_data):
         "row_errors": [],
     }
     if error:
-      info["block_errors"].append(errors.WRONG_OBJECT_TYPE.format(**error))
       if name == '':
-        info["block_warnings"].append(
-            errors.SNAPSHOT_IMPORT_WARNING.format(**error)
+        info["block_errors"].append(
+            errors.SNAPSHOT_IMPORT_ERROR.format(**error)
         )
+      else:
+        info["block_errors"].append(errors.WRONG_OBJECT_TYPE.format(**error))
     return info
 
   exportables = get_exportables()
