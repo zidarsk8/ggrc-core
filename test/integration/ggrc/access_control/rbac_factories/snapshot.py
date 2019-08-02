@@ -55,7 +55,8 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
     # Assume that Admin is first in people table
     admin = all_models.Person.query.get(1)
     self.api.set_user(admin)
-    self.api.put(original, {"title": factories.random_str()})
+    with self.api.as_external():
+      self.api.put(original, {"title": factories.random_str()})
     user = all_models.Person.query.get(self.user_id)
     self.api.set_user(user)
 
@@ -80,9 +81,7 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
         all_models.Revision.resource_id == snapshot.child_id,
     ).first()[0]
     return self.api.client.get(
-        "api/revisions?id__in={}%2C{}".format(
-            snapshot.revision.id, last_revision
-        )
+        "api/revisions?id__in={}".format(last_revision)
     )
 
   def update(self):
