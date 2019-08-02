@@ -251,7 +251,15 @@ class TestAssessmentImport(TestCase):
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
     """
     self.import_file("assessment_full_no_warnings.csv")
-    self.import_file("assessment_update_intermediate.csv", safe=False)
+    response = self._import_file("assessment_update_intermediate.csv")
+    self._check_csv_response(response, {
+        "Assessment": {
+            "row_warnings": {
+                errors.STATE_WILL_BE_IGNORED.format(line=4),
+                errors.STATE_WILL_BE_IGNORED.format(line=7),
+            }
+        }
+    })
 
     assessments = {r.slug: r for r in all_models.Assessment.query.all()}
     self.assertEqual(assessments["Assessment 60"].status,
@@ -926,38 +934,125 @@ class TestAssessmentImport(TestCase):
         "text", assessment.custom_attribute_values[0].attribute_value
     )
 
-  @ddt.data("user@example.com", "--")
-  def test_asmt_state_updating_verifiers_with_map_fields(self, new_verifier):
+  @ddt.data(
+      (
+          factories.IssueFactory,
+          "map:issue",
+          "user@example.com",
+      ),
+      (
+          factories.ObjectiveFactory,
+          "map:objective versions",
+          "user@example.com",
+      ),
+  )
+  @ddt.unpack
+  def test_asmt_state_updating_verifiers_with_map_fields(
+      self, map_factory, map_column_name, new_verifier
+  ):
     """Test assessment In Progress after updating Verifiers and map fields"""
-    audit = factories.AuditFactory()
-    objective = factories.ObjectiveFactory()
-    factories.SnapshotFactory(
-        parent=audit,
-        child_id=objective.id,
-        child_type=objective.__class__.__name__,
-        revision=factories.RevisionFactory()
-    )
-    assessment = \
-        factories.AssessmentFactory(audit=audit,
-                                    status=all_models.Assessment.DONE_STATE,
-                                    )
-    person = factories.PersonFactory(email="verifier@example.com")
-    factories.AccessControlPersonFactory(
-        ac_list=assessment.acr_name_acl_map["Verifiers"],
-        person=person,
-    )
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      map_object = map_factory()
+      spanpshot = factories.SnapshotFactory(
+          parent=audit,
+          child_id=map_object.id,
+          child_type=map_object.__class__.__name__,
+          revision=factories.RevisionFactory()
+      )
+      assessment = factories.AssessmentFactory(
+          audit=audit,
+          status=all_models.Assessment.DONE_STATE,
+      )
+      person = factories.PersonFactory(email="verifier@example.com")
+      factories.RelationshipFactory(source=assessment, destination=spanpshot)
+      factories.AccessControlPersonFactory(
+          ac_list=assessment.acr_name_acl_map["Verifiers"],
+          person=person,
+      )
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.DONE_STATE)
-    self.import_data(OrderedDict([
+    response = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
         ("Verifiers", new_verifier),
-        ("map:objective versions", objective.slug)
+        (map_column_name, map_object.slug),
     ]))
+    expected_response = {
+        "Assessment": {
+            "row_warnings": {
+                errors.STATE_WILL_BE_IGNORED.format(line=3),
+            }
+        }
+    }
+    self._check_csv_response(response, expected_response)
+    assessment = all_models.Assessment.query.get(assessment.id)
+    verifiers = [v.email for v in assessment.verifiers]
+    self.assertEqual(assessment.status, all_models.Assessment.PROGRESS_STATE)
+    self.assertEqual(verifiers or [""], [new_verifier])
+
+  @ddt.data(
+      (
+          factories.IssueFactory,
+          "map:issue",
+      ),
+      (
+          factories.ObjectiveFactory,
+          "map:objective versions",
+      ),
+  )
+  @ddt.unpack
+  def test_asmt_state_updating_empty_verifiers_with_map_fields(
+      self, map_factory, map_column_name
+  ):
+    """Test assessment In Progress after updating empty Verifiers,map fields"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      map_object = map_factory()
+      spanpshot = factories.SnapshotFactory(
+          parent=audit,
+          child_id=map_object.id,
+          child_type=map_object.__class__.__name__,
+          revision=factories.RevisionFactory()
+      )
+      assessment = factories.AssessmentFactory(
+          audit=audit,
+          status=all_models.Assessment.DONE_STATE,
+      )
+      person = factories.PersonFactory(email="verifier@example.com")
+      factories.RelationshipFactory(source=assessment, destination=spanpshot)
+      factories.AccessControlPersonFactory(
+          ac_list=assessment.acr_name_acl_map["Verifiers"],
+          person=person,
+      )
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
-        all_models.Assessment.PROGRESS_STATE)
+        all_models.Assessment.DONE_STATE)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code", assessment.slug),
+        ("Verifiers", "--"),
+        (map_column_name, map_object.slug),
+    ]))
+    expected_response = {
+        "Assessment": {
+            "row_warnings": {
+                errors.STATE_WILL_BE_IGNORED.format(line=3),
+            }
+        }
+    }
+    expected_response["Assessment"]["row_warnings"].add(
+        errors.NO_VERIFIER_WARNING.format(
+            line=3,
+            status=all_models.Assessment.DONE_STATE
+        )
+    )
+    self._check_csv_response(response, expected_response)
+    assessment = all_models.Assessment.query.get(assessment.id)
+    verifiers = [v.email for v in assessment.verifiers]
+    self.assertEqual(assessment.status, all_models.Assessment.PROGRESS_STATE)
+    self.assertEqual(verifiers or [""], [""])
 
 
 @ddt.ddt

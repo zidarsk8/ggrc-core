@@ -15,6 +15,7 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc.converters import get_importables
 from ggrc.converters import pre_commit_checks
+from ggrc.converters.handlers import acl
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
@@ -62,7 +63,7 @@ class RowConverter(object):
 
 class ImportRowConverter(RowConverter):
   """Class for handling row data for import"""
-  # pylint: disable=too-many-instance-attributes
+  # pylint: disable=too-many-public-methods,too-many-instance-attributes
   def __init__(self, block_converter, object_class, headers, line, **options):
     super(ImportRowConverter, self).__init__(block_converter, object_class,
                                              headers, options)
@@ -273,29 +274,65 @@ class ImportRowConverter(RowConverter):
     return obj
 
   def setup_secondary_objects(self):
-    """Import secondary objects.
+    """Import non-acl secondary objects.
+
+    This function creates and stores all secondary objects except acl such as
+    relationships and any linked object that need the original object to be
+    saved before they can be processed. This is usually due to needing the id
+    of the original object that is created with a csv import.
+    """
+    if not self.obj or self.ignore or self.is_delete:
+      return
+    for mapping in self.objects.values():
+      if not mapping.ignore and not isinstance(
+          mapping,
+          acl.AccessControlRoleColumnHandler
+      ):
+        mapping.set_obj_attr()
+    self._setup_secondary_objects()
+
+  def setup_acl_secondary_objects(self):
+    """Import acl secondary objects.
+
+    This function creates and stores only acl secondary objects such as
+    relationships and any linked object that need the original object to
+    be saved before they can be processed. This is usually due to needing the
+    id of the original object that is created with a csv import.
+    """
+    if not self.obj or self.ignore or self.is_delete:
+      return
+    for mapping in self.objects.values():
+      if not mapping.ignore and isinstance(
+          mapping,
+          acl.AccessControlRoleColumnHandler
+      ):
+        mapping.set_obj_attr()
+    self._setup_secondary_objects(acl_only=True)
+
+  def _setup_secondary_objects(self, acl_only=False):
+    """Import all secondary objects.
 
     This function creates and stores all secondary object such as relationships
     and any linked object that need the original object to be saved before they
     can be processed. This is usually due to needing the id of the original
     object that is created with a csv import.
     """
-    if not self.obj or self.ignore or self.is_delete:
-      return
-    for mapping in self.objects.values():
-      if not mapping.ignore:
-        mapping.set_obj_attr()
     if hasattr(self.obj, "validate_role_limit"):
       results = self.obj.validate_role_limit(_import=True)
       for role, msg in results:
         self.add_error(errors.VALIDATION_ERROR,
                        column_name=role,
                        message=msg)
-    self._check_secondary_objects()
+    # Need to proceed only after acl objects were added to the session
+    if acl_only:
+      self._check_secondary_objects()
     if self.dry_run:
       return
     try:
-      self.insert_secondary_objects()
+      if acl_only:
+        self.insert_acl_secondary_objects()
+      else:
+        self.insert_secondary_objects()
     except exc.SQLAlchemyError as err:
       db.session.rollback()
       logger.exception("Import failed with: %s", err.message)
@@ -381,6 +418,7 @@ class ImportRowConverter(RowConverter):
 
     self.flush_object()
     self.setup_secondary_objects()
+    self.setup_acl_secondary_objects()
     self.commit_object()
 
   def _check_object_class(self):
@@ -582,16 +620,35 @@ class ImportRowConverter(RowConverter):
         handler.insert_object()
 
   def insert_secondary_objects(self):
-    """Add additional objects to the current database session.
+    """Add non-acl additional objects to the current database session.
 
-    This is used for adding any extra created objects such as Relationships, to
+    This is used for adding non-acl extra created objects such as
+    Relationships, to the current session to be committed.
+    """
+    if not self.obj or self.ignore or self.is_delete:
+      return
+
+    for handler in self.objects.values():
+      if not handler.ignore and not isinstance(
+          handler,
+          acl.AccessControlRoleColumnHandler
+      ):
+        handler.insert_object()
+
+  def insert_acl_secondary_objects(self):
+    """Add acl additional objects to the current database session.
+
+    This is used for adding acl extra created objects such as Relationships, to
     the current session to be committed.
     """
     if not self.obj or self.ignore or self.is_delete:
       return
 
     for handler in self.objects.values():
-      if not handler.ignore:
+      if not handler.ignore and isinstance(
+          handler,
+          acl.AccessControlRoleColumnHandler
+      ):
         handler.insert_object()
 
     self._update_issue_tracker_object()

@@ -144,8 +144,7 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
       elif self.unmap and mapping:
         db.session.delete(mapping)
         signals.Restful.model_deleted.send(models.Relationship, obj=mapping)
-    if relationships:
-      db.session.flush(relationships)
+    db.session.flush(relationships)
     self.dry_run = True
 
   def get_value(self):
