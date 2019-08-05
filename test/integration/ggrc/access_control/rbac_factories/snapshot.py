@@ -70,6 +70,13 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
     original = get_model(snapshot.child_type).query.get(snapshot.child_id)
     return self.api.get(original, original.id)
 
+  def read_attached_revision(self):
+    """Read revision attached to a Snapshot"""
+    snapshot = all_models.Snapshot.query.get(self.snapshot_id)
+    return self.api.client.get(
+        "api/revisions?id__in={}".format(snapshot.revision.id)
+    )
+
   def get_latest_version(self):
     """Get latest revisions for original object of Snapshot"""
     self._update_orig_obj()
