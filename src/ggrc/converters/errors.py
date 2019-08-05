@@ -150,11 +150,12 @@ INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: Need to type double dash "
                                    u"cycle task state is {deny_states}. "
                                    u"The line will be ignored.")
 
-DEPRECATED_METRIC_STATUS = (u"Line {line}: In case there are any "
-                            u"compliance/on-boarding Questionnaires related "
-                            u"to {object_type} {object_title} in {ggrc_q_link}"
-                            u" they will be deprecated too. Please click "
-                            u"'Proceed' to confirm <deprecation/deletion>")
+DEPRECATED_DELETED_METRIC_STATUS = (u"Line {line}: In case there are "
+                                    u"any compliance/on-boarding "
+                                    u"Questionnaires related to {object_type} "
+                                    u"'{object_title}' in {ggrc_q_link} they "
+                                    u"will be deprecated too. Please click "
+                                    u"'Proceed' to confirm {action_status}.")
 
 ONLY_IMPORTABLE_COLUMNS_WARNING = (u"Line {line}: Only the following "
                                    u"attributes are importable: {columns}. "

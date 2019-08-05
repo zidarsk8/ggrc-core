@@ -63,11 +63,12 @@ class TestMetricsImport(TestCase):
       expected_response = {} if not is_integration else {
           "Metric": {
               "row_warnings": {
-                  errors.DEPRECATED_METRIC_STATUS.format(
+                  errors.DEPRECATED_DELETED_METRIC_STATUS.format(
                       line=3,
                       object_type="Metric",
                       object_title=metric.title,
                       ggrc_q_link=ggrc_q_link,
+                      action_status="deprecation",
                   ),
               },
           }
