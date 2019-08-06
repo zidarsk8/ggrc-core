@@ -10,3 +10,4 @@ Contents:
     how_to_write_a_commit_message
     branch_management
     reviewing_pull_requests
+    creating_pull_requests

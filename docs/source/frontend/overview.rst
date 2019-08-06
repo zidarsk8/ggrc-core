@@ -43,7 +43,7 @@ Page Structure
 **TODO**: Show and talk about diagram with Title, LHN, Dashboard,
 Dashboard Widget, Info Widget, TreeView & TreeNode.
 
-.. figure:: /_static/res/page_structure.png
+.. figure:: /docs/source/_static/res/page_structure.png
    :alt: Page structure
 
    Page structure
@@ -113,7 +113,7 @@ that has a three major parts:
 
 3) Info pane (preview of object)
 
-.. figure:: /_static/res/tree-widget.png
+.. figure:: /docs/source/_static/res/tree-widget.png
 
 .. _advanced-search:
 
@@ -137,7 +137,7 @@ search modals (:ref:`mapping-and-global-search`)
 ``Advanced Search`` UI generate a complex query to :ref:`advanced-query-api`
 in order to fetch data from server side.
 
-.. figure:: /_static/res/advanced-search.png
+.. figure:: /docs/source/_static/res/advanced-search.png
 
 
 QuickFormController

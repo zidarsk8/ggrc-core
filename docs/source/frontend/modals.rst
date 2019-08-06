@@ -88,4 +88,5 @@ Mapping modal allow us search objects use :ref:`advanced-search` and
 map them to context one.
 
 Architecture of modals that contain ``Advanced Search`` functionality:
-.. figure:: /_static/res/mapping-advanced-search.png
+
+.. figure:: /docs/source/_static/res/mapper-advanced-search.png
