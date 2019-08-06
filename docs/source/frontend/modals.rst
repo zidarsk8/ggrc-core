@@ -48,7 +48,7 @@ the modals
 -  fetch_data a bit complex because we could be TBD
 -  ``_transient`` property - added to the object instance while the object
    is open, but removed from the modal once the modal closes
--  run form_preload on the modal (if it exists)
+-  run formPreload on the modal (if it exists)
 -  apply object params - uses the data-object-params from the link that
    gets set on the modal. Example: when you create a request for an
    audit, a hidden field is the audit id. That's how you communicate any

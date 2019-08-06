@@ -59,7 +59,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "2.10.0-Pumpkin" + BUILD_NUMBER
+VERSION = "2.11.0-Pumpkin" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -226,11 +226,6 @@ GAPI_CLIENT_ID = os.environ.get('GGRC_GAPI_CLIENT_ID', "")
 GAPI_ADMIN_GROUP = os.environ.get('GGRC_GAPI_ADMIN_GROUP', "")
 GAPI_CLIENT_SECRET = os.environ.get('GGRC_GAPI_CLIENT_SECRET', "")
 
-# ggrc_risk_assessment specific module settings
-RISK_ASSESSMENT_URL = os.environ.get(
-    'GGRC_RISK_ASSESSMENT_URL',
-    'http://localhost:8080'
-)
 ASSESSMENT_SHORT_URL_PREFIX = os.environ.get(
     'GGRC_ASSESSMENT_SHORT_URL_PREFIX',
     ''

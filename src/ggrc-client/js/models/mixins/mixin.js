@@ -5,29 +5,31 @@
 
 import loIncludes from 'lodash/includes';
 import loIsFunction from 'lodash/isFunction';
-import loForEach from 'lodash/forEach';
-import canConstruct from 'can-construct';
 
-const Mixin = canConstruct.extend({
-  newInstance: function () {
+export default class Mixin {
+  constructor() {
     throw new Error('Mixins cannot be directly instantiated');
-  },
-  add_to: function (cls) {
+  }
+
+  static addTo(cls) {
     if (this === Mixin) {
       throw new Error('Must only add a subclass of Mixin to an object,' +
         ' not Mixin itself');
     }
     function setupFns(obj) {
       return function (fn, key) {
-        let blockedKeys = ['fullName', 'defaults', '_super', 'constructor'];
-        let aspect = ~key.indexOf(':') ?
-          key.substr(0, key.indexOf(':')) :
-          'after';
-        let oldfn;
+        let blockedKeys = ['constructor', 'length', 'name', 'prototype'];
+        let aspect;
+        let index = key.indexOf(':');
+        if (index !== -1) {
+          aspect = key.substr(0, index);
+          key = key.substr(index + 1);
+        } else {
+          aspect = 'after';
+        }
 
-        key = ~key.indexOf(':') ? key.substr(key.indexOf(':') + 1) : key;
-        if (fn !== Mixin[key] && !blockedKeys.includes(key)) {
-          oldfn = obj[key];
+        if (!blockedKeys.includes(key)) {
+          let oldfn = obj[key];
           // TODO support other ways of adding functions.
           //  E.g. "override" (doesn't call super fn at all)
           //       "sub" (sets this._super for mixin function)
@@ -68,12 +70,14 @@ const Mixin = canConstruct.extend({
     if (!loIncludes(cls._mixins, this)) {
       cls._mixins = cls._mixins || [];
       cls._mixins.push(this);
-      Object.keys(this).forEach(function (key) {
+      // static properties
+      Object.getOwnPropertyNames(this).forEach((key) => {
         setupFns(cls)(this[key], key);
-      }.bind(this));
-      loForEach(this.prototype, setupFns(cls.prototype));
+      });
+      // prototype properties
+      Object.getOwnPropertyNames(this.prototype).forEach((key) => {
+        setupFns(cls.prototype)(this.prototype[key], key);
+      });
     }
-  },
-}, {});
-
-export default Mixin;
+  }
+}

@@ -12,7 +12,7 @@ import {
 import {
   initCounts,
 } from '../../plugins/utils/widgets-utils';
-import Permission from '../../permission';
+import {refreshPermissions} from '../../permission';
 import {countsMap as workflowCountsMap} from '../../apps/workflows';
 
 const viewModel = canMap.extend({
@@ -35,7 +35,7 @@ const viewModel = canMap.extend({
     this.attr('waiting', true);
     try {
       await this.initWorkflow(workflow);
-      await Permission.refresh();
+      await refreshPermissions();
       await this.updateActiveCycleCounts(workflow);
       await workflow.refresh_all('task_groups', 'task_group_tasks');
       redirectToCycle();

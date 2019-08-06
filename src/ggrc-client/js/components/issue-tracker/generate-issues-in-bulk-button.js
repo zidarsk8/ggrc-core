@@ -8,7 +8,7 @@ import canStache from 'can-stache';
 import canMap from 'can-map';
 import canComponent from 'can-component';
 import template from './templates/generate-issues-in-bulk-button.stache';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {notifier} from '../../plugins/utils/notifiers-utils';
 import Stub from '../../models/stub';
 import {handleAjaxError} from '../../plugins/utils/errors-utils';
@@ -25,7 +25,7 @@ export default canComponent.extend({
     define: {
       isAllowedToGenerate: {
         get() {
-          return Permission.is_allowed_for('update', this.attr('instance'));
+          return isAllowedFor('update', this.attr('instance'));
         },
       },
       disableButton: {

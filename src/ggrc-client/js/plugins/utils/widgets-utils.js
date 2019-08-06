@@ -28,7 +28,7 @@ import {
   isMegaObjectRelated,
   getMegaObjectConfig,
 } from './mega-object-utils';
-import WidgetList from '../../modules/widget_list';
+import {getWidgetListFor} from '../../modules/widget_list';
 import {
   getPageType,
   getPageInstance,
@@ -73,7 +73,7 @@ function getWidgetList(modelName, path) {
   if (!modelName) {
     return widgetList;
   }
-  widgetList = WidgetList.get_widget_list_for(modelName);
+  widgetList = getWidgetListFor(modelName);
   // Needs refactoring: Should be removed and replaced with Routing!!!
   isAssessmentsView = /^\/assessments_view/.test(path);
 

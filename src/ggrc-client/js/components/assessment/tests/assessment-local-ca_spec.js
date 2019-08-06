@@ -7,7 +7,7 @@ import canMap from 'can-map';
 import {
   ddValidationMapToValue,
 } from '../../../plugins/utils/ca-utils';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../assessment-local-ca';
 
@@ -22,7 +22,7 @@ describe('assessment-local-ca component', () => {
     let spy;
 
     beforeEach(() => {
-      spy = spyOn(Permission, 'is_allowed_for');
+      spy = spyOn(Permission, 'isAllowedFor');
       viewModel.attr('instance', {});
     });
 

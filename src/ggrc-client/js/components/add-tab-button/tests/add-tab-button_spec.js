@@ -6,7 +6,7 @@
 import canMap from 'can-map';
 import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../add-tab-button';
-import Permission from '../../../permission';
+import * as Permission from '../../../permission';
 
 describe('add-tab-button component', function () {
   'use strict';
@@ -45,7 +45,7 @@ describe('add-tab-button component', function () {
           type: 'Assessment',
           audit: {},
         });
-        spyOn(Permission, 'is_allowed_for').and.returnValue(true);
+        spyOn(Permission, 'isAllowedFor').and.returnValue(true);
 
         let result = viewModel.attr('isAuditInaccessibleAssessment');
 
@@ -56,7 +56,7 @@ describe('add-tab-button component', function () {
     describe('returns true', () => {
       it(`if instance type is Assessment, there is audit but
         it is not allowed to read instance.audit`, () => {
-        spyOn(Permission, 'is_allowed_for').and.returnValue(false);
+        spyOn(Permission, 'isAllowedFor').and.returnValue(false);
         viewModel.attr('instance', {
           type: 'Assessment',
           audit: {},

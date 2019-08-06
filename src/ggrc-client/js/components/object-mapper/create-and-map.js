@@ -15,7 +15,7 @@ import {
   isSnapshotModel,
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
-import Permission from '../../permission';
+import {isAllowedAny} from '../../permission';
 import {shouldBeMappedExternally} from '../../models/mappers/mappings';
 import {
   confirm,
@@ -50,7 +50,7 @@ export default canComponent.extend({
           let isSnapshotModelDst = isSnapshotModel(destination);
 
           let result =
-            Permission.is_allowed_any('create', destination) &&
+            isAllowedAny('create', destination) &&
             // Don't allow if source is Audit scope model (Asmt) and destination is snapshotable
             !((isInAuditScopeSrc && isSnapshotModelDst) ||
               // Don't allow if source is snapshotParent (Audit) and destination is snapshotable.

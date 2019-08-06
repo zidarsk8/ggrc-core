@@ -4,10 +4,9 @@
 */
 
 import loFind from 'lodash/find';
-import canConstruct from 'can-construct';
 import canList from 'can-list';
 import canMap from 'can-map';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {hasRelatedAssessments} from './models-utils';
 import Person from '../../models/business-models/person';
 import Audit from '../../models/business-models/audit';
@@ -79,8 +78,9 @@ function isAuditScopeModel(model) {
  * @return {Object} The object
  */
 function toObject(instance) {
-  let content = instance.revision.content instanceof canConstruct ?
-    instance.revision.content.attr() : instance.revision.content;
+  let content = instance.revision.content.attr
+    ? instance.revision.content.attr()
+    : instance.revision.content;
 
   content.originalLink = getParentUrl(instance);
   content.snapshot = new canMap(instance);
@@ -91,14 +91,14 @@ function toObject(instance) {
   content.type = instance.child_type;
   content.id = instance.id;
   content.originalObjectDeleted = instance.original_object_deleted;
-  content.canRead = Permission.is_allowed_for('read', {
+  content.canRead = isAllowedFor('read', {
     type: instance.child_type,
     id: instance.child_id,
   });
   content.updated_at = instance.updated_at;
   content.canGetLatestRevision =
     !instance.is_latest_revision &&
-    Permission.is_allowed_for('update', {
+    isAllowedFor('update', {
       type: instance.child_type,
       id: instance.child_id}) &&
     !instance.original_object_deleted &&

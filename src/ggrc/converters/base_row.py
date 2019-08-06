@@ -230,7 +230,7 @@ class ImportRowConverter(RowConverter):
     """
     value = self.get_value(attr_name)
     new_objects = self.block_converter.converter.new_objects[self.object_class]
-    if value in new_objects:
+    if value in new_objects and new_objects[value]:
       return new_objects[value]
     obj = self.get_object_by_key(attr_name)
     if value:

@@ -11,7 +11,7 @@ import './request-review-modal';
 import template from './templates/object-review.stache';
 import notificationTemplate from './templates/complete-review-notification.stache';
 import Review from '../../models/service-models/review';
-import Permission from '../../permission';
+import {isAllowedFor} from '../../permission';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 import {createReviewInstance, saveReview} from '../../plugins/utils/object-review-utils';
 import {
@@ -59,7 +59,7 @@ export default canComponent.extend({
         get() {
           const instance = this.attr('review') || this.attr('instance');
 
-          return Permission.is_allowed_for('update', instance);
+          return isAllowedFor('update', instance);
         },
       },
       hasReviewers: {

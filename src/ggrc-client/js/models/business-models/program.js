@@ -5,12 +5,12 @@
 
 import Cacheable from '../cacheable';
 import {getRole} from '../../plugins/utils/acl-utils';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
-import programNotifications from '../mixins/notifications/program-notifications';
-import proposable from '../mixins/proposable';
-import megaObject from '../mixins/mega-object';
+import UniqueTitle from '../mixins/unique-title';
+import CaUpdate from '../mixins/ca-update';
+import AccessControlList from '../mixins/access-control-list';
+import ProgramNotifications from '../mixins/notifications/program-notifications';
+import Proposable from '../mixins/proposable';
+import MegaObject from '../mixins/mega-object';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -23,12 +23,12 @@ export default Cacheable.extend({
   update: 'PUT /api/programs/{id}',
   destroy: 'DELETE /api/programs/{id}',
   mixins: [
-    uniqueTitle,
-    caUpdate,
-    accessControlList,
-    programNotifications,
-    proposable,
-    megaObject,
+    UniqueTitle,
+    CaUpdate,
+    AccessControlList,
+    ProgramNotifications,
+    Proposable,
+    MegaObject,
   ],
   is_custom_attributable: true,
   isRoleable: true,

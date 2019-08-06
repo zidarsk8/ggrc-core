@@ -22,7 +22,7 @@ export default Cacheable.extend({
       },
     },
   },
-  form_preload: function (isNew, params, pageInstance) {
+  formPreload: function (isNew, params, pageInstance) {
     this.attr('comment', pageInstance);
   },
   /**

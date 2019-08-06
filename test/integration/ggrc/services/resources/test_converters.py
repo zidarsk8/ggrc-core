@@ -21,6 +21,7 @@ from appengine import base
 
 from ggrc import db
 from ggrc.models import all_models
+from ggrc.models import exceptions as models_exceptions
 from ggrc.notifications import import_export
 from ggrc.utils import errors as app_errors
 
@@ -93,11 +94,37 @@ class TestImportExportExceptions(TestImportExportBase):
     self.assert400(response)
     self.assertEqual(response.json['message'], error)
 
+  # pylint: disable=invalid-name
   @ddt.data(("Export", "exports"),
             ("Import", "imports"))
   @ddt.unpack
-  def test_handle_stop_raises_wrong(self, job, url):
-    """Test handle_export_stop method raises wrong status exception"""
+  def test_handle_ie_stop_raises_wrong(self, job, url):
+    """Test {} stop method raises wrong status exception"""
+    user = all_models.Person.query.first()
+    ie_job = factories.ImportExportFactory(
+        job_type=job,
+        created_at=datetime.now(),
+        created_by=user,
+        status="Wrong Status",
+    )
+    response = self.client.put(
+        "/api/people/{}/{}/{}/stop".format(user.id, url, ie_job.id),
+        headers=self.headers
+    )
+    self.assert400(response)
+    self.assertEqual(response.json['message'], app_errors.WRONG_STATUS)
+
+  @ddt.data(
+      ("Import", "imports",
+       app_errors.IMPORT_FINISHED_WARNING,
+       models_exceptions.ImportFinishedException),
+      ("Export", "exports",
+       app_errors.EXPORT_FINISHED_WARNING,
+       models_exceptions.ExportFinishedException)
+  )
+  @ddt.unpack
+  def test_handle_ie_stop_finished(self, job, url, error, exception):
+    """Test {} stop method "was finished" exception"""
     user = all_models.Person.query.first()
     ie_job = factories.ImportExportFactory(
         job_type=job,
@@ -110,7 +137,8 @@ class TestImportExportExceptions(TestImportExportBase):
         headers=self.headers
     )
     self.assert400(response)
-    self.assertEqual(response.json['message'], app_errors.WRONG_STATUS)
+    self.assertRaises(exception)
+    self.assertEqual(response.json['message'], error)
 
 
 @ddt.ddt

@@ -38,8 +38,8 @@ export default canControl.extend({
       this.options.widget_view = GGRC.templates_path +
         this.element.data('widget-view');
     }
-    if (this.options.instance.info_pane_preload) {
-      this.options.instance.info_pane_preload();
+    if (this.options.instance.infoPanePreload) {
+      this.options.instance.infoPanePreload();
     }
     this.options.context = new canMap({
       model: this.options.model,

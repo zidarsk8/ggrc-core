@@ -16,7 +16,7 @@ import {
   hasWarningType,
   shouldApplyPreconditions,
 } from '../plugins/utils/controllers';
-import Permission from '../permission';
+import {refreshPermissions} from '../permission';
 import {
   getPageInstance,
   navigate,
@@ -198,7 +198,7 @@ let handlers = {
           }
         }
 
-        Permission.refresh().then(function () {
+        refreshPermissions().then(function () {
           let hiddenElement;
           let tagName;
 

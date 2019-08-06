@@ -30,7 +30,7 @@ import {
 import {
   getPageType,
 } from '../../../plugins/utils/current-page-utils';
-import Permission from '../../../permission';
+import {isAllowedFor} from '../../../permission';
 
 let viewModel = canMap.extend({
   partials: {
@@ -41,7 +41,7 @@ let viewModel = canMap.extend({
   define: {
     isAllowedToUpdate: {
       get() {
-        return Permission.is_allowed_for('update', this.attr('instance'));
+        return isAllowedFor('update', this.attr('instance'));
       },
     },
     isEditDenied: {

@@ -4,11 +4,11 @@
 */
 
 import Cacheable from '../cacheable';
-import uniqueTitle from '../mixins/unique-title';
-import caUpdate from '../mixins/ca-update';
-import accessControlList from '../mixins/access-control-list';
-import baseNotifications from '../mixins/notifications/base-notifications';
-import relatedAssessmentsLoader from '../mixins/related-assessments-loader';
+import UniqueTitle from '../mixins/unique-title';
+import CaUpdate from '../mixins/ca-update';
+import AccessControlList from '../mixins/access-control-list';
+import BaseNotifications from '../mixins/notifications/base-notifications';
+import RelatedAssessmentsLoader from '../mixins/related-assessments-loader';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -23,11 +23,11 @@ export default Cacheable.extend({
   update: 'PUT /api/objectives/{id}',
   destroy: 'DELETE /api/objectives/{id}',
   mixins: [
-    uniqueTitle,
-    caUpdate,
-    accessControlList,
-    baseNotifications,
-    relatedAssessmentsLoader,
+    UniqueTitle,
+    CaUpdate,
+    AccessControlList,
+    BaseNotifications,
+    RelatedAssessmentsLoader,
   ],
   is_custom_attributable: true,
   isRoleable: true,

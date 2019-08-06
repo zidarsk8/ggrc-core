@@ -61,7 +61,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated Date',
         'Last Updated By',
-        'Folder',
+        'Gdrive Folder ID',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}

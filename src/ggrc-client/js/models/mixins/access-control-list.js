@@ -6,7 +6,7 @@
 import Mixin from './mixin';
 import {isSnapshot} from '../../plugins/utils/snapshot-utils';
 
-export default Mixin.extend({
+export default class AccessControlList extends Mixin {
   /**
    * This method clears ACL
    * before it's filled with the data from server or backup.
@@ -39,13 +39,15 @@ export default Mixin.extend({
     }
 
     return resource;
-  },
-  'after:init': function () {
+  }
+
+  'after:init'() {
     if (!this.access_control_list) {
       this.attr('access_control_list', []);
     }
-  },
+  }
+
   'before:restore'() {
     this.cleanupAcl();
-  },
-});
+  }
+}

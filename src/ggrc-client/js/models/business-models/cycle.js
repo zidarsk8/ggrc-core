@@ -4,8 +4,8 @@
 */
 
 import Cacheable from '../cacheable';
-import Permission from '../../permission';
-import isOverdue from '../mixins/is-overdue';
+import {refreshPermissions} from '../../permission';
+import IsOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 import Workflow from './workflow';
 import {getPageInstance} from '../../plugins/utils/current-page-utils';
@@ -16,7 +16,7 @@ function refreshWorkflow(ev, instance) {
     return;
   }
 
-  Permission.refresh();
+  refreshPermissions();
 
   const workflowId = instance.attr('workflow.id');
   const model = Workflow.findInCacheById(workflowId);
@@ -35,7 +35,7 @@ export default Cacheable.extend({
   create: 'POST /api/cycles',
   update: 'PUT /api/cycles/{id}',
   destroy: 'DELETE /api/cycles/{id}',
-  mixins: [isOverdue],
+  mixins: [IsOverdue],
   attributes: {
     workflow: Stub,
     modified_by: Stub,

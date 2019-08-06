@@ -248,15 +248,6 @@ describe('inner-nav view model', () => {
       expect(result.uncountable).toBe(true);
     });
 
-    it('should set forceRefetch', () => {
-      let result = viewModel.createWidget({
-        forceRefetch: true,
-        model: {},
-        content_controller_options: {},
-      });
-      expect(result.forceRefetch).toBe(true);
-    });
-
     it('should set default count', () => {
       let result = viewModel.createWidget({
         model: {},

@@ -4,7 +4,7 @@
 */
 
 import Cacheable from '../cacheable';
-import isOverdue from '../mixins/is-overdue';
+import IsOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
 
 export default Cacheable.extend({
@@ -16,7 +16,7 @@ export default Cacheable.extend({
   create: 'POST /api/cycle_task_groups',
   update: 'PUT /api/cycle_task_groups/{id}',
   destroy: 'DELETE /api/cycle_task_groups/{id}',
-  mixins: [isOverdue],
+  mixins: [IsOverdue],
   attributes: {
     cycle: Stub,
     task_group: Stub,

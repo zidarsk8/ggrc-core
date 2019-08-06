@@ -4,6 +4,7 @@
 """Test for proposal in case of usage of custom creator role"""
 
 import json
+import ddt
 
 from ggrc.models import all_models
 
@@ -17,6 +18,7 @@ from integration.ggrc_basic_permissions.models \
 from integration.ggrc.query_helper import WithQueryApi
 
 
+@ddt.ddt
 class TestOwnerAccess(TestCase, WithQueryApi):
   """Ensure that global creator has access to created proposal by him"""
 
@@ -124,3 +126,58 @@ class TestOwnerAccess(TestCase, WithQueryApi):
                                 headers=headers).json
     self.assertEqual(1, len(resp))
     self.assertEqual(resp[0]["Proposal"]["count"], 0)
+
+  @ddt.data("Program Readers", "Program Editors")
+  def test_program_read_as_creator(self, program_role):
+    """Test access to proposal for program reader/editor as Creator role"""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      program_manager = factories.PersonFactory()
+      factories.AccessControlPersonFactory(
+          ac_list=program.acr_name_acl_map["Program Managers"],
+          person=program_manager,
+      )
+      program_id = program.id
+
+    # make query to create proposal by program_manager
+    self.api.set_user(program_manager)
+    self.client.get("/login")
+
+    acr_class = all_models.AccessControlRole
+    acr = acr_class.query.filter(acr_class.name == 'ProposalEditor',
+                                 acr_class.object_type == 'Proposal').one()
+
+    create_data = self._get_create_proposal_request(
+        program_id, acr.id, program_manager.id)
+    self.api.post(all_models.Proposal, create_data)
+
+    query_data = _get_query_proposal_request(program_id)
+    headers = {"Content-Type": "application/json", }
+    resp = self.api.client.post("/query",
+                                data=json.dumps(query_data),
+                                headers=headers).json
+    self.assertEqual(1, len(resp))
+    self.assertEqual(resp[0]["Proposal"]["count"], 1)
+
+    role_creator = all_models.Role.query.filter(
+        all_models.Role.name == "Creator").one()
+
+    # make query to check proposals by Creator role person
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      rbac_factories.UserRoleFactory(role=role_creator, person=person)
+      factories.AccessControlPersonFactory(
+          ac_list=program.acr_name_acl_map[program_role],
+          person=person,
+      )
+
+    self.api.set_user(person)
+    self.client.get("/login")
+
+    query_data = _get_query_proposal_request(program_id)
+    headers = {"Content-Type": "application/json", }
+    resp = self.api.client.post("/query",
+                                data=json.dumps(query_data),
+                                headers=headers).json
+    self.assertEqual(1, len(resp))
+    self.assertEqual(resp[0]["Proposal"]["count"], 1)

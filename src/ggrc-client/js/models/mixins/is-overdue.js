@@ -9,15 +9,15 @@ import Mixin from './mixin';
 /**
  * Specific Model mixin to check overdue status
  */
-export default Mixin.extend({
-}, {
-  'after:init': function () {
+export default class IsOverdue extends Mixin {
+  'after:init'() {
     this.attr('isOverdue', this._isOverdue());
     this.bind('change', function () {
       this.attr('isOverdue', this._isOverdue());
     }.bind(this));
-  },
-  _isOverdue: function () {
+  }
+
+  _isOverdue() {
     let doneState = this.attr('is_verification_needed') ?
       'Verified' : 'Finished';
     let endDate = moment(
@@ -30,5 +30,5 @@ export default Mixin.extend({
       return false;
     }
     return isOverdue;
-  },
-});
+  }
+}

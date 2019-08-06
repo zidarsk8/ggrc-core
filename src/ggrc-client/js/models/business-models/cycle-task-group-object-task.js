@@ -12,10 +12,10 @@ import Workflow from './workflow';
 import {REFRESH_SUB_TREE} from '../../events/eventTypes';
 import {getPageType} from '../../plugins/utils/current-page-utils';
 import {getClosestWeekday} from '../../plugins/utils/date-utils';
-import isOverdue from '../mixins/is-overdue';
-import accessControlList from '../mixins/access-control-list';
-import caUpdate from '../mixins/ca-update';
-import cycleTaskNotifications from '../mixins/notifications/cycle-task-notifications';
+import IsOverdue from '../mixins/is-overdue';
+import AccessControlList from '../mixins/access-control-list';
+import CaUpdate from '../mixins/ca-update';
+import CycleTaskNotifications from '../mixins/notifications/cycle-task-notifications';
 import Stub from '../stub';
 import {reify} from '../../plugins/utils/reify-utils';
 
@@ -67,10 +67,10 @@ export default Cacheable.extend({
   root_object: 'cycle_task_group_object_task',
   root_collection: 'cycle_task_group_object_tasks',
   mixins: [
-    isOverdue,
-    accessControlList,
-    caUpdate,
-    cycleTaskNotifications,
+    IsOverdue,
+    AccessControlList,
+    CaUpdate,
+    CycleTaskNotifications,
   ],
   category: 'workflow',
   findAll: 'GET /api/cycle_task_group_object_tasks',
@@ -254,7 +254,7 @@ export default Cacheable.extend({
     }
     populateFromWorkflow(this, workflow);
   },
-  form_preload: function (newObjectForm, objectParams) {
+  formPreload: function (newObjectForm, objectParams) {
     let form = this;
     let cycle;
     let startDate;

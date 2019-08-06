@@ -43,7 +43,6 @@ class TestSlugPrefix(unittest.TestCase):
       'Project': 'PROJECT',
       'Regulation': 'REGULATION',
       'Risk': 'RISK',
-      'RiskAssessment': 'RISKASSESSMENT',
       'Requirement': 'REQUIREMENT',
       'Standard': 'STANDARD',
       'System': 'SYSTEM',

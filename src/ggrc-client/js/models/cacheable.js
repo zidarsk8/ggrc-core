@@ -24,8 +24,8 @@ import {
 } from '../plugins/utils/snapshot-utils';
 import resolveConflict from './conflict-resolution/conflict-resolution';
 import PersistentNotifier from '../plugins/persistent-notifier';
-import SaveQueue from './save_queue';
-import RefreshQueue from './refresh_queue';
+import enqueue from './save_queue';
+import {refreshAll} from './refresh_queue';
 import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
@@ -157,7 +157,7 @@ export default canModel.extend({
 
     if (staticProps.mixins) {
       loForEach(staticProps.mixins, function (mixin) {
-        mixin.add_to(that);
+        mixin.addTo(that);
       });
       delete this.mixins;
     }
@@ -647,7 +647,7 @@ export default canModel.extend({
               return that.constructor.model(response);
             })
             .then((model) => {
-              that.after_refresh && that.after_refresh();
+              that.afterRefresh && that.afterRefresh();
               return model;
             })
             .done(function (response) {
@@ -736,20 +736,20 @@ export default canModel.extend({
     this.dispatch('modelBeforeSave');
 
     if (isNew) {
-      if (this.before_create) {
-        this.before_create();
+      if (this.beforeCreate) {
+        this.beforeCreate();
       }
     }
 
     let saveXHR = saveCallback.call(this)
       .then((result) => {
         if (!isNew) {
-          this.after_update && this.after_update();
+          this.afterUpdate && this.afterUpdate();
         }
-        this.after_save && this.after_save();
+        this.afterSave && this.afterSave();
         return result;
       }, (xhr, status, message) => {
-        this.save_error && this.save_error(xhr.responseText);
+        this.saveError && this.saveError(xhr.responseText);
         return new $.Deferred().reject(xhr, status, message);
       })
       .fail((response) => {
@@ -774,18 +774,18 @@ export default canModel.extend({
     this._dfd = new $.Deferred();
     delayLeavingPageUntil(this._dfd);
 
-    SaveQueue.enqueue(this, this._super);
+    enqueue(this, this._super);
 
     return this._dfd;
   },
   refresh_all: function () {
     let props = Array.prototype.slice.call(arguments, 0);
 
-    return RefreshQueue.refresh_all(this, props);
+    return refreshAll(this, props);
   },
   refresh_all_force: function () {
     let props = Array.prototype.slice.call(arguments, 0);
 
-    return RefreshQueue.refresh_all(this, props, true);
+    return refreshAll(this, props, true);
   },
 });

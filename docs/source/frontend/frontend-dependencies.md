@@ -5,7 +5,6 @@
 - can-stache: https://v3.canjs.com/doc/can-stache.html
 - can-stache-bindgins: https://v3.canjs.com/doc/can-stache-bindings.html
 - can-component: https://v3.canjs.com/doc/can-component.html
-- can-construct: https://v3.canjs.com/doc/can-construct.html
 - can-event: https://v3.canjs.com/doc/can-event.html
 - can-jquery: https://v3.canjs.com/doc/can-jquery.html
 
