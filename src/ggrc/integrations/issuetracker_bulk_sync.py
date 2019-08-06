@@ -694,12 +694,13 @@ class IssueTrackerAuditChildUpdated(IssueTrackerBulkUpdater):
 
         for obj in handler.load_issuetracked_objects(parent_type, parent_id,
                                                      is_synced=True):
-          # pylint: disable=protected-access
-          handler()._add_disable_comment(
+          handler().add_disable_comment(
               obj,
               obj.issuetracker_issue.issue_id)
 
-    except:  # pylint: disable=bare-except
+    except (TypeError, ValueError, AttributeError, integrations_errors.Error,
+            ggrc_exceptions.ValidationError, exceptions.Forbidden) as error:
+      logger.error("Issues sync failed with error: %s", str(error))
       self.send_notification(parent_type, parent_id, failed=True)
     else:
       self.send_notification(parent_type, parent_id, errors=errors)
