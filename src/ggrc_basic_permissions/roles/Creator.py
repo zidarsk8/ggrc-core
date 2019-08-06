@@ -28,14 +28,7 @@ owner_read = owner_base + [
         },
         "condition": "relationship",
     },
-    {
-        "type": "Proposal",
-        "condition": "is_allowed_based_on",
-        "terms": {
-            "property_name": "instance",
-            "action": "read",
-        },
-    },
+    "Proposal",
     "Role",
     "Comment",
     "UserRole",
