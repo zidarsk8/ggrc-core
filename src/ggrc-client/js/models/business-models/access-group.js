@@ -6,7 +6,7 @@
 import Cacheable from '../cacheable';
 import UniqueTitle from '../mixins/unique-title';
 import CaUpdate from '../mixins/ca-update';
-import AaccessControlList from '../mixins/access-control-list';
+import AccessControlList from '../mixins/access-control-list';
 import ScopeObjectNotifications from '../mixins/notifications/scope-object-notifications';
 import Questionnaire from '../mixins/questionnaire';
 import Stub from '../stub';
@@ -23,7 +23,7 @@ export default Cacheable.extend({
   mixins: [
     UniqueTitle,
     CaUpdate,
-    AaccessControlList,
+    AccessControlList,
     ScopeObjectNotifications,
     Questionnaire,
   ],

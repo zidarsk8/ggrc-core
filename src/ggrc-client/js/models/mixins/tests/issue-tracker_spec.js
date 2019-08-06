@@ -6,14 +6,14 @@
 import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import Cacheable from '../../cacheable';
-import issueTracker from '../issue-tracker';
+import IssueTracker from '../issue-tracker';
 
-describe('issueTracker mixin', () => {
+describe('IssueTracker mixin', () => {
   let Mixin;
 
   beforeAll(function () {
     GGRC.ISSUE_TRACKER_ENABLED = true;
-    Mixin = issueTracker;
+    Mixin = IssueTracker;
   });
 
   describe('initIssueTracker() method', () => {

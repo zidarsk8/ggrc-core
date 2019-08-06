@@ -10,7 +10,7 @@ import * as snapshotUtils from '../../../plugins/utils/snapshot-utils';
 import Cacheable from '../../cacheable';
 import AccessControlList from '../../../models/mixins/access-control-list';
 
-describe('accessControlList mixin', () => {
+describe('AccessControlList mixin', () => {
   describe('"cleanupAcl" method: ', () => {
     let resource;
     let objectFromResourceSpy;
