@@ -41,6 +41,12 @@ class Document(Roleable, Relatable, mixins.Titled,
                          'Document')
   FILE = "FILE"
   REFERENCE_URL = "REFERENCE_URL"
+
+  recipients = db.Column(
+      db.String,
+      nullable=False,
+      default=u"Admin")
+
   VALID_DOCUMENT_KINDS = [FILE, REFERENCE_URL]
 
   START_STATE = 'Active'
