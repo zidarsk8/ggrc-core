@@ -10,6 +10,7 @@
 < docs/source/backend/overview.rst
 < docs/source/contributing/css_and_html.rst
 < docs/source/contributing/git/branch_management.rst
+< docs/source/contributing/git/creating_pull_requests.rst
 < docs/source/contributing/git/how_to_write_a_commit_message.rst
 < docs/source/contributing/git/index.rst
 < docs/source/contributing/git/reviewing_pull_requests.rst

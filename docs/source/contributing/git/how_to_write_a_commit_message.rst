@@ -213,34 +213,3 @@ Please keep in mind that, for various technical reasons, Selenium tests
 *NOTE: These tests only work with Docker-based development environments,
 since they require Docker prerequisites to be installed on the host
 machine. Vagrant is not supported.*
-
-
-Pull Request Titles
--------------------
-
-For pull request titles we should use the same rules as for the subject
-line of a commit, but we need to prefix the title with one of:
-
- - ISSUE ID when we have one or more issues 
- - QUICK-FIX when there is no jira ticket for the codechange
- - DOCS when for PRs that update only documentation and there is no jira ticket 
- - BACKMERGE for merging release or master branches back into dev
- - MERGE for dev branch to release and release to master
-
-A pull request title must also reflect on what changes have been done.
-If the pull request title states that it contains test modifications, it
-must not contain any code changes outside of tests. If there are logic
-changes in the PR, the title must reflect those and the changes in the
-tests are implied with the code changes.
-
-Examples::
-
-    GGRC-9999 Fix performance issues on bulk operations
-    GGRC-1111/1112/9900 Fix rbac issues for creators
-    GGRC-1111,GGRC-1112 Fix rbac issues for editors
-    QUICK-FIX Break test cases into smaller parts
-    DOCS Add section that explains client side mappings
-    BACKMERGE master into Release/xyz
-    BACKMERGE Release/xyz into dev
-    MERGE dev into Release/xyz
-    MERGE Release/xyz into master
