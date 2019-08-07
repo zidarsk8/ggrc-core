@@ -1166,7 +1166,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     # import new object
     response = self.import_data(OrderedDict([
         ('object_type', 'Assessment'),
-        ('Code*', 'Test Code'),
+        ('Code*', ''),
         ('Audit', audit.slug),
         ('Creators', 'user@example.com'),
         ('Assignees*', 'user@example.com'),
