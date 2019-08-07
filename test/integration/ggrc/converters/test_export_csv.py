@@ -123,6 +123,7 @@ class TestExportEmptyTemplate(TestCase):
       self.assertIn(field, response.data)
 
 
+@ddt.ddt
 class TestExportSingleObject(TestCase):
 
   def setUp(self):
@@ -175,6 +176,40 @@ class TestExportSingleObject(TestCase):
         self.assertIn(",Cat ipsum {},".format(i), response.data)
       else:
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
+
+  @ddt.data(
+      ("Program", factories.ProgramFactory),
+      ("Regulation", factories.RegulationFactory),
+      ("Objective", factories.ObjectiveFactory),
+      ("Contract", factories.ContractFactory),
+      ("Policy", factories.PolicyFactory),
+      ("Standard", factories.StandardFactory),
+      ("Threat", factories.ThreatFactory),
+      ("Requirement", factories.RequirementFactory),
+  )
+  @ddt.unpack
+  def test_reviewable_object_columns(self, object_name, object_factory):
+    """Test review state/reviewers exist export file"""
+    obj = object_factory()
+    data = [{
+        "object_name": object_name,
+        "filters": {
+            "expression": {
+                "left": "title",
+                "op": {"name": "="},
+                "right": obj.title,
+            },
+        },
+        "fields": "all",
+    }]
+    response = self.export_csv(data)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertIn("Title*", response.data)
+    self.assertIn(object_name, response.data)
+    self.assertIn(obj.title, response.data)
+    self.assertIn("Review State", response.data)
+    self.assertIn("Reviewers", response.data)
 
   def test_and_export_query(self):
     """Test export query with AND clause."""

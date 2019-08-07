@@ -49,11 +49,13 @@ class Reviewable(rest_handable.WithPutHandable,
   _aliases = {
       "review_status": {
           "display_name": "Review State",
-          "mandatory": False
+          "mandatory": False,
+          "skip_in_template": True,
       },
       "reviewers": {
           "display_name": "Reviewers",
-          "mandatory": False
+          "mandatory": False,
+          "skip_in_template": True,
       }
   }
 

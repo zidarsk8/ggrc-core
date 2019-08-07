@@ -20,7 +20,6 @@ from ggrc import utils
 from ggrc.models import exceptions
 from ggrc.models import all_models
 from ggrc.models import reflection
-from ggrc.models import review
 from ggrc.models import mixins
 from ggrc.rbac import permissions
 from ggrc.utils import benchmark
@@ -571,7 +570,8 @@ class ExportBlockConverter(BlockConverter):
 
     self._create_ca_definitions_cache(field_names=fields)
     self.object_headers = import_helper.get_object_column_definitions(
-        self.object_class, ca_cache=self._ca_cache)
+        self.object_class, ca_cache=self._ca_cache,
+        for_template=self.is_template)
 
     raw_headers = [unicode(key) for key in self._get_header_names().keys()]
     self.headers = self.clean_headers(raw_headers)
@@ -588,14 +588,15 @@ class ExportBlockConverter(BlockConverter):
     """Returns width of block (header length)."""
     return len(self.fields)
 
+  @property
+  def is_template(self):
+    """Clarify if file is the template"""
+    return not self.object_ids
+
   def organize_fields(self, fields):
     """Setup fields property."""
     if fields == "all":
       fields = self.object_headers.keys()
-    if not self.object_ids and issubclass(self.object_class,
-                                          review.Reviewable):
-      fields.remove("review_status")
-      fields.remove("reviewers")
     self.fields = import_helper.get_column_order(fields)
 
   def generate_csv_header(self):

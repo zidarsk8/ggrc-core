@@ -1045,7 +1045,8 @@ class ExportOnlyIssueTrackerColumnHandler(ExportOnlyColumnHandler):
 class ReviewableColumnHandler(ExportOnlyColumnHandler):
   """Only on export handler for Reviewable columns"""
 
-  def parse_item(self):
+  def _validate_item(self):
+    """Adds 'ignored message' warnings if new value unequal initial"""
     if self.raw_value and self.raw_value != self.get_value():
       self.add_warning(
           errors.REVIEWABLE_WILL_BE_IGNORED,
@@ -1053,7 +1054,7 @@ class ReviewableColumnHandler(ExportOnlyColumnHandler):
       )
 
   def set_value(self):
-    self.parse_item()
+    self._validate_item()
 
 
 class ReviewersColumnHandler(ReviewableColumnHandler):
