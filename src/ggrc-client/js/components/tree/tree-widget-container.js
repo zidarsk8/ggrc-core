@@ -573,9 +573,9 @@ let viewModel = canMap.extend({
       return;
     }
 
-    const modelName = this.attr('model').table_singular;
+    const widgetId = this.attr('options.widgetId');
     const permalink = AdvancedSearch
-      .buildSearchPermalink(selectedSavedSearch.id, modelName);
+      .buildSearchPermalink(selectedSavedSearch.id, widgetId);
 
     this.attr('savedSearchPermalink', permalink);
     this.attr('appliedSavedSearch', selectedSavedSearch.serialize());

@@ -230,14 +230,14 @@ export const setDefaultStatusConfig = (state, modelName) => {
 /**
  * Build permalink for saved search
  * @param {Number} searchId - saved search ID
- * @param {String} modelName - model name
+ * @param {String} widgetId - widget id
  * @return {String} - permalink
  */
-export const buildSearchPermalink = (searchId, modelName) => {
+export const buildSearchPermalink = (searchId, widgetId) => {
   const origin = window.location.origin;
   const pathName = window.location.pathname;
   const url = `${origin}${pathName}`;
-  const hash = `#!${modelName}&saved_search=${searchId}`;
+  const hash = `#!${widgetId}&saved_search=${searchId}`;
   const permalink = `${url}${hash}`;
 
   return permalink;

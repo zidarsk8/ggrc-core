@@ -24,7 +24,7 @@ export default canComponent.extend({
   leakScope: false,
   viewModel: canMap.extend({
     pubSub,
-    modelName: '',
+    widgetId: '',
     objectType: '',
     searchType: '',
     searches: [],
@@ -150,7 +150,7 @@ export default canComponent.extend({
         savedSearch = savedSearch();
       }
 
-      const link = buildSearchPermalink(savedSearch.id, this.attr('modelName'));
+      const link = buildSearchPermalink(savedSearch.id, this.attr('widgetId'));
       return options.fn({permalink: link});
     },
   },
