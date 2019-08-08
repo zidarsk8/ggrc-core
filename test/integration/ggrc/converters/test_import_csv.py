@@ -509,7 +509,7 @@ class TestBasicCsvImport(TestCase):
         ("Code*", "program-1"),
         ("Program managers", "user@example.com"),
         ("Title", "program-1"),
-        ("Gdrive Folder ID", folder_id)
+        ("GDrive Folder ID", folder_id)
 
     ]))
     self._check_csv_response(response, {})
