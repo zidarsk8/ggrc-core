@@ -5,7 +5,7 @@
 
 # pylint: disable=invalid-name,too-many-public-methods,too-many-lines
 
-from collections import OrderedDict
+import collections
 
 import ddt
 import mock
@@ -57,17 +57,6 @@ class TestIssueTrackedImport(ggrc.TestCase):
     self.patch_update_issue.stop()
     self.patch_create_issue.stop()
 
-  def test_asmt_creation_detached(self):
-    """Test assessment creation via import detached from IssueTracker hooks."""
-    self.import_file("assessment_full_no_warnings.csv")
-    self.mock_create_issue.assert_not_called()
-
-  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
-  def test_issue_creation_detached(self):
-    """Test issue creation via import detached from IssueTracker hooks."""
-    self.import_file("issue_for_import.csv")
-    self.mock_create_issue.assert_not_called()
-
   @ddt.data(
       ("Issue", "Issue", "component_id", "Component ID", 123),
       ("Issue", "Issue", "hotlist_id", "Hotlist ID", 321),
@@ -108,7 +97,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
           issue_tracked_obj=obj,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", model_name),
         ("Code*", obj.slug),
         (alias, value),
@@ -129,9 +118,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @ddt.unpack
   def test_issue_import_create_succeed(self, field, alias, value):
     """Test Issue {1} set correctly during create via import."""
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("Title", "Object Title"),
         ("Due Date*", "2016-10-24T15:35:37"),
@@ -154,9 +143,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
   def test_assmt_import_create_succeed(self, field, alias, value):
     """Test Assessment {1} set correctly during create via import."""
     audit = factories.AuditFactory()
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -180,9 +169,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
     """Test Assessment Template {1} set correctly during create via import."""
     audit = factories.AuditFactory()
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment Template"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
         ("Object Under Assessment", "Control"),
@@ -217,9 +206,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       }
     else:
       expected_messages = {}
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "ISSUE-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("Title", "Issue Title"),
         ("Due Date*", "2016-10-24T15:35:37"),
@@ -244,9 +233,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       }
     else:
       expected_messages = {}
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "ISSUE-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("Title", "Issue Title"),
         ("Hotlist ID", value),
@@ -271,9 +260,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       }
     else:
       expected_messages = {}
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "ISSUE-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("Title", "Issue Title"),
         ("Component ID", value),
@@ -311,9 +300,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       }
     else:
       expected_messages = {}
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Audit"),
-        ("Code*", "slug-1"),
+        ("Code*", ""),
         ("Program", program.slug),
         ("Title", "Audit Title"),
         ("State", "Planned"),
@@ -336,9 +325,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
   def test_audit_import_create_succeed(self, field, alias, value):
     """Test Audit "{0}"={2} set correctly during create via import."""
     program = factories.ProgramFactory()
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Audit"),
-        ("Code*", "slug-1"),
+        ("Code*", ""),
         ("Program", program.slug),
         ("Title", "Audit Title"),
         ("State", "Planned"),
@@ -384,9 +373,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
                                     expected_warnings):
     """Test Audit people sync={0} set during create via import."""
     program = factories.ProgramFactory()
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Audit"),
-        ("Code*", "slug-1"),
+        ("Code*", ""),
         ("Program", program.slug),
         ("Title", "Audit Title"),
         ("State", "Planned"),
@@ -441,7 +430,7 @@ class TestIssueTrackedImport(ggrc.TestCase):
           people_sync_enabled=current_obj_value,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Audit"),
         ("Code*", audit.slug),
         ("Sync people with Ticket Tracker", imported_value),
@@ -460,7 +449,38 @@ class TestIssueTrackedImport(ggrc.TestCase):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_bulk_create_from_import(self):
     """Test data was imported and tickets were updated using bulk mechanism."""
-    response = self.import_file("issuetracker_no_warnings.csv")
+    program = factories.ProgramFactory(title="program-1")
+    audit = factories.AuditFactory(title="Audit-1",
+                                   program=program)
+
+    assessment_data = [
+        collections.OrderedDict([
+            ("object_type", "Assessment"),
+            ("Code*", ""),
+            ("Audit*", audit.slug),
+            ("Assignees*", "user@example.com"),
+            ("Creators", "user@example.com"),
+            ("Title", "Assessment-1"),
+        ])
+    ]
+    self.import_data(*assessment_data)
+    assessment = all_models.Assessment.query.one()
+    assessment_slug = assessment.slug
+
+    issue_data = [
+        collections.OrderedDict([
+            ("object_type", "Issue"),
+            ("Code*", ""),
+            ("Admin", "user@example.com"),
+            ("Title", "Issue Title"),
+            ("Due Date*", "2019-11-20T15:35:37"),
+        ])
+    ]
+
+    response = self.import_data(*issue_data)
+    issue = all_models.Issue.query.one()
+    issue_slug = issue.slug
+
     self._check_csv_response(response, {})
     iti = all_models.IssuetrackerIssue
     assmt_iti = iti.query.filter(iti.object_type == "Assessment").one()
@@ -472,9 +492,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
     db.session.commit()
 
     with mock.patch("ggrc.notifications.common.send_email") as send_mock:
-      self.import_data(OrderedDict([
+      self.import_data(collections.OrderedDict([
           ("object_type", "Assessment"),
-          ("code", "ASSESSMENT-1"),
+          ("code", assessment_slug),
           ("title", "Title1"),
       ]))
     send_mock.assert_called_once()
@@ -483,9 +503,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
         "ggrc.integrations.issues.Client.update_issue"
     ) as update_mock:
       with mock.patch("ggrc.notifications.common.send_email") as send_mock:
-        self.import_data(OrderedDict([
+        self.import_data(collections.OrderedDict([
             ("object_type", "Issue"),
-            ("code", "ISSUE-1"),
+            ("code", issue_slug),
             ("priority", "P1"),
         ]))
     send_mock.assert_called_once()
@@ -527,9 +547,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       iti = factories.IssueTrackerIssueFactory(issue_tracked_obj=audit)
       setattr(iti, missed_field, audit_value)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -577,9 +597,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       audit = factories.AuditFactory()
       factories.IssueTrackerIssueFactory(issue_tracked_obj=audit)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -628,9 +648,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       iti = factories.IssueTrackerIssueFactory(issue_tracked_obj=audit)
       setattr(iti, missed_field, audit_value)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment Template"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
         ("Object Under Assessment", "Control"),
@@ -677,9 +697,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       audit = factories.AuditFactory()
       factories.IssueTrackerIssueFactory(issue_tracked_obj=audit)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment Template"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
         ("Object Under Assessment", "Control"),
@@ -729,9 +749,9 @@ class TestIssueTrackedImport(ggrc.TestCase):
       factories.IssueTrackerIssueFactory(
           issue_tracked_obj=tmpl, **{field: tmpl_value})
 
-    fields = OrderedDict([
+    fields = collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -776,7 +796,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           enabled=False,
           issue_id=None,
       )
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", ""),
         ("Audit", audit.slug),
@@ -800,7 +820,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           enabled=False,
           issue_id=None,
       )
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
         ("Code*", obj.slug),
         ("Ticket Tracker Integration", "On"),
@@ -814,9 +834,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_generation_issue_allowed_on_create(self, status):
     """Test ticket generation allowed for Issue in status={0} on create"""
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("State", status),
         ("Title", "Object Title"),
@@ -850,7 +870,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
             "row_warnings": {expected_warning},
         }
     }
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
         ("Code*", obj.slug),
         ("Ticket Tracker Integration", "On"),
@@ -874,9 +894,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
             "row_warnings": {expected_warning},
         }
     }
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("Title", "Object Title"),
         ("State", status),
@@ -892,9 +912,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
   def test_enabled_state_audit_create_succeed(self, value):
     """Test Audit integration={0} set correctly during create via import."""
     program = factories.ProgramFactory()
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Audit"),
-        ("Code*", "slug-1"),
+        ("Code*", ""),
         ("Program", program.slug),
         ("Title", "Audit Title"),
         ("State", "Planned"),
@@ -930,7 +950,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
             "row_warnings": {expected_warning}
         }
     }
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", model_name),
         ("Code*", obj.slug),
         ("Ticket Tracker Integration", "test_value"),
@@ -959,9 +979,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           enabled=audit_value,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment Template"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Default Assignees*", "user@example.com"),
         ("Object Under Assessment", "Control"),
@@ -982,9 +1002,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
         issue_tracked_obj=audit,
         enabled=True,
     )
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -1012,7 +1032,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           issue_tracked_obj=assmt,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assmt.slug),
         ("Ticket Tracker Integration", value),
@@ -1041,7 +1061,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           issue_tracked_obj=obj,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", model_name),
         ("Code*", obj.slug),
         ("Ticket Tracker Integration", value),
@@ -1055,9 +1075,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
   def test_enabled_state_issue_create_succeed(self, value):
     """Test Issue integr state={0} set correctly during create via import."""
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Issue"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Admin", "user@example.com"),
         ("Title", "Object Title"),
         ("Ticket Tracker Integration", value),
@@ -1090,7 +1110,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           issue_id=None,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assmt.slug),
         ("Ticket Tracker Integration", "On"),
@@ -1133,7 +1153,7 @@ class TestEnabledViaImport(TestIssueTrackedImport):
             "row_warnings": {expected_warning},
         }
     }
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assmt.slug),
         ("Ticket Tracker Integration", "On"),
@@ -1153,9 +1173,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
           enabled=True,
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
@@ -1190,9 +1210,9 @@ class TestEnabledViaImport(TestIssueTrackedImport):
             "row_warnings": {expected_warning},
         }
     }
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "OBJ-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", "user@example.com"),
         ("Creators", "user@example.com"),
