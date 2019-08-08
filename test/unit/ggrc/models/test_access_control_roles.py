@@ -45,6 +45,14 @@ class TestAccessControlRoles(unittest.TestCase):
       self.acr.name = name
       self.acr.object_type = object_type
 
+  def test_invalid_camelcase_name_throws(self):
+    """Test if raises on collision with global attributes"""
+
+    with self.assertRaises(ValueError):
+      name, object_type = "TiTle", "Control"
+      self.acr.name = name
+      self.acr.object_type = object_type
+
   @ddt.data("role title with asterisk*",
             "map:object",
             "unmap:object",
@@ -62,6 +70,13 @@ class TestAccessControlRoles(unittest.TestCase):
     """Test if raises on collision with custom attributes attributes"""
     with self.assertRaises(ValueError):
       name, object_type = "reg url", "Regulation"
+      self.acr.name = name
+      self.acr.object_type = object_type
+
+  def test_if_invalid_camelcase_ca_check(self):
+    """Test if raises on collision with custom attributes attributes"""
+    with self.assertRaises(ValueError):
+      name, object_type = "Reg Url", "Regulation"
       self.acr.name = name
       self.acr.object_type = object_type
 
