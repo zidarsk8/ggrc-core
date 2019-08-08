@@ -230,7 +230,7 @@ def count_objects(csv_data):
     class_name = data[1][0].strip().lower()
     object_class = exportables.get(class_name, "")
     rows = len(data) - 2
-    if 'snapshot' in class_name.lower():
+    if 'snapshot' in class_name:
       blocks_info.append(get_info(class_name.title(), rows,
                                   line=offset + 2,
                                   object_name=class_name))
