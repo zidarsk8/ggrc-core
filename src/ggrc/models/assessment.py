@@ -3,18 +3,18 @@
 
 """Module for Assessment object"""
 
-from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import remote
 from sqlalchemy.orm import validates
 from sqlalchemy import orm
+import sqlalchemy as sa
 
 from ggrc import db
+from ggrc import utils
 from ggrc.builder import simple_property
 from ggrc.fulltext import mixin
 from ggrc.models.comment import Commentable
-from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models import audit
+from ggrc.models import custom_attribute_definition
 from ggrc.models.mixins import with_last_comment
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import base
@@ -98,17 +98,34 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
 
       This is used in the relate_ca method in hooks/assessment.py.
     """
+    cad = custom_attribute_definition.CustomAttributeDefinition
+    current_type = cls.__name__
+
+    def join_expr():
+      return sa.and_(
+          orm.foreign(orm.remote(cad.definition_id)) == cls.id,
+          cad.definition_type == utils.underscore_from_camelcase(current_type),
+      )
+
+    # Since there is some kind of generic relationship on CAD side, correct
+    # join expression for backref should be provided. If default, every call of
+    # "{}_definition".format(definition_type) on CAD will produce a lot of
+    # unnecessary DB queries returning nothing.
+    def backref_join_expr():
+      return orm.remote(cls.id) == orm.foreign(cad.definition_id)
+
     return db.relationship(
-        'CustomAttributeDefinition',
-        primaryjoin=lambda: and_(
-            remote(CustomAttributeDefinition.definition_id) == cls.id,
-            remote(CustomAttributeDefinition.definition_type) == "assessment"),
-        foreign_keys=[
-            CustomAttributeDefinition.definition_id,
-            CustomAttributeDefinition.definition_type
-        ],
-        backref='assessment_definition',
-        cascade='all, delete-orphan')
+        "CustomAttributeDefinition",
+        primaryjoin=join_expr,
+        backref=db.backref(
+            "{}_definition".format(
+                utils.underscore_from_camelcase(current_type)
+            ),
+            lazy="joined",
+            primaryjoin=backref_join_expr,
+        ),
+        cascade="all, delete-orphan",
+    )
 
   object = {}  # we add this for the sake of client side error checking
 
