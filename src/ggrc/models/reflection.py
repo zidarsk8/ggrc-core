@@ -506,7 +506,7 @@ class AttributeInfo(object):
     if hasattr(object_class, "slug"):
       aliases.append(("delete", {
           "display_name": "Delete",
-          "description": "",
+          "description": "Allowed value is:\nYes",
       }))
 
     unique_columns = cls.get_unique_constraints(object_class)
