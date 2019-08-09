@@ -73,7 +73,7 @@
   <simple-modal instance:from="relatedAssessments.instance"
                 modalTitle:from="'Related Assessments'"
                 state:from="relatedAssessments.state"
-                extraCssClass:from="related-assessments">
+                extraCssClass:from="'related-assessments'">
     <div class="simple-modal__body">
       <related-assessments
         instance:from="instance">

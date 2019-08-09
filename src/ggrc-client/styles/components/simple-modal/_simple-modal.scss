@@ -164,10 +164,11 @@ simple-modal {
   &.related-assessments {
     width: 85%;
     max-width: 85%;
-    height: 85%;
   }
 
   &.related-assessments {
+    flex: 1;
+
     .simple-modal__body {
       overflow: hidden;
       max-height: none;
