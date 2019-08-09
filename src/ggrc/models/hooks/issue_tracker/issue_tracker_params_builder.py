@@ -298,7 +298,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
         if acl.ac_role.name == "Primary Contacts" and
         person.email in allowed_emails
     ]
-    primary_contacts = sorted(primary_contacts, key=lambda p: p.name)
+    primary_contacts = sorted(primary_contacts, key=lambda p: p.email)
     assignee_email = primary_contacts[0].email if primary_contacts else ""
     self.params.assignee = assignee_email
 
