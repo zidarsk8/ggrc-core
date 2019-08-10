@@ -348,8 +348,9 @@ class TestSnapshot(TestCase):
     self.assert200(response)
     self.assertEquals(1, response.json[0]["Snapshot"]["count"])
 
-  def test_comment_adding_revision(self):
-    """Test absence of snapshot after comment adding"""
+  # pylint: disable=invalid-name
+  def test_identity_revision_after_adding_comment(self):
+    """Test checks identity of revisions after adding comment"""
     with factories.single_commit():
       audit = factories.AuditFactory()
       standard = factories.StandardFactory()
