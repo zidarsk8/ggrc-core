@@ -257,7 +257,7 @@ class AttributeInfo(object):
 
   @classmethod
   def gather_attr_dicts(cls, tgt_class, src_attr):
-    """ Gather dictionaries from target class parets """
+    """ Gather dictionaries from target class parents """
     result = {}
     _complete = getattr(tgt_class, src_attr + "_complete", None)
     if _complete:
@@ -469,9 +469,11 @@ class AttributeInfo(object):
     unique_columns = [u.columns.keys() for u in unique if len(u.columns) == 1]
     return set(sum(unique_columns, []))
 
+  # pylint: disable=too-many-arguments,too-many-boolean-expressions
   @classmethod
   def get_object_attr_definitions(cls, object_class, ca_cache=None,
-                                  ca_fields=None, include_hidden=False):
+                                  ca_fields=None, include_hidden=False,
+                                  for_template=False):
     """Get all column definitions for object_class.
 
     This function joins custom attribute definitions, mapping definitions and
@@ -489,6 +491,9 @@ class AttributeInfo(object):
       include_hidden (bool): Flag which specifies if we should include
         attribute definition for hidden attributes (they marked as 'hidden'
         in _aliases dict).
+      for_template (bool): Flag which specifies if we should exclude column
+        handlers for attributes that marked as 'ship_in_template'
+        in _aliases dict.
 
     Returns:
       A dict of attribute definitions.
@@ -511,6 +516,10 @@ class AttributeInfo(object):
           not include_hidden and
           isinstance(value, dict) and
           value.get("hidden")
+      ) or (
+          for_template and
+          isinstance(value, dict) and
+          value.get("skip_in_template")
       ):
         continue
       column = object_class.__table__.columns.get(key)

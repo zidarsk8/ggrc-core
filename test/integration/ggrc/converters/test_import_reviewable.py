@@ -3,6 +3,10 @@
 
 """Tests import reviewable."""
 from collections import OrderedDict
+
+import ddt
+
+from ggrc.converters import errors
 from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc import generator
@@ -10,6 +14,7 @@ from integration.ggrc.models import factories
 from integration.ggrc.review import generate_review_object
 
 
+@ddt.ddt
 class TestImportReviewable(TestCase):
   """Reviewable import tests."""
 
@@ -34,7 +39,15 @@ class TestImportReviewable(TestCase):
         ]
     )
     response = self.import_data(import_data)
-    self._check_csv_response(response, {})
+    expected_response = {
+        "Program": {
+            "row_warnings": {
+                errors.REVIEWABLE_WILL_BE_IGNORED.format(
+                    column_name="Review State", line=3),
+            },
+        }
+    }
+    self._check_csv_response(response, expected_response)
 
     program = all_models.Program.query.get(program_id)
     self.assertEqual(
@@ -232,3 +245,46 @@ class TestImportReviewable(TestCase):
         all_models.Review.STATES.REVIEWED,
         program.review_status
     )
+
+  @ddt.data(
+      ("Program", all_models.Program, factories.ProgramFactory),
+      ("Regulation", all_models.Regulation, factories.RegulationFactory),
+      ("Objective", all_models.Objective, factories.ObjectiveFactory),
+      ("Contract", all_models.Contract, factories.ContractFactory),
+      ("Policy", all_models.Policy, factories.PolicyFactory),
+      ("Standard", all_models.Standard, factories.StandardFactory),
+      ("Threat", all_models.Threat, factories.ThreatFactory),
+      ("Requirement", all_models.Requirement, factories.RequirementFactory),
+  )
+  @ddt.unpack
+  def test_reviewable_warning_columns(self, object_type, object_class,
+                                      object_factory):
+    """Test warning while editing review state or reviewers columns"""
+    obj = object_factory()
+    obj_id = obj.id
+
+    import_data = OrderedDict(
+        [
+            ("object_type", object_type),
+            ("Code*", obj.slug),
+            ("Review State", "REVIEWED"),
+            ("Reviewers", "test@test.com"),
+        ]
+    )
+    response = self.import_data(import_data)
+    expected_response = {
+        object_type: {
+            "row_warnings": {
+                errors.REVIEWABLE_WILL_BE_IGNORED.format(
+                    column_name="Review State", line=3),
+                errors.REVIEWABLE_WILL_BE_IGNORED.format(
+                    column_name="Reviewers", line=3),
+            },
+        }
+    }
+    self._check_csv_response(response, expected_response)
+    obj = object_class.query.get(obj_id)
+    self.assertEqual(
+        all_models.Review.STATES.UNREVIEWED, obj.review_status
+    )
+    self.assertFalse(obj.reviewers)

@@ -22,8 +22,9 @@ from ggrc.converters.handlers import handlers
 logger = logging.getLogger(__name__)
 
 
-def get_object_column_definitions(object_class, fields=None, ca_cache=None,
-                                  include_hidden=False):
+def get_object_column_definitions(object_class, fields=None,
+                                  ca_cache=None, include_hidden=False,
+                                  for_template=False):
   """Attach additional info to attribute definitions.
 
   Fetches the attribute info (_aliases) for the given object class and adds
@@ -41,6 +42,9 @@ def get_object_column_definitions(object_class, fields=None, ca_cache=None,
     include_hidden (bool): Flag which specifies if we should include column
       handlers for hidden attributes (they marked as 'hidden'
       in _aliases dict).
+    for_template (bool): Flag which specifies if we should exclude column
+      handlers for attributes that marked as 'ship_in_template'
+      in _aliases dict.
 
   Returns:
     A dict of attribute definitions.
@@ -49,6 +53,7 @@ def get_object_column_definitions(object_class, fields=None, ca_cache=None,
       object_class,
       ca_fields=fields,
       include_hidden=include_hidden,
+      for_template=for_template,
       ca_cache=ca_cache,
   )
 

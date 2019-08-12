@@ -570,7 +570,8 @@ class ExportBlockConverter(BlockConverter):
 
     self._create_ca_definitions_cache(field_names=fields)
     self.object_headers = import_helper.get_object_column_definitions(
-        self.object_class, ca_cache=self._ca_cache)
+        self.object_class, ca_cache=self._ca_cache,
+        for_template=self.is_template)
 
     raw_headers = [unicode(key) for key in self._get_header_names().keys()]
     self.headers = self.clean_headers(raw_headers)
@@ -586,6 +587,11 @@ class ExportBlockConverter(BlockConverter):
   def block_width(self):
     """Returns width of block (header length)."""
     return len(self.fields)
+
+  @property
+  def is_template(self):
+    """Clarify if file is the template"""
+    return not self.object_ids
 
   def organize_fields(self, fields):
     """Setup fields property."""
