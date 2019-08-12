@@ -3,8 +3,6 @@
 
 """Attribute validatior"""
 
-import collections
-
 import flask
 import ggrc.models
 import ggrc.access_control
@@ -75,7 +73,7 @@ class AttributeValidator(object):
       definition_types.append("assessment")
 
     if not hasattr(flask.g, "global_cad_names"):
-      flask.g.global_cad_names = collections.defaultdict(set)
+      flask.g.global_cad_names = dict()
     if definition_type not in flask.g.global_cad_names:
       query = db.session.query(
           cad.CustomAttributeDefinition.title,
