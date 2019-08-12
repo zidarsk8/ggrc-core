@@ -53,7 +53,7 @@
 </div>
 
 <div class="modal-body">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{entriesTotalCount}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount entriesTotalCount}}'" expanded:bind="showResults">
     <div class="search-results">
       <mapper-results
         baseInstance:from="parentInstance"
