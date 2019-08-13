@@ -22,7 +22,6 @@ from ggrc.models.relationship import Relatable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext import attributes
 from ggrc.models import reflection
-from ggrc.models import proposal
 from ggrc.models.exceptions import ValidationError
 
 
@@ -42,7 +41,6 @@ class Control(synchronizable.Synchronizable,
               mixins.BusinessObject,
               Indexed,
               mixins.Folderable,
-              proposal.Proposalable,
               db.Model):
   """Control model definition."""
   __tablename__ = 'controls'

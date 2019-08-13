@@ -12,6 +12,7 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 
 from ggrc import db
+from ggrc import settings
 from ggrc.converters import get_exportables, errors
 from ggrc.login import get_current_user
 from ggrc.models import all_models
@@ -160,6 +161,15 @@ class DeleteColumnHandler(ColumnHandler):
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
       return False
     is_delete = self.raw_value.lower() in self.TRUE_VALUES
+    if is_delete and isinstance(self.row_converter.obj, all_models.Metric):
+      if settings.GGRC_Q_INTEGRATION_URL:
+        self.add_warning(
+            errors.DEPRECATED_DELETED_METRIC_STATUS,
+            object_type=self.row_converter.obj.__class__.__name__,
+            object_title=self.row_converter.obj.title,
+            ggrc_q_link=settings.GGRC_Q_INTEGRATION_URL,
+            action_status="deletion",
+        )
     self._allow_cascade = self.raw_value.lower() == "force"
     self.row_converter.is_delete = is_delete
     return is_delete
@@ -211,6 +221,17 @@ class StatusColumnHandler(ColumnHandler):
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if status is not None:
+      if status == "Deprecated" and isinstance(
+          self.row_converter.obj, all_models.Metric
+      ):
+        if settings.GGRC_Q_INTEGRATION_URL:
+          self.add_warning(
+              errors.DEPRECATED_DELETED_METRIC_STATUS,
+              object_type=self.row_converter.obj.__class__.__name__,
+              object_title=self.row_converter.obj.title,
+              ggrc_q_link=settings.GGRC_Q_INTEGRATION_URL,
+              action_status="deprecation",
+          )
       return status
     if self.row_converter.obj.status:
       status = self.row_converter.obj.status

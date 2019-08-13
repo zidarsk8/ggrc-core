@@ -55,7 +55,8 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
     # Assume that Admin is first in people table
     admin = all_models.Person.query.get(1)
     self.api.set_user(admin)
-    self.api.put(original, {"title": factories.random_str()})
+    with self.api.as_external():
+      self.api.put(original, {"title": factories.random_str()})
     user = all_models.Person.query.get(self.user_id)
     self.api.set_user(user)
 
@@ -69,6 +70,13 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
     original = get_model(snapshot.child_type).query.get(snapshot.child_id)
     return self.api.get(original, original.id)
 
+  def read_attached_revision(self):
+    """Read revision attached to a Snapshot"""
+    snapshot = all_models.Snapshot.query.get(self.snapshot_id)
+    return self.api.client.get(
+        "api/revisions?id__in={}".format(snapshot.revision.id)
+    )
+
   def get_latest_version(self):
     """Get latest revisions for original object of Snapshot"""
     self._update_orig_obj()
@@ -80,9 +88,7 @@ class SnapshotRBACFactory(base.BaseRBACFactory):
         all_models.Revision.resource_id == snapshot.child_id,
     ).first()[0]
     return self.api.client.get(
-        "api/revisions?id__in={}%2C{}".format(
-            snapshot.revision.id, last_revision
-        )
+        "api/revisions?id__in={}".format(last_revision)
     )
 
   def update(self):

@@ -110,7 +110,7 @@ We tag release branches after QA is finished and we are ready to deploy
 to production. The name of the tag should include the full version
 number (e.g. ``v0.9.0.6591``).
 
-.. figure:: /_static/res/branch_management.png
+.. figure:: /docs/source/_static/res/branch_management.png
    :alt: branch diagram
 
    branch diagram

@@ -384,35 +384,6 @@ function applyChangesToCAValue(values, changes) {
   });
 }
 
-/**
- * @deprecated Use CustomAttributeObject API to get access to the necessary custom
- * attribute field and make some manipulations with it.
- * Ensures that the Global Custom Attributes are present in the instance
- * @param  {canMap} instance assessment instance
- * @return {Promise} Promise whichi is resolved when GCAs are present in
- *                   the assessment instance
- */
-function ensureGlobalCA(instance) {
-  let definitions;
-  let values;
-  let def = $.Deferred();
-  if (instance.attr('id')) {
-    def.resolve();
-    return def.promise();
-  }
-
-  definitions = GGRC.custom_attr_defs.filter(function (gca) {
-    return gca.definition_type === instance.constructor.root_object &&
-      gca.definition_id === null;
-  });
-
-  values = prepareCustomAttributes(definitions, [])
-    .sort(sortCustomAttributes);
-
-  instance.attr('custom_attribute_definitions', definitions);
-  instance.attr('custom_attribute_values', values);
-}
-
 function getLCAPopupTitle(validationMap) {
   let fixedValidationMap = Object.assign({}, validationMap);
 
@@ -435,7 +406,6 @@ export {
   isUrlRequired,
   convertToFormViewField,
   applyChangesToCAValue,
-  ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
   CA_DD_FLAGS,
   ddValidationValueToMap,
