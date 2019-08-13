@@ -29,12 +29,13 @@ from sqlalchemy.orm import load_only
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import (
-  BadRequest,
-  Forbidden,
-  HTTPException,
-  NotFound,
-  MethodNotAllowed,
-  ServiceUnavailable)
+    BadRequest,
+    Forbidden,
+    HTTPException,
+    NotFound,
+    MethodNotAllowed,
+    ServiceUnavailable
+)
 
 import ggrc.builder.json
 import ggrc.models
@@ -310,6 +311,7 @@ class ModelView(View):
     return query
 
   def get_object(self, obj_id):
+    """return object by its id"""
     # This could also use `self.pk`
     # .one() is required as long as any .eager_load() adds joins using
     #   'contains_eager()' to the core query, because 'LIMIT 1' breaks up
@@ -384,6 +386,7 @@ class ModelView(View):
 
   @classmethod
   def url_for(cls, *args, **kwargs):
+    """Builds url for object (itself or id)"""
     url = cls.base_url_for()
     if args:
       arg = args[0]
@@ -398,6 +401,7 @@ class ModelView(View):
 
   @classmethod
   def decorate_view_func(cls, view_func, decorators):
+    """Decorate view function by decorators"""
     if not isinstance(decorators, (list, tuple)):
       decorators = (decorators,)
     for decorator in reversed(decorators):
