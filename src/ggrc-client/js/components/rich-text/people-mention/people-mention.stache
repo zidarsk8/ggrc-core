@@ -3,22 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<people-autocomplete-wrapper {{#if showResults}}class="shown"{{/if}}
-    currentValue:from="mentionBeforeSelection"
-    showResults:bind="showResults"
-    modelName:from="'Person'"
-    queryField:from="'email'"
-    modelConstructor:from="loadedModel"
-    actionKey:from="actionKey"
-    >
-
-  <people-autocomplete-results
-      currentValue:bind="currentValue"
-      items:from="result"
-      showResults:bind="showResults"
-      showNewValue:from="showNewValue"
-      on:addNewItem="createLabel(scope.event)"
-      on:selectItem="personSelected(scope.event)"
-      actionKey:from="actionKey"
-    ></people-autocomplete-results>
-</people-autocomplete-wrapper>
+<people-autocomplete-dropdown currentValue:bind="mentionBeforeSelection"
+  showResults:bind="showResults"
+  actionKey:from="actionKey"
+  on:personSelected="personSelected(scope.event)">
+</people-autocomplete-dropdown>

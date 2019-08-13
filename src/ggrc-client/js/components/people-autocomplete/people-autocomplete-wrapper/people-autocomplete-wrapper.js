@@ -4,10 +4,7 @@
 */
 
 import canComponent from 'can-component';
-import '../people-autocomplete-results/people-autocomplete-results';
-
 import baseAutocompleteWrapper from '../../custom-autocomplete/autocomplete-wrapper';
-import PersonModel from '../../../models/business-models/person';
 import {ggrcGet} from '../../../plugins/ajax_extensions';
 
 export default canComponent.extend({
@@ -16,7 +13,6 @@ export default canComponent.extend({
   viewModel: baseAutocompleteWrapper.extend({
     currentValue: null,
     modelName: 'Person',
-    modelConstructor: PersonModel,
     queryField: 'email',
     result: [],
     objectsToExclude: [],
