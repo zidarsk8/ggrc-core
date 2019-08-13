@@ -7,16 +7,16 @@ import canMap from 'can-map';
 import * as issueTrackerUtils from '../../../plugins/utils/issue-tracker-utils';
 import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
-import assessmentIssueTracker from '../assessment-issue-tracker';
+import AssessmentIssueTracker from '../assessment-issue-tracker';
 import Assessment from '../../business-models/assessment';
 
-describe('assessmentIssueTracker mixin', () => {
+describe('AssessmentIssueTracker mixin', () => {
   let Mixin;
   let audit;
 
   beforeAll(function () {
     GGRC.ISSUE_TRACKER_ENABLED = true;
-    Mixin = assessmentIssueTracker;
+    Mixin = AssessmentIssueTracker;
 
     audit = new canMap({
       id: 123,
