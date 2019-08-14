@@ -122,7 +122,7 @@ class TestIssueIntegration(ggrc.TestCase):
                         obj,
                         issue_tracker_issue,
                         issue_attrs,
-                        issue_tracker_ticket_attrs):
+                        ticket_attrs):
     """Checks issuetracker_issue were updated correctly.
 
     Make assertions to check if issue tracker fields were updated according
@@ -139,9 +139,9 @@ class TestIssueIntegration(ggrc.TestCase):
     self.assertEqual(issue_tracker_issue.title,
                      issue_attrs["issue"]["title"])
     self.assertEqual(int(issue_tracker_issue.component_id),
-                     issue_attrs["issue"]["issue_tracker"]["component_id"])
+                     ticket_attrs["issueState"]["component_id"])
     self.assertEqual(int(issue_tracker_issue.hotlist_id),
-                     issue_attrs["issue"]["issue_tracker"]["hotlist_id"])
+                     ticket_attrs["issueState"]["hotlist_ids"][0])
     self.assertEqual(issue_tracker_issue.issue_priority,
                      issue_attrs["issue"]["issue_tracker"]["issue_priority"])
     self.assertEqual(issue_tracker_issue.issue_severity,
@@ -152,7 +152,7 @@ class TestIssueIntegration(ggrc.TestCase):
                      issue_attrs["issue"]["issue_tracker"]["issue_type"])
 
     # These attributes should be taken from ticket information
-    ticket_status = issue_tracker_ticket_attrs["issueState"]["status"]
+    ticket_status = ticket_attrs["issueState"]["status"]
     ticket_mapped_status = ISSUE_STATUS_MAPPING[ticket_status]
     self.assertEqual(obj.status, ticket_mapped_status)
 
