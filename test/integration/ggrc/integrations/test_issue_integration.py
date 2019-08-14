@@ -122,7 +122,7 @@ class TestIssueIntegration(ggrc.TestCase):
                         obj,
                         issue_tracker_issue,
                         issue_attrs,
-                        issue_tracker_ticket_attrs):
+                        ticket_attrs):
     """Checks issuetracker_issue were updated correctly.
 
     Make assertions to check if issue tracker fields were updated according
@@ -139,9 +139,9 @@ class TestIssueIntegration(ggrc.TestCase):
     self.assertEqual(issue_tracker_issue.title,
                      issue_attrs["issue"]["title"])
     self.assertEqual(int(issue_tracker_issue.component_id),
-                     issue_attrs["issue"]["issue_tracker"]["component_id"])
+                     ticket_attrs["issueState"]["component_id"])
     self.assertEqual(int(issue_tracker_issue.hotlist_id),
-                     issue_attrs["issue"]["issue_tracker"]["hotlist_id"])
+                     ticket_attrs["issueState"]["hotlist_ids"][0])
     self.assertEqual(issue_tracker_issue.issue_priority,
                      issue_attrs["issue"]["issue_tracker"]["issue_priority"])
     self.assertEqual(issue_tracker_issue.issue_severity,
@@ -152,7 +152,7 @@ class TestIssueIntegration(ggrc.TestCase):
                      issue_attrs["issue"]["issue_tracker"]["issue_type"])
 
     # These attributes should be taken from ticket information
-    ticket_status = issue_tracker_ticket_attrs["issueState"]["status"]
+    ticket_status = ticket_attrs["issueState"]["status"]
     ticket_mapped_status = ISSUE_STATUS_MAPPING[ticket_status]
     self.assertEqual(obj.status, ticket_mapped_status)
 
@@ -493,6 +493,8 @@ class TestIssueLink(TestIssueIntegration):
       ({"issue_type": "type1"}, {"issue_type": "process"}),
       ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
       ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
+      ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
+      ({"component_id": 1234}, {"component_id": 4321}),
       ({"status": "Draft"}, {"status": "fixed"}),
   )
   @ddt.unpack
@@ -518,53 +520,6 @@ class TestIssueLink(TestIssueIntegration):
                            issue_tracker_issue,
                            issue_request_payload,
                            response_payload)
-
-  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
-  def test_link_to_existing_ticket(self):
-    """Check linking to existing ticket"""
-
-    issue_request_payload = self._request_payload_builder(
-        {"issue_id": 9999}
-    )
-
-    get_issue_resp = self._response_payload_builder(
-        {"component_id": 77, "hotlist_id": 44}
-    )
-
-    get_issue_mock_cm = mock.patch(
-        "ggrc.integrations.issues.Client.get_issue",
-        return_value=get_issue_resp
-    )
-    update_issue_mock_cm = mock.patch(
-        "ggrc.integrations.issues.Client.update_issue"
-    )
-
-    with get_issue_mock_cm, update_issue_mock_cm as update_issue_mock:
-      response = self.api.post(all_models.Issue, issue_request_payload)
-      self.assert201(response)
-      called_param1, called_param2 = update_issue_mock.call_args[0]
-      self.assertEquals(9999, called_param1)
-      self.assertEquals(77, called_param2["component_id"])
-      self.assertEquals(44, called_param2["hotlist_ids"][0])
-
-      # should be fixed
-      self.assertEquals(
-          issue_request_payload["issue"]["issue_tracker"]["issue_priority"],
-          called_param2["priority"]
-      )
-      self.assertEquals(
-          issue_request_payload["issue"]["issue_tracker"]["issue_severity"],
-          called_param2["severity"]
-      )
-      self.assertEquals(
-          issue_request_payload["issue"]["issue_tracker"]["issue_type"],
-          called_param2["type"]
-      )
-      self.assertEquals("new", called_param2["status"])
-      self.assertEquals(
-          issue_request_payload["issue"]["issue_tracker"]["title"],
-          called_param2["title"]
-      )
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")
   @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)

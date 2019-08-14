@@ -120,7 +120,7 @@ class AssessmentTrackerHandler(object):
       Args:
           issue_info: dictionary with issue payload information
     """
-    # self._validate_generic_fields(issue_info)
+    self._validate_generic_fields(issue_info)
     self._validate_assessment_title(issue_info)
 
   @staticmethod
@@ -1811,7 +1811,7 @@ class AssessmentTrackerHandler(object):
     """Extract hotlist_id from issue_tracker_info"""
     try:
       hotlist_id = issue_tracker_info["hotlist_ids"][0]
-    except IndexError:
+    except (KeyError, IndexError):
       hotlist_id = ""
     return hotlist_id
 

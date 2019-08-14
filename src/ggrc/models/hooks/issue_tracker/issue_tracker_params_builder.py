@@ -238,7 +238,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     """Extract hotlist_id form ticket info"""
     try:
       self.params.hotlist_id = ticket_info["issueState"]["hotlist_ids"][0]
-    except IndexError:
+    except (KeyError, IndexError):
       self.params.hotlist_id = ""
 
   def _populate_component_id(self, ticket_info):

@@ -109,7 +109,6 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     payload_attrs = dict(self.DEFAULT_TICKET_ATTRS, **ticket_attrs)
     payload = {"issueState": {
         "component_id": payload_attrs["component_id"],
-        # "hotlist_id": payload_attrs["hotlist_id"], #hotlist_ids wtf??
         "hotlist_ids": [payload_attrs["hotlist_id"]],
         "issue_id": payload_attrs["issue_id"],
         "status": payload_attrs["status"],
@@ -161,7 +160,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
   def check_issuetracker_issue_fields(self,
                                       issue_tracker_issue,
-                                      assmt_attrs):
+                                      assmt_attrs, ticket_attrs):
     """Checks issuetracker_issue were updated correctly.
 
     Make assertions to check if issue tracker fields were updated according
@@ -177,11 +176,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     )
     self.assertEqual(
         int(issue_tracker_issue.component_id),
-        assmt_attrs["assessment"]["issue_tracker"]["component_id"]
+        ticket_attrs["issueState"]["component_id"]
     )
     self.assertEqual(
         int(issue_tracker_issue.hotlist_id),
-        assmt_attrs["assessment"]["issue_tracker"]["hotlist_id"]
+        ticket_attrs["issueState"]["hotlist_ids"][0]
     )
     self.assertEqual(
         issue_tracker_issue.issue_priority,
@@ -205,6 +204,8 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       ({"issue_type": "type1"}, {"issue_type": "process"}),
       ({"issue_severity": "S0"}, {"issue_severity": "S1"}),
       ({"issue_priority": "P0"}, {"issue_priority": "P1"}),
+      ({"hotlist_id": 1234}, {"hotlist_id": 4321}),
+      ({"component_id": 1234}, {"component_id": 4321}),
       ({"status": "Draft"}, {"status": "fixed"}),
   )
   @ddt.unpack
@@ -236,7 +237,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     self.assertEqual(response.status_code, 201)
     assmt_id = response.json.get("assessment").get("id")
     it_issue = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
-    self.check_issuetracker_issue_fields(it_issue, assmt_request_payload)
+    self.check_issuetracker_issue_fields(
+        it_issue,
+        assmt_request_payload,
+        response_payload
+    )
 
   @staticmethod
   def _create_issuetracked_obj(factory, acl, people_sync_enabled=True,
@@ -759,28 +764,27 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     with get_issue_mock_cm, update_issue_mock_cm as update_issue_mock:
       response = self.api.put(assess, issue_request_payload)
       self.assert200(response)
-      called_param1, called_param2 = update_issue_mock.call_args[0]
-      self.assertEquals(9999, called_param1)
-      self.assertEquals(77, called_param2["component_id"])
-      self.assertEquals(44, called_param2["hotlist_ids"][0])
+      called_issue_id, call_payload = update_issue_mock.call_args[0]
+      self.assertEquals(9999, called_issue_id)
+      self.assertEquals(77, call_payload["component_id"])
+      self.assertEquals(44, call_payload["hotlist_ids"][0])
 
-      # should be fixed
       self.assertEquals(
           issue_request_payload["issue_tracker"]["issue_priority"],
-          called_param2["priority"]
+          call_payload["priority"]
       )
       self.assertEquals(
           issue_request_payload["issue_tracker"]["issue_severity"],
-          called_param2["severity"]
+          call_payload["severity"]
       )
       self.assertEquals(
           issue_request_payload["issue_tracker"]["issue_type"],
-          called_param2["type"]
+          call_payload["type"]
       )
-      self.assertEquals("ASSIGNED", called_param2["status"])
+      self.assertEquals("ASSIGNED", call_payload["status"])
       self.assertEquals(
           issue_request_payload["issue_tracker"]["title"],
-          called_param2["title"]
+          call_payload["title"]
       )
 
   @ddt.data(
