@@ -67,14 +67,31 @@ class AttributeValidator(object):
   @classmethod
   def _get_global_cad_names(cls, definition_type):
     """Get names of global cad for a given object"""
-    cad = ggrc.models.custom_attribute_definition.CustomAttributeDefinition
+    cad = ggrc.models.custom_attribute_definition
     definition_types = [definition_type]
     if definition_type == "assessment_template":
       definition_types.append("assessment")
-    if not getattr(flask.g, "global_cad_names", set()):
-      query = db.session.query(cad.title, cad.id).filter(
-          cad.definition_type.in_(definition_types),
-          cad.definition_id.is_(None)
+
+    if not hasattr(flask.g, "global_cad_names"):
+      flask.g.global_cad_names = dict()
+    if definition_type not in flask.g.global_cad_names:
+      query = db.session.query(
+          cad.CustomAttributeDefinition.title,
+          cad.CustomAttributeDefinition.id,
+      ).filter(
+          cad.CustomAttributeDefinition.definition_type.in_(definition_types),
+          cad.CustomAttributeDefinition.definition_id.is_(None),
       )
-      flask.g.global_cad_names = {name.lower(): id_ for name, id_ in query}
-    return flask.g.global_cad_names
+
+      flask.g.global_cad_names[definition_type] = {
+          name.lower(): id_ for name, id_ in query
+      }
+
+    return flask.g.global_cad_names[definition_type]
+
+
+def invalidate_gca_cache(mapper, content, target):
+  # pylint: disable=unused-argument
+  """Clear `global_cad_names` if GCA is created or update or deleted."""
+  if hasattr(flask.g, "global_cad_names"):
+    del flask.g.global_cad_names

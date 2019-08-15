@@ -15,7 +15,16 @@
           Name
           <i class="fa fa-asterisk"></i>
         </label>
-        <input tabindex="1" class="span12" id="person_name" name="name" placeholder="John Doe" size="30" type="text" value="{{name}}" autofocus>
+        <input tabindex="1"
+          class="span12"
+          id="person_name"
+          name="name"
+          placeholder="John Doe"
+          size="30"
+          type="text"
+          value="{{name}}"
+          {{#if isNameReadOnly}}disabled{{/if}}
+          autofocus>
         <br>
       </div>
       <div class="span4">
@@ -23,7 +32,17 @@
           Email
           <i class="fa fa-asterisk"></i>
         </label>
-        <input tabindex="2" class="span12" id="person_email" name="email" placeholder="email@company.com" size="30" type="text" value="{{email}}">
+        <person-autocomplete-field personEmail:bind="email"
+          personName:bind="name"
+          inputId:from="'person_email'"
+          placeholder:from="'email@company.com'"
+          tabindex:from="2"
+          on:vm:personSelected="personSelected(scope.event)"
+          on:vm:keyUp="onEmailFieldKeyUp(scope.event)"
+          {{^if_config_exist 'external_services.Person'}}
+            autocompleteEnabled:from="false"
+          {{/if_config_exist}}>
+        </person-autocomplete-field>
         <span class="help-inline">
         </span>
         <br>

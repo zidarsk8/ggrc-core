@@ -161,9 +161,6 @@ const DashboardControl = canControl.extend({
       $.extend(descriptor, nameOrDescriptor || {});
     });
 
-    // Create widget in container?
-    // return this.options.widget_container[0].add_widget(descriptor);
-
     if ($('#' + descriptor.controller_options.widget_id).length > 0) {
       return;
     }

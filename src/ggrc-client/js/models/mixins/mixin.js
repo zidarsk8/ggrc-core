@@ -30,15 +30,6 @@ export default class Mixin {
 
         if (!blockedKeys.includes(key)) {
           let oldfn = obj[key];
-          // TODO support other ways of adding functions.
-          //  E.g. "override" (doesn't call super fn at all)
-          //       "sub" (sets this._super for mixin function)
-          //       "chain" (pushes result of oldfn onto args)
-          //       "before"/"after" (overridden function)
-          // TODO support extension for objects.
-          //   Necessary for "attributes"/"serialize"/"convert"
-          // Defaults will always be "after" for functions
-          //  and "override" for non-function values
           if (loIsFunction(oldfn)) {
             switch (aspect) {
               case 'before':

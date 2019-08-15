@@ -98,7 +98,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "notes": handlers.TextColumnHandler,
     "operationally": handlers.ConclusionColumnHandler,
     "procedure_description": handlers.TextColumnHandler,
-    "review_status": handlers.ExportOnlyColumnHandler,
+    "review_status": handlers.ReviewableColumnHandler,
     "reviewers": handlers.ReviewersColumnHandler,
     "readonly": boolean.AdminCheckboxColumnHandler,
     "program": handlers.ProgramColumnHandler,

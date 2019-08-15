@@ -5,6 +5,9 @@
 """Tests for assessment templates export."""
 import ddt
 
+from ggrc.models.assessment_template import AssessmentTemplate
+from ggrc.models.assessment_template import _hint_verifier_assignees
+
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
 
@@ -74,3 +77,17 @@ class TestAssessmentTemplatesExport(TestCase):
     assessment_template = response["Assessment Template"][0]
     self.assertEqual(proc_description,
                      assessment_template["Default Assessment Procedure"])
+
+  def test_default_description(self):
+    """Test default assignees and verifiers description"""
+    # pylint: disable=protected-access
+
+    response = self.export_csv(self.EXPORT_ALL_FIELDS_DATA)
+    expected_description = _hint_verifier_assignees(
+        AssessmentTemplate._DEFAULT_PEOPLE_LABELS_ACTUAL,
+        AssessmentTemplate._DEFAULT_PEOPLE_LABELS_CONTROL,
+        AssessmentTemplate._DEFAULT_PEOPLE_LABELS_RISK
+    )
+
+    self.assertEqual(response.status_code, 200)
+    self.assertIn(expected_description, response.data)

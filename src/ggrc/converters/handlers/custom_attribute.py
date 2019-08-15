@@ -30,7 +30,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
   """Custom attribute column handler
 
   This is a handler for all types of custom attribute column. It works with
-  any custom attribute definition and with mondatory flag on or off.
+  any custom attribute definition and with mandatory flag on or off.
   """
 
   _type_handlers = {
@@ -76,7 +76,7 @@ class CustomAttributeColumnHandler(handlers.TextColumnHandler):
     return value_handler(self)
 
   def get_value(self):
-    """Return the value of the custom attrbute field.
+    """Return the value of the custom attribute field.
 
     Returns:
       Text representation if the custom attribute value if it exists, otherwise
@@ -247,7 +247,25 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
 
   def get_ca_definition(self):
     """Get custom attribute definition for a specific object."""
-    if self.row_converter.obj.id is None:
-      return None
     cache = self.row_converter.block_converter.ca_definitions_cache
+    if self.row_converter.obj.id is None:
+      if self.row_converter.object_class == models.all_models.Assessment:
+        template = self._get_assessment_template()
+        cad = cache.get((template.id, self.display_name))
+        return cad
+
+      return None
     return cache.get((self.row_converter.obj.id, self.display_name))
+
+  def _get_assessment_template(self):
+    """Collect assessment template from row_converter"""
+    template_handler = self.row_converter.objects.get("assessment_template")
+    if template_handler is None:
+      return None
+
+    templates = template_handler.parse_item()
+    if not templates:
+      return None
+
+    template = templates[0]
+    return template

@@ -22,6 +22,7 @@ from integration.ggrc_basic_permissions.models \
 @ddt.ddt
 class TestBasicCsvImport(TestCase):
   """Test basic CSV imports."""
+  # pylint: disable=too-many-public-methods
 
   def setUp(self):
     super(TestBasicCsvImport, self).setUp()
@@ -49,7 +50,7 @@ class TestBasicCsvImport(TestCase):
     policy = models.Policy.eager_query().first()
     self.assertEqual(policy.modified_by.email, "user@example.com")
 
-  def test_policy_import_working_with_warnings(self):
+  def test_policy_work_with_warnings(self):
     """Test Policy import with warnings."""
     def test_owners(policy):
       """Assert policy has the correct Admin set."""
@@ -514,6 +515,82 @@ class TestBasicCsvImport(TestCase):
     self._check_csv_response(response, {})
     program = models.Program.query.first()
     self.assertEqual(program.folder, folder_id)
+
+  @ddt.data(
+      'AccessGroup',
+      'AccountBalance',
+      'DataAsset',
+      'Facility',
+      'KeyReport',
+      'Market',
+      'Metric',
+      'OrgGroup',
+      'Process',
+      'Product',
+      'ProductGroup',
+      'Project',
+      'System',
+      'TechnologyEnvironment',
+      'Vendor')
+  def test_document_recipients_roles(self, object_type):
+    """Test check admin recipients for document created via import roleable"""
+    title = 'program 1'
+    user = factories.PersonFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", object_type),
+        ("Code*", ""),
+        ("title", title),
+        ("Admin", user.email),
+        ("Assignee*", "user@example.com"),
+        ("Verifier*", "user@example.com"),
+        ("reference url", "http://someurl.html")
+    ]))
+
+    self._check_csv_response(response, {})
+    document = all_models.Document.query.one()
+    self.assertEqual(document.recipients, 'Admin')
+
+  @ddt.data(
+      'Contract',
+      'Objective',
+      'Policy',
+      'Regulation',
+      'Requirement',
+      'Standard',
+      'Threat',
+  )
+  def test_document_recipients(self, object_type):
+    """Test check admin recipients for document created via import"""
+    title = 'program 1'
+    user = factories.PersonFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", object_type),
+        ("Code*", ""),
+        ("title", title),
+        ("Admin", user.email),
+        ("reference url", "http://someurl.html")
+    ]))
+
+    self._check_csv_response(response, {})
+    document = all_models.Document.query.one()
+    self.assertEqual(document.recipients, 'Admin')
+
+  def test_document_recipients_issue(self):
+    """Test check admin recipients for document created via import issue"""
+    title = 'program 1'
+    user = factories.PersonFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", 'Issue'),
+        ("Code*", ""),
+        ("title", title),
+        ("Admin", user.email),
+        ("reference url", "http://someurl.html"),
+        ("Due Date", "07/30/2019")
+    ]))
+
+    self._check_csv_response(response, {})
+    document = all_models.Document.query.one()
+    self.assertEqual(document.recipients, 'Admin')
 
 
 @base.with_memcache

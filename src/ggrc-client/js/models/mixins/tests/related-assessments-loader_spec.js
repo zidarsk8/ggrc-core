@@ -17,7 +17,7 @@ import * as AjaxUtils from '../../../plugins/ajax_extensions';
 
 const ENDPOINT = '/api/related_assessments';
 
-describe('relatedAssessmentsLoader mixin', () => {
+describe('RelatedAssessmentsLoader mixin', () => {
   beforeEach(() => {
     spyOn(AjaxUtils, 'ggrcGet');
   });

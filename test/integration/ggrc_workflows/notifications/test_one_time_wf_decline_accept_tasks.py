@@ -8,10 +8,6 @@ from freezegun import freeze_time
 from mock import patch
 from sqlalchemy import and_
 
-from ggrc.app import db
-from ggrc.models import Notification
-from ggrc.models import NotificationType
-from ggrc.models import Person
 from ggrc.models import all_models
 from ggrc.notifications import common
 from ggrc.notifications.common import generate_cycle_tasks_notifs
@@ -36,11 +32,10 @@ class TestCycleTaskStatusChange(TestCase):
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
-    Notification.query.delete()
-
+    all_models.Notification.query.delete()
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(
-        user_role="Administrator")
+    self.user = self.create_user_with_role(role="Administrator")
+    self.secondary_assignee = self.create_user_with_role(role="Reader")
     self.create_test_cases()
 
     def init_decorator(init):
@@ -50,9 +45,11 @@ class TestCycleTaskStatusChange(TestCase):
           self.created_at = datetime.now()
       return new_init
 
-    Notification.__init__ = init_decorator(Notification.__init__)
+    all_models.Notification.__init__ = init_decorator(
+        all_models.Notification.__init__)
 
   def test_task_declined_notification_created(self):
+    """Test declined cycle task notifications"""
     with freeze_time("2015-05-01"):
       _, workflow = self.wf_generator.generate_workflow(
           self.one_time_workflow_1)
@@ -66,18 +63,11 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1, "Declined")
 
-      notif = db.session.query(Notification).filter(and_(
-          Notification.object_id == task1.id,
-          Notification.object_type == task1.type,
-          Notification.sent_at == None,  # noqa
-          Notification.notification_type == self.get_notification_type(
-              "cycle_task_declined"
-          )
-      )).all()
-
+      notif = self.get_notifications_by_type(task1, "cycle_task_declined")
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
   def test_all_tasks_finished_notification_created(self):
+    """Test all task completed notifications"""
     with freeze_time("2015-05-01 13:20:34"):
       _, workflow = self.wf_generator.generate_workflow(
           self.one_time_workflow_1)
@@ -92,29 +82,17 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1)
 
       generate_cycle_tasks_notifs()
-      notif = db.session.query(Notification).filter(and_(
-          Notification.object_id == cycle.id,
-          Notification.object_type == cycle.type,
-          Notification.sent_at == None,  # noqa
-          Notification.notification_type == self.get_notification_type(
-              "all_cycle_tasks_completed"
-          )
-      )).all()
 
+      notif = self.get_notifications_by_type(cycle,
+                                             "all_cycle_tasks_completed")
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
-      notif = db.session.query(Notification).filter(and_(
-          Notification.object_id == task1.id,
-          Notification.object_type == task1.type,
-          Notification.sent_at == None,  # noqa
-          Notification.notification_type != self.get_notification_type(
-              "all_cycle_tasks_completed"
-          )
-      )).all()
-
+      notif = self.get_notifications_by_type(task1,
+                                             "all_cycle_tasks_completed")
       self.assertEqual(notif, [])
 
   def test_multi_all_tasks_finished_notification_created(self):
+    """Test several all task completed notifications"""
 
     with freeze_time("2015-05-01 13:20:34"):
       _, workflow = self.wf_generator.generate_workflow(
@@ -130,27 +108,15 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1)
 
       generate_cycle_tasks_notifs()
-      notif = db.session.query(Notification).filter(and_(
-          Notification.object_id == cycle.id,
-          Notification.object_type == cycle.type,
-          Notification.sent_at == None,  # noqa
-          Notification.notification_type == self.get_notification_type(
-              "all_cycle_tasks_completed"
-          )
-      )).all()
+      notif = self.get_notifications_by_type(cycle,
+                                             "all_cycle_tasks_completed")
 
       # there is still one task in the cycle, so there should be no
       # notifications for all tasks completed
       self.assertEqual(notif, [])
 
-      notif = db.session.query(Notification).filter(and_(
-          Notification.object_id == task1.id,
-          Notification.object_type == task1.type,
-          Notification.sent_at == None,  # noqa
-          Notification.notification_type != self.get_notification_type(
-              "all_cycle_tasks_completed"
-          )
-      )).all()
+      notif = self.get_notifications_by_type(task1,
+                                             "all_cycle_tasks_completed")
 
       # The task was verified, so there should be no notifications left for due
       # dates.
@@ -162,14 +128,8 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task2)
 
       generate_cycle_tasks_notifs()
-      notif = db.session.query(Notification).filter(and_(
-          Notification.object_id == cycle.id,
-          Notification.object_type == cycle.type,
-          Notification.sent_at == None,  # noqa
-          Notification.notification_type == self.get_notification_type(
-              "all_cycle_tasks_completed"
-          )
-      )).all()
+      notif = self.get_notifications_by_type(cycle,
+                                             "all_cycle_tasks_completed")
 
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
@@ -199,6 +159,7 @@ class TestCycleTaskStatusChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2015-05-02"):
       common.send_daily_digest_notifications()
 
@@ -208,11 +169,10 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.task_change_status(task1, "Declined")
 
-      user = Person.query.get(self.user.id)
       _, notif_data = common.get_daily_notifications()
-
-      self.assertIn(user.email, notif_data)
-      self.assertIn("task_declined", notif_data[user.email])
+      for user in task_assignees:
+        self.assertIn(user.email, notif_data)
+        self.assertIn("task_declined", notif_data[user.email])
 
   @patch("ggrc.notifications.common.send_email")
   def test_single_task_accepted(self, mock_mail):
@@ -240,6 +200,7 @@ class TestCycleTaskStatusChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2015-05-03 13:20:34"):
       cycle = Cycle.query.get(cycle.id)
       task1 = CycleTaskGroupObjectTask.query.get(
@@ -248,9 +209,9 @@ class TestCycleTaskStatusChange(TestCase):
       self.task_change_status(task1)
 
       generate_cycle_tasks_notifs()
-      user = Person.query.get(self.user.id)
       _, notif_data = common.get_daily_notifications()
-      self.assertNotIn(user.email, notif_data)
+      for user in task_assignees:
+        self.assertNotIn(user.email, notif_data)
       self.assertIn("all_tasks_completed", notif_data["user@example.com"])
 
   @patch("ggrc.notifications.common.send_email")
@@ -263,17 +224,19 @@ class TestCycleTaskStatusChange(TestCase):
       _, cycle = self.wf_generator.generate_cycle(workflow)
       self.wf_generator.activate_workflow(workflow)
 
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time("2015-05-03"):
       _, notif_data = common.get_daily_notifications()
       cycle = Cycle.query.get(cycle.id)
-      user = Person.query.get(self.user.id)
-      self.assertIn(user.email, notif_data)
+      for user in task_assignees:
+        self.assertIn(user.email, notif_data)
       self.wf_generator.modify_object(cycle, data={"is_current": False})
       cycle = Cycle.query.get(cycle.id)
       self.assertFalse(cycle.is_current)
 
       _, notif_data = common.get_daily_notifications()
-      self.assertNotIn(user.email, notif_data)
+      for user in task_assignees:
+        self.assertNotIn(user.email, notif_data)
 
   def create_test_cases(self):
     def person_dict(person_id):
@@ -283,10 +246,16 @@ class TestCycleTaskStatusChange(TestCase):
           "type": "Person"
       }
 
-    role_id = all_models.AccessControlRole.query.filter(
+    task_assignee_role_id = all_models.AccessControlRole.query.filter(
         all_models.AccessControlRole.name == "Task Assignees",
         all_models.AccessControlRole.object_type == "TaskGroupTask",
     ).one().id
+
+    task_secondary_assignee = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Secondary Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
+
     self.one_time_workflow_1 = {
         "title": "one time test workflow",
         "notify_on_change": True,
@@ -300,7 +269,11 @@ class TestCycleTaskStatusChange(TestCase):
                 "title": "task 1",
                 "description": "single task in a wf",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_secondary_assignee,
+                                            self.secondary_assignee.id),
+                ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
@@ -320,14 +293,16 @@ class TestCycleTaskStatusChange(TestCase):
                 "title": "task 1",
                 "description": "two taks in wf with different objects",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id)],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }, {
                 "title": "task 2",
                 "description": "two taks in wf with different objects",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id)],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
@@ -336,8 +311,8 @@ class TestCycleTaskStatusChange(TestCase):
     }
 
   def get_notification_type(self, name):
-    return db.session.query(NotificationType).filter(
-        NotificationType.name == name).one()
+    return all_models.NotificationType.query.filter(
+        all_models.NotificationType.name == name).one()
 
   def task_change_status(self, task, status="Verified"):
     self.wf_generator.modify_object(
@@ -346,3 +321,13 @@ class TestCycleTaskStatusChange(TestCase):
     task = CycleTaskGroupObjectTask.query.get(task.id)
 
     self.assertEqual(task.status, status)
+
+  def get_notifications_by_type(self, obj, notif_type):
+    return all_models.Notification.query.filter(and_(
+      all_models.Notification.object_id == obj.id,
+      all_models.Notification.object_type == obj.type,
+      all_models.Notification.sent_at == None,  # noqa
+      all_models.Notification.notification_type == self.get_notification_type(
+          notif_type
+      )
+    )).all()

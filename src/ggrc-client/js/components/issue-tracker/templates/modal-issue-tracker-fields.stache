@@ -45,11 +45,11 @@
           {{#if isTicketIdMandatory}} disabled {{/if}}>
           Generate new ticket
         </button>
-        <!-- <button type="button"
+        <button type="button"
           class="btn btn-small btn-darkBlue"
           on:el:click="linkToExistingTicket">
           Link to existing ticket
-        </button> -->
+        </button>
       </div>
       <div class="ggrc-form-item__multiple-row--double">
         <div class="ggrc-form-item__note">

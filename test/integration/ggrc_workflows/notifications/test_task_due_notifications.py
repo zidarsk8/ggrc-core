@@ -15,7 +15,7 @@ from mock import patch
 
 import ddt
 
-from ggrc import models
+from ggrc.models import all_models
 from ggrc.notifications import common
 
 from integration.ggrc import TestCase
@@ -49,24 +49,30 @@ class TestTaskDueNotifications(TestCase):
           self.created_at = datetime.now()
       return new_init
 
-    models.Notification.__init__ = init_decorator(models.Notification.__init__)
+    all_models.Notification.__init__ = init_decorator(
+        all_models.Notification.__init__)
 
   def setUp(self):
     super(TestTaskDueNotifications, self).setUp()
     self.api = Api()
     self.wf_generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
-    models.Notification.query.delete()
+    all_models.Notification.query.delete()
 
     self._fix_notification_init()
 
     self.random_objects = self.object_generator.generate_random_objects(2)
-    _, self.user = self.object_generator.generate_person(
-        user_role="Administrator")
+    self.user = self.create_user_with_role(role="Administrator")
+    self.secondary_assignee = self.create_user_with_role(role="Reader")
 
-    role_id = models.all_models.AccessControlRole.query.filter(
-        models.all_models.AccessControlRole.name == "Task Assignees",
-        models.all_models.AccessControlRole.object_type == "TaskGroupTask",
+    task_assignee_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
+
+    task_secondary_assignee = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Secondary Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
     ).one().id
 
     self.one_time_workflow = {
@@ -86,35 +92,55 @@ class TestTaskDueNotifications(TestCase):
                 "title": "task 1",
                 "description": "some task",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_secondary_assignee,
+                                            self.secondary_assignee.id),
+                ],
                 "start_date": date(2017, 5, 15),
                 "end_date": date(2017, 6, 11),
             }, {
                 "title": "task 2",
                 "description": "some task 2",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_secondary_assignee,
+                                            self.secondary_assignee.id),
+                ],
                 "start_date": date(2017, 5, 8),
                 "end_date": date(2017, 6, 12),
             }, {
                 "title": "task 3",
                 "description": "some task 3",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_secondary_assignee,
+                                            self.secondary_assignee.id),
+                ],
                 "start_date": date(2017, 5, 31),
                 "end_date": date(2017, 6, 13),
             }, {
                 "title": "task 4",
                 "description": "some task 4",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_secondary_assignee,
+                                            self.secondary_assignee.id),
+                ],
                 "start_date": date(2017, 6, 2),
                 "end_date": date(2017, 6, 14),
             }, {
                 "title": "task 5",
                 "description": "some task 5",
                 "access_control_list": [
-                    acl_helper.get_acl_json(role_id, self.user.id)],
+                    acl_helper.get_acl_json(task_assignee_role_id,
+                                            self.user.id),
+                    acl_helper.get_acl_json(task_secondary_assignee,
+                                            self.secondary_assignee.id),
+                ],
                 "start_date": date(2017, 6, 8),
                 "end_date": date(2017, 6, 15),
             }],
@@ -140,28 +166,29 @@ class TestTaskDueNotifications(TestCase):
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)
 
-    user = models.Person.query.get(self.user.id)
-
+    task_assignees = [self.user, self.secondary_assignee]
     with freeze_time(fake_now):
       # mark all yeasterday notifications as sent
-      models.all_models.Notification.query.filter(
-          sa.func.DATE(models.all_models.Notification.send_on) < date.today()
-      ).update({models.all_models.Notification.sent_at:
+      all_models.Notification.query.filter(
+          sa.func.DATE(all_models.Notification.send_on) < date.today()
+      ).update({all_models.Notification.sent_at:
                 datetime.now() - timedelta(1)},
                synchronize_session="fetch")
 
       _, notif_data = common.get_daily_notifications()
-      user_notifs = notif_data.get(user.email, {})
+      for user in task_assignees:
+        user_notifs = notif_data.get(user.email, {})
 
-      actual_overdue = [n['title'] for n in
-                        user_notifs.get("task_overdue", {}).itervalues()]
-      actual_overdue.sort()
-      self.assertEqual(actual_overdue, expected_overdue)
+        actual_overdue = [n['title'] for n in
+                          user_notifs.get("task_overdue", {}).itervalues()]
+        actual_overdue.sort()
+        self.assertEqual(actual_overdue, expected_overdue)
 
-      self.assertEqual(
-          [n['title'] for n in user_notifs.get("due_today", {}).itervalues()],
-          expected_due_today)
+        self.assertEqual(
+            [n['title'] for n in
+             user_notifs.get("due_today", {}).itervalues()],
+            expected_due_today)
 
-      self.assertEqual(
-          [n['title'] for n in user_notifs.get("due_in", {}).itervalues()],
-          expected_due_in)
+        self.assertEqual(
+            [n['title'] for n in user_notifs.get("due_in", {}).itervalues()],
+            expected_due_in)

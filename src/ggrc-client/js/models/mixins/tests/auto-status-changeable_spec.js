@@ -5,15 +5,15 @@
 
 import canMap from 'can-map';
 import * as ModalsUtils from '../../../plugins/utils/modals';
-import autoStatusChangeable from '../auto-status-changeable';
+import AutoStatusChangeable from '../auto-status-changeable';
 
-describe('autoStatusChangeable mixin', function () {
+describe('AutoStatusChangeable mixin', function () {
   'use strict';
 
   let Mixin;
 
   beforeAll(function () {
-    Mixin = autoStatusChangeable;
+    Mixin = AutoStatusChangeable;
   });
 
   describe('confirmBeginEdit() method', function () {

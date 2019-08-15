@@ -6,7 +6,7 @@
 import {makeFakeModel} from '../../../../js_specs/spec_helpers';
 import Program from '../../business-models/program';
 
-describe('mega-object mixin', () => {
+describe('MegaObject mixin', () => {
   let model;
 
   beforeEach(function () {

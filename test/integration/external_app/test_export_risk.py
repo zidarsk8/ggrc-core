@@ -47,7 +47,7 @@ class TestExportRisk(query_helper.WithQueryApi, TestCase):
       ).id
 
       cad_dropdown_id = factories.CustomAttributeDefinitionFactory(
-          title="multiselect_GCA",
+          title="dropdown_GCA",
           definition_type="risk",
           attribute_type="Dropdown",
           multi_choice_options="one,two,three,four,five"

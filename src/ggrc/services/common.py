@@ -34,6 +34,7 @@ from werkzeug.exceptions import (
     HTTPException,
     NotFound,
     MethodNotAllowed,
+    ServiceUnavailable
 )
 
 import ggrc.builder.json
@@ -152,6 +153,7 @@ class ModelView(View):
 
   @staticmethod
   def _get_type_where_clause(model):
+    """Helper for where clause"""
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:
       return True
@@ -165,6 +167,7 @@ class ModelView(View):
 
   @staticmethod
   def get_match_columns(model):
+    """Returns matching columns"""
     mapper = model._sa_class_manager.mapper
     columns = []
     columns.append(mapper.primary_key[0].label('id'))
@@ -308,6 +311,7 @@ class ModelView(View):
     return query
 
   def get_object(self, obj_id):
+    """return object by its id"""
     # This could also use `self.pk`
     # .one() is required as long as any .eager_load() adds joins using
     #   'contains_eager()' to the core query, because 'LIMIT 1' breaks up
@@ -382,6 +386,7 @@ class ModelView(View):
 
   @classmethod
   def url_for(cls, *args, **kwargs):
+    """Builds url for object (itself or id)"""
     url = cls.base_url_for()
     if args:
       arg = args[0]
@@ -396,6 +401,7 @@ class ModelView(View):
 
   @classmethod
   def decorate_view_func(cls, view_func, decorators):
+    """Decorate view function by decorators"""
     if not isinstance(decorators, (list, tuple)):
       decorators = (decorators,)
     for decorator in reversed(decorators):
@@ -1076,14 +1082,14 @@ class Resource(ModelView):
     return accumulator
 
   def _build_request_stub_cache(self, data):
+    """Query objects from `data` and store them in cache."""
     objects = self._gather_referenced_objects(data)
     flask.g.referenced_objects = {}
     for class_name, ids in objects.items():
-      class_ = getattr(ggrc.models, class_name, None)
-      if hasattr(class_, "query"):
-        flask.g.referenced_objects[class_] = {
-            obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
-        }
+      utils.referenced_objects.mark_to_cache(class_name, ids)
+    utils.referenced_objects.rewarm_cache(
+        undefer=True,
+    )
 
   def _check_post_create_options(self, body):
     """Do NOTHING by default"""
@@ -1273,6 +1279,9 @@ class Resource(ModelView):
           self.collection_post_loop(body, res, no_result)
         except (IntegrityError, ValidationError, ValueError) as error:
           res.append(self._make_error_from_exception(error))
+          db.session.rollback()
+        except ServiceUnavailable as error:
+          res.append((503, error.description or ""))
           db.session.rollback()
         except gdrive.GdriveUnauthorized as error:
           headers["X-Expected-Error"] = True

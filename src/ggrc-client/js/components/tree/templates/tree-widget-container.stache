@@ -56,7 +56,7 @@
       {{#if isSavedSearchShown}}
         <aside>
           <saved-search-list
-            modelName:from="model.table_singular"
+            widgetId:from="options.widgetId"
             objectType:from="model.model_singular"
             selectedSearchId:from="selectedSavedSearchId"
             searchType:from="'AdvancedSearch'"

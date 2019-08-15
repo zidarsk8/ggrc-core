@@ -377,6 +377,26 @@ class TestAssessmentImport(TestCase):
     }
     self._check_csv_response(response, expected_errors)
 
+  def test_blank_optional_field(self):
+    """Test warnings while import assessment with blank IssueTracker fields"""
+    audit = factories.AuditFactory()
+    resp = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", "ASSESSMENT-1"),
+        ("Audit*", audit.slug),
+        ("Title*", "ass1"),
+        ("Creators*", "user@example.com"),
+        ("Assignees*", "user@example.com"),
+        ("Component ID", ""),
+        ("Hotlist ID", ""),
+        ("Priority", ""),
+        ("Severity", ""),
+        ("Issue Type", ""),
+        ("Ticket Title", ""),
+        ("Ticket Tracker Integration", ""),
+    ]))
+    self._check_csv_response(resp, {})
+
   def test_mapping_control_through_snapshot(self):
     "Test for add mapping control on assessment"
     with factories.single_commit():

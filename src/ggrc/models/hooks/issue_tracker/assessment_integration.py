@@ -10,9 +10,10 @@ import datetime
 import itertools
 import logging
 import urlparse
+from werkzeug import exceptions as flask_exceptions
+import sqlalchemy as sa
 import html2text
 
-import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import utils
@@ -1538,6 +1539,7 @@ class AssessmentTrackerHandler(object):
           issue_info,
           issue_tracker_info["issueState"]
       )
+
       issue_payload = {
           "component_id": int(issue_info["component_id"]),
           "hotlist_ids": [int(issue_info["hotlist_id"])]
@@ -1782,7 +1784,36 @@ class AssessmentTrackerHandler(object):
         "cc_list": list(ccs)
     })
 
+    # use component_id and hotlist_id form the linked issue
+    issue_info_db["component_id"] = self._extract_component_id(
+        issue_tracker_info
+    )
+    issue_info_db["hotlist_id"] = self._extract_hotlist_id(
+        issue_tracker_info
+    )
+
     return issue_info_db
+
+  @staticmethod
+  def _extract_component_id(issue_tracker_info):
+    """Extract component_id from issue_tracker_info"""
+    try:
+      component_id = issue_tracker_info["component_id"]
+    except KeyError:
+      raise flask_exceptions.ServiceUnavailable(
+          "component_id attribute is mandatory. "
+          "Please check if integration service API changed."
+      )
+    return component_id
+
+  @staticmethod
+  def _extract_hotlist_id(issue_tracker_info):
+    """Extract hotlist_id from issue_tracker_info"""
+    try:
+      hotlist_id = issue_tracker_info["hotlist_ids"][0]
+    except (KeyError, IndexError):
+      hotlist_id = ""
+    return hotlist_id
 
   @staticmethod
   def _merge_reporter(reporter_db, reporter_tracker,

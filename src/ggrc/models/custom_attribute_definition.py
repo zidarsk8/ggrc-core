@@ -4,6 +4,7 @@
 """Custom attribute definition module"""
 
 import re
+
 import flask
 import sqlalchemy as sa
 from sqlalchemy import func
@@ -358,6 +359,21 @@ sa.event.listen(
     CustomAttributeDefinition,
     "before_delete",
     validators.validate_definition_type_ggrcq
+)
+sa.event.listen(
+    CustomAttributeDefinition,
+    "after_insert",
+    attributevalidator.invalidate_gca_cache,
+)
+sa.event.listen(
+    CustomAttributeDefinition,
+    "after_delete",
+    attributevalidator.invalidate_gca_cache,
+)
+sa.event.listen(
+    CustomAttributeDefinition,
+    "after_update",
+    attributevalidator.invalidate_gca_cache,
 )
 
 
