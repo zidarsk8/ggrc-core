@@ -131,7 +131,7 @@ class TestExport(query_helper.WithQueryApi, TestCase):
     self.assert_slugs("comment", desc, slugs)
 
   def test_search_by_deleted_relation(self):
-    """Filter by deleted relation to commment"""
+    """Filter by deleted relation to comment"""
     db.session.delete(self.rel)
     db.session.commit()
     self.assert_slugs("comment", self.comment.description, [])
