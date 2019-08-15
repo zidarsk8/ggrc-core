@@ -50,13 +50,14 @@ class TestCommentableMixin(TestCase):
   def test_comments_delete(self, object_factory):
     """Test if {} deleted along with comments."""
     obj = object_factory()
-    comments = [factories.CommentFactory(), factories.CommentFactory()]
-    comment_ids = [comment.id for comment in comments]
-    relationships = [
-        factories.RelationshipFactory(source=comments[0], destination=obj),
-        factories.RelationshipFactory(source=obj, destination=comments[1])
-    ]
-    rel_ids = [rel.id for rel in relationships]
+    comment_first = factories.CommentFactory()
+    comment_second = factories.CommentFactory()
+    comment_ids = (comment_first.id, comment_second.id)
+    relationship_first = factories.RelationshipFactory(
+        source=comment_first, destination=obj)
+    relationship_second = factories.RelationshipFactory(
+        source=obj, destination=comment_second)
+    rel_ids = (relationship_first.id, relationship_second.id)
 
     result = self.api.delete(obj)
     self.assertEqual(result.status_code, 200)
