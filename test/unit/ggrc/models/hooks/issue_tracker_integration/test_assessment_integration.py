@@ -91,6 +91,29 @@ class TestUtilityFunctions(unittest.TestCase):
     self.assertEqual(info, initial_info)
 
   @ddt.data(
+      ('wrong component', 'wrong hotlist'),
+      ('', ''),
+  )
+  @ddt.unpack
+  # pylint: disable=no-self-use
+  def test_validate_link_info(self, component_id, hotlist_id):
+    """Test link assessment validation doesn't check integer fields
+
+    In case it would try to validate integer component or hotlist this test
+    would rise exception"""
+    tracker_handler = assessment_integration.AssessmentTrackerHandler()
+    # pylint: disable=protected-access
+    tracker_handler._validate_generic_fields(
+        {'component_id': component_id,
+         'hotlist_id': hotlist_id,
+         'issue_type': 'PROCESS',
+         'issue_priority': 'P2',
+         'issue_severity': 'S2',
+         'title': 'Title'},
+        link_mode=True,
+    )
+
+  @ddt.data(
       ({'component_id': '1111', 'hotlist_id': '2222'},
        {'component_id': 1111, 'hotlist_id': 2222},
        None,),
