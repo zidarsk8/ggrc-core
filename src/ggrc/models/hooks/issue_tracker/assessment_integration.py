@@ -105,22 +105,23 @@ class AssessmentTrackerHandler(object):
         raise exceptions.ValidationError("Ticket Severity is incorrect.")
 
   @classmethod
-  def _validate_generic_fields(cls, issue_info):
+  def _validate_generic_fields(cls, issue_info, link_mode=False):
     """Validate generic fields for issue.
 
     Args:
         issue_info: dictionary with issue payload information
     """
-    cls._validate_integer_fields(issue_info)
+    if not link_mode:
+      cls._validate_integer_fields(issue_info)
     cls._validate_string_fields(issue_info)
 
-  def _validate_assessment_fields(self, issue_info):
+  def _validate_assessment_fields(self, issue_info, link_mode=False):
     """Validate assessment fields for issue
 
       Args:
           issue_info: dictionary with issue payload information
     """
-    self._validate_generic_fields(issue_info)
+    self._validate_generic_fields(issue_info, link_mode)
     self._validate_assessment_title(issue_info)
 
   @staticmethod
@@ -664,7 +665,7 @@ class AssessmentTrackerHandler(object):
         assessment,
         assessment_src
     )
-    self._validate_assessment_fields(issuetracker_info)
+    self._validate_assessment_fields(issuetracker_info, link_mode=True)
     issuetracker_info = self._update_with_assmt_data_for_ticket_create(
         assessment,
         issuetracker_info
