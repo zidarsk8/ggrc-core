@@ -21,7 +21,7 @@ FIELDS_TO_CHECK = ()
 
 ISSUE_STATUS_MAPPING = {
     "new": "Draft",
-    "assigned": "Draft",
+    "assigned": "Active",
     "accepted": "Active",
     "fixed": "Fixed",
     "verified": "Fixed and Verified",

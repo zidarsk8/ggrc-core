@@ -37,7 +37,7 @@ class TestIssueIntegration(ggrc.TestCase):
 
   @ddt.data(
       ("new", "Draft"),
-      ("assigned", "Draft"),
+      ("assigned", "Active"),
       ("accepted", "Active"),
       ("fixed", "Fixed"),
       ("verified", "Fixed and Verified"),
