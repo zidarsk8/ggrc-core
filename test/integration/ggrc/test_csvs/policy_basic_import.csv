@@ -1,5 +1,5 @@
 Object type,required,required,required,required
-policy,code,title,admins,state
+policy,code,title,admin,state
 ,"p1",some weird policy,user@example.com,Draft
 ,p2,another weird policy,user@example.com,Draft
 ,,Who let the dogs out,user@example.com,Draft

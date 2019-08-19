@@ -104,13 +104,10 @@ class TestCreator(TestCase):
               .format(model_singular))
           continue
 
-        admin_title = "Admins"
-        if model_singular in ["Document"]:
-          admin_title = "Admin"
         # Test GET when owner
         acr = all_models.AccessControlRole.query.filter_by(
             object_type=model_singular,
-            name=admin_title,
+            name="Admin"
         ).one()
         acl = all_models.AccessControlList.query.filter_by(
             object_id=obj_id,
@@ -151,7 +148,7 @@ class TestCreator(TestCase):
     self.api.set_user(self.users['creator'])
     acr_id = all_models.AccessControlRole.query.filter_by(
         object_type="Policy",
-        name="Admins"
+        name="Admin"
     ).first().id
     response = self.api.post(all_models.Policy, {
         "policy": {
@@ -238,7 +235,7 @@ class TestCreator(TestCase):
     self.api.set_user(self.users["creator"])
     acr_id = all_models.AccessControlRole.query.filter_by(
         object_type="Requirement",
-        name="Admins"
+        name="Admin"
     ).first().id
     linked_acl = {
         "access_control_list": [

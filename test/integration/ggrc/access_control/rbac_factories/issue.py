@@ -36,7 +36,7 @@ class IssueRBACFactory(base.BaseRBACFactory):
     self.issue_id = issue.id
     self.parent = parent
     self.admin_acr_id = all_models.AccessControlRole.query.filter_by(
-        name="Admins",
+        name="Admin",
         object_type="Issue",
     ).one().id
     self.user_id = user_id

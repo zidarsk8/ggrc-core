@@ -10,5 +10,5 @@ export default class BaseNotifications extends Mixin {
 
 Object.assign(BaseNotifications.prototype, {
   send_by_default: true,
-  recipients: 'Admins,Primary Contacts,Secondary Contacts',
+  recipients: 'Admin,Primary Contacts,Secondary Contacts',
 });

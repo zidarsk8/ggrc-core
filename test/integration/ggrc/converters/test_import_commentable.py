@@ -33,7 +33,7 @@ class TestImportCommentable(TestCase):
         ("object_type", model_name),
         ("Code", "{}-2".format(model_name)),
         ("Title", "{}-Title".format(model_name)),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Recipients", ','.join(recipients)),
         ("Send by default", True),
     ]
@@ -70,7 +70,7 @@ class TestImportCommentable(TestCase):
         ("object_type", model_name),
         ("Code", "{}-1".format(model_name)),
         ("Title", "{}-Title".format(model_name)),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Recipients", ','.join(recipients)),
         ("Send by default", True),
         ("Assignee", "user@example.com"),

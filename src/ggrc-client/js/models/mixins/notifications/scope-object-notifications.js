@@ -11,7 +11,7 @@ export default class ScopeObjectNotifications extends Mixin {
 
 Object.assign(ScopeObjectNotifications.prototype, {
   send_by_default: true,
-  recipients: 'Admins,Assignee,Verifier,Compliance Contacts,' +
+  recipients: 'Admin,Assignee,Verifier,Compliance Contacts,' +
     'Primary Contacts,Secondary Contacts,Product Managers,' +
     'Technical Leads,Technical / ' +
     'Program Managers,Legal Counsels,System Owners,' +

@@ -5,7 +5,7 @@ from lib.app_entity import person_entity
 from lib.constants import roles
 
 _COMMON_ACCESS_CONTROL_ROLE_MAPPING = {
-    "admins": roles.ADMINS
+    "admins": "Admin"
 }
 
 
