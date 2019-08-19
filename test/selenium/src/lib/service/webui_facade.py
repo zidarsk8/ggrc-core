@@ -136,7 +136,7 @@ def assert_cannot_delete_control(selenium, cntrl):
 def _get_ui_service(selenium, obj):
   """Get webui_service for object"""
   obj_type = objects.get_plural(obj.type)
-  return webui_service.BaseWebUiService(selenium, obj_type)
+  return webui_service.BaseWebUiService(obj_type, selenium)
 
 
 def _assert_title_editable(obj, selenium, info_page):
@@ -407,8 +407,7 @@ def export_objects(path_to_export_dir, obj_type, src_obj=None,
     Returns: list of objects from CSV file in test's temporary directory
     'path_to_export_dir'."""
   ui_service = factory.get_cls_webui_service(
-      objects.get_plural(singular=obj_type, title=True))(
-      browsers.get_driver(), is_versions_widget)
+      objects.get_plural(singular=obj_type, title=True))(is_versions_widget)
   widget = (ui_service.open_widget_of_mapped_objs(src_obj) if src_obj
             else ui_service.open_obj_dashboard_tab())
   return ui_service.exported_objs_via_tree_view(path_to_export_dir, widget)

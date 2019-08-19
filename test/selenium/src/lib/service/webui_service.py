@@ -5,26 +5,25 @@ import re
 
 from dateutil import parser, tz
 
-from lib import factory, url
-from lib.constants import objects, messages, element, regex
-from lib.constants.locator import WidgetInfoAssessment
-from lib.element.tab_containers import DashboardWidget
-from lib.entities.entity import Representation
+from lib import factory, url, base
+from lib.constants import objects, messages, element, regex, locator
+from lib.element import tab_containers
+from lib.entities import entity
 from lib.page import dashboard, widget_bar, export_page
-from lib.page.modal import unified_mapper
-from lib.page.modal.request_review import RequestReviewModal
+from lib.page.modal import unified_mapper, request_review
 from lib.page.widget import generic_widget, object_modal
 from lib.utils import (
-    selenium_utils, file_utils, conftest_utils, test_utils, ui_utils)
-from lib.utils.string_utils import StringMethods, Symbols
+    selenium_utils, file_utils, conftest_utils, test_utils, ui_utils,
+    string_utils)
 
 
-class BaseWebUiService(object):
+class BaseWebUiService(base.WithBrowser):
   """Base class for business layer's services objects."""
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=too-many-public-methods
-  def __init__(self, driver, obj_name):
-    self.driver = driver
+  # pylint: disable=unused-argument
+  def __init__(self, obj_name, driver=None):
+    super(BaseWebUiService, self).__init__()
     self.obj_name = obj_name
     self.obj_type = objects.get_singular(self.obj_name, title=True)
     self.snapshot_obj_type = None
@@ -48,19 +47,22 @@ class BaseWebUiService(object):
     list_factory_objs = [
         entity_factory().obj_inst() for _ in xrange(len(list_scopes))]
     list_scopes_with_upper_keys = [
-        StringMethods.dict_keys_to_upper_case(scope) for scope in list_scopes]
-    list_scopes_to_convert = StringMethods.exchange_dicts_items(
-        transform_dict=Representation.remap_collection(),
+        string_utils.StringMethods.dict_keys_to_upper_case(scope)
+        for scope in list_scopes]
+    list_scopes_to_convert = string_utils.StringMethods.exchange_dicts_items(
+        transform_dict=entity.Representation.remap_collection(),
         dicts=list_scopes_with_upper_keys, is_keys_not_values=True)
     # convert and represent values in scopes
     for scope in list_scopes_to_convert:
       # convert u'None', u'No person' to None type
-      StringMethods.update_dicts_values(scope, ["None", "No person"], None)
+      string_utils.StringMethods.update_dicts_values(
+          scope, ["None", "No person"], None)
       for key, val in scope.iteritems():
         if val:
           if key in ["mandatory", "verified"]:
             # convert u'false', u'true' like to Boolean
-            scope[key] = StringMethods.get_bool_value_from_arg(val)
+            scope[key] = string_utils.StringMethods.get_bool_value_from_arg(
+                val)
           if key in ["updated_at", "created_at"]:
             # UI like u'08/20/2017' to date=2017-08-20, timetz=00:00:00
             datetime_val = parser.parse(val)
@@ -78,12 +80,12 @@ class BaseWebUiService(object):
             # extract datetime from u'(Creator) 08/20/2017 07:30:45 AM +03:00'
             scope[key] = [
                 {k: (parser.parse(re.sub(regex.TEXT_W_PARENTHESES,
-                                         Symbols.BLANK, v)
+                                         string_utils.Symbols.BLANK, v)
                                   ).astimezone(tz=tz.tzutc())
                      if k == "created_at" else v)
                  for k, v in comment.iteritems()} for comment in val]
           # convert multiple values to list of strings and split if need it
-          if (key in Representation.people_attrs_names and
+          if (key in entity.Representation.people_attrs_names and
              not isinstance(val, list)):
             # split Tree View values if need 'Ex1, Ex2 F' to ['Ex1', 'Ex2 F']
             # Info Widget values will be represent by internal methods
@@ -91,22 +93,23 @@ class BaseWebUiService(object):
           # convert 'slug' from CSV for snapshoted objects u'*23eb72ac-4d9d'
           if (key == "slug" and
                   (self.obj_name in objects.ALL_SNAPSHOTABLE_OBJS) and
-                  Symbols.STAR in val):
-            scope[key] = val.replace(Symbols.STAR, Symbols.BLANK)
+                  string_utils.Symbols.STAR in val):
+            scope[key] = val.replace(string_utils.Symbols.STAR,
+                                     string_utils.Symbols.BLANK)
     return [
         factory_obj.update_attrs(is_allow_none=True, **scope) for
         scope, factory_obj in zip(list_scopes_to_convert, list_factory_objs)]
 
   def submit_obj_modal(self, obj):
     """Submits object modal with `obj`."""
-    object_modal.get_modal_obj(obj.type, self.driver).submit_obj(obj)
+    object_modal.get_modal_obj(obj.type, self._driver).submit_obj(obj)
 
   def build_obj_from_page(self, root_elem=None):
     """Builds obj from opened page."""
     info_page = (
-        self.info_widget_cls(self.driver, root_elem) if
+        self.info_widget_cls(self._driver, root_elem) if
         self.info_widget_cls.__name__ == objects.RISKS.title() else
-        self.info_widget_cls(self.driver))
+        self.info_widget_cls(self._driver))
     scope = info_page.get_info_widget_obj_scope()
     return self._create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
@@ -114,7 +117,7 @@ class BaseWebUiService(object):
   def create_obj_and_get_obj(self, obj):
     """Creates obj via LHN and returns a created obj."""
     object_name = objects.get_plural(obj.type)
-    conftest_utils.get_lhn_accordion(self.driver, object_name).create_new()
+    conftest_utils.get_lhn_accordion(self._driver, object_name).create_new()
     self.submit_obj_modal(obj)
     return self.build_obj_from_page()
 
@@ -127,15 +130,15 @@ class BaseWebUiService(object):
     # todo fix freezing when navigate through tabs by URLs and using driver.get
     selenium_utils.open_url(generic_widget_url, is_via_js=True)
     return self.generic_widget_cls(
-        self.driver, self.obj_name, self.is_versions_widget) if hasattr(
+        self._driver, self.obj_name, self.is_versions_widget) if hasattr(
         self, "is_versions_widget") else self.generic_widget_cls(
-        self.driver, self.obj_name)
+        self._driver, self.obj_name)
 
   def open_obj_dashboard_tab(self):
     """Navigates to dashboard tab URL of object according to object name.
     Returns: generic widget class object."""
     dashboard.Dashboard().open_objs_tab_via_url(self.obj_type)
-    return self.generic_widget_cls(self.driver, self.obj_name)
+    return self.generic_widget_cls(self._driver, self.obj_name)
 
   def open_info_page_of_obj(self, obj):
     """Navigates to info page URL of object according to URL of object.
@@ -144,7 +147,7 @@ class BaseWebUiService(object):
     info_page_url = self.url_obj_info_page.format(
         obj_url=obj.url)
     selenium_utils.open_url(info_page_url)
-    return self.info_widget_cls(self.driver)
+    return self.info_widget_cls(self._driver)
 
   def open_info_panel_of_mapped_obj(self, src_obj, obj):
     """Navigates to info panel URL of object according to URL of source object
@@ -227,7 +230,7 @@ class BaseWebUiService(object):
     dict_key = dict_list_objs_scopes.iterkeys().next()
     # 'Control' to 'controls', 'Control Snapshot' to 'controls'
     obj_name_from_dict = objects.get_plural(
-        StringMethods.get_first_word_from_str(dict_key))
+        string_utils.StringMethods.get_first_word_from_str(dict_key))
     if self.obj_name == obj_name_from_dict:
       list_scopes = self._normalize_list_scopes_from_csv(
           dict_list_objs_scopes[dict_key])
@@ -243,7 +246,7 @@ class BaseWebUiService(object):
     Tree View, fill data according to object attributes and create new object.
     """
     self.open_widget_of_mapped_objs(src_obj).tree_view.open_create()
-    object_modal.get_modal_obj(obj.type, self.driver).submit_obj(obj)
+    object_modal.get_modal_obj(obj.type, self._driver).submit_obj(obj)
 
   def _get_unified_mapper(self, src_obj):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -264,7 +267,7 @@ class BaseWebUiService(object):
     (dest_objs_widget.tree_view.open_map().
      map_dest_objs(dest_objs_type=dest_objs[0].type.title(),
                    dest_objs_titles=dest_objs_titles))
-    self.driver.refresh()
+    self._driver.refresh()
 
   def _search_objs_via_tree_view(self, src_obj, dest_objs):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -316,7 +319,7 @@ class BaseWebUiService(object):
     Returns: list of objects from CSV file in test's temporary directory
     'path_to_export_dir'."""
     widget.tree_view.open_3bbs().select_export()
-    page = export_page.ExportPage(self.driver)
+    page = export_page.ExportPage(self._driver)
     page.open_export_page()
     return self.get_list_objs_from_csv(
         page.download_obj_to_csv(path_to_export_dir))
@@ -425,14 +428,14 @@ class BaseWebUiService(object):
     # pylint: disable=invalid-name
     self.open_info_page_of_obj(src_obj)
     return sorted(dashboard.Dashboard(
-        self.driver).get_mappable_via_add_widgets_objs_aliases())
+        self._driver).get_mappable_via_add_widgets_objs_aliases())
 
   def is_dashboard_tab_exist(self, obj):
     """Navigate to InfoPage of object and check is 'Dashboard' tab exist.
       - Return: bool.
     """
     self.open_info_page_of_obj(obj)
-    return dashboard.Dashboard(self.driver).is_dashboard_tab_exist()
+    return dashboard.Dashboard(self._driver).is_dashboard_tab_exist()
 
   def get_items_from_dashboard_widget(self, obj):
     """Navigate to InfoPage of object. Open 'Dashboard' tab and return
@@ -441,15 +444,15 @@ class BaseWebUiService(object):
     """
     self.open_info_page_of_obj(obj)
     dashboard_widget_elem = (
-        dashboard.Dashboard(self.driver).select_dashboard_tab())
-    return DashboardWidget(
-        self.driver, dashboard_widget_elem).get_all_tab_names_and_urls()
+        dashboard.Dashboard(self._driver).select_dashboard_tab())
+    return tab_containers.DashboardWidget(
+        self._driver, dashboard_widget_elem).get_all_tab_names_and_urls()
 
   def get_dashboard_content(self, obj):
     """Navigate to InfoPage of object, open dashboard tab and return it's
     content."""
     self.open_info_page_of_obj(obj)
-    dashboard_widget_elem = generic_widget.CADashboard(self.driver)
+    dashboard_widget_elem = generic_widget.CADashboard(self._driver)
     dashboard_widget_elem.select_dashboard_tab()
     return dashboard_widget_elem.active_dashboard_tab_elem
 
@@ -492,20 +495,21 @@ class BaseWebUiService(object):
     """
     # pylint: disable=invalid-name
     self.edit_obj(obj, title="[EDITED]" + obj.title)
-    return self.info_widget_cls(self.driver)
+    return self.info_widget_cls(self._driver)
 
   def edit_obj(self, obj, **changes):
     """Opens `obj` and makes `changes` using Edit modal."""
     obj_info_page = self.open_info_page_of_obj(obj)
     obj_info_page.three_bbs.select_edit()
-    modal = object_modal.get_modal_obj(obj.type, self.driver)
+    modal = object_modal.get_modal_obj(obj.type, self._driver)
     modal.fill_form(**changes)
     modal.save_and_close()
 
   def submit_for_review(self, obj, user_email, comment_msg):
     """Submit object for review scenario."""
     self.open_info_page_of_obj(obj).open_submit_for_review_popup()
-    RequestReviewModal(self.driver).fill_and_submit(user_email, comment_msg)
+    request_review.RequestReviewModal(self._driver).fill_and_submit(
+        user_email, comment_msg)
 
   def approve_review(self, obj):
     """Approve review scenario."""
@@ -523,8 +527,8 @@ class BaseWebUiService(object):
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
-  def __init__(self, driver, obj_name, is_versions_widget):
-    super(SnapshotsWebUiService, self).__init__(driver, obj_name)
+  def __init__(self, obj_name, is_versions_widget, driver=None):
+    super(SnapshotsWebUiService, self).__init__(obj_name, driver)
     self.is_versions_widget = is_versions_widget
     self.snapshot_obj_type = objects.get_singular(
         objects.SNAPSHOTS, title=True)
@@ -553,8 +557,8 @@ class SnapshotsWebUiService(BaseWebUiService):
 
 class AuditsService(BaseWebUiService):
   """Class for Audits business layer's services objects."""
-  def __init__(self, driver):
-    super(AuditsService, self).__init__(driver, objects.AUDITS)
+  def __init__(self, driver=None):
+    super(AuditsService, self).__init__(objects.AUDITS, driver)
 
   def clone_via_info_page_and_get_obj(self, audit_obj):
     """Open Info page of Audit object and clone it including Assessment
@@ -565,9 +569,9 @@ class AuditsService(BaseWebUiService):
     (audit_info_page.
      three_bbs.select_clone().confirm_clone(is_full=True))
     cloned_audit_obj = self.entities_factory_cls().obj_inst().update_attrs(
-        url=url.Utils.get_src_obj_url(self.driver.current_url))
+        url=url.Utils.get_src_obj_url(self._driver.current_url))
     actual_cloned_audit_obj = self.get_obj_from_info_page(obj=cloned_audit_obj)
-    self.driver.refresh()
+    self._driver.refresh()
     return actual_cloned_audit_obj.update_attrs(url=cloned_audit_obj.url)
 
   def bulk_update_via_info_page(self, audit_obj):
@@ -580,16 +584,16 @@ class AuditsService(BaseWebUiService):
 
 class AssessmentTemplatesService(BaseWebUiService):
   """Class for AssessmentTemplates business layer's services objects."""
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(AssessmentTemplatesService, self).__init__(
-        driver, objects.ASSESSMENT_TEMPLATES)
+        objects.ASSESSMENT_TEMPLATES, driver)
 
 
 class AssessmentsService(BaseWebUiService):
   """Class for Assessments business layer's services objects."""
-  def __init__(self, driver):
+  def __init__(self, driver=None):
     super(AssessmentsService, self).__init__(
-        driver, objects.ASSESSMENTS)
+        objects.ASSESSMENTS, driver)
 
   def add_comments(self, src_obj, obj, comment_objs):
     """Open Info Panel of 'obj' navigate by object's title, maximize it and
@@ -655,7 +659,7 @@ class AssessmentsService(BaseWebUiService):
 
     def wait_for_status_to_change():
       """Waits for status to become completed."""
-      return self.info_widget_cls(self.driver).status() != initial_state
+      return self.info_widget_cls(self._driver).status() != initial_state
     test_utils.wait_for(wait_for_status_to_change)
     ui_utils.wait_for_spinner_to_disappear()
 
@@ -664,17 +668,17 @@ class AssessmentsService(BaseWebUiService):
     click 'Verify' button then return info page of object in new state"""
     from lib.constants.locator import ObjectWidget
     self.open_info_page_of_obj(obj).click_verify()
-    for locator in [ObjectWidget.HEADER_STATE_COMPLETED,
-                    WidgetInfoAssessment.ICON_VERIFIED]:
-      selenium_utils.wait_until_element_visible(self.driver, locator)
-    return self.info_widget_cls(self.driver)
+    for elem in [ObjectWidget.HEADER_STATE_COMPLETED,
+                 locator.WidgetInfoAssessment.ICON_VERIFIED]:
+      selenium_utils.wait_until_element_visible(self._driver, elem)
+    return self.info_widget_cls(self._driver)
 
   def reject_assessment(self, obj):
     """Navigate to info page of object according to URL of object then find and
     click 'Needs Rework' button then return info page of object in new state.
     """
     self.open_info_page_of_obj(obj).click_needs_rework()
-    return self.info_widget_cls(self.driver)
+    return self.info_widget_cls(self._driver)
 
   def deprecate_assessment(self, obj):
     """Deprecate an object"""
@@ -711,7 +715,7 @@ class AssessmentsService(BaseWebUiService):
     and map snapshots from mapped_objects attribute of passed object.
     """
     self.open_info_page_of_obj(obj).three_bbs.select_edit()
-    modal = object_modal.AssessmentModal(self.driver)
+    modal = object_modal.AssessmentModal(self._driver)
     modal.map_objects(objs_to_map)
     modal.save_and_close()
 
@@ -725,40 +729,40 @@ class ControlsService(SnapshotsWebUiService):
   """Class for Controls business layer's services objects."""
   def __init__(self, driver=None, is_versions_widget=False):
     super(ControlsService, self).__init__(
-        driver, objects.CONTROLS, is_versions_widget)
+        objects.CONTROLS, is_versions_widget, driver)
 
 
 class ObjectivesService(SnapshotsWebUiService):
   """Class for Objectives business layer's services objects."""
-  def __init__(self, driver, is_versions_widget=False):
+  def __init__(self, driver=None, is_versions_widget=False):
     super(ObjectivesService, self).__init__(
-        driver, objects.OBJECTIVES, is_versions_widget)
+        objects.OBJECTIVES, is_versions_widget, driver)
 
 
 class RisksService(SnapshotsWebUiService):
   """Class for Risks business layer's services objects."""
-  def __init__(self, driver, is_versions_widget=False):
+  def __init__(self, driver=None, is_versions_widget=False):
     super(RisksService, self).__init__(
-        driver, objects.RISKS, is_versions_widget)
+        objects.RISKS, is_versions_widget, driver)
 
 
 class OrgGroupsService(SnapshotsWebUiService):
   """Class for Org Groups business layer's services objects."""
-  def __init__(self, driver, is_versions_widget=False):
+  def __init__(self, driver=None, is_versions_widget=False):
     super(OrgGroupsService, self).__init__(
-        driver, objects.ORG_GROUPS, is_versions_widget)
+        objects.ORG_GROUPS, is_versions_widget, driver)
 
 
 class IssuesService(BaseWebUiService):
   """Class for Issues business layer's services objects."""
-  def __init__(self, driver):
-    super(IssuesService, self).__init__(driver, objects.ISSUES)
+  def __init__(self, driver=None):
+    super(IssuesService, self).__init__(objects.ISSUES, driver)
 
 
 class ProgramsService(BaseWebUiService):
   """Class for Programs business layer's services objects."""
-  def __init__(self, driver):
-    super(ProgramsService, self).__init__(driver, objects.PROGRAMS)
+  def __init__(self, driver=None):
+    super(ProgramsService, self).__init__(objects.PROGRAMS, driver)
 
   def add_and_map_obj_widget(self, obj):
     """Adds widget of selected type and
@@ -768,11 +772,11 @@ class ProgramsService(BaseWebUiService):
     dashboard.CreateObjectDropdown().click_item_by_text(
         text=objects.get_normal_form(obj))
     obj_modal = unified_mapper.CommonUnifiedMapperModal(
-        self.driver, obj).click_create_and_map_obj()
+        self._driver, obj).click_create_and_map_obj()
     return obj_modal
 
 
 class ProductsService(BaseWebUiService):
   """Class for Programs business layer's services objects."""
-  def __init__(self, driver):
-    super(ProductsService, self).__init__(driver, objects.PRODUCTS)
+  def __init__(self, driver=None):
+    super(ProductsService, self).__init__(objects.PRODUCTS, driver)
