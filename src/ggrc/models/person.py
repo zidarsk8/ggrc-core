@@ -11,6 +11,7 @@ from ggrc import builder
 from ggrc import db
 from ggrc import rbac
 from ggrc import settings
+from ggrc.login import get_user_date
 from ggrc.fulltext import attributes
 from ggrc.fulltext import mixin as ft_mixin
 from ggrc.models import context
@@ -256,3 +257,7 @@ class Person(customattributable.CustomAttributable,
     sorted_roles = sorted(unique_roles,
                           key=lambda x: role_hierarchy.get(x, -1))
     return sorted_roles[0]
+
+  @property
+  def user_date(self):
+    return get_user_date()
