@@ -746,7 +746,9 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       assess = factories.AssessmentFactory(audit=audit)
 
     issue_request_payload = self.put_request_payload_builder(
-        {"issue_id": 9999}
+        {"issue_id": 9999,
+         "component_id": None,
+         "hotlist_id": None}
     )
 
     get_issue_resp = self.response_payload_builder(
