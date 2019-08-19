@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Facade for Web UI services"""
 import copy
+import random
 import re
 
 from lib import url, users, base
@@ -10,8 +11,8 @@ from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.page.modal import unified_mapper
 from lib.page.widget import generic_widget, object_modal, import_page
-from lib.service import webui_service, rest_service, rest_facade
-from lib.service.webui_service import ControlsService
+from lib.service import (webui_service, rest_service, rest_facade,
+                         admin_webui_service)
 from lib.utils import selenium_utils, ui_utils, string_utils
 
 
@@ -95,7 +96,8 @@ def assert_can_edit(selenium, obj, can_edit):
 
 def assert_can_edit_control(selenium, cntrl, can_edit):
   """Assert that current user cannot edit control via UI."""
-  info_page = ControlsService(selenium).open_info_page_of_obj(cntrl)
+  info_page = webui_service.ControlsService(
+      selenium).open_info_page_of_obj(cntrl)
   els_shown_for_editor = info_page.els_shown_for_editor()
   exp_list = [can_edit] * (len(els_shown_for_editor))
   # Add comment btn exists on all control pages
@@ -123,7 +125,8 @@ def assert_can_delete(selenium, obj, can_delete):
 
 def assert_cannot_delete_control(selenium, cntrl):
   """Assert that current user cannot delete control via UI."""
-  cntrl_info_page = ControlsService(selenium).open_info_page_of_obj(cntrl)
+  cntrl_info_page = webui_service.ControlsService(
+      selenium).open_info_page_of_obj(cntrl)
   if cntrl_info_page.three_bbs.exists:
     assert cntrl_info_page.three_bbs.delete_option.exists is False
 
@@ -306,3 +309,23 @@ def get_available_templates_list():
   page = import_page.ImportPage()
   page.open()
   return page.open_download_template_modal().available_templates_list
+
+
+def edit_gca(selenium, old_ca_type, new_ca_type):
+  """Create Global Custom attribute via rest api and edit it via web ui.
+
+  Returns:
+    dict with actual edited CA and expected CA.
+  """
+  new_ca = rest_facade.create_gcad(definition_type=objects.get_singular(
+      random.choice(objects.EDITABLE_CA_OBJS)), attribute_type=old_ca_type,
+      mandatory=True)
+  expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
+      attribute_type=new_ca_type, definition_type=new_ca.definition_type,
+      helptext=element.Common.TITLE_EDITED_PART, mandatory=False)
+  if new_ca_type in (element.AdminWidgetCustomAttributes.TEXT,
+                     element.AdminWidgetCustomAttributes.RICH_TEXT):
+    expected_ca.update_attrs(placeholder=element.Common.TITLE_EDITED_PART)
+  actual_ca = admin_webui_service.CustomAttributeWebUiService(
+      selenium).edit_custom_attribute(new_ca, expected_ca)
+  return {"actual_ca": actual_ca, "expected_ca": expected_ca}
