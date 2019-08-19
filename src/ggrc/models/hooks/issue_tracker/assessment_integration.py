@@ -105,23 +105,50 @@ class AssessmentTrackerHandler(object):
         raise exceptions.ValidationError("Ticket Severity is incorrect.")
 
   @classmethod
-  def _validate_generic_fields(cls, issue_info, link_mode=False):
+  def _validate_generic_fields(cls, issue_info):
     """Validate generic fields for issue.
 
     Args:
         issue_info: dictionary with issue payload information
     """
-    if not link_mode:
-      cls._validate_integer_fields(issue_info)
+    cls._validate_integer_fields(issue_info)
     cls._validate_string_fields(issue_info)
 
-  def _validate_assessment_fields(self, issue_info, link_mode=False):
+  def _validate_assessment_fields(self, issue_info):
     """Validate assessment fields for issue
 
       Args:
           issue_info: dictionary with issue payload information
     """
-    self._validate_generic_fields(issue_info, link_mode)
+    self._validate_generic_fields(issue_info)
+    self._validate_assessment_title(issue_info)
+
+  @staticmethod
+  def _validate_issue_id(issue_info):
+    """Validate issue id field. It should be mandatory numeric field.
+
+    Args:
+        issue_info: dictionary with issue
+        payload information
+    """
+    try:
+      issue_id = issue_info["issue_id"]
+    except KeyError:
+      raise exceptions.ValidationError("Issue ID is mandatory.")
+    else:
+      try:
+        int(issue_id)
+      except (ValueError, TypeError):
+        raise exceptions.ValidationError("Issue ID must be a number.")
+
+  def _validate_assmt_link_fields(self, issue_info):
+    """""Validate assessment fields for issue
+
+      Args:
+          issue_info: dictionary with issue payload information
+    """
+    self._validate_issue_id(issue_info)
+    self._validate_string_fields(issue_info)
     self._validate_assessment_title(issue_info)
 
   @staticmethod
@@ -665,7 +692,7 @@ class AssessmentTrackerHandler(object):
         assessment,
         assessment_src
     )
-    self._validate_assessment_fields(issuetracker_info, link_mode=True)
+    self._validate_assmt_link_fields(issuetracker_info)
     issuetracker_info = self._update_with_assmt_data_for_ticket_create(
         assessment,
         issuetracker_info
