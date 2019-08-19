@@ -26,7 +26,7 @@ class ProgramRBACFactory(base.BaseRBACFactory):
     self.admin_control_id = {
         name: id for id, name
         in access_control.role.get_custom_roles_for("Control").items()
-    }["Admins"]
+    }["Admin"]
     self.api = Api()
     self.objgen = generator.ObjectGenerator()
     self.objgen.api = self.api

@@ -343,7 +343,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     data = OrderedDict([
         ("object_type", "System"),
         ("Code*", "CODE"),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
         ("Verifier", "user@example.com"),
         ("Title", "b"),
@@ -362,7 +362,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     data = OrderedDict([
         ("object_type", "System"),
         ("Code*", "CODE"),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
         ("Verifier", "user@example.com"),
         ("Title", "b"),
@@ -602,7 +602,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     data = OrderedDict([
         ("object_type", "System"),
         ("Code*", "CODE"),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
         ("Verifier", "user@example.com"),
         ("Title", "b"),
@@ -655,7 +655,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     data = OrderedDict([
         ("object_type", "System"),
         ("Code*", "CODE"),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
         ("Verifier", "user@example.com"),
         ("Title", "b"),
@@ -736,7 +736,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     data = OrderedDict([
         ("object_type", "System"),
         ("Code*", "CODE"),
-        ("Admins", "user@example.com"),
+        ("Admin", "user@example.com"),
         ("Assignee", "user@example.com"),
         ("Verifier", "user@example.com"),
         ("Title", "b"),
@@ -838,7 +838,7 @@ class TestWithReadOnlyAccessImport(TestCase):
     response = self.import_data(OrderedDict([
         ("object_type", "System"),
         ("Code*", "System-1"),
-        ("Admins", user.email),
+        ("Admin", user.email),
         ("Assignee", user.email),
         ("Verifier", user.email),
         ("Title", "New System"),
@@ -878,7 +878,7 @@ class TestWithReadOnlyAccessImport(TestCase):
       user = factories.PersonFactory()
       system = factories.SystemFactory(readonly=True)
       rbac_factories.UserRoleFactory(role=role_obj, person=user)
-      system.add_person_with_role_name(user, "Admins")
+      system.add_person_with_role_name(user, "Admin")
 
       system_slug = system.slug
       user_id = user.id
@@ -922,12 +922,12 @@ class TestWithReadOnlyAccessImport(TestCase):
       user = factories.PersonFactory()
       system = factories.SystemFactory(readonly=old_readonly)
       rbac_factories.UserRoleFactory(role=role_obj, person=user)
-      system.add_person_with_role_name(user, "Admins")
+      system.add_person_with_role_name(user, "Admin")
 
     response = self.import_data(OrderedDict([
         ("object_type", "System"),
         ("Code*", system.slug),
-        ("Admins", user.email),
+        ("Admin", user.email),
         ("Read-only", new_readonly),
     ]), person=user)
 

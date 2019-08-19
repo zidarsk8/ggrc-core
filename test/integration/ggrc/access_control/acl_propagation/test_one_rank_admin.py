@@ -105,7 +105,7 @@ class TestAdminPropagation(base.TestACLPropagation):
     """
     self.setup_people()
     primary_contacts = all_models.AccessControlRole.query.filter_by(
-        name="Admins",
+        name="Admin",
         object_type=parent,
     ).first()
     rbac_factory = rbac_factories.TEST_FACTORIES_MAPPING[model]

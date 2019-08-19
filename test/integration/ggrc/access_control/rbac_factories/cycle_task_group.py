@@ -26,7 +26,7 @@ class CycleTaskGroupRBACFactory(base.BaseRBACFactory):
     self.admin_control_id = {
         name: id_ for id_, name
         in access_control.role.get_custom_roles_for("Control").items()
-    }["Admins"]
+    }["Admin"]
     self.api = Api()
 
     if user_id:

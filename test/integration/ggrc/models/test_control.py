@@ -311,7 +311,7 @@ class TestSyncServiceControl(TestCase):
         "control": {
             "title": "Control title",
             "context": None,
-            "recipients": "Admins,Control Operators,Control Owners",
+            "recipients": "Admin,Control Operators,Control Owners",
             "send_by_default": 0,
             "external_id": factories.SynchronizableExternalId.next(),
             "external_slug": factories.random_str(),
@@ -819,13 +819,13 @@ class TestSyncServiceControl(TestCase):
   @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
   @ddt.data(
       {
-          "Admins": {
+          "Admin": {
               "email": "user1@example.com",
               "name": "user1",
           },
       },
       {
-          "Admins": "user1@example.com",
+          "Admin": "user1@example.com",
       },
   )
   def test_invalid_acl_format(self, access_control_list):
@@ -936,7 +936,7 @@ class TestSyncServiceControl(TestCase):
   @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
   @ddt.data(
       {
-          "Admins": [
+          "Admin": [
               {
                   "email": "user1@example.com",
                   "name": "user1",
@@ -944,7 +944,7 @@ class TestSyncServiceControl(TestCase):
           ],
       },
       {
-          "Admins": [
+          "Admin": [
               {
                   "email": "user1@example.com",
                   "name": "user1",
@@ -993,7 +993,7 @@ class TestSyncServiceControl(TestCase):
   def test_acl_new_people_create(self):
     """Test creation of control with acl which contain new people."""
     access_control_list = {
-        "Admins": [
+        "Admin": [
             {
                 "email": "user1@example.com",
                 "name": "user1",
@@ -1019,7 +1019,7 @@ class TestSyncServiceControl(TestCase):
     })
     self.assertEqual(201, response.status_code)
 
-    for expected_person in access_control_list["Admins"]:
+    for expected_person in access_control_list["Admin"]:
       user = all_models.Person.query.filter_by(
           email=expected_person["email"]
       ).one()
@@ -1034,10 +1034,10 @@ class TestSyncServiceControl(TestCase):
     with factories.single_commit():
       control = factories.ControlFactory()
       person = factories.PersonFactory()
-      control.add_person_with_role_name(person, "Admins")
+      control.add_person_with_role_name(person, "Admin")
 
     access_control_list = {
-        "Admins": [
+        "Admin": [
             {
                 "email": "user1@example.com",
                 "name": "user1",
@@ -1062,10 +1062,10 @@ class TestSyncServiceControl(TestCase):
     person = self.generator.generate_person(user_role="Creator")[1]
     with factories.single_commit():
       control = factories.ControlFactory()
-      control.add_person_with_role_name(person, "Admins")
+      control.add_person_with_role_name(person, "Admin")
 
     access_control_list = {
-        "Admins": [
+        "Admin": [
             {
                 "email": person.email,
                 "name": person.name,
@@ -1091,7 +1091,7 @@ class TestSyncServiceControl(TestCase):
     })
     self.assert200(response)
 
-    for expected_person in access_control_list["Admins"]:
+    for expected_person in access_control_list["Admin"]:
       user = all_models.Person.query.filter_by(
           email=expected_person["email"]
       ).one()
@@ -1106,7 +1106,7 @@ class TestSyncServiceControl(TestCase):
     with factories.single_commit():
       control = factories.ControlFactory()
       person = factories.PersonFactory(name="user1", email="user1@example.com")
-      control.add_person_with_role_name(person, "Admins")
+      control.add_person_with_role_name(person, "Admin")
 
     access_control_list = {
         "Non-existing role": [
@@ -1128,7 +1128,7 @@ class TestSyncServiceControl(TestCase):
     control = all_models.Control.query.get(control.id)
     self.assert_obj_acl(
         control,
-        {"Admins": [{"name": "user1", "email": "user1@example.com"}]}
+        {"Admin": [{"name": "user1", "email": "user1@example.com"}]}
     )
 
   def test_json_deserialization(self):

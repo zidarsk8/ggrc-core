@@ -64,7 +64,7 @@ class TestCTGOT(BaseTestCase):
           person=sec_assignee,
       )
       factories.AccessControlPersonFactory(
-          ac_list=workflow.acr_name_acl_map["Admins"],
+          ac_list=workflow.acr_name_acl_map["Admin"],
           person=workflow_admin,
       )
 

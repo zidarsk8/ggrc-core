@@ -128,8 +128,8 @@ class TestExportSnapshots(TestCase):
             "Archived": u"yes" if audit.archived else u"no",
             # Computed attributes
             "Last Assessment Date": u"",
-            "Admins": u"admin@example.com\ncreator@example.com\n"
-                      u"editor@example.com",
+            "Admin": u"admin@example.com\ncreator@example.com\n"
+                     u"editor@example.com",
             "Control Operators": u"creator@example.com",
             "Control Owners": u"creator@example.com",
             "Other Contacts": u"creator@example.com",
@@ -248,7 +248,7 @@ class TestExportSnapshots(TestCase):
             "Assertions": u",".join(json.loads(control.assertions)),
             "Categories": u"",
             "Document File": u"",
-            "Admins": u"",
+            "Admin": u"",
             "Control Operators": u"",
             "Control Owners": u"",
             "Other Contacts": u"",

@@ -71,12 +71,12 @@ def sync_verifier_email(issuetracker_state, sync_object, admin_role):
       email=issue_tracker_verifier
   ).first()
   if new_verifier:
-    issue_admins = sync_object.get_persons_for_rolename("Admins")
+    issue_admins = sync_object.get_persons_for_rolename("Admin")
     admin_emails = [admin.email for admin in issue_admins]
     if issue_tracker_verifier not in admin_emails:
       person, current_verifier_acl = get_current_issue_tracker_person_acl(
           sync_object,
-          "Admins",
+          "Admin",
       )
       if current_verifier_acl:
         current_verifier_acl.remove_person(person)
@@ -122,7 +122,7 @@ def sync_issue_attributes():
   ).first()
 
   admin_role = all_models.AccessControlRole.query.filter_by(
-      object_type=all_models.Issue.__name__, name="Admins"
+      object_type=all_models.Issue.__name__, name="Admin"
   ).first()
 
   processed_ids = set()
