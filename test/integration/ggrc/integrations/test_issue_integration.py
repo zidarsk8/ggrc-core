@@ -19,9 +19,9 @@ from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.models.hooks.issue_tracker import issue_integration
 from ggrc.models.hooks.issue_tracker import issue_tracker_params_builder \
     as params_builder
-
 from integration import ggrc
 from integration.ggrc import api_helper
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 from integration.ggrc.models import factories
@@ -122,7 +122,7 @@ class TestIssueIntegration(ggrc.TestCase):
                         obj,
                         issue_tracker_issue,
                         issue_attrs,
-                        issue_tracker_ticket_attrs):
+                        ticket_attrs):
     """Checks issuetracker_issue were updated correctly.
 
     Make assertions to check if issue tracker fields were updated according
@@ -139,9 +139,9 @@ class TestIssueIntegration(ggrc.TestCase):
     self.assertEqual(issue_tracker_issue.title,
                      issue_attrs["issue"]["title"])
     self.assertEqual(int(issue_tracker_issue.component_id),
-                     issue_attrs["issue"]["issue_tracker"]["component_id"])
+                     ticket_attrs["issueState"]["component_id"])
     self.assertEqual(int(issue_tracker_issue.hotlist_id),
-                     issue_attrs["issue"]["issue_tracker"]["hotlist_id"])
+                     ticket_attrs["issueState"]["hotlist_ids"][0])
     self.assertEqual(issue_tracker_issue.issue_priority,
                      issue_attrs["issue"]["issue_tracker"]["issue_priority"])
     self.assertEqual(issue_tracker_issue.issue_severity,
@@ -152,7 +152,7 @@ class TestIssueIntegration(ggrc.TestCase):
                      issue_attrs["issue"]["issue_tracker"]["issue_type"])
 
     # These attributes should be taken from ticket information
-    ticket_status = issue_tracker_ticket_attrs["issueState"]["status"]
+    ticket_status = ticket_attrs["issueState"]["status"]
     ticket_mapped_status = ISSUE_STATUS_MAPPING[ticket_status]
     self.assertEqual(obj.status, ticket_mapped_status)
 
@@ -424,6 +424,66 @@ class TestIssueIntegration(ggrc.TestCase):
     self.assertEqual(expected_info, with_info)
     self.assertEqual(without_info, with_info)
 
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              return_value={"issueId": "issueId"})
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  def test_assignee_sorted(self, mock_create_issue):
+    """Test proper ordering for Issue Assignee role"""
+
+    with factories.single_commit():
+      user_a = factories.PersonFactory(email="alpha@example.com")
+      user_b = factories.PersonFactory(email="beta@example.com")
+      user_admin = factories.PersonFactory(email="issueadmin@example.com")
+
+      user_a_id = user_a.id
+      user_b_id = user_b.id
+      user_admin_id = user_admin.id
+
+      user_a_email = user_a.email
+
+    admin_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Issue",
+        all_models.AccessControlRole.name == "Admin"
+    ).first().id
+
+    primary_contact_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.object_type == "Issue",
+        all_models.AccessControlRole.name == "Primary Contacts"
+    ).first().id
+
+    with mock.patch.object(integration_utils, "exclude_auditor_emails",
+                           return_value={u"user@example.com",
+                                         u"alpha@example.com",
+                                         u"beta@example.com"}):
+      response = self.api.post(all_models.Issue, {
+          "issue": {
+              "access_control_list": [
+                  acl_helper.get_acl_json(admin_role_id, user_admin_id),
+                  acl_helper.get_acl_json(primary_contact_role_id, user_b_id),
+                  acl_helper.get_acl_json(primary_contact_role_id, user_a_id)
+              ],
+              "title": "sorted Assignee",
+              "context": None,
+              "issue_tracker": {
+                  "enabled": True,
+                  "component_id": 1234,
+                  "hotlist_id": 4321,
+                  "issue_type": "Default Issue type",
+                  "issue_priority": "P2",
+                  "issue_severity": "S1",
+              },
+              "due_date": "10/10/2019"
+          },
+      })
+
+      self.assertEqual(response.status_code, 201)
+      mock_create_issue.assert_called_once()
+      issue_id = response.json.get("issue").get("id")
+      issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue",
+                                                               issue_id)
+      self.assertTrue(issue_tracker_issue.enabled)
+      self.assertEqual(issue_tracker_issue.assignee, user_a_email)
+
 
 @ddt.ddt
 class TestIssueLink(TestIssueIntegration):
@@ -471,9 +531,9 @@ class TestIssueLink(TestIssueIntegration):
         "ccs": ["cc1@example.com", "cc2@example.com"],
     }
     with factories.single_commit():
-      factories.PersonFactory(email="verifier@example.com")
-      factories.PersonFactory(email="assignee@example.com")
-      for email in ["cc1@example.com", "cc2@example.com"]:
+      factories.PersonFactory(email=ticket_attrs['verifier'])
+      factories.PersonFactory(email=ticket_attrs['assignee'])
+      for email in ticket_attrs['ccs']:
         factories.PersonFactory(email=email)
 
     issue_request_payload = self._request_payload_builder({})

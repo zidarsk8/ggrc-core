@@ -52,8 +52,6 @@ class TestCycleStartFailed(TestCase):
     with freeze_time("2015-02-01 13:39:20"):
       _, wf = self.wf_generator.generate_workflow(self.quarterly_wf)
       response, wf = self.wf_generator.activate_workflow(wf)
-      print wf.next_cycle_start_date
-
       self.assert200(response)
 
     with freeze_time("2015-01-01 13:39:20"):

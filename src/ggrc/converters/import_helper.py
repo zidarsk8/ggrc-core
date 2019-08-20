@@ -22,8 +22,9 @@ from ggrc.converters.handlers import handlers
 logger = logging.getLogger(__name__)
 
 
-def get_object_column_definitions(object_class, fields=None, ca_cache=None,
-                                  include_hidden=False):
+def get_object_column_definitions(object_class, fields=None,
+                                  ca_cache=None, include_hidden=False,
+                                  for_template=False):
   """Attach additional info to attribute definitions.
 
   Fetches the attribute info (_aliases) for the given object class and adds
@@ -41,6 +42,9 @@ def get_object_column_definitions(object_class, fields=None, ca_cache=None,
     include_hidden (bool): Flag which specifies if we should include column
       handlers for hidden attributes (they marked as 'hidden'
       in _aliases dict).
+    for_template (bool): Flag which specifies if we should exclude column
+      handlers for attributes that marked as 'ship_in_template'
+      in _aliases dict.
 
   Returns:
     A dict of attribute definitions.
@@ -49,6 +53,7 @@ def get_object_column_definitions(object_class, fields=None, ca_cache=None,
       object_class,
       ca_fields=fields,
       include_hidden=include_hidden,
+      for_template=for_template,
       ca_cache=ca_cache,
   )
 
@@ -214,7 +219,11 @@ def count_objects(csv_data):
         "row_errors": [],
     }
     if error:
-      info["block_errors"].append(errors.WRONG_OBJECT_TYPE.format(**error))
+      if 'snapshot' in name.lower():
+        info["block_errors"].append(
+            errors.SNAPSHOT_IMPORT_ERROR.format(**error))
+      else:
+        info["block_errors"].append(errors.WRONG_OBJECT_TYPE.format(**error))
     return info
 
   exportables = get_exportables()
@@ -226,7 +235,13 @@ def count_objects(csv_data):
     class_name = data[1][0].strip().lower()
     object_class = exportables.get(class_name, "")
     rows = len(data) - 2
-    if object_class:
+    if 'snapshot' in class_name:
+      blocks_info.append(get_info(class_name.title(), rows,
+                                  line=offset + 2,
+                                  object_name=class_name))
+      failed = True
+
+    elif object_class:
       object_name = object_class.__name__
       blocks_info.append(get_info(object_name, rows))
       counts[object_name] = counts.get(object_name, 0) + rows

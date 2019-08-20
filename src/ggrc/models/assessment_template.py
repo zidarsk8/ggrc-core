@@ -111,7 +111,6 @@ class AssessmentTemplate(assessment.AuditRelationship,
       ("Secondary Assignees", "Secondary Assignees"),
       ("Primary Contacts", "Primary Contacts"),
       ("Secondary Contacts", "Secondary Contacts"),
-      ("Other Contacts", "Other Contacts"),
   ])
 
   # labels to show as hint in Default Assignees/Verifiers for Control

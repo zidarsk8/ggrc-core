@@ -273,11 +273,11 @@ describe('people-mention component', () => {
     });
   });
 
-  describe('personSelected({item}) method', () => {
-    let item;
+  describe('personSelected({person}) method', () => {
+    let person;
 
     beforeEach(() => {
-      item = {email: 'ara@example.com'};
+      person = {email: 'ara@example.com'};
       editor.attr({
         updateContents: jasmine.createSpy('editor.updateContents'),
         setSelection: jasmine.createSpy('editor.setSelection'),
@@ -292,7 +292,7 @@ describe('people-mention component', () => {
       it('with "retain" operation if mentionIndex > 0', () => {
         vm.attr('mentionIndex', 3);
 
-        vm.personSelected({item});
+        vm.personSelected({person});
 
         expect(editor.updateContents).toHaveBeenCalledWith({
           ops: jasmine.arrayContaining([{retain: 3}]),
@@ -302,7 +302,7 @@ describe('people-mention component', () => {
       it('without "retain" operation if mentionIndex is 0', () => {
         vm.attr('mentionIndex', 0);
 
-        vm.personSelected({item});
+        vm.personSelected({person});
 
         const ops = editor.updateContents.calls.first().args[0].ops;
         expect(ops).not.toEqual(jasmine.arrayContaining(
@@ -310,7 +310,7 @@ describe('people-mention component', () => {
       });
 
       it('with "delete" operation', () => {
-        vm.personSelected({item});
+        vm.personSelected({person});
 
         const ops = editor.updateContents.calls.first().args[0].ops;
         expect(ops).toEqual(jasmine.arrayContaining(
@@ -318,17 +318,17 @@ describe('people-mention component', () => {
       });
 
       it('with "insert" operation for link', () => {
-        vm.personSelected({item});
+        vm.personSelected({person});
 
         const ops = editor.updateContents.calls.first().args[0].ops;
         expect(ops).toEqual(jasmine.arrayContaining([{
-          insert: `+${item.email}`,
-          attributes: {link: `mailto:${item.email}`},
+          insert: `+${person.email}`,
+          attributes: {link: `mailto:${person.email}`},
         }]));
       });
 
       it('with "insert" for space', () => {
-        vm.personSelected({item});
+        vm.personSelected({person});
 
         const ops = editor.updateContents.calls.first().args[0].ops;
         expect(ops).toEqual(jasmine.arrayContaining(
@@ -337,18 +337,18 @@ describe('people-mention component', () => {
     });
 
     it('calls setSelection of editor with index after inserted mention', () => {
-      vm.personSelected({item});
+      vm.personSelected({person});
 
       expect(editor.setSelection).toHaveBeenCalledWith(
         vm.attr('mentionIndex') + // retain length
         1 + // mention sign length
-        item.email.length +
+        person.email.length +
         1 // space length
       );
     });
 
     it('clears mention', () => {
-      vm.personSelected({item});
+      vm.personSelected({person});
 
       expect(vm.clearMention).toHaveBeenCalled();
     });

@@ -338,3 +338,15 @@ class Roleable(object):
       )
       return
     acl.add_person(person)
+
+  def get_acl_with_role_name(self, ac_role_name):
+    """Get ACL with a given role name."""
+    acl = self.acr_name_acl_map.get(ac_role_name)
+    if not acl:
+      logger.warning(
+          "Trying to get invalid role by name %s to %s(%s)",
+          ac_role_name,
+          self.type,
+          self.id,
+      )
+    return acl

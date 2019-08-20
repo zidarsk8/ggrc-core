@@ -51,7 +51,7 @@ describe('person-modal component', () => {
       expect(UserUtils.loadPersonProfile).toHaveBeenCalledWith(
         viewModel.attr('instance')
       );
-      expect(UserUtils.loadPersonProfile).toHaveBeenCalledBefore(profile.save),
+      expect(UserUtils.loadPersonProfile).toHaveBeenCalledBefore(profile.save);
       done();
     });
 
@@ -90,6 +90,50 @@ describe('person-modal component', () => {
       viewModel.loadPersonProfile();
 
       expect(viewModel.attr('turnOnCalendarEvents')).toBe(true);
+    });
+  });
+
+  describe('setIsNameReadOnly() method', () => {
+    it('sets true for internal emails (which ends with @google.com)', () => {
+      viewModel.attr('isNameReadOnly', false);
+      viewModel.attr('instance.email', 'test@google.com');
+      viewModel.setIsNameReadOnly();
+      expect(viewModel.attr('isNameReadOnly')).toBe(true);
+    });
+
+    it('sets false for external emails', () => {
+      viewModel.attr('isNameReadOnly', true);
+      viewModel.attr('instance.email', 'test@gmail.com');
+      viewModel.setIsNameReadOnly();
+      expect(viewModel.attr('isNameReadOnly')).toBe(false);
+    });
+
+    it('sets false if email contains,' +
+      'but doesn\'t end with @google.com', () => {
+      viewModel.attr('isNameReadOnly', false);
+      viewModel.attr('instance.email', 'test@google.commercial');
+      viewModel.setIsNameReadOnly();
+      expect(viewModel.attr('isNameReadOnly')).toBe(false);
+    });
+  });
+
+  describe('personSelected() method', () => {
+    it('sets instance.email', () => {
+      viewModel.attr('instance.email', '');
+      viewModel.personSelected({person: {email: 'test@google.com'}});
+      expect(viewModel.attr('instance.email')).toBe('test@google.com');
+    });
+
+    it('sets instance.name', () => {
+      viewModel.attr('instance.name', '');
+      viewModel.personSelected({person: {name: 'Anze'}});
+      expect(viewModel.attr('instance.name')).toBe('Anze');
+    });
+
+    it('calls setIsNameReadOnly', () => {
+      const spy = spyOn(viewModel, 'setIsNameReadOnly');
+      viewModel.personSelected({person: {email: '', name: ''}});
+      expect(spy).toHaveBeenCalled();
     });
   });
 

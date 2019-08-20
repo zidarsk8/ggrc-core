@@ -1234,5 +1234,6 @@ class UnmapObjectsView(flask.views.MethodView):
         models.Relationship, obj=relationship, service=self, event=event)
     services_common.send_event_job(event)
 
+
 app.add_url_rule('/api/relationships/unmap',
                  view_func=UnmapObjectsView.as_view('unmap_objects'))

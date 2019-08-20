@@ -5,15 +5,15 @@
 
 import moment from 'moment';
 import canMap from 'can-map';
-import isOverdue from '../is-overdue';
+import IsOverdue from '../is-overdue';
 
-describe('isOverdue mixin', function () {
+describe('IsOverdue mixin', function () {
   'use strict';
 
   let Mixin;
 
   beforeAll(function () {
-    Mixin = isOverdue;
+    Mixin = IsOverdue;
   });
 
   describe('_isOverdue() method: ', function () {

@@ -1249,7 +1249,7 @@ CREATE TABLE `documents` (
   `gdrive_id` varchar(250) NOT NULL DEFAULT '',
   `slug` varchar(250) NOT NULL,
   `status` varchar(250) NOT NULL DEFAULT 'Active',
-  `recipients` varchar(250) DEFAULT NULL,
+  `recipients` varchar(250) NOT NULL DEFAULT 'Admin',
   `send_by_default` tinyint(1) NOT NULL DEFAULT '1',
   `last_deprecated_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),

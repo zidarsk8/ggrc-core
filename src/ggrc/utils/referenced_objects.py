@@ -34,14 +34,28 @@ def get(type_, id_):
   return result
 
 
-def mark_to_cache(type_, id_):
-  """Mark object for warmup"""
+def mark_to_cache(type_, ids):
+  # type: (Union[str, db.Model], Union[int, Iterable[int]]) -> None
+  """Mark objects for warmup.
+
+  Add type and IDs into `flask.g.referenced_objects_markers` so objects of this
+  type and with these IDs could be later queried in one DB query by calling
+  `rewarm_cache` function.
+
+  Args:
+    type_ (Union[str, db.Model]): Type of objects to mark to cache. Could be
+      either of `str` or `db.Model` type. If passed type does not exist,
+      nothing will be added to `flask.g.referenced_objects_markers`.
+    ids (Union[int, Iterable[int]]): Object's IDs to mark to cache. Could be
+      either ID of a single object or an iterable of object IDs.
+  """
   if not hasattr(flask.g, "referenced_objects_markers"):
     flask.g.referenced_objects_markers = collections.defaultdict(set)
   if not (isinstance(type_, type) and issubclass(type_, db.Model)):
     type_ = inflector.get_model(type_)
   if type_ is not None:
-    flask.g.referenced_objects_markers[type_].add(id_)
+    ids = {ids, } if not isinstance(ids, collections.Iterable) else set(ids)
+    flask.g.referenced_objects_markers[type_].update(ids)
 
 
 def rewarm_cache(rewarm_type=None, skip_cad=False, undefer=False):

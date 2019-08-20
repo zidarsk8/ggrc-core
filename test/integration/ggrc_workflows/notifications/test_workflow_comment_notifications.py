@@ -31,32 +31,39 @@ class TestWorkflowCommentNotification(test_assignable_notifications.
     Check if the correct notification entries are created when a comment gets
     posted.
     """
-    recipient_types = ["Task Assignees", "Task Secondary Assignees"]
     person = all_models.Person.query.first()
-    person_email = person.email
+    secondary_assignee = self.create_user_with_role(role="Reader")
+    task_assignees_emails = [person.email, secondary_assignee.email]
+    recipients = {
+        "Task Assignees": person,
+        "Task Secondary Assignees": secondary_assignee,
+    }
     with factories.single_commit():
       obj = wf_factories.CycleTaskGroupObjectTaskFactory(
-          recipients=",".join(recipient_types),
+          recipients=",".join(recipients),
           send_by_default=False,
       )
       # pylint: disable=protected-access
       for acl in obj._access_control_list:
-        if acl.ac_role.name in recipient_types:
-          factories.AccessControlPersonFactory(
-              ac_list=acl,
-              person=person,
-          )
+        if acl.ac_role.name in recipients:
+          recipient = recipients.get(acl.ac_role.name)
+          if recipient:
+            factories.AccessControlPersonFactory(
+                ac_list=acl,
+                person=recipient,
+            )
 
     self.generator.generate_comment(
         obj, "", "some comment", send_notification="true")
 
     notifications, notif_data = common.get_daily_notifications()
-    self.assertEqual(len(notifications), 1,
-                     "Missing comment notification entry.")
+    for email in task_assignees_emails:
+      self.assertEqual(len(notifications), 1,
+                       "Missing comment notification entry.")
 
-    recip_notifs = notif_data.get(person_email, {})
-    comment_notifs = recip_notifs.get("comment_created", {})
-    self.assertEqual(len(comment_notifs), 1)
+      recip_notifs = notif_data.get(email, {})
+      comment_notifs = recip_notifs.get("comment_created", {})
+      self.assertEqual(len(comment_notifs), 1)
 
     self.client.get("/_notifications/send_daily_digest")
     notifications = self._get_notifications(notif_type="comment_created").all()

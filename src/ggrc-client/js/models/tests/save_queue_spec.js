@@ -8,7 +8,7 @@ import {_processSaveResponses} from '../save_queue';
 describe('SaveQueue module', function () {
   'use strict';
 
-  describe('_process_save_responses() method', function () {
+  describe('_processSaveResponses() method', function () {
     let bucket;
     let method; // the method under test
 

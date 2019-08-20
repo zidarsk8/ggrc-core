@@ -268,3 +268,11 @@ NON_ADMIN_ACCESS_ERROR = (u"Line {line}: You don't have permissions to use "
 STATE_WILL_BE_IGNORED = (u"Line {line}: State will be set to 'In progress' "
                          u"due to change of verifier/creator/assignee. "
                          u"Column 'State' will be ignored.")
+
+
+SNAPSHOT_IMPORT_ERROR = (u"Line {line}: Import for Snapshot object is not "
+                         u"available in GGRC.")
+
+REVIEWABLE_WILL_BE_IGNORED = (u"Line {line}: Field '{column_name}' is "
+                              u"non-editable via import. The the "
+                              u"'{column_name}' column will be ignored.")
