@@ -17,7 +17,7 @@ class TestBasicExport(TestCase):
   def test_export_folder(self):
     """Test checks folder attr export."""
     folder_id = "1WXB8oulc68ZWdFhX96Tv1PBLi8iwALR3"
-    attr_name = "Gdrive Folder ID"
+    attr_name = "GDrive Folder ID"
     factories.AuditFactory(folder=folder_id)
 
     data = [{
