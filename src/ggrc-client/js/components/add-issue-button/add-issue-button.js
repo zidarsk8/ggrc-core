@@ -13,6 +13,7 @@ import {
 } from '../../plugins/utils/current-page-utils';
 import {initCounts} from '../../plugins/utils/widgets-utils';
 import Issue from '../../models/business-models/issue';
+import pubSub from '../../pub-sub';
 
 export default canComponent.extend({
   tag: 'add-issue-button',
@@ -38,6 +39,7 @@ export default canComponent.extend({
       },
     },
     relatedInstance: {},
+    pubSub,
   }),
   events: {
     refreshIssueList: function (window, event, instance) {
@@ -57,7 +59,13 @@ export default canComponent.extend({
         model,
       });
     },
-    '{window} modal:added': 'refreshIssueList',
-    '{window} modal:success': 'refreshIssueList',
+    '[data-toggle="modal-ajax-form"] modal:added': 'refreshIssueList',
+    '[data-toggle="modal-ajax-form"] modal:success': 'refreshIssueList',
+    '{pubSub} objectDeleted'(pubSub, event) {
+      let instance = event.instance;
+      if (instance instanceof Issue) {
+        this.refreshIssueList(window, event, instance);
+      }
+    },
   },
 });

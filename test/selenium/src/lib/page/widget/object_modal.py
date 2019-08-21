@@ -12,7 +12,7 @@ from lib.entities import entity
 from lib.page.error_popup import ErrorPopup
 from lib.page.modal import delete_object
 from lib.page.modal.repeat_workflow_modal import RepeatWorkflowModal
-from lib.utils import ui_utils, selenium_utils
+from lib.utils import ui_utils
 
 
 def get_modal_obj(obj_type, _selenium=None):
@@ -44,21 +44,30 @@ _FIELD_METHOD_MAPPING = {
     "risk_type": "set_risk_type",
     "repeat_unit": "set_repeat_workflow",
     "manual_snapshots": "set_manually_map_snapshots",
+    "attribute_type": "set_attribute_type",  # custom attribute
+    "mandatory": "set_mandatory",  # custom attribute
+    "helptext": "set_helptext",  # custom attribute
+    "placeholder": "set_placeholder",  # custom attribute
+    "multi_choice_options": "set_multi_choice_options"  # custom attribute
 }
 
 
-class BaseObjectModal(base.WithBrowser):
-  """Represents object modal."""
+class BaseFormModal(base.Modal):
+  """Represents modal with form."""
 
-  def __init__(self, _driver=None):
-    super(BaseObjectModal, self).__init__()
-    self._root = self._browser.element(css=".modal[style*='display: block']")
-    self.title_field = self._root.text_field(name="title")
-    self.description_field = self._root.div(
-        data_placeholder="Enter Description")
-    self.state_select = self._root.element(id="state").select()
-    self._fields = ["title", "description", "status"]
+  def __init__(self, driver=None):
+    super(BaseFormModal, self).__init__(driver)
+    self._root = self._browser.div(class_name="modal")
     self.close_btn = self._root.element(class_name="modal-dismiss")
+    self._fields = []
+
+  def _wait_for_submit_changes(self):
+    """Waits for changes after submit."""
+    self._root.wait_until(lambda modal: not modal.exists)
+    # Spinner sometimes appears for loading content after modal is closed.
+    # Though it's not a responsibility of modal to wait for it, it looks
+    # to be safe as long as implementation is general.
+    ui_utils.wait_for_spinner_to_disappear()
 
   def submit_obj(self, obj):
     """Submits form with `obj`."""
@@ -78,6 +87,16 @@ class BaseObjectModal(base.WithBrowser):
     self._root.link(data_toggle="modal-submit", text="Save & Close").click()
     self._wait_for_submit_changes()
 
+  @property
+  def is_present(self):
+    """Checks presence of modal element."""
+    return self._root.exist
+
+  def close(self):
+    """Close modal window."""
+    self.close_btn.click()
+    self._root.wait_until_not(lambda e: e.exists)
+
   def click_save_btn_causes_error_alert(self):
     """Clicks Save & Close button and wait until error popup appears."""
     # pylint: disable=invalid-name
@@ -91,6 +110,19 @@ class BaseObjectModal(base.WithBrowser):
     DiscardChangesModal().discard_and_close()
     self._wait_for_submit_changes()
 
+
+class BaseObjectModal(BaseFormModal):
+  """Represents object modal."""
+
+  def __init__(self, _driver=None):
+    super(BaseObjectModal, self).__init__()
+    self._root = self._browser.element(css=".modal[style*='display: block']")
+    self.title_field = self._root.text_field(name="title")
+    self.description_field = self._root.div(
+        data_placeholder="Enter Description")
+    self.state_select = self._root.element(id="state").select()
+    self._fields = ["title", "description", "status"]
+
   def delete(self):
     """Clicks Delete button, confirms deletion in new popup
     and waits for changes to happen.
@@ -98,14 +130,6 @@ class BaseObjectModal(base.WithBrowser):
     self._root.link(text="Delete").click()
     delete_object.DeleteObjectModal().confirm_delete()
     self._wait_for_submit_changes()
-
-  def _wait_for_submit_changes(self):
-    """Waits for changes after submit."""
-    self._root.wait_until(lambda modal: not modal.exists)
-    # Spinner sometimes appears for loading content after modal is closed.
-    # Though it's not a responsibility of modal to wait for it, it looks
-    # to be safe as long as implementation is general.
-    ui_utils.wait_for_spinner_to_disappear()
 
   def set_title(self, title):
     """Sets title."""
@@ -125,19 +149,8 @@ class BaseObjectModal(base.WithBrowser):
     self._root.link(text="Propose").click()
     self._wait_for_submit_changes()
 
-  @property
-  def is_present(self):
-    """Checks presence of modal element."""
-    return self._root.exist
 
-  def close(self):
-    """Close modal window."""
-    self.close_btn.click()
-    selenium_utils.wait_until_not_present(
-        self._driver, self._locators.MODAL_CSS)
-
-
-class DiscardChangesModal(BaseObjectModal):
+class DiscardChangesModal(base.Modal):
   """Represents discard changes modal."""
 
   def __init__(self, _driver=None):
@@ -153,7 +166,6 @@ class DiscardChangesModal(BaseObjectModal):
     """Clicks Discard button and wait for modal is closed."""
     self.wait_until_present()
     self._root.link(text="Discard").click()
-    self._wait_for_submit_changes()
 
 
 class ControlModal(BaseObjectModal):
@@ -299,8 +311,10 @@ class TaskGroupModal(BaseObjectModal):
     self._fields = ["title"]
 
 
-class CommonConfirmModal(BaseObjectModal):
+class CommonConfirmModal(base.Modal):
   """Represents confirmation object modal."""
+  # pylint: disable=too-few-public-methods
+
   def __init__(self):
     super(CommonConfirmModal, self).__init__()
     self._root = self._browser.element(

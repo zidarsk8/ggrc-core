@@ -14,10 +14,9 @@ import pytest
 
 from lib import base, constants, url, users
 from lib.constants import element, messages, objects, roles
-from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entities_factory
 from lib.page import dashboard
-from lib.service import admin_webui_service, rest_facade
+from lib.service import admin_webui_service, rest_facade, webui_facade
 from lib.utils import date_utils, selenium_utils, string_utils
 
 
@@ -76,23 +75,6 @@ class TestAdminDashboardPage(base.Test):
     actual_ca_groups_set = set(
         [item.text for item in ca_tab.get_items_list()])
     assert expected_ca_groups_set == actual_ca_groups_set
-
-  @pytest.mark.smoke_tests
-  @pytest.mark.parametrize(
-      "ca_type",
-      AdminWidgetCustomAttributes.ALL_GCA_TYPES
-  )
-  def test_add_global_ca(self, admin_dashboard, ca_type):
-    """Create different types of Custom Attribute on Admin Dashboard."""
-    def_type = objects.get_normal_form(random.choice(objects.EDITABLE_CA_OBJS))
-    expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
-        attribute_type=ca_type, definition_type=def_type)
-    ca_tab = admin_dashboard.select_custom_attributes()
-    ca_tab.add_custom_attribute(ca_obj=expected_ca)
-    actual_cas = ca_tab.get_custom_attributes_list(ca_group=expected_ca)
-    # 'actual_ca': multi_choice_options (None)
-    self.general_contain_assert(expected_ca, actual_cas,
-                                "multi_choice_options")
 
   @pytest.mark.smoke_tests
   def test_custom_roles_widget(self, admin_dashboard):
@@ -342,3 +324,47 @@ class TestPeopleAdministration(base.Test):
     act_person = admin_webui_service.PeopleAdminWebUiService(
         selenium).edit_authorizations(creator, roles.ADMINISTRATOR)
     self.general_equal_assert(exp_person, act_person)
+
+
+class TestCAAdministration(base.Test):
+  """Test for Custom Attributes tab functionality."""
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "ca_type",
+      element.AdminWidgetCustomAttributes.ALL_GCA_TYPES
+  )
+  def test_add_global_ca(self, selenium, ca_type):
+    """Create different types of Custom Attribute on Admin Dashboard."""
+    def_type = objects.get_normal_form(random.choice(objects.EDITABLE_CA_OBJS))
+    expected_ca = entities_factory.CustomAttributeDefinitionsFactory().create(
+        attribute_type=ca_type, definition_type=def_type)
+    ca_admin_service = admin_webui_service.CustomAttributeWebUiService(
+        selenium)
+    ca_admin_service.create_custom_attribute(new_ca=expected_ca)
+    actual_cas = ca_admin_service.ca_widget.get_custom_attributes_list(
+        obj_type=expected_ca.definition_type)
+    self.general_contain_assert(expected_ca, actual_cas,
+                                "multi_choice_options")
+
+  @pytest.mark.parametrize(
+      'old_ca_type, new_ca_type',
+      [(element.AdminWidgetCustomAttributes.TEXT,
+        element.AdminWidgetCustomAttributes.RICH_TEXT),
+       (element.AdminWidgetCustomAttributes.TEXT,
+        element.AdminWidgetCustomAttributes.DATE),
+       (element.AdminWidgetCustomAttributes.TEXT,
+        element.AdminWidgetCustomAttributes.CHECKBOX),
+       (element.AdminWidgetCustomAttributes.TEXT,
+        element.AdminWidgetCustomAttributes.MULTISELECT),
+       (element.AdminWidgetCustomAttributes.TEXT,
+        element.AdminWidgetCustomAttributes.DROPDOWN),
+       (element.AdminWidgetCustomAttributes.RICH_TEXT,
+        element.AdminWidgetCustomAttributes.TEXT)]
+  )
+  def test_destructive_edit_global_ca(
+      self, old_ca_type, new_ca_type, selenium
+  ):
+    """Check that Global Custom Attributes can be edited."""
+    ca_data = webui_facade.edit_gca(selenium, old_ca_type, new_ca_type)
+    self.general_equal_assert(ca_data["expected_ca"], ca_data["actual_ca"])

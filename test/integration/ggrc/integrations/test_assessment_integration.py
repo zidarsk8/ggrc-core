@@ -1375,6 +1375,32 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assertEqual(assmt_issue_tracker_info[field],
                        audit_issue_tracker_info[field])
 
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  @mock.patch('ggrc.integrations.issues.Client.update_issue')
+  def test_sync_child_assessments(self, upd_mock):
+    """
+      Test send comment to child Assessments when disable issue tracker
+      for parent Audit
+    """
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      audit_issue = factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+      assessment = factories.AssessmentFactory(audit=audit)
+      assessment_issue = factories.IssueTrackerIssueFactory(
+          enabled=True, issue_tracked_obj=assessment
+      )
+    issue_id = assessment_issue.issue_id
+    self.api.put(audit_issue.issue_tracked_obj,
+                 {"issue_tracker": {"enabled": False,
+                                    "title": audit_issue.title,
+                                    "issue_id": audit_issue.issue_id}})
+    expected_comment = {"comment": "Changes to this GGRC Assessment will no "
+                                   "longer be tracked within this bug."}
+    upd_mock.assert_called_with(issue_id, expected_comment)
+
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'
             'assessment_integration.AssessmentTrackerHandler.'
