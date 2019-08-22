@@ -29,12 +29,6 @@ from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
-DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
-                                    "'Declined' / 'Deprecated'>")
-DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
-                                    "'Declined' / 'Deprecated' / 'Finished'>")
-
-
 class BaseTestCycleTaskImportUpdate(TestCase):
   """Base class for CycleTask imports"""
   @staticmethod
@@ -64,8 +58,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
       "Summary",
       "Task Description",
       "Start Date", "Due Date",
-      "Actual Finish Date",
-      "Actual Verified Date",
       "State",
       "Task Assignees",
       "Task Secondary Assignees",
@@ -108,16 +100,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                     columns=", ".join(self.IMPORTABLE_COLUMN_NAMES)
                 )
             },
-            'row_warnings': {
-                errors.UNMODIFIABLE_COLUMN.format(
-                    line=12,
-                    column_name="Actual Verified Date"
-                ),
-                errors.UNMODIFIABLE_COLUMN.format(
-                    line=17,
-                    column_name="Actual Verified Date"
-                )
-            }
+            'row_warnings': []
         }
     }
 
@@ -445,8 +428,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_active[3]["description"] + " four",
             "start_date": "2016-06-19",
             "end_date": "2016-06-24",
-            "finished_date": "2016-07-19",
-            "verified_date": "None",
             "status": "Finished"
         },
         "CYCLETASK-5": {
@@ -495,8 +476,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[3]["description"] + " four",
             "start_date": "2014-04-19",
             "end_date": "2014-04-24",
-            "finished_date": "2014-05-19",
-            "verified_date": "None",
             "status": "Finished"
         },
         "CYCLETASK-10": {
@@ -528,21 +507,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                     line=3,
                     start_date="Start Date",
                     end_date="End Date",
-                ),
-                errors.INVALID_STATUS_DATE_CORRELATION.format(
-                    line=4,
-                    date="Actual Finish Date",
-                    deny_states=DENY_FINISHED_DATES_STATUSES_STR,
-                ),
-                errors.INVALID_STATUS_DATE_CORRELATION.format(
-                    line=6,
-                    date="Actual Verified Date",
-                    deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
-                ),
-                errors.INVALID_START_END_DATES.format(
-                    line=7,
-                    start_date="Actual Finish Date",
-                    end_date="Actual Verified Date",
                 ),
                 errors.INVALID_START_END_DATES.format(
                     line=8,

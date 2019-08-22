@@ -18,12 +18,6 @@ from integration.ggrc_workflows.models import factories
 from integration.ggrc.models import factories as ggrc_factories
 
 
-DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
-                                    "'Declined' / 'Deprecated'>")
-DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
-                                    "'Declined' / 'Deprecated' / 'Finished'>")
-
-
 @ddt.ddt
 class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
   """Test cases for update status on import cycle tasks"""
@@ -199,57 +193,6 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
     verified_dates = [t.verified_date for t in self.tasks]
     self.assertNotEqual([None] * len(self.tasks), verified_dates)
     self.assertFalse(self.tasks[0].cycle.is_current)
-    # wrong rollback  case (try to import from verified to finished)
-    response = self.import_data(*self.build_import_data(start_statuses))
-    line_error_tmpl_1 = errors.INVALID_STATUS_DATE_CORRELATION.format(
-        date="Actual Verified Date",
-        deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
-        line="{}"
-    )
-    line_error_tmpl_2 = errors.INVALID_STATUS_DATE_CORRELATION.format(
-        date="Actual Finish Date",
-        deny_states=DENY_FINISHED_DATES_STATUSES_STR,
-        line="{}"
-    )
-    verfied_date_errors = {line_error_tmpl_1.format(i + 3)
-                           for i in xrange(len(self.tasks))}
-    finished_date_errors = {line_error_tmpl_2.format(i + 3)
-                            for i in xrange(len(self.tasks))}
-    self._check_csv_response(
-        response,
-        {
-            "Cycle Task": {
-                "row_errors": verfied_date_errors | finished_date_errors
-            }
-        }
-    )
-    self.tasks = all_models.CycleTaskGroupObjectTask.query.filter(
-        all_models.CycleTaskGroupObjectTask.id.in_(self.task_ids)
-    ).all()
-    # nothing change
-    self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
-                     [t.status for t in self.tasks])
-    self.assertEqual(finished_dates, [t.finished_date for t in self.tasks])
-    self.assertEqual(verified_dates, [t.verified_date for t in self.tasks])
-    self.assertFalse(self.tasks[0].cycle.is_current)
-    # correct rollback
-    rollback_data = self.build_import_data(start_statuses)
-    # setup verified dates as empty
-    for line in rollback_data:
-      line["Actual Verified Date"] = "--"
-      line["Actual Finish Date"] = "--"
-    response = self.import_data(*rollback_data)
-    self._check_csv_response(response, {})
-    self.tasks = all_models.CycleTaskGroupObjectTask.query.filter(
-        all_models.CycleTaskGroupObjectTask.id.in_(self.task_ids)
-    ).all()
-    # assert correct rollback
-    self.assertEqual(start_statuses, [t.status for t in self.tasks])
-    self.assertEqual([None] * len(self.tasks),
-                     [t.finished_date for t in self.tasks])
-    self.assertEqual([None] * len(self.tasks),
-                     [t.verified_date for t in self.tasks])
-    self.assertTrue(self.tasks[0].cycle.is_current)
 
   @ddt.data(1, 2, 3)
   def test_finished_to_verified(self, number_of_tasks):
@@ -287,52 +230,6 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
         [t.verified_date for t in self.tasks][number_of_tasks:])
     self.assertEqual(len(self.tasks) != number_of_tasks,
                      self.tasks[0].cycle.is_current)
-    # wrong rollback  case (try to import from verified to finished)
-    response = self.import_data(*self.build_import_data(start_statuses))
-    line_error_tmpl = errors.INVALID_STATUS_DATE_CORRELATION.format(
-        date="Actual Verified Date",
-        deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
-        line="{}"
-    )
-    self._check_csv_response(
-        response,
-        {
-            "Cycle Task": {
-                "row_errors": {line_error_tmpl.format(idx + 3)
-                               for idx in xrange(number_of_tasks)}
-            }
-        }
-    )
-    self.tasks = all_models.CycleTaskGroupObjectTask.query.filter(
-        all_models.CycleTaskGroupObjectTask.id.in_(self.task_ids)
-    ).all()
-    # nothing change
-    self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
-                     [t.status for t in self.tasks])
-    self.assertEqual([finished_date] * len(self.tasks),
-                     [t.finished_date for t in self.tasks])
-    self.assertEqual(len(self.tasks) != number_of_tasks,
-                     self.tasks[0].cycle.is_current)
-    self.assertEqual(
-        verified_dates,
-        [t.verified_date for t in self.tasks])
-    # correct rollback
-    rollback_data = self.build_import_data(start_statuses)
-    # setup verified dates as empty
-    for line in rollback_data:
-      line["Actual Verified Date"] = "--"
-    response = self.import_data(*rollback_data)
-    self._check_csv_response(response, {})
-    self.tasks = all_models.CycleTaskGroupObjectTask.query.filter(
-        all_models.CycleTaskGroupObjectTask.id.in_(self.task_ids)
-    ).all()
-    # assert correct rollback
-    self.assertEqual(start_statuses, [t.status for t in self.tasks])
-    self.assertEqual([finished_date] * len(self.tasks),
-                     [t.finished_date for t in self.tasks])
-    self.assertEqual([None] * len(self.tasks),
-                     [t.verified_date for t in self.tasks])
-    self.assertTrue(self.tasks[0].cycle.is_current)
 
   @staticmethod
   def __build_error_tmpl(error_tmpl, **context):
@@ -415,7 +312,6 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
                                 start_structure=start_structure)
 
   @ddt.data(
-      ("Actual Finish Date", "Actual Verified Date"),
       ("Start Date", "Due Date"),
   )
   def test_for_date_compare_error(self, columns):
@@ -432,27 +328,5 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
                                   ("Code*", self.tasks[0].slug)])
     for column, date in zip(columns, dates):
       data_to_import[column] = date
-    response = self.import_data(data_to_import)
-    self._check_csv_response(response, error_resp)
-
-  @ddt.data(
-      ("Actual Finish Date", DENY_FINISHED_DATES_STATUSES_STR),
-      ("Actual Verified Date", DENY_VERIFIED_DATES_STATUSES_STR),
-  )
-  @ddt.unpack
-  def test_for_date_state_error(self, column, deny_states):
-    """Validate task {0} not allowed for in {0} tasks."""
-    self._update_structure(self.IN_PROGRESS_STRUCTURE)
-    today = datetime.date.today()
-    error_tmpl = self.__build_error_tmpl(
-        errors.INVALID_STATUS_DATE_CORRELATION,
-        date=column,
-        deny_states=deny_states,
-    )
-    # line format
-    error_resp = {self.ALIAS: {"row_errors": {error_tmpl.format(3)}}}
-    data_to_import = OrderedDict([("object_type", self.ALIAS),
-                                  ("Code*", self.tasks[0].slug),
-                                  (column, today)])
     response = self.import_data(data_to_import)
     self._check_csv_response(response, error_resp)

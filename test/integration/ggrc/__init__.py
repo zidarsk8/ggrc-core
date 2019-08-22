@@ -296,7 +296,7 @@ class TestCase(BaseTestCase, object):
     expected_str = json.dumps(expected_messages, indent=4, sort_keys=True,
                               cls=SetEncoder)
 
-    self.assertEqual(responses, expected_messages,
+    self.assertEqual(response_str, expected_str,
                      "Expected response does not match received response:\n\n"
                      "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
                          expected_str, response_str))
