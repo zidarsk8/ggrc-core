@@ -252,6 +252,7 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
           "mandatory": False,
           "ignore_on_update": True,
           "view_only": True,
+          "description": "Allowed values are:\nyes\nno"
       },
       "test_plan": "Assessment Procedure",
       # Currently we decided to have 'Due Date' alias for start_date,

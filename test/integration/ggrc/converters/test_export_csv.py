@@ -150,8 +150,21 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Assessment.VALID_CONCLUSIONS)), response.data)
 
+  def test_archived_tip(self):
+    """Tests if Archived column has tip message for Assessment. """
+    data = {
+        "export_to": "csv",
+        "objects": [
+           {"object_name": "Assessment", "fields": "all"},
+
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nyes\nno", response.data)
+
   def test_assessment_type_tip(self):
-    """Tests if Assessment type column has tip message in export file for {}"""
+    """Tests if Assessment type column has tip message for Assessment."""
     data = {
         "export_to": "csv",
         "objects": [
