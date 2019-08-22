@@ -351,6 +351,11 @@ def load_access_control_list(user, permissions):
   objects consume too much memory when lots of objects
   are loaded.
   """
+  # In below sql query we don't need to skip access_control_people.person_id
+  # value in case it equals user_id and object_type = 'Proposal'.
+  # If we will skip this it leads to the problem when added to object
+  # Global Creator user doesn't have a permissions to read other users
+  # proposals in object.
   access_control_list = db.session.execute(sa.text("""
       SELECT
           acl_propagated.object_type AS acl_propagated_object_type,
@@ -364,7 +369,8 @@ def load_access_control_list(user, permissions):
           access_control_people,
           access_control_list AS acl_base
       WHERE
-          access_control_people.person_id = :user_id
+          (access_control_people.person_id = :user_id
+              OR acl_propagated.object_type = 'Proposal')
               AND access_control_people.ac_list_id = acl_base.id
               AND acl_base.id = acl_propagated.base_id
               AND acl_propagated.ac_role_id = access_control_roles.id {}
