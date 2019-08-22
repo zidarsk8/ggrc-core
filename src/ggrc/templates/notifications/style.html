@@ -190,6 +190,46 @@ style=" border-bottom: 2px solid #f1f1f1;
 
 {%- endmacro %}
 
+{% macro assessment_notification_title() -%}
+style="
+<!--  border-bottom: 1px solid #a5a5a5;-->
+  padding-bottom: 20px;
+  margin: 10px 0;
+  "
+{%- endmacro %}
+
+{% macro assessment_updated_th() -%}
+style=" border-bottom:1px solid #DCDCDC;
+        text-align: left;
+        line-height: 3em;
+        margin-bottom: 15px;
+        color: #000;
+        font-size: 13px;
+        font-weight: lighter;
+
+"
+
+{%- endmacro %}
+
+{% macro assessment_updated_td_value() -%}
+style=" vertical-align: baseline;
+        line-height: 1.4em;
+        color:#000;
+        font-weight: bold;
+        font-size: 13px;
+"
+
+{%- endmacro %}
+
+{% macro assessment_updated_td() -%}
+style=" vertical-align: baseline;
+        line-height: 1.4em;
+        color:#545454;
+        font-size: 13px;
+"
+
+{%- endmacro %}
+
 {% macro proposal_container() -%}
 style=" display: block !important;
         max-width: 800px !important;
