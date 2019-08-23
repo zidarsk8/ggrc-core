@@ -13,7 +13,9 @@ from operator import itemgetter
 import mock
 
 import ddt
+import freezegun
 from flask import json
+
 from ggrc import app
 from ggrc import db
 from ggrc import models
@@ -151,10 +153,12 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
 
   # pylint: disable=invalid-name
   @ddt.data(
-      ("effective date", ">", "05-18-2015"),
-      ("start_date", "=", "2017-06/12"),
-      ("start_date", "=", "2017-33-12"),
-      ("start_date", "=", "2017-06-33"),
+      ("effective date", ">", "05.18.2015"),
+      ("start_date", "=", "2017-06.12"),
+      ("start_date", "=", "2017-33.12"),
+      ("start_date", "=", "2017.06-33"),
+      ("start_date", "=", "2017/33.12"),
+      ("start_date", "=", "2017.06/33"),
   )
   @ddt.unpack
   def test_basic_query_incorrect_date_format(self, field, operation, date):
@@ -164,8 +168,22 @@ class TestAdvancedQueryAPI(WithQueryApi, TestCase):
     )
     response = self._post(data)
     self.assert400(response)
-
     self.assertEqual(DateValue.VALUE_ERROR_MSG, response.json['message'])
+
+  def test_filtering_objective_by_date(self):
+    """Filtering by 'mm-dd-yyyy', 'mm-yyyy' date format"""
+    with freezegun.freeze_time('08-23-2019'):
+      objective = factories.ObjectiveFactory()
+      objective_id = objective.id
+    with freezegun.freeze_time('08-22-2019'):
+      factories.ObjectiveFactory()
+
+    query = ('LAST UPDATED DATE', '=', '08-23-2019')
+    data = self._make_query_dict('Objective', expression=query)
+    result = self._get_first_result_set(data, 'Objective')
+
+    self.assertEqual(result['count'], 1)
+    self.assertEqual(objective_id, result['values'][0]['id'])
 
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
@@ -1335,7 +1353,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     """CA filtering should fail on incorrect date when CA title is unique."""
     data = self._make_query_dict(
         "Program",
-        expression=["ca date", ">", "05-18-2015"],
+        expression=["ca date", ">", "05.18.2015"],
     )
     response = self._post(data)
     self.assert400(response)
