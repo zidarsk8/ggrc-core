@@ -194,7 +194,8 @@ def create_issue_handler(obj, issue_tracker_info):
   ticket_id = issue_tracker_info.get("issue_id")
 
   if ticket_id:
-    link_issue(obj, ticket_id, issue_tracker_info)
+    link_issue(obj,
+               ticket_id, {"enabled": issue_tracker_info.get("enabled")})
   else:
     create_ticket_for_new_issue(obj, issue_tracker_info)
 

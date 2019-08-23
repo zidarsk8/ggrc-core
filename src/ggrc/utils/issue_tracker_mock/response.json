@@ -1,6 +1,8 @@
 {
   "issueId": 1234,
   "issueState": {
+    "component_id": "123456",
+    "hotlist_ids": ["654321"],
     "title": "Some mocked issue",
     "type": "PROCESS",
     "status": "NEW",
@@ -8,6 +10,7 @@
     "severity": "S2",
     "reporter": "example@example.com",
     "assignee": "example@example.com",
-    "verifier": "example@example.com"
+    "verifier": "example@example.com",
+    "ccs": "example@exampl.com"
   }
 }
