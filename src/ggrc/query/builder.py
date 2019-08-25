@@ -9,6 +9,7 @@ This class is used to build SqlAlchemy queries and fetch the result ids.
 # flake8: noqa
 import collections
 import datetime
+import itertools
 
 import sqlalchemy as sa
 
@@ -294,20 +295,26 @@ class QueryHelper(object):
     return objects
 
   @staticmethod
-  def _get_revision_related_ids(revision):
-    """Get related objs ids for revision."""
-    return [revision.resource_id,
-            revision.source_id,
-            revision.destination_id,
-            revision.id]
-
-
-  def _get_revisions_related_ids(self, revisions):
+  def _get_revisions_related_ids(revisions):
     """Get ids of all related objects for revisions"""
-    result = []
-    for revision in revisions:
-      result += self._get_revision_related_ids(revision)
-    return result
+    result = [[revision.resource_id,
+              revision.source_id,
+              revision.destination_id,
+              revision.id] for revision in revisions]
+    return list(itertools.chain.from_iterable(result))
+
+  def _get_filtered_expression(self, expression, object_class, tgt_class, query):
+    """Filter query according to expression."""
+    with benchmark("Parse filter query: _get_ids > _build_expression"):
+      filter_expression = custom_operators.build_expression(
+          expression,
+          object_class,
+          tgt_class,
+          self.query
+      )
+      if filter_expression is not None:
+        query = query.filter(filter_expression)
+    return query
 
   def _get_revision_query(self, object_class, expression, object_query):
     """ Get query object for Revision"""
@@ -317,15 +324,7 @@ class QueryHelper(object):
       object_class.source_id,
       object_class.resource_id,
     )
-    with benchmark("Parse filter query: _get_ids > _build_expression"):
-      filter_expression = custom_operators.build_expression(
-          expression,
-          object_class,
-          object_class,
-          self.query
-      )
-      if filter_expression is not None:
-        query = query.filter(filter_expression)
+    query = self._get_filtered_expression(expression, object_class, object_class, query)
     related_objects_ids = self._get_revisions_related_ids(query)
     requested_permissions = object_query.get("permissions", "read")
     with benchmark("Get permissions: _get_ids > _get_type_query"):
@@ -361,16 +360,12 @@ class QueryHelper(object):
         type_query = self._get_type_query(object_class, requested_permissions)
         if type_query is not None:
           query = query.filter(type_query)
-      with benchmark("Parse filter query: _get_ids > _build_expression"):
-        filter_expression = custom_operators.build_expression(
-            expression,
-            object_class,
-            tgt_class,
-            self.query
-        )
-        if filter_expression is not None:
-          query = query.filter(filter_expression)
-
+      query = self._get_filtered_expression(
+          expression,
+          object_class,
+          tgt_class,
+          query
+      )
     if object_query.get("order_by"):
       with benchmark("Sorting: _get_ids > order_by"):
         query = pagination.apply_order_by(
