@@ -71,7 +71,7 @@ export default canComponent.extend({
     },
     setValidationFlags({initialized, linking}) {
       this.attr('instance.issue_tracker').attr({
-        _linking: linking,
+        is_linking: linking,
         _initialized: initialized,
       });
     },
@@ -103,7 +103,7 @@ export default canComponent.extend({
     removed() {
       let instance = this.viewModel.attr('instance');
       if (instance) {
-        instance.removeAttr('issue_tracker._linking');
+        instance.removeAttr('issue_tracker.is_linking');
         instance.removeAttr('issue_tracker._initialized');
       }
     },
