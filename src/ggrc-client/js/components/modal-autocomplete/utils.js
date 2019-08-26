@@ -55,7 +55,7 @@ export const onAutocompleteSelect = (
   if (useInstanceInputHandler) {
     instance.setValueFromInput(item);
     setTimeout(function () {
-      el.val(item.name || item.email || item.title, item);
+      el.val(item.email || item.name || item.title, item);
     }, 0);
     return;
   }
@@ -70,7 +70,7 @@ export const onAutocompleteSelect = (
   } else {
     path = path.join('.');
     setTimeout(function () {
-      el.val(item.name || item.email || item.title, item);
+      el.val(item.email || item.name || item.title, item);
     }, 0);
 
     instance.attr(path, item);
