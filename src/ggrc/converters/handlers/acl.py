@@ -31,6 +31,7 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
       if is_updated and is_status_changing and not self.row_converter.is_new:
         self.add_warning(errors.STATE_WILL_BE_IGNORED,
                          column_name=self.display_name)
+        self.row_converter.status_changing = True
 
   def get_value(self):
     """Get list of emails for people with the current AC role."""
