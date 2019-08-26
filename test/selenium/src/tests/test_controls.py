@@ -8,7 +8,7 @@ import pytest
 
 from lib import base, browsers
 from lib.constants import element
-from lib.service import webui_service
+from lib.service import webui_service, webui_facade
 
 
 @pytest.fixture()
@@ -49,6 +49,15 @@ class TestControls(base.Test):
     expected_options = {"can_edit": False,
                         "can_delete": False}
     assert expected_options == actual_options
+
+  def test_cannot_make_and_view_proposals_for_control(self, control,
+                                                      soft_assert, selenium):
+    """Confirm that user cannot make and view Proposals for Control."""
+    info_page = webui_service.ControlsService(
+        selenium).open_info_page_of_obj(control)
+    webui_facade.soft_assert_cannot_make_proposal(info_page, soft_assert)
+    webui_facade.soft_assert_cannot_view_proposals(info_page, soft_assert)
+    soft_assert.assert_expectations()
 
   def test_user_cannot_add_person_to_custom_role(self, control,
                                                  controls_service):

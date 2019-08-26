@@ -811,5 +811,5 @@ def app_control():
 
 @pytest.fixture()
 def soft_assert():
-  """Fixture for soft assertations."""
+  """Fixture for soft assertions."""
   return assert_utils.SoftAssert()
