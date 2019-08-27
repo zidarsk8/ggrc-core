@@ -172,7 +172,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     # from assessment attributes
     self.assertEqual(
         issue_tracker_issue.title,
-        assmt_attrs["assessment"]["title"]
+        assmt_attrs["assessment"]["issue_tracker"]["title"]
     )
     self.assertEqual(
         int(issue_tracker_issue.component_id),
@@ -237,9 +237,18 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     self.assertEqual(response.status_code, 201)
     assmt_id = response.json.get("assessment").get("id")
     it_issue = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
+    expected_assmt_request_payload = assmt_request_payload.copy()
+    # we do not update some values during manual linking
+    expected_assmt_request_payload["assessment"]["issue_tracker"] = dict(
+        expected_assmt_request_payload["assessment"]["issue_tracker"],
+        **{
+            "title": response_payload["issueState"]["title"],
+            "issue_severity": response_payload["issueState"]["severity"],
+            "issue_priority": response_payload["issueState"]["priority"],
+        })
     self.check_issuetracker_issue_fields(
         it_issue,
-        assmt_request_payload,
+        expected_assmt_request_payload,
         response_payload
     )
 
@@ -772,11 +781,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       self.assertEquals(44, call_payload["hotlist_ids"][0])
 
       self.assertEquals(
-          issue_request_payload["issue_tracker"]["issue_priority"],
+          get_issue_resp["issueState"]["priority"],
           call_payload["priority"]
       )
       self.assertEquals(
-          issue_request_payload["issue_tracker"]["issue_severity"],
+          get_issue_resp["issueState"]["severity"],
           call_payload["severity"]
       )
       self.assertEquals(
@@ -785,7 +794,7 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
       )
       self.assertEquals("ASSIGNED", call_payload["status"])
       self.assertEquals(
-          issue_request_payload["issue_tracker"]["title"],
+          get_issue_resp["issueState"]["title"],
           call_payload["title"]
       )
 

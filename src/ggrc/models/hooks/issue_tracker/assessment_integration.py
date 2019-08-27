@@ -717,7 +717,7 @@ class AssessmentTrackerHandler(object):
         assessment,
         assessment_src
     )
-    self._validate_assmt_link_fields(issuetracker_info)
+    self._validate_issue_id(issuetracker_info)
     issuetracker_info = self._update_with_assmt_data_for_ticket_create(
         assessment,
         issuetracker_info
@@ -1844,6 +1844,9 @@ class AssessmentTrackerHandler(object):
     issue_info_db["hotlist_id"] = self._extract_hotlist_id(
         issue_tracker_info
     )
+    issue_info_db["issue_priority"] = issue_tracker_info.get("priority")
+    issue_info_db["issue_severity"] = issue_tracker_info.get("severity")
+    issue_info_db["title"] = issue_tracker_info.get("title")
 
     return issue_info_db
 
