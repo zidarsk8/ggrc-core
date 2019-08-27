@@ -104,6 +104,12 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'name',
   ]
   _include_links = []
+  ROLE_OPTIONS = ("No Access",
+                  "Creator",
+                  "Reader",
+                  "Editor",
+                  "Administrator"
+                  )
   _aliases = {
       "name": "Name",
       "email": {
@@ -115,6 +121,8 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
           "display_name": "Role",
           "type": "user_role",
           "filter_by": "_filter_by_user_role",
+          "description": "Allowed values are\n{}".format(
+              "\n".join(ROLE_OPTIONS))
       },
   }
 
