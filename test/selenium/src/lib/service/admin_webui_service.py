@@ -5,6 +5,8 @@
 from nerodia.wait import wait
 
 from lib import url
+from lib.constants import objects
+from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.page.modal import person_modal
 from lib.utils import selenium_utils
@@ -75,10 +77,58 @@ class PeopleAdminWebUiService(AdminWebUiService):
   def edit_authorizations(self, person, new_role):
     """Open User Role Assignments Modal window for selected person and apply
     new role.
-    Return edited person."""
+
+    Returns:
+       edited person."""
     people_tree_item = self.expand_found_person(person)
     people_tree_item.open_edit_authorizations_modal().select_and_submit_role(
         new_role)
     wait.Wait.until(
         lambda: people_tree_item.get_person().system_wide_role == new_role)
     return self.expand_found_person(person).get_person()
+
+
+class CustomAttributeWebUiService(AdminWebUiService):
+  """Class for custom attributes business layer's services objects."""
+
+  def __init__(self, driver):
+    super(CustomAttributeWebUiService, self).__init__(driver)
+    self.ca_widget = self._open_custom_attributes_tab()
+
+  def _open_custom_attributes_tab(self):
+    """Open Custom Attributes widget on Admin dashboard.
+
+    Returns:
+      lib.page.widget.admin_widget.CustomAttributes
+    """
+    selenium_utils.open_url(url.Urls().admin_dashboard)
+    return dashboard.AdminDashboard(self._driver).select_custom_attributes()
+
+  def create_custom_attribute(self, new_ca):
+    """Create new custom attribute on Custom Attributes widget."""
+    ca_item_content = self.ca_widget.expand_collapse_group(
+        objects.get_normal_form(new_ca.definition_type), expand=True)
+    ca_item_content.open_add_new_ca_modal().submit_obj(new_ca)
+
+  def edit_custom_attribute(self, ca_to_edit, new_ca):
+    """Open Custom Attribute Definition Modal window for ca_to_edit (found
+    by title) and submit form with ca_to_edit data.
+
+    Returns:
+      edited CA from ui.
+    """
+    definition_type = objects.get_normal_form(
+        objects.get_plural(ca_to_edit.definition_type))
+    self.ca_widget.open_edit_modal(
+        definition_type, ca_to_edit.title).submit_obj(new_ca)
+    return self.get_custom_attribute(definition_type, new_ca.title)
+
+  def get_custom_attribute(self, obj_type, ca_title):
+    """Collect Custom Attribute data from Edit Modal.
+
+    Returns:
+      CA entity.
+    """
+    data = self.ca_widget.open_edit_modal(
+        obj_type, ca_title).get_custom_attribute_dict()
+    return entities_factory.CustomAttributeDefinitionsFactory().create(**data)

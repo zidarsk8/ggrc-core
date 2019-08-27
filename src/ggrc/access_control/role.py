@@ -114,10 +114,10 @@ class AccessControlRole(attributevalidator.AttributeValidator,
       validators.validate_name_correctness(value)
 
     if key == "name" and self.object_type:
-      name = value
+      name = value.lower()
       object_type = self.object_type
     elif key == "object_type" and self.name:
-      name = self.name.strip()
+      name = self.name.strip().lower()
       object_type = value
     else:
       return value

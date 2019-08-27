@@ -10,9 +10,8 @@ separated in the csv file with empty lines.
 import collections
 import logging
 
-from sqlalchemy import or_
-from sqlalchemy import and_
 from flask import _app_ctx_stack
+import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import models
@@ -29,6 +28,7 @@ from ggrc.converters import errors
 from ggrc.converters import get_shared_unique_rules
 from ggrc.converters import base_row
 from ggrc.converters import import_helper
+from ggrc.converters.block_mixins import people_cache
 from ggrc.models.mixins import issue_tracker as issue_tracker_mixins
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
@@ -173,12 +173,12 @@ class BlockConverter(object):
             relationship.source_type,
             relationship.destination_id,
             relationship.destination_type,
-        ).filter(or_(
-            and_(
+        ).filter(sa.or_(
+            sa.and_(
                 relationship.source_type == self.object_class.__name__,
                 relationship.source_id.in_(self.object_ids),
             ),
-            and_(
+            sa.and_(
                 relationship.destination_type == self.object_class.__name__,
                 relationship.destination_id.in_(self.object_ids),
             )
@@ -359,7 +359,8 @@ class BlockConverter(object):
     return header
 
 
-class ImportBlockConverter(BlockConverter):
+class ImportBlockConverter(people_cache.WithPeopleCache,
+                           BlockConverter):
   """Import block processing functionality."""
   def __init__(self, converter, object_class, rows, raw_headers,
                offset, class_name, csv_lines):
@@ -386,6 +387,7 @@ class ImportBlockConverter(BlockConverter):
     self.unique_values = self.get_unique_values_dict(self.object_class)
     self.revision_ids = []
     self._import_info = self._make_empty_info()
+    self._create_people_cache()
 
   def check_block_restrictions(self):
     """Check some block related restrictions"""
@@ -426,7 +428,7 @@ class ImportBlockConverter(BlockConverter):
     for i, row in enumerate(self.rows):
       line = self.csv_lines[i]
       yield base_row.ImportRowConverter(self, self.object_class, row=row,
-                                        headers=self.headers, line=line)
+                                        headers=self.headers, line=line, idx=i)
 
   @property
   def handle_fields(self):

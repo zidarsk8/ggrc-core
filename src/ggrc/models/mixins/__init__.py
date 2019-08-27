@@ -722,11 +722,11 @@ class Folderable(WithProtectedAttributes):
   _fulltext_attrs = ['folder']
   _aliases = {
       "folder": {
-          "display_name": "Gdrive Folder ID",
-          "description": ("Add 'Folder ID' that is part of "
+          "display_name": "GDrive Folder ID",
+          "description": ("Add 'GDrive Folder ID' that is part of "
                           "drive link to a folder "
                           "'https://drive.google.com/corp/drive/folders/XXX', "
-                          "where XXX is a 'Folder ID'")
+                          "where XXX is a 'GDrive Folder ID'")
       }
   }
   PROTECTED_ATTRIBUTES = {"folder"}
