@@ -8,8 +8,7 @@ import ddt
 from ggrc.models import all_models
 from integration import ggrc
 from integration.ggrc.models import factories
-from integration.ggrc_basic_permissions.models \
-    import factories as rbac_factories
+from integration.ggrc.utils.helpers import add_person_global_role
 
 
 @ddt.ddt
@@ -48,17 +47,6 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
           source=asmt,
           destination=evid,
       )
-
-  @staticmethod
-  def _create_person_with_sys_role(sys_role):
-    """Helper function to create person with specific system role."""
-    with factories.single_commit():
-      person = factories.PersonFactory()
-      system_role = all_models.Role.query.filter(
-          all_models.Role.name == sys_role,
-      ).one()
-      rbac_factories.UserRoleFactory(role=system_role, person=person)
-    return person
 
   @ddt.data(("In Review", "In Review"),
             ("Verified", "Completed"),
@@ -196,7 +184,8 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
     asmt_id = self.asmt.id
     evid_id = self.evidence.id
     self._map(self.evidence, self.asmt)
-    person = self._create_person_with_sys_role(system_role)
+    person = factories.PersonFactory()
+    add_person_global_role(person, system_role)
 
     self.api.set_user(person)
     response = self.api.put(all_models.Assessment.query.get(asmt_id), {
@@ -215,7 +204,8 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
     asmt_id = self.asmt.id
     evid_id = self.evidence.id
     self._map(self.evidence, self.asmt)
-    person = self._create_person_with_sys_role(system_role)
+    person = factories.PersonFactory()
+    add_person_global_role(person, system_role)
 
     self.api.set_user(person)
     response = self.api.put(all_models.Assessment.query.get(asmt_id), {
@@ -238,7 +228,8 @@ class TestAssessmentCompleteWithAction(ggrc.TestCase):
     asmt_id = self.asmt.id
     evid_id = self.evidence.id
     self._map(self.evidence, self.asmt)
-    person = self._create_person_with_sys_role(system_role)
+    person = factories.PersonFactory()
+    add_person_global_role(person, system_role)
     factories.AccessControlPersonFactory(
         ac_list=self.asmt.acr_name_acl_map[role],
         person=person,
