@@ -251,7 +251,7 @@ class ObjectCaColumnHandler(CustomAttributeColumnHandler):
     if self.row_converter.obj.id is None:
       if self.row_converter.object_class == models.all_models.Assessment:
         template = self._get_assessment_template()
-        cad = cache.get((template.id, self.display_name))
+        cad = cache.get((template.id if template else None, self.display_name))
         return cad
 
       return None
