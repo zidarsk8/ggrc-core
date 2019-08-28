@@ -712,7 +712,7 @@ class AssessmentsService(BaseWebUiService):
 
 class ControlsService(SnapshotsWebUiService):
   """Class for Controls business layer's services objects."""
-  def __init__(self, driver, is_versions_widget=False):
+  def __init__(self, driver=None, is_versions_widget=False):
     super(ControlsService, self).__init__(
         driver, objects.CONTROLS, is_versions_widget)
 
