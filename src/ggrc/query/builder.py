@@ -9,6 +9,7 @@ This class is used to build SqlAlchemy queries and fetch the result ids.
 # flake8: noqa
 import collections
 import datetime
+import itertools
 
 import sqlalchemy as sa
 
@@ -209,7 +210,7 @@ class QueryHelper(object):
     return self.query
 
   @staticmethod
-  def _get_revision_type_query(model, permission_type):
+  def _get_revision_type_query(model, permission_type, filter_ids=None):
     """Filter model based on availability of related objects.
 
     This method is used only when quering revisions. In such case only
@@ -221,6 +222,9 @@ class QueryHelper(object):
     allowed_resources = permissions.all_resources(permission_type)
     if not allowed_resources:
       return sa.false()
+
+    if filter_ids:
+      allowed_resources = [i for i in allowed_resources if i[1] in filter_ids]
 
     return sa.or_(
         sa.tuple_(
@@ -244,7 +248,7 @@ class QueryHelper(object):
     )
 
   @staticmethod
-  def _get_type_query(model, permission_type):
+  def _get_type_query(model, permission_type, filter_ids=None):
     """Filter by contexts and resources
 
     Prepare query to filter models based on the available contexts and
@@ -259,7 +263,7 @@ class QueryHelper(object):
     if model.__name__ == "Revision":
       # Since revision contains all object data, query API should query only
       # revisions of objects user has right permission on.
-      return QueryHelper._get_revision_type_query(model, permission_type)
+      return QueryHelper._get_revision_type_query(model, permission_type, filter_ids)
 
     contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
@@ -290,6 +294,47 @@ class QueryHelper(object):
 
     return objects
 
+  @staticmethod
+  def _get_revisions_related_ids(revisions):
+    """Get ids of all related objects for revisions"""
+    result = [[revision.resource_id,
+              revision.source_id,
+              revision.destination_id,
+              revision.id] for revision in revisions]
+    return list(itertools.chain.from_iterable(result))
+
+  def _get_filtered_expression(self, expression, object_class, tgt_class, query):
+    """Filter query according to expression."""
+    with benchmark("Parse filter query: _get_ids > _build_expression"):
+      filter_expression = custom_operators.build_expression(
+          expression,
+          object_class,
+          tgt_class,
+          self.query
+      )
+      if filter_expression is not None:
+        query = query.filter(filter_expression)
+    return query
+
+  def _get_revision_query(self, object_class, expression, object_query):
+    """ Get query object for Revision"""
+    query = db.session.query(
+      object_class.id,
+      object_class.destination_id,
+      object_class.source_id,
+      object_class.resource_id,
+    )
+    query = self._get_filtered_expression(expression, object_class, object_class, query)
+    related_objects_ids = self._get_revisions_related_ids(query)
+    requested_permissions = object_query.get("permissions", "read")
+    with benchmark("Get permissions: _get_ids > _get_type_query"):
+      type_query = self._get_type_query(object_class,
+                                        requested_permissions,
+                                        related_objects_ids)
+      if type_query is not None:
+        query = query.filter(type_query)
+    return query
+
   def _get_ids(self, object_query):
     """Get a set of ids of objects described in the filters."""
 
@@ -301,28 +346,26 @@ class QueryHelper(object):
     object_class = inflector.get_model(object_name)
     if object_class is None:
       return set()
-    query = db.session.query(object_class.id)
-
     tgt_class = object_class
-    if object_name == "Snapshot":
-      child_type = self._get_snapshot_child_type(object_query)
-      tgt_class = getattr(models.all_models, child_type, object_class)
+    if object_name == "Revision":
+      query = self._get_revision_query(object_class, expression, object_query)
+    else:
+      query = db.session.query(object_class.id)
+      if object_name == "Snapshot":
+        child_type = self._get_snapshot_child_type(object_query)
+        tgt_class = getattr(models.all_models, child_type, object_class)
 
-    requested_permissions = object_query.get("permissions", "read")
-    with benchmark("Get permissions: _get_ids > _get_type_query"):
-      type_query = self._get_type_query(object_class, requested_permissions)
-      if type_query is not None:
-        query = query.filter(type_query)
-    with benchmark("Parse filter query: _get_ids > _build_expression"):
-      filter_expression = custom_operators.build_expression(
+      requested_permissions = object_query.get("permissions", "read")
+      with benchmark("Get permissions: _get_ids > _get_type_query"):
+        type_query = self._get_type_query(object_class, requested_permissions)
+        if type_query is not None:
+          query = query.filter(type_query)
+      query = self._get_filtered_expression(
           expression,
           object_class,
           tgt_class,
-          self.query
+          query
       )
-      if filter_expression is not None:
-        query = query.filter(filter_expression)
-
     if object_query.get("order_by"):
       with benchmark("Sorting: _get_ids > order_by"):
         query = pagination.apply_order_by(
