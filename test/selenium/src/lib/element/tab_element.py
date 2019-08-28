@@ -5,22 +5,26 @@
 
 class Tabs(object):
   """Represents a container with tab elements."""
+  # pylint: disable=inconsistent-return-statements
 
   TOP = "top"
   INTERNAL = "internal"
 
   def __init__(self, container, level):
     if level == self.TOP:
-      self._root = container.nav(class_name="internav")
+      # 'if' statement is needed for getting only elements of displayed tabs
+      self.tab_elements = [el.element() for el in container.elements(
+          tag_name="inner-nav-item") if el.element().exists]
     elif level == self.INTERNAL:
-      self._root = container.ul(class_name="nav-tabs")
+      self.tab_elements = [el.parent() for el in container.elements(
+          class_name="nav-tabs__panel")]
     else:
       raise NotImplementedError
 
   @property
   def tabs(self):
     """Returns a list of tabs."""
-    return [Tab(tab_el) for tab_el in self._root.elements()]
+    return [Tab(tab_el) for tab_el in self.tab_elements]
 
   @property
   def tab_names(self):
@@ -30,16 +34,24 @@ class Tabs(object):
   @property
   def active_tab(self):
     """Returns active tab."""
-    return Tab(self._root.element(class_name="active"))
+    return Tab(self._active_tab_el())
 
   def ensure_tab(self, tab_name):
-    """Ensure that page tab `tab_name` is opened"""
+    """Ensure that page tab `tab_name` is opened."""
     if self.active_tab.name != tab_name:
       self._tab_with_name(tab_name).select()
 
   def _tab_with_name(self, name):
     """Returns tab with name `name`."""
-    return Tab(self._root.element(text=name))
+    for tab in self.tabs:
+      if tab.name == name:
+        return tab
+
+  def _active_tab_el(self):
+    """Returns an active tab element."""
+    for tab_el in self.tab_elements:
+      if "active" in tab_el.classes:
+        return tab_el
 
 
 class Tab(object):

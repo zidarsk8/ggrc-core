@@ -216,7 +216,7 @@ class ProgramsService(BaseRestService):
 
 
 class ProductsService(BaseRestService):
-  """Service for working with Controls entities."""
+  """Service for working with Products entities."""
   def __init__(self):
     super(ProductsService, self).__init__(url.PRODUCTS)
 
@@ -426,3 +426,9 @@ class ObjectsInfoService(HelpRestService):
     person.__dict__.update({k: v for k, v in person_attrs[0].iteritems()
                             if v and k not in ["type", ]})
     return person
+
+
+class StandardsService(BaseRestService):
+  """Service for working with Standard entities."""
+  def __init__(self):
+    super(StandardsService, self).__init__(url.STANDARDS)

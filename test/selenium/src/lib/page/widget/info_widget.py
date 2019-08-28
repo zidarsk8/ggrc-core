@@ -415,7 +415,7 @@ class Programs(InfoWidget, page_mixins.WithProposals):
 
   def related_proposals(self):
     """Open related proposals tab."""
-    self.tabs.ensure_tab(self.proposals_tab_name)
+    self.tabs.ensure_tab(self.proposals_tab_or_link_name)
     selenium_utils.wait_for_js_to_load(self._driver)
     return related_proposals.RelatedProposals()
 
@@ -807,7 +807,8 @@ class Requirements(InfoWidget):
     super(Requirements, self).__init__(driver)
 
 
-class Controls(page_mixins.WithAssignFolder, InfoWidget):
+class Controls(page_mixins.WithAssignFolder,
+               page_mixins.WithDisabledProposals, InfoWidget):
   """Model for Control object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoControl
@@ -981,7 +982,7 @@ class Markets(InfoWidget):
     super(Markets, self).__init__(driver)
 
 
-class Risks(InfoWidget):
+class Risks(page_mixins.WithDisabledProposals, InfoWidget):
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
 

@@ -36,12 +36,6 @@ def check_tasks(row_converter):
     row_converter.add_error(errors.END_DATE_ON_WEEKEND_ERROR)
 
 
-DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
-                                    "'Declined' / 'Deprecated'>")
-DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
-                                    "'Declined' / 'Deprecated' / 'Finished'>")
-
-
 def check_cycle_tasks(row_converter):  # noqa
   """Checker for CycleTaskGroupObjectTask model objects.
 
@@ -61,32 +55,6 @@ def check_cycle_tasks(row_converter):  # noqa
         errors.INVALID_START_END_DATES,
         start_date="Start Date",
         end_date="Due Date",
-    )
-  if (obj.finished_date and obj.verified_date and
-          obj.finished_date > obj.verified_date):
-    row_converter.add_error(
-        errors.INVALID_START_END_DATES,
-        start_date="Actual Finish Date",
-        end_date="Actual Verified Date",
-    )
-  if obj.status not in (obj.FINISHED, obj.VERIFIED):
-    if obj.finished_date:
-      row_converter.add_error(
-          errors.INVALID_STATUS_DATE_CORRELATION,
-          date="Actual Finish Date",
-          deny_states=DENY_FINISHED_DATES_STATUSES_STR,
-      )
-    if obj.verified_date:
-      row_converter.add_error(
-          errors.INVALID_STATUS_DATE_CORRELATION,
-          date="Actual Verified Date",
-          deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
-      )
-  if obj.status == obj.FINISHED and obj.verified_date:
-    row_converter.add_error(
-        errors.INVALID_STATUS_DATE_CORRELATION,
-        date="Actual Verified Date",
-        deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
     )
 
 
@@ -130,15 +98,32 @@ def check_assessment(row_converter):
     row_converter.add_error(errors.ARCHIVED_IMPORT_ERROR)
 
 
+def _is_done_or_end_state(obj):
+  """Check Assessment status.
+
+  Status should be 'Completed and verified', 'Verified',
+  'In Review' or 'Rework Needed'.
+
+  Args:
+    obj: db.Model instance.
+
+  Returns:
+     Boolean: indicated that obj in 'Completed and verified', 'Verified',
+    'In Review' or 'Rework Needed' status.
+  """
+  in_done_state = obj.status in {obj.DONE_STATE, obj.REWORK_NEEDED}
+  in_end_state = obj.status in obj.END_STATES and obj.verified
+  return in_done_state or in_end_state
+
+
 def secondary_check_assessment(row_converter):
   """Check Assessment after setup of secondary objects
 
   Assessment can't be imported with 'Completed and verified', 'Verified',
   'In Review', 'Rework Needed' state if don't have Verifier"""
   obj = row_converter.obj
-  if ((obj.status in {obj.DONE_STATE, obj.REWORK_NEEDED} or
-          (obj.status in obj.END_STATES and obj.verified)) and
-          not obj.verifiers):
+  if (_is_done_or_end_state(obj) and not obj.verifiers and
+          not row_converter.status_changing):
     row_converter.add_warning(errors.NO_VERIFIER_WARNING, status=obj.status)
     # In case of import new asmt with 'Rework Needed' status
     # we can't change it to default state because of validation

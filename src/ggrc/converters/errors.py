@@ -164,11 +164,6 @@ INVALID_ATTRIBUTE_WARNING = (u"Line {line}: Object does not contain attribute "
 CREATE_INSTANCE_ERROR = (u"Line {line}: New instance creation is denied. "
                          u"The line will be ignored.")
 
-INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: Need to type double dash "
-                                   u"'--' into '{date}' cell, if "
-                                   u"cycle task state is {deny_states}. "
-                                   u"The line will be ignored.")
-
 DEPRECATED_DELETED_METRIC_STATUS = (u"Line {line}: In case there are "
                                     u"any compliance/on-boarding "
                                     u"Questionnaires related to {object_type} "

@@ -14,7 +14,6 @@ from lib.constants import roles
 from lib.constants import objects
 from lib.rest_facades import person_rest_facade
 from lib.service import webui_facade
-from lib.ui import ui_facade
 
 
 @pytest.fixture(params=[roles.ADMINISTRATOR, roles.CREATOR,
@@ -34,7 +33,7 @@ def login_as_person_with_role(person_with_role):
 class TestCreateObject(base.Test):
   """Tests for checking create object process."""
 
-  def test_create_control_no_modal(self, selenium,
+  def test_create_control_no_modal(self, soft_assert, selenium,
                                    login_as_person_with_role):
     """Test to check that no modal present
     after starting create object control."""
@@ -42,4 +41,5 @@ class TestCreateObject(base.Test):
       pytest.xfail(reason="GGRC-6934 Create object is not present.")
     obj_modal = webui_facade.open_create_obj_modal(
         obj_type=objects.get_singular(objects.CONTROLS, title=True))
-    ui_facade.verify_modal_obj_not_present_in_all_windows(obj_modal)
+    webui_facade.soft_assert_no_modals_present(obj_modal, soft_assert)
+    soft_assert.assert_expectations()

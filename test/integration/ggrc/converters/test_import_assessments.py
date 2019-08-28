@@ -813,42 +813,6 @@ class TestAssessmentImport(TestCase):
                           if 'INSERT INTO revisions' in query]
     self.assertEqual(len(rev_insert_queries), 1)
 
-  @ddt.data(
-      ("", "In Review", "", True),
-      ("", "In Review", "user@example.com", False),
-      ("", "Rework Needed", "", True),
-      ("12/27/2018", "Completed", "", True),
-      ("", "Completed", "", False),
-      ("12/27/2018", "Completed", "user@example.com", False),
-      ("", "In Progress", "", False),
-  )
-  @ddt.unpack
-  def test_asmt_status_and_verifier(self, date, status, verifiers, warning):
-    """Test assessment status validation requiring verifier"""
-    audit = factories.AuditFactory()
-    response = self.import_data(OrderedDict([
-        ("object_type", "Assessment"),
-        ("Code*", ""),
-        ("Title", "Test title"),
-        ("Audit", audit.slug),
-        ("Creators", "user@example.com"),
-        ("Assignees", "user@example.com"),
-        ("Verifiers", verifiers),
-        ("Verified Date", date),
-        ("State", status),
-    ]))
-    expected_warnings = {
-        'Assessment': {
-            'row_warnings': {
-                errors.NO_VERIFIER_WARNING.format(
-                    line=3,
-                    status=status
-                )}}}
-    if warning:
-      self._check_csv_response(response, expected_warnings)
-    else:
-      self._check_csv_response(response, {})
-
   def test_asmt_verified_date_update_from_none(self):
     """Test that we able to set Verified Date if it is empty"""
     audit = factories.AuditFactory()
@@ -1062,12 +1026,6 @@ class TestAssessmentImport(TestCase):
             }
         }
     }
-    expected_response["Assessment"]["row_warnings"].add(
-        errors.NO_VERIFIER_WARNING.format(
-            line=3,
-            status=all_models.Assessment.DONE_STATE
-        )
-    )
     self._check_csv_response(response, expected_response)
     assessment = all_models.Assessment.query.get(assessment.id)
     verifiers = [v.email for v in assessment.verifiers]
@@ -1270,3 +1228,83 @@ class TestAssessmentExport(TestCase):
     resp = self.export_parsed_csv(data)["Assessment"]
     self.assertEqual(1, len(resp))
     self.assertEqual(slug, resp[0]["Code*"])
+
+  @ddt.data(
+      ("", "In Review", "", True),
+      ("", "In Review", "user@example.com", False),
+      ("", "Rework Needed", "", True),
+      ("12/27/2018", "Completed", "", True),
+      ("", "Completed", "", False),
+      ("12/27/2018", "Completed", "user@example.com", False),
+      ("", "In Progress", "", False),
+  )
+  @ddt.unpack
+  def test_asmt_status_and_verifier(self, date, status, verifiers, warning):
+    """Test assessment status validation requiring verifier"""
+    audit = factories.AuditFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Title", "Test title"),
+        ("Audit", audit.slug),
+        ("Creators", "user@example.com"),
+        ("Assignees", "user@example.com"),
+        ("Verifiers", verifiers),
+        ("Verified Date", date),
+        ("State", status),
+    ]))
+
+    expected_warnings = {
+        'Assessment': {
+            'row_warnings': {
+                errors.NO_VERIFIER_WARNING.format(
+                    line=3,
+                    status=status
+                )}}}
+    if warning:
+      self._check_csv_response(response, expected_warnings)
+    else:
+      self._check_csv_response(response, {})
+
+  def test_import_assessment_without_verifiers(self):
+    """Test import with change status and remove verifiers"""
+    asmt = factories.AssessmentFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmt.slug),
+        ("State", "In Review"),
+        ("Verifiers", "--")
+    ]))
+
+    expected_errors = {
+        "Assessment": {
+            "row_warnings": {
+                errors.NO_VERIFIER_WARNING.format(line=3, status='In Review'),
+            }
+        }
+    }
+    self._check_csv_response(response, expected_errors)
+
+  @ddt.data(1, 2)
+  def test_import_assessment_with_verifiers(self, verifiers_num):
+    """Test import with change status and remove verifiers"""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory(status="In Review")
+      for _ in range(verifiers_num):
+        user = factories.PersonFactory()
+        asmt.add_person_with_role_name(user, "Verifiers")
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmt.slug),
+        ("State", "In Review"),
+        ("Verifiers", "--")
+    ]))
+
+    expected_errors = {
+        "Assessment": {
+            "row_warnings": {
+                errors.STATE_WILL_BE_IGNORED.format(line=3),
+            }
+        }
+    }
+    self._check_csv_response(response, expected_errors)

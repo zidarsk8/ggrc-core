@@ -140,14 +140,12 @@ class BaseWebUiService(object):
     selenium_utils.open_url(info_page_url)
     return self.info_widget_cls(self.driver)
 
-  def open_info_panel_of_obj_by_title(self, src_obj, obj):
-    """Navigate to info panel URL of object according to URL of source object
+  def open_info_panel_of_mapped_obj(self, src_obj, obj):
+    """Navigates to info panel URL of object according to URL of source object
     and URL of mapped object return generic widget class of mapped objects.
     """
-    objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    obj_info_panel = (objs_widget.tree_view.
-                      select_member_by_title(title=obj.title))
-    return obj_info_panel
+    return self.open_widget_of_mapped_objs(
+        src_obj).tree_view.select_member_by_title(title=obj.title)
 
   def get_list_objs_from_tree_view(self, src_obj):
     """Get and return list of objects from Tree View."""
@@ -332,7 +330,7 @@ class BaseWebUiService(object):
     object scope as dict with titles (keys) and entered_titles (values) that
     displayed on Info panel.
     """
-    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
+    obj_info_panel = self.open_info_panel_of_mapped_obj(src_obj, obj)
     return obj_info_panel.get_info_widget_obj_scope()
 
   def is_obj_editable_via_info_panel(self, src_obj, obj):
@@ -340,7 +338,7 @@ class BaseWebUiService(object):
     by title and check via Info panel that object is editable.
     """
     dropdown_on_info_panel = (
-        self.open_info_panel_of_obj_by_title(src_obj, obj).three_bbs)
+        self.open_info_panel_of_mapped_obj(src_obj, obj).three_bbs)
     return dropdown_on_info_panel.edit_option.exists
 
   def is_obj_unmappable_via_info_panel(self, src_obj, obj):
@@ -349,7 +347,7 @@ class BaseWebUiService(object):
     """
     # pylint: disable=invalid-name
     dropdown_on_info_panel = (
-        self.open_info_panel_of_obj_by_title(src_obj, obj).three_bbs)
+        self.open_info_panel_of_mapped_obj(src_obj, obj).three_bbs)
     return dropdown_on_info_panel.unmap_option.exists
 
   def is_obj_page_exist_via_info_panel(self, src_obj, obj):
@@ -357,7 +355,7 @@ class BaseWebUiService(object):
     by title and check via Info panel that object page is exist.
     """
     # pylint: disable=invalid-name
-    return self.open_info_panel_of_obj_by_title(
+    return self.open_info_panel_of_mapped_obj(
         src_obj, obj).three_bbs.open_option.exists
 
   def filter_and_get_list_objs_from_tree_view(self, src_obj, filter_exp):
@@ -401,7 +399,7 @@ class BaseWebUiService(object):
     this by click on "Unmap" button.
     """
     dropdown_on_info_panel = (
-        self.open_info_panel_of_obj_by_title(src_obj, obj).three_bbs)
+        self.open_info_panel_of_mapped_obj(src_obj, obj).three_bbs)
     dropdown_on_info_panel.unmap_option.click()
 
   def get_objs_available_to_map_via_mapper(self, src_obj):
@@ -538,8 +536,8 @@ class SnapshotsWebUiService(BaseWebUiService):
     """Open generic widget of mapped objects, select snapshotable object from
     Tree View by title and check via Info panel that object is updateble.
     """
-    obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).panel)
-    return obj_info_panel.has_link_to_get_latest_version()
+    return self.open_info_panel_of_mapped_obj(
+        src_obj, obj).panel.has_link_to_get_latest_version()
 
 
 class AuditsService(BaseWebUiService):
@@ -589,7 +587,7 @@ class AssessmentsService(BaseWebUiService):
     """
     comments_descriptions = tuple(
         comment_obj.description for comment_obj in comment_objs)
-    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
+    obj_info_panel = self.open_info_panel_of_mapped_obj(src_obj, obj)
     return obj_info_panel.comments_panel.add_comments(comments_descriptions)
 
   def generate_objs_via_tree_view(self, src_obj, objs_under_asmt,

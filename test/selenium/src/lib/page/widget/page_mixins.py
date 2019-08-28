@@ -138,13 +138,32 @@ class WithObjectReview(base.WithBrowser):
     return self.review_status.text.title()
 
 
-class WithProposals(base.WithBrowser):
-  """A mixin for proposals elements."""
+class WithDisabledProposals(base.WithBrowser):
+  """A mixin for disabled objects pages with proposals elements."""
 
   @property
-  def proposals_tab_name(self):
+  def proposals_tab_or_link_name(self):
+    """Returns a name of proposals tab/link for active/disabled objects."""
     return "Change Proposals"
+
+  def click_change_proposals(self):
+    """Click 'Change Proposals' link or tab."""
+    self._browser.link(text=self.proposals_tab_or_link_name).click()
+
+  @property
+  def propose_changes_btn(self):
+    """Returns 'Propose Changes' button element."""
+    return self._browser.link(text="Propose Changes")
+
+  @property
+  def is_propose_changes_btn_exists(self):
+    """Returns whether 'Propose Changes' button exists."""
+    return self.propose_changes_btn.exists
+
+
+class WithProposals(WithDisabledProposals):
+  """A mixin for proposals elements."""
 
   def click_propose_changes(self):
     """Click on Propose Changes button."""
-    self._browser.link(text="Propose Changes").click()
+    self.propose_changes_btn.click()

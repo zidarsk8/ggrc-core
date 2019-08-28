@@ -596,9 +596,8 @@ def product():
 
 
 @pytest.fixture()
-def product_mapped_to_control(product):
+def product_mapped_to_control(control, product):
   """Creates a product mapped to control."""
-  control = rest_facade.create_control()
   rest_facade.map_objs(product, control)
   return product
 
@@ -810,6 +809,19 @@ def app_control():
 
 
 @pytest.fixture()
+def standard():
+  """Creates a Standard."""
+  return rest_facade.create_standard()
+
+
+@pytest.fixture()
+def standard_mapped_to_control(control, standard):
+  """Creates a Standard mapped to Control."""
+  rest_facade.map_objs(standard, control)
+  return standard
+
+
+@pytest.fixture()
 def soft_assert():
-  """Fixture for soft assertations."""
+  """Fixture for soft assertions."""
   return assert_utils.SoftAssert()

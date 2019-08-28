@@ -848,7 +848,7 @@ class TestRelatedAssessments(base.Test):
         objs_to_map=[control_mapped_to_program])
         for _ in xrange(2)]
     control_panel = webui_service.ControlsService(
-        selenium).open_info_panel_of_obj_by_title(
+        selenium).open_info_panel_of_mapped_obj(
             assessments[0], control_mapped_to_program)
     related_asmts_table = control_panel.show_related_assessments()
     related_asmts_titles = [
