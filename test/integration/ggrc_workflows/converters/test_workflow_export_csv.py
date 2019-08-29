@@ -3,17 +3,14 @@
 
 """Tests for workflow object exports."""
 
-from os.path import abspath, dirname, join
+from freezegun import freeze_time
 
 from flask.json import dumps
-from ggrc import db
-from ggrc.app import app  # NOQA  # pylint: disable=unused-import
-from ggrc_workflows.models import Workflow, TaskGroup
+from ggrc_workflows.models import Workflow
 from integration.ggrc import TestCase
+from integration.ggrc.models import factories
 from integration.ggrc_workflows.generator import WorkflowsGenerator
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
+from integration.ggrc_workflows.models import factories as wf_factories
 
 
 class TestExportEmptyTemplate(TestCase):
@@ -67,93 +64,82 @@ class TestExportEmptyTemplate(TestCase):
 
 class TestExportMultipleObjects(TestCase):
 
-  """ Test data is found in the google sheet:
-  https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=2035742544
-  """
-
-  CSV_DIR = join(abspath(dirname(__file__)), "test_csvs/")
-
-  def activate(self):
-    """ activate workflows just once after the class has been initialized
-
-    This should be in setUpClass method, but we can't access the server
-    context from there."""
-    gen = WorkflowsGenerator()
-
-    # generate cycle for the only one time wf
-    wf1 = Workflow.query.filter_by(status="Draft", slug="wf-1").first()
-    if wf1:
-      gen.generate_cycle(wf1)
-
-    # Only workflows with at least one task group could be activated
-    workflows = db.session.query(Workflow).join(TaskGroup).filter(
-        Workflow.id == TaskGroup.workflow_id,
-        Workflow.status == 'Draft').all()
-    for workflow in workflows:
-      gen.activate_workflow(workflow)
+  """Test export of multiple objects."""
 
   def setUp(self):
     self.clear_data()
-    # TODO: use here such a CSV that doesn't have errors or warnings
-    self.import_file("workflow_big_sheet.csv", safe=False)
     self.client.get("/login")
-    self.headers = {
-        'Content-Type': 'application/json',
-        "X-Requested-By": "GGRC",
-        "X-export-view": "blocks",
-    }
-    self.activate()
+    self.wf_generator = WorkflowsGenerator()
 
-  def export_csv(self, data):
-    response = super(TestExportMultipleObjects, self).export_csv(data)
-    self.assert200(response)
-    return response
+  def test_workflow_task_group_mapping(self):  # pylint: disable=invalid-name
+    """Test workflow and task group mappings."""
+    with freeze_time("2017-03-07"):
+      workflow = wf_factories.WorkflowFactory()
+      workflow_slug = workflow.slug
+      task_group1 = wf_factories.TaskGroupFactory(workflow=workflow)
+      task_group1_slug = task_group1.slug
 
-  def test_workflow_task_group_mapping(self):
-    """ test workflow and task group mappings """
+      task_group2 = wf_factories.TaskGroupFactory(workflow=workflow)
+      task_group2_slug = task_group2.slug
+
     data = [
         {
-            "object_name": "Workflow",  # wf-1
+            "object_name": "Workflow",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
                     "object_name": "TaskGroup",
-                    "slugs": ["tg-1"],
+                    "slugs": [task_group1_slug],
                 },
             },
             "fields": "all",
         }, {
-            "object_name": "TaskGroup",  # tg-1, tg-2
+            "object_name": "TaskGroup",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
                     "object_name": "__previous__",
-                    "ids": ["0"],
+                    "ids": [0],
                 },
             },
             "fields": "all",
         },
     ]
-    response = self.export_csv(data).data
-    self.assertEqual(3, response.count("wf-1"))  # 1 for wf and 1 on each tg
-    self.assertIn("tg-1", response)
-    self.assertIn("tg-6", response)
+    response = self.export_csv(data)
+    self.assert200(response)
+    response_data = response.data
+
+    self.assertEqual(3, response_data.count(workflow_slug))
+    self.assertIn(task_group1_slug, response_data)
+    self.assertIn(task_group2_slug, response_data)
 
   def test_tg_task(self):
-    """ test task group and task mappings """
+    """Test task group task mappings."""
+    with freeze_time("2017-03-07"):
+      workflow = wf_factories.WorkflowFactory()
+      task_group1 = wf_factories.TaskGroupFactory(workflow=workflow)
+      task_group1_slug = task_group1.slug
+      task_group_task1 = wf_factories.TaskGroupTaskFactory(
+          task_group=task_group1)
+      task_group_task1_slug = task_group_task1.slug
+
+      task_group_task2 = wf_factories.TaskGroupTaskFactory(
+          task_group=task_group1)
+      task_group_task2_slug = task_group_task2.slug
+
     data = [
         {
-            "object_name": "TaskGroupTask",  # task-1, task-7
+            "object_name": "TaskGroupTask",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
                     "object_name": "TaskGroup",
-                    "slugs": ["tg-1"],
+                    "slugs": [task_group1_slug],
                 },
             },
             "fields": "all",
         }, {
-            "object_name": "TaskGroup",  # tg-1, tg-2
+            "object_name": "TaskGroup",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
@@ -164,99 +150,96 @@ class TestExportMultipleObjects(TestCase):
             "fields": "all",
         },
     ]
-    response = self.export_csv(data).data
-    self.assertEqual(3, response.count("tg-1"))  # 2 for tasks and 1 for tg
-    self.assertIn("task-1", response)
-    self.assertIn("task-7", response)
+    response = self.export_csv(data)
+    self.assert200(response)
+    response_data = response.data
+    self.assertEqual(3, response_data.count(task_group1_slug))
+    self.assertIn(task_group_task1_slug, response_data)
+    self.assertIn(task_group_task2_slug, response_data)
 
   def test_workflow_cycle_mapping(self):
-    """ test workflow and cycle mappings """
+    """Test workflow and cycle mappings."""
+    with freeze_time("2017-03-07"):
+      workflow = wf_factories.WorkflowFactory()
+      workflow_slug = workflow.slug
+      task_group = wf_factories.TaskGroupFactory(workflow=workflow)
+      wf_factories.TaskGroupTaskFactory(task_group=task_group)
+
+      wf_factories.TaskGroupTaskFactory(task_group=task_group)
+
+      self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
+
+    def block(obj, obj_id):
+      return {
+          "object_name": obj,
+          "filters": {
+              "expression": {
+                  "op": {"name": "relevant"},
+                  "object_name": "__previous__",
+                  "ids": [obj_id],
+              },
+          },
+          "fields": "all",
+      }
+
     data = [
         {
-            "object_name": "Cycle",  # cycle with title wf-1
+            "object_name": "Cycle",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
                     "object_name": "Workflow",
-                    "slugs": ["wf-1"],
-                },
-            },
-            "fields": "all",
-        }, {
-            "object_name": "Workflow",  # wf-1
-            "filters": {
-                "expression": {
-                    "op": {"name": "relevant"},
-                    "object_name": "__previous__",
-                    "ids": ["0"],
-                },
-            },
-            "fields": "all",
-        }, {
-            "object_name": "CycleTaskGroup",  # two cycle groups
-            "filters": {
-                "expression": {
-                    "op": {"name": "relevant"},
-                    "object_name": "__previous__",
-                    "ids": ["0"],
-                },
-            },
-            "fields": "all",
-        }, {
-            "object_name": "Cycle",  # sholud be same cycle as in first block
-            "filters": {
-                "expression": {
-                    "op": {"name": "relevant"},
-                    "object_name": "__previous__",
-                    "ids": ["2"],
-                },
-            },
-            "fields": "all",
-        }, {
-            # Task mapped to any of the two task groups, 3 tasks
-            "object_name": "CycleTaskGroupObjectTask",
-            "filters": {
-                "expression": {
-                    "op": {"name": "relevant"},
-                    "object_name": "__previous__",
-                    "ids": ["2"],
-                },
-            },
-            "fields": "all",
-        }, {
-            "object_name": "CycleTaskGroup",  # two cycle groups
-            "filters": {
-                "expression": {
-                    "op": {"name": "relevant"},
-                    "object_name": "__previous__",
-                    "ids": ["4"],
+                    "slugs": [workflow_slug],
                 },
             },
             "fields": "all",
         },
+        block("Workflow", "0"),
+        block("CycleTaskGroup", "0"),
+        block("Cycle", "2"),
+        block("CycleTaskGroupObjectTask", "2"),
+        block("CycleTaskGroup", "4"),
     ]
-    response = self.export_csv(data).data
-    self.assertEqual(3, response.count("wf-1"))  # 2 for cycles and 1 for wf
-    # 3rd block = 2, 5th block = 3, 6th block = 2.
-    self.assertEqual(7, response.count("CYCLEGROUP-"))
-    self.assertEqual(9, response.count("CYCLE-"))
-    self.assertEqual(3, response.count("CYCLETASK-"))
 
-  def test_cycle_taks_objects(self):
-    """ test cycle task and various objects """
+    response = self.export_csv(data)
+    self.assert200(response)
+    response_data = response.data
+
+    self.assertEqual(3, response_data.count(workflow_slug))
+    self.assertEqual(4, response_data.count("CYCLEGROUP-"))
+    self.assertEqual(6, response_data.count("CYCLE-"))
+    self.assertEqual(2, response_data.count("CYCLETASK-"))
+
+  def test_cycle_task_objects(self):
+    """Test cycle task and various objects."""
+    with freeze_time("2017-03-07"):
+      workflow = wf_factories.WorkflowFactory()
+      task_group = wf_factories.TaskGroupFactory(workflow=workflow)
+      wf_factories.TaskGroupTaskFactory(task_group=task_group)
+
+      wf_factories.TaskGroupTaskFactory(task_group=task_group)
+
+      policy = factories.PolicyFactory()
+      policy_slug = policy.slug
+      factories.RelationshipFactory(source=task_group, destination=policy)
+
+      self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
+
     data = [
         {
-            "object_name": "CycleTaskGroupObjectTask",  #
+            "object_name": "CycleTaskGroupObjectTask",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
                     "object_name": "Policy",
-                    "slugs": ["p1"],
+                    "slugs": [policy_slug],
                 },
             },
             "fields": "all",
         }, {
-            "object_name": "Policy",  #
+            "object_name": "Policy",
             "filters": {
                 "expression": {
                     "op": {"name": "relevant"},
@@ -267,12 +250,32 @@ class TestExportMultipleObjects(TestCase):
             "fields": ["slug", "title"],
         },
     ]
-    response = self.export_csv(data).data
-    self.assertEqual(2, response.count("CYCLETASK-"))
-    self.assertEqual(3, response.count(",p1,"))
+    response = self.export_csv(data)
+    self.assert200(response)
+    response_data = response.data
 
-  def test_wf_indirect_relevant_filters(self):
-    """ test related filter for indirect relationships on wf objects """
+    self.assertEqual(2, response_data.count("CYCLETASK-"))
+    self.assertEqual(3, response_data.count(policy_slug))
+
+  def test_wf_indirect_relevant_filters(self):  # pylint: disable=invalid-name
+    """Test related filter for indirect relationships on wf objects."""
+    with freeze_time("2017-03-07"):
+      workflow = wf_factories.WorkflowFactory(title="workflow-1")
+      task_group1 = wf_factories.TaskGroupFactory(workflow=workflow)
+      wf_factories.TaskGroupTaskFactory(task_group=task_group1)
+
+      wf_factories.TaskGroupTaskFactory(task_group=task_group1)
+
+      task_group2 = wf_factories.TaskGroupFactory(workflow=workflow)
+      wf_factories.TaskGroupTaskFactory(task_group=task_group2)
+
+      policy = factories.PolicyFactory()
+      policy_slug = policy.slug
+      factories.RelationshipFactory(source=task_group1, destination=policy)
+
+      self.wf_generator.generate_cycle(workflow)
+      self.wf_generator.activate_workflow(workflow)
+
     def block(obj):
       return {
           "object_name": obj,
@@ -281,7 +284,7 @@ class TestExportMultipleObjects(TestCase):
               "expression": {
                   "object_name": "Policy",
                   "op": {"name": "relevant"},
-                  "slugs": ["p1"],
+                  "slugs": [policy_slug],
               },
           },
       }
@@ -292,43 +295,43 @@ class TestExportMultipleObjects(TestCase):
         block("CycleTaskGroup"),
         block("CycleTaskGroupObjectTask"),
     ]
-    response = self.export_csv(data).data
+    response = self.export_csv(data)
+    self.assert200(response)
+    response_data = response.data
 
-    wf = Workflow.query.filter_by(slug="wf-1").first()
-    cycle = wf.cycles[0]
+    wf1 = Workflow.query.filter_by(title="workflow-1").first()
+    cycle = wf1.cycles[0]
     cycle_tasks = []
     for cycle_task in cycle.cycle_task_group_object_tasks:
-      is_related = False
       for related_object in cycle_task.related_objects():
-        if related_object.slug == "p1":
-          is_related = True
-      if is_related:
-        cycle_tasks.append(cycle_task)
+        if related_object.slug == policy_slug:
+          cycle_tasks.append(cycle_task)
+          break
 
     cycle_task_groups = list({cycle_task.cycle_task_group
                               for cycle_task in cycle_tasks})
 
-    self.assertEqual(1, response.count("wf-"))
+    self.assertEqual(1, response_data.count("WORKFLOW-"))
 
-    self.assertRegexpMatches(response, ",{}[,\r\n]".format(wf.slug))
+    self.assertRegexpMatches(response_data, ",{}[,\r\n]".format(wf1.slug))
 
-    self.assertEqual(1, response.count("CYCLE-"))
-    self.assertRegexpMatches(response, ",{}[,\r\n]".format(cycle.slug))
+    self.assertEqual(1, response_data.count("CYCLE-"))
+    self.assertRegexpMatches(response_data, ",{}[,\r\n]".format(cycle.slug))
 
-    self.assertEqual(1, response.count("CYCLEGROUP-"))
+    self.assertEqual(1, response_data.count("CYCLEGROUP-"))
     self.assertEqual(1, len(cycle_task_groups))
-    self.assertRegexpMatches(response, ",{}[,\r\n]".format(
+    self.assertRegexpMatches(response_data, ",{}[,\r\n]".format(
         cycle_task_groups[0].slug))
 
-    self.assertEqual(2, response.count("CYCLETASK-"))
+    self.assertEqual(2, response_data.count("CYCLETASK-"))
     self.assertEqual(2, len(cycle_tasks))
     for cycle_task in cycle_tasks:
-      self.assertRegexpMatches(response, ",{}[,\r\n]".format(
+      self.assertRegexpMatches(response_data, ",{}[,\r\n]".format(
           cycle_task.slug))
 
     destinations = [
-        ("Workflow", wf.slug, 3),
-        ("Cycle", cycle.slug, 3),
+        ("Workflow", wf1.slug, 1),
+        ("Cycle", cycle.slug, 1),
         ("CycleTaskGroupObjectTask", cycle_tasks[0].slug, 1),
         ("CycleTaskGroupObjectTask", cycle_tasks[1].slug, 1),
     ]
@@ -344,6 +347,9 @@ class TestExportMultipleObjects(TestCase):
               },
           },
       }]
-      response = self.export_csv(data).data
-      self.assertEqual(count, response.count(",p"), "Count for " + object_name)
-      self.assertIn(",p1", response)
+      response = self.export_csv(data)
+      self.assert200(response)
+      response_data = response.data
+      self.assertEqual(count, response_data.count(",POLICY-"),
+                       "Count for " + object_name)
+      self.assertIn("," + policy_slug, response_data)
