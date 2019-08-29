@@ -356,13 +356,13 @@ class Workflow(roleable.Roleable,
       "is_verification_needed": {
           "display_name": "Need Verification",
           "mandatory": True,
-          "description": "This field is not changeable\nafter "
-                         "workflow activation.",
+          "description": "Allowed values are:\nTRUE\nFALSE",
       },
       "notify_custom_message": "Custom email message",
       "notify_on_change": {
           "display_name": "Force real-time email updates",
           "mandatory": False,
+          "description": "Allowed values are:\nYes\nNo"
       },
       "status": None,
       "start_date": None,

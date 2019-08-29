@@ -235,6 +235,30 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Product.TYPE_OPTIONS)), response.data)
 
+  def test_f_realtime_email_updates(self):
+    """Tests if Force real-time email updates column has tip message. """
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": "Workflow", "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nYes\nNo", response.data)
+
+  def test_need_verification_tip(self):
+    """Tests if Need Verification column has tip message in export file. """
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": "Workflow", "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nTRUE\nFALSE", response.data)
+
 
 @ddt.ddt
 class TestExportSingleObject(TestCase):
