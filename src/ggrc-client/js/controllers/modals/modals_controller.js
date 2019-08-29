@@ -794,8 +794,8 @@ export default canControl.extend({
     this.disable_hide = true;
 
     ajd = instance.save();
-    ajd.fail(this.save_error.bind(this))
-      .done(function (obj) {
+    ajd.catch(this.save_error.bind(this))
+      .then(function (obj) {
         // enable ui after clicking on save & other
         that.disableEnableContentUI(false);
         delete that.disable_hide;
