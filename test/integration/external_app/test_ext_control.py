@@ -256,7 +256,7 @@ class TestSyncServiceControl(TestCase):
         "custom_attribute_values": [cav_body],
     })
 
-    response = self.api.post(all_models.Control, {
+    response = self.api.post(all_models.Control, data={
         "control": control_body,
     })
 
@@ -320,27 +320,27 @@ class TestSyncServiceControl(TestCase):
   @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", "mock")
   def test_update_control_with_cads(self):
     """Test update control with CADs/CAVs."""
+    ext_user_email = "external@example.com"
     factories.ExternalCustomAttributeDefinitionFactory(
         id=444,
         attribute_type="Text",
         definition_type="control"
     )
-    external_user = factories.PersonFactory(email=self.ext_user_email)
+    external_user = factories.PersonFactory(email=ext_user_email)
     control = factories.ControlFactory(id=123, modified_by=external_user)
     response = self.api.get(control, control.id)
     response_json = response.json
     cad_body = self.prepare_external_cad_body("Text", "Control")
     cav_body = self.prepare_external_cav_body(123, "Control")
-    api_link = response_json["control"].pop("selfLink")
     response_json["control"].update({
         "custom_attribute_definitions": [cad_body],
         "custom_attribute_values": [cav_body],
     })
 
-    response = self.api.client.put(
-        api_link,
-        data=json.dumps(response_json),
-        headers=self.api.headers,
+    response = self.api.put(
+        control,
+        control.id,
+        response_json
     )
 
     self.assertEqual(response.status_code, 200)
