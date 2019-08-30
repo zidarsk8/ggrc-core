@@ -59,6 +59,13 @@ class TestControls(base.Test):
     webui_facade.soft_assert_cannot_view_proposals(info_page, soft_assert)
     soft_assert.assert_expectations()
 
+  def test_cannot_restore_disabled_object_version(self, control, soft_assert,
+                                                  selenium):
+    """Confirm that user cannot restore disabled object's version."""
+    webui_facade.soft_assert_cannot_view_version_history(
+        control, soft_assert, selenium)
+    soft_assert.assert_expectations()
+
   def test_user_cannot_add_person_to_custom_role(self, control,
                                                  controls_service):
     """Tests that user cannot add a person to custom Role."""
