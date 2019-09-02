@@ -163,6 +163,19 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Options are:\n{}".format('\n'.join(
         all_models.Assessment.ASSESSMENT_TYPE_OPTIONS)), response.data)
 
+  def test_role_tip(self):
+    """Tests if Role column has tip message in export file (People Object)."""
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": "Person", "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are\n{}".format('\n'.join(
+        all_models.Person.ROLE_OPTIONS)), response.data)
+
 
 @ddt.ddt
 class TestExportSingleObject(TestCase):
