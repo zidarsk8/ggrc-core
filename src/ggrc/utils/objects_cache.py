@@ -3,6 +3,7 @@
 
 """Functionality for caching db data for GGRC objects."""
 from collections import defaultdict
+import logging
 
 import sqlalchemy as sa
 
@@ -10,6 +11,9 @@ from ggrc import db
 from ggrc.models import all_models
 from ggrc.utils import benchmark
 from ggrc.utils import helpers
+
+
+logger = logging.getLogger(__name__)
 
 
 @helpers.cached
@@ -93,5 +97,14 @@ def related_snapshot_slugs_cache(obj_class, obj_ids):
     ).fetchall()
 
     for object_id, snapshot_obj_type, snapshot_obj_slug in mapped_revs:
+      if not snapshot_obj_slug:
+        logger.warning(
+            "Snapshot for object %s with ID=%s contains invalid object slug. "
+            "The value will be ignored.",
+            snapshot_obj_type,
+            object_id,
+        )
+        continue
       snapshots[object_id][snapshot_obj_type].add(snapshot_obj_slug)
+
     return snapshots
