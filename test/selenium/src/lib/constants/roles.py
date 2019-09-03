@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants for roles."""
 from lib import url
+from lib.constants import objects
 from lib.decorator import lazy_property, memoize
 from lib.service.rest.client import RestClient
 
@@ -21,6 +22,7 @@ VERIFIERS = "Verifiers"
 # program roles
 PROGRAM_EDITOR = "Program Editor"
 PROGRAM_MANAGER = "Program Manager"
+PROGRAM_MANAGERS = PROGRAM_MANAGER + "s"
 PROGRAM_READER = "Program Reader"
 # workflow roles
 WORKFLOW_MEMBER = "Workflow Member"
@@ -30,6 +32,7 @@ OTHER = "other"
 CREATORS = CREATOR + "s"
 AUDIT_LEAD = "Audit Lead"
 AUDITORS = "Auditors"
+AUDIT_CAPTAINS = "Audit Captains"
 PRINCIPAL_ASSIGNEES = "Principal " + ASSIGNEES
 SECONDARY_ASSIGNEES = "Secondary " + ASSIGNEES
 PRIMARY_CONTACTS = "Primary Contacts"
@@ -41,6 +44,7 @@ TECHNICAL_LEADS = "Technical Leads"
 TECHNICAL_PMS = "Technical / Program Managers"
 LEGAL_COUNSELS = "Legal Counsels"
 SYSTEM_OWNERS = "System Owners"
+REVIEWERS = "Reviewers"
 
 # Some Smoke ACL tests check functionality under this set of roles
 IMPORTANT_ASMT_ROLES = [
@@ -112,59 +116,86 @@ class ACLRolesIDsMetaClass(type):
 
   @property
   def CONTROL_ADMINS(cls):
-    return cls.id_of_role(object_type="Control", name="Admin")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.CONTROLS),
+                          name=ADMIN)
 
   @property
   def ISSUE_ADMINS(cls):
-    return cls.id_of_role(object_type="Issue", name="Admin")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.ISSUES),
+                          name=ADMIN)
 
   @property
   def OBJECTIVE_ADMINS(cls):
-    return cls.id_of_role(object_type="Objective", name="Admin")
+    return cls.id_of_role(objects.get_obj_type(objects.OBJECTIVES),
+                          name=ADMIN)
 
   @property
   def RISK_ADMINS(cls):
-    return cls.id_of_role(object_type="Risk", name="Admin")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.RISKS),
+                          name=ADMIN)
 
   @property
   def ORG_GROUPS_ADMINS(cls):
-    return cls.id_of_role(object_type="OrgGroup", name="Admin")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.ORG_GROUPS),
+                          name=ADMIN)
 
   @property
   def ASSESSMENT_CREATORS(cls):
-    return cls.id_of_role(object_type="Assessment", name="Creators")
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ASSESSMENTS),
+        name=CREATORS)
 
   @property
   def ASSESSMENT_ASSIGNEES(cls):
-    return cls.id_of_role(object_type="Assessment", name="Assignees")
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ASSESSMENTS),
+        name=ASSIGNEES)
 
   @property
   def ASSESSMENT_VERIFIERS(cls):
-    return cls.id_of_role(object_type="Assessment", name="Verifiers")
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.ASSESSMENTS),
+        name=VERIFIERS)
 
   @property
   def AUDIT_CAPTAINS(cls):
-    return cls.id_of_role(object_type="Audit", name="Audit Captains")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.AUDITS),
+                          name=AUDIT_CAPTAINS)
 
   @property
   def AUDITORS(cls):
-    return cls.id_of_role(object_type="Audit", name="Auditors")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.AUDITS),
+                          name=AUDITORS)
 
   @property
   def PROGRAM_MANAGERS(cls):
-    return cls.id_of_role(object_type="Program", name="Program Managers")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.PROGRAMS),
+                          name=PROGRAM_MANAGERS)
 
   @property
   def PRODUCT_MANAGERS(cls):
-    return cls.id_of_role(object_type="Product", name="Product Managers")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.PRODUCTS),
+                          name=PRODUCT_MANAGERS)
 
   @property
   def REVIEWERS(cls):
-    return cls.id_of_role(object_type="Review", name="Reviewers")
+    return cls.id_of_role(object_type=objects.get_obj_type(objects.REVIEWS),
+                          name=REVIEWERS)
 
   @property
   def STANDARD_ADMINS(cls):
-    return cls.id_of_role(object_type="Standard", name="Admin")
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.STANDARDS), name=ADMIN)
+
+  @property
+  def REGULATION_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.REGULATIONS), name=ADMIN)
+
+  @property
+  def REQUIREMENT_ADMINS(cls):
+    return cls.id_of_role(
+        object_type=objects.get_obj_type(objects.REQUIREMENTS), name=ADMIN)
 
 
 class ACLRolesIDs(object):

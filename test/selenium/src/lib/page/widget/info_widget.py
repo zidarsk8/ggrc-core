@@ -15,7 +15,8 @@ from lib.constants.locator import WidgetInfoAssessment, WidgetInfoControl
 from lib.element import (
     info_widget_three_bbs, page_elements, tables, tab_element, tab_containers)
 from lib.page import dashboard
-from lib.page.modal import apply_decline_proposal, set_value_for_asmt_ca
+from lib.page.modal import (
+    apply_decline_proposal, set_value_for_asmt_ca, snapshoted_controls_info)
 from lib.page.widget import (
     info_panel, object_modal, object_page, related_proposals)
 from lib.page.widget import page_mixins
@@ -662,6 +663,14 @@ class Assessments(InfoWidget):
     titles = titles_from_current_tab()
     self.tabs.ensure_tab(self._other_attributes_tab_name)
     return titles + titles_from_current_tab()
+
+  def open_mapped_control_snapshot_info(self, control):
+    """Click on control snapshot on assessment tab to open control snapshot
+    info modal."""
+    self.tabs.ensure_tab(self._assessment_tab_name)
+    self._active_tab_root.element(class_name="mapped-snapshot-item").element(
+        text=control.title).click()
+    return snapshoted_controls_info.SnapshotedControlsInfo()
 
   def custom_attributes(self):
     """Returns the dictionary of all custom attributes."""

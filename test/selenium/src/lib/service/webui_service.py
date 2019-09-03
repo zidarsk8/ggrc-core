@@ -717,6 +717,14 @@ class AssessmentsService(BaseWebUiService):
     asmt_info = self.open_info_page_of_obj(asmt)
     asmt_info.choose_and_fill_dropdown_lca(dropdown, **kwargs)
 
+  def get_snapshots_which_are_related_to_control_snapshot(self, asmt, control,
+                                                          obj_type):
+    """Returns list of specific type snapshots which are related to control
+    snapshot."""
+    # pylint: disable=invalid-name
+    return (self.open_info_page_of_obj(asmt).open_mapped_control_snapshot_info(
+        control).get_related_snapshots(obj_type))
+
 
 class ControlsService(SnapshotsWebUiService):
   """Class for Controls business layer's services objects."""
