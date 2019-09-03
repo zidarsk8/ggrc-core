@@ -239,13 +239,11 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
     it_issue = models.IssuetrackerIssue.get_issue("Assessment", assmt_id)
     expected_assmt_request_payload = assmt_request_payload.copy()
     # we do not update some values during manual linking
-    expected_assmt_request_payload["assessment"]["issue_tracker"] = dict(
-        expected_assmt_request_payload["assessment"]["issue_tracker"],
-        **{
-            "title": response_payload["issueState"]["title"],
-            "issue_severity": response_payload["issueState"]["severity"],
-            "issue_priority": response_payload["issueState"]["priority"],
-        })
+    expected_assmt_request_payload["assessment"]["issue_tracker"].update({
+        "title": response_payload["issueState"]["title"],
+        "issue_severity": response_payload["issueState"]["severity"],
+        "issue_priority": response_payload["issueState"]["priority"],
+    })
     self.check_issuetracker_issue_fields(
         it_issue,
         expected_assmt_request_payload,

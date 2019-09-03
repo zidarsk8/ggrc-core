@@ -518,14 +518,12 @@ class TestIssueLink(TestIssueIntegration):
     issue = all_models.Issue.query.filter_by(id=issue_id).first()
     expected_issue_request_payload = issue_request_payload.copy()
     # we do not update some values during manual linking
-    expected_issue_request_payload["issue"]["issue_tracker"] = dict(
-        expected_issue_request_payload["issue"]["issue_tracker"],
-        **{
-            "title": response_payload["issueState"]["title"],
-            "issue_severity": response_payload["issueState"]["severity"],
-            "issue_priority": response_payload["issueState"]["priority"],
-            "issue_type": "PROCESS"  # default value for GGRC
-        })
+    expected_issue_request_payload["issue"]["issue_tracker"].update({
+        "title": response_payload["issueState"]["title"],
+        "issue_severity": response_payload["issueState"]["severity"],
+        "issue_priority": response_payload["issueState"]["priority"],
+        "issue_type": "PROCESS"  # default value for GGRC
+    })
 
     self._check_iti_fields(issue,
                            issue_tracker_issue,

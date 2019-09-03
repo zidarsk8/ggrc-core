@@ -141,16 +141,6 @@ class AssessmentTrackerHandler(object):
       except (ValueError, TypeError):
         raise exceptions.ValidationError("Issue ID must be a number.")
 
-  def _validate_assmt_link_fields(self, issue_info):
-    """""Validate assessment fields for issue
-
-      Args:
-          issue_info: dictionary with issue payload information
-    """
-    self._validate_issue_id(issue_info)
-    self._validate_string_fields(issue_info)
-    self._validate_assessment_title(issue_info)
-
   @staticmethod
   def _validate_assessment_title(issue_info):
     """Validate assessment fields for issue
@@ -430,14 +420,15 @@ class AssessmentTrackerHandler(object):
                 assessment,
                 issue_db_info
             )
-      elif self._is_update_issue_mode(issue_id_stored, issue_id_sent):
-        self._update_and_disable_ticket(
-            assessment,
-            initial_state,
-            issue_initial_obj,
-            issue_id_stored,
-            assessment_src
-        )
+      elif (self._is_update_issue_mode(issue_id_stored, issue_id_sent) and
+            not assessment_src["issue_tracker"].get("is_linking")):
+          self._update_and_disable_ticket(
+              assessment,
+              initial_state,
+              issue_initial_obj,
+              issue_id_stored,
+              assessment_src
+          )
       elif self._is_link_detach_issue_mode(issue_id_stored, issue_id_sent):
         self._link_and_detach_ticket(
             assessment,

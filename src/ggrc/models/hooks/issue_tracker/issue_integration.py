@@ -276,6 +276,11 @@ def update_issue_handler(obj, initial_state, new_issuetracker_info=None):  # noq
       detach_issue(new_ticket_id, old_ticket_id)
     return
 
+  if new_ticket_id == old_ticket_id and \
+     new_issuetracker_info.get("is_linking"):
+    # issue already linked. no need to do something
+    return
+
   current_issue_tracker_info = it_object.to_dict(
       include_issue=True,
       include_private=True
