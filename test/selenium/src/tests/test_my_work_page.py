@@ -15,7 +15,6 @@ from lib.constants import objects
 from lib.page import dashboard, lhn
 from lib.page.widget import generic_widget, object_modal
 from lib.service import webui_facade
-from lib.ui import ui_facade
 from lib.utils import selenium_utils
 
 
@@ -206,8 +205,9 @@ class TestMyWorkPage(base.Test):
       )
     assert hnb_objects.issubset(lhn_objects) is True
 
-  def test_user_cannot_create_control_from_lhn(self, lhn_menu):
+  def test_user_cannot_create_control_from_lhn(self, lhn_menu, soft_assert):
     """Tests that `New Control` modal object cannot be opened from lhn."""
     lhn_menu.select_controls_or_objectives().select_controls().create_new()
-    ui_facade.verify_modal_obj_not_present_in_all_windows(
-        object_modal.ControlModal())
+    webui_facade.soft_assert_no_modals_present(object_modal.ControlModal(),
+                                               soft_assert)
+    soft_assert.assert_expectations()

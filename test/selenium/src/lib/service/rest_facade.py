@@ -23,6 +23,11 @@ def create_objective(program=None, **attrs):
   return _create_obj_in_program_scope("Objectives", program, **attrs)
 
 
+def create_standard(program=None, **attrs):
+  """Creates a standard (optionally map to a `program`)."""
+  return _create_obj_in_program_scope(objects.STANDARDS, program, **attrs)
+
+
 def create_control(**attrs):
   """Create an control."""
   return _create_obj_in_program_scope("Controls", None, **attrs)

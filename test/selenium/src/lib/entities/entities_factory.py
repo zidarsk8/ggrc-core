@@ -746,3 +746,17 @@ class ReviewsFactory(EntitiesFactory):
   def default_review(self):
     """Returns default review value as dict."""
     return self.create().convert_review_to_dict()
+
+
+class StandardsFactory(EntitiesFactory):
+  """Factory class for Standard entities."""
+
+  def __init__(self):
+    super(StandardsFactory, self).__init__(objects.STANDARDS)
+    self._acl_roles = [
+        ("admins", roles.ACLRolesIDs.STANDARD_ADMINS, [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Creates Standard entity."""
+    return self.obj_inst().update_attrs(title=self.obj_title)

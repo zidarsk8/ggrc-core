@@ -1,6 +1,6 @@
 # Copyright (C) 2019 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
+"""Tests exported csv files"""
 from os.path import abspath, dirname, join
 
 import collections
@@ -36,6 +36,7 @@ class TestExportEmptyTemplate(TestCase):
     }
 
   def test_basic_policy_template(self):
+    """Tests for basic policy templates."""
     data = {
         "export_to": "csv",
         "objects": [{"object_name": "Policy", "fields": "all"}]
@@ -48,6 +49,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Policy", response.data)
 
   def test_multiple_empty_objects(self):
+    """Tests for multiple empty objects"""
     data = {
         "export_to": "csv",
         "objects": [
@@ -125,7 +127,6 @@ class TestExportEmptyTemplate(TestCase):
   @ddt.data("Assessment", "Issue")
   def test_delete_tip_in_export_csv(self, model):
     """Tests if delete column has tip message in export file for {}"""
-
     data = {
         "export_to": "csv",
         "objects": [
@@ -134,8 +135,20 @@ class TestExportEmptyTemplate(TestCase):
     }
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
-
     self.assertIn("Allowed value is:\nYes", response.data)
+
+  def test_assessment_type_tip(self):
+    """Tests if Assessment type column has tip message in export file for {}"""
+    data = {
+        "export_to": "csv",
+        "objects": [
+            {"object_name": "Assessment", "fields": "all"},
+        ],
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Options are:\n{}".format('\n'.join(
+        all_models.Assessment.ASSESSMENT_TYPE_OPTIONS)), response.data)
 
 
 @ddt.ddt
@@ -282,6 +295,7 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_program_audit_relevant_query(self):
+    """Test program audit relevant query"""
     response = self._import_file("data_for_export_testing_program_audit.csv")
     self._check_csv_response(response, {})
     data = [{  # should return just program prog-1
@@ -403,6 +417,7 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(title, response.data, "'{}' was found".format(title))
 
   def test_multiple_relevant_query(self):
+    """Test multiple relevant query"""
     response = self._import_file(
         "data_for_export_testing_program_policy_contract.csv")
     self._check_csv_response(response, {})
@@ -435,6 +450,7 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_query_all_aliases(self):
+    """Tests query for all aliases"""
     def rhs(model, attr):
       attr = getattr(model, attr, None)
       if attr is not None and hasattr(attr, "_query_clause_element"):
@@ -462,11 +478,11 @@ class TestExportSingleObject(TestCase):
         if field is None:
           continue
         try:
-          field = field["display_name"] if type(field) is dict else field
+          field = field["display_name"] if isinstance(field, dict) else field
           res = self.export_csv(data(model, attr, field))
           self.assertEqual(res.status_code, 200)
-        except Exception as e:
-          failed.add((model, attr, field, e))
+        except Exception as err:
+          failed.add((model, attr, field, err))
     self.assertEqual(sorted(failed), [])
 
 

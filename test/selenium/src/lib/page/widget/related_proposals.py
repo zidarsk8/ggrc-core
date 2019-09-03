@@ -10,6 +10,10 @@ from lib.utils import date_utils
 class RelatedProposals(base.WithBrowser):
   """Related proposals."""
 
+  def are_proposals_displayed(self):
+    """Returns whether proposals are displayed on page."""
+    return self._browser.element(tag_name="related-proposals").exists
+
   def get_proposals(self):
     """Get proposal rows."""
     obj_list_element = self._browser.element(

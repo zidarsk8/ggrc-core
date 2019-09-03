@@ -57,9 +57,9 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
   _title_uniqueness = False
 
   IMPORTABLE_FIELDS = (
-      'slug', 'title', 'description', 'start_date',
-      'end_date', 'finished_date', 'verified_date', 'comments',
-      'status', '__acl__:Task Assignees', '__acl__:Task Secondary Assignees',
+      'slug', 'title', 'description',
+      'start_date', 'end_date', 'comments', 'status',
+      '__acl__:Task Assignees', '__acl__:Task Secondary Assignees',
   )
 
   @classmethod
@@ -230,19 +230,9 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       "description": "Task Description",
       "finished_date": {
           "display_name": "Actual Finish Date",
-          "description": ("Make sure that 'Actual Finish Date' isn't set, "
-                          "if cycle task state is <'Assigned' / "
-                          "'In Progress' / 'Declined' / 'Deprecated'>. "
-                          "Type double dash '--' into "
-                          "'Actual Finish Date' cell to remove it.")
       },
       "verified_date": {
           "display_name": "Actual Verified Date",
-          "description": ("Make sure that 'Actual Verified Date' isn't set, "
-                          "if cycle task state is <'Assigned' / "
-                          "'In Progress' / 'Declined' / 'Deprecated' / "
-                          "'Finished'>. Type double dash '--' into "
-                          "'Actual Verified Date' cell to remove it.")
       },
       "cycle": {
           "display_name": "Cycle",
