@@ -170,7 +170,7 @@ class TestTaskAssigneesPropagation(base.TestACLPropagation):
           "CycleTaskGroup": {
               "read": True,
               "update": False,
-              "delete": False,
+              "delete": True,
           },
           "CycleTask": {
               "create": True,
