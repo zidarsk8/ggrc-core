@@ -8,7 +8,7 @@ import unittest
 import ddt
 import mock
 
-from ggrc.models.hooks import assessment
+from ggrc.models.hooks import assessment as asmt_hooks
 
 
 @ddt.ddt
@@ -43,7 +43,7 @@ class TestFromSession(unittest.TestCase):
       ),
   )
   @ddt.unpack
-  def test_generate_role_object_dict(self, content_acl, expected):
+  def test_generate_role_people_map(self, content_acl, expected):
     """Generate role object should not fail on a missing role for
 
     This test checks that any role can be missing and the roles dict is still
@@ -56,12 +56,28 @@ class TestFromSession(unittest.TestCase):
           1: "Auditors",
           2: "Audit Captains",
       }
-      assessment.logger = mock.MagicMock()
+      asmt_hooks.logger = mock.MagicMock()
       audit = mock.MagicMock()
       audit.access_control_list = []
       snapshot = mock.MagicMock()
       snapshot.revision.content = {
           "access_control_list": content_acl,
       }
-      acl_dict = assessment.generate_role_object_dict(snapshot, audit)
+      # pylint: disable=protected-access
+      acl_dict = asmt_hooks._generate_role_people_map(
+          audit, snapshot, snapshot.revision.content)
       self.assertEqual(acl_dict, expected)
+
+  def test_missing_snapshot_plan(self):
+    """Test copy_snapshot_plan when test_plan is missing from revision."""
+    asmt = mock.MagicMock(test_plan="Initial Test Plan.")
+    asmt_test_plan_before = asmt.test_plan
+    snapshot_rev_content = {}
+
+    asmt_hooks.set_test_plan(
+        assessment=asmt,
+        template=None,
+        snapshot_rev_content=snapshot_rev_content,
+    )
+
+    self.assertEqual(asmt_test_plan_before, asmt.test_plan)

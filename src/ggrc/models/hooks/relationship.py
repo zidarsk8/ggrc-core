@@ -16,7 +16,7 @@ from ggrc.login import is_external_app_user
 from ggrc.models import all_models
 from ggrc.models import exceptions
 from ggrc.models.comment import Commentable, ExternalCommentable
-from ggrc.models.hooks import assessment
+from ggrc.models.hooks import assessment as asmt_hooks
 from ggrc.models.mixins.base import ChangeTracked
 from ggrc.services import signals
 
@@ -299,7 +299,11 @@ def copy_snapshot_test_plan(objects):
       # and if test_plan_procedure was set to True
       if asmnt.assessment_type == snapshot.child_type and \
          asmnt.test_plan_procedure:
-        assessment.copy_snapshot_plan(asmnt, snapshot)
+        asmt_hooks.set_test_plan(
+            assessment=asmnt,
+            template=None,
+            snapshot_rev_content=snapshot.revision.content,
+        )
 
 
 def delete_comment_notification(comment):

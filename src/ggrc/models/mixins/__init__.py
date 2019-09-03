@@ -19,6 +19,7 @@ color
 from logging import getLogger
 from uuid import uuid1
 import datetime
+import re
 
 from sqlalchemy import event
 from sqlalchemy import orm
@@ -60,7 +61,7 @@ class Titled(object):
     if value is None:
       raise ValueError("'title' must be specified")
 
-    return value.strip()
+    return re.sub(r"\s+", " ", value).strip()
 
   title = db.Column(db.String, nullable=False)
 
