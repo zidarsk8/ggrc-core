@@ -224,7 +224,7 @@ class TestExportEmptyTemplate(TestCase):
     }
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
-    self.assertIn("Options are:\n{}".format('\n'.join(
+    self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Assessment.ASSESSMENT_TYPE_OPTIONS)), response.data)
 
   def test_role_tip(self):
