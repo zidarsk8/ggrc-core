@@ -422,13 +422,13 @@ class AssessmentTrackerHandler(object):
             )
       elif (self._is_update_issue_mode(issue_id_stored, issue_id_sent) and
             not assessment_src["issue_tracker"].get("is_linking")):
-          self._update_and_disable_ticket(
-              assessment,
-              initial_state,
-              issue_initial_obj,
-              issue_id_stored,
-              assessment_src
-          )
+        self._update_and_disable_ticket(
+            assessment,
+            initial_state,
+            issue_initial_obj,
+            issue_id_stored,
+            assessment_src
+        )
       elif self._is_link_detach_issue_mode(issue_id_stored, issue_id_sent):
         self._link_and_detach_ticket(
             assessment,
