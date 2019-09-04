@@ -48,6 +48,25 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Title*", response.data)
     self.assertIn("Policy", response.data)
 
+  @ddt.data("Assessment", "Issue", "Person", "Audit", "Product")
+  def test_custom_attr(self, model):
+    """Test if custom attribute Dropdown type has hint for {}."""
+    with factories.single_commit():
+      multi_options = "option_1,option_2,option_3"
+      factories.CustomAttributeDefinitionFactory(
+          definition_type=model.lower(),
+          attribute_type="Dropdown",
+          multi_choice_options=multi_options,
+      )
+    data = {
+        "export_to": "csv",
+        "objects": [{"object_name": model, "fields": "all"}]
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\n{}".format(
+        multi_options.replace(',', '\n')), response.data)
+
   def test_multiple_empty_objects(self):
     """Tests for multiple empty objects"""
     data = {
