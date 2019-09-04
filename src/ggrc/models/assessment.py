@@ -222,6 +222,7 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
                              "ProductGroup",
                              "KeyReport"
                              )
+
   _aliases = {
       "owners": None,
       "assessment_template": {
@@ -236,13 +237,22 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
           "description": "Options are:\n{}".format(
               '\n'.join(ASSESSMENT_TYPE_OPTIONS)),
       },
-      "design": "Conclusion: Design",
-      "operationally": "Conclusion: Operation",
+      "design": {
+          "display_name": "Conclusion: Design",
+          "description": "Allowed values are:\n{}".format(
+              '\n'.join(VALID_CONCLUSIONS)),
+      },
+      "operationally": {
+          "display_name": "Conclusion: Operation",
+          "description": "Allowed values are:\n{}".format(
+              '\n'.join(VALID_CONCLUSIONS)),
+      },
       "archived": {
           "display_name": "Archived",
           "mandatory": False,
           "ignore_on_update": True,
           "view_only": True,
+          "description": "Allowed values are:\nyes\nno"
       },
       "test_plan": "Assessment Procedure",
       # Currently we decided to have 'Due Date' alias for start_date,

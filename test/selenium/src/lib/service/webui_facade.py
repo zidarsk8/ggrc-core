@@ -6,13 +6,13 @@ import copy
 import random
 import re
 
-from lib import url, users, base, browsers
+from lib import url, users, base, browsers, factory
 from lib.constants import objects, element
 from lib.entities import entities_factory
 from lib.page import dashboard
 from lib.page.modal import unified_mapper
 from lib.page.widget import (generic_widget, object_modal, import_page,
-                             related_proposals)
+                             related_proposals, version_history)
 from lib.service import (webui_service, rest_service, rest_facade,
                          admin_webui_service)
 from lib.utils import selenium_utils, ui_utils, string_utils
@@ -362,6 +362,25 @@ def soft_assert_cannot_view_proposals(info_page, soft_assert):
     soft_assert.expect(
         not related_proposals.RelatedProposals().are_proposals_displayed(),
         "Proposals should not be displayed in browser tab number {}.".
+        format(tab_num))
+
+
+def soft_assert_cannot_view_version_history(obj, soft_assert, selenium):
+  """Performs soft assertion that user cannot view Version History for disabled
+  object."""
+  info_page = factory.get_cls_webui_service(objects.get_plural(
+      obj.type))(selenium).open_info_page_of_obj(obj)
+  info_page.click_version_history()
+  soft_assert.expect(are_tabs_urls_equal(), "Tabs urls should be equal.")
+  soft_assert.expect(
+      info_page.version_history_tab_or_link_name
+      not in info_page.tabs.tab_names,
+      "'Version History' tab should not be displayed.")
+  for tab_num, tab in enumerate(browsers.get_browser().windows(), start=1):
+    tab.use()
+    soft_assert.expect(
+        not version_history.VersionHistory().is_version_history_displayed(),
+        "Version history should not be displayed in browser tab number {}.".
         format(tab_num))
 
 

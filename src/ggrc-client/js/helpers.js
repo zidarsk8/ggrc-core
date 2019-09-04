@@ -744,3 +744,11 @@ canStache.registerHelper('isTextLarge', (data, options) => {
     options.fn(data):
     options.inverse(options.contexts);
 });
+
+// Formats the counter according to "(number)" format
+canStache.registerHelper('displayCount', (countObserver) => {
+  let count = countObserver();
+  if (count) {
+    return '(' + count + ')';
+  }
+});

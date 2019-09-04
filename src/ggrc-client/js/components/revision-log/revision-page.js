@@ -193,9 +193,9 @@ export default canComponent.extend({
           value = value || EMPTY_DIFF_VALUE;
           value = value.length ? value : EMPTY_DIFF_VALUE;
           if (loIsObject(value)) {
-            value = value.map(function (item) {
-              return item.display_name;
-            });
+            value = value.map((item) =>
+              loIsObject(item) ? item.display_name : item
+            );
           }
           return value;
         };
@@ -476,8 +476,8 @@ export default canComponent.extend({
         }
         const automappingTitle =
           `(automapping triggered after ${person} mapped ` +
-        `${automapping.destination.type} "${automapping.destination.title}"` +
-        ` to ${automapping.source.type} "${automapping.source.title}")`;
+          `${automapping.destination.type} "${automapping.destination.title}"` +
+          ` to ${automapping.source.type} "${automapping.source.title}")`;
         return {
           automapping: {
             title: automappingTitle,

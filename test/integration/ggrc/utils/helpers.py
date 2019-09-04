@@ -6,6 +6,19 @@ import collections
 
 import ddt
 
+from ggrc.models import all_models
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
+
+
+def add_person_global_role(person, role):
+  """Add role to person"""
+  system_role = all_models.Role.query.filter(
+      all_models.Role.name == role
+  ).one()
+  rbac_factories.UserRoleFactory(role=system_role, person=person)
+  return person
+
 
 def tuplify(data, unwrap_keys=False):
   """Convert dictionary to a list of tuples."""

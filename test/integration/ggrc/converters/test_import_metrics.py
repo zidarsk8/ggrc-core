@@ -2,15 +2,15 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for task group task specific export."""
-from collections import OrderedDict
+import collections
 
 import ddt
 import mock
 
+from ggrc.models import all_models
+from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
-from ggrc.converters import errors
-from ggrc.models import all_models
 
 
 @ddt.ddt
@@ -23,20 +23,55 @@ class TestMetricsImport(TestCase):
 
   def test_metrics_import(self):
     """Test metrics import"""
-    filename = "import_metrics.csv"
-    response = self._import_file(filename)
-    metric_response = response[2]
+    regulation = factories.RegulationFactory()
+    standard = factories.StandardFactory()
+    metric_data = [
+        collections.OrderedDict([
+            ("object_type", "Metric"),
+            ("Code*", ""),
+            ("Title*", "Metric-1"),
+            ("Admin*", "user@example.com"),
+            ("Assignee", "user@example.com"),
+            ("Verifier", "user@example.com"),
+            ("map:regulation", ""),
+            ("map:standard", ""),
+        ]),
+        collections.OrderedDict([
+            ("object_type", "Metric"),
+            ("Code*", ""),
+            ("Title*", "Metric-2"),
+            ("Admin*", "user@example.com"),
+            ("Assignee", "user@example.com"),
+            ("Verifier", "user@example.com"),
+            ("map:regulation", regulation.slug),
+            ("map:standard", ""),
+        ]),
+        collections.OrderedDict([
+            ("object_type", "Metric"),
+            ("Code*", ""),
+            ("Title*", "Metric-3"),
+            ("Admin*", "user@example.com"),
+            ("Assignee", "user@example.com"),
+            ("Verifier", "user@example.com"),
+            ("map:regulation", ""),
+            ("map:standard", standard.slug),
+        ]),
+    ]
+
+    response = self.import_data(*metric_data)
+
+    metric_response = response[0]
     self.assertEqual(metric_response["created"], 3)
     self._check_csv_response(response, {
         "Metric": {
             "row_warnings": {
                 errors.MAP_UNMAP_SCOPE_ERROR.format(
-                    line=14,
+                    line=4,
                     object_type="Regulation",
                     action="map",
                 ),
                 errors.MAP_UNMAP_SCOPE_ERROR.format(
-                    line=15,
+                    line=5,
                     object_type="Standard",
                     action="map",
                 ),
@@ -54,8 +89,7 @@ class TestMetricsImport(TestCase):
     with mock.patch("ggrc.settings.GGRC_Q_INTEGRATION_URL",
                     test_url) as ggrc_q_link:
       metric = factories.MetricFactory()
-      self.assertEqual(metric.status, "Draft")
-      response = self.import_data(OrderedDict([
+      response = self.import_data(collections.OrderedDict([
           ("object_type", "Metric"),
           ("Code*", metric.slug),
           ("Launch Status", "Deprecated"),

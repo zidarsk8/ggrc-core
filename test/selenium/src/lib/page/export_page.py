@@ -21,7 +21,7 @@ class ExportItem(base.Component):
     self.export_item_elem.button(text="Download CSV").click()
 
 
-class ExportPage(base.AbstractPage):
+class ExportPage(base.Component):
   """Export Page."""
   _locators = locator.ExportPage
   _elements = element.ExportPage

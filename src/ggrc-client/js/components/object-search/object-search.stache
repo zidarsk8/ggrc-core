@@ -100,7 +100,7 @@
     </div>
 
     <div class="modal-footer {{#if showResults}}expanded{{/if}}">
-      <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount scope.vars.totalObjects}}'" expanded:bind="showResults">
+      <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount entriesTotalCount}}'" expanded:bind="showResults">
         <div class="search-results">
           {{#if resultsRequested}}
             <mapper-results class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
@@ -108,7 +108,7 @@
                             isLoading:bind="is_loading"
                             type:from="type"
                             @onSearch:to="onSearchCallback"
-                            paging.total:to="scope.vars.totalObjects"
+                            paging.total:to="entriesTotalCount"
                             searchOnly:from="true"
                             useSnapshots:from="useSnapshots"
                             items:bind="entries"

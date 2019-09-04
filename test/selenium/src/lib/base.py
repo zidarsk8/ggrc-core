@@ -452,21 +452,6 @@ class FilterLHN(FilterCommon):
     selenium_utils.wait_for_js_to_load(self._driver)
 
 
-class AbstractPage(Component):
-  """Represent page that can be navigated to, but we don't necessarily know
- it's url in advance."""
-
-  def __init__(self, _driver=None):
-    super(AbstractPage, self).__init__()
-    self.url = self._driver.current_url
-
-  def navigate_to(self, custom_url=None):
-    """Navigate to url."""
-    url_to_use = self.url if custom_url is None else custom_url
-    selenium_utils.open_url(url_to_use)
-    return self
-
-
 class DropdownDynamic(AnimatedComponent):
   """Dropdown that doesn't load all contents at once."""
 
@@ -555,7 +540,7 @@ class MultiInputItem(Element):
     return Element(self.element, self._locators.DATE).text
 
 
-class Widget(AbstractPage):
+class Widget(Component):
   """Page like class for which we don't know initial url."""
 
   def __init__(self, _driver=None):

@@ -6,8 +6,8 @@
 import copy
 import pytest
 
-from lib import base, browsers, url
-from lib.constants import element
+from lib import base, browsers, factory, url
+from lib.constants import element, objects
 from lib.service import webui_service, webui_facade
 
 
@@ -57,6 +57,13 @@ class TestControls(base.Test):
         selenium).open_info_page_of_obj(control)
     webui_facade.soft_assert_cannot_make_proposal(info_page, soft_assert)
     webui_facade.soft_assert_cannot_view_proposals(info_page, soft_assert)
+    soft_assert.assert_expectations()
+
+  def test_cannot_restore_disabled_object_version(self, control, soft_assert,
+                                                  selenium):
+    """Confirm that user cannot restore disabled object's version."""
+    webui_facade.soft_assert_cannot_view_version_history(
+        control, soft_assert, selenium)
     soft_assert.assert_expectations()
 
   def test_user_cannot_add_person_to_custom_role(self, control,
@@ -123,3 +130,14 @@ class TestControls(base.Test):
         control).click_ctrl_review_details_btn()
     old_tab, new_tab = browsers.get_browser().windows()
     assert old_tab.url == new_tab.url
+
+  def test_deprecated_obj_review_buttons(self, control, soft_assert, selenium):
+    """Check that buttons 'Mark Reviewed' and 'Request Review' are not
+    displayed at Control Info page."""
+    info_page = factory.get_cls_webui_service(objects.get_plural(
+        control.type))().open_info_page_of_obj(control)
+    soft_assert.expect(not info_page.mark_reviewed_btn.exists,
+                       "There should be no 'Mark Reviewed' button.")
+    soft_assert.expect(not info_page.request_review_btn.exists,
+                       "There should be no 'Request Review button.")
+    soft_assert.assert_expectations()

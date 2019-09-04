@@ -56,7 +56,7 @@ class TestAssessmentNotification(TestCase):
             },
             "access_control_list": [
                 acl_helper.get_acl_json(self.primary_role_id, self.auditor.id),
-                acl_helper.get_acl_json(assignee_acr.id, self.auditor.id),
+                acl_helper.get_acl_json(assignee_acr.id, self.auditor.id)
             ],
             "status": "In Progress",
         }
@@ -245,6 +245,10 @@ class TestAssessmentNotification(TestCase):
 
   def test_access_conrol_list(self):
     """Test notification when access conrol list is changed"""
+    creator_acr = all_models.AccessControlRole.query.filter_by(
+        object_type="Assessment",
+        name="Creators",
+    ).first()
     assignee_acr = all_models.AccessControlRole.query.filter_by(
         object_type="Assessment",
         name="Assignees",
@@ -252,7 +256,8 @@ class TestAssessmentNotification(TestCase):
     response = self.api.put(self.assessment, {
         "access_control_list": [
             acl_helper.get_acl_json(self.secondary_role_id, self.auditor.id),
-            acl_helper.get_acl_json(assignee_acr.id, self.auditor.id)
+            acl_helper.get_acl_json(assignee_acr.id, self.auditor.id),
+            acl_helper.get_acl_json(creator_acr.id, self.auditor.id),
         ],
     })
     self.assert200(response)

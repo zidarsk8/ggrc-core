@@ -106,8 +106,13 @@ class CombineParser(Parser):
 
 
 class USSecondParser(Parser):
-  """Class Parser for US format date time day/month/year hour:minute:second"""
-  GENERAL_PATTERN = r'^(\d{0,2}\/){2}\d{4} \d{1,2}(:\d{1,2}){2}$'
+  """Class Parser for US format date time with seconds
+
+  The following formats are accepted:
+    - day/month/year hour:minute:second
+    - day-month-year hour:minute:second
+  """
+  GENERAL_PATTERN = r'^(\d{0,2}(\/|-)){2}\d{4} \d{1,2}(:\d{1,2}){2}$'
 
   @staticmethod
   def parse(date):
@@ -119,8 +124,13 @@ class USSecondParser(Parser):
 
 
 class USMinuteParser(Parser):
-  """Class Parser for US format date time day/month/year hour:minute"""
-  GENERAL_PATTERN = r'^(\d{0,2}\/){2}\d{4} \d{1,2}(:\d{1,2}){1}$'
+  """Class Parser for US format date time with minutes
+
+  The following formats are accepted:
+    - day/month/year hour:minute
+    - day-month-year hour:minute
+  """
+  GENERAL_PATTERN = r'^(\d{0,2}(\/|-)){2}\d{4} \d{1,2}(:\d{1,2}){1}$'
 
   @staticmethod
   def parse(date):
@@ -131,8 +141,13 @@ class USMinuteParser(Parser):
 
 
 class USHourParser(Parser):
-  """Class Parser for US format date time day/month/year hour"""
-  GENERAL_PATTERN = r'^(\d{0,2}\/){2}\d{4} \d{1,2}$'
+  """Class Parser for US format date time with hours
+
+  The following formats are accepted:
+    - day/month/year hour
+    - day-month-year hour
+  """
+  GENERAL_PATTERN = r'^(\d{0,2}(\/|-)){2}\d{4} \d{1,2}$'
 
   @staticmethod
   def parse(date):
@@ -143,8 +158,13 @@ class USHourParser(Parser):
 
 
 class USDayParser(Parser):
-  """Class Parser for US format date time day/month/year"""
-  GENERAL_PATTERN = r'^(\d{0,2}\/){2}\d{4}$'
+  """Class Parser for US format date time with days
+
+  The following formats are accepted:
+    - day/month/year
+    - day-month-year
+  """
+  GENERAL_PATTERN = r'^(\d{0,2}(\/|-)){2}\d{4}$'
 
   @staticmethod
   def parse(date):
@@ -155,8 +175,13 @@ class USDayParser(Parser):
 
 
 class USMonthParser(Parser):
-  """Class Parser for US format date time month/year"""
-  GENERAL_PATTERN = r'^(\d{0,2}\/){1}\d{4}$'
+  """Class Parser for US format date time with months
+
+  The following formats are accepted:
+    - month/year
+    - month-year
+  """
+  GENERAL_PATTERN = r'^(\d{0,2}(\/|-)){1}\d{4}$'
 
   @staticmethod
   def parse(date):
@@ -174,7 +199,7 @@ def combiner_factory(name, pattern, parsers):
 
 USCombiner = combiner_factory(  # pylint: disable=invalid-name
     "USCombiner",
-    r'^(\d{0,2}\/){0,2}(\d{4})(( \d{1,2}(:\d{1,2}){0,2})?)$',
+    r'^(\d{0,2}(\/|-)){0,2}(\d{4})(( \d{1,2}(:\d{1,2}){0,2})?)$',
     [
         USSecondParser,
         USMinuteParser,

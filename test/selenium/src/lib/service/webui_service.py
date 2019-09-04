@@ -14,7 +14,7 @@ from lib.entities.entity import Representation
 from lib.page import dashboard, export_page, widget_bar
 from lib.page.modal import unified_mapper
 from lib.page.modal.request_review import RequestReviewModal
-from lib.page.widget import object_modal
+from lib.page.widget import generic_widget, object_modal
 from lib.utils import (
     selenium_utils, file_utils, conftest_utils, test_utils, ui_utils)
 from lib.utils.string_utils import StringMethods, Symbols
@@ -442,6 +442,14 @@ class BaseWebUiService(object):
     return DashboardWidget(
         self.driver, dashboard_widget_elem).get_all_tab_names_and_urls()
 
+  def get_dashboard_content(self, obj):
+    """Navigate to InfoPage of object, open dashboard tab and return it's
+    content."""
+    self.open_info_page_of_obj(obj)
+    dashboard_widget_elem = generic_widget.CADashboard(self.driver)
+    dashboard_widget_elem.select_dashboard_tab()
+    return dashboard_widget_elem.active_dashboard_tab_elem
+
   def get_obj_related_asmts_titles(self, obj):
     """Open obj Info Page. Click Assessments button to open
     Related Assessments modal. Return list of Related Assessments Titles.
@@ -709,10 +717,18 @@ class AssessmentsService(BaseWebUiService):
     asmt_info = self.open_info_page_of_obj(asmt)
     asmt_info.choose_and_fill_dropdown_lca(dropdown, **kwargs)
 
+  def get_snapshots_which_are_related_to_control_snapshot(self, asmt, control,
+                                                          obj_type):
+    """Returns list of specific type snapshots which are related to control
+    snapshot."""
+    # pylint: disable=invalid-name
+    return (self.open_info_page_of_obj(asmt).open_mapped_control_snapshot_info(
+        control).get_related_snapshots(obj_type))
+
 
 class ControlsService(SnapshotsWebUiService):
   """Class for Controls business layer's services objects."""
-  def __init__(self, driver, is_versions_widget=False):
+  def __init__(self, driver=None, is_versions_widget=False):
     super(ControlsService, self).__init__(
         driver, objects.CONTROLS, is_versions_widget)
 

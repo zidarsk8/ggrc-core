@@ -9,13 +9,14 @@
 import pytest
 
 from lib import base, environment, users
-from lib.constants import value_aliases as aliases, object_states
+from lib.constants import object_states
 from lib.constants.element import objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
+from lib.page import login_page
 from lib.page.widget import object_modal
-from lib.service import webui_service, rest_service, rest_facade
+from lib.service import rest_facade, webui_service
 from lib.utils import string_utils
 
 
@@ -346,7 +347,7 @@ class TestAuditPage(base.Test):
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests
-  def test_dashboard_gca(self, program, selenium):
+  def test_dashboard_gca(self, audit, soft_assert, selenium):
     # pylint: disable=anomalous-backslash-in-string
     """Check Dashboard Tab is exist if 'Dashboard' GCA filled
     with right value. Possible values match to regexp r"^https?://[^\s]+$".
@@ -357,24 +358,25 @@ class TestAuditPage(base.Test):
       - Navigate to 'Dashboard' tab.
       - Check only GCAs filled with right values displayed on the tab.
     """
-    urls = ["https://gmail.by/", "https://www.google.com/",
-            environment.app_url, string_utils.StringMethods.random_string(),
-            "ftp://something.com/"]
-    cads_rest_service = rest_service.CustomAttributeDefinitionsService()
-    gca_defs = (cads_rest_service.create_dashboard_gcas(
-        program.type, count=len(urls)))
-    program_rest_service = rest_service.ProgramsService()
-    program_rest_service.update_obj(
-        obj=program, custom_attributes=dict(
-            zip([gca_def.id for gca_def in gca_defs], urls)))
-    expected_dashboards_items = dict(zip(
-        [gca_def.title.replace(aliases.DASHBOARD + "_", "")
-         for gca_def in gca_defs], urls[:3]))
-    programs_ui_service = webui_service.ProgramsService(selenium)
-    is_dashboard_tab_exist = (
-        programs_ui_service.is_dashboard_tab_exist(program))
-    assert is_dashboard_tab_exist
-    actual_dashboards_items = (
-        programs_ui_service.get_items_from_dashboard_widget(program))
-    assert expected_dashboards_items == actual_dashboards_items
-    cads_rest_service.delete_objs(gca_defs)
+    expected_tabs = rest_facade.cas_dashboards(
+        audit, "https://gmail.by/", "https://www.google.com/",
+        environment.app_url, string_utils.StringMethods.random_string(),
+        "ftp://something.com/")
+    audit_ui_service = webui_service.AuditsService(selenium)
+    soft_assert.expect(audit_ui_service.is_dashboard_tab_exist(audit),
+                       "Dashboard tab should be displayed.")
+    soft_assert.expect(
+        expected_tabs == audit_ui_service.get_items_from_dashboard_widget(
+            audit), "Dashboard tab items are not displayed correctly.")
+    soft_assert.assert_expectations()
+
+  @pytest.mark.smoke_tests
+  def test_page_on_dashboard_gca(self, audit, soft_assert, selenium):
+    """Check that Dashboard Tab displays login page if 'Dashboard' GCA filled
+    with appropriate url."""
+    rest_facade.cas_dashboards(audit, environment.app_url)
+    dashboard_content = login_page.LoginPage(
+        webui_service.AuditsService(selenium).get_dashboard_content(audit))
+    for element in dashboard_content.get_visible_elements():
+      soft_assert.expect(element.exists, "{} is not found".format(element))
+    soft_assert.assert_expectations()

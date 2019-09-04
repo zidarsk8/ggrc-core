@@ -23,14 +23,7 @@ class TestWorkflowPeopleImport(TestCase):
     with ggrc_factories.single_commit():
       self.user_emails = [
           ggrc_factories.PersonFactory().email for _ in xrange(8)]
-    self.wf_slug = ggrc_factories.random_str(chars=string.ascii_letters)
-    self.tg_slug = ggrc_factories.random_str(chars=string.ascii_letters)
-    self.wf_import_params = collections.OrderedDict([
-        ("object_type", "Workflow"),
-        ("code", self.wf_slug),
-        ("title", "SomeTitle"),
-        ("Need Verification", 'True')
-    ])
+    self.wf_slug = self.tg_slug = None
 
   def _import_workflow(self, import_data, expected_resp_action):
     """Import Workflow with ACL parameters.
@@ -43,18 +36,28 @@ class TestWorkflowPeopleImport(TestCase):
             'members': Test people data indexes who should get Member role.
         expected_resp_action: Action which was performed on imported item.
     """
+    wf_title = ggrc_factories.random_str(chars=string.ascii_letters)
+    wf_import_params = collections.OrderedDict([
+        ("object_type", "Workflow"),
+        ("title", wf_title),
+        ("Need Verification", 'True')
+    ])
     if import_data['members']:
       import_members = '\n'.join(
           self.user_emails[idx] for idx in import_data['members'])
-      self.wf_import_params['workflow member'] = import_members
+      wf_import_params['workflow member'] = import_members
     if import_data['admins']:
       import_admins = '\n'.join(
           self.user_emails[idx] for idx in import_data['admins'])
-      self.wf_import_params['admin'] = import_admins
-    response = self.import_data(self.wf_import_params)
-    self.assertEqual(response[0][expected_resp_action], 1)
+      wf_import_params['admin'] = import_admins
+    wf_import_params['code'] = self.wf_slug
+    response = self.import_data(wf_import_params)
     if expected_resp_action != 'ignored':
       self._check_csv_response(response, {})
+    if not self.wf_slug and expected_resp_action != 'ignored':
+      workflow = Workflow.query.filter(Workflow.title == wf_title).one()
+      self.wf_slug = workflow.slug
+    self.assertEqual(response[0][expected_resp_action], 1)
 
   def _import_task_group(self, assignee_id, expected_resp_action):
     """Import TaskGroup with provided assignee.
@@ -67,15 +70,20 @@ class TestWorkflowPeopleImport(TestCase):
     """
     tg_data = collections.OrderedDict([
         ("object_type", TaskGroup.__name__),
-        ("code", self.tg_slug),
         ("workflow", self.wf_slug),
         ("assignee", self.user_emails[assignee_id]),
         ("title", "TG SomeTitle"),
     ])
+    tg_data['code'] = self.tg_slug
     response = self.import_data(tg_data)
+    self._check_csv_response(response, {})
+    if not self.tg_slug:
+      workflow = Workflow.query.filter(Workflow.slug == self.wf_slug).one()
+      task_group = TaskGroup.query.filter(
+          TaskGroup.workflow_id == workflow.id
+      ).one()
+      self.tg_slug = task_group.slug
     self.assertEqual(response[0][expected_resp_action], 1)
-    if expected_resp_action != 'ignored':
-      self._check_csv_response(response, {})
 
   def _check_workflow_acl(self, expected_data):
     """Check that actual Workflow ACL equals expected test data.
