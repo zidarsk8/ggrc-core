@@ -54,3 +54,12 @@ class ExternalResource(common.Resource):
     obj.modified_by = get_current_user()
 
     db.session.add(obj)
+
+
+class ExternalCADResource(ExternalResource):
+  """Resource handler for External Custom Attribute Definitions"""
+
+  def delete(self, *args, **kwargs):
+    """DELETE operation handler."""
+    del args, kwargs
+    raise MethodNotAllowed()
