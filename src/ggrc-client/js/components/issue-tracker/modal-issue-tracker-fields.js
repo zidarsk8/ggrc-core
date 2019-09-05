@@ -56,6 +56,7 @@ export default canComponent.extend({
       this.setValidationFlags({linking: true, initialized: true});
 
       this.attr('instance.issue_tracker').attr({
+        issue_id: null,
         hotlist_id: null,
         component_id: null,
       });
