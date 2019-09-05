@@ -29,6 +29,35 @@ const isIssueTrackerEnabled = (instance) => {
 };
 
 /**
+ * Removes unnecessary fields from issue_tracker attr before save
+
+ * @param {can.Map} instance - instance of model
+ */
+const cleanUpBeforeSave = (instance) => {
+  const issueTracker = instance.attr('issue_tracker');
+  if (!instance.attr('can_use_issue_tracker') || !issueTracker) {
+    return;
+  }
+
+  if (!issueTracker.attr('enabled')) {
+    issueTracker.attr({enabled: false}, true);
+  }
+
+  const isLinking = issueTracker.attr('is_linking');
+  const issueId = issueTracker.attr('issue_id');
+
+  if (issueId && isLinking) {
+    const modifiedIssueTracker = {
+      enabled: true,
+      is_linking: true,
+      issue_id: issueId,
+    };
+
+    issueTracker.attr(modifiedIssueTracker, true);
+  }
+};
+
+/**
  * Initializes issue tracker data from predefined defaults if tracker
  * data is not available from server ( new/old instance with empty issue_tracker )
  * @param  {Object} [instance={}] instance of type
@@ -71,4 +100,5 @@ export {
   initIssueTrackerObject,
   checkWarnings,
   cleanUpWarnings,
+  cleanUpBeforeSave,
 };
