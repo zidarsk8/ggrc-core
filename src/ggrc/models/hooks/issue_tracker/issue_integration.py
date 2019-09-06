@@ -254,7 +254,8 @@ def update_issue_handler(obj, initial_state, new_issuetracker_info=None):  # noq
   # We should create new ticket if new ticket_id is empty, we don't store
   # IssueTrackerIssue object or it contains empty ticket_id
   needs_creation = (not it_object) or \
-                   (not old_ticket_id) or (not new_ticket_id)
+                   (not old_ticket_id) or \
+                   (not new_ticket_id and new_issuetracker_info["enabled"])
 
   if needs_creation:
     create_issue_handler(obj, new_issuetracker_info)
