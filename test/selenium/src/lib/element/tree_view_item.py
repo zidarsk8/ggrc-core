@@ -75,6 +75,10 @@ class Products(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Products TreeViewItem"""
 
 
+class TechnologyEnvironments(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of TechnologyEnvironments TreeViewItem"""
+
+
 class Projects(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Projects TreeViewItem"""
 

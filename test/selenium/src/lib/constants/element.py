@@ -205,6 +205,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   CREATORS = roles.CREATORS
   ASSIGNEES = roles.ASSIGNEES
   VERIFIERS = roles.VERIFIERS
+  LAUNCH_STATUS = "Launch Status"
 
 
 class CommonProgram(Common):
@@ -409,6 +410,24 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.STATE,
       CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
       PRIMARY_CONTACTS, ADMIN)
+
+
+class TechnologyEnvironmentModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Technology Environments.
+ """
+  # pylint: disable=too-many-instance-attributes
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      objects.get_normal_form(objects.get_singular(
+          objects.TECHNOLOGY_ENVIRONMENTS)))
+  ADMIN = TransformationSetVisibleFields.ADMIN
+  ASSIGNEE = objects.get_singular(roles.ASSIGNEES)
+  VERIFIER = objects.get_singular(roles.VERIFIERS)
+  LAUNCH_STATUS = TransformationSetVisibleFields.LAUNCH_STATUS
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, LAUNCH_STATUS,
+      ADMIN, ASSIGNEE, VERIFIER)
 
 
 class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):

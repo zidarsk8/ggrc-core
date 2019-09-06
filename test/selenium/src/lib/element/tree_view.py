@@ -76,6 +76,10 @@ class Products(CommonDropdownSettings):
   """Products 3BBS button/dropdown settings on Tree View."""
 
 
+class TechnologyEnvironments(CommonDropdownSettings):
+  """TechnologyEnvironments 3BBS button/dropdown settings on Tree View."""
+
+
 class Projects(CommonDropdownSettings):
   """Projects 3BBS button/dropdown settings on Tree View."""
 

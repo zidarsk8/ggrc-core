@@ -45,6 +45,11 @@ def create_control(**attrs):
   return _create_obj_in_program_scope("Controls", None, **attrs)
 
 
+def create_technology_environment(**attrs):
+  """Create a technology environment."""
+  return _create_obj_in_program_scope("TechnologyEnvironments", None, **attrs)
+
+
 def create_product(**attrs):
   """Create a product."""
   return _create_obj_in_program_scope("Products", None, **attrs)

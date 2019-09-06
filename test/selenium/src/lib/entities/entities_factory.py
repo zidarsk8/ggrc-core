@@ -383,8 +383,7 @@ class ProductsFactory(EntitiesFactory):
   def __init__(self):
     super(ProductsFactory, self).__init__(objects.PRODUCTS)
     self._acl_roles = [
-        ("managers",
-         roles.ACLRolesIDs.PRODUCT_MANAGERS,
+        ("managers", roles.ACLRolesIDs.PRODUCT_MANAGERS,
          [users.current_user()])
     ]
 
@@ -394,6 +393,22 @@ class ProductsFactory(EntitiesFactory):
         title=self.obj_title
     )
     return product_object
+
+
+class TechnologyEnvironmentsFactory(EntitiesFactory):
+  """Factory class for Technology Environments entities."""
+  def __init__(self):
+    super(TechnologyEnvironmentsFactory, self).__init__(
+        objects.TECHNOLOGY_ENVIRONMENTS)
+    self._acl_roles = [
+        ("admins",
+         roles.ACLRolesIDs.TECHNOLOGY_ENVIRONMENT_ADMINS,
+         [users.current_user()])
+    ]
+
+  def _create_random_obj(self, is_add_rest_attrs):
+    """Create TechnologyEnvironment entity."""
+    return self.obj_inst().update_attrs(title=self.obj_title)
 
 
 class ControlsFactory(EntitiesFactory):
