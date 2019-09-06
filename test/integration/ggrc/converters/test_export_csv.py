@@ -150,12 +150,13 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Allowed values are:\n{}".format('\n'.join(
         all_models.Assessment.VALID_CONCLUSIONS)), response.data)
 
-  def test_archived_tip(self):
-    """Tests if Archived column has tip message for Assessment. """
+  @ddt.data("Assessment", "Audit")
+  def test_archived_tip(self, model):
+    """Tests if Archived column has tip message for {}. """
     data = {
         "export_to": "csv",
         "objects": [
-           {"object_name": "Assessment", "fields": "all"},
+           {"object_name": model, "fields": "all"},
 
         ],
     }
