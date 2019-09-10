@@ -23,7 +23,6 @@ def all_cache_entries():
       resource('access_groups', 'AccessGroup'),
       resource('account_balances', 'AccountBalance'),
       resource('audits', 'Audit'),
-      resource('custom_attribute_values', 'CustomAttributeValue'),
       resource('comments', 'Comment'),
       resource('external_comments', 'ExternalComment'),
       resource('contexts', 'Context'),
@@ -69,7 +68,11 @@ def all_cache_entries():
 
       # ggrc custom attribuess
       resource('custom_attribute_definitions', 'CustomAttributeDefinition'),
+      resource('external_custom_attribute_definitions',
+               'ExternalCustomAttributeDefinition'),
       resource('custom_attribute_values', 'CustomAttributeValue'),
+      resource('external_custom_attribute_values',
+               'ExternalCustomAttributeValue'),
 
       # FIXME: Extension-defined models should be registered
       #        from the extensions.

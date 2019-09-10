@@ -8,19 +8,6 @@ from ggrc.services import signals
 from ggrc.models import custom_attribute_definition as cad
 
 
-def invalidate_cache(sender, obj, src=None, service=None):
-  """Invalidate cache related to cads."""
-  # pylint: disable=unused-argument
-  cad.get_cads_counts.invalidate_cache()
-  if obj.definition_id:
-    cad.get_local_cads.invalidate_cache(
-        obj.definition_type,
-        obj.definition_id)
-  else:
-    cad.get_global_cads.invalidate_cache(
-        obj.definition_type)
-
-
 def init_hook():
   """Initialize CAD hooks"""
   # pylint: disable=unused-variable
@@ -29,6 +16,10 @@ def init_hook():
       models.all_models.CustomAttributeDefinition)
   @signals.Restful.model_posted_after_commit.connect_via(
       models.all_models.CustomAttributeDefinition)
+  @signals.Restful.model_put_after_commit.connect_via(
+      models.all_models.ExternalCustomAttributeDefinition)
+  @signals.Restful.model_posted_after_commit.connect_via(
+      models.all_models.ExternalCustomAttributeDefinition)
   def handle_cad_creating_editing(sender, obj=None, src=None, service=None,
                                   event=None, initial_state=None):
     """Make reindex without creating revisions for related objects after
@@ -63,14 +54,3 @@ def init_hook():
     views.start_update_cad_related_objs(
         event.id, model_name, need_revisions=True
     )
-
-  signals.Restful.model_posted.connect(
-      invalidate_cache,
-      models.all_models.CustomAttributeDefinition,
-      weak=False
-  )
-  signals.Restful.model_deleted.connect(
-      invalidate_cache,
-      models.all_models.CustomAttributeDefinition,
-      weak=False
-  )

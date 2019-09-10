@@ -28,6 +28,14 @@ from ggrc.access_control import roleable
 from integration.ggrc.models.model_factory import ModelFactory
 
 
+def is_external_custom_attributable(_type):
+  """Check whether given _type is ExternalCustomAttributable"""
+  from ggrc.models import get_model
+  from ggrc.models.mixins import external_customattributable
+  return issubclass(get_model(_type),
+                    external_customattributable.ExternalCustomAttributable)
+
+
 def random_str(length=8, prefix="", chars=None):
   chars = chars or string.ascii_uppercase + string.digits + "  _.-"
   return prefix + "".join(random.choice(chars) for _ in range(length))
@@ -66,12 +74,8 @@ class WithACLandCAFactory(ModelFactory):
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
     """Create instance of model"""
-    acls = []
-    if "access_control_list_" in kwargs:
-      acls = kwargs.pop("access_control_list_")
-    cavs = []
-    if "custom_attribute_values_" in kwargs:
-      cavs = kwargs.pop("custom_attribute_values_")
+    acls = kwargs.pop("access_control_list_", [])
+    cavs = kwargs.pop("custom_attribute_values_", [])
 
     instance = target_class(**kwargs)
     db.session.add(instance)
@@ -84,16 +88,23 @@ class WithACLandCAFactory(ModelFactory):
             ac_role_id=acl.get("ac_role_id"),
             person_id=acl.get("person_id"),
         ))
-    if cavs and isinstance(instance, all_models.mixins.CustomAttributable):
-      for cav in cavs:
+    for cav in cavs:
+      if isinstance(instance, all_models.mixins.CustomAttributable):
         db.session.add(all_models.CustomAttributeValue(
             attributable=instance,
             attribute_value=cav.get("attribute_value"),
             attribute_object_id=cav.get("attribute_object_id"),
             custom_attribute_id=cav.get("custom_attribute_id"),
         ))
+      elif isinstance(instance, all_models.mixins.ExternalCustomAttributable):
+        db.session.add(all_models.ExternalCustomAttributeValue(
+            attributable=instance,
+            attribute_value=cav.get("attribute_value"),
+            custom_attribute_id=cav.get("custom_attribute_id"),
+        ))
 
-    if isinstance(instance, all_models.CustomAttributeValue):
+    if isinstance(instance, (all_models.CustomAttributeValue,
+                             all_models.ExternalCustomAttributeValue)):
       cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
       cls._log_event(instance)
@@ -112,6 +123,17 @@ class CustomAttributeDefinitionFactory(TitledFactory):
   attribute_type = "Text"
   multi_choice_options = None
 
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Assert definition_type"""
+    assert not is_external_custom_attributable(kwargs["definition_type"]), \
+        "Please use ExternalCustomAttributeDefinitionFactory"
+    return super(CustomAttributeDefinitionFactory, cls)._create(
+        target_class,
+        *args,
+        **kwargs
+    )
+
 
 class CustomAttributeValueFactory(ModelFactory):
 
@@ -123,6 +145,53 @@ class CustomAttributeValueFactory(ModelFactory):
   attributable_type = None
   attribute_value = None
   attribute_object_id = None
+
+
+class ExternalCustomAttributeDefinitionFactory(TitledFactory):
+
+  class Meta:
+    model = all_models.ExternalCustomAttributeDefinition
+
+  definition_type = None
+  attribute_type = "Text"
+  multi_choice_options = None
+
+  @classmethod
+  def _generate_id(cls, _id=None):
+    """Return id next after biggest or provided as _id argument"""
+    if _id:
+      if _id > getattr(cls, "_biggest_id", 0):
+        cls._biggest_id = _id
+      return _id
+    else:
+      cls._biggest_id = getattr(cls, "_biggest_id", 0) + 1
+      return cls._biggest_id
+
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Assign id attribute since it is not autoincremental"""
+    assert is_external_custom_attributable(kwargs["definition_type"]), \
+        "Please use CustomAttributeDefinitionFactory"
+    ecad_id = cls._generate_id(kwargs.pop('id', None))
+    ecad_external_id = kwargs.pop('external_id', ecad_id + 1)
+    return super(ExternalCustomAttributeDefinitionFactory, cls)._create(
+        target_class,
+        id=ecad_id,
+        external_id=ecad_external_id,
+        *args,
+        **kwargs
+    )
+
+
+class ExternalCustomAttributeValueFactory(ModelFactory):
+
+  class Meta:
+    model = all_models.ExternalCustomAttributeValue
+
+  custom_attribute = None
+  attributable_id = None
+  attributable_type = None
+  attribute_value = None
 
 
 class DirectiveFactory(TitledFactory):
