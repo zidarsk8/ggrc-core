@@ -774,3 +774,32 @@ class TestSnapshots(base.Test):
         selenium, webui_facade.create_audit(
             selenium, program, manual_snapshots=True))
     assert actual_count == {"controls_tab_count": 0, "controls_count": 0}
+
+  @pytest.mark.parametrize(
+      'obj_mapped_to_control',
+      ["requirement_mapped_to_program", "regulation_mapped_to_program"],
+      indirect=True)
+  @pytest.mark.parametrize(
+      'obj',
+      ["audit_w_manually_mapped_control_and_obj_mapped_to_control", "audit"],
+      indirect=True)
+  def test_related_snapshots_in_control_snapshot_info_modal(
+      self, control_mapped_to_program, obj_mapped_to_control, obj,
+      asmt_w_control_snapshot, selenium
+  ):
+    """Check that snapshot which is related to control snapshot is shown in
+    'SHOW RELATED' section of control snapshot info modal.
+    Preconditions:
+    - Program with mapped Control
+    - Audit with manually/auto mapped Control snapshot
+    - Regulation/Requirement mapped to the Program and Control
+    - Regulation/Requirement snapshot mapped to Audit
+    - Assessment for Audit with a Control snapshot
+    """
+    related_objs = (webui_service.AssessmentsService(selenium)
+                    .get_snapshots_which_are_related_to_control_snapshot(
+        asmt_w_control_snapshot, control_mapped_to_program,
+        obj_mapped_to_control.type))
+    self.general_contain_assert(
+        obj_mapped_to_control, related_objs, 'status', 'modified_by',
+        'slug', *obj_mapped_to_control.tree_view_attrs_to_exclude)

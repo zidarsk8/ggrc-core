@@ -50,12 +50,18 @@ class Product(Roleable,
       'kind',
       'version',
   ]
+  TYPE_OPTIONS = ("Saas",
+                  "Desktop Software",
+                  "Appliance"
+                  )
   _sanitize_html = ['version', ]
   _aliases = {
       "documents_file": None,
       "kind": {
           "display_name": "Kind/Type",
           "filter_by": "_filter_by_kind",
+          "description": "Allowed values are:\n{}".format(
+              "\n".join(TYPE_OPTIONS))
       },
   }
 

@@ -3,6 +3,8 @@
 
 """Base test case for all ggrc integration tests."""
 from collections import defaultdict
+from datetime import datetime, date
+
 import contextlib
 import json
 import logging
@@ -18,6 +20,8 @@ import sqlalchemy as sa
 from sqlalchemy import exc
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
+from sqlalchemy.ext import associationproxy
+from sqlalchemy.orm import collections
 from google.appengine.ext import testbed
 
 from ggrc import db
@@ -26,6 +30,7 @@ from ggrc import settings
 from ggrc.converters.import_helper import read_csv_file
 from ggrc.views.converters import check_import_file
 from ggrc.models import Revision, all_models
+from ggrc.utils import user_generator
 from integration.ggrc import api_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
@@ -131,6 +136,60 @@ class TestCase(BaseTestCase, object):
   def __init__(self, *args, **kwargs):
     super(TestCase, self).__init__(*args, **kwargs)
     self._headers = {}
+
+  def normalize_field(self, field):
+    """Convert field from date/db.Model/query to string value."""
+    # pylint: disable=protected-access
+    normilized_field = field
+
+    if isinstance(normilized_field, datetime):
+      normilized_field = self.normalize_field(normilized_field.date())
+    elif isinstance(normilized_field, date):
+      normilized_field = str(normilized_field)
+    elif isinstance(normilized_field, db.Model):
+      normilized_field = {
+          "type": normilized_field.type,
+          "id": normilized_field.id
+      }
+    elif isinstance(normilized_field, dict) and "email" in normilized_field:
+      user = user_generator.find_user_by_email(normilized_field["email"])
+      normilized_field = self.normalize_field(user)
+    elif isinstance(normilized_field, dict):
+      normilized_field.pop("context_id", None)
+      normilized_field.pop("href", None)
+    elif isinstance(normilized_field, list):
+      normilized_field = [self.normalize_field(i) for i in normilized_field]
+    elif isinstance(
+        normilized_field,
+        (associationproxy._AssociationList, collections.InstrumentedList)
+    ):
+      normilized_field = [
+          {"type": i.type, "id": i.id} for i in normilized_field
+      ]
+    return normilized_field
+
+  def assert_response_fields(self, response_json, expected_body):
+    """Check if data in response is the same with expected."""
+    for field, value in expected_body.items():
+      response_field = self.normalize_field(response_json[field])
+      expected_value = self.normalize_field(value)
+
+      self.assertEqual(
+          response_field,
+          expected_value,
+          "Fields '{}' are not equal".format(field)
+      )
+
+  def assert_object_fields(self, object_, expected_body):
+    """Check if object field values are the same with expected."""
+    for field, value in expected_body.items():
+      obj_value = self.normalize_field(getattr(object_, field))
+      expected_value = self.normalize_field(value)
+      self.assertEqual(
+          obj_value,
+          expected_value,
+          "Fields '{}' are not equal".format(field)
+      )
 
   @staticmethod
   def get_role_id_for_obj(obj, role_name):

@@ -28,7 +28,8 @@ class CustomAttributeMock(object):
     """Generate a custom attribute definition."""
     definition = factories.CustomAttributeDefinitionFactory(
         attribute_type=self.attribute_type,
-        definition_type=self.attributable.__class__.__name__,
+        # pylint: disable=protected-access
+        definition_type=self.attributable._inflector.table_singular,
         definition_id=None if self.global_ else self.attributable.id,
         mandatory=self.mandatory,
         multi_choice_options=(self.dropdown_parameters[0]

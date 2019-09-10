@@ -27,12 +27,4 @@ export default canComponent.extend({
       type: 'Control',
     });
   },
-  helpers: {
-    displayCount: function (countObserver) {
-      let count = countObserver();
-      if (count) {
-        return '(' + count + ')';
-      }
-    },
-  },
 });

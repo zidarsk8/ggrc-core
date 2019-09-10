@@ -240,22 +240,26 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 {% endif %}
 
                 {% if digest.get('assessment_updated') %}
+                  <div style="padding-bottom: 15px;">
                   {% for assessment_id, assessment_data in digest['assessment_updated'].iteritems() %}
-                    <p {{ style.notification_title() }}>Assessment "{{ assessment_data['title'] }}" has been updated</p>
-                    <table {{ style.proposal_table_full() }}>
+                    <p {{ style.assessment_notification_title() }}>Assessment "{{ assessment_data['title'] }}" has been updated</p>
+                    <table {{ style.table_full() }}>
                       <thead>
                         <tr>
-                            <th {{ style.proposal_th() }}>ATTRIBUTE</th>
-                            <th {{ style.proposal_th() }}>NEW VALUE</th>
-                            <th {{ style.proposal_th() }}>OLD VALUE</th>
+                            <th {{ style.assessment_updated_th() }} width="20%">ATTRIBUTE</th>
+                            <th {{ style.assessment_updated_th() }} width="40%">NEW VALUE</th>
+                            <th {{ style.assessment_updated_th() }} width="40%">OLD VALUE</th>
+                        </tr>
+                        <tr>
+                          <th style="padding-bottom: 5px;"></th>
                         </tr>
                       </thead>
                       <tbody>
                       {% for field, value in assessment_data['updated_data'].iteritems() %}
                       <tr>
-                        <td>{{ field }}</td>
-                        <td>{{ value[0] }}</td>
-                        <td>{{ value[1] }}</td>
+                        <td {{ style.assessment_updated_td() }}>{{ field }}</td>
+                        <td {{ style.assessment_updated_td_value() }}>{{ value[0] }}</td>
+                        <td {{ style.assessment_updated_td() }}>{{ value[1] }}</td>
                       </tr>
                       {% endfor %}
                       </tbody>
@@ -265,6 +269,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     </p>
                     <a href="{{ assessment_data['url'] }}" {{ style.notification_btn() }}>Open</a>
                   {% endfor %}
+                  </div>
                 {% endif %}
 
                 {% if digest.get('assessment_completed') %}

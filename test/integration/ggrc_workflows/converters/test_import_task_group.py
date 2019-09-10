@@ -239,12 +239,12 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
 
   @ddt.data(
       (datetime.date(2018, 7, 13), datetime.date(2018, 7, 21),
-       {u"Line 3: Task Due Date can not occur on weekends."}),
+       {errors.END_DATE_ON_WEEKEND_ERROR.format(line=3)}),
       (datetime.date(2018, 7, 14), datetime.date(2018, 7, 20),
-       {u"Line 3: Task Start Date can not occur on weekends."}),
+       {errors.START_DATE_ON_WEEKEND_ERROR.format(line=3)}),
       (datetime.date(2018, 7, 14), datetime.date(2018, 7, 21),
-       {u"Line 3: Task Due Date can not occur on weekends.",
-        u"Line 3: Task Start Date can not occur on weekends."})
+       {errors.END_DATE_ON_WEEKEND_ERROR.format(line=3),
+        errors.START_DATE_ON_WEEKEND_ERROR.format(line=3)})
   )
   @ddt.unpack
   def test_task_group_task_weekend(self, start_date, end_date,
@@ -253,7 +253,7 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
 
     tgt_data = collections.OrderedDict([
         ("object_type", "Task Group Task"),
-        ("code", "TASKGROUPTASK-1"),
+        ("code", ""),
         ("task type", "Rich Text"),
         ("task group", self.task_group.slug),
         ("summary", "Task group test task 1"),
@@ -262,18 +262,18 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
         ("task assignees", self.person.email),
     ])
 
-    object_count_before_import = all_models.TaskGroupTask.query.count()
     response = self.import_data(tgt_data)
-
     expected_messages = {
         "Task Group Task": {
             "row_errors": expected_errors,
         }
     }
-
-    object_count_after_import = all_models.TaskGroupTask.query.count()
     self._check_csv_response(response, expected_messages)
-    self.assertEqual(object_count_before_import, object_count_after_import)
+
+    task_group_tasks = all_models.TaskGroupTask.query.filter(
+        all_models.TaskGroupTask.task_group_id == self.task_group.id
+    ).first()
+    self.assertIsNone(task_group_tasks)
 
   @ddt.data((datetime.date(2018, 7, 10), datetime.date(2018, 7, 21),
              {u"Line 3: Task Due Date can not occur on weekends."}),
@@ -328,26 +328,21 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
     self.assertEquals(end_date_before, end_date_after)
 
   @ddt.data(
-      (
-          "",
-          datetime.date(2018, 7, 21),
-          {u"Line 3: Field 'Start Date' is required. "
-           u"The line will be ignored."},
-      ),
-      (
-          datetime.date(2018, 7, 14),
-          "",
-          {u"Line 3: Field 'End Date' is required. "
-           u"The line will be ignored."},
-      ),
-      (
-          "",
-          "",
-          {u"Line 3: Field 'Start Date' is required. "
-           u"The line will be ignored.",
-           u"Line 3: Field 'End Date' is required. "
-           u"The line will be ignored."},
-      ),
+      ("", datetime.date(2018, 7, 21),
+       {errors.MISSING_VALUE_ERROR.format(line=3,
+                                          column_name="Start Date"
+                                          )}
+       ),
+      (datetime.date(2018, 7, 14), "",
+       {errors.MISSING_VALUE_ERROR.format(line=3,
+                                          column_name="End Date")}
+       ),
+      ("", "",
+       {errors.MISSING_VALUE_ERROR.format(line=3,
+                                          column_name="Start Date"),
+        errors.MISSING_VALUE_ERROR.format(line=3,
+                                          column_name="End Date")}
+       ),
   )
   # pylint: disable=invalid-name
   @ddt.unpack
@@ -357,7 +352,7 @@ class TestTaskGroupTaskImport(WorkflowTestCase):
 
     tgt_import_data = collections.OrderedDict([
         ("object_type", "Task Group Task"),
-        ("code", "code"),
+        ("code", ""),
         ("task type", "Rich Text"),
         ("task group", self.task_group.slug),
         ("summary", "Task group test task 1"),

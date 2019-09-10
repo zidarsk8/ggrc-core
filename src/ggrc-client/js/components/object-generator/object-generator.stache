@@ -81,7 +81,7 @@
 </div>
 
 <div class="modal-footer {{#if showResults}}expanded{{/if}}">
-  <collapsible-panel softMode:from="true" titleText:from="'Search Results ({{entriesTotalCount}})'" expanded:bind="showResults">
+  <collapsible-panel softMode:from="true" titleText:from="'Search Results {{displayCount entriesTotalCount}}'" expanded:bind="showResults">
   
     <div class="search-results">
       <div class="{{^if resultsRequested}} hidden {{/if}}">

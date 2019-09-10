@@ -910,3 +910,11 @@ class DailyEmailUI(Representation):
 
 class StandardEntity(Entity):
   """Class that represent model for Standard entity."""
+
+
+class RegulationEntity(Entity):
+  """Regulation entity."""
+
+
+class RequirementEntity(Entity):
+  """Requirement entity."""

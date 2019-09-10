@@ -13,7 +13,7 @@ from ggrc.models import inflector
 from ggrc.models.mixins import customattributable as ca
 
 
-def get(type_, id_):
+def get(type_, id_, raise_exception=False):
   """Check flask.g.referenced_objects for the object or get it from the DB."""
   # id == 0 is a valid case if id is an int; therefore "not id" doesn't fit
   if id_ is None:
@@ -30,6 +30,10 @@ def get(type_, id_):
 
   if not result:
     result = type_.query.get(id_)
+
+  if not result and raise_exception:
+    raise ValueError("No {} with id {} found."
+                     .format(type_, id_))
 
   return result
 

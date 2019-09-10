@@ -1308,3 +1308,34 @@ class TestAssessmentExport(TestCase):
         }
     }
     self._check_csv_response(response, expected_errors)
+
+  def test_import_assessment_with_deleted_template(self):
+    """Test import with deleted template from exported assessment"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment_template = factories.AssessmentTemplateFactory(audit=audit)
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title='test_attr',
+          definition_type='assessment_template',
+          definition_id=assessment_template.id,
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title='test_attr',
+          definition_type='assessment',
+          definition_id=assessment.id,
+      )
+      db.session.delete(assessment_template)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Template", ""),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "test-{id}Title".format(id=assessment.id)),
+        ("test_attr", "asdfafs"),
+    ]), dry_run=True)
+
+    self._check_csv_response(response, {})

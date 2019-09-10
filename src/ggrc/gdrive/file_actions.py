@@ -147,6 +147,36 @@ def validate_response(response):
     raise InternalServerError(errors.MISSING_KEYS.format(keys))
 
 
+def _generate_new_file_name(files_list, original_name, folder_id, idx=0):
+  """
+  Generate new file name if file with name {original_name} already exists
+  in folder with id {folder_id}
+
+  Examples: If "Name1" already exists in the folder, than "Name1 (1)" will be
+  return.
+
+  Args:
+    files_list: list if files from GDrive containing {original_name} in name
+    original_name: original name of the file to be uploaded
+    folder_id: id of folder to upload file
+    idx: index applying to file name
+
+  Returns:
+    New name for file if {original_name} already exists in folder.
+  """
+  file_format = "{} ({})"
+  for file_ in files_list:
+    if folder_id in file_.get('parents'):
+      if (not idx and file_.get('name') == original_name) or\
+          (idx and
+           file_.get('name') == file_format.format(original_name, idx)):
+        return _generate_new_file_name(files_list, original_name, folder_id,
+                                       idx + 1)
+  if idx > 0:
+    return file_format.format(original_name, idx)
+  return original_name
+
+
 def process_gdrive_file(file_id, folder_id, is_uploaded=False):
   """Process gdrive file to new folder"""
   http_auth = get_http_auth()
@@ -160,7 +190,14 @@ def process_gdrive_file(file_id, folder_id, is_uploaded=False):
     if is_uploaded:
       response = file_meta
     else:
-      body = _build_request_body(folder_id, file_meta['name'])
+      response = drive_service.files().list(
+          q="name contains '{}'".format(file_meta['name']),
+          spaces='drive',
+          fields='files(parents, name)').execute()
+      file_name = _generate_new_file_name(response.get('files', []),
+                                          file_meta['name'],
+                                          folder_id)
+      body = _build_request_body(folder_id, file_name)
       response = copy_file_request(drive_service, file_id, body)
     validate_response(response)
   except HttpAccessTokenRefreshError:

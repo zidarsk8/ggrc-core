@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Access Control List model"""
-import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import utils
@@ -71,34 +70,13 @@ class AccessControlList(base.ContextRBAC, mixins.Base, db.Model):
       cascade='all, delete-orphan',
   )
 
-  def _query_people(self):
-    from ggrc.models import person
-    return db.session.query(
-        person.Person,
-    ).join(
-        acp.AccessControlPerson,
-        acp.AccessControlPerson.person_id == person.Person.id,
-    ).filter(
-        acp.AccessControlPerson.ac_list_id == self.id,
-    ).options(
-        sa.orm.Load(person.Person).undefer_group(
-            "Person_complete",
-        ),
-    )
-
   @property
   def people_json(self):
     """Get json representation of people in ACL."""
     people_json = []
     common_json = self.log_json()
-
-    people = [_acp.person for _acp in self.access_control_people]
-    if any(not utils.is_deferred_loaded(person) for person in people):
-      # Since fields needed to create person json representation for ACL are
-      # deferred and to avoid unnecessary DB queries, people reloading is
-      # performed here.
-      people = self._query_people()
-    for person in people:
+    for _acp in self.access_control_people:
+      person = _acp.person
       person_entry = dict(
           person=utils.create_stub(person),
           person_email=person.email,
