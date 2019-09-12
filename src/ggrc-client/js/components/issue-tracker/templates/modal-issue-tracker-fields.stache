@@ -85,6 +85,7 @@
               <div class="ggrc-form-item__multiple-row issue-tracker__ticket-id-input">
                 <numberbox-component additionalClass:from="'input-block-level'"
                                       placeholder:from="'Enter Ticket ID'"
+                                      on:el:keyup="onTicketIdKeyUp(scope.event)"
                                       value:bind="instance.issue_tracker.issue_id">
                 </numberbox-component>
                 <spinner-component toggle:from="isTicketIdChecking"></spinner-component>

@@ -155,6 +155,13 @@ export default canComponent.extend({
       this.attr('ticketIdCheckMessage', '');
       this.attr('isTicketIdChecked', false);
     },
+    onTicketIdKeyUp(ev) {
+      // ENTER key
+      if (ev.keyCode === 13) {
+        this.checkTicketId();
+        ev.stopPropagation();
+      }
+    },
   }),
   events: {
     inserted() {
