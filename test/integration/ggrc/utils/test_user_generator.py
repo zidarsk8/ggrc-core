@@ -277,7 +277,7 @@ class TestUserGenerator(TestCase):
           ("Default Assignees", "aturing@example.com"),
           ("Default Verifiers", "aturing@example.com\ncbabbage@example.com"),
           ("Title", "Title"),
-          ("Object Under Assessment", 'Control'),
+          ("Default Assessment Type", 'Control'),
       ]))
       self._check_csv_response(response, {})
       assessment_template = AssessmentTemplate.query.filter(
@@ -309,7 +309,7 @@ class TestUserGenerator(TestCase):
           ("Audit*", audit.slug),
           ("Default Verifiers", "aturing@example.com"),
           ("Title", "Title"),
-          ("Object Under Assessment", 'Control'),
+          ("Default Assessment Type", 'Control'),
       ]))
       self._check_csv_response(
           response,
@@ -341,7 +341,7 @@ class TestUserGenerator(TestCase):
           ("Default Assignees", ""),
           ("Default Verifiers", "aturing@example.com"),
           ("Title", "Title"),
-          ("Object Under Assessment", 'Control'),
+          ("Default Assessment Type", 'Control'),
       ]))
       self._check_csv_response(
           response,
@@ -375,7 +375,7 @@ class TestUserGenerator(TestCase):
           ("Default Assignees", "aturing@example.com"),
           ("Default Verifiers", "aturing@example.com\ncbabbage@example.com"),
           ("Title", "Title"),
-          ("Object Under Assessment", 'Control'),
+          ("Default Assessment Type", 'Control'),
       ]))
       self._check_csv_response(
           response,
@@ -414,7 +414,7 @@ class TestUserGenerator(TestCase):
           ('Default Assignees', assignee_email),
           ('Default Verifiers', verifier_email),
           ('Title', 'Title'),
-          ('Object Under Assessment', 'Control'),
+          ('Default Assessment Type', 'Control'),
       ]))
       assessment_template = AssessmentTemplate.query.filter(
           AssessmentTemplate.slug == slug).first()
@@ -465,7 +465,7 @@ class TestUserGenerator(TestCase):
           ('Default Assignees', 'aturing@example.com'),
           ('Default Verifiers', 'aturing@example.com'),
           ('Title', 'Title'),
-          ('Object Under Assessment', 'Control'),
+          ('Default Assessment Type', 'Control'),
       ]))
       imported_template = AssessmentTemplate.query.filter(
           AssessmentTemplate.slug == slug).first()
@@ -479,7 +479,7 @@ class TestUserGenerator(TestCase):
           ('Default Assignees', 'aturing2@example.com'),
           ('Default Verifiers', verifier_update_email),
           ('Title', 'Title'),
-          ('Object Under Assessment', 'Control'),
+          ('Default Assessment Type', 'Control'),
       ]))
       updated_template = AssessmentTemplate.query.filter(
           AssessmentTemplate.slug == slug).first()
@@ -511,7 +511,7 @@ class TestUserGenerator(TestCase):
           ('Audit*', audit.slug),
           ('Default Assignees', 'aturing@example.com'),
           ('Title', 'Title'),
-          ('Object Under Assessment', 'Control'),
+          ('Default Assessment Type', 'Control'),
       ]))
       assessment_template = AssessmentTemplate.query.filter(
           AssessmentTemplate.slug == slug).first()
