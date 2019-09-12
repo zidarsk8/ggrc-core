@@ -439,6 +439,8 @@ class AttributeInfo(object):
         description += u"Accepted values are:\n{}".format(
             attr.multi_choice_options.replace(",", "\n")
         )
+      elif attr.attribute_type == attr.ValidTypes.CHECKBOX:
+        description += u"Allowed values are:\nTRUE\nFALSE"
       if attr.definition_id:
         ca_type = cls.Type.OBJECT_CUSTOM
         attr_name = u"{}{}".format(

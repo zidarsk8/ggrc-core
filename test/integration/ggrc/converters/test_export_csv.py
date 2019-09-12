@@ -35,6 +35,22 @@ class TestExportEmptyTemplate(TestCase):
         "X-export-view": "blocks",
     }
 
+  @ddt.data("Assessment", "Issue", "Person", "Audit", "Product")
+  def test_custom_attr(self, model):
+    """Test if  custom attribute checkbox type has hint for {}."""
+    with factories.single_commit():
+      factories.CustomAttributeDefinitionFactory(
+          definition_type=model.lower(),
+          attribute_type="Checkbox",
+      )
+    data = {
+        "export_to": "csv",
+        "objects": [{"object_name": model, "fields": "all"}]
+    }
+    response = self.client.post("/_service/export_csv",
+                                data=dumps(data), headers=self.headers)
+    self.assertIn("Allowed values are:\nTRUE\nFALSE", response.data)
+
   def test_basic_policy_template(self):
     """Tests for basic policy templates."""
     data = {
