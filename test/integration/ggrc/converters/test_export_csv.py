@@ -257,7 +257,8 @@ class TestExportEmptyTemplate(TestCase):
     }
     response = self.client.post("/_service/export_csv",
                                 data=dumps(data), headers=self.headers)
-    self.assertIn("Allowed values are:\nTRUE\nFALSE", response.data)
+    self.assertIn("This field is not changeable\nafter workflow activation."
+                  "\nAllowed values are:\nTRUE\nFALSE", response.data)
 
 
 @ddt.ddt
