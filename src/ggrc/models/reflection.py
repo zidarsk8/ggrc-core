@@ -436,7 +436,7 @@ class AttributeInfo(object):
               attr.multi_choice_options):
         if description:
           description += "\n\n"
-        description += u"Accepted values are:\n{}".format(
+        description += u"Allowed values are:\n{}".format(
             attr.multi_choice_options.replace(",", "\n")
         )
       elif attr.attribute_type == attr.ValidTypes.CHECKBOX:
