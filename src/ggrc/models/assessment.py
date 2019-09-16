@@ -129,12 +129,10 @@ class Assessment(Assignable, statusable.Statusable, AuditRelationship,
 
   object = {}  # we add this for the sake of client side error checking
 
-  VALID_CONCLUSIONS = frozenset([
-      "Effective",
-      "Ineffective",
-      "Needs improvement",
-      "Not Applicable"
-  ])
+  VALID_CONCLUSIONS = ("Effective",
+                       "Ineffective",
+                       "Needs improvement",
+                       "Not Applicable")
 
   # REST properties
   _api_attrs = reflection.ApiAttributes(
