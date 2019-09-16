@@ -36,7 +36,7 @@ class TestExportEmptyTemplate(TestCase):
     }
 
   @ddt.data("Assessment", "Issue", "Person", "Audit", "Product")
-  def test_custom_attr(self, model):
+  def test_custom_attr_cb(self, model):
     """Test if  custom attribute checkbox type has hint for {}."""
     with factories.single_commit():
       factories.CustomAttributeDefinitionFactory(
@@ -65,7 +65,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Policy", response.data)
 
   @ddt.data("Assessment", "Issue", "Person", "Audit", "Product")
-  def test_custom_attr(self, model):
+  def test_custom_attr_dd(self, model):
     """Test if custom attribute Dropdown type has hint for {}."""
     with factories.single_commit():
       multi_options = "option_1,option_2,option_3"
