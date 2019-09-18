@@ -282,6 +282,7 @@ class TestExportEmptyTemplate(TestCase):
 
 @ddt.ddt
 class TestExportSingleObject(TestCase):
+  """Test case for export single object."""
 
   def setUp(self):
     super(TestExportSingleObject, self).setUp()
