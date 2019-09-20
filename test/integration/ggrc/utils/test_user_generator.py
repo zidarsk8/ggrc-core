@@ -491,6 +491,7 @@ class TestUserGenerator(TestCase):
 
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  @freeze_time("2019-09-10 11:11:11")
   @ddt.data(
       ('aturing@example.com', '', {}),
       ('aturing@example.com', '--', {})
