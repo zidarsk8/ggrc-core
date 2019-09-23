@@ -13,20 +13,21 @@ import sqlalchemy as sa
 
 from alembic import op
 from ggrc.migrations import utils
-from ggrc.models import all_models
-
 
 # revision identifiers, used by Alembic.
 revision = 'ac75e70c9081'
 down_revision = '8937c6e26f00'
 
-models_names = {
-    model.__name__: model for model in all_models.all_models
-}
-
 
 def remove_comments(conn, data):
-  """Removes comments from Comment table."""
+  """Removes comments from Comment table.
+
+  Args:
+    conn: An instance of SQLAlchemy connection.
+    data: List of comment ids to be deleted.
+  Returns:
+    -
+  """
   comment_ids = [d.id for d in data]
   if comment_ids:
     conn.execute(
@@ -41,7 +42,13 @@ def remove_comments(conn, data):
 
 
 def load_comments_data(conn):
-  """Load comment necessary data for migration"""
+  """Load comment necessary data for migration
+
+  Args:
+    conn: An instance of SQLAlchemy connection.
+  Returns:
+    List of comment ids which have no relationships with other objects
+  """
   sql = """
     SELECT source_id as id FROM relationships WHERE
     (source_type = 'Comment' AND destination_type != 'Comment')
