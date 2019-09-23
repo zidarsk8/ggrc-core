@@ -815,7 +815,7 @@ class AssessmentTrackerHandler(object):
             assessment,
             issue_db_info
         )
-    else:
+    elif assessment.issue_tracker.get("enabled") and assessment_src:
       sync_status = self.add_disable_comment(
           assessment,
           issue_id_stored

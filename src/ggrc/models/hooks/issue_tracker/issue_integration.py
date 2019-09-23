@@ -195,7 +195,8 @@ def create_issue_handler(obj, issue_tracker_info):
 
   if ticket_id:
     link_issue(obj,
-               ticket_id, {"enabled": issue_tracker_info.get("enabled")})
+               ticket_id, {"enabled": issue_tracker_info.get("enabled",
+                                                             False)})
   else:
     create_ticket_for_new_issue(obj, issue_tracker_info)
 
@@ -254,10 +255,9 @@ def update_issue_handler(obj, initial_state, new_issuetracker_info=None):  # noq
   # We should create new ticket if new ticket_id is empty, we don't store
   # IssueTrackerIssue object or it contains empty ticket_id
   needs_creation = (not it_object) or \
-                   (not old_ticket_id) or \
-                   (not new_ticket_id and new_issuetracker_info["enabled"])
+                   (not old_ticket_id) or (not new_ticket_id)
 
-  if needs_creation:
+  if needs_creation and new_issuetracker_info["enabled"]:
     create_issue_handler(obj, new_issuetracker_info)
     if not obj.warnings:
       it_issue = all_models.IssuetrackerIssue.get_issue(
