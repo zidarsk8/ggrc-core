@@ -62,15 +62,6 @@ class TestProposalsDestructive(base.Test):
                               "proposal_from_gr": proposal_from_gr}
     return self.__class__._data
 
-  @classmethod
-  def check_ggrc_6592_7562(cls, login_user, condition):
-    """Check if it is xfail because of GGRC-6591(about proposal_creator) or
-    GGRC-7562(about obj_creator) or fail."""
-    if login_user in ["proposal_creator", "obj_creator"]:
-      base.Test().check_xfail_or_fail(
-          condition, "Issue GGRC-6592\n",
-          "There are no proposals in the list from ui.")
-
   @pytest.mark.parametrize(
       "login_user",
       ["obj_creator", "global_reader", "proposal_creator"]
@@ -85,7 +76,6 @@ class TestProposalsDestructive(base.Test):
         test_data["proposal_to_apply"]]
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
-    self.check_ggrc_6592_7562(login_user, actual_proposals == exp_proposals)
     assert exp_proposals == actual_proposals
 
   @pytest.fixture()
@@ -120,9 +110,8 @@ class TestProposalsDestructive(base.Test):
     exp_proposals = [
         test_data["proposal_from_gr"], test_data["proposal_to_decline"],
         test_data["proposal_to_apply"]]
-    actual_proposals = proposal_ui_facade.get_related_proposals(
+    proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
-    self.check_ggrc_6592_7562(login_user, actual_proposals == exp_proposals)
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], exp_proposals, apply_btns_exist)
 
