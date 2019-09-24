@@ -298,7 +298,8 @@ def _propagate_relationships(relationship_ids, new_acl_ids, user_id):
   _propagate(child_ids, user_id)
   # retrieve user ids from propagated ACPs
   user_ids = acl_utils.get_user_ids(
-      all_models.AccessControlList.id.in_(child_ids)
+      sa.or_(all_models.AccessControlList.id.in_(child_ids),
+             all_models.AccessControlList.object_type == 'Proposal')
   )
   getattr(flask.g, "user_ids").update(user_ids)
 

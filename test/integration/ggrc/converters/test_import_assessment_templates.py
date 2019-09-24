@@ -56,7 +56,7 @@ class TestAssessmentTemplatesImport(TestCase):
         ("Code*", slug),
         ("Audit*", "Audit"),
         ("Title", "Title"),
-        ("Object Under Assessment", 'Control'),
+        ("Default Assessment Type", 'Control'),
     ]))
     template = models.AssessmentTemplate.query \
         .filter(models.AssessmentTemplate.slug == slug) \
@@ -74,7 +74,7 @@ class TestAssessmentTemplatesImport(TestCase):
         ("Code*", slug),
         ("Audit*", "Audit"),
         ("Title", "Title"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Default Verifiers", "Secondary Contacts")
     ]))
     template = models.AssessmentTemplate.query \
@@ -143,7 +143,7 @@ class TestAssessmentTemplatesImport(TestCase):
         ("Default Assignees", "user@example.com"),
         ("Default Verifiers", "user@example.com"),
         ("Title", "Title"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Custom Attributes", "Text, {}".format(cad_title)),
     ]))
 
@@ -182,7 +182,7 @@ class TestAssessmentTemplatesImport(TestCase):
         ("Default Assignees", "user@example.com"),
         ("Default Verifiers", "user@example.com"),
         ("Title", "Title"),
-        ("Object Under Assessment", "Control"),
+        ("Default Assessment Type", "Control"),
         ("Custom Attributes", "Text, {}".format(acr_name)),
     ]))
 
