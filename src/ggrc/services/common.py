@@ -84,9 +84,11 @@ def set_ids_for_new_custom_attributes(parent_obj):
   if not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
     return
   for obj in get_modified_objects(db.session).new:
-    if obj.type == "CustomAttributeValue":
+    if obj.type in ("CustomAttributeValue",
+                    "ExternalCustomAttributeValue"):
       obj.attributable = parent_obj
-    elif obj.type == "CustomAttributeDefinition":
+    elif obj.type in ("CustomAttributeDefinition",
+                      "ExternalCustomAttributeDefinition"):
       obj.definition = parent_obj
 
 
@@ -96,6 +98,11 @@ def inclusion_filter(obj):
 
 
 def get_modified_objects(session):
+  """Gets objects from cache.
+
+  Args:
+    session: Current SQLAlchemy session (db.session)
+  """
   session.flush()
   cache = Cache.get_cache()
   if cache:
@@ -149,11 +156,22 @@ class ModelView(View):
     return getattr(self.model, self.modified_attr_name)
 
   def modified_at(self, obj):
+    """Returns modified_attr_name attr.
+
+    Args:
+      obj: An instance of class with modified_attr_name.
+    Returns:
+      Value of modified_attr_name attr.
+    """
     return getattr(obj, self.modified_attr_name)
 
   @staticmethod
   def _get_type_where_clause(model):
-    """Helper for where clause"""
+    """Gets type in where clause.
+
+    Args:
+      model: Class of table model.
+    """
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:
       return True
@@ -167,7 +185,7 @@ class ModelView(View):
 
   @staticmethod
   def get_match_columns(model):
-    """Returns matching columns"""
+    """Gets match columns."""
     mapper = model._sa_class_manager.mapper
     columns = []
     columns.append(mapper.primary_key[0].label('id'))
@@ -181,6 +199,7 @@ class ModelView(View):
     return columns
 
   def get_collection_matches(self, model, filter_by_contexts=True):
+    """Gets collection matches."""
     columns = self.get_match_columns(self.model)
     query = db.session.query(*columns).filter(
         self._get_type_where_clause(model))
@@ -188,6 +207,7 @@ class ModelView(View):
         query, filter_by_contexts=filter_by_contexts)
 
   def get_resource_match_query(self, model, obj_id):
+    """Gets resource match query."""
     columns = self.get_match_columns(model)
     query = db.session.query(*columns).filter(
         sa.and_(
@@ -197,6 +217,7 @@ class ModelView(View):
 
   # Default model/DB helpers
   def get_collection(self, filter_by_contexts=True):
+    """Gets collection."""
     if '__stubs_only' not in request.args and \
        hasattr(self.model, 'eager_query'):
       query = self.model.eager_query()
@@ -206,6 +227,7 @@ class ModelView(View):
         query, filter_by_contexts=filter_by_contexts)
 
   def filter_query_by_request(self, query, filter_by_contexts=True):  # noqa
+    """Returns query filter by request."""
     joinlist = []
     if request.args:
       querybuilder = AttributeQueryBuilder(self.model)
@@ -311,7 +333,7 @@ class ModelView(View):
     return query
 
   def get_object(self, obj_id):
-    """return object by its id"""
+    """Gets object."""
     # This could also use `self.pk`
     # .one() is required as long as any .eager_load() adds joins using
     #   'contains_eager()' to the core query, because 'LIMIT 1' breaks up
@@ -362,6 +384,7 @@ class ModelView(View):
 
   @classmethod
   def url_for_preserving_querystring(cls, *args, **kwargs):
+    """Gets url for preserving querystring."""
     url = cls.url_for(*args, **kwargs)
     # preserve original query string
     idx = request.url.find('?')
@@ -369,7 +392,11 @@ class ModelView(View):
     return url + querystring
 
   @classmethod
-  def base_url_for(cls, _memoized_base_url={}):
+  def base_url_for(cls, _memoized_base_url=None):
+    """Gets base url."""
+    if _memoized_base_url is None:
+      _memoized_base_url = {}
+
     if cls not in _memoized_base_url:
       if has_request_context():
         _memoized_base_url[cls] = url_for(cls.endpoint_name())
@@ -386,7 +413,7 @@ class ModelView(View):
 
   @classmethod
   def url_for(cls, *args, **kwargs):
-    """Builds url for object (itself or id)"""
+    """Returns url for."""
     url = cls.base_url_for()
     if args:
       arg = args[0]
@@ -401,7 +428,7 @@ class ModelView(View):
 
   @classmethod
   def decorate_view_func(cls, view_func, decorators):
-    """Decorate view function by decorators"""
+    """Decorates view func."""
     if not isinstance(decorators, (list, tuple)):
       decorators = (decorators,)
     for decorator in reversed(decorators):
@@ -792,6 +819,7 @@ class Resource(ModelView):
     return cache_utils.has_memcache()
 
   def apply_paging(self, matches_query):
+    """Apply pagination."""
     page_size = min(
         int(request.args.get('__page_size', self.DEFAULT_PAGE_SIZE)),
         self.MAX_PAGE_SIZE)
@@ -817,6 +845,7 @@ class Resource(ModelView):
     return matches, collection_extras
 
   def get_matched_resources(self, matches):
+    """Gets matched resources."""
     cache_objs = {}
     if self.has_cache():
       self.request.cache_manager = cache_utils.get_cache_manager()
@@ -835,6 +864,7 @@ class Resource(ModelView):
     return cache_objs, database_objs
 
   def collection_get(self):
+    """Gets collection."""
     with benchmark("dispatch_request > collection_get > Check headers"):
       accept_header = self.request.headers.get('Accept', '').strip()
       if (
@@ -1184,6 +1214,7 @@ class Resource(ModelView):
 
   @utils.validate_mimetype("application/json")  # noqa
   def collection_post(self):
+    """Posts into collection."""
     with benchmark("collection post"):
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
@@ -1332,6 +1363,7 @@ class Resource(ModelView):
 
   @classmethod
   def add_to(cls, app, url, model_class=None, decorators=()):
+    """Adds url for model."""
     if model_class:
       service_class = type(model_class.__name__, (cls,), {
           '_model': model_class,
@@ -1359,6 +1391,7 @@ class Resource(ModelView):
 
   @staticmethod
   def get_properties_to_include(inclusions):
+    """Gets properties to include."""
     # FIXME This needs to be improved to deal with branching paths... if that's
     # desirable or needed.
     if inclusions is not None:
@@ -1438,10 +1471,13 @@ class Resource(ModelView):
     return resources
 
   def build_page_object_for_json(self, paging):
+    """Builds page object for json."""
     def page_url(params):
+      """Gets page url."""
       return base_url + '?' + urlencode(utils.encoded_dict(params))
 
     def page_args(next_num, per_page):
+      """Gets page args."""
       # coerce the values to be plain strings, rather than unicode
       ret = dict([(k, unicode(v)) for k, v in request.args.items()])
       ret['__page'] = next_num
@@ -1463,6 +1499,7 @@ class Resource(ModelView):
     return paging_obj
 
   def get_resources_from_database(self, matches):
+    """Gets resources from database."""
     # FIXME: This is cheating -- `matches` should be allowed to be any model
     model = self.model
     ids = {m[0]: m for m in matches}
@@ -1486,6 +1523,7 @@ class Resource(ModelView):
     return resources
 
   def build_collection_representation(self, objs, extras=None):
+    """Builds collection representation."""
     table_plural = self.model._inflector.table_plural
     collection_name = '{0}_collection'.format(table_plural)
     resource = {
@@ -1507,6 +1545,7 @@ class Resource(ModelView):
     return {model_name: json_obj}
 
   def build_resource_representation(self, obj, extras=None):
+    """Builds resource representation."""
     table_singular = self.model._inflector.table_singular
     resource = {
         table_singular: obj,

@@ -22,6 +22,7 @@ from ggrc.builder import json as builder_json
 from ggrc.cache import utils as cache_utils
 from ggrc.fulltext import mixin
 from ggrc.integrations import integrations_errors, issues
+from ggrc.integrations.external_app import constants
 from ggrc.models import background_task, reflection, revision
 from ggrc.models.hooks.issue_tracker import integration_utils
 from ggrc.notifications import common
@@ -385,17 +386,18 @@ def refresh_program_cads_title(cad):
 @helpers.without_sqlalchemy_cache
 def update_cad_related_objects(task):
   """Update CAD related objects"""
-  event_id = task.parameters.get("event_id")
-  model_name = task.parameters.get("model_name")
-  need_revisions = task.parameters.get("need_revisions")
-  modified_by_id = task.parameters.get("modified_by_id")
-
-  event = models.all_models.Event.query.filter_by(id=event_id).first()
-  cad = models.all_models.CustomAttributeDefinition.query.filter_by(
-      id=event.resource_id
+  event = models.all_models.Event.query.filter_by(
+      id=task.parameters.get("event_id")
   ).first()
-  model = models.get_model(model_name)
-  query = db.session.query(model if need_revisions else model.id)
+  model = models.get_model(task.parameters.get("model_name"))
+  if issubclass(model, models.mixins.ExternalCustomAttributable):
+    cad_model = models.all_models.ExternalCustomAttributeDefinition
+  else:
+    cad_model = models.all_models.CustomAttributeDefinition
+  cad = cad_model.query.filter_by(id=event.resource_id).first()
+  query = db.session.query(model
+                           if task.parameters.get("need_revisions")
+                           else model.id)
   if event.action == "PUT":
     refresh_program_cads_title(cad)
   objects_count = len(query.all())
@@ -406,10 +408,10 @@ def update_cad_related_objects(task):
     logger.info(
         "Updating CAD related objects: %s/%s", handled_objects, objects_count
     )
-    if need_revisions:
+    if task.parameters.get("need_revisions"):
       for obj in chunk_objects:
         obj.updated_at = datetime.datetime.utcnow()
-        obj.modified_by_id = modified_by_id
+        obj.modified_by_id = task.parameters.get("modified_by_id")
     else:
       model.bulk_record_update_for([obj_id for obj_id, in chunk_objects])
     log_event.log_event(db.session, cad, event=event)
@@ -676,12 +678,19 @@ def get_attributes_json():
   """Get a list of all custom attribute definitions"""
   with benchmark("Get attributes JSON"):
     with benchmark("Get attributes JSON: query"):
+      # get only GCA and exclude external CADs
+      # external GCA should be deleted from internal GCA table
       attrs = models.CustomAttributeDefinition.eager_query().filter(
-          models.CustomAttributeDefinition.definition_id.is_(None)
+          models.CustomAttributeDefinition.definition_id.is_(None),
+          ~models.CustomAttributeDefinition.definition_type.in_(
+              constants.GGRCQ_OBJ_TYPES_FOR_SYNC)
       ).all()
+      ext_attrs = models.ExternalCustomAttributeDefinition.eager_query().all()
     with benchmark("Get attributes JSON: publish"):
       published = []
       for attr in attrs:
+        published.append(builder_json.publish(attr))
+      for attr in ext_attrs:
         published.append(builder_json.publish(attr))
       published = builder_json.publish_representation(published)
     with benchmark("Get attributes JSON: json"):
@@ -733,9 +742,19 @@ def get_all_attributes_json(load_custom_attributes=False):
     published = {}
     ca_cache = collections.defaultdict(list)
     if load_custom_attributes:
-      definitions = models.CustomAttributeDefinition.eager_query().group_by(
+      # get only GCA and exclude external CADs
+      # external GCA should be deleted from internal GCA table
+      definitions = models.CustomAttributeDefinition.eager_query().filter(
+          ~models.CustomAttributeDefinition.definition_type.in_(
+              constants.GGRCQ_OBJ_TYPES_FOR_SYNC)).group_by(
           models.CustomAttributeDefinition.title,
           models.CustomAttributeDefinition.definition_type)
+      for attr in definitions:
+        ca_cache[attr.definition_type].append(attr)
+      ecad = models.ExternalCustomAttributeDefinition
+      definitions = ecad.eager_query().group_by(
+          models.ExternalCustomAttributeDefinition.title,
+          models.ExternalCustomAttributeDefinition.definition_type)
       for attr in definitions:
         ca_cache[attr.definition_type].append(attr)
     for model in models.all_models.all_models:
