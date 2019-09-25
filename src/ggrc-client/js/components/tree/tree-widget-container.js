@@ -895,11 +895,11 @@ const processNotExistedSearch = (viewModel) => {
   viewModel.removeAdvancedFilters();
 };
 
-const loadSavedSearch = (viewModel) => {
+export const loadSavedSearch = (viewModel) => {
   const searchId = viewModel.attr('router.saved_search');
   viewModel.attr('loading', true);
 
-  SavedSearch.findOne({id: searchId}).then((response) => {
+  return SavedSearch.findOne({id: searchId}).then((response) => {
     viewModel.attr('loading', false);
     const savedSearch = response.SavedSearch;
 
@@ -932,8 +932,8 @@ const loadSavedSearch = (viewModel) => {
  * @param {Array} parentItems - parentItems attribute of Advanced search
  * @return {Array} - filtered parentItems
  */
-const filterParentItems = (parentInstance, parentItems) => {
-  return parentItems = parentItems.filter((item) =>
+export const filterParentItems = (parentInstance, parentItems) => {
+  return parentItems.filter((item) =>
     item.value.id !== parentInstance.value.id ||
     item.value.type !== parentInstance.value.type);
 };
