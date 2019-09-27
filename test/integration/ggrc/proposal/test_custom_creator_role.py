@@ -158,9 +158,10 @@ class TestOwnerAccess(TestCase, WithQueryApi):
     self.api.post(all_models.Proposal, create_data)
 
     query_data = _get_query_proposal_request(program_id)
+    headers = {"Content-Type": "application/json", }
     resp = self.api.client.post("/query",
                                 data=json.dumps(query_data),
-                                headers=self.headers).json
+                                headers=headers).json
     self.assertEqual(1, len(resp))
     self.assertEqual(resp[0]["Proposal"]["count"], 1)
 
@@ -180,9 +181,10 @@ class TestOwnerAccess(TestCase, WithQueryApi):
     self.client.get("/login")
 
     query_data = _get_query_proposal_request(program_id)
+    headers = {"Content-Type": "application/json", }
     resp = self.api.client.post("/query",
                                 data=json.dumps(query_data),
-                                headers=self.headers).json
+                                headers=headers).json
     self.assertEqual(1, len(resp))
     self.assertEqual(resp[0]["Proposal"]["count"], 1)
 
@@ -214,9 +216,10 @@ class TestOwnerAccess(TestCase, WithQueryApi):
     self.api.post(all_models.Proposal, create_data)
 
     query_data = _get_query_proposal_request(program_id)
+    headers = {"Content-Type": "application/json", }
     resp = self.api.client.post("/query",
                                 data=json.dumps(query_data),
-                                headers=self.headers).json
+                                headers=headers).json
     self.assertEqual(1, len(resp))
     self.assertEqual(resp[0]["Proposal"]["count"], 1)
 
@@ -236,8 +239,9 @@ class TestOwnerAccess(TestCase, WithQueryApi):
     self.client.get("/login")
 
     query_data = _get_query_proposal_request(program_id)
+    headers = {"Content-Type": "application/json", }
     resp = self.api.client.post("/query",
                                 data=json.dumps(query_data),
-                                headers=self.headers).json
+                                headers=headers).json
     self.assertEqual(1, len(resp))
     self.assertEqual(resp[0]["Proposal"]["count"], 1)
