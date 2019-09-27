@@ -81,12 +81,12 @@ class TestPermissions(TestCase):
         )
 
   @ddt.data(
-      ("Creator", 200),
+      ("Creator", 403),
       ("Reader", 200),
       ("Editor", 200),
       ("ACL_Reader", 200),
       ("ACL_Editor", 200),
-      ("ACL_Nobody", 200),
+      ("ACL_Nobody", 403),
       ("Administrator", 200),
       ("Program Editors", 200),
       ("Program Managers", 200),
@@ -181,7 +181,7 @@ class TestPermissions(TestCase):
     self.assertEqual(status, resp.status_code)
 
   @ddt.data(
-      ("Creator", 1),
+      ("Creator", 0),
       ("Reader", 1),
       ("Editor", 1),
       # Following two tests have been commented out as the functionality for
@@ -189,11 +189,11 @@ class TestPermissions(TestCase):
       # be enabled back in scope of ticket GGRC-4991
       # ("ACL_Reader", 1),
       # ("ACL_Editor", 1),
-      ("ACL_Nobody", 1),
+      ("ACL_Nobody", 0),
       ("Administrator", 1),
-      ("Program Editors", 1),
-      ("Program Managers", 1),
-      ("Program Readers", 1),
+      ("Program Editors", 0),
+      ("Program Managers", 0),
+      ("Program Readers", 0),
   )
   @ddt.unpack
   def test_query_filter(self, role_name, expected_count):
