@@ -1512,6 +1512,34 @@ class TestIssueTrackerIntegration(SnapshotterBaseTestCase):
 
     update_issue_mock.assert_not_called()
 
+  @mock.patch.object(settings, "ISSUE_TRACKER_ENABLED", True)
+  @mock.patch("ggrc.integrations.issues.Client.create_issue",
+              side_effect=[integrations_errors.HotlistPermissionError()])
+  def test_no_permissions_hotlist(self, _):
+    """Test warning message if no permissions to Hotlist."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      factories.IssueTrackerIssueFactory(
+          enabled=True,
+          issue_tracked_obj=audit
+      )
+
+    issue_data = {"issue_id": None}
+    issue_tracker_attrs = self.post_request_payload_builder(issue_data)
+
+    response = self.api.post(all_models.Assessment, {
+        "assessment": {
+            "title": "asmt",
+            "audit": {"id": audit.id, "type": audit.type},
+            "issue_tracker": issue_tracker_attrs["issue_tracker"],
+        },
+    })
+
+    self.assertIn(constants.WarningsDescription.HOTLIST_PERMISSIONS_ERROR,
+                  response.json.get(
+                      "assessment", {}).get("issue_tracker",
+                                            {}).get("_warnings", []))
+
 
 @mock.patch('ggrc.models.hooks.issue_tracker.'
             'assessment_integration.AssessmentTrackerHandler.'

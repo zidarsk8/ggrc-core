@@ -2597,12 +2597,14 @@ class AssessmentTrackerHandler(object):
         assessment: object from Assessment model
     """
     if sync_result.status == SyncResult.SyncResultStatus.ERROR:
-      assessment.add_warning(constants.WarningsDescription.CREATE_ASSESSMENT)
+      if isinstance(sync_result.error,
+                    integrations_errors.HotlistPermissionError):
+        assessment.add_warning(constants.WarningsDescription.
+                               HOTLIST_PERMISSIONS_ERROR)
+      else:
+        assessment.add_warning(constants.WarningsDescription.CREATE_ASSESSMENT)
       logger.error(
-          constants.ErrorsDescription.CREATE_ASSESSMENT % (
-              assessment.id,
-              sync_result.error
-          ),
+          constants.ErrorsDescription.CREATE_ASSESSMENT,
           assessment.id,
           sync_result.error
       )

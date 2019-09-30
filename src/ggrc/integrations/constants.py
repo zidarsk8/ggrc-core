@@ -188,8 +188,13 @@ class WarningsDescription(object):
   """Constants for warnings description."""
   # pylint: disable=too-few-public-methods
   CREATE_ASSESSMENT = "Unable to create a ticket."
+  CREATE_ISSUE = "Unable to create a ticket in issue tracker."
   LINK_ASSESSMENT = "Unable to link a ticket."
   UPDATE_ASSESSMENT = "Unable to update a ticket."
   SYNC_ASSESSMENT = "Unable to sync assessment."
   DELETE_ASSESSMENT = "Unable to delete assessment."
   DETACH_ASSESSMENT = "Unable to add detach comment to ticket issue ID=%d"
+  HOTLIST_PERMISSIONS_ERROR = (
+      "Ticket in issue tracker wasn't added to Hotlist. "
+      "Please make sure that you have enough rights for the "
+      "Hotlist and try again.")
