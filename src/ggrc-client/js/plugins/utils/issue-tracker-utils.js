@@ -30,7 +30,6 @@ const isIssueTrackerEnabled = (instance) => {
 
 /**
  * Removes unnecessary fields from issue_tracker attr before save
-
  * @param {can.Map} instance - instance of model
  */
 const cleanUpBeforeSave = (instance) => {
@@ -41,6 +40,7 @@ const cleanUpBeforeSave = (instance) => {
 
   if (!issueTracker.attr('enabled')) {
     issueTracker.attr({enabled: false}, true);
+    return;
   }
 
   const isLinking = issueTracker.attr('is_linking');

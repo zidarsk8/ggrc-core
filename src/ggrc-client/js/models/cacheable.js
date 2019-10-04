@@ -29,7 +29,6 @@ import {refreshAll} from './refresh_queue';
 import tracker from '../tracker';
 import {delayLeavingPageUntil} from '../plugins/utils/current-page-utils';
 import Stub from './stub';
-import {cleanUpBeforeSave} from '../plugins/utils/issue-tracker-utils';
 
 export default canModel.extend({
   ajax: ggrcAjax,
@@ -774,8 +773,7 @@ export default canModel.extend({
   save: function () {
     this._dfd = new $.Deferred();
 
-    cleanUpBeforeSave(this);
-
+    this.beforeEnqueue && this.beforeEnqueue();
     delayLeavingPageUntil(this._dfd);
 
     enqueue(this, this._super);
