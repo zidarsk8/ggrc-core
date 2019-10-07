@@ -88,6 +88,31 @@ class TestAssessmentImport(TestCase):
     ]))
     self.assertEquals([], response[0]['row_warnings'])
 
+  def test_import_assessment_with_template(self):
+    """If assessment exist and import with template and lca"""
+
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory()
+      template = factories.AssessmentTemplateFactory()
+      factories.RelationshipFactory(source=audit,
+                                    destination=assessment)
+      factories.CustomAttributeDefinitionFactory(
+          title="Test LCA",
+          definition_type="assessment",
+          attribute_type="Text",
+          definition_id=assessment.id
+      )
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("Template", template.slug),
+    ]))
+
+    self.assertEquals([], response[0]["row_warnings"])
+    self.assertEquals([], response[0]["row_errors"])
+
   def test_import_assessment_with_evidence_url_existing(self):
     """If url already mapped to assessment ignore it"""
     evidence_url = "test_gdrive_url"
