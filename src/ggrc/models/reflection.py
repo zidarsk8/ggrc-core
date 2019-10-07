@@ -391,11 +391,13 @@ class AttributeInfo(object):
         rules.get_mapping_rules().get(object_class.__name__, set()),
         cls.MAPPING_PREFIX, "map:{}",
     ))
-    from ggrc.snapshotter.rules import Types
-    read_only_classes = {"Issue": Types.all}.get(object_class.__name__, None)
+    mapping_types = rules.get_snapshot_mapping_rules().get(
+        object_class.__name__, set())
+    read_only_classes = None
+    if object_class.__name__ == "Issue":
+      read_only_classes = mapping_types
     definitions.update(cls._generate_mapping_definition(
-        rules.get_snapshot_mapping_rules().get(object_class.__name__, set()),
-        cls.SNAPSHOT_MAPPING_PREFIX, "map:{} versions",
+        mapping_types, cls.SNAPSHOT_MAPPING_PREFIX, "map:{} versions",
         read_only_types=read_only_classes
     ))
     definitions.update(cls._generate_mapping_definition(
