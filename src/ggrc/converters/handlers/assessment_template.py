@@ -24,7 +24,7 @@ class AssessmentTemplateColumnHandler(handlers.MappingColumnHandler):
 
   def set_obj_attr(self):
     self.value = self.parse_item()
-    if not self.dry_run:
+    if not self.dry_run and self.row_converter.is_new:
       self.create_custom_attributes()
 
   def insert_object(self):
