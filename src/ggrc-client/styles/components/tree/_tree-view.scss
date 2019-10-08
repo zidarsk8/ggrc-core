@@ -44,7 +44,8 @@ tree-widget-container {
     display: flex;
     justify-content: flex-end;
 
-    .saved-search-permalink {
+    .saved-search-permalink,
+    .create-task-group {
       a {
         text-decoration: none;
         .fa-link {

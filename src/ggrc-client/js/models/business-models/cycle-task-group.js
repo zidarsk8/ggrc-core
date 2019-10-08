@@ -6,6 +6,8 @@
 import Cacheable from '../cacheable';
 import IsOverdue from '../mixins/is-overdue';
 import Stub from '../stub';
+import Contactable from '../mixins/contactable';
+import pubSub from '../../pub-sub';
 
 export default Cacheable.extend({
   root_object: 'cycle_task_group',
@@ -16,7 +18,7 @@ export default Cacheable.extend({
   create: 'POST /api/cycle_task_groups',
   update: 'PUT /api/cycle_task_groups/{id}',
   destroy: 'DELETE /api/cycle_task_groups/{id}',
-  mixins: [IsOverdue],
+  mixins: [IsOverdue, Contactable],
   attributes: {
     cycle: Stub,
     task_group: Stub,
@@ -24,4 +26,29 @@ export default Cacheable.extend({
     modified_by: Stub,
     context: Stub,
   },
-}, {});
+  init: function () {
+    if (this._super) {
+      this._super(...arguments);
+    }
+    pubSub.dispatch('createdCycleTaskGroup');
+  },
+}, {
+  define: {
+    title: {
+      value: '',
+      validate: {
+        required: true,
+      },
+    },
+    contact: {
+      validate: {
+        required: true,
+      },
+    },
+    cycle: {
+      validate: {
+        required: true,
+      },
+    },
+  },
+});
