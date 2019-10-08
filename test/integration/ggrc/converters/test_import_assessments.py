@@ -782,7 +782,7 @@ class TestAssessmentImport(TestCase):
     response = self.import_data(data)
     self._check_csv_response(response, {})
 
-  def test_import_complete_with_warnings(self):
+  def test_import_complete_missing_answers_warnings(self):
     """Test complete assessment with missing mandatory CAD comments."""
     with factories.single_commit():
       audit = factories.AuditFactory()

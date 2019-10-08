@@ -504,18 +504,16 @@ class ImportRowConverter(RowConverter):
           modified_objects,
           self.block_converter.CACHE_EXPIRY_IMPORT,
       )
-      store_revision = True
       try:
         self.send_before_commit_signals(import_event)
       except StatusValidationError as exp:
         status_alias = self.headers.get("status", {}).get("display_name")
-        store_revision = False
         self.add_error(errors.VALIDATION_ERROR,
                        column_name=status_alias,
                        message=exp.message)
       db.session.commit_hooks_enable_flag.disable()
       db.session.commit()
-      if store_revision:
+      if not self.ignore:
         self.block_converter.store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self.block_converter)
       update_snapshot_index(modified_objects)
@@ -523,7 +521,7 @@ class ImportRowConverter(RowConverter):
       db.session.rollback()
       logger.exception("Import failed with: %s", err.message)
       self.block_converter.add_errors(errors.UNKNOWN_ERROR,
-                                      line=self.block_converter.offset + 2)
+                                      line=self.block_converter.offset)
     else:
       self.create_comment_notifications()
       self.send_comment_notifications()
