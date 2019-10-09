@@ -467,6 +467,33 @@ class TestRevisions(query_helper.WithQueryApi, TestCase):
             for i in range(count - 1))
     )
 
+  def test_revision_cads_ordering(self):
+    """Test revisions CADs ordering by id"""
+    with factories.single_commit():
+      asmnt = factories.AssessmentFactory()
+      for i in range(5):
+        cad_params = {
+            "title": "test_cad {}".format(5 - i),  # test not sorting by title
+            "definition_type": "assessment",
+            "attribute_type": "Text"
+        }
+        cad = factories.CustomAttributeDefinitionFactory(**cad_params)
+        factories.CustomAttributeValueFactory(
+            custom_attribute=cad,
+            attributable=asmnt,
+            attribute_value="text",
+        )
+    revisions = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == asmnt.id,
+        ggrc.models.Revision.resource_type == "Assessment",
+    ).order_by(ggrc.models.Revision.id.desc()).all()
+    self.assertEqual(6, len(revisions))
+    for revision in revisions:
+      self.assertIn("custom_attribute_definitions", revision.content)
+      self.assertEqual(revision.content["custom_attribute_definitions"],
+                       sorted(revision.content["custom_attribute_definitions"],
+                              key=lambda x: x['id']))
+
   def test_created_at_filtering(self):
     """Test revision could be filtered by created_at."""
     with freeze_time("2019-01-08 12:00:00"):
