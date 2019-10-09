@@ -215,6 +215,7 @@ class AttributeInfo(object):
       "comments",
       "last_comment",
       CUSTOM_ATTR_PREFIX,
+      OBJECT_CUSTOM_ATTR_PREFIX,
       "issue_tracker",
       "component_id",
       "enabled",
