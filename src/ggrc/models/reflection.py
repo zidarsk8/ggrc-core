@@ -351,11 +351,12 @@ class AttributeInfo(object):
     }
 
   @classmethod
-  def _generate_mapping_definition(cls, rules_set, prefix, display_name_tmpl):
+  def _generate_mapping_definition(cls, rules_set, prefix, display_name_tmpl,
+                                   read_only_types=None):
     """Generate definition from template"""
     definitions = {}
     from ggrc.snapshotter.rules import Types
-    read_only = Types.parents | Types.scoped
+    read_only = read_only_types or Types.parents | Types.scoped
     read_only_text = "Read only column and will be ignored on import."
     for klass in rules_set:
       klass_name = title_from_camelcase(klass)
@@ -390,9 +391,14 @@ class AttributeInfo(object):
         rules.get_mapping_rules().get(object_class.__name__, set()),
         cls.MAPPING_PREFIX, "map:{}",
     ))
+    mapping_types = rules.get_snapshot_mapping_rules().get(
+        object_class.__name__, set())
+    read_only_classes = None
+    if object_class.__name__ == "Issue":
+      read_only_classes = mapping_types
     definitions.update(cls._generate_mapping_definition(
-        rules.get_snapshot_mapping_rules().get(object_class.__name__, set()),
-        cls.SNAPSHOT_MAPPING_PREFIX, "map:{} versions",
+        mapping_types, cls.SNAPSHOT_MAPPING_PREFIX, "map:{} versions",
+        read_only_types=read_only_classes
     ))
     definitions.update(cls._generate_mapping_definition(
         rules.get_unmapping_rules().get(object_class.__name__, set()),
