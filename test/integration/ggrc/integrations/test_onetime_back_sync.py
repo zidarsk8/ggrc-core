@@ -43,6 +43,12 @@ class TestOnetimeBackSync(TestCase):
           component_id=correct_component_id,
           issue_id=333
       )
+      # Invalid type of attributes
+      issue_4 = factories.IssueTrackerIssueFactory(
+          hotlist_id='qwe',
+          component_id=None,
+          issue_id=333
+      )
 
     sync_result_mock.return_value = [{
         int(issue_1.issue_id): {
@@ -64,6 +70,15 @@ class TestOnetimeBackSync(TestCase):
 
         },
         int(issue_3.issue_id): {
+            "status": "NEW",
+            "type": "PROCESS",
+            "priority": "P2",
+            "severity": "S2",
+            "component_id": correct_component_id,
+            "hotlist_ids": [correct_hotlist_id]
+
+        },
+        int(issue_4.issue_id): {
             "status": "NEW",
             "type": "PROCESS",
             "priority": "P2",
@@ -96,8 +111,11 @@ class TestOnetimeBackSync(TestCase):
     issue_1 = all_models.IssuetrackerIssue.query.get(issue_1.id)
     issue_2 = all_models.IssuetrackerIssue.query.get(issue_2.id)
     issue_3 = all_models.IssuetrackerIssue.query.get(issue_3.id)
+    issue_4 = all_models.IssuetrackerIssue.query.get(issue_4.id)
 
     self.assertEqual(int(issue_1.hotlist_id), correct_hotlist_id)
     self.assertEqual(int(issue_2.component_id), correct_component_id)
     self.assertEqual(int(issue_3.component_id), correct_component_id)
     self.assertEqual(int(issue_3.hotlist_id), correct_hotlist_id)
+    self.assertEqual(int(issue_4.hotlist_id), correct_hotlist_id)
+    self.assertEqual(int(issue_4.component_id), correct_component_id)
