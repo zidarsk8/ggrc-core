@@ -82,4 +82,16 @@ describe('validateIssueTrackerTitle extension', () => {
       expect(instance.errors.issue_tracker).toBeUndefined();
     }
   );
+
+  it('should return TRUE. is_linking is TRUE', () => {
+    const instance = new TestModel();
+    instance.attr('issue_tracker', new canMap({
+      enabled: true,
+      title: undefined,
+      is_linking: true,
+    }));
+    instance.attr('can_use_issue_tracker', true);
+    expect(instance.validate()).toBeTruthy();
+    expect(instance.errors.issue_tracker).toBeUndefined();
+  });
 });
