@@ -31,8 +31,23 @@ def _collect_issues_from_db():
   )
   objects_info = {}
   for obj in query:
-    objects_info[int(obj.issue_id)] = {"component_id": int(obj.component_id),
-                                       "hotlist_id": int(obj.hotlist_id)}
+
+    if obj.hotlist_id and obj.hotlist_id.isdigit():
+      obj_hotlist_id = int(obj.hotlist_id)
+    else:
+      logger.warning("IssueTrackerIssue id: %s has invalid hotlist_id: %s",
+                     obj.id, obj.hotlist_id)
+      obj_hotlist_id = ""
+
+    if obj.component_id and obj.component_id.isdigit():
+      obj_component_id = int(obj.component_id)
+    else:
+      logger.warning("IssueTrackerIssue id: %s has invalid component_id: %s",
+                     obj.id, obj.component_id)
+      obj_component_id = ""
+
+    objects_info[int(obj.issue_id)] = {"component_id": obj_component_id,
+                                       "hotlist_id": obj_hotlist_id}
   return objects_info
 
 
