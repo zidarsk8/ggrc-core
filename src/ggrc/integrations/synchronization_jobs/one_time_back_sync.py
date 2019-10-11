@@ -31,8 +31,23 @@ def _collect_issues_from_db():
   )
   objects_info = {}
   for obj in query:
-    objects_info[int(obj.issue_id)] = {"component_id": int(obj.component_id),
-                                       "hotlist_id": int(obj.hotlist_id)}
+
+    if obj.hotlist_id and obj.hotlist_id.isdigit():
+      obj_hotlist_id = int(obj.hotlist_id)
+    else:
+      logger.warning("IssueTrackerIssue id: %s has invalid hotlist_id: %s",
+                     obj.id, obj.hotlist_id)
+      obj_hotlist_id = ""
+
+    if obj.component_id and obj.component_id.isdigit():
+      obj_component_id = int(obj.component_id)
+    else:
+      logger.warning("IssueTrackerIssue id: %s has invalid component_id: %s",
+                     obj.id, obj.component_id)
+      obj_component_id = ""
+
+    objects_info[int(obj.issue_id)] = {"component_id": obj_component_id,
+                                       "hotlist_id": obj_hotlist_id}
   return objects_info
 
 
@@ -50,17 +65,17 @@ def _compare_values_for_issues():
 
   logger.info("Collecting issues those need to be updated")
   for info in external_issues:
-    for issue_id in info:
+    for issue_id, issue_data in info.iteritems():
       local_component = local_issues[issue_id].get("component_id")
       local_hotlist = local_issues[issue_id].get("hotlist_id")
 
-      if local_component != info[issue_id]["component_id"]:
-        issues_to_update[issue_id]["component_id"] = \
-            info[issue_id]["component_id"]
+      if local_component != issue_data["component_id"]:
+        issues_to_update[issue_id]["component_id"] = issue_data["component_id"]
 
-      if local_hotlist not in info[issue_id]["hotlist_ids"]:
-        issues_to_update[issue_id]["hotlist_id"] = \
-            info[issue_id]["hotlist_ids"][0]
+      if not issue_data["hotlist_ids"]:
+        issues_to_update[issue_id]["hotlist_id"] = None
+      elif local_hotlist not in issue_data["hotlist_ids"]:
+        issues_to_update[issue_id]["hotlist_id"] = issue_data["hotlist_ids"][0]
 
   return issues_to_update
 

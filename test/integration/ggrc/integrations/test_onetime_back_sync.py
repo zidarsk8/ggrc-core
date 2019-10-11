@@ -43,6 +43,18 @@ class TestOnetimeBackSync(TestCase):
           component_id=correct_component_id,
           issue_id=333
       )
+      # Invalid type of attributes
+      issue_4 = factories.IssueTrackerIssueFactory(
+          hotlist_id='qwe',
+          component_id=None,
+          issue_id=444
+      )
+      # Invalid hotlist_id
+      issue_5 = factories.IssueTrackerIssueFactory(
+          hotlist_id='123',
+          component_id=456,
+          issue_id=555
+      )
 
     sync_result_mock.return_value = [{
         int(issue_1.issue_id): {
@@ -51,8 +63,7 @@ class TestOnetimeBackSync(TestCase):
             "priority": "P2",
             "severity": "S2",
             "component_id": int(issue_1.component_id),
-            "hotlist_ids": [correct_hotlist_id]
-
+            "hotlist_ids": [correct_hotlist_id],
         },
         int(issue_2.issue_id): {
             "status": "NEW",
@@ -60,8 +71,7 @@ class TestOnetimeBackSync(TestCase):
             "priority": "P2",
             "severity": "S2",
             "component_id": correct_component_id,
-            "hotlist_ids": [int(issue_2.hotlist_id)]
-
+            "hotlist_ids": [int(issue_2.hotlist_id)],
         },
         int(issue_3.issue_id): {
             "status": "NEW",
@@ -69,10 +79,24 @@ class TestOnetimeBackSync(TestCase):
             "priority": "P2",
             "severity": "S2",
             "component_id": correct_component_id,
-            "hotlist_ids": [correct_hotlist_id]
-
-        }
-
+            "hotlist_ids": [correct_hotlist_id],
+        },
+        int(issue_4.issue_id): {
+            "status": "NEW",
+            "type": "PROCESS",
+            "priority": "P2",
+            "severity": "S2",
+            "component_id": correct_component_id,
+            "hotlist_ids": [correct_hotlist_id],
+        },
+        int(issue_5.issue_id): {
+            "status": "NEW",
+            "type": "PROCESS",
+            "priority": "P2",
+            "severity": "S2",
+            "component_id": correct_component_id,
+            "hotlist_ids": [],
+        },
     }]
 
     response = self.client.post('/admin/onetime_back_sync')
@@ -96,8 +120,14 @@ class TestOnetimeBackSync(TestCase):
     issue_1 = all_models.IssuetrackerIssue.query.get(issue_1.id)
     issue_2 = all_models.IssuetrackerIssue.query.get(issue_2.id)
     issue_3 = all_models.IssuetrackerIssue.query.get(issue_3.id)
+    issue_4 = all_models.IssuetrackerIssue.query.get(issue_4.id)
+    issue_5 = all_models.IssuetrackerIssue.query.get(issue_5.id)
 
     self.assertEqual(int(issue_1.hotlist_id), correct_hotlist_id)
     self.assertEqual(int(issue_2.component_id), correct_component_id)
     self.assertEqual(int(issue_3.component_id), correct_component_id)
     self.assertEqual(int(issue_3.hotlist_id), correct_hotlist_id)
+    self.assertEqual(int(issue_4.hotlist_id), correct_hotlist_id)
+    self.assertEqual(int(issue_4.component_id), correct_component_id)
+    self.assertEqual(issue_5.hotlist_id, None)
+    self.assertEqual(int(issue_5.component_id), correct_component_id)
