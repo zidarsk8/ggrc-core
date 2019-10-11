@@ -65,17 +65,17 @@ def _compare_values_for_issues():
 
   logger.info("Collecting issues those need to be updated")
   for info in external_issues:
-    for issue_id in info:
+    for issue_id, issue_data in info.iteritems():
       local_component = local_issues[issue_id].get("component_id")
       local_hotlist = local_issues[issue_id].get("hotlist_id")
 
-      if local_component != info[issue_id]["component_id"]:
-        issues_to_update[issue_id]["component_id"] = \
-            info[issue_id]["component_id"]
+      if local_component != issue_data["component_id"]:
+        issues_to_update[issue_id]["component_id"] = issue_data["component_id"]
 
-      if local_hotlist not in info[issue_id]["hotlist_ids"]:
-        issues_to_update[issue_id]["hotlist_id"] = \
-            info[issue_id]["hotlist_ids"][0]
+      if not issue_data["hotlist_ids"]:
+        issues_to_update[issue_id]["hotlist_id"] = None
+      elif local_hotlist not in issue_data["hotlist_ids"]:
+        issues_to_update[issue_id]["hotlist_id"] = issue_data["hotlist_ids"][0]
 
   return issues_to_update
 
