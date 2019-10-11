@@ -116,6 +116,11 @@ permissions = {
             "terms": {},
         },
         {
+            "type": "CycleTaskGroup",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
             "type": "TaskGroupObject",
             "condition": "is_workflow_admin",
             "terms": {},
@@ -178,5 +183,11 @@ permissions = {
         "Review"
     ],
     "update": owner_update,
-    "delete": owner_delete,
+    "delete": owner_delete + [
+        {
+            "type": "CycleTaskGroup",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+    ],
 }
