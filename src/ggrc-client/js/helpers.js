@@ -27,6 +27,7 @@ import {
 } from './permission';
 import modalModels from './models/modal-models';
 import {isScopeModel} from './plugins/utils/models-utils';
+import {scopingObjects} from './plugins/models-types-collections';
 import {
   allowedToMap,
   allowedToCreate,
@@ -253,6 +254,11 @@ canStache.registerHelper('is_allowed', function (...args) {
       passed = passed && isAllowedAny(action, resourceType);
     }
   });
+
+  // remove Delete permission for all Scope objects
+  if (actions.includes('delete') && scopingObjects.includes(resourceType)) {
+    passed = false;
+  }
 
   return passed ? options.fn(options.contexts || this) :
     options.inverse(options.contexts || this);
