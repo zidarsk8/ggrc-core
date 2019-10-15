@@ -179,7 +179,7 @@ def _get_updated_fields(obj, created_at, definitions, roles):  # noqa: C901
 
   new_rev, old_rev = _get_revisions(obj, created_at)
   if not old_rev:
-    return []
+    return {}
 
   new_attrs = new_rev.content
   old_attrs = old_rev.content
