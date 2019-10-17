@@ -12,23 +12,28 @@ from ggrc import db
 from ggrc.models import all_models
 
 from integration.ggrc import TestCase
+from integration.ggrc.models import factories
 from integration.ggrc.query_helper import WithQueryApi
+from integration.ggrc_workflows.models import factories as wf_factories
 
 
 @ddt.ddt
 class TestOrder(TestCase, WithQueryApi):
   """Tests people ordering"""
 
-  @classmethod
-  def setUpClass(cls):
-    """Set up test cases for all tests."""
-    TestCase.clear_data()
-    # This imported file could be simplified a bit to speed up testing.
-    cls.response = cls._import_file("people_order.csv")
-
   def setUp(self):
-    self._check_csv_response(self.response, {})
+    super(TestOrder, self).setUp()
     self.client.get("/login")
+    self.users = []
+    test_user_names = ["Turing",
+                       "Alan",
+                       "Smurfette",
+                       "Terminator",
+                       "Rosy",
+                       "Lilly"]
+    for username in test_user_names:
+      self.users.append(factories.PersonFactory(
+          name=username, email="{}@example.com".format(username.lower())))
 
   def _check_ordering(self, object_name, sorted_titles, order_by):
     """Check query set ordering"""
@@ -36,7 +41,6 @@ class TestOrder(TestCase, WithQueryApi):
                                 order_by=[{"name": order_by, "desc": False}])
     titles = [obj['title'] for obj in objects]
     self.assertEqual(titles, sorted_titles)
-
     objects = self.simple_query(object_name,
                                 order_by=[{"name": order_by, "desc": True}])
     titles = [obj['title'] for obj in objects]
@@ -45,6 +49,13 @@ class TestOrder(TestCase, WithQueryApi):
   @ddt.data("Assignees", "Creators", "Verifiers")
   def test_assessment_roles(self, role):
     """Assessment assignees/verifiers/creators ordering"""
+    with factories.single_commit():
+
+      for i, user in enumerate(self.users):
+        assessment = factories.AssessmentFactory(
+            title="assessment{}".format(i + 1))
+        assessment.add_person_with_role_name(user, role)
+
     query = db.session.query(all_models.Assessment.title).join(
         all_models.AccessControlList,
         sa.and_(
@@ -85,6 +96,11 @@ class TestOrder(TestCase, WithQueryApi):
 
   def test_task_group_assignee(self):
     """Task Group assignee ordering"""
+    with factories.single_commit():
+      for user in self.users:
+        task_group = wf_factories.TaskGroupFactory(contact_id=user.id)
+        task_group.add_person_with_role_name(user, "Task Assignee")
+
     sorted_titles = [
         title for title, in
         db.session.query(all_models.TaskGroup.title).filter(
