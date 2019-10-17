@@ -11,8 +11,6 @@ from ggrc.access_control.list import AccessControlList
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.people import AccessControlPerson
 from ggrc.snapshotter.rules import Types
-
-from integration.ggrc import generator
 from integration.ggrc.models import factories
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
@@ -25,23 +23,17 @@ class TestClonable(SnapshotterBaseTestCase):
   # pylint: disable=invalid-name
 
   def setUp(self):
-    # pylint: disable=super-on-old-class
-    # pylint seems to get confused, mro chain successfully resolves and returns
-    # <type 'object'> as last entry.
     super(TestClonable, self).setUp()
-
     self.client.get("/login")
-    self.generator = generator.Generator()
-    self.object_generator = generator.ObjectGenerator()
 
   def clone_audit(self, obj, mapped_objects=None):
     """Perform clone operation on an object"""
     if not mapped_objects:
       mapped_objects = []
-    return self.object_generator.generate_object(
+    return self.objgen.generate_object(
         models.Audit,
         {
-            "program": self.object_generator.create_stub(obj.program),
+            "program": self.objgen.create_stub(obj.program),
             "title": "Audit - copy 1",
             "operation": "clone",
             "status": "Planned",
@@ -604,73 +596,6 @@ class TestClonable(SnapshotterBaseTestCase):
             attributable_id=audit_copy.id
         ).count(), 1, "Custom Attribute weren't copied.")
 
-  def test_audit_snapshot_scope_cloning(self):
-    """Test that exact same copy of original audit scope is created."""
-
-    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
-
-    program = db.session.query(models.Program).filter(
-        models.Program.slug == "Prog-13211"
-    ).one()
-
-    self.create_audit(program)
-
-    audit = db.session.query(models.Audit).filter(
-        models.Audit.title == "Snapshotable audit").one()
-
-    snapshots = db.session.query(models.Snapshot).filter(
-        models.Snapshot.parent_type == "Audit",
-        models.Snapshot.parent_id == audit.id,
-    )
-
-    self.assertEqual(snapshots.count(), len(Types.all - Types.external) * 3)
-
-    self._check_csv_response(self._import_file("snapshotter_update.csv"), {})
-
-    # We create another copy of this object to test that it will not be
-    # snapshotted
-    new_control = self.create_object(models.Control, {
-        "title": "Test New Control On Program"
-    })
-    self.objgen.generate_relationship(program, new_control)
-
-    audit = db.session.query(models.Audit).filter(
-        models.Audit.title == "Snapshotable audit").one()
-
-    self.clone_audit(audit)
-
-    audit_copy = db.session.query(models.Audit).filter(
-        models.Audit.title == "Snapshotable audit - copy 1").one()
-
-    clones_snapshots = db.session.query(models.Snapshot).filter(
-        models.Snapshot.parent_type == "Audit",
-        models.Snapshot.parent_id == audit_copy.id,
-    )
-
-    self.assertEqual(clones_snapshots.count(),
-                     len(Types.all - Types.external) * 3)
-
-    original_revisions = {
-        (snapshot.child_type, snapshot.child_id): snapshot.revision_id
-        for snapshot in snapshots
-    }
-
-    clone_revisions = {
-        (snapshot.child_type, snapshot.child_id): snapshot.revision_id
-        for snapshot in clones_snapshots
-    }
-
-    for child, revision_id in original_revisions.items():
-      self.assertEqual(revision_id, clone_revisions[child])
-
-    self.assertEqual(
-        db.session.query(models.Snapshot).filter(
-            models.Snapshot.child_type == "Control",
-            models.Snapshot.child_id == new_control.id
-        ).count(),
-        0, "No snapshots should exist for new control."
-    )
-
   @ddt.data(
       "Active",
       "Draft",
@@ -702,3 +627,80 @@ class TestClonable(SnapshotterBaseTestCase):
         models.AssessmentTemplate.id != assessment_template.id
     ).first()
     self.assertEqual(template_copy.status, status)
+
+
+class TestAuditSnapshotClone(SnapshotterBaseTestCase):
+  """Test class for audit snapshot clone"""
+
+  def setUp(self):
+    super(TestAuditSnapshotClone, self).setUp()
+    self.client.get("/login")
+    self.program = factories.ProgramFactory(title="Prog-13211")
+
+  def clone_audit(self, obj, mapped_objects=None):
+    """Perform clone operation on an object"""
+    if not mapped_objects:
+      mapped_objects = []
+    return self.objgen.generate_object(
+        models.Audit,
+        {
+            "program": self.objgen.create_stub(obj.program),
+            "title": "Audit - copy 1",
+            "operation": "clone",
+            "status": "Planned",
+            "cloneOptions": {
+                "sourceObjectId": obj.id,
+                "mappedObjects": mapped_objects
+            }
+        })
+
+  def test_audit_snapshots(self):
+    """Tests if the audit snapshots count matches"""
+    with factories.single_commit():
+      for model in Types.all - Types.external:
+        model_factory = factories.get_model_factory(model)()
+        factories.RelationshipFactory(source=self.program,
+                                      destination=model_factory)
+    audit = self.create_audit(self.program)
+    snapshots = db.session.query(models.Snapshot).filter(
+        models.Snapshot.parent_type == "Audit",
+        models.Snapshot.parent_id == audit.id,
+    )
+
+    self.assertEqual(snapshots.count(), len(Types.all - Types.external))
+
+  def test_cloned_audit_snapshots(self):
+    """Tests if the audit and cloned audit has same number of snapshots"""
+    with factories.single_commit():
+      for model in Types.all - Types.external:
+        model_factory = factories.get_model_factory(model)()
+        factories.RelationshipFactory(source=self.program,
+                                      destination=model_factory)
+    audit = self.create_audit(self.program)
+    audit_copy = self.clone_audit(audit)
+    snapshots = db.session.query(models.Snapshot).filter(
+        models.Snapshot.parent_type == "Audit",
+        models.Snapshot.parent_id == audit.id,
+    )
+    clones_snapshots = db.session.query(models.Snapshot).filter(
+        models.Snapshot.parent_type == "Audit",
+        models.Snapshot.parent_id == audit_copy[1].id,
+    )
+    self.assertEqual(clones_snapshots.count(),
+                     snapshots.count())
+
+  def test_control_snapshot(self):
+    """Test if snapshot is created for Control Objects"""
+    with factories.single_commit():
+      new_control = factories.ControlFactory(title="control1")
+      new_control_id = new_control.id
+      factories.RelationshipFactory(source=self.program,
+                                    destination=new_control)
+
+    self.assertEqual(
+        db.session.query(models.Snapshot).filter(
+            models.Snapshot.child_type == "Control",
+            models.Snapshot.child_id == new_control_id
+        ).count(),
+        0, "No snapshots should exist for new control."
+    )
