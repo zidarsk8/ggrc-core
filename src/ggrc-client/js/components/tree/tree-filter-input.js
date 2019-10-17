@@ -27,7 +27,7 @@ let viewModel = canMap.extend({
   disabled: false,
   showAdvanced: false,
   onFilter: function () {
-    this.dispatch('filter');
+    this.dispatch('submitFilter');
   },
   onFilterChange: function (newValue) {
     let filter = QueryParser.parse(newValue);

@@ -100,7 +100,7 @@ let viewModel = canMap.extend({
     this.filter();
   },
   filter() {
-    this.dispatch('filter');
+    this.dispatch('submitFilter');
   },
 });
 
