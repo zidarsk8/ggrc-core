@@ -5,7 +5,7 @@
 
 <tree-filter-input class="flex-size-1"
   on:vm:searchQueryChanged="searchQueryChanged(scope.event)"
-  on:vm:filter="onFilter()"
+  on:vm:submitFilter="onFilter()"
   on:vm:treeFilterReady="treeFilterReady(scope.event)"
   on:vm:openAdvanced="openAdvancedFilter()"
   on:vm:removeAdvanced="removeAdvancedFilters()"
@@ -19,7 +19,7 @@
     modelName:from="modelName"
     on:vm:searchQueryChanged="searchQueryChanged(scope.event)"
     on:vm:treeFilterReady="treeFilterReady(scope.event)"
-    on:vm:filter="onFilter()"
+    on:vm:submitFilter="onFilter()"
     disabled:from="advancedSearch.filter">
       <multiselect-dropdown options:from="filterStates"
         placeholder:from="'Filter by State'"

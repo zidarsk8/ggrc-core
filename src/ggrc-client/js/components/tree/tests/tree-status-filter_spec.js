@@ -175,7 +175,7 @@ describe('tree-status-filter component', () => {
         handler([router], null, newStatuses);
         expect(viewModel.buildSearchQuery).toHaveBeenCalledWith(newStatuses);
         expect(viewModel.setStatesDropdown).toHaveBeenCalledWith(newStatuses);
-        expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
+        expect(viewModel.dispatch).toHaveBeenCalledWith('submitFilter');
       });
 
       it(`when component is enabled,
