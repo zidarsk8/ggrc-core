@@ -87,7 +87,8 @@ class Representation(object):
     }
     ui_remap_items = {
         els.PROGRAM_MANAGERS: "managers", els.VERIFIED: "verified",
-        els.STATUS: "status", els.LAST_UPDATED: "updated_at",
+        els.STATUS: "status", els.LAUNCH_STATUS: "status",
+        els.LAST_UPDATED: "updated_at",
         els.AUDIT_CAPTAINS: "audit_captains",
         els.AUDITORS: "auditors",
         "MAPPED_OBJECTS": "mapped_objects", els.ASSIGNEES: "assignees",
@@ -155,6 +156,17 @@ class Representation(object):
     representation.
     """
     return self.convert_repr_rest_to_ui(objs=self)
+
+  def tree_item_representation(self):
+    """Make object's copy and convert it to the view of tree item."""
+    obj = copy.deepcopy(self)
+    for attr in obj.tree_view_attrs_to_exclude:
+      setattr(obj, attr, None)
+    from lib.service import rest_service
+    new_modified_by_value = getattr(rest_service.ObjectsInfoService().get_obj(
+        obj=obj.repr_dict_to_obj(obj.modified_by)), "email")
+    obj.modified_by = new_modified_by_value
+    return obj
 
   @classmethod  # noqa: ignore=C901
   def convert_repr_rest_to_ui(cls, objs):
@@ -648,7 +660,7 @@ class Entity(Representation):
         ControlEntity, AuditEntity, AssessmentEntity, AssessmentTemplateEntity,
         IssueEntity, CommentEntity, ObjectiveEntity, AccessControlRoleEntity,
         RiskEntity, OrgGroupEntity, ProposalEntity, ReviewEntity,
-        ProductEntity
+        ProductEntity, TechnologyEnvironmentEntity
     )
 
   def __lt__(self, other):
@@ -764,6 +776,12 @@ class ProductEntity(Entity):
   """Class that represent model for Product entity."""
   def __init__(self, **attrs):
     super(ProductEntity, self).__init__()
+
+
+class TechnologyEnvironmentEntity(Entity):
+  """Class that represent model for TechnologyEnvironment entity."""
+  def __init__(self, **attrs):
+    super(TechnologyEnvironmentEntity, self).__init__()
 
 
 class ControlEntity(Entity):
