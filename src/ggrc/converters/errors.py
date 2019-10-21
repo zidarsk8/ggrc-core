@@ -241,6 +241,12 @@ NO_VERIFIER_WARNING = (u"Line {line}: Assessment without verifier cannot "
                        u"be moved to {status} state. "
                        u"The value will be ignored.")
 
+NO_REQUIRED_ANSWERS_WARNING = (u"Line {line}: Assessment status couldn't be "
+                               u"changed as some required info was not added "
+                               u"to answers. The column 'State' will "
+                               u"be skipped.")
+
+
 UNEXPECTED_ERROR = u"Unexpected error on import."
 
 EXTERNAL_MODEL_IMPORT_RESTRICTION = (u"Line {line}: Import for "

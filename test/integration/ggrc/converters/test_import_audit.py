@@ -164,8 +164,8 @@ class TestAuditImport(TestCase):
     ])
     expected_messages = {
         "Audit": {
-            "row_errors": {
-                errors.UNKNOWN_ERROR.format(line=7),
+            "block_errors": {
+                errors.UNKNOWN_ERROR.format(line=4),
             },
         },
         "Person": {

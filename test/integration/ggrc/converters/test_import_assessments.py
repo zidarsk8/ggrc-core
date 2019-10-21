@@ -807,6 +807,37 @@ class TestAssessmentImport(TestCase):
     response = self.import_data(data)
     self._check_csv_response(response, {})
 
+  def test_import_complete_missing_answers_warnings(self):
+    """Test complete assessment with missing mandatory CAD comments."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title="CAD",
+          definition_type="assessment",
+          definition_id=asmnt.id,
+          attribute_type="Dropdown",
+          multi_choice_options="no,yes",
+          multi_choice_mandatory="0,1"
+      )
+    data = OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+        ("CAD", "yes"),
+    ])
+    expected_response = {
+        "Assessment": {
+            "row_warnings": {
+                errors.NO_REQUIRED_ANSWERS_WARNING.format(line=3),
+            }
+        }
+    }
+    response = self.import_data(data)
+    self._check_csv_response(response, expected_response)
+
   def test_import_asmnt_rev_query_count(self):
     """Test only one revisions insert query should occur while importing."""
     with factories.single_commit():
