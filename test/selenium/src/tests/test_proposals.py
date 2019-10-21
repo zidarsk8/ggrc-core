@@ -93,6 +93,10 @@ class TestProposalsDestructive(base.Test):
     """Apply proposal."""
     if test_data["proposal_to_apply"].status == object_states.PROPOSED:
       users.set_current_user(test_data["obj_creator"])
+      self.check_ggrc_6592_7562(
+          "obj_creator",
+          test_data["proposal_to_apply"] in
+          proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
       proposal_ui_facade.apply_proposal(
           selenium, test_data["obj"], test_data["proposal_to_apply"],
           [test_data["proposal_from_gr"], test_data["proposal_to_decline"]])
@@ -102,10 +106,13 @@ class TestProposalsDestructive(base.Test):
     """Decline proposal."""
     if test_data["proposal_to_decline"].status == object_states.PROPOSED:
       users.set_current_user(test_data["obj_creator"])
+      self.check_ggrc_6592_7562(
+          "obj_creator",
+          test_data["proposal_to_decline"] in
+          proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
       proposal_ui_facade.decline_proposal(
           selenium, test_data["obj"], test_data["proposal_to_decline"])
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   @pytest.mark.parametrize(
       "login_user, apply_btns_exist",
       [("obj_creator", True), ("global_reader", False),
@@ -126,7 +133,6 @@ class TestProposalsDestructive(base.Test):
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], exp_proposals, apply_btns_exist)
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   @pytest.mark.parametrize(
       "proposal, proposal_author",
       [("proposal_to_apply", "proposal_creator"),
@@ -141,16 +147,18 @@ class TestProposalsDestructive(base.Test):
         selenium, test_data["obj"], test_data[proposal],
         test_data[proposal_author])
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   def test_check_proposals_comparison_window(
       self, test_data, selenium
   ):
     """Check if proposal comparison window has correct info."""
     users.set_current_user(test_data["obj_creator"])
+    self.check_ggrc_6592_7562(
+        "obj_creator",
+        test_data["proposal_to_apply"] in
+        proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
     proposal_ui_facade.assert_proposal_comparison_window_has_correct_info(
         selenium, test_data["obj"], test_data["proposal_to_apply"])
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   @pytest.mark.parametrize(
       "login_user",
       ["obj_creator", "global_reader", "proposal_creator"]
@@ -162,19 +170,25 @@ class TestProposalsDestructive(base.Test):
     users.set_current_user(test_data[login_user])
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
+    self.check_ggrc_6592_7562(
+        login_user, test_data["proposal_to_apply"] in actual_proposals)
     assert test_data["proposal_to_apply"] in actual_proposals
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   def test_check_proposals_apply_btn_after_applying(
       self, test_data, apply_proposal, selenium
   ):
     """Check an applied proposal apply button does not exist."""
     users.set_current_user(test_data["obj_creator"])
+    self.check_ggrc_6592_7562(
+        "obj_creator",
+        (proposal_ui_facade.get_related_proposals(
+            selenium, test_data["obj"]) ==
+         [test_data["proposal_from_gr"], test_data["proposal_to_decline"],
+          test_data["proposal_to_apply"]]))
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], [test_data["proposal_to_apply"]],
-        False)
+        apply_btn_exists=False)
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   @pytest.mark.parametrize(
       "login_user",
       ["obj_creator", "global_reader", "proposal_creator"]
@@ -186,14 +200,20 @@ class TestProposalsDestructive(base.Test):
     users.set_current_user(test_data[login_user])
     actual_proposals = proposal_ui_facade.get_related_proposals(
         selenium, test_data["obj"])
+    self.check_ggrc_6592_7562(
+        login_user,
+        test_data["proposal_to_decline"] in actual_proposals)
     assert test_data["proposal_to_decline"] in actual_proposals
 
-  @pytest.mark.skip(reason="Will be implemented in scope of another ticket.")
   def test_check_proposals_apply_btn_after_declining(
       self, test_data, decline_proposal, selenium
   ):
     """Check an applied proposal apply button does not exist."""
     users.set_current_user(test_data["obj_creator"])
+    self.check_ggrc_6592_7562(
+        "obj_creator",
+        test_data["proposal_to_decline"] in
+        proposal_ui_facade.get_related_proposals(selenium, test_data["obj"]))
     proposal_ui_facade.assert_proposal_apply_btns_exist(
         selenium, test_data["obj"], [test_data["proposal_to_decline"]],
         True)

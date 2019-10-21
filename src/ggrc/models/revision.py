@@ -663,6 +663,10 @@ class Revision(before_flush_handleable.BeforeFlushHandleable,
     populated_content.update(self.populate_readonly())
     populated_content.update(self.populate_automappings())
 
+    populated_content["custom_attribute_definitions"] = sorted(
+        populated_content["custom_attribute_definitions"],
+        key=lambda x: x['id'])
+
     self.populate_requirements(populated_content)
     self.populate_options(populated_content)
     self.populate_review_status_display_name(populated_content)

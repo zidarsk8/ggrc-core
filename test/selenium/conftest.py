@@ -250,7 +250,7 @@ def new_program_rest(request):
 
 @pytest.fixture(scope="function")
 def new_programs_rest(request):
-  """Create new Controls objects via REST API.
+  """Create new Programs objects via REST API.
   Return: [lib.entities.entity.ProgramEntity, ...]
   """
   yield _common_fixtures(request.fixturename)
@@ -585,7 +585,7 @@ def program():
 
 @pytest.fixture()
 def programs():
-  """Create a program."""
+  """Create 2 programs."""
   return [rest_facade.create_program() for _ in xrange(2)]
 
 
@@ -596,7 +596,21 @@ def product():
 
 
 @pytest.fixture()
-def product_mapped_to_control(control, product):
+def programs_with_audit_and_techenv(programs, technology_environment):
+  """Creates 2 programs and 1 technology environment objects, then maps second
+  program to first as a child, then creates an Audit in scope of program 2
+  and finally maps Technology Environment object to Audit."""
+  first_program, second_program = programs
+  rest_facade.map_objs(first_program, second_program)
+  audit = rest_facade.create_audit(second_program)
+  rest_facade.map_objs(audit, technology_environment)
+  return {'programs': programs,
+          'audit': audit,
+          'techenv': technology_environment}
+
+
+@pytest.fixture()
+def product_mapped_to_control(product, control):
   """Creates a product mapped to control."""
   rest_facade.map_objs(product, control)
   return product
@@ -630,6 +644,12 @@ def control():
 def controls():
   """Create 2 controls."""
   return [rest_facade.create_control() for _ in xrange(2)]
+
+
+@pytest.fixture()
+def technology_environment():
+  """Create a technology environment."""
+  return rest_facade.create_technology_environment()
 
 
 @pytest.fixture()

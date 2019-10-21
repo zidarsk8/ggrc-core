@@ -343,3 +343,37 @@ class TestExport(query_helper.WithQueryApi, TestCase):
 
     self.assertEquals(expected_evid_file_string, resp["Evidence File"])
     self.assertEquals(evid_url_link, resp["Evidence URL"])
+
+  def test_exported_columns_order(self):
+    """Test GCA and LCA columns order in exported file"""
+
+    with factories.single_commit():
+      assessment1 = factories.AssessmentFactory(
+          title="test assessment",
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title="Test LCA",
+          definition_type="assessment",
+          definition_id=assessment1.id,
+          attribute_type="Text",
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title="Test GCA",
+          definition_type="assessment",
+          attribute_type="Text",
+      )
+
+    search_request = [{
+        "object_name": "Assessment",
+        "filters": {
+            "expression": {}
+        },
+        "fields": "all"
+    }]
+
+    response = self.export_csv(search_request)
+    # Here expected string contains the part of sorted headers sequence
+    # Normal Attributes, GCA, LCA and Ticket Tracker
+    expected_order = 'Last Comment,Test GCA,Test LCA,Ticket Tracker'
+    header_line = response.data.split("\r\n")[1]
+    self.assertIn(expected_order, header_line)

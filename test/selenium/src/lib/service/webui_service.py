@@ -767,6 +767,13 @@ class IssuesService(BaseWebUiService):
     super(IssuesService, self).__init__(objects.ISSUES, driver)
 
 
+class TechnologyEnvironmentService(BaseWebUiService):
+  """Class for Technology Environments business layer's services objects."""
+  def __init__(self, driver):
+    super(TechnologyEnvironmentService, self).__init__(
+        objects.TECHNOLOGY_ENVIRONMENTS, driver)
+
+
 class ProgramsService(BaseWebUiService):
   """Class for Programs business layer's services objects."""
   def __init__(self, driver=None):

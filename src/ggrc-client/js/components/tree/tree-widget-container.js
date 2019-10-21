@@ -645,6 +645,9 @@ export default canComponent.extend({
     '{viewModel.parent_instance} displayTree'([scope], {destinationType}) {
       this.viewModel.refresh(destinationType);
     },
+    '{pubSub} createdCycleTaskGroup'() {
+      this.viewModel.loadItems();
+    },
     '{pubSub} refetchOnce'(scope, event) {
       if (event.modelNames.includes(this.viewModel.attr('modelName'))) {
         // refresh widget content when tab is opened

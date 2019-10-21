@@ -240,8 +240,8 @@ export default canControl.extend({
       }
     });
 
-    return dfd.done(function () {
-      this.reset_form(this.options.instance);
+    return dfd.then(function () {
+      return this.reset_form(this.options.instance);
     }.bind(that));
   },
 

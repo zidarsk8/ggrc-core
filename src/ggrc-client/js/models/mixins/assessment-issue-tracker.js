@@ -19,6 +19,10 @@ export default class AssessmentIssueTracker extends Mixin {
     issueTrackerUtils.cleanUpWarnings(this);
   }
 
+  beforeEnqueue() {
+    issueTrackerUtils.cleanUpBeforeSave(this);
+  }
+
   afterRefresh() {
     this.initIssueTracker();
   }

@@ -87,6 +87,18 @@ export default canComponent.extend({
           );
         },
       },
+      showCreateTaskGroup: {
+        type: 'boolean',
+        get() {
+          const isActiveTab =
+            this.attr('options.countsName') === 'cycles:active';
+          const isActiveWorkflow =
+            this.attr('parentInstance.status') === 'Active';
+          const isOneTimeWorkfow =
+            this.attr('parentInstance.repeat') === 'off';
+          return isActiveWorkflow && isOneTimeWorkfow && isActiveTab;
+        },
+      },
       showImport: {
         type: 'boolean',
         get() {

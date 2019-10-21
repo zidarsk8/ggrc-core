@@ -63,7 +63,7 @@ validatejs.validators.validateIssueTrackerComponentId = (value,
   if (attributes.can_use_issue_tracker &&
       value.enabled &&
       !value.component_id &&
-      !value._linking) { // user is in progress with generating new ticket
+      !value.is_linking) { // user is in progress with generating new ticket
     return {
       component_id: blankMessage,
     };
@@ -72,9 +72,19 @@ validatejs.validators.validateIssueTrackerComponentId = (value,
 
 validatejs.validators.validateIssueTrackerTitle = (value,
   options, key, attributes) => {
-  if (attributes.can_use_issue_tracker &&
-      value.enabled &&
-      (!value.title || (value.title && !value.title.trim()))) {
+  if (!attributes.can_use_issue_tracker || !value) {
+    return;
+  }
+
+  // Do not validate for disabled issue tracker or linked.
+  // Title of linked ticket will be set from issue tracker service.
+  if (!value.enabled || value.is_linking) {
+    return;
+  }
+
+  let title = value.title && value.title.trim();
+
+  if (!title) {
     return {
       title: blankMessage,
     };
@@ -156,7 +166,7 @@ validatejs.validators.validateDefaultVerifiers = (value) => {
 validatejs.validators.validateIssueTrackerIssueId = (value,
   statuses, key, attributes) => {
   if (value.enabled &&
-    (statuses.includes(attributes.status) || value._linking) &&
+    (statuses.includes(attributes.status) || value.is_linking) &&
     !value.issue_id) {
     return {
       issue_id: blankMessage,

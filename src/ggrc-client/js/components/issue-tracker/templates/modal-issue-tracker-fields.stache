@@ -57,7 +57,7 @@
             {{{mandatoryTicketIdNote}}}
           {{/if}}
         </div>
-      </div> 
+      </div>
     {{/if}}
   </div>
 </div>
@@ -79,15 +79,39 @@
         {{/case}}
 
         {{#case state.LINK_TO_EXISTING}}
-          <div class="ggrc-form-item__multiple-row">
-            <numberbox-component
-                        additionalClass:from="'input-block-level'"
-                        placeholder:from="'Enter Ticket ID'"
-                        value:bind="instance.issue_tracker.issue_id">
-            </numberbox-component>
-            {{#validateAttr instance "issue_tracker.issue_id"}}
-              <label class="help-inline warning">{{this}}</label>
-            {{/validateAttr}}
+          <div class="{{#if ticketIdErrorMessage}}field-failure{{/if}}">
+            <div class="issue-tracker__ticket-id">
+
+              <div class="ggrc-form-item__multiple-row issue-tracker__ticket-id-input">
+                <numberbox-component additionalClass:from="'input-block-level'"
+                                      placeholder:from="'Enter Ticket ID'"
+                                      on:el:keyup="onTicketIdKeyUp(scope.event)"
+                                      value:bind="instance.issue_tracker.issue_id">
+                </numberbox-component>
+                <spinner-component toggle:from="isTicketIdChecking"></spinner-component>
+                {{#if isTicketIdChecked}}
+                  <span class="issue-tracker__ticket-id-checked-icon">
+                    {{#if isTicketIdCheckSuccessful}}
+                      <i class="fa fa-check"></i>
+                    {{else}}
+                      <i class="fa fa-times"></i>
+                    {{/if}}
+                  </span>
+                {{/if}}
+              </div>
+
+              <button type="button"
+                class="{{#if isTicketIdDisabled}}disabled{{/if}} btn btn-small btn-darkBlue"
+                on:el:click="checkTicketId()">
+                Check Ticket ID
+              </button>
+
+            </div>
+            {{#ticketIdErrorMessage}}
+              <label class="help-inline">
+                {{this}}
+              </label>
+            {{/ticketIdErrorMessage}}
           </div>
         {{/case}}
 
@@ -99,43 +123,30 @@
     </div>
   </div>
 
-  <div class="ggrc-form-item">
-    <div class="ggrc-form-item__multiple-row">
-      <label class="ggrc-form-item__label">
-        Hotlist ID
-      </label>
-      {{#switch currentState}}
-
-        {{#case state.GENERATE_NEW}}
+  {{^eq currentState state.LINK_TO_EXISTING}}
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Hotlist ID
+        </label>
+        {{#eq currentState state.GENERATE_NEW}}
           <numberbox-component
             additionalClass:from="'input-block-level'"
             placeholder:from="'Enter Hotlist ID'"
             value:bind="instance.issue_tracker.hotlist_id">
           </numberbox-component>
-        {{/case}}
-
-        {{#case state.LINK_TO_EXISTING}}
-          -
-        {{/case}}
-
-        {{#case state.LINKED}}
+        {{else}}
           {{instance.issue_tracker.hotlist_id}}
-        {{/case}}
-
-      {{/switch}}
-      
-    </div>
-    <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.component_id"}}field-failure{{/isValidAttr}}">
-      <label class="form-label ggrc-form-item__label">
-        Component ID
-        {{#eq(currentState, state.GENERATE_NEW)}}
-          <i class="fa fa-asterisk"></i>
         {{/eq}}
-      </label>
-
-      {{#switch currentState}}
-
-        {{#case state.GENERATE_NEW}}
+      </div>
+      <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.component_id"}}field-failure{{/isValidAttr}}">
+        <label class="form-label ggrc-form-item__label">
+          Component ID
+          {{#eq(currentState, state.GENERATE_NEW)}}
+            <i class="fa fa-asterisk"></i>
+          {{/eq}}
+        </label>
+        {{#eq currentState state.GENERATE_NEW}}
           <numberbox-component
             additionalClass:from="'input-block-level'"
             placeholder:from="'Enter Component ID'"
@@ -144,60 +155,53 @@
           {{#validateAttr instance "issue_tracker.component_id"}}
             <label class="help-inline warning">{{this}}</label>
           {{/validateAttr}}
-        {{/case}}
-
-        {{#case state.LINK_TO_EXISTING}}
-          -
-        {{/case}}
-
-        {{#case state.LINKED}}
+        {{else}}
           {{instance.issue_tracker.component_id}}
-        {{/case}}
-      {{/switch}}
-      
-    </div>
-    <div class="ggrc-form-item__multiple-row">
-      <label class="ggrc-form-item__label">
-        Ticket Type
-      </label>
-      <div>
-        {{instance.issue_tracker.issue_type}}
+        {{/eq}}
+      </div>
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Ticket Type
+        </label>
+        <div>
+          {{instance.issue_tracker.issue_type}}
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="ggrc-form-item">
-    <div class="ggrc-form-item__multiple-row">
-      <label class="ggrc-form-item__label">
-        Ticket Priority
-      </label>
-      <dropdown-component optionsList:from="instance.constructor.issue_tracker_priorities"
-                name:bind="instance.issue_tracker.issue_priority">
-      </dropdown-component>
-    </div>
-    <div class="ggrc-form-item__multiple-row">
-      <label class="ggrc-form-item__label">
-        Ticket Severity
-      </label>
-      <dropdown-component instance:from="instance"
-                optionsList:from="instance.constructor.issue_tracker_severities"
-                name:bind="instance.issue_tracker.issue_severity">
-      </dropdown-component>
-    </div>
+    <div class="ggrc-form-item">
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Ticket Priority
+        </label>
+        <dropdown-component optionsList:from="instance.constructor.issue_tracker_priorities"
+                  name:bind="instance.issue_tracker.issue_priority">
+        </dropdown-component>
+      </div>
+      <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label">
+          Ticket Severity
+        </label>
+        <dropdown-component instance:from="instance"
+                  optionsList:from="instance.constructor.issue_tracker_severities"
+                  name:bind="instance.issue_tracker.issue_severity">
+        </dropdown-component>
+      </div>
 
-    <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.title"}}field-failure{{/isValidAttr}}">
-      <label class="form-label ggrc-form-item__label">
-        Ticket Title
-        <i class="fa fa-asterisk"></i>
-      </label>
-      <input class="input-block-level"
-              placeholder="Enter Ticket Title"
-              type="text"
-              el:value:bind="instance.issue_tracker.title"
-      />
-      {{#validateAttr instance "issue_tracker.title"}}
-        <label class="help-inline warning">{{this}}</label>
-      {{/validateAttr}}
+      <div class="ggrc-form-item__multiple-row {{^isValidAttr instance "issue_tracker.title"}}field-failure{{/isValidAttr}}">
+        <label class="form-label ggrc-form-item__label">
+          Ticket Title
+          <i class="fa fa-asterisk"></i>
+        </label>
+        <input class="input-block-level"
+                placeholder="Enter Ticket Title"
+                type="text"
+                el:value:bind="instance.issue_tracker.title"
+        />
+        {{#validateAttr instance "issue_tracker.title"}}
+          <label class="help-inline warning">{{this}}</label>
+        {{/validateAttr}}
+      </div>
     </div>
-  </div>
+  {{/eq}}
 {{/if}}

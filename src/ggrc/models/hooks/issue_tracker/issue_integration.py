@@ -198,7 +198,9 @@ def create_issue_handler(obj, issue_tracker_info):
   ticket_id = issue_tracker_info.get("issue_id")
 
   if ticket_id:
-    link_issue(obj, ticket_id, issue_tracker_info)
+    link_issue(obj,
+               ticket_id, {"enabled": issue_tracker_info.get("enabled",
+                                                             False)})
   else:
     create_ticket_for_new_issue(obj, issue_tracker_info)
 
@@ -259,7 +261,7 @@ def update_issue_handler(obj, initial_state, new_issuetracker_info=None):  # noq
   needs_creation = (not it_object) or \
                    (not old_ticket_id) or (not new_ticket_id)
 
-  if needs_creation:
+  if needs_creation and new_issuetracker_info["enabled"]:
     create_issue_handler(obj, new_issuetracker_info)
     if not obj.warnings:
       it_issue = all_models.IssuetrackerIssue.get_issue(
@@ -277,6 +279,11 @@ def update_issue_handler(obj, initial_state, new_issuetracker_info=None):  # noq
     link_issue(obj, new_ticket_id, new_issuetracker_info)
     if not obj.warnings:
       detach_issue(new_ticket_id, old_ticket_id)
+    return
+
+  if new_ticket_id == old_ticket_id and \
+     new_issuetracker_info.get("is_linking"):
+    # issue already linked. no need to do something
     return
 
   current_issue_tracker_info = it_object.to_dict(

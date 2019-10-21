@@ -120,7 +120,11 @@ def secondary_check_assessment(row_converter):
   """Check Assessment after setup of secondary objects
 
   Assessment can't be imported with 'Completed and verified', 'Verified',
-  'In Review', 'Rework Needed' state if don't have Verifier"""
+  'In Review', 'Rework Needed' state if don't have Verifier
+
+  Assessment can't be imported with 'Completed' state if any
+  assessment precondition failed"""
+
   obj = row_converter.obj
   if (_is_done_or_end_state(obj) and not obj.verifiers and
           not row_converter.status_changing):
@@ -129,6 +133,13 @@ def secondary_check_assessment(row_converter):
     # we can't change it to default state because of validation
     obj.skip_rework_validation = True
     obj.status = row_converter.initial_state.status or obj.default_status()
+
+  old_value = row_converter.initial_state.status
+  new_value = obj.status
+  if old_value in obj.NOT_DONE_STATES and new_value in obj.DONE_STATES:
+    if hasattr(obj, "preconditions_failed") and obj.preconditions_failed:
+      row_converter.add_warning(errors.NO_REQUIRED_ANSWERS_WARNING)
+      obj.status = old_value or obj.default_status()
 
 
 def check_assessment_template(row_converter):

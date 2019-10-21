@@ -46,7 +46,8 @@ def get_expected_proposal_email(obj, proposal, proposal_author):
     change.pop("cur_value", None)
   person_name = proposal_author.name
   expected_email = entity.ProposalEmailUI(
-      recipient_email=obj.admins[0], author=person_name,
+      # program obj has managers instead of admins
+      recipient_email=obj.managers[0], author=person_name,
       obj_type=obj.type.lower(), changes=proposal_copy.changes,
       comment=proposal_copy.comment)
   return expected_email
@@ -67,7 +68,8 @@ def assert_proposal_apply_btns_exist(
 def assert_proposal_notification_connects_to_obj(
     selenium, obj, proposal, proposal_author
 ):
-  """Check if proposal notification email exists."""
+  """Check if proposal notification email exists and lead to the
+  correspondent obj info page."""
   proposal_digest_service = (
       emails_digest_service.ProposalDigestService(selenium))
   proposal_digest_service.open_emails_digest()
