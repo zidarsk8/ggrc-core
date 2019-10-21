@@ -1008,7 +1008,7 @@ class TestAssessmentImport(TestCase):
           multi_choice_options="no,yes",
           multi_choice_mandatory="0,1"
       )
-    data = OrderedDict([
+    data = collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
