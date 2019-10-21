@@ -2268,15 +2268,15 @@ class AssessmentTrackerHandler(object):
       return False
 
     is_custom_fields_same, remove_fields = self.custom_fields_processing(
-        issue_payload.get("custom_fields", []),
-        issue_tracker_info.get("custom_fields", [])
+        issue_payload,
+        issue_tracker_info,
     )
     if remove_fields:
       issue_payload.pop("custom_fields", [])
 
-    is_css_same = self._is_ccs_same(
+    is_ccs_same = self._is_ccs_same(
         issue_payload,
-        issue_tracker_info
+        issue_tracker_info,
     )
 
     is_common_fields_same = self._is_common_fields_same(
@@ -2284,7 +2284,7 @@ class AssessmentTrackerHandler(object):
         issue_tracker_info
     )
 
-    return not all([is_css_same, is_common_fields_same, is_custom_fields_same])
+    return not all([is_ccs_same, is_common_fields_same, is_custom_fields_same])
 
   @staticmethod
   def _is_creation_mode(issue_obj, issue_id):
@@ -2465,28 +2465,35 @@ class AssessmentTrackerHandler(object):
     return True
 
   @staticmethod
-  def _is_ccs_same(ccs_payload, ccs_tracker):
-    """Check that CCs calculated and Issue Tracker same.
+  def _is_ccs_same(issue_payload, issue_tracker_info):
+    # type: (Dict[str, Any], Dict[str, Any]) -> bool
+    """Check that issue's CCS is the same in GGRC and Issue Tracker.
 
     Args:
-        ccs_payload: CCs calculated from ggrc.
-        ccs_tracker: CCs from Issue Tracker.
+        issue_payload (Dict[str, Any]): Issue information from GGRC.
+        issue_tracker_info (Dict[str, Any]): Issue information from
+          Issue Tracker.
 
     Returns:
         Boolean indicator for CCs validation
     """
-    ccs_payload = set(cc.strip() for cc in ccs_payload)
-    ccs_tracker = set(cc.strip() for cc in ccs_tracker)
+    ccs_ggrc_payload = issue_payload.get("ccs") or []
+    ccs_tracker_payload = issue_tracker_info.get("ccs") or []
 
-    return ccs_payload.issubset(ccs_tracker)
+    ccs_ggrc = set(cc.strip() for cc in ccs_ggrc_payload)
+    ccs_tracker = set(cc.strip() for cc in ccs_tracker_payload)
+
+    return ccs_ggrc.issubset(ccs_tracker)
 
   @staticmethod
   def _is_common_fields_same(issue_payload, issue_tracker_info):
-    """Check that common fields for Issue Tracker same.
+    # type: (Dict[str, Any], Dict[str, Any]) -> bool
+    """Check that issue's common fields are the same in GGRC and Issue Tracker.
 
     Args:
-        issue_payload: issue information on payload.
-        issue_tracker_info: issue information from Issue Tracker
+        issue_payload (Dict[str, Any]): Issue information from GGRC.
+        issue_tracker_info (Dict[str, Any]): Issue information from
+          Issue Tracker.
 
     Returns:
         Boolean indicator for common fields validation
@@ -2646,19 +2653,24 @@ class AssessmentTrackerHandler(object):
       )
 
   @staticmethod
-  def custom_fields_processing(custom_fields_payload, custom_fields_tracker):
-    """Check that custom fields for Issue Tracker same.
+  def custom_fields_processing(issue_payload, issue_tracker_info):
+    # type: (Dict[str, Any], Dict[str, Any]) -> bool
+    """Check that issue's custom fields are the same in GGRC and Issue Tracker.
 
     Args:
-        custom_fields_payload: custom fields on issue payload
-        custom_fields_tracker: custom fields from Issue Tracker
+        issue_payload (Dict[str, Any]): Issue information from GGRC.
+        issue_tracker_info (Dict[str, Any]): Issue information from
+          Issue Tracker.
 
     Returns:
-        Boolean indicator for custom fields validation
+        Boolean indicator for custom fields validation.
     """
-    if any(custom_fields_payload):
+    custom_fields_ggrc = issue_payload.get("custom_fields") or []
+    custom_fields_tracker = issue_tracker_info.get("custom_fields") or []
+
+    if any(custom_fields_ggrc):
       due_date_payload = datetime.datetime.strptime(
-          custom_fields_payload[0]["value"].strip(),
+          custom_fields_ggrc[0]["value"].strip(),
           "%Y-%m-%d"
       )
     else:
