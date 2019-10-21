@@ -6,10 +6,12 @@
 import makeArray from 'can-util/js/make-array/make-array';
 import canList from 'can-list';
 import canMap from 'can-map';
-import {makeFakeInstance} from '../../../../js_specs/spec_helpers';
+import {
+  makeFakeInstance,
+  makeFakeModel,
+} from '../../../../js_specs/spec_helpers';
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as WidgetsUtils from '../../../plugins/utils/widgets-utils';
-import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 import * as NotifierUtils from '../../../plugins/utils/notifiers-utils';
 import * as MegaObjectUtils from '../../../plugins/utils/mega-object-utils';
 import tracker from '../../../tracker';
@@ -17,8 +19,10 @@ import {getComponentVM} from '../../../../js_specs/spec_helpers';
 import Component from '../tree-widget-container';
 import Relationship from '../../../models/service-models/relationship';
 import exportMessage from '../templates/export-message.stache';
-import QueryParser from '../../../generated/ggrc_filter_query_parser';
 import router from '../../../router';
+import Cacheable from '../../../models/cacheable';
+import Program from '../../../models/business-models/program';
+import Assessment from '../../../models/business-models/assessment';
 
 describe('tree-widget-container component', function () {
   let vm;
@@ -81,7 +85,7 @@ describe('tree-widget-container component', function () {
       vm.attr('options', {
         parent_instance: parent,
       });
-      vm.attr('advancedSearch', {
+      vm.attr('currentFilter', {
         filter,
         request,
       });
@@ -191,176 +195,6 @@ describe('tree-widget-container component', function () {
 
       _widgetShown();
       expect(vm.loadItems).toHaveBeenCalled();
-    });
-  });
-
-  describe('openAdvancedFilter() method', function () {
-    it('copies applied filter and mapping items', function () {
-      let appliedFilterItems = new canList([
-        AdvancedSearch.create.attribute(),
-      ]);
-      let appliedMappingItems = new canList([
-        AdvancedSearch.create.mappingCriteria({
-          filter: AdvancedSearch.create.attribute(),
-        }),
-      ]);
-      vm.attr('advancedSearch.appliedFilterItems', appliedFilterItems);
-      vm.attr('advancedSearch.appliedMappingItems', appliedMappingItems);
-      vm.attr('advancedSearch.filterItems', canList());
-      vm.attr('advancedSearch.mappingItems', canList());
-
-      vm.openAdvancedFilter();
-
-      expect(vm.attr('advancedSearch.filterItems').attr())
-        .toEqual(appliedFilterItems.attr());
-      expect(vm.attr('advancedSearch.mappingItems').attr())
-        .toEqual(appliedMappingItems.attr());
-    });
-
-    it('opens modal window', function () {
-      vm.attr('advancedSearch.open', false);
-
-      vm.openAdvancedFilter();
-
-      expect(vm.attr('advancedSearch.open')).toBe(true);
-    });
-  });
-
-  describe('applyAdvancedFilters() method', function () {
-    let filterItems = new canList([
-      AdvancedSearch.create.attribute(),
-    ]);
-    let mappingItems = new canList([
-      AdvancedSearch.create.mappingCriteria({
-        filter: AdvancedSearch.create.attribute(),
-      }),
-    ]);
-    beforeEach(function () {
-      vm.attr('advancedSearch.filterItems', filterItems);
-      vm.attr('advancedSearch.mappingItems', mappingItems);
-      vm.attr('advancedSearch.appliedFilterItems', canList());
-      vm.attr('advancedSearch.appliedMappingItems', canList());
-      spyOn(vm, 'onFilter');
-      spyOn(AdvancedSearch, 'buildFilter')
-        .and.callFake(function (items, request) {
-          request.push({name: 'item'});
-        });
-      spyOn(QueryParser, 'joinQueries');
-    });
-
-    it('copies filter and mapping items to applied', function () {
-      vm.applyAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.appliedFilterItems').attr())
-        .toEqual(filterItems.attr());
-      expect(vm.attr('advancedSearch.appliedMappingItems').attr())
-        .toEqual(mappingItems.attr());
-    });
-
-    it('initializes advancedSearch.filter property', function () {
-      QueryParser.joinQueries.and.returnValue({
-        name: 'test',
-      });
-      vm.attr('advancedSearch.filter', null);
-
-      vm.applyAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.filter.name')).toBe('test');
-    });
-
-    it('initializes advancedSearch.request property', function () {
-      vm.attr('advancedSearch.request', canList());
-
-
-      vm.applyAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.request.length')).toBe(3);
-    });
-
-    it('closes modal window', function () {
-      vm.attr('advancedSearch.open', true);
-
-      vm.applyAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.open')).toBe(false);
-    });
-
-    it('calls onFilter() method', function () {
-      vm.applyAdvancedFilters();
-
-      expect(vm.onFilter).toHaveBeenCalled();
-    });
-  });
-
-  describe('removeAdvancedFilters() method', function () {
-    beforeEach(function () {
-      spyOn(vm, 'onFilter');
-    });
-
-    it('removes applied filter and mapping items', function () {
-      vm.attr('advancedSearch.appliedFilterItems', new canList([
-        {title: 'item'},
-      ]));
-      vm.attr('advancedSearch.appliedMappingItems', new canList([
-        {title: 'item'},
-      ]));
-
-      vm.removeAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.appliedFilterItems.length')).toBe(0);
-      expect(vm.attr('advancedSearch.appliedMappingItems.length')).toBe(0);
-    });
-
-    it('cleans advancedSearch.filter property', function () {
-      vm.attr('advancedSearch.filter', {});
-
-      vm.removeAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.filter')).toBe(null);
-    });
-
-    it('closes modal window', function () {
-      vm.attr('advancedSearch.open', true);
-
-      vm.removeAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.open')).toBe(false);
-    });
-
-    it('calls onFilter() method', function () {
-      vm.removeAdvancedFilters();
-
-      expect(vm.onFilter).toHaveBeenCalled();
-    });
-
-    it('resets advancedSearch.request list', function () {
-      vm.attr('advancedSearch.request', new canList([{data: 'test'}]));
-
-      vm.removeAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.request.length')).toBe(0);
-    });
-  });
-
-  describe('resetAdvancedFilters() method', function () {
-    it('resets filter items', function () {
-      vm.attr('advancedSearch.filterItems', new canList([
-        {title: 'item'},
-      ]));
-
-      vm.resetAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.filterItems.length')).toBe(0);
-    });
-
-    it('resets mapping items', function () {
-      vm.attr('advancedSearch.mappingItems', new canList([
-        {title: 'item'},
-      ]));
-
-      vm.resetAdvancedFilters();
-
-      expect(vm.attr('advancedSearch.mappingItems.length')).toBe(0);
     });
   });
 
@@ -663,7 +497,7 @@ describe('tree-widget-container component', function () {
       vm.attr('options', {
         parent_instance: parent,
       });
-      vm.attr('advancedSearch', {
+      vm.attr('currentFilter', {
         filter,
         request,
       });
@@ -683,6 +517,157 @@ describe('tree-widget-container component', function () {
         'info',
         exportMessage,
         {data: true});
+    });
+  });
+
+  describe('setColumnsConfiguration() method', () => {
+    it('should call addServiceColumns() method', () => {
+      vm.attr('model', {
+        model_singular: 'test model',
+      });
+      spyOn(TreeViewUtils, 'getColumnsForModel')
+        .and.returnValue([]);
+      spyOn(vm, 'addServiceColumns');
+
+      vm.setColumnsConfiguration();
+
+      expect(vm.addServiceColumns).toHaveBeenCalled();
+    });
+  });
+
+  describe('onUpdateColumns() method', () => {
+    it('should call addServiceColumns() method', () => {
+      vm.attr('model', {
+        model_singular: 'test model',
+      });
+      spyOn(TreeViewUtils, 'setColumnsForModel')
+        .and.returnValue([]);
+      spyOn(vm, 'addServiceColumns');
+
+      vm.onUpdateColumns({});
+
+      expect(vm.addServiceColumns).toHaveBeenCalled();
+    });
+  });
+
+  describe('addServiceColumns() method', () => {
+    const columns = {};
+
+    beforeEach(() => {
+      columns.available = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+      }];
+      columns.selected = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+      }];
+
+      const fakeModel = makeFakeModel({
+        model: Cacheable,
+        staticProps: {
+          model_singular: 'Person',
+          tree_view_options: {
+            service_attr_list: [{
+              name: 'serviceCol1',
+            }],
+          },
+        },
+      });
+
+      vm.attr('model', fakeModel);
+    });
+
+    it('should work for Persons', () => {
+      vm.addServiceColumns(columns);
+
+      const expectedOutput = {
+        available: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }, {
+          name: 'serviceCol1',
+        }],
+        selected: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }, {
+          name: 'serviceCol1',
+        }],
+      };
+
+      expect(columns).toEqual(expectedOutput);
+    });
+
+    it('should not work for models except Person', () => {
+      const expectedOutput = {
+        available: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }],
+        selected: [{
+          name: 'col1',
+        }, {
+          name: 'col2',
+        }],
+      };
+
+      vm.attr('model', Assessment);
+      vm.addServiceColumns(columns);
+      expect(columns).toEqual(expectedOutput);
+
+      vm.attr('model', Program);
+      vm.addServiceColumns(columns);
+      expect(columns).toEqual(expectedOutput);
+    });
+
+    it('should sort columns by order', () => {
+      columns.available = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+        order: 2,
+      }];
+      columns.selected = [{
+        name: 'col1',
+      }, {
+        name: 'col2',
+        order: 2,
+      }];
+
+      vm.attr('model').tree_view_options.service_attr_list = [{
+        name: 'serviceCol1',
+        order: 1,
+      }];
+
+      const expectedOutput = {
+        available: [{
+          name: 'serviceCol1',
+          order: 1,
+        }, {
+          name: 'col2',
+          order: 2,
+        }, {
+          name: 'col1',
+        }],
+        selected: [{
+          name: 'serviceCol1',
+          order: 1,
+        }, {
+          name: 'col2',
+          order: 2,
+        }, {
+          name: 'col1',
+        }],
+      };
+
+      vm.addServiceColumns(columns);
+      expect(columns).toEqual(expectedOutput);
     });
   });
 });

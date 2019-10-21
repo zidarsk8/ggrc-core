@@ -3,12 +3,11 @@
 
 """Base objects for csv file converters."""
 
+import collections
 import logging
-from collections import defaultdict
 
-import sqlalchemy as sa
-from flask import g
 from google.appengine.ext import deferred
+import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import login
@@ -33,7 +32,7 @@ class BaseConverter(object):
   """Base class for csv converters."""
   # pylint: disable=too-few-public-methods
   def __init__(self, ie_job):
-    self.new_objects = defaultdict(structures.CaseInsensitiveDict)
+    self.new_objects = collections.defaultdict(structures.CaseInsensitiveDict)
     self.shared_state = {}
     self.response_data = []
     self.cache_manager = cache_utils.get_cache_manager()
@@ -100,7 +99,7 @@ class ImportConverter(BaseConverter):
   ]
 
   def __init__(self, ie_job, dry_run=True, csv_data=None):
-    self.user = getattr(g, '_current_user', None)
+    self.user = login.get_current_user()
     self.dry_run = dry_run
     self.csv_data = csv_data or []
     self.indexer = get_indexer()
@@ -187,12 +186,14 @@ class ExportConverter(BaseConverter):
   blocks and columns are handled in the correct order.
   """
 
-  def __init__(self, ids_by_type, exportable_queries=None, ie_job=None):
+  def __init__(self, ids_by_type, exportable_queries=None, ie_job=None,
+               ca_cache=None):
     super(ExportConverter, self).__init__(ie_job)
     self.dry_run = True  # TODO: fix ColumnHandler to not use it for exports
     self.block_converters = []
     self.ids_by_type = ids_by_type
     self.exportable_queries = exportable_queries or []
+    self._ca_cache = ca_cache
 
   def get_object_names(self):
     return [c.name for c in self.block_converters]
@@ -227,6 +228,7 @@ class ExportConverter(BaseConverter):
             fields=fields,
             object_ids=object_ids,
             class_name=class_name,
+            ca_cache=self._ca_cache
         )
         self.block_converters.append(block_converter)
 
