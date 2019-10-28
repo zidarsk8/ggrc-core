@@ -141,16 +141,6 @@ class AssessmentTrackerHandler(object):
       except (ValueError, TypeError):
         raise exceptions.ValidationError("Issue ID must be a number.")
 
-  def _validate_assmt_link_fields(self, issue_info):
-    """""Validate assessment fields for issue
-
-      Args:
-          issue_info: dictionary with issue payload information
-    """
-    self._validate_issue_id(issue_info)
-    self._validate_string_fields(issue_info)
-    self._validate_assessment_title(issue_info)
-
   @staticmethod
   def _validate_assessment_title(issue_info):
     """Validate assessment fields for issue
@@ -412,7 +402,7 @@ class AssessmentTrackerHandler(object):
               issue_db_info
           )
       elif self._is_create_detach_issue_mode(issue_id_stored, issue_id_sent):
-        self._create_and_detach_ticket(
+        self._create_and_disable_ticket(
             assessment,
             issue_id_stored,
             issue_id_sent,
@@ -430,8 +420,9 @@ class AssessmentTrackerHandler(object):
                 assessment,
                 issue_db_info
             )
-      elif self._is_update_issue_mode(issue_id_stored, issue_id_sent):
-        self._update_and_disable_ticket(
+      elif (self._is_update_issue_mode(issue_id_stored, issue_id_sent) and
+            not assessment_src["issue_tracker"].get("is_linking")):
+        self._update_ticket(
             assessment,
             initial_state,
             issue_initial_obj,
@@ -674,7 +665,6 @@ class AssessmentTrackerHandler(object):
     Returns:
         issue_db_info: dictionary with information
         for issue store
-        sync_result.status: status of request to Issue Tracker
     """
     issue_info = assessment_src.get("issue_tracker", {})
     self._validate_assessment_fields(issue_info)
@@ -697,8 +687,12 @@ class AssessmentTrackerHandler(object):
         sync_result,
         assessment
     )
-
-    return issue_db_info, sync_result.status
+    if sync_result.status == SyncResult.SyncResultStatus.SYNCED:
+      all_models.IssuetrackerIssue.create_or_update_from_dict(
+          assessment,
+          issue_db_info
+      )
+    return issue_db_info
 
   def _link_ticket(self, assessment, issue_id, assessment_src):
     """Link Issue with Assessment info.
@@ -717,8 +711,8 @@ class AssessmentTrackerHandler(object):
         assessment,
         assessment_src
     )
-    self._validate_assmt_link_fields(issuetracker_info)
-    issuetracker_info = self._update_with_assmt_data_for_ticket_create(
+    self._validate_issue_id(issuetracker_info)
+    self._handle_people_emails(
         assessment,
         issuetracker_info
     )
@@ -795,9 +789,9 @@ class AssessmentTrackerHandler(object):
 
     return sync_result.status
 
-  def _create_and_detach_ticket(self, assessment, issue_id_stored,
-                                issue_id_sent, assessment_src):
-    """'Create-detach' ticket on update
+  def _create_and_disable_ticket(self, assessment, issue_id_stored,
+                                 issue_id_sent, assessment_src):
+    """'Create-disable' ticket on update
 
     Args:
         assessment: object from Assessment model
@@ -821,34 +815,7 @@ class AssessmentTrackerHandler(object):
             assessment,
             issue_db_info
         )
-
-  def _update_and_disable_ticket(self, assessment, initial_state,
-                                 issue_initial_obj, issue_id_stored,
-                                 assessment_src):
-    # pylint: disable=too-many-arguments
-    """Update - disable action on update
-
-    Args:
-        assessment: object from Assessment model
-        assessment_src: dictionary with issue information
-        issue_id_stored: issue id stored into db
-        issue_initial_obj: issue information from previous Assessment
-        initial_state: object with previous Assessment state
-    """
-    if self._is_issue_enabled(assessment_src):
-      issue_db_info, sync_status = self._update_ticket(
-          assessment,
-          initial_state,
-          issue_initial_obj,
-          issue_id_stored,
-          assessment_src
-      )
-      if sync_status == SyncResult.SyncResultStatus.SYNCED:
-        all_models.IssuetrackerIssue.create_or_update_from_dict(
-            assessment,
-            issue_db_info
-        )
-    elif issue_initial_obj.get("enabled") and assessment_src:
+    elif assessment.issue_tracker.get("enabled") and assessment_src:
       sync_status = self.add_disable_comment(
           assessment,
           issue_id_stored
@@ -1344,6 +1311,28 @@ class AssessmentTrackerHandler(object):
     return template.format(issue_id=issue_id)
 
   @classmethod
+  def _handle_people_emails(cls, assessment, issue_db_info):
+    """Handle emails.
+
+    Args:
+      assessment: object from Assessment model
+      issue_db_info: dictionary with issue information
+    """
+    reporter = cls._get_reporter(assessment.audit)
+    assignee = cls._get_assignee(assessment)
+    ccs = cls._get_ccs(
+        reporter,
+        assignee,
+        assessment
+    )
+    issue_db_info.update({
+        "assignee": assignee,
+        "reporter": reporter,
+        "cc_list": ccs,
+        "people_sync_enabled": cls._is_people_sync_enabled(assessment.audit),
+    })
+
+  @classmethod
   def _update_with_assmt_data_for_ticket_create(cls, assessment, assmt_src):
     # pylint: disable=invalid-name
     """Update issue information with assessment data.
@@ -1356,13 +1345,6 @@ class AssessmentTrackerHandler(object):
         issue_db_info: dictionary with information
         for store issue into db
     """
-    reporter = cls._get_reporter(assessment.audit)
-    assignee = cls._get_assignee(assessment)
-    ccs = cls._get_ccs(
-        reporter,
-        assignee,
-        assessment
-    )
 
     issue_db_info = {
         "object_id": assessment.id,
@@ -1375,13 +1357,11 @@ class AssessmentTrackerHandler(object):
         "issue_priority": assmt_src["issue_priority"],
         "issue_severity": assmt_src["issue_severity"],
         "enabled": True,
-        "assignee": assignee,
-        "reporter": reporter,
-        "cc_list": ccs,
         "due_date": assessment.start_date,
         "issue_id": assmt_src.get("issue_id"),
-        "people_sync_enabled": cls._is_people_sync_enabled(assessment.audit),
     }
+
+    cls._handle_people_emails(assessment, issue_db_info)
 
     return issue_db_info
 
@@ -1475,24 +1455,29 @@ class AssessmentTrackerHandler(object):
         "object_id": audit.id,
         "object_type": audit.__class__.__name__,
         "component_id": audit_src.get(
-            "component_id",
-            constants.DEFAULT_ISSUETRACKER_VALUES["component_id"]
+            "component_id", audit.issue_tracker.get(
+                "component_id",
+                constants.DEFAULT_ISSUETRACKER_VALUES["component_id"])
         ),
         "hotlist_id": audit_src.get(
-            "hotlist_id",
-            constants.DEFAULT_ISSUETRACKER_VALUES["hotlist_id"],
+            "hotlist_id", audit.issue_tracker.get(
+                "hotlist_id",
+                constants.DEFAULT_ISSUETRACKER_VALUES["hotlist_id"])
         ),
         "issue_type": audit_src.get(
-            "issue_type",
-            constants.DEFAULT_ISSUETRACKER_VALUES["issue_type"]
+            "issue_type", audit.issue_tracker.get(
+                "issue_type",
+                constants.DEFAULT_ISSUETRACKER_VALUES["issue_type"])
         ),
         "issue_priority": audit_src.get(
-            "issue_priority",
-            constants.DEFAULT_ISSUETRACKER_VALUES["issue_priority"]
+            "issue_priority", audit.issue_tracker.get(
+                "issue_priority",
+                constants.DEFAULT_ISSUETRACKER_VALUES["issue_priority"])
         ),
         "issue_severity": audit_src.get(
-            "issue_severity",
-            constants.DEFAULT_ISSUETRACKER_VALUES["issue_severity"]
+            "issue_severity", audit.issue_tracker.get(
+                "issue_severity",
+                constants.DEFAULT_ISSUETRACKER_VALUES["issue_severity"])
         ),
         "enabled": audit_src["enabled"],
         "people_sync_enabled": audit_src.get("people_sync_enabled", True),
@@ -1515,12 +1500,22 @@ class AssessmentTrackerHandler(object):
     issue_db_info = {
         "object_id": assessment_template.id,
         "object_type": assessment_template.__class__.__name__,
-        "component_id": assmt_template_src["component_id"],
-        "hotlist_id": assmt_template_src.get("hotlist_id"),
-        "issue_type": assmt_template_src["issue_type"],
-        "issue_priority": assmt_template_src["issue_priority"],
-        "issue_severity": assmt_template_src["issue_severity"],
-        "enabled": assmt_template_src["enabled"]
+        "component_id": assmt_template_src.get(
+            "component_id",
+            constants.DEFAULT_ISSUETRACKER_VALUES["component_id"]),
+        "hotlist_id": assmt_template_src.get(
+            "hotlist_id",
+            constants.DEFAULT_ISSUETRACKER_VALUES["hotlist_id"]),
+        "issue_type": assmt_template_src.get(
+            "issue_type",
+            constants.DEFAULT_ISSUETRACKER_VALUES["issue_type"]),
+        "issue_priority": assmt_template_src.get(
+            "issue_priority",
+            constants.DEFAULT_ISSUETRACKER_VALUES["issue_priority"]),
+        "issue_severity": assmt_template_src.get(
+            "issue_severity",
+            constants.DEFAULT_ISSUETRACKER_VALUES["issue_severity"]),
+        "enabled": assmt_template_src.get("enabled")
     }
 
     return issue_db_info
@@ -1598,7 +1593,7 @@ class AssessmentTrackerHandler(object):
           "hotlist_ids": [int(issue_info["hotlist_id"])]
           if issue_info["hotlist_id"] else [],
           "title": issue_info["title"],
-          "type": issue_info["issue_type"],
+          "type": constants.DEFAULT_ISSUETRACKER_VALUES["issue_type"],
           "priority": issue_info["issue_priority"],
           "severity": issue_info["issue_severity"],
           "reporter": issue_info["reporter"],
@@ -1844,6 +1839,9 @@ class AssessmentTrackerHandler(object):
     issue_info_db["hotlist_id"] = self._extract_hotlist_id(
         issue_tracker_info
     )
+    issue_info_db["issue_priority"] = issue_tracker_info.get("priority")
+    issue_info_db["issue_severity"] = issue_tracker_info.get("severity")
+    issue_info_db["title"] = issue_tracker_info.get("title")
 
     return issue_info_db
 

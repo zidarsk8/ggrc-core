@@ -4,14 +4,14 @@
 """Tests for snapshot export."""
 import collections
 import json
-import unittest
-
+from appengine import base
 from ggrc import models, db
+from ggrc.models import all_models
 from ggrc.utils import QueryCounter, DATE_FORMAT_US
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
-
-from appengine import base
+from integration.ggrc_basic_permissions.models \
+    import factories as rbac_factories
 
 
 @base.with_memcache
@@ -21,15 +21,7 @@ class TestExportSnapshots(TestCase):
   def setUp(self):
     super(TestExportSnapshots, self).setUp()
     self.client.get("/login")
-    self.headers = {
-        "Content-Type": "application/json",
-        "X-Requested-By": "GGRC",
-        "X-export-view": "blocks",
-    }
-
-  def test_simple_export(self):
-    """Test simple empty snapshot export."""
-    search_request = [{
+    self.search_request = [{
         "object_name": "Snapshot",
         "filters": {
             "expression": {
@@ -39,7 +31,11 @@ class TestExportSnapshots(TestCase):
             },
         },
     }]
-    parsed_data = self.export_parsed_csv(search_request)["Snapshot"]
+
+  def test_simple_export(self):
+    """Test simple empty snapshot export."""
+
+    parsed_data = self.export_parsed_csv(self.search_request)["Snapshot"]
     self.assertEqual(parsed_data, [])
 
   @staticmethod
@@ -92,89 +88,35 @@ class TestExportSnapshots(TestCase):
               multi_choice_options="one,two,three,four,five"),
       ]
 
-  @unittest.skip("Skip until import for controls will be deprecated")
-  def test_full_control_export(self):
-    """Test exporting of a single full control snapshot."""
-    self._create_cads("control")
-    self.import_file("control_snapshot_data_single.csv")
-    # Duplicate import because we have a bug in logging revisions and this
-    # makes sure that the fixture created properly.
-    self.import_file("control_snapshot_data_single.csv")
-
-    controls = models.Control.query.all()
-    with factories.single_commit():
-      audit = factories.AuditFactory()
-      snapshots = self._create_snapshots(audit, controls)
-
-    control_dicts = {
-        control.slug: {
-            # normal fields
-            "Code": u"*" + control.slug,
-            "Revision Date":
-                snapshot.revision.created_at.strftime(DATE_FORMAT_US),
-            "Description": control.description,
-            "Effective Date": control.start_date.strftime(DATE_FORMAT_US),
-            "Fraud Related": u"yes" if control.fraud_related else u"no",
-            "Frequency": control.verify_frequency,
-            "Kind/Nature": control.kind,
-            "Notes": control.notes,
-            "Review State": control.review_status,
-            "Review Status": control.review_status_display_name,
-            "Reviewers": u"",
-            "Significance": u"key" if control.key_control else u"non-key",
-            "State": control.status,
-            "Last Deprecated Date": u"",
-            "Assessment Procedure": control.test_plan,
-            "Title": control.title,
-            "Type/Means": control.means,
-            # Custom attributes
-            "RT": self._get_cav(control, "RT"),
-            "checkbox": self._get_cav(control, "checkbox"),
-            "date": self._get_cav(control, "date"),
-            "dropdown": self._get_cav(control, "dropdown"),
-            # Special snapshot export fields
-            "Audit": audit.slug,
-            "Document File": u"\n".join(c.link + " " + c.title for c in
-                                        control.documents_file),
-            "Reference URL": u"\n".join(c.link for c in
-                                        control.documents_reference_url),
-            "Assertions": u",".join(json.loads(control.assertions)),
-            "Categories": u",".join(json.loads(control.categories)),
-            "GDrive Folder ID": u"",
-            "Archived": u"yes" if audit.archived else u"no",
-            # Computed attributes
-            "Last Assessment Date": u"",
-            "Admin": u"admin@example.com\ncreator@example.com\n"
-                     u"editor@example.com",
-            "Control Operators": u"creator@example.com",
-            "Control Owners": u"creator@example.com",
-            "Other Contacts": u"creator@example.com",
-            "Principal Assignees": u"creator@example.com",
-            "Secondary Assignees": u"creator@example.com",
-            'Created Date': control.created_at.strftime(DATE_FORMAT_US),
-            'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
-            'Last Updated By': control.modified_by.email,
-        }
-        for snapshot, control in zip(snapshots, controls)
-    }
-
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
-    parsed_dict = {line["Code"]: line for line in parsed_data}
-
-    self.assertEqual(
-        parsed_dict["*Control 1"],
-        control_dicts["Control 1"],
-    )
+  @staticmethod
+  def _control_dict(new_values):
+    """Creates the control object empty fields dictionary"""
+    control_dict = {"Description": u"",
+                    "Effective Date": u"",
+                    "Fraud Related": u"",
+                    "Frequency": u"",
+                    "Kind/Nature": u"",
+                    "Notes": u"",
+                    "Reference URL": u"",
+                    "Review Status": u"some status",
+                    "Significance": u"",
+                    "State": u"Draft",
+                    "Last Assessment Date": u"",
+                    "Last Deprecated Date": u"",
+                    "Assessment Procedure": u"",
+                    "Type/Means": u"",
+                    "Categories": u"",
+                    "Document File": u"",
+                    'Last Updated By': "",
+                    "GDrive Folder ID": u"",
+                    "Control Operators": u"",
+                    "Control Owners": u"",
+                    "Other Contacts": u"",
+                    "Principal Assignees": u"",
+                    "Secondary Assignees": u"",
+                    "Admin": u""}
+    control_dict.update(new_values)
+    return control_dict
 
   def test_snapshot_mappings_export(self):
     """Test exporting snapshots with object mappings."""
@@ -191,18 +133,10 @@ class TestExportSnapshots(TestCase):
         factories.RelationshipFactory(source=snapshot, destination=assessment)
         factories.RelationshipFactory(source=issue, destination=snapshot)
 
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-        "fields": ["mappings"]
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    self.search_request[0]["fields"] = ["mappings"]
+
+    parsed_data = self.export_parsed_csv(
+        self.search_request)["Control Snapshot"]
     exported_control_dict = parsed_data[0]
 
     self.assertEqual(
@@ -228,66 +162,30 @@ class TestExportSnapshots(TestCase):
       snapshots = self._create_snapshots(audit, controls)
 
     control_dicts = {
-        control.slug: {
+        control.slug: self._control_dict({
             # normal fields
             "Code": "*" + control.slug,
             "Revision Date":
                 snapshot.revision.created_at.strftime(DATE_FORMAT_US),
-            "Description": u"",
-            "Effective Date": u"",
-            "Fraud Related": u"",
-            "Frequency": u"",
-            "Kind/Nature": u"",
-            "Notes": u"",
-            "Review Status": u"some status",
-            "Significance": u"",
-            "State": u"Draft",
-            "Last Deprecated Date": u"",
-            "Assessment Procedure": u"",
             "Title": control.title,
-            "Type/Means": u"",
             # Special snapshot export fields
             "Audit": audit.slug,
             "Archived": u"yes" if audit.archived else u"no",
-            # Computed attributes
-            "Last Assessment Date": u"",
-
             # Custom attributes
             "RT": u"",
-            "Reference URL": u"",
             "date": u"",
             "dropdown": u"",
             "multiselect": u"",
-
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u",".join(json.loads(control.assertions)),
-            "Categories": u"",
-            "Document File": u"",
-            "Admin": u"",
-            "Control Operators": u"",
-            "Control Owners": u"",
-            "Other Contacts": u"",
-            "Principal Assignees": u"",
-            "Secondary Assignees": u"",
+
             'Created Date': control.created_at.strftime(DATE_FORMAT_US),
             'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
-            'Last Updated By': "",
-            "GDrive Folder ID": u"",
-        }
+        })
         for snapshot, control in zip(snapshots, controls)
     }
-
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    parsed_data = self.export_parsed_csv(
+        self.search_request)["Control Snapshot"]
     parsed_dict = {line["Code"]: line for line in parsed_data}
 
     self.assertEqual(
@@ -305,17 +203,8 @@ class TestExportSnapshots(TestCase):
       self._create_snapshots(audit2, controls)
       audit_codes = {audit1.slug, audit2.slug}
 
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    parsed_data = self.export_parsed_csv(
+        self.search_request)["Control Snapshot"]
 
     self.assertEqual(
         [line["Code"] for line in parsed_data],
@@ -334,10 +223,20 @@ class TestExportSnapshots(TestCase):
     """
     # pylint: disable=too-many-locals
     self._create_cads("product")
-    self.import_file("product_snapshot_data_multiple.csv")
-
-    product = models.Product.query.all()
+    user_details = ("Administrator",
+                    "Creator",
+                    "Editor",
+                    "Reader")
     with factories.single_commit():
+      roles = {r.name: r for r in all_models.Role.query.all()}
+      for user in user_details:
+        person = factories.PersonFactory(name=user,
+                                         email="{}@example.com".format(user))
+        rbac_factories.UserRoleFactory(role=roles[user],
+                                       person=person)
+        factories.ProductFactory(title="Product {}".format(user))
+
+      product = models.Product.query.all()
       audit = factories.AuditFactory()
       snapshots = self._create_snapshots(audit, product)
       count = len(snapshots)
@@ -360,9 +259,9 @@ class TestExportSnapshots(TestCase):
                   },
                   "op": {"name": "AND"},
                   "right": {
-                      "left": "Code",
+                      "left": "title",
                       "op": {"name": "="},
-                      "right": "Product 1",
+                      "right": "Product Editor",
                   },
               },
           },
@@ -388,7 +287,7 @@ class TestExportSnapshots(TestCase):
       }]
       self.assertEqual(
           len(self.export_parsed_csv(search_request)["Product Snapshot"]),
-          5,
+          4,
       )
       multiple_query_count = counter.get
 
@@ -433,48 +332,21 @@ class TestExportSnapshots(TestCase):
       db.session.add(snapshot.revision)
       db.session.commit()
 
-      control_dicts[control.slug] = {
+      control_dicts[control.slug] = self._control_dict({
           "Code": "*" + control.slug,
           "Revision Date":
               snapshot.revision.created_at.strftime(DATE_FORMAT_US),
-          "Description": u"",
-          "Effective Date": u"",
-          "Fraud Related": u"",
-          "Frequency": u"",
-          "Kind/Nature": u"",
-          "Notes": u"",
-          "Reference URL": u"",
-          "Review Status": u"some status",
-          "Significance": u"",
-          "State": u"Draft",
-          "Last Assessment Date": u"",
-          "Last Deprecated Date": u"",
-          "Assessment Procedure": u"",
           "Title": control.title,
-          "Type/Means": u"",
           "Audit": audit.slug,
           "Assertions": u",".join(json.loads(control.assertions)),
-          "Categories": u"",
-          "Document File": u"",
           'Created Date': control.created_at.strftime(DATE_FORMAT_US),
           'Last Updated Date': control.updated_at.strftime(DATE_FORMAT_US),
-          'Last Updated By': "",
-          "GDrive Folder ID": u"",
           "Archived": u"yes" if audit.archived else u"no",
-      }
+      })
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    parsed_data = self.export_parsed_csv(
+        self.search_request)["Control Snapshot"]
     parsed_dict = {line["Code"]: line for line in parsed_data}
 
     for i, _ in enumerate(controls):
@@ -509,17 +381,8 @@ class TestExportSnapshots(TestCase):
     db.session.delete(ac_role)
     db.session.commit()
 
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"][0]
+    parsed_data = self.export_parsed_csv(
+        self.search_request)["Control Snapshot"][0]
     self.assertNotIn("Custom Role", parsed_data)
 
   def test_export_archived_snapshot(self):

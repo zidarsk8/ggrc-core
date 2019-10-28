@@ -650,3 +650,169 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(
         flag if flag is not None else False,
         all_models.Workflow.query.get(workflow_id).is_verification_needed)
+
+  @ddt.data(
+      ('Editor', 201, 1),
+      ('Creator', 403, 0),
+      ('Reader', 403, 0),
+      ('Administrator', 201, 1),
+  )
+  @ddt.unpack
+  def test_create_ctg_wf_member(self, member_role, response_code, exp_count):
+    """Check creation cycle task group by workflow member"""
+    member = self.create_user_with_role(member_role)
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      workflow.add_person_with_role_name(member, 'Workflow Member')
+      task_group = wf_factories.TaskGroupFactory(
+          title='TestTG',
+          context=factories.ContextFactory(),
+          workflow=workflow
+      )
+      wf_factories.TaskGroupTaskFactory(
+          title='TestTGT',
+          task_group=task_group,
+          start_date=datetime.date(2017, 8, 3),
+          end_date=datetime.date(2017, 8, 7)
+      )
+      cycle = wf_factories.CycleFactory(workflow=workflow)
+    self.generator.activate_workflow(workflow)
+    self.api.set_user(member)
+
+    response = self.api.post(all_models.CycleTaskGroup, {
+        "cycle_task_group": {
+            "cycle": {
+                "id": cycle.id,
+            },
+            "contact": {
+                "id": member.id,
+            },
+            "title": 'title1',
+        },
+    })
+
+    self.assertEquals(response.status_code, response_code)
+    count = len(all_models.CycleTaskGroup.query.all())
+    self.assertEquals(count, exp_count)
+
+  @ddt.data(
+      'Reader',
+      'Editor',
+      'Administrator',
+      'Creator',
+  )
+  def test_create_ctg_wf_admin(self, admin_role):
+    """Check creation cycle task group by workflow admin"""
+    admin = self.create_user_with_role(admin_role)
+    exp_count = 1
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      workflow.add_person_with_role_name(admin, 'Admin')
+      task_group = wf_factories.TaskGroupFactory(
+          title='TestTG',
+          context=factories.ContextFactory(),
+          workflow=workflow
+      )
+      wf_factories.TaskGroupTaskFactory(
+          title='TestTGT',
+          task_group=task_group,
+          start_date=datetime.date(2017, 8, 3),
+          end_date=datetime.date(2017, 8, 7)
+      )
+      cycle = wf_factories.CycleFactory(workflow=workflow)
+    self.generator.activate_workflow(workflow)
+    self.api.set_user(admin)
+
+    response = self.api.post(all_models.CycleTaskGroup, {
+        "cycle_task_group": {
+            "cycle": {
+                "id": cycle.id,
+            },
+            "contact": {
+                "id": admin.id,
+            },
+            "title": 'title1',
+        },
+    })
+
+    self.assert201(response)
+    count = len(all_models.CycleTaskGroup.query.all())
+    self.assertEquals(count, exp_count)
+
+  @ddt.data(
+      ('Editor', 200, 0),
+      ('Creator', 403, 1),
+      ('Reader', 403, 1),
+      ('Administrator', 200, 0),
+  )
+  @ddt.unpack
+  def test_delete_ctg_wf_member(self, member_role, response_code, exp_count):
+    """Check deletion cycle task group by workflow member"""
+    member = self.create_user_with_role(member_role)
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      workflow.add_person_with_role_name(member, 'Workflow Member')
+      task_group = wf_factories.TaskGroupFactory(
+          title='TestTG',
+          context=factories.ContextFactory(),
+          workflow=workflow
+      )
+      wf_factories.TaskGroupTaskFactory(
+          title='TestTGT',
+          task_group=task_group,
+          start_date=datetime.date(2017, 8, 3),
+          end_date=datetime.date(2017, 8, 7)
+      )
+      cycle = wf_factories.CycleFactory(workflow=workflow)
+      cycle_task_group = wf_factories.CycleTaskGroupFactory(
+          cycle=cycle,
+          title='Title1'
+      )
+    ctg = all_models.CycleTaskGroup.query.get(cycle_task_group.id)
+    self.generator.activate_workflow(workflow)
+    self.api.set_user(member)
+
+    response = self.api.delete(ctg)
+
+    self.assertEquals(response.status_code, response_code)
+    count = len(all_models.CycleTaskGroup.query.all())
+    self.assertEquals(count, exp_count)
+
+  @ddt.data(
+      'Reader',
+      'Editor',
+      'Administrator',
+      'Creator',
+  )
+  def test_delete_ctg_wf_admin(self, admin_role):
+    """Check deletion cycle task group by workflow member"""
+    admin = self.create_user_with_role(admin_role)
+    exp_count = 0
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      workflow.add_person_with_role_name(admin, 'Admin')
+      task_group = wf_factories.TaskGroupFactory(
+          title='TestTG',
+          context=factories.ContextFactory(),
+          workflow=workflow
+      )
+      wf_factories.TaskGroupTaskFactory(
+          title='TestTGT',
+          task_group=task_group,
+          start_date=datetime.date(2017, 8, 3),
+          end_date=datetime.date(2017, 8, 7)
+      )
+      cycle = wf_factories.CycleFactory(workflow=workflow)
+      cycle_task_group = wf_factories.CycleTaskGroupFactory(
+          cycle=cycle,
+          title='Title1'
+      )
+    ctg = all_models.CycleTaskGroup.query.get(cycle_task_group.id)
+    self.generator.activate_workflow(workflow)
+    self.api.set_user(admin)
+
+    response = self.api.delete(ctg)
+
+    self.assert200(response)
+    count = len(all_models.CycleTaskGroup.query.all())
+    self.assertEquals(count, exp_count)

@@ -75,6 +75,7 @@ class ACLRolesIDsMetaClass(type):
   # pylint: disable=no-self-use
   # pylint: disable=not-an-iterable
   # pylint: disable=no-value-for-parameter
+  # pylint: disable=too-many-public-methods
 
   def roles(cls):
     """Return ACL roles."""
@@ -176,6 +177,12 @@ class ACLRolesIDsMetaClass(type):
   def PRODUCT_MANAGERS(cls):
     return cls.id_of_role(object_type=objects.get_obj_type(objects.PRODUCTS),
                           name=PRODUCT_MANAGERS)
+
+  @property
+  def TECHNOLOGY_ENVIRONMENT_ADMINS(cls):
+    return cls.id_of_role(object_type=objects.get_obj_type(
+                          objects.TECHNOLOGY_ENVIRONMENTS),
+                          name=ADMIN)
 
   @property
   def REVIEWERS(cls):

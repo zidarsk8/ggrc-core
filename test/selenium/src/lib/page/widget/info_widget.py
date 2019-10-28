@@ -912,6 +912,13 @@ class Vendors(InfoWidget):
     super(Vendors, self).__init__(driver)
 
 
+class TechnologyEnvironments(InfoWidget):
+  """Model for Technology Environment object Info pages and Info panels."""
+
+  def __init__(self, driver):
+    super(TechnologyEnvironments, self).__init__(driver)
+
+
 class AccessGroup(InfoWidget):
   """Model for Access Group object Info pages and Info panels."""
   _locators = locator.WidgetInfoAccessGroup

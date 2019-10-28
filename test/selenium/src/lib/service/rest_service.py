@@ -204,6 +204,13 @@ class ControlsService(BaseRestService):
     super(ControlsService, self).__init__(url.CONTROLS)
 
 
+class TechnologyEnvironmentsService(BaseRestService):
+  """Service for working with TechnologyEnvironments entities."""
+  def __init__(self):
+    super(TechnologyEnvironmentsService, self).__init__(
+        url.TECHNOLOGY_ENVIRONMENTS)
+
+
 class ObjectivesService(BaseRestService):
   """Service for working with Objectives entities."""
   def __init__(self):

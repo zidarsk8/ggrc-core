@@ -76,16 +76,21 @@ class BaseIssueTrackerParamsBuilder(object):
         ggrc_utils.view_url_for(obj)
     )
 
-  def handle_issue_tracker_info(self, obj, issue_tracker_info):
+  def handle_issue_tracker_info(self, obj, issue_tracker_info,
+                                remote_info=None):
     """Handle issue tracker information."""
     default_values = constants.DEFAULT_ISSUETRACKER_VALUES
     issue_component_id = issue_tracker_info.get("component_id")
+    remote_info = remote_info or {}
+    issue_state = remote_info.get("issueState", {})
     self.params.component_id = issue_component_id or \
-        default_values["issue_component_id"]
+        issue_state.get("component_id", default_values["issue_component_id"])
 
     issue_hotlist_id = issue_tracker_info.get("hotlist_id")
+    remote_hotlist_id = issue_state.get("hotlist_ids",
+                                        [default_values["issue_hotlist_id"]])
     self.params.hotlist_id = issue_hotlist_id or \
-        default_values["issue_hotlist_id"]
+        remote_hotlist_id[0] if remote_hotlist_id else None
 
     issue_type = issue_tracker_info.get("issue_type")
     self.params.issue_type = issue_type or \
@@ -93,13 +98,14 @@ class BaseIssueTrackerParamsBuilder(object):
 
     issue_priority = issue_tracker_info.get("issue_priority")
     self.params.issue_priority = issue_priority or \
-        default_values["issue_priority"]
+        issue_state.get("priority", default_values["issue_priority"])
 
     issue_severity = issue_tracker_info.get("issue_severity")
     self.params.issue_severity = issue_severity or \
-        default_values["issue_severity"]
+        issue_state.get("severity", default_values["issue_severity"])
 
-    self.params.title = issue_tracker_info.get("title") or obj.title
+    self.params.title = issue_tracker_info.get("title") or \
+        issue_state.get("title", obj.title)
     self.params.enabled = issue_tracker_info.get("enabled")
 
   def _update_issue_tracker_info(self, new_issue_tracker_info,
@@ -226,7 +232,7 @@ class IssueParamsBuilder(BaseIssueTrackerParamsBuilder):
     else:
       self.params.status = res["issueState"]["status"]
       self._add_link_message(obj)
-      self.handle_issue_tracker_info(obj, it_info)
+      self.handle_issue_tracker_info(obj, it_info, res)
       self._populate_hotlist_id(res)
       self._populate_component_id(res)
       self._handle_emails_from_response(res)

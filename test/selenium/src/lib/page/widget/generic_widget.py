@@ -294,6 +294,10 @@ class Programs(Widget):
   """Model for Programs generic widgets"""
 
 
+class TechnologyEnvironments(Widget):
+  """Model for TechnologyEnvironments generic widgets"""
+
+
 class Processes(Widget):
   """Model for Process generic widgets."""
 

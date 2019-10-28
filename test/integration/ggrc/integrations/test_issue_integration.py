@@ -109,9 +109,9 @@ class TestIssueIntegration(ggrc.TestCase):
         "hotlist_ids": [payload_attrs["hotlist_id"], ],
         "issue_id": payload_attrs["issue_id"],
         "status": payload_attrs["status"],
-        "issue_type": payload_attrs["issue_type"],
-        "issue_priority": payload_attrs["issue_priority"],
-        "issue_severity": payload_attrs["issue_severity"],
+        "type": payload_attrs["issue_type"],
+        "priority": payload_attrs["issue_priority"],
+        "severity": payload_attrs["issue_severity"],
         "title": payload_attrs["title"],
         "verifier": payload_attrs["verifier"],
         "assignee": payload_attrs["assignee"],
@@ -138,7 +138,7 @@ class TestIssueIntegration(ggrc.TestCase):
     # According to our business logic these attributes should be taken
     # from issue information
     self.assertEqual(issue_tracker_issue.title,
-                     issue_attrs["issue"]["title"])
+                     issue_attrs["issue"]["issue_tracker"]["title"])
     self.assertEqual(int(issue_tracker_issue.component_id),
                      ticket_attrs["issueState"]["component_id"])
     self.assertEqual(int(issue_tracker_issue.hotlist_id),
@@ -517,9 +517,18 @@ class TestIssueLink(TestIssueIntegration):
     issue_id = response.json.get("issue").get("id")
     issue_tracker_issue = models.IssuetrackerIssue.get_issue("Issue", issue_id)
     issue = all_models.Issue.query.filter_by(id=issue_id).first()
+    expected_issue_request_payload = issue_request_payload.copy()
+    # we do not update some values during manual linking
+    expected_issue_request_payload["issue"]["issue_tracker"].update({
+        "title": response_payload["issueState"]["title"],
+        "issue_severity": response_payload["issueState"]["severity"],
+        "issue_priority": response_payload["issueState"]["priority"],
+        "issue_type": "PROCESS"  # default value for GGRC
+    })
+
     self._check_iti_fields(issue,
                            issue_tracker_issue,
-                           issue_request_payload,
+                           expected_issue_request_payload,
                            response_payload)
 
   @mock.patch("ggrc.integrations.issues.Client.update_issue")

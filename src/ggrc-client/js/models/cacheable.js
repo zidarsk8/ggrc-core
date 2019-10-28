@@ -772,6 +772,8 @@ export default canModel.extend({
   },
   save: function () {
     this._dfd = new $.Deferred();
+
+    this.beforeEnqueue && this.beforeEnqueue();
     delayLeavingPageUntil(this._dfd);
 
     enqueue(this, this._super);

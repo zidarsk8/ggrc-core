@@ -513,14 +513,15 @@ class ImportRowConverter(RowConverter):
                        message=exp.message)
       db.session.commit_hooks_enable_flag.disable()
       db.session.commit()
-      self.block_converter.store_revision_ids(import_event)
+      if not self.ignore:
+        self.block_converter.store_revision_ids(import_event)
       cache_utils.update_memcache_after_commit(self.block_converter)
       update_snapshot_index(modified_objects)
     except exc.SQLAlchemyError as err:
       db.session.rollback()
       logger.exception("Import failed with: %s", err.message)
       self.block_converter.add_errors(errors.UNKNOWN_ERROR,
-                                      line=self.offset + 2)
+                                      line=self.block_converter.offset)
     else:
       self.create_comment_notifications()
       self.send_comment_notifications()

@@ -7,7 +7,7 @@
 
 import unittest
 import datetime
-from collections import OrderedDict
+import collections
 
 import ddt
 import freezegun
@@ -41,11 +41,36 @@ class TestAssessmentImport(TestCase):
   def test_import_assessments_with_templates(self):
     """Test importing of assessments with templates."""
 
-    self.import_file("assessment_template_no_warnings.csv")
-    self.import_file("assessment_with_templates.csv")
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment_template = factories.AssessmentTemplateFactory(audit=audit)
+      assessment_template_slug = assessment_template.slug
+      factories.CustomAttributeDefinitionFactory(
+          title='test_attr1',
+          definition_type='assessment_template',
+          definition_id=assessment_template.id,
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title='test_attr2',
+          attribute_type="Date",
+          definition_type='assessment_template',
+          definition_id=assessment_template.id,
+      )
+
+    self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Template", assessment_template_slug),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Assessment 1"),
+        ("test_attr1", "abc"),
+        ("test_attr2", "7/15/2015"),
+    ]))
 
     assessment = all_models.Assessment.query.filter(
-        all_models.Assessment.slug == "A 4").first()
+        all_models.Assessment.title == "Assessment 1").first()
 
     values = set(v.attribute_value for v in assessment.custom_attribute_values)
     self.assertIn("abc", values)
@@ -53,12 +78,23 @@ class TestAssessmentImport(TestCase):
 
   def test_import_assessment_with_evidence_file(self):
     """Test import evidence file should add warning"""
-    response = self.import_file("assessment_with_evidence_file.csv",
-                                safe=False)
+
+    evidence_url = "test_gdrive_url"
+    audit = factories.AuditFactory()
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Audit*", audit.slug),
+        ("Title*", "Assessment1"),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Evidence File", evidence_url),
+    ]))
+
     evidences = all_models.Evidence.query.filter(
         all_models.Evidence.kind == all_models.Evidence.FILE).all()
     self.assertEquals(len(evidences), 0)
-    expected_warning = (u"Line 11: 'Evidence File' can't be changed via "
+    expected_warning = (u"Line 3: 'Evidence File' can't be changed via "
                         u"import. Please go on Assessment page and make "
                         u"changes manually. The column will be skipped")
     expected_messages = {
@@ -81,7 +117,7 @@ class TestAssessmentImport(TestCase):
       evidence = factories.EvidenceFileFactory(link=evidence_url)
       factories.RelationshipFactory(source=assessment,
                                     destination=evidence)
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment_slug),
         ("Evidence File", evidence_url),
@@ -104,7 +140,7 @@ class TestAssessmentImport(TestCase):
           definition_id=assessment.id
       )
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment.slug),
         ("Template", template.slug),
@@ -126,7 +162,7 @@ class TestAssessmentImport(TestCase):
       evidence = factories.EvidenceUrlFactory(link=evidence_url)
       factories.RelationshipFactory(source=assessment,
                                     destination=evidence)
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment_slug),
         ("Evidence Url", evidence_url),
@@ -153,7 +189,7 @@ class TestAssessmentImport(TestCase):
       factories.RelationshipFactory(source=assessment,
                                     destination=evidence2)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment_slug),
         ("Evidence File", evidence_url + "\n another_gdrive_url"),
@@ -179,7 +215,7 @@ class TestAssessmentImport(TestCase):
       factories.RelationshipFactory(source=assessment,
                                     destination=evidence2)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment_slug),
         ("Evidence File", evidence_file),
@@ -236,25 +272,53 @@ class TestAssessmentImport(TestCase):
     CSV sheet:
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=704933240&vpid=A7
     """
-    self.import_file("assessment_full_no_warnings.csv")
+    with factories.single_commit():
+      for i in range(1, 4):
+        factories.PersonFactory(
+            name="user {}".format(i),
+            email="user{}@example.com".format(i)
+        )
+      audit = factories.AuditFactory()
 
-    # Test first Assessment line in the CSV file
-    asmt_1 = all_models.Assessment.query.filter_by(slug="Assessment 1").first()
+    assessment_data = [
+        collections.OrderedDict([
+            ("object_type", "Assessment"),
+            ("Code*", ""),
+            ("Audit*", audit.slug),
+            ("Assignees*", "user1@example.com\nuser2@example.com"),
+            ("Creators", "user2@example.com"),
+            ("Title", "Assessment 1"),
+            ("Evidence Url", "http://i.imgur.com/Lppr347.jpg")
+        ]),
+        collections.OrderedDict([
+            ("object_type", "Assessment"),
+            ("Code*", ""),
+            ("Audit*", audit.slug),
+            ("Assignees*", "user1@example.com\nuser3@example.com"),
+            ("Creators", "user2@example.com\nuser3@example.com"),
+            ("Title", "Assessment 2"),
+            ("Status", "In Progress")
+        ]),
+    ]
+    self.import_data(*assessment_data)
+    # Test first Assessment
+    asmt_1 = all_models.Assessment.query.filter_by(
+        title="Assessment 1").first()
     users = {
         "user 1": {"Assignees"},
-        "user 2": {"Assignees", "Creators"}
+        "user 2": {"Assignees", "Creators"},
+        "user 3": {}
     }
     self._test_assessment_users(asmt_1, users)
     self.assertEqual(asmt_1.status, all_models.Assessment.PROGRESS_STATE)
 
-    # Test second Assessment line in the CSV file
-    asmt_2 = all_models.Assessment.query.filter_by(slug="Assessment 2").first()
+    # Test second Assessment
+    asmt_2 = all_models.Assessment.query.filter_by(
+        title="Assessment 2").first()
     users = {
         "user 1": {"Assignees"},
         "user 2": {"Creators"},
-        "user 3": {},
-        "user 4": {},
-        "user 5": {},
+        "user 3": {"Assignees", "Creators"},
     }
     self._test_assessment_users(asmt_2, users)
     self.assertEqual(asmt_2.status, all_models.Assessment.PROGRESS_STATE)
@@ -263,10 +327,30 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(audit.context, asmt_1.context)
 
     evidence = all_models.Evidence.query.filter_by(
-        link="http://i.imgur.com/Lppr447.jpg").first()
+        link="http://i.imgur.com/Lppr347.jpg").first()
     self.assertEqual(audit.context, evidence.context)
 
-  def test_assessment_import_states(self):
+  @ddt.data(
+      ("In PROGRESS",
+       {
+           "State": "Verified",
+           "Verifiers": "user@example.com",
+       },
+       all_models.Assessment.PROGRESS_STATE
+       ),
+      ("not started",
+       {
+           "State": "In Review",
+           "Verifiers": "user@example.com",
+           "Title": "Modified Assessment",
+           "Notes": "Edited Notes"
+       },
+       all_models.Assessment.PROGRESS_STATE
+       )
+  )
+  @ddt.unpack
+  def test_assessment_import_states(self, start_status,
+                                    modified_data, expected_status):
     """ Test Assessment state imports
 
     These tests are an intermediate part for zucchini release and will be
@@ -275,37 +359,45 @@ class TestAssessmentImport(TestCase):
     CSV sheet:
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=299569476
     """
-    self.import_file("assessment_full_no_warnings.csv")
-    response = self._import_file("assessment_update_intermediate.csv")
+    emails = ["user1@example.com", "user2@example.com"]
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      audit_slug = audit.slug
+      for email in emails:
+        factories.PersonFactory(email=email)
+
+    assessment_data = collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", ""),
+        ("Audit*", audit_slug),
+        ("Assignees*", "user1@example.com"),
+        ("Creators", "user2@example.com"),
+        ("Title", "New Assessment"),
+        ("State", start_status)
+    ])
+    self.import_data(assessment_data)
+
+    assessment = all_models.Assessment.query.filter_by(
+        title="New Assessment").first()
+    assessment_slug = assessment.slug
+
+    modified_asmt_data = collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment_slug),
+    ])
+    modified_asmt_data.update(modified_data)
+    response = self.import_data(modified_asmt_data)
+
     self._check_csv_response(response, {
         "Assessment": {
             "row_warnings": {
-                errors.STATE_WILL_BE_IGNORED.format(line=4),
-                errors.STATE_WILL_BE_IGNORED.format(line=7),
+                errors.STATE_WILL_BE_IGNORED.format(line=3),
             }
         }
     })
 
-    assessments = {r.slug: r for r in all_models.Assessment.query.all()}
-    self.assertEqual(assessments["Assessment 60"].status,
-                     all_models.Assessment.START_STATE)
-    self.assertEqual(assessments["Assessment 61"].status,
-                     all_models.Assessment.PROGRESS_STATE)
-    self.assertEqual(assessments["Assessment 62"].status,
-                     all_models.Assessment.DONE_STATE)
-    self.assertEqual(assessments["Assessment 63"].status,
-                     all_models.Assessment.FINAL_STATE)
-    self.assertEqual(assessments["Assessment 64"].status,
-                     all_models.Assessment.FINAL_STATE)
-    self.assertEqual(assessments["Assessment 3"].status,
-                     all_models.Assessment.PROGRESS_STATE)
-    self.assertEqual(assessments["Assessment 4"].status,
-                     all_models.Assessment.PROGRESS_STATE)
-
-    # Check that there is only one attachment left
-    asmt1 = assessments["Assessment 1"]
-    self.assertEqual({"a.b.com", "c d com"},
-                     {i.title for i in asmt1.evidences_url})
+    assessment = all_models.Assessment.query.first()
+    self.assertEqual(assessment.status, expected_status)
 
   @unittest.skip("Test randomly fails because backend does not return errors")
   def test_error_ca_import_states(self):
@@ -320,7 +412,7 @@ class TestAssessmentImport(TestCase):
           attribute_type="Text",
           mandatory=True,
       )
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
@@ -348,74 +440,166 @@ class TestAssessmentImport(TestCase):
     ).first()
     self.assertEqual(asmnt.status, "Not Started")
 
-  def test_assessment_warnings_errors(self):
+  @ddt.data(
+      (
+          [
+              collections.OrderedDict([
+                  ("object_type", "Assessment"),
+                  ("Code*", ""),
+                  ("Assignees", "user@example.com"),
+                  ("Creators", "user@example.com"),
+                  ("Title", "Some title"),
+                  ("Unexpected Column", "Some value")
+              ])
+          ],
+          {
+              "Assessment": {
+                  "block_warnings": {
+                      errors.UNKNOWN_COLUMN.format(
+                          line=2,
+                          column_name="unexpected column"
+                      )
+                  }
+              }
+          }
+      ),
+      (
+          [
+              collections.OrderedDict([
+                  ("object_type", "Assessment"),
+                  ("Code*", ""),
+                  ("Assignees", "user@example.com"),
+                  ("Creators", "user@example.com"),
+                  ("Title", "Some title"),
+                  ("map:project", "")
+              ])
+          ],
+          {
+              "Assessment": {
+                  "block_warnings": {
+                      errors.UNSUPPORTED_MAPPING.format(
+                          line=2,
+                          obj_a="Assessment",
+                          obj_b="Project",
+                          column_name="map:project"
+                      )
+                  }
+              }
+          }
+      ),
+      (
+          [
+              collections.OrderedDict([
+                  ("object_type", "Assessment"),
+                  ("Code*", ""),
+                  ("Audit*", "not existing"),
+                  ("Assignees", "user@example.com"),
+                  ("Creators", "user@example.com"),
+                  ("Title", "Some title"),
+              ])
+          ],
+          {
+              "Assessment": {
+                  "row_errors": {
+                      errors.MISSING_VALUE_ERROR.format(
+                          line=3,
+                          column_name="Audit"
+                      )
+                  },
+                  "row_warnings": {
+                      errors.UNKNOWN_OBJECT.format(
+                          line=3,
+                          object_type="Audit",
+                          slug="not existing"
+                      )
+                  }
+              }
+          }
+      ),
+      (
+          [
+              collections.OrderedDict([
+                  ("object_type", "Assessment"),
+                  ("Code*", ""),
+                  ("Assignees", "user@example.com"),
+                  ("Creators", "user@example.com"),
+                  ("Title", "Some title"),
+                  ("State", "Open")
+              ])
+          ],
+          {
+              "Assessment": {
+                  "row_warnings": {
+                      errors.WRONG_VALUE_DEFAULT.format(
+                          line=3,
+                          column_name="State",
+                          value="open",
+                      )
+                  }
+              }
+          }
+      ),
+      (
+          [
+              collections.OrderedDict([
+                  ("object_type", "Assessment"),
+                  ("Code*", ""),
+                  ("Title", "New Assessment"),
+                  ("Creators", "user@example.com"),
+                  ("Assignees", "user@example.com"),
+                  ("Verifiers", "user@example.com"),
+                  ("Finished Date", "7/3/2015"),
+                  ("Verified Date", "5/14/2016"),
+              ]),
+              collections.OrderedDict([
+                  ("object_type", "Assessment"),
+                  ("Code*", ""),
+                  ("Verified Date", "5/15/2016"),
+              ])
+          ],
+          {
+              "Assessment": {
+                  "row_warnings": {
+                      errors.UNMODIFIABLE_COLUMN.format(
+                          line=3,
+                          column_name="Verified Date"
+                      )
+                  }
+              }
+          }
+      ),
+  )
+  @ddt.unpack
+  def test_assessment_warnings_errors(self, assessment_data, expected_errors):
     """ Test full assessment import with warnings and errors
 
     CSV sheet:
       https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=889865936
     """
-    self.import_file("assessment_full_no_warnings.csv")
-    response = self.import_file("assessment_with_warnings_and_errors.csv",
-                                safe=False)
+    if len(assessment_data) == 1:
+      if "Audit*" not in assessment_data[0]:
+        audit = factories.AuditFactory()
+        assessment_data[0]["Audit*"] = audit.slug
+      response = self.import_data(*assessment_data)
+    else:
+      audit = factories.AuditFactory()
+      assessment_data[0]["Audit*"] = audit.slug
+      self.import_data(assessment_data[0])
+      assessment = all_models.Assessment.query.filter_by(
+          title="New Assessment").first()
+      assessment_data[1]["Code*"] = assessment.slug
+      assessment_data[1]["Audit*"] = audit.slug
 
-    expected_errors = {
-        "Assessment": {
-            "block_errors": set([]),
-            "block_warnings": {
-                errors.UNKNOWN_COLUMN.format(
-                    line=2,
-                    column_name="error description - non existing column will "
-                    "be ignored"
-                ),
-                errors.UNKNOWN_COLUMN.format(
-                    line=2,
-                    column_name="actual error message"
-                ),
-                errors.UNSUPPORTED_MAPPING.format(
-                    line=2,
-                    obj_a="Assessment",
-                    obj_b="Project",
-                    column_name="map:project"
-                ),
-            },
-            "row_errors": {
-                errors.MISSING_VALUE_ERROR.format(
-                    line=19,
-                    column_name="Audit"
-                ),
-                errors.DUPLICATE_VALUE_IN_CSV.format(
-                    line="22",
-                    processed_line="20",
-                    column_name="Code",
-                    value="Assessment 22",
-                ),
-            },
-            "row_warnings": {
-                errors.UNKNOWN_OBJECT.format(
-                    line=19,
-                    object_type="Audit",
-                    slug="not existing"
-                ),
-                errors.WRONG_VALUE_DEFAULT.format(
-                    line=20,
-                    column_name="State",
-                    value="open",
-                ),
-                errors.UNMODIFIABLE_COLUMN.format(
-                    line=22,
-                    column_name="Verified Date"
-                ),
-            },
-        }
-    }
+      response = self.import_data(assessment_data[1])
+
     self._check_csv_response(response, expected_errors)
 
   def test_blank_optional_field(self):
     """Test warnings while import assessment with blank IssueTracker fields"""
     audit = factories.AuditFactory()
-    resp = self.import_data(OrderedDict([
+    resp = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", "ASSESSMENT-1"),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Title*", "ass1"),
         ("Creators*", "user@example.com"),
@@ -454,7 +638,7 @@ class TestAssessmentImport(TestCase):
         all_models.Relationship.get_related_query(
             assessment, all_models.Snapshot()
         ).exists()).first()[0])
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment.slug),
         ("map:Control versions", control.slug),
@@ -476,7 +660,7 @@ class TestAssessmentImport(TestCase):
       audit = factories.AuditFactory()
       assessment = factories.AssessmentFactory(audit=audit)
       factories.RelationshipFactory(source=audit, destination=assessment)
-    resp = self.import_data(OrderedDict([
+    resp = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment.slug),
         ("archived", value),
@@ -513,7 +697,7 @@ class TestAssessmentImport(TestCase):
       audit = factories.AuditFactory(archived=is_archived)
       assessment = factories.AssessmentFactory(audit=audit)
       factories.RelationshipFactory(source=audit, destination=assessment)
-    resp = self.import_data(OrderedDict([
+    resp = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment.slug),
         ("archived", value),
@@ -555,10 +739,10 @@ class TestAssessmentImport(TestCase):
         all_models.Relationship.get_related_query(
             all_models.Assessment(), all_models.Snapshot()
         ).exists()).first()[0])
-    slug = "TestAssessment"
-    response = self.import_data(OrderedDict([
+
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", slug),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", all_models.Person.query.all()[0].email),
         ("Creators", all_models.Person.query.all()[0].email),
@@ -567,7 +751,7 @@ class TestAssessmentImport(TestCase):
     ]))
     self._check_csv_response(response, {})
     assessment = all_models.Assessment.query.filter(
-        all_models.Assessment.slug == slug
+        all_models.Assessment.title == "Strange title"
     ).first()
     self.assertTrue(db.session.query(all_models.Relationship.get_related_query(
         assessment, all_models.Snapshot()).exists()).first()[0]
@@ -577,20 +761,19 @@ class TestAssessmentImport(TestCase):
     "Test for creation assessment with mapped assignees"
     name = "test_name"
     email = "test@email.com"
-    slug = "TestAssessment"
     with factories.single_commit():
       audit = factories.AuditFactory()
       assignee_id = factories.PersonFactory(name=name, email=email).id
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", slug),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", email),
         ("Creators", all_models.Person.query.all()[0].email),
         ("Title", "Strange title"),
     ]))
     assessment = all_models.Assessment.query.filter(
-        all_models.Assessment.slug == slug
+        all_models.Assessment.title == "Strange title"
     ).first()
     self._test_assigned_user(assessment, assignee_id, "Assignees")
 
@@ -598,20 +781,19 @@ class TestAssessmentImport(TestCase):
     "Test for creation assessment with mapped creator"
     name = "test_name"
     email = "test@email.com"
-    slug = "TestAssessment"
     with factories.single_commit():
       audit = factories.AuditFactory()
       creator_id = factories.PersonFactory(name=name, email=email).id
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
-        ("Code*", slug),
+        ("Code*", ""),
         ("Audit*", audit.slug),
         ("Assignees*", all_models.Person.query.all()[0].email),
         ("Creators", email),
         ("Title", "Strange title"),
     ]))
     assessment = all_models.Assessment.query.filter(
-        all_models.Assessment.slug == slug
+        all_models.Assessment.title == "Strange title"
     ).first()
     self._test_assigned_user(assessment, creator_id, "Creators")
 
@@ -624,7 +806,7 @@ class TestAssessmentImport(TestCase):
       assessment = factories.AssessmentFactory(slug=slug)
       creator_id = factories.PersonFactory(name=name, email=email).id
     self._test_assigned_user(assessment, None, "Creators")
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Creators", email),
@@ -643,7 +825,7 @@ class TestAssessmentImport(TestCase):
       assessment = factories.AssessmentFactory(slug=slug)
       assignee_id = factories.PersonFactory(name=name, email=email).id
     self._test_assigned_user(assessment, None, "Assignees")
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Assignees", email),
@@ -663,7 +845,7 @@ class TestAssessmentImport(TestCase):
     verifier = factories.PersonFactory(name=name, email=email)
     verifier_id = verifier.id
 
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Verifiers", email),
@@ -672,7 +854,7 @@ class TestAssessmentImport(TestCase):
         all_models.Assessment.slug == slug
     ).first()
     self._test_assigned_user(assessment, verifier_id, "Verifiers")
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Verifiers", ""),
@@ -711,9 +893,11 @@ class TestAssessmentImport(TestCase):
     }]
     before_update = self.export_parsed_csv(data)["Assessment"][0][field]
     with freezegun.freeze_time("2017-9-10"):
-      self.import_data(OrderedDict([("object_type", "Assessment"),
-                                    ("Code*", slug),
-                                    (field, value)]))
+      self.import_data(collections.OrderedDict([
+          ("object_type", "Assessment"),
+          ("Code*", slug),
+          (field, value)
+      ]))
     self.assertEqual(before_update,
                      self.export_parsed_csv(data)["Assessment"][0][field])
 
@@ -742,9 +926,13 @@ class TestAssessmentImport(TestCase):
     }]
     before_update = self.export_parsed_csv(data)["Assessment"][0][field]
     self.assertEqual(before_update, "modifier@email.com")
-    self.import_data(OrderedDict([("object_type", "Assessment"),
-                                  ("Code*", slug),
-                                  (field, value)]))
+    self.import_data(collections.OrderedDict(
+        [
+            ("object_type", "Assessment"),
+            ("Code*", slug),
+            (field, value)
+        ]
+    ))
     after_update = self.export_parsed_csv(data)["Assessment"][0][field]
     self.assertEqual(after_update, "user@example.com")
 
@@ -754,7 +942,7 @@ class TestAssessmentImport(TestCase):
       with freezegun.freeze_time("2017-01-01"):
         assessment = factories.AssessmentFactory(status="Deprecated")
 
-    resp = self.import_data(OrderedDict([
+    resp = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("code", assessment.slug),
         ("Last Deprecated Date", "02/02/2017"),
@@ -772,7 +960,7 @@ class TestAssessmentImport(TestCase):
     with factories.single_commit():
       assessment = factories.AssessmentFactory(status=start_state)
     resp = self.import_data(
-        OrderedDict([
+        collections.OrderedDict([
             ("object_type", "Assessment"),
             ("code", assessment.slug),
             ("State", all_models.Assessment.DEPRECATED),
@@ -796,7 +984,7 @@ class TestAssessmentImport(TestCase):
           attribute_type="Text",
           mandatory=True,
       )
-    data = OrderedDict([
+    data = collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
@@ -806,6 +994,37 @@ class TestAssessmentImport(TestCase):
     ])
     response = self.import_data(data)
     self._check_csv_response(response, {})
+
+  def test_import_complete_missing_answers_warnings(self):
+    """Test complete assessment with missing mandatory CAD comments."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title="CAD",
+          definition_type="assessment",
+          definition_id=asmnt.id,
+          attribute_type="Dropdown",
+          multi_choice_options="no,yes",
+          multi_choice_mandatory="0,1"
+      )
+    data = collections.OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+        ("CAD", "yes"),
+    ])
+    expected_response = {
+        "Assessment": {
+            "row_warnings": {
+                errors.NO_REQUIRED_ANSWERS_WARNING.format(line=3),
+            }
+        }
+    }
+    response = self.import_data(data)
+    self._check_csv_response(response, expected_response)
 
   def test_import_asmnt_rev_query_count(self):
     """Test only one revisions insert query should occur while importing."""
@@ -821,7 +1040,7 @@ class TestAssessmentImport(TestCase):
             attribute_type="Text",
             mandatory=True,
         )
-    data = OrderedDict([
+    data = collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", asmnt.slug),
         ("Audit", audit.slug),
@@ -842,7 +1061,7 @@ class TestAssessmentImport(TestCase):
     """Test that we able to set Verified Date if it is empty"""
     audit = factories.AuditFactory()
     assessment = factories.AssessmentFactory(audit=audit)
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
         ("Verifiers", "user@example.com"),
@@ -867,7 +1086,7 @@ class TestAssessmentImport(TestCase):
                     line=3,
                     column_name="Verified Date"
                 )}}}
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
         ("Verifiers", "user@example.com"),
@@ -894,7 +1113,7 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.DONE_STATE)
-    self.import_data(OrderedDict([
+    self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
         ("Verifiers", new_verifier),
@@ -931,7 +1150,7 @@ class TestAssessmentImport(TestCase):
       )
       assessment_id = assessment.id
     # update given assessment with empty GCA multiselect type
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assess_slug),
         ("multiselect_GCA", ""),
@@ -982,7 +1201,7 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.DONE_STATE)
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
         ("Verifiers", new_verifier),
@@ -1038,7 +1257,7 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(
         all_models.Assessment.query.get(assessment.id).status,
         all_models.Assessment.DONE_STATE)
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code", assessment.slug),
         ("Verifiers", "--"),
@@ -1070,7 +1289,9 @@ class TestAssessmentExport(TestCase):
 
   def test_simple_export(self):
     """ Test full assessment export with no warnings"""
-    self.import_file("assessment_full_no_warnings.csv")
+    assessment = factories.AssessmentFactory(title="Assessment 1")
+    assessment_slug = assessment.slug
+
     data = [{
         "object_name": "Assessment",
         "filters": {
@@ -1079,8 +1300,8 @@ class TestAssessmentExport(TestCase):
         "fields": "all",
     }]
     response = self.export_csv(data)
-    # check that Assessment 1 -> description utf8 exported properly
-    self.assertIn(u"\u5555", response.data.decode("utf8"))
+
+    self.assertIn(',{},'.format(assessment_slug), response.data)
 
   # pylint: disable=invalid-name
   def assertColumnExportedValue(self, value, instance, column):
@@ -1183,13 +1404,13 @@ class TestAssessmentExport(TestCase):
   # pylint: disable=invalid-name
   def test_export_assessments_with_filters_and_conflicting_ca_names(self):
     """Test exporting assessments with conflicting custom attribute names."""
-    self.import_file("assessment_template_no_warnings.csv")
-    self.import_file("assessment_with_templates.csv")
 
     # also create an object level custom attribute with a name that clashes
     # with a name of a "regular" attribute
+    assessment = factories.AssessmentFactory(title="No template Assessment 1")
+    assessment_slug = assessment.slug
     assessment = all_models.Assessment.query.filter(
-        all_models.Assessment.slug == u"A 2").first()
+        all_models.Assessment.slug == assessment_slug).first()
     cad = all_models.CustomAttributeDefinition(
         attribute_type=u"Text",
         title=u"ca title",
@@ -1207,7 +1428,7 @@ class TestAssessmentExport(TestCase):
                 "left": {
                     "left": "code",
                     "op": {"name": "~"},
-                    "right": "A 2"
+                    "right": "ASSESSMENT"
                 },
                 "op": {"name": "AND"},
                 "right": {
@@ -1226,7 +1447,7 @@ class TestAssessmentExport(TestCase):
     }]
 
     response = self.export_csv(data)
-    self.assertIn(u"No template Assessment 2", response.data)
+    self.assertIn(u"No template Assessment 1", response.data)
 
   @ddt.data(
       ("Last Updated By", "new_user@email.com"),
@@ -1270,7 +1491,7 @@ class TestAssessmentExport(TestCase):
   def test_asmt_status_and_verifier(self, date, status, verifiers, warning):
     """Test assessment status validation requiring verifier"""
     audit = factories.AuditFactory()
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", ""),
         ("Title", "Test title"),
@@ -1297,7 +1518,7 @@ class TestAssessmentExport(TestCase):
   def test_import_assessment_without_verifiers(self):
     """Test import with change status and remove verifiers"""
     asmt = factories.AssessmentFactory()
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", asmt.slug),
         ("State", "In Review"),
@@ -1321,7 +1542,7 @@ class TestAssessmentExport(TestCase):
       for _ in range(verifiers_num):
         user = factories.PersonFactory()
         asmt.add_person_with_role_name(user, "Verifiers")
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", asmt.slug),
         ("State", "In Review"),
@@ -1355,7 +1576,7 @@ class TestAssessmentExport(TestCase):
       )
       db.session.delete(assessment_template)
 
-    response = self.import_data(OrderedDict([
+    response = self.import_data(collections.OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", ""),
         ("Template", ""),

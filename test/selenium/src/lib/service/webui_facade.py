@@ -411,3 +411,24 @@ def export_objects(path_to_export_dir, obj_type, src_obj=None,
   widget = (ui_service.open_widget_of_mapped_objs(src_obj) if src_obj
             else ui_service.open_obj_dashboard_tab())
   return ui_service.exported_objs_via_tree_view(path_to_export_dir, widget)
+
+
+def soft_assert_techenv_mapped_to_programs(
+    programs_with_audit_and_techenv, selenium, soft_assert
+):
+  """Performs soft assertion that technology environment mapped to audit which
+   created in scope of child program is mapped to both child and parent
+    programs."""
+  technology_environment_service = (webui_service.
+                                    TechnologyEnvironmentService(selenium))
+  technology_environment = (programs_with_audit_and_techenv['techenv'].
+                            tree_item_representation())
+  for program in programs_with_audit_and_techenv['programs']:
+    technology_environment_service.open_info_page_of_obj(program)
+    mapped_technology_environments = (technology_environment_service.
+                                      get_list_objs_from_tree_view(
+                                          src_obj=program))
+    soft_assert.expect(
+        [technology_environment] == mapped_technology_environments,
+        '{} should be mapped to {}'.format(technology_environment.title,
+                                           program.title))
